@@ -37,7 +37,7 @@ public class MultimediaContentImpl<T extends MultimediaContentType> implements M
 
   /**
    * Creates a new multimedia content container.
-   * 
+   *
    * @param type
    *          the content type
    */
@@ -48,7 +48,7 @@ public class MultimediaContentImpl<T extends MultimediaContentType> implements M
 
   /**
    * Adds a content element to the collection.
-   * 
+   *
    * @param c
    *          the content to add
    */
@@ -62,7 +62,7 @@ public class MultimediaContentImpl<T extends MultimediaContentType> implements M
 
   /**
    * Removes the content element from the collection.
-   * 
+   *
    * @param c
    *          the content to remove
    */
@@ -72,7 +72,7 @@ public class MultimediaContentImpl<T extends MultimediaContentType> implements M
 
   /**
    * Removes the content element with the given identifier from the collection.
-   * 
+   *
    * @param id
    *          the content identifier
    */

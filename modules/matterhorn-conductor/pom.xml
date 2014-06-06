@@ -1,7 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.opencastproject</groupId>
   <artifactId>matterhorn-conductor</artifactId>
   <packaging>bundle</packaging>
   <name>matterhorn-conductor</name>
@@ -164,32 +162,31 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     <dependency>
-    	<groupId>org.gstreamer</groupId>
-    	<artifactId>gstreamer-java</artifactId>
-    	<version>1.4-no-tests-and-bin-launch</version>
+      <groupId>org.gstreamer</groupId>
+      <artifactId>gstreamer-java</artifactId>
+      <version>1.4-no-tests-and-bin-launch</version>
     </dependency>
     <dependency>
-    	<groupId>net.java.dev.jna</groupId>
-    	<artifactId>jna</artifactId>
-    	<version>3.2.4</version>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>3.2.4</version>
     </dependency>
     <dependency>
-	    <groupId>org.sakaiproject.nakamura</groupId>
-	    <artifactId>javax.activation-mail</artifactId>
-	    <version>1.1.1.1.4.2-1.4.2</version>
-	</dependency>
+      <groupId>org.sakaiproject.nakamura</groupId>
+      <artifactId>javax.activation-mail</artifactId>
+      <version>1.1.1.1.4.2-1.4.2</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.0.1</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-	    <Include-Resource>
+            <Include-Resource>
 	      {maven-resources},
 	      ui/operation/trim/common-data.tpl=../../shared-resources/templates/common-data.tpl,
 	      ui/operation/trim/additional-description.tpl=../../shared-resources/templates/additional-description.tpl
@@ -231,6 +228,7 @@
               OSGI-INF/operations/error-handler.xml,
               OSGI-INF/operations/error-resolution.xml,
               OSGI-INF/operations/failing.xml,
+              OSGI-INF/operations/http-notify.xml,
               OSGI-INF/operations/image.xml,
               OSGI-INF/operations/image-to-video.xml,
               OSGI-INF/operations/ingest.xml,

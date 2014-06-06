@@ -26,14 +26,14 @@ public interface JobProducer {
 
   /**
    * The type of jobs that this producer creates.
-   * 
+   *
    * @return the job type
    */
   String getJobType();
 
   /**
    * Get the number of jobs in a current status on all nodes.
-   * 
+   *
    * @return Number of jobs in this state
    * @throws ServiceRegistryException
    *           if an error occurs while communicating with the backing data source
@@ -43,7 +43,7 @@ public interface JobProducer {
   /**
    * Asks the job producer to handle the given job using the provided operation and list of arguments. The
    * implementation of this method <b>must</b> be asynchronous if the processing takes more than a few seconds.
-   * 
+   *
    * @param job
    *          the job being dispatched
    * @throws ServiceRegistryException
@@ -53,7 +53,7 @@ public interface JobProducer {
 
   /**
    * Whether new jobs can be accepted in general.
-   * 
+   *
    * @param operation
    *          operation
    * @throws ServiceRegistryException
@@ -64,7 +64,7 @@ public interface JobProducer {
 
   /**
    * Whether the job can be accepted.
-   * 
+   *
    * @param job
    *          the job being dispatched
    * @throws ServiceRegistryException

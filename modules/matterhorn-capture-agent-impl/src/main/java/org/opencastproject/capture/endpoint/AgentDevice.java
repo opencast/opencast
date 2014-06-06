@@ -52,7 +52,7 @@ public class AgentDevice {
 
   /**
    * Constructor.
-   * 
+   *
    * @param device
    *          friendly device name
    * @param type
@@ -66,7 +66,7 @@ public class AgentDevice {
 
   /**
    * Get device friendly name.
-   * 
+   *
    * @return device friendly name
    */
   public String getDevice() {
@@ -75,7 +75,7 @@ public class AgentDevice {
 
   /**
    * Get device capture type.
-   * 
+   *
    * @return device capture type ({@link org.opencastproject.capture.impl.CaptureAgent#CAPTURE_TYPE_AUDIO} or
    *         {@link org.opencastproject.capture.impl.CaptureAgent#CAPTURE_TYPE_VIDEO})
    */
@@ -85,7 +85,7 @@ public class AgentDevice {
 
   /**
    * Get {@link AgentDevice} as a {@link org.w3c.dom.Node} representation.
-   * 
+   *
    * @return XML {@link org.w3c.dom.Node} representation of the {@link AgentDevice}
    */
   public Node toXml(Document document) {

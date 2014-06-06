@@ -287,7 +287,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from OSGi to set the search service implementation.
-   * 
+   *
    * @param searchService
    *          the service implementation
    */
@@ -297,7 +297,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from OSGi to set the service registry implementation.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */

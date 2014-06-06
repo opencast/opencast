@@ -22,14 +22,14 @@ public interface MediaSegmentPreview {
 
   /**
    * Returns the url to the preview image.
-   * 
+   *
    * @return the url
    */
   String getUrl();
 
   /**
    * Returns the reference to the source track that was used to produce the segment.
-   * 
+   *
    * @return the reference to the source track
    */
   String getReference();

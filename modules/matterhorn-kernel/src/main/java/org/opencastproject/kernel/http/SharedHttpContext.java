@@ -55,7 +55,7 @@ public class SharedHttpContext implements HttpContext {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.http.HttpContext#getMimeType(java.lang.String)
    */
   @Override
@@ -65,7 +65,7 @@ public class SharedHttpContext implements HttpContext {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.http.HttpContext#getResource(java.lang.String)
    */
   @Override
@@ -75,7 +75,7 @@ public class SharedHttpContext implements HttpContext {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.http.HttpContext#handleSecurity(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */

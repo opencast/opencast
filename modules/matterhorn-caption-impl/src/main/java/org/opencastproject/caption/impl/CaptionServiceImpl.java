@@ -65,7 +65,7 @@ import javax.activation.FileTypeMap;
  * Implementation of {@link CaptionService}. Uses {@link ComponentContext} to get all registered
  * {@link CaptionConverter}s. Converters are searched based on <code>caption.format</code> property. If there is no
  * match for specified input or output format {@link UnsupportedCaptionFormatException} is thrown.
- * 
+ *
  */
 public class CaptionServiceImpl extends AbstractJobProducer implements CaptionService {
 
@@ -107,7 +107,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * Activate this service implementation via the OSGI service component runtime.
-   * 
+   *
    * @param componentContext
    *          the component context
    */
@@ -117,7 +117,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.CaptionService#convert(org.opencastproject.mediapackage.Catalog,
    *      java.lang.String, java.lang.String)
    */
@@ -142,7 +142,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.CaptionService#convert(org.opencastproject.mediapackage.Catalog,
    *      java.lang.String, java.lang.String, java.lang.String)
    */
@@ -169,7 +169,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * Converts the captions and returns them in a new catalog.
-   * 
+   *
    * @return the converted catalog
    */
   protected Catalog convert(Job job, Catalog input, String inputFormat, String outputFormat, String language)
@@ -240,9 +240,9 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.CaptionService#getLanguageList(org.opencastproject.mediapackage.MediaPackageElement,
    *      java.lang.String)
    */
@@ -314,7 +314,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    * {@link CaptionConverter} to be found, it has to have <code>caption.format</code> property set with
    * {@link CaptionConverter} format. If none is found, null is returned, if more than one is found then the first
    * reference is returned.
-   * 
+   *
    * @param formatName
    *          name of the caption format
    * @return {@link CaptionConverter} or null if none is found
@@ -339,7 +339,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * Imports captions using registered converter engine and specified language.
-   * 
+   *
    * @param input
    *          file containing captions
    * @param inputFormat
@@ -376,7 +376,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   /**
    * Exports captions {@link List} to specified format. Extension is added to exported file name. Throws
    * {@link UnsupportedCaptionFormatException} if format is not supported.
-   * 
+   *
    * @param captions
    *          {@link {@link List} to be exported
    * @param outputName
@@ -412,7 +412,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(Job)
    */
   @Override
@@ -465,7 +465,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -475,7 +475,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -485,7 +485,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -495,7 +495,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -505,7 +505,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override
@@ -515,7 +515,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -525,7 +525,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override

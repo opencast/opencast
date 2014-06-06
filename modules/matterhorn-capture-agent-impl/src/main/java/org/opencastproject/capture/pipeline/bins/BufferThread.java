@@ -32,7 +32,7 @@ public class BufferThread implements Runnable {
   /**
    * A Quick and dirty logging class. This will only be created when the logging level is set to TRACE. It's sole
    * purpose is to output the three limits on the buffer for each device
-   * 
+   *
    * @param newQueue
    *          The GStreamer Element queue that we will be logging.
    */

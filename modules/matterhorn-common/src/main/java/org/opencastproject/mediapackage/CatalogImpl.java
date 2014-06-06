@@ -48,7 +48,7 @@ public class CatalogImpl extends AbstractMediaPackageElement implements Catalog 
 
   /**
    * Creates an abstract metadata container.
-   * 
+   *
    * @param id
    *          the element identifier withing the package
    * @param flavor
@@ -69,7 +69,7 @@ public class CatalogImpl extends AbstractMediaPackageElement implements Catalog 
 
   /**
    * Creates an abstract metadata container.
-   * 
+   *
    * @param flavor
    *          the catalog flavor
    * @param uri
@@ -87,7 +87,7 @@ public class CatalogImpl extends AbstractMediaPackageElement implements Catalog 
 
   /**
    * Reads the metadata from the specified file and returns it encapsulated in a {@link Catalog} object.
-   * 
+   *
    * @param catalog
    *          the dublin core metadata container file
    * @return the dublin core object
@@ -98,7 +98,7 @@ public class CatalogImpl extends AbstractMediaPackageElement implements Catalog 
 
   /**
    * Reads the metadata from the specified file and returns it encapsulated in a {@link Catalog} object.
-   * 
+   *
    * @param uri
    *          the dublin core metadata container file
    * @return the dublin core object

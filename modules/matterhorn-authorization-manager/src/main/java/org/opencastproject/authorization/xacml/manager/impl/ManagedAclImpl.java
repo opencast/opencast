@@ -30,7 +30,7 @@ public final class ManagedAclImpl implements ManagedAcl {
 
   /**
    * Create a managed acl
-   * 
+   *
    * @param id
    *          an id
    * @param name

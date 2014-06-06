@@ -64,7 +64,7 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
 
   /**
    * Creates a new attachment plugin builder that will accept attachments with the given flavor.
-   * 
+   *
    * @param flavor
    *          the attachment flavor
    */
@@ -83,7 +83,7 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
 
   /**
    * This implementation of <code>accept</code> tests for the element type (attachment).
-   * 
+   *
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.opencastproject.mediapackage.MediaPackageElement.Type
    *      , org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
@@ -95,7 +95,7 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
 
   /**
    * This implementation of <code>accept</code> tests for the correct node type (attachment).
-   * 
+   *
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.w3c.dom.Node)
    */
   public boolean accept(Node elementNode) {
@@ -238,7 +238,7 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
 
   /**
    * Utility method that returns an attachment object from the given url.
-   * 
+   *
    * @param uri
    *          the element location
    * @return an attachment object
@@ -263,7 +263,7 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
   /**
    * Overwrite this method in order to return a specialization of the attachment. This implementation just returns the
    * attachment that is was given.
-   * 
+   *
    * @param attachment
    *          the general attachment representation
    * @return a specialized attachment

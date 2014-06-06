@@ -74,7 +74,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   /**
    * Adds a user provider.
-   * 
+   *
    * @param userProvider
    *          the user provider to add
    */
@@ -85,7 +85,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   /**
    * Remove a user provider.
-   * 
+   *
    * @param userProvider
    *          the user provider to remove
    */
@@ -96,7 +96,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   /**
    * Adds a role provider.
-   * 
+   *
    * @param roleProvider
    *          the role provider to add
    */
@@ -107,7 +107,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   /**
    * Remove a role provider.
-   * 
+   *
    * @param roleProvider
    *          the role provider to remove
    */
@@ -118,7 +118,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserDirectoryService#getUsers()
    */
   @Override
@@ -143,7 +143,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
    */
   @Override
@@ -165,7 +165,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserDirectoryService#loadUser(java.lang.String)
    */
   @Override
@@ -204,7 +204,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername(java.lang.String)
    */
   @Override
@@ -238,7 +238,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   /**
    * Merges two representations of a user, as returned by two different user providers. The set or roles from the
    * provided users will be merged into one set.
-   * 
+   *
    * @param user1
    *          the first user to merge
    * @param user2
@@ -260,7 +260,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   /**
    * Sets the security service
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */

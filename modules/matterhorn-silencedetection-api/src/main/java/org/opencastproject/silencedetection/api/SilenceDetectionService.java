@@ -31,7 +31,7 @@ public interface SilenceDetectionService {
 
   /**
    * Run silence detection on audio (visual) file.
-   * 
+   *
    * @param sourceTrack track to detect non silent segments from
    * @return Job detection job
    * @throws SilenceDetectionFailedException if fails
@@ -40,7 +40,7 @@ public interface SilenceDetectionService {
 
   /**
    * Run silence detection on audio (visual) file.
-   * 
+   *
    * @param sourceTrack track to detect non silent segments from
    * @param referenceTracks tracks to reference in smil file instead of sourceTrack
    * @return Job detection job

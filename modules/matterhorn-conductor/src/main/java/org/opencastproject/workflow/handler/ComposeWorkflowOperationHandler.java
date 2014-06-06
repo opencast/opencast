@@ -79,7 +79,7 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param composerService
    *          the local composer service
    */
@@ -90,7 +90,7 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -100,7 +100,7 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -110,7 +110,7 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -127,7 +127,7 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * Encode tracks from MediaPackage using profiles stored in properties and updates current MediaPackage.
-   * 
+   *
    * @param src
    *          The source media package
    * @param operation
@@ -333,7 +333,7 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
     /**
      * Returns the track.
-     * 
+     *
      * @return the track
      */
     public Track getTrack() {
@@ -342,7 +342,7 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
     /**
      * Returns the profile.
-     * 
+     *
      * @return the profile
      */
     public EncodingProfile getProfile() {

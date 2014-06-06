@@ -34,7 +34,7 @@ import java.text.ParseException;
 /**
  * The class to schedule the task of serializing the MediaPackage (this means: obtaining an XML representation) and
  * zipping it.
- * 
+ *
  */
 public class SerializeJob implements Job {
 
@@ -45,7 +45,7 @@ public class SerializeJob implements Job {
 
   /**
    * Generates a manifest file then zips everything up so it can be ingested. Also schedules a IngestJob. {@inheritDoc}
-   * 
+   *
    * @see org.quartz.Job#execute(JobExecutionContext)
    * @throws JobExecutionException
    */

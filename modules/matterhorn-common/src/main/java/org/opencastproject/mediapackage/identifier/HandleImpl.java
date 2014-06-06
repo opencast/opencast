@@ -42,7 +42,7 @@ public final class HandleImpl extends IdImpl implements Handle {
    * Creates a new handle from the given naming authority and local name. For example, if a handle were
    * <code>10.254/test</code>, then the naming authority would be <code>10.254</code> while the local name would be
    * <code>test</code>.
-   * 
+   *
    * @param namingAuthority
    *          the naming authority
    * @param localName
@@ -64,7 +64,7 @@ public final class HandleImpl extends IdImpl implements Handle {
   /**
    * Creates a new handle from the given naming authority and local name, pointing to the given url as the handle's
    * target.
-   * 
+   *
    * @param namingAuthority
    *          the naming authority
    * @param localName
@@ -83,7 +83,7 @@ public final class HandleImpl extends IdImpl implements Handle {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.identifier.Handle#getLocalName()
    */
   public String getLocalName() {
@@ -92,7 +92,7 @@ public final class HandleImpl extends IdImpl implements Handle {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.identifier.Handle#getNamingAuthority()
    */
   public String getNamingAuthority() {
@@ -101,7 +101,7 @@ public final class HandleImpl extends IdImpl implements Handle {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.identifier.Handle#getFullName()
    */
   public String getFullName() {
@@ -114,7 +114,7 @@ public final class HandleImpl extends IdImpl implements Handle {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.identifier.Handle#resolve()
    */
   public URL resolve() throws HandleException {
@@ -136,7 +136,7 @@ public final class HandleImpl extends IdImpl implements Handle {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -150,7 +150,7 @@ public final class HandleImpl extends IdImpl implements Handle {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -160,7 +160,7 @@ public final class HandleImpl extends IdImpl implements Handle {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -171,7 +171,7 @@ public final class HandleImpl extends IdImpl implements Handle {
   /**
    * Returns the formatted version of a handle consisting of the specified <code>namingAuthority</code> and
    * <code>localName</code>.
-   * 
+   *
    * @param namingAuthority
    *          the naming authority
    * @param localName
@@ -187,7 +187,7 @@ public final class HandleImpl extends IdImpl implements Handle {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.identifier.Id#compact()
    */
   public String compact() {

@@ -33,3 +33,4 @@ public interface GstreamerElements {
   String CUTTER = "cutter";
 
 }
+

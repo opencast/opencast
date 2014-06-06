@@ -31,7 +31,7 @@ sed -e 's/^minimum_yasm_minor_version=.*/minimum_yasm_minor_version=0/' \
 [ $? -ne 0 ] && exit 1
 cp $TMPFILE configure
 [ $? -ne 0 ] && exit 1
-./configure
+./configure --prefix=$LOCAL_PREFIX
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1

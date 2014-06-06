@@ -36,7 +36,7 @@ public class LatestFeedService extends AbstractFeedService implements FeedGenera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#loadFeedData(org.opencastproject.feed.api.Feed.Type,
    *      java.lang.String[], int, int)
    */
@@ -53,7 +53,7 @@ public class LatestFeedService extends AbstractFeedService implements FeedGenera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedService#initialize(java.util.Properties)
    */
   @Override

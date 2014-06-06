@@ -84,7 +84,7 @@ public class SearchMigrationService {
 
   /**
    * Callback for setting the search service.
-   * 
+   *
    * @param searchService
    *          the search service to set
    */
@@ -94,7 +94,7 @@ public class SearchMigrationService {
 
   /**
    * Callback for setting the search service database.
-   * 
+   *
    * @param searchServiceDatabase
    *          the search service database to set
    */
@@ -104,7 +104,7 @@ public class SearchMigrationService {
 
   /**
    * Callback for setting the authorization service.
-   * 
+   *
    * @param authorizationService
    *          the authorization service to set
    */
@@ -114,7 +114,7 @@ public class SearchMigrationService {
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the security service to set
    */
@@ -124,7 +124,7 @@ public class SearchMigrationService {
 
   /**
    * Callback for setting the workspace
-   * 
+   *
    * @param workspace
    *          the workspace to set
    */
@@ -250,11 +250,11 @@ public class SearchMigrationService {
 
   /**
    * Parse an old 1.3 mediapackage
-   * 
+   *
    * @param mediapackage
    *          the 1.3 mediapackage
    * @return the 1.4 mediapacakge
-   * 
+   *
    */
   @SuppressWarnings("unchecked")
   private MediaPackage parseOldMediaPackage(String mediapackage) throws MediaPackageException, IOException {

@@ -34,7 +34,7 @@ public class ContentImpl implements Content {
 
   /**
    * Creates a new content element with only the value set.
-   * 
+   *
    * @param value
    *          the content value
    */
@@ -44,7 +44,7 @@ public class ContentImpl implements Content {
 
   /**
    * Creates a new content element
-   * 
+   *
    * @param value
    *          the content value
    * @param type

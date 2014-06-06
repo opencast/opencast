@@ -233,18 +233,6 @@ jam5_x64_pkgs: jam-2.5-4.el5.x86_64.rpm
 jam6_x64_url: ${EPEL_MIRROR}/epel/6/x86_64 ${USASK_MIRROR} ${ETH_MIRROR}
 jam6_x64_pkgs: jam-2.5-10.el6.x86_64.rpm
 
-yasm5_x86_url: http://pkgs.repoforge.org/yasm ${USASK_MIRROR} ${ETH_MIRROR}
-yasm5_x86_pkgs: yasm-1.1.0-1.el5.rf.i386.rpm
-
-yasm6_x86_url: http://pkgs.repoforge.org/yasm ${USASK_MIRROR} ${ETH_MIRROR}
-yasm6_x86_pkgs: yasm-1.1.0-1.el6.rf.i686.rpm
-
-yasm5_x64_url: http://pkgs.repoforge.org/yasm ${USASK_MIRROR} ${ETH_MIRROR}
-yasm5_x64_pkgs: yasm-1.1.0-1.el5.rf.x86_64.rpm
-
-yasm6_x64_url: http://pkgs.repoforge.org/yasm ${USASK_MIRROR} ${ETH_MIRROR}
-yasm6_x64_pkgs: yasm-1.1.0-1.el6.rf.x86_64.rpm
-
 ImageMagick5_x86_url: ${CENTOS_MIRROR}/5/os/i386/CentOS ${USASK_MIRROR} ${ETH_MIRROR}
 ImageMagick5_x86_pkgs: ImageMagick-6.2.8.0-15.el5_8.i386.rpm
 

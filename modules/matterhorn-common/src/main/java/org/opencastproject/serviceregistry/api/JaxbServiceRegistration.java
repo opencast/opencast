@@ -82,7 +82,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * Creates a new JAXB annotated service registration based on an existing service registration
-   * 
+   *
    * @param serviceRegistration
    */
   public JaxbServiceRegistration(ServiceRegistration serviceRegistration) {
@@ -102,7 +102,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * Creates a new service registration which is online and not in maintenance mode.
-   * 
+   *
    * @param host
    *          the host
    * @param serviceId
@@ -117,7 +117,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * Creates a new service registration which is online and not in maintenance mode.
-   * 
+   *
    * @param host
    *          the host
    * @param serviceId
@@ -134,7 +134,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getHost()
    */
   @Override
@@ -152,7 +152,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getServiceType()
    */
   @Override
@@ -170,7 +170,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isInMaintenanceMode()
    */
   @Override
@@ -180,7 +180,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * Sets the maintenance status of this service registration
-   * 
+   *
    * @param maintenanceMode
    */
   public void setInMaintenanceMode(boolean maintenanceMode) {
@@ -189,7 +189,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isActive()
    */
   @Override
@@ -203,7 +203,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isOnline()
    */
   @Override
@@ -213,7 +213,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * Sets the online status of this service registration
-   * 
+   *
    * @param online
    */
   public void setOnline(boolean online) {
@@ -224,7 +224,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getPath()
    */
   @Override
@@ -242,7 +242,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isJobProducer()
    */
   @Override
@@ -252,7 +252,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * Sets whether this service registration is a job producer.
-   * 
+   *
    * @param jobProducer
    *          the jobProducer to set
    */
@@ -261,9 +261,9 @@ public class JaxbServiceRegistration implements ServiceRegistration {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getOnlineFrom()
    */
   @Override
@@ -273,7 +273,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * Sets the last time the service has been declared online
-   * 
+   *
    * @param onlineFrom
    *          the onlineFrom to set
    */
@@ -282,9 +282,9 @@ public class JaxbServiceRegistration implements ServiceRegistration {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getServiceState()
    */
   @Override
@@ -294,7 +294,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * Sets the current state of the service.
-   * 
+   *
    * @param state
    *          current state
    */
@@ -305,7 +305,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
   /**
    * Sets the current state of the service and the trigger Job. If the state is set to {@link ServiceState#WARNING} or
    * {@link ServiceState#ERROR} the triggered job will be set.
-   * 
+   *
    * @param state
    *          the service state
    * @param triggerJobSignature
@@ -324,7 +324,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getStateChanged()
    */
   @Override
@@ -334,7 +334,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * Sets the last date when the state was changed
-   * 
+   *
    * @param stateChanged
    *          last date
    */
@@ -344,7 +344,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getErrorStateTrigger()
    */
   @Override
@@ -354,7 +354,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * Sets the job which triggered the last error state
-   * 
+   *
    * @param job
    *          the job
    */
@@ -364,7 +364,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getWarningStateTrigger()
    */
   @Override
@@ -374,7 +374,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * Sets the job which triggered the last warning state
-   * 
+   *
    * @param job
    *          the job
    */
@@ -384,7 +384,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -394,7 +394,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -407,7 +407,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

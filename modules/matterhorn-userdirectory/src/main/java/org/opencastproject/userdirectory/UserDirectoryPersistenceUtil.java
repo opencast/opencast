@@ -39,7 +39,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Persist a set of roles
-   * 
+   *
    * @param roles
    *          the roles to persist
    * @param emf
@@ -80,7 +80,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Persist an organization
-   * 
+   *
    * @param organization
    *          the organization to persist
    * @param emf
@@ -113,7 +113,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns all groups from the persistence unit as a list
-   * 
+   *
    * @param organization
    *          the organization
    * @param limit
@@ -140,7 +140,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns all roles from the persistence unit as a list
-   * 
+   *
    * @param organization
    *          the organization
    * @param limit
@@ -167,7 +167,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns a list of roles by a search query if set or all roles if search query is <code>null</code>
-   * 
+   *
    * @param orgId
    *          the organization identifier
    * @param query
@@ -198,7 +198,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns all user groups from the persistence unit as a list
-   * 
+   *
    * @param userName
    *          the user name
    * @param emf
@@ -222,7 +222,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns the persisted organization by the given organization
-   * 
+   *
    * @param organization
    *          the organization
    * @param emf
@@ -246,7 +246,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns the persisted user by the user name and organization id
-   * 
+   *
    * @param userName
    *          the user name
    * @param organizationId
@@ -273,7 +273,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns a list of users by a search query if set or all users if search query is <code>null</code>
-   * 
+   *
    * @param orgId
    *          the organization identifier
    * @param query
@@ -304,7 +304,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns a list of users by a search query if set or all users if search query is <code>null</code>
-   * 
+   *
    * @param query
    *          the query to search
    * @param limit
@@ -331,7 +331,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns the persisted role by the name and organization id
-   * 
+   *
    * @param name
    *          the role name
    * @param organization
@@ -358,7 +358,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns the persisted group by the group id and organization id
-   * 
+   *
    * @param groupId
    *          the group id
    * @param orgId

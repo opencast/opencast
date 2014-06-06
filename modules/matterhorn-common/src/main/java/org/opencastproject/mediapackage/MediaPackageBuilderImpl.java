@@ -50,7 +50,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
 
   /**
    * Creates a new media package builder.
-   * 
+   *
    * @throws IllegalStateException
    *           if the temporary directory cannot be created or is not accessible
    */
@@ -60,7 +60,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
   /**
    * Creates a new media package builder that uses the given serializer to resolve urls while reading manifests and
    * adding new elements.
-   * 
+   *
    * @param serializer
    *          the media package serializer
    * @throws IllegalStateException
@@ -74,7 +74,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#createNew()
    */
   public MediaPackage createNew() throws MediaPackageException {
@@ -83,7 +83,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#createNew(org.opencastproject.mediapackage.identifier.Id)
    */
   public MediaPackage createNew(Id identifier) throws MediaPackageException {
@@ -92,7 +92,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#loadFromXml(java.io.InputStream)
    */
   public MediaPackage loadFromXml(InputStream is) throws MediaPackageException {
@@ -126,7 +126,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#loadFromXml(java.lang.String)
    */
   @Override

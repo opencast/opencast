@@ -173,9 +173,9 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
   }
 
   /**
-   * Run silence detection on the source track and returns 
-   * {@see org.opencastproject.silencedetection.api.MediaSegments}   
-   * XML as string. Source track should have an audio stream. All detected 
+   * Run silence detection on the source track and returns
+   * {@see org.opencastproject.silencedetection.api.MediaSegments}
+   * XML as string. Source track should have an audio stream. All detected
    * {@see org.opencastproject.silencedetection.api.MediaSegment}s
    * (one or more) are non silent sequences.
    *
@@ -199,7 +199,7 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
 
   /**
    * Create a smil from given parameters.
-   * 
+   *
    * @param segments media segment list with timestamps
    * @param referenceTracks tracks to put as media segment source files
    * @return generated smil

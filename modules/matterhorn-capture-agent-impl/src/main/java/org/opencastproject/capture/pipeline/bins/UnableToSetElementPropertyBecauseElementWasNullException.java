@@ -18,7 +18,7 @@ package org.opencastproject.capture.pipeline.bins;
 import org.gstreamer.Element;
 
 /**
- * When the properties of a gstreamer element fail to be set this exception is thrown. 
+ * When the properties of a gstreamer element fail to be set this exception is thrown.
  */
 public class UnableToSetElementPropertyBecauseElementWasNullException extends Exception {
   private String message;

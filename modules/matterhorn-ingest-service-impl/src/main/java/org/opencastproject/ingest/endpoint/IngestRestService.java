@@ -142,7 +142,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Returns the maximum number of concurrent ingest operations or <code>-1</code> if no limit is enforced.
-   * 
+   *
    * @return the maximum number of concurrent ingest operations
    * @see #isIngestLimitEnabled()
    */
@@ -152,7 +152,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the maximum number of concurrent ingest operations. Use <code>-1</code> to indicate no limit.
-   * 
+   *
    * @param ingestLimit
    *          the limit
    */
@@ -162,7 +162,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Returns <code>true</code> if a maximum number of concurrent ingest operations has been defined.
-   * 
+   *
    * @return <code>true</code> if there is a maximum number of concurrent ingests
    */
   protected synchronized boolean isIngestLimitEnabled() {
@@ -886,7 +886,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   /**
    * Creates an upload job and returns an HTML form ready for uploading the file to the newly created upload job.
    * Returns 500 if something goes wrong unexpectedly
-   * 
+   *
    * @return HTML form ready for uploading the file
    */
   @GET
@@ -962,7 +962,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    * Add an elements to a MediaPackage and keeps track of the progress of the upload. Returns an HTML that triggers the
    * host sites UploadListener.uploadComplete javascript event Returns an HTML that triggers the host sites
    * UploadListener.uplaodFailed javascript event in case of error
-   * 
+   *
    * @param jobId
    *          of the upload job
    * @param request
@@ -1050,7 +1050,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Builds a Response containing an HTML that calls the UploadListener.uploadFailed javascript handler.
-   * 
+   *
    * @return HTML that calls the UploadListener.uploadFailed js function
    */
   private Response buildUploadFailedRepsonse(UploadJob job) {
@@ -1071,7 +1071,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   /**
    * Adds a dublinCore metadata catalog to the MediaPackage and returns the grown mediaPackage. JQuery Ajax functions
    * doesn't support multipart/form-data encoding.
-   * 
+   *
    * @param mp
    *          MediaPackage
    * @param dc
@@ -1119,9 +1119,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   /**
    * Returns information about the progress of a file upload as a JSON string. Returns 404 if upload job id doesn't
    * exists Returns 500 if something goes wrong unexpectedly
-   * 
+   *
    * TODO cache UploadJobs because endpoint is asked periodically so that not each request yields a DB query operation
-   * 
+   *
    * @param jobId
    * @return progress JSON string
    */
@@ -1160,7 +1160,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGi Declarative Services callback to set the reference to the ingest service.
-   * 
+   *
    * @param ingestService
    *          the ingest service
    */
@@ -1170,7 +1170,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGi Declarative Services callback to set the reference to the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -1180,7 +1180,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGi Declarative Services callback to set the reference to the dublin core service.
-   * 
+   *
    * @param dcService
    *          the dublin core service
    */
@@ -1190,7 +1190,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGi Declarative Services callback to set the reference to the persistence provider.
-   * 
+   *
    * @param persistenceProvider
    *          the persistence provider
    */
@@ -1200,7 +1200,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGi Declarative Services callback to set the reference to the persistence properties.
-   * 
+   *
    * @param persistenceProperties
    *          the persistence properties
    */

@@ -40,7 +40,7 @@ public class AttachmentTest {
 
   /**
    * Creates everything that is needed to test a media package.
-   * 
+   *
    * @throws java.lang.Exception
    */
   @Before

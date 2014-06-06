@@ -48,7 +48,7 @@ public class AggregationFeedService extends AbstractFeedService implements FeedG
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.api.FeedGenerator#accept(java.lang.String[])
    */
   public boolean accept(String[] query) {
@@ -61,7 +61,7 @@ public class AggregationFeedService extends AbstractFeedService implements FeedG
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#loadFeedData(org.opencastproject.feed.api.Feed.Type,
    *      java.lang.String[], int, int)
    */
@@ -78,7 +78,7 @@ public class AggregationFeedService extends AbstractFeedService implements FeedG
 
   /**
    * Sets the series that are to be aggregated when creating the feed.
-   * 
+   *
    * @param series
    *          the series identifier
    */
@@ -101,7 +101,7 @@ public class AggregationFeedService extends AbstractFeedService implements FeedG
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedService#initialize(java.util.Properties)
    */
   @Override

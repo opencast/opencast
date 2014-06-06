@@ -112,7 +112,7 @@ public class CLIWorkflowOperationHandlerTest {
 
   /**
    * Tests the xpath replacement in the CLI handler
-   * 
+   *
    * @throws Exception
    */
 

@@ -316,7 +316,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
   /**
    * Since the index is populated from persistent storage where media package element URIs have been transformed to
    * location independend URNs these have to be rewritten to point to actual locations.
-   * 
+   *
    * @param uriRewriter
    *          facility used to point mediapackage element URIs to the episode service
    * @param waitForRestService
@@ -363,7 +363,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
   /**
    * Since the index is populated from persistent storage where media package element URIs have been transformed to
    * location independend URNs these have to be rewritten to point to actual locations.
-   * 
+   *
    * @param uriRewriter
    *          facility used to point mediapackage element URIs to the episode service
    * @param waitForRestService
@@ -409,7 +409,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
   /**
    * Since the index is populated from persistent storage where media package element URIs have been transformed to
    * location independend URNs these have to be rewritten to point to actual locations.
-   * 
+   *
    * @param uriRewriter
    *          facility used to point mediapackage element URIs to the episode service
    */
@@ -554,7 +554,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
   /**
    * Create a unique id for the manifest xml. This is to avoid an id collision in the rare case that the mediapackage
    * contains an XML element with the id used for the manifest. A UUID could also be used but this is far less readable.
-   * 
+   *
    * @param seedId
    *          the id to start with
    */
@@ -603,7 +603,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
 
   /**
    * Interpret the payload of a completed Job as a MediaPackageElement. Wait for the job to complete if necessary.
-   * 
+   *
    * @throws MediaPackageException
    *           in case the payload is not a mediapackage element
    */
@@ -632,7 +632,7 @@ public final class EpisodeServiceImpl implements EpisodeService {
 
   /**
    * Clears the complete solr index.
-   * 
+   *
    * @throws EpisodeServiceException
    *           if clearing the index fails
    */

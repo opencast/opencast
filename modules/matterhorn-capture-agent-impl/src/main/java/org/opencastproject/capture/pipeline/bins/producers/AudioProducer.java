@@ -50,15 +50,15 @@ public abstract class AudioProducer extends ProducerBin {
   /**
    * Super class for all audio Producers whether they are test, pulse, alsa or other. To create a descendant to create a
    * new audio Producer:
-   * 
+   *
    * 1. Override createElements to add any new Elements you might need, setElementProperties to set any specific
    * properties on the newly created Elements, addElementsToBin to add these new Elements to the Bin and finally
    * linkElements to link your new Elements together and possibly to the queue and audio converter.
-   * 
+   *
    * 2. If you are using audioconverter as the last Element in your Bin leave it as the getSrcPad target. If you have a
    * new Element as the last one in your Bin (that will act as the source for the Consumers) please return it's src pads
    * as the ones to ghost so that it can be connected to the Consumers.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If setProperties is called before createElements this Exception is thrown because all of the Elements
    *           will be null.
@@ -83,7 +83,7 @@ public abstract class AudioProducer extends ProducerBin {
 
   /**
    * Create all the common element for audio sources an audio converter and a volume control.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the necessary module to create an audioconverter isn't present then this Exception is thrown.
    **/

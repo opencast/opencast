@@ -43,7 +43,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
   static class DateAdapter extends XmlAdapter<Long, Date> {
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see javax.xml.bind.annotation.adapters.XmlAdapter#marshal(java.lang.Object)
      */
     @Override
@@ -53,7 +53,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see javax.xml.bind.annotation.adapters.XmlAdapter#unmarshal(java.lang.Object)
      */
     @Override
@@ -143,7 +143,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * Builds a new workflow operation instance based on another workflow operation.
-   * 
+   *
    * @param def
    *          the workflow definition
    * @param position
@@ -185,7 +185,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * Constructs a new operation instance with the given id and initial state.
-   * 
+   *
    * @param id
    *          the operation id
    * @param state
@@ -199,7 +199,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getId()
    */
   @Override
@@ -209,7 +209,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * Sets the job identifier
-   * 
+   *
    * @param jobId
    *          the job identifier
    */
@@ -219,7 +219,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getTemplate()
    */
   @Override
@@ -229,7 +229,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * Sets the template
-   * 
+   *
    * @param template
    *          the template
    */
@@ -273,7 +273,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getState()
    */
   @Override
@@ -303,7 +303,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getConfiguration(java.lang.String)
    */
   public String getConfiguration(String key) {
@@ -318,7 +318,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#removeConfiguration(java.lang.String)
    */
   public void removeConfiguration(String key) {
@@ -335,7 +335,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#setConfiguration(java.lang.String, java.lang.String)
    */
   public void setConfiguration(String key, String value) {
@@ -356,7 +356,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getConfigurationKeys()
    */
   @Override
@@ -394,7 +394,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * Returns the title for the link to this operations hold state UI, a default String if no title is set.
-   * 
+   *
    * @return title to be displayed
    */
   public String getHoldActionTitle() {
@@ -403,7 +403,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getExceptionHandlingWorkflow()
    */
   @Override
@@ -413,7 +413,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#isFailWorkflowOnException()
    */
   @Override
@@ -469,7 +469,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getTimeInQueue()
    */
   @Override
@@ -487,7 +487,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getPosition()
    */
   @Override
@@ -497,7 +497,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * Sets the workflow operation's position within the workflow.
-   * 
+   *
    * @param position
    *          the position
    */
@@ -507,7 +507,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -517,7 +517,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -534,7 +534,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -544,7 +544,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#isAbortable()
    */
   public Boolean isAbortable() {
@@ -553,7 +553,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * Defines whether this operation instance should be abortable from a hold state.
-   * 
+   *
    * @param abortable
    *          <code>true</code> to allow the user to cancel the operation
    */
@@ -563,7 +563,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#isContinuable()
    */
   public Boolean isContinuable() {
@@ -573,7 +573,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
   /**
    * Defines whether this operation instance should be continuable from a hold state or whether it is resumed
    * automatically.
-   * 
+   *
    * @param continuable
    *          <code>true</code> to allow the user to resume the operation
    */
@@ -583,7 +583,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getFailedAttempts()
    */
   @Override
@@ -601,7 +601,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getRetryStrategy()
    */
   @Override
@@ -619,7 +619,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getExecutionHost()
    */
   @Override
@@ -629,7 +629,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#setExecutionHost(java.lang.String)
    */
   @Override
@@ -639,7 +639,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getExecutionHistory()
    */
   @Override
@@ -649,7 +649,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#addToExecutionHistory(long)
    */
   @Override
@@ -659,7 +659,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getMaxAttempts()
    */
   @Override

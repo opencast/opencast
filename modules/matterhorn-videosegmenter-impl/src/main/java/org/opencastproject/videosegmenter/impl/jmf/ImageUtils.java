@@ -39,7 +39,7 @@ public final class ImageUtils {
   /**
    * Convers the frame buffer to a <code>BufferedImage</code>. This method returns <code>null</code> if the buffer
    * couldn't be created
-   * 
+   *
    * @param buf
    *          the buffer
    * @return a <code>BufferedImage</code>
@@ -52,7 +52,7 @@ public final class ImageUtils {
 
   /**
    * Writes the image to disk.
-   * 
+   *
    * @param image
    *          the image
    */

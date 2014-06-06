@@ -51,7 +51,7 @@ public class DownloadDVDWorkflowOperationHandler extends ResumableWorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -68,7 +68,7 @@ public class DownloadDVDWorkflowOperationHandler extends ResumableWorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
@@ -79,7 +79,7 @@ public class DownloadDVDWorkflowOperationHandler extends ResumableWorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext, java.util.Map)
    */

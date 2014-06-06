@@ -115,7 +115,7 @@ public interface MediaPackageElements {
 
   /**
    * XACML policy flavor.
-   * 
+   *
    * @deprecated use {@link #XACML_POLICY_SERIES} instead.
    */
   MediaPackageElementFlavor XACML_POLICY = new MediaPackageElementFlavor("security", "xacml",

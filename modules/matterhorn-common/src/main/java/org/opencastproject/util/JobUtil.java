@@ -84,7 +84,7 @@ public final class JobUtil {
 
   /**
    * Returns <code>true</code> if the job is ready to be dispatched.
-   * 
+   *
    * @param job
    *          the job
    * @return <code>true</code> whether the job is ready to be dispatched
@@ -196,7 +196,7 @@ public final class JobUtil {
   /**
    * Interpret the payload of a completed {@link Job} as a {@link MediaPackageElement}. Wait for the job to complete if
    * necessary.
-   * 
+   *
    * @throws MediaPackageException
    *           in case the payload is not a mediapackage element
    */

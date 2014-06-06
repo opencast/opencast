@@ -67,7 +67,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   /**
    * Creates a new track object.
-   * 
+   *
    * @param flavor
    *          the track flavor
    * @param uri
@@ -83,7 +83,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   /**
    * Creates a new track object for the given file and track type.
-   * 
+   *
    * @param flavor
    *          the track flavor
    * @param uri
@@ -95,7 +95,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   /**
    * Creates a new track from the given url.
-   * 
+   *
    * @param uri
    *          the track location
    * @return the track
@@ -106,7 +106,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   /**
    * Sets the track's duration in milliseconds.
-   * 
+   *
    * @param duration
    *          the duration
    */
@@ -147,7 +147,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.Track#hasAudio()
    */
   @Override
@@ -157,7 +157,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.Track#hasVideo()
    */
   @Override
@@ -205,7 +205,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   /**
    * This implementation returns the track's mime type.
-   * 
+   *
    * @see org.opencastproject.mediapackage.Track#getDescription()
    */
   public String getDescription() {
