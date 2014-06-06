@@ -22,7 +22,7 @@ import org.opencastproject.util.NotFoundException;
 
 /**
  * An interactive shell command for putting Maintainable services in and out of maintenance mode
- * 
+ *
  */
 public class MaintenanceCommand {
   protected ServiceRegistry serviceRegistry;

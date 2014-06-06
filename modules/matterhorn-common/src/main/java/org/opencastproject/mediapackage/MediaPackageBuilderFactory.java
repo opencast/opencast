@@ -53,7 +53,7 @@ public final class MediaPackageBuilderFactory {
 
   /**
    * Returns an instance of a MediaPackageBuilderFactory.
-   * 
+   *
    * @return the media package builder factory
    * @throws ConfigurationException
    *           if the factory cannot be instantiated
@@ -71,7 +71,7 @@ public final class MediaPackageBuilderFactory {
    * <li>Implementation specified using the <code>org.opencastproject.mediapackage.builder</code> system property</li>
    * <li>Platform default implementation</li>
    * </ul>
-   * 
+   *
    * @return the media package builder
    * @throws ConfigurationException
    *           If the builder cannot be instantiated

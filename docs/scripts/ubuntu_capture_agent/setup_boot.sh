@@ -11,7 +11,7 @@ if [[ ! $INSTALL_RUN ]]; then
 fi
 
 # Copy startup script to the init directory
-cp $FELIX_HOME/docs/scripts/init/matterhorn_init_d.sh $STARTUP_SCRIPT
+cp $FELIX_HOME/docs/scripts/init/old/etc-init.d-matterhorn $STARTUP_SCRIPT
 
 # Set up the init script variables
 sed -i "s#^MATTERHORN=.*\$#MATTERHORN=$OC_DIR#g" $STARTUP_SCRIPT

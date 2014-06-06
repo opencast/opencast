@@ -30,7 +30,7 @@ public class GStreamerFactory implements EncoderEngineFactory {
 
   /**
    * Activates factory and initializes GStreamer.
-   * 
+   *
    * @param cc
    */
   public void activate(ComponentContext cc) {
@@ -41,7 +41,7 @@ public class GStreamerFactory implements EncoderEngineFactory {
    * Deactivates and deinitializes GStreamer. NOTE: It seems that deinitialization is done asynchronously and is not
    * necessary completed by the time deinit returns. Calling init right after deinit can lead to unexpected behavior or
    * even seg fault of gstreamer.
-   * 
+   *
    * @param cc
    */
   public void deactivate(ComponentContext cc) {
@@ -50,7 +50,7 @@ public class GStreamerFactory implements EncoderEngineFactory {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.composer.api.EncoderEngineFactory#newEncoderEngine(org.opencastproject.composer.api.EncodingProfile
    * )

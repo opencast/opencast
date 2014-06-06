@@ -67,7 +67,7 @@ public final class JpaRole implements Role {
 
   /**
    * Constructs a role with the specified name and organization.
-   * 
+   *
    * @param name
    *          the name
    * @param organization
@@ -81,7 +81,7 @@ public final class JpaRole implements Role {
 
   /**
    * Constructs a role with the specified name, organization and description.
-   * 
+   *
    * @param name
    *          the name
    * @param organization
@@ -96,7 +96,7 @@ public final class JpaRole implements Role {
 
   /**
    * Gets the identifier.
-   * 
+   *
    * @return the identifier
    */
   public Long getId() {
@@ -105,7 +105,7 @@ public final class JpaRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.Role#getName()
    */
   @Override
@@ -115,7 +115,7 @@ public final class JpaRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.Role#getDescription()
    */
   @Override
@@ -125,7 +125,7 @@ public final class JpaRole implements Role {
 
   /**
    * Sets the description
-   * 
+   *
    * @param description
    *          the description
    */
@@ -135,7 +135,7 @@ public final class JpaRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.Role#getOrganization()
    */
   @Override
@@ -145,7 +145,7 @@ public final class JpaRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -155,7 +155,7 @@ public final class JpaRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -168,7 +168,7 @@ public final class JpaRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

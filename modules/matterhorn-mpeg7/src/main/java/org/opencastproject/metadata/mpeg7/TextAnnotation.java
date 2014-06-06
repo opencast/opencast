@@ -22,7 +22,7 @@ import java.util.Iterator;
 
 /**
  * Base interface for text annotations with relevance and confidence values.
- * 
+ *
  * <pre>
  * &lt;complexType name=&quot;TextAnnotationType&quot;&gt;
  *   &lt;choice minOccurs=&quot;1&quot; maxOccurs=&quot;unbounded&quot;&gt;
@@ -36,14 +36,14 @@ import java.util.Iterator;
  *   &lt;attribute ref=&quot;xml:lang&quot;/&gt;
  * &lt;/complexType&gt;
  * </pre>
- * 
+ *
  * TODO: How to encode source and version? Maybe use MediaInformation in VideoSegment
  */
 public interface TextAnnotation extends XmlElement {
 
   /**
    * Returns the relevance of this annotation.
-   * 
+   *
    * @return the relevance value
    */
   float getRelevance();
@@ -51,24 +51,24 @@ public interface TextAnnotation extends XmlElement {
   /**
    * Returns the confidence of the validity of this annotation. The value will be in the range of <code>0.0</code> and
    * <code>1.0</code>.
-   * 
+   *
    * The confidence may vary with the technique that was used to create the annotation. For example, extracting a word
    * using optical character recognition usually has a better confidence value than speech recognition.
-   * 
+   *
    * @return the confidence value
    */
   float getConfidence();
 
   /**
    * Returns the language of this annotation in ISO represenatation, e. g. <code>en</code> for annotations in English.
-   * 
+   *
    * @return the language
    */
   String getLanguage();
 
   /**
    * Adds a new keyword annotation.
-   * 
+   *
    * @param keywordAnnotation
    *          the annotation
    */
@@ -76,7 +76,7 @@ public interface TextAnnotation extends XmlElement {
 
   /**
    * Adds a free text annotation.
-   * 
+   *
    * @param freeTextAnnotation
    *          the annotation
    */
@@ -84,14 +84,14 @@ public interface TextAnnotation extends XmlElement {
 
   /**
    * Returns an iteration of the keyword annotations.
-   * 
+   *
    * @return the keyword annotations
    */
   Iterator<KeywordAnnotation> keywordAnnotations();
 
   /**
    * Returns an iteration of the free text annotations.
-   * 
+   *
    * @return the free text annotations
    */
   Iterator<FreeTextAnnotation> freeTextAnnotations();

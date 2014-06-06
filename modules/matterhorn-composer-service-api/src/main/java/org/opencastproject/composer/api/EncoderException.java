@@ -32,7 +32,7 @@ public class EncoderException extends Exception {
 
   /**
    * Creates a new encoder exception with the given error message.
-   * 
+   *
    * @param message
    *          the error message
    */
@@ -42,7 +42,7 @@ public class EncoderException extends Exception {
 
   /**
    * Creates a new encoder exception with the given error message, caused by the given exception.
-   * 
+   *
    * @param message
    *          the error message
    * @param cause
@@ -54,7 +54,7 @@ public class EncoderException extends Exception {
 
   /**
    * Creates a new encoder exception, caused by the given exception.
-   * 
+   *
    * @param cause
    *          the error cause
    */
@@ -99,7 +99,7 @@ public class EncoderException extends Exception {
 
   /**
    * Returns the compression engine that threw the exception.
-   * 
+   *
    * @return the engine
    */
   public EncoderEngine getEngine() {
@@ -109,7 +109,7 @@ public class EncoderException extends Exception {
   /**
    * Returns the exit code of the process if it was not 0. If the exception wasn't caused by an exit code unequal to 0,
    * -1 is returned.
-   * 
+   *
    * @return the exit code
    */
   public int getExitCode() {

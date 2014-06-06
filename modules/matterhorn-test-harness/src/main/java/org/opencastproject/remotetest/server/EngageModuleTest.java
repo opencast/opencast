@@ -42,16 +42,16 @@ import javax.xml.xpath.XPathFactory;
 
 /**
  * Tests the functionality of the Engage module Tests if all media player components are available
- * 
+ *
  * This needs to be improved by String[] EngageGFXuri = { "/engage-hybrid-player/icons/cc_off.png",
  * "/engage-hybrid-player/icons/cc_on.png", .... }
- * 
+ *
  * String[] EngageJSuri = { ... }
- * 
+ *
  * to remove many Testcases
- * 
+ *
  * The DefaultHttpClient needs to be threadsafe - included in org.apache.httpcomponents version 4-1alpha
- * 
+ *
  */
 public class EngageModuleTest {
   TrustedHttpClient client;
@@ -69,7 +69,7 @@ public class EngageModuleTest {
     domFactory = DocumentBuilderFactory.newInstance();
     domFactory.setNamespaceAware(false); // don't forget this!
   }
-  
+
   @After
   public void tearDown() throws Exception {
     Main.returnClient(client);

@@ -42,7 +42,7 @@ import java.util.Map;
 /**
  * This service provides {@link org.opencastproject.metadata.api.StaticMetadata} for a given mediapackage, based on the
  * information in the media package itself.
- * 
+ *
  * todo unit tests will follow
  */
 public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataService {
@@ -75,7 +75,7 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.MetadataService#getMetadata(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
@@ -181,7 +181,7 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.MetadataService#getPriority()
    */
   @Override

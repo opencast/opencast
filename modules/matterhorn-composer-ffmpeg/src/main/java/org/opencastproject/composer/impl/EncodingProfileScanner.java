@@ -75,7 +75,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * Returns the list of profiles.
-   * 
+   *
    * @return the profile definitions
    */
   public Map<String, EncodingProfile> getProfiles() {
@@ -84,7 +84,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * OSGi callback on component activation.
-   * 
+   *
    * @param ctx
    *          the bundle context
    */
@@ -94,7 +94,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * Returns the encoding profile for the given identifier or <code>null</code> if no such profile has been configured.
-   * 
+   *
    * @param id
    *          the profile identifier
    * @return the profile
@@ -105,7 +105,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * Returns the list of profiles that are applicable for the given track type.
-   * 
+   *
    * @return the profile definitions
    */
   public Map<String, EncodingProfile> getApplicableProfiles(MediaType type) {
@@ -121,7 +121,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * Reads the profiles from the given set of properties.
-   * 
+   *
    * @param artifact
    *          the properties file
    * @return the profiles found in the properties
@@ -165,7 +165,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * Reads the profile from the given properties
-   * 
+   *
    * @param profile
    * @param properties
    * @param artifact
@@ -236,7 +236,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * Returns the default property and registers the property key in the list.
-   * 
+   *
    * @param profile
    *          the profile identifier
    * @param keySuffix
@@ -259,7 +259,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactListener#canHandle(java.io.File)
    */
   @Override
@@ -269,7 +269,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   @Override
@@ -307,7 +307,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#uninstall(java.io.File)
    */
   @Override
@@ -323,7 +323,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#update(java.io.File)
    */
   @Override

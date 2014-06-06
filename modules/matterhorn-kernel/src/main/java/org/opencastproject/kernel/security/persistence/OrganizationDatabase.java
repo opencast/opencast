@@ -27,7 +27,7 @@ public interface OrganizationDatabase {
 
   /**
    * Returns all organizations in persistent storage.
-   * 
+   *
    * @return the list of stored organizations
    * @throws OrganizationDatabaseException
    *           if there is a problem communicating with the underlying data store
@@ -36,7 +36,7 @@ public interface OrganizationDatabase {
 
   /**
    * Counts all organizations in persistent storage
-   * 
+   *
    * @return the number of organizations
    * @throws OrganizationDatabaseException
    *           if there is a problem communicating with the underlying data store
@@ -45,7 +45,7 @@ public interface OrganizationDatabase {
 
   /**
    * Gets a single organization by its identifier.
-   * 
+   *
    * @param orgId
    *          the organization's identifier
    * @return the organization
@@ -58,7 +58,7 @@ public interface OrganizationDatabase {
 
   /**
    * Gets a single organization by host and port.
-   * 
+   *
    * @param host
    *          the organization's host
    * @param port
@@ -73,7 +73,7 @@ public interface OrganizationDatabase {
 
   /**
    * Removes an organization from persistent storage.
-   * 
+   *
    * @param orgId
    *          ID of the organization to be removed
    * @throws OrganizationDatabaseException
@@ -85,7 +85,7 @@ public interface OrganizationDatabase {
 
   /**
    * Stores (or updates) an organization.
-   * 
+   *
    * @param organization
    *          the organization to store
    * @throws OrganizationDatabaseException
@@ -95,7 +95,7 @@ public interface OrganizationDatabase {
 
   /**
    * Returns <code>true</code> if the given organization by its identifier is found or <code>false</code> if not
-   * 
+   *
    * @param orgId
    *          the organization's identifier
    * @return <code>true</code> if found or <code>false</code> if not

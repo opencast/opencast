@@ -35,9 +35,9 @@ public interface Mpeg7Catalog extends Mpeg7, MetadataCatalog, Cloneable {
 
   /**
    * Saves the catalog to disk.
-   * 
+   *
    * todo think about hiding technical exceptions
-   * 
+   *
    * @throws ParserConfigurationException
    *           if the xml parser environment is not correctly configured
    * @throws TransformerException

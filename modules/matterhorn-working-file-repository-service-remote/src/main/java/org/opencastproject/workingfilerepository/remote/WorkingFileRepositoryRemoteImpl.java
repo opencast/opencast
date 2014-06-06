@@ -58,7 +58,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#copyTo(java.lang.String, java.lang.String,
    *      java.lang.String, java.lang.String, java.lang.String)
    */
@@ -91,7 +91,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#moveTo(java.lang.String, java.lang.String,
    *      java.lang.String, java.lang.String, java.lang.String)
    */
@@ -124,7 +124,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#delete(java.lang.String, java.lang.String)
    */
   @Override
@@ -145,7 +145,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#get(java.lang.String, java.lang.String)
    */
   @Override
@@ -171,7 +171,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getCollectionContents(java.lang.String)
    */
   @Override
@@ -205,7 +205,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getCollectionSize(java.lang.String)
    */
   @Override
@@ -215,7 +215,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getDiskSpace()
    */
   @Override
@@ -242,7 +242,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getFromCollection(java.lang.String,
    *      java.lang.String)
    */
@@ -268,7 +268,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getTotalSpace()
    */
   @Override
@@ -278,7 +278,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getCollectionURI(java.lang.String,
    *      java.lang.String)
    */
@@ -301,7 +301,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getURI(java.lang.String, java.lang.String)
    */
   @Override
@@ -311,7 +311,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getURI(java.lang.String, java.lang.String,
    *      java.lang.String)
    */
@@ -336,7 +336,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsableSpace()
    */
   @Override
@@ -346,7 +346,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsedSpace()
    */
   @Override
@@ -356,7 +356,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#put(java.lang.String, java.lang.String,
    *      java.lang.String, java.io.InputStream)
    */
@@ -384,7 +384,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#putInCollection(java.lang.String,
    *      java.lang.String, java.io.InputStream)
    */
@@ -412,7 +412,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#deleteFromCollection(java.lang.String,
    *      java.lang.String)
    */
@@ -432,7 +432,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getBaseUri()
    */
   @Override

@@ -25,7 +25,7 @@ import java.util.Vector;
 
 /**
  * This is the document model class which is the basis for all doc data models
- * 
+ *
  * @see DocRestData if you want to create rest endpoint docs
  */
 public class DocData {
@@ -40,7 +40,7 @@ public class DocData {
 
   /**
    * Create a new DocData object
-   * 
+   *
    * @param name
    *          the name of the document (must be alphanumeric (includes _) and no spaces or special chars)
    * @param title
@@ -89,7 +89,7 @@ public class DocData {
 
   /**
    * Add a note to the document
-   * 
+   *
    * @param note
    *          the text of the note
    */

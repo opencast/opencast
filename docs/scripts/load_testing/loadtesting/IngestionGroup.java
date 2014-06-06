@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 public class IngestionGroup {
 	LinkedList<IngestJob> ingestJobs = new LinkedList<IngestJob>();
-	
+
 	public IngestionGroup(long numberOfIngests, long delayToIngest){
 		IngestJob newJob;
 		SecureRandom random = new SecureRandom();
@@ -15,7 +15,7 @@ public class IngestionGroup {
 		for(long i = 0; i < numberOfIngests; i++){
 			newJob = new IngestJob(new BigInteger(130, random).toString(32), delayToIngest);
 			Logger.print("Creating job " + newJob);
-			ingestJobs.add(newJob);	
+			ingestJobs.add(newJob);
 			thread = new Thread(newJob);
 			thread.start();
 		}

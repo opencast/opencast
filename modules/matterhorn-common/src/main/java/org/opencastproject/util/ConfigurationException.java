@@ -26,7 +26,7 @@ public class ConfigurationException extends RuntimeException {
 
   /**
    * Creates a new configuration exception.
-   * 
+   *
    * @param message
    *          the exception message
    */
@@ -36,7 +36,7 @@ public class ConfigurationException extends RuntimeException {
 
   /**
    * Creates a new configuration exception with the given message and cause of the malconfiguration.
-   * 
+   *
    * @param message
    *          the message
    * @param cause

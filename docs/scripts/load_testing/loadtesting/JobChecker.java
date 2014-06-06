@@ -6,11 +6,11 @@ import java.util.LinkedList;
 
 public class JobChecker implements Runnable {
 	LinkedList<IngestJob> ingestJobs = new LinkedList<IngestJob>();
-	
+
 	public JobChecker(LinkedList<IngestJob> ingestJobs){
 		this.ingestJobs = ingestJobs;
 	}
-	
+
 	private void checkJob(String id) {
 		String curlCommand = "/usr/bin/curl";
 		curlCommand += " --get";
@@ -20,7 +20,7 @@ public class JobChecker implements Runnable {
 		curlCommand += " --header" + " \"X-Requested-Auth: Digest\"";
 		curlCommand += " http://" + LoadTesting.CORE_ADDRESS
 				+ "/workflow/instance/" + id + ".xml";
-		
+
 		try {
 			// Create file
 			FileWriter fstream = new FileWriter(LoadTesting.WORKSPACE + "curl.sh");
@@ -45,7 +45,7 @@ public class JobChecker implements Runnable {
 			for(IngestJob ingestJob : ingestJobs){
 				checkJob(ingestJob.getID());
 			}
-			
+
 		}
 	}
 }

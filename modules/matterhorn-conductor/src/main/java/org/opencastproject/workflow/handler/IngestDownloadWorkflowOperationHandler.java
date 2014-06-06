@@ -82,7 +82,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * Sets the workspace to use.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -92,7 +92,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * Sets the trusted http client
-   * 
+   *
    * @param client
    *          the trusted http client
    */
@@ -102,7 +102,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -231,7 +231,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override

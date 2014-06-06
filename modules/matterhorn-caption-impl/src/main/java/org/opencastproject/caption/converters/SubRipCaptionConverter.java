@@ -39,7 +39,7 @@ import java.util.Scanner;
 /**
  * Converter engine for SubRip srt caption format. It does not support advanced SubRip format (SubRip format with
  * annotations). Advanced format will be parsed but all annotations will be stripped off.
- * 
+ *
  */
 public class SubRipCaptionConverter implements CaptionConverter {
 
@@ -53,7 +53,7 @@ public class SubRipCaptionConverter implements CaptionConverter {
 
   /**
    * {@inheritDoc} Since srt does not store information about language, language parameter is ignored.
-   * 
+   *
    * @see org.opencastproject.caption.api.CaptionConverter#importCaption(java.io.InputStream, java.lang.String)
    */
   @Override
@@ -120,7 +120,7 @@ public class SubRipCaptionConverter implements CaptionConverter {
 
   /**
    * {@inheritDoc} Since srt does not store information about language, language parameter is ignored.
-   * 
+   *
    * @see org.opencastproject.caption.api.CaptionConverter#exportCaption(java.io.OutputStream, java.lang.String)
    */
   @Override
@@ -151,7 +151,7 @@ public class SubRipCaptionConverter implements CaptionConverter {
 
   /**
    * Helper function that creates caption text.
-   * 
+   *
    * @param captionLines
    *          array containing caption lines
    * @return string representation of caption text
@@ -167,7 +167,7 @@ public class SubRipCaptionConverter implements CaptionConverter {
 
   /**
    * Helper function that splits text into lines and remove any style annotation
-   * 
+   *
    * @param captionText
    * @return array of caption's text lines
    */
@@ -184,7 +184,7 @@ public class SubRipCaptionConverter implements CaptionConverter {
 
   /**
    * {@inheritDoc} Returns empty list since srt format does not store any information about language.
-   * 
+   *
    * @see org.opencastproject.caption.api.CaptionConverter#getLanguageList(java.io.InputStream)
    */
   @Override
@@ -194,7 +194,7 @@ public class SubRipCaptionConverter implements CaptionConverter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.CaptionConverter#getExtension()
    */
   @Override

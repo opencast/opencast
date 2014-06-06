@@ -25,7 +25,7 @@ public final class Layout {
 
   /**
    * Create a new layout.
-   * 
+   *
    * @param dim
    *          the dimension of the shape
    * @param offset

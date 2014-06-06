@@ -19,7 +19,7 @@ import org.opencastproject.mediapackage.XmlElement;
 
 /**
  * This locator specifies elements in time and space.
- * 
+ *
  * <pre>
  * &lt;complexType name="SpatioTemporalLocatorType" final="#all"&gt;
  *   &lt;sequence&gt;
@@ -42,7 +42,7 @@ public interface SpatioTemporalLocator extends XmlElement {
 
   /**
    * Sets the media time.
-   * 
+   *
    * @param time
    *          the time
    */
@@ -50,7 +50,7 @@ public interface SpatioTemporalLocator extends XmlElement {
 
   /**
    * Returns the locator's time and duration.
-   * 
+   *
    * @return the media time
    */
   MediaTime getMediaTime();

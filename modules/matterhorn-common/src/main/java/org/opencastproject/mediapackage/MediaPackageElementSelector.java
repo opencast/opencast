@@ -25,7 +25,7 @@ public interface MediaPackageElementSelector<T extends MediaPackageElement> {
 
   /**
    * Returns the media package elements that are matched by this selector.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param withTagsAndFlavors

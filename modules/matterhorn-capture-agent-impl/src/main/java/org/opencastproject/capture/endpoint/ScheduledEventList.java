@@ -42,7 +42,7 @@ public class ScheduledEventList {
 
   /**
    * Pass in a list of the api ScheduledEvent objects
-   * 
+   *
    * @param eventLists
    *          A list of the interface class ScheduledEvent that we will change each instance to ScheduledEventImpl.
    * **/

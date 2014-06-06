@@ -33,7 +33,7 @@ public class EpisodeServiceDatabaseException extends Exception {
 
   /**
    * Create exception with a message.
-   * 
+   *
    * @param message
    */
   public EpisodeServiceDatabaseException(String message) {
@@ -42,7 +42,7 @@ public class EpisodeServiceDatabaseException extends Exception {
 
   /**
    * Create exception with a cause.
-   * 
+   *
    * @param cause
    */
   public EpisodeServiceDatabaseException(Throwable cause) {
@@ -51,7 +51,7 @@ public class EpisodeServiceDatabaseException extends Exception {
 
   /**
    * Create exception with a message and a cause.
-   * 
+   *
    * @param message
    * @param cause
    */

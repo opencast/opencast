@@ -28,7 +28,7 @@ public class HttpsRequestWrapper extends HttpServletRequestWrapper {
 
   /**
    * Wraps the request to enforce https as the request scheme.
-   * 
+   *
    * @param request
    *          the original request
    */
@@ -42,7 +42,7 @@ public class HttpsRequestWrapper extends HttpServletRequestWrapper {
 
   /**
    * Overwrites the original request's scheme to return <code>https</code>.
-   * 
+   *
    * @return always returns <code>https</code>
    */
   public String getScheme() {
@@ -51,7 +51,7 @@ public class HttpsRequestWrapper extends HttpServletRequestWrapper {
 
   /**
    * Indicates that this is a secured request.
-   * 
+   *
    * @return always returns <code>true</code>
    */
   public boolean isSecure() {
@@ -60,7 +60,7 @@ public class HttpsRequestWrapper extends HttpServletRequestWrapper {
 
   /**
    * Returns the request url with a "fixed" scheme of <code>https</code>.
-   * 
+   *
    * @return the original url featuring the <code>https</code> scheme
    */
   public StringBuffer getRequestURL() {

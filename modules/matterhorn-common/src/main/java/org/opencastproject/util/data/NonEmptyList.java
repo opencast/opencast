@@ -25,7 +25,7 @@ import java.util.ListIterator;
 
 /**
  * Non empty list. Also immutable.
- * 
+ *
  * @param <A>
  *          content type
  */

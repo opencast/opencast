@@ -83,7 +83,7 @@ public class XmlRpcEngineController implements Runnable {
 
   /**
    * Creates a new monitor for the given engine.
-   * 
+   *
    * @param engine
    *          the compression engine instance
    * @param host
@@ -115,7 +115,7 @@ public class XmlRpcEngineController implements Runnable {
 
   /**
    * Stopts the encoder controller.
-   * 
+   *
    * @param reason
    *          the reason for stopping
    */
@@ -136,7 +136,7 @@ public class XmlRpcEngineController implements Runnable {
 
   /**
    * Sets the monitor frequency.
-   * 
+   *
    * @param timeout
    *          the timeout
    */
@@ -147,7 +147,7 @@ public class XmlRpcEngineController implements Runnable {
   /**
    * Submits a job to the watchfolder monitor. The monitor will then notify the engine and registered listeners about
    * the appearance of <code>outfile</code>, once it shows up after processing.
-   * 
+   *
    * @param track
    *          the track that is being encoded
    * @param profiles
@@ -233,7 +233,7 @@ public class XmlRpcEngineController implements Runnable {
    * Returns a list of settings for the specified track and profile. The settings are being looked up in episode's
    * settings folder (usually <tt>/Users/Shared/Episode Engine/Settings</tt>) and inside this folder at location
    * <tt>Opencast/&lt;profile&gt;</tt>
-   * 
+   *
    * @param sourceFile
    *          the file to be encoded
    * @param profile
@@ -274,9 +274,9 @@ public class XmlRpcEngineController implements Runnable {
   /**
    * Returns <code>true</code> if the engine is processing the specified track for the same media format and profile,
    * using at least one setting.
-   * 
+   *
    * TODO do we need this?
-   * 
+   *
    * @param file
    *          the file
    * @param profile
@@ -292,7 +292,7 @@ public class XmlRpcEngineController implements Runnable {
 
   /**
    * Returns the jobs that are currently in the system processing the given file with the specified profile.
-   * 
+   *
    * @param sourceFile
    *          the file to be encoded
    * @param profile
@@ -450,7 +450,7 @@ public class XmlRpcEngineController implements Runnable {
   /**
    * Encapsulates communication with episode engine. Since the connection can sometimes be instable, a bit of retry
    * logic has been added here.
-   * 
+   *
    * @param command
    *          the command to execute
    * @param arguments

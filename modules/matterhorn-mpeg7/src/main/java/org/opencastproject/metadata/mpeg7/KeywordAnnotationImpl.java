@@ -33,7 +33,7 @@ public class KeywordAnnotationImpl implements KeywordAnnotation {
 
   /**
    * Creates a new keyword annotation.
-   * 
+   *
    * @param keyword
    *          the keyword
    */
@@ -43,7 +43,7 @@ public class KeywordAnnotationImpl implements KeywordAnnotation {
 
   /**
    * Creates a new keyword annotation.
-   * 
+   *
    * @param keyword
    *          the keyword
    * @param type

@@ -11,7 +11,7 @@
   <inceptionYear>2009</inceptionYear>
 
   <prerequisites>
-    <maven>2.0.6</maven>
+    <maven>3.0.4</maven>
   </prerequisites>
   <properties>
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
@@ -87,82 +87,6 @@
         <module>modules/matterhorn-workflow-service-impl</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>analytics</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-analytics-impl</module>
-        <module>modules/matterhorn-analytics-ui</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-search-service-api</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-usertracking-api</module>
-        <module>modules/matterhorn-usertracking-impl</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>export-admin</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-export-impl</module>
-        <module>modules/matterhorn-gstreamer-service-api</module>
-        <module>modules/matterhorn-gstreamer-service-remote</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-serviceregistry</module>
-        <module>modules/matterhorn-static</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>export-worker</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-gstreamer-service-api</module>
-        <module>modules/matterhorn-gstreamer-service-impl</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>export-all-in-one</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-export-impl</module>
-        <module>modules/matterhorn-gstreamer-service-api</module>
-        <module>modules/matterhorn-gstreamer-service-impl</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-serviceregistry</module>
-        <module>modules/matterhorn-static</module>
       </modules>
     </profile>
 
@@ -796,6 +720,7 @@
       </activation>
       <modules>
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
+        <module>modules/matterhorn-dictionary-none</module>
       </modules>
     </profile>
 
@@ -1020,6 +945,7 @@
             <java.awt.headless>true</java.awt.headless>
             <eclipselink.logging.level>SEVERE</eclipselink.logging.level>
             <java.util.logging.config.file>${basedir}/conf/services/java.util.logging.properties</java.util.logging.config.file>
+            <logj4.configuration>${basedir}/docs/log4j/log4j.properties</logj4.configuration>
           </systemPropertyVariables>
         </configuration>
       </plugin>

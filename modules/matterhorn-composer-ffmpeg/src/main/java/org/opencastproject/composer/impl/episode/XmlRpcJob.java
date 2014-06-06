@@ -117,7 +117,7 @@ public class XmlRpcJob {
 
   /**
    * Information and state container for jobs that have been submitted to episode engine by xmlrpc.
-   * 
+   *
    * @param id
    *          the job id
    * @param sourceFile
@@ -137,7 +137,7 @@ public class XmlRpcJob {
 
   /**
    * Sets the job state.
-   * 
+   *
    * @param state
    *          the state
    */
@@ -147,7 +147,7 @@ public class XmlRpcJob {
 
   /**
    * Returns the current job state.
-   * 
+   *
    * @return the state
    */
   XmlRpcJobState getState() {
@@ -156,7 +156,7 @@ public class XmlRpcJob {
 
   /**
    * Returns the job identifier.
-   * 
+   *
    * @return the identifier
    */
   int getIdentifier() {
@@ -165,7 +165,7 @@ public class XmlRpcJob {
 
   /**
    * Returns the track that is encoded.
-   * 
+   *
    * @return the track
    */
   File getSourceFile() {
@@ -174,7 +174,7 @@ public class XmlRpcJob {
 
   /**
    * Returns the media format.
-   * 
+   *
    * @return the format
    */
   EncodingProfile getEncodingProfile() {
@@ -183,7 +183,7 @@ public class XmlRpcJob {
 
   /**
    * Returns the job's episode settings.
-   * 
+   *
    * @return the settings
    */
   EpisodeSettings getSettings() {
@@ -192,7 +192,7 @@ public class XmlRpcJob {
 
   /**
    * Returns the progress.
-   * 
+   *
    * @return the progress
    */
   int getProgress() {
@@ -201,7 +201,7 @@ public class XmlRpcJob {
 
   /**
    * Sets the progress.
-   * 
+   *
    * @param progress
    *          the progress value
    */

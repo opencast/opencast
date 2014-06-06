@@ -32,7 +32,7 @@ public abstract class PartialBin {
   /**
    * PartialBin is an abstract class used to consolidate common attributes to both Producers and Consumers and the
    * pattern for their Element creation
-   * 
+   *
    * @param captureDevice
    *          The properties of the capture device such as location, output file location, codec, confidence monitoring
    *          settings etc.
