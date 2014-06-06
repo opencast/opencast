@@ -119,3 +119,4 @@ public class SmilMetaImpl extends SmilObjectImpl implements SmilMeta {
     // Meta elements hasn't childs
   }
 }
+

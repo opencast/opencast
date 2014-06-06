@@ -85,3 +85,4 @@ public class VideoEditorServiceRemote extends RemoteBase implements VideoEditorS
     this.smilService = smilService;
   }
 }
+
