@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
 /**
- * This class holds the start and stop position of a media file in milliseconds. 
+ * This class holds the start and stop position of a media file in milliseconds.
  */
 @XmlAccessorType(XmlAccessType.NONE)
 public class MediaSegment {
