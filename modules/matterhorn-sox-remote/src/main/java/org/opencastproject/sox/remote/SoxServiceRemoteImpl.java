@@ -45,7 +45,7 @@ public class SoxServiceRemoteImpl extends RemoteBase implements SoxService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.sox.api.SoxService#analyze(Track)
    */
   @Override
@@ -80,7 +80,7 @@ public class SoxServiceRemoteImpl extends RemoteBase implements SoxService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.sox.api.SoxService#normalize(Track, Float)
    */
   @Override
