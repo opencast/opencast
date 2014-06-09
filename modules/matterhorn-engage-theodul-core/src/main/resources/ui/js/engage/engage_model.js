@@ -38,6 +38,34 @@ define(['require', 'jquery', 'underscore', 'backbone'], function (require, $, _,
   });
   
   /*
+   * Model with informations about the current user and the current MH configuration
+   */
+  var MeInfoModel = Backbone.Model.extend({
+    urlRoot: "../../../info/me.json",
+    initialize : function () {
+      this.ready = false;
+      this.fetch({
+          success : function (me) {
+            me.ready = true;
+            var hotkeys = new Array(); //hardcoded hotkeys
+            var customHotkeys = new Array(); //custom hotkeys
+            //extract hotkey infos
+            $.each(me.attributes.org.properties, function(key, value){ //hardcoded regex
+                if(key.match("theodul.hotkey.(pause|jumpToBegin|nextChapter|prevChapter|volUp|volDown|mute|jumpToX|fullscreen|nextEpisode|prevEpisode)") !== null){
+                  hotkeys.push({name:key.substring(15,key.length), key:value})
+                }else if(key.match("theodul.hotkey.") !== null){ // else hotkeys are customs
+                  var cSplit = key.substring(15,key.length).split("."); //cut key string and split into app(0) and func(1) string, examp. theodul.hotkey.annotation.add
+                  customHotkeys.push({app:cSplit[0], func:cSplit[1], key:value});
+                }
+            });
+            me.set("hotkeys", hotkeys);
+            me.set("hotkeysCustom", customHotkeys);
+          }
+      });
+    }
+  });
+  
+  /*
    * END Prototypes
    */
   
@@ -92,6 +120,7 @@ define(['require', 'jquery', 'underscore', 'backbone'], function (require, $, _,
     defaults : {
       "pluginsInfo" : new PluginInfoModel(),
       "pluginModels" : new PluginModelCollection(),
+      "meInfo" : new MeInfoModel(),
       "urlParameters": {}
     }
   });

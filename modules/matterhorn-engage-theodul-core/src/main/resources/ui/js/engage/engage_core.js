@@ -15,7 +15,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'engage/engage_tab_logic'], function (require, $, _, Backbone, EngageModel, EngageTabLogic) {
+define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/engage_model', 'engage/engage_tab_logic'], function (require, $, _, Backbone, Mousetrap, EngageModel, EngageTabLogic) {
   //
   "use strict"; // strict mode in all our application
   //
@@ -140,6 +140,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
               }
             });
             /*END LOAD PLUGINS*/
+            //wait that me infos are loaded
+            while(engageCore.model.get("meInfo").ready === false){}
+            bindHotkeysToEvents(); //bind configured hotkeys to theodul events
           });
         });
       });
@@ -148,6 +151,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
         $(".loading").hide();
         $("#engage_view").show();
       });
+    },
+    //bind a key event as a string to given theodul event
+    bindKeyToEvent : function (hotkey, event) {
+      //only for EngageEvent objects
+      if(event instanceof EngageEvent){
+        Mousetrap.bind(hotkey, function(){
+          engageCore.trigger(event);
+        });        
+      }       
     },
     on : function (event, handler, context) {
       if(event instanceof EngageEvent){
@@ -199,45 +211,78 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
   /*
    * BEGIN Private core functions
    */
-  /*
-  function addPluginLogic() {
-    EngageTabLogic('tabs', 'engage_tab_nav');
+  
+  //binds configured hotkeys(see MH org config) to corresponding theodul events
+  function bindHotkeysToEvents(){
+    //process hardcoded keys
+    $.each(engageCore.model.get("meInfo").get("hotkeys"), function(i, val){
+      switch(val.name){
+      case "jumpToX":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Controls:jumpToX");
+        });
+        break;
+      case "nextChapter":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:nextChapter");
+        });
+        break;
+      case "fullscreen":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:goFullscreen");
+        });
+        break;
+      case "jumpToBegin":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:jumpToBegin");
+        });
+        break;
+      case "prevEpisode":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Core:previousEpisode");
+        });
+        break;
+      case "prevChapter":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:previousChapter");
+        });
+        break;
+      case "pause":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:pause");
+        });
+        break;
+      case "mute":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:mute");
+        });
+        break;
+      case "nextEpisode":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Core:nextEpisode");
+        });
+        break;
+      case "volDown":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:volumeUp");
+        });
+        break;
+      case "volUp":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:volumeDown");
+        });
+        break;
+      default:
+        break;
+      }
+    });
+    //process custom hotkeys
+    $.each(engageCore.model.get("meInfo").get("hotkeysCustom"), function(i, val){
+      Mousetrap.bind(val.key, function(){
+        engageCore.trigger(val.app+":"+val.func); //trigger specific custom event
+      });      
+    });
   }
-
-  function insertProcessedTemplate(processed_template, plugin_type, plugin_name) {
-    var container = "";
-    switch (plugin_type) {
-    case "engage_controls":       
-      $("#engage_controls").html(processed_template);
-      container = "#engage_controls";
-      break;
-    case "engage_video":        
-      $("#engage_video").html(processed_template);
-      container = "#engage_video";
-      break;        
-    case "engage_tab":        
-      var tab_ref = plugin_name.replace(/ /g, "_");
-      // insert tab navigation line
-      var tabNavTag = '<li><a href="#engage_' + tab_ref + '_tab">' + plugin_name + '</a></li>';
-      $("#engage_tab_nav").prepend(tabNavTag);
-      // insert tab content
-      var tabTag = '<div class="tab-pane" id="engage_' + tab_ref + '_tab">' + processed_template + '</div>';
-      $("#engage_tab_content").prepend(tabTag);
-      container = "#engage_" + tab_ref + "_tab";
-      break;
-    case "engage_description":
-      $("#engage_description").html(processed_template);
-      container = "#engage_description";
-      break;    
-    case "engage_timeline":
-      $("#engage_timeline_plugin").html(processed_template);
-      container = "#engage_timeline_plugin";
-      break; 
-    default:
-    }
-    return container;
-  }
-  */
 
   function checkAllPluginsloaded() {
     var all_plugins_loaded = true;
