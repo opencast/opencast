@@ -28,11 +28,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
   /*
    * Logic to insert a plugin with name and type to the player in embed mode
    */
-  var insertPluginToDOM = function(processed_template, plugin_type, plugin_name) {
-    //id of the DOM element which is used as plugin container
-    var container = "";
+  var insertPluginToDOM = function(plugin) {
+    //DEBUG, currently no impl here, so please init no plugin
+    plugin.inserted = false;
     //switch plugin type to insert the plugin to the right DOM element and execute custom view code
-    switch (plugin_type) {
+    switch (plugin.type) {
     case "engage_controls":       
 
       break;
@@ -50,7 +50,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
     break; 
     default:
     }
-    return container;
   }
   
   /*

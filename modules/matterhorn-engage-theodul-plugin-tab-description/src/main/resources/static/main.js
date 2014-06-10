@@ -75,8 +75,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
   });
 
   function initPlugin() {
-    //create a new view with the media package model and the template
-    new DescriptionTabView(Engage.model.get("mediaPackage"), plugin.template);
+    //only init if plugin template was inserted into the DOM
+    if(plugin.inserted === true){
+      //create a new view with the media package model and the template
+      new DescriptionTabView(Engage.model.get("mediaPackage"), plugin.template);
+    }
   }
   
 	//Init Event

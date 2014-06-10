@@ -330,12 +330,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
           }          
           // add full plugin path to the tmeplate data
           template_data.plugin_path =  'engage/theodul/' + plugin_path;
-          // Process the template using underscore
-          var processed_template = _.template(template, template_data);
-          // Load the compiled HTML into the component
-          plugin.container = engageCore.pluginView.insertPlugin(processed_template, plugin.type, plugin.name);
+          // Process the template using underscore and set it in the plugin obj
+          plugin.templateProcessed = _.template(template, template_data);
           plugin.template = template;
           plugin.pluginPath = 'engage/theodul/' + plugin_path;
+          // Load the compiled HTML into the component
+          engageCore.pluginView.insertPlugin(plugin);
           // plugin load done counter
           plugins_loaded[plugin_name] = true;
           // Check if all plugins are ready

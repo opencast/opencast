@@ -47,40 +47,44 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
   /*
    * Logic to insert a plugin with name and type to the player in desktop mode
    */
-  var insertPluginToDOM = function(processed_template, plugin_type, plugin_name) {
-    //id of the DOM element which is used as plugin container
-    var container = "";
+  var insertPluginToDOM = function(plugin) {
     //switch plugin type to insert the plugin to the right DOM element and execute custom view code
-  	switch (plugin_type) {
+  	switch (plugin.type) {
   	case "engage_controls":       
-  	  $("#engage_controls").html(processed_template);
-  	  container = "#engage_controls";
+  	  $("#engage_controls").html(plugin.templateProcessed);
+      plugin.inserted = true;
+  	  plugin.container = "#engage_controls";
   	  break;
   	case "engage_video":        
-  	  $("#engage_video").html(processed_template);
-  	  container = "#engage_video";
+  	  $("#engage_video").html(plugin.templateProcessed);
+      plugin.inserted = true;
+  	  plugin.container = "#engage_video";
   	  break;        
   	case "engage_tab":        
-  	  var tab_ref = plugin_name.replace(/ /g, "_");
+  	  var tab_ref = plugin.name.replace(/ /g, "_");
   	  // insert tab navigation line
-  	  var tabNavTag = '<li><a href="#engage_' + tab_ref + '_tab">' + plugin_name + '</a></li>';
+  	  var tabNavTag = '<li><a href="#engage_' + tab_ref + '_tab">' + plugin.name + '</a></li>';
   	  $("#engage_tab_nav").prepend(tabNavTag);
   	  // insert tab content
-  	  var tabTag = '<div class="tab-pane" id="engage_' + tab_ref + '_tab">' + processed_template + '</div>';
+  	  var tabTag = '<div class="tab-pane" id="engage_' + tab_ref + '_tab">' + plugin.templateProcessed + '</div>';
   	  $("#engage_tab_content").prepend(tabTag);
-  	  container = "#engage_" + tab_ref + "_tab";
+      plugin.inserted = true;
+  	  plugin.container = "#engage_" + tab_ref + "_tab";
   	  break;
   	case "engage_description":
-  	  $("#engage_description").html(processed_template);
-  	  container = "#engage_description";
+  	  $("#engage_description").html(plugin.templateProcessed);
+      plugin.inserted = true;
+  	  plugin.container = "#engage_description";
   	  break;    
   	case "engage_timeline":
-  	  $("#engage_timeline_plugin").html(processed_template);
-  	  container = "#engage_timeline_plugin";
+  	  $("#engage_timeline_plugin").html(plugin.templateProcessed);
+      plugin.inserted = true;
+  	  plugin.container = "#engage_timeline_plugin";
     break; 
     default:
+      plugin.inserted = false;
+      plugin.container = "";
     }
-    return container;
   }
   
   /*
