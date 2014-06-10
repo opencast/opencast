@@ -20,6 +20,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
   'use strict'; // strict mode in all our application
   //
   /*
+   * Init logic function
+   */
+  var initEmbedView = function(){
+
+  }
+  /*
    * Logic to insert a plugin with name and type to the player in embed mode
    */
   var insertPluginToDOM = function(processed_template, plugin_type, plugin_name) {
@@ -56,6 +62,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
   
   // public functions fo the module
   return {
+    initView : initEmbedView,
     insertPlugin : insertPluginToDOM,
     allPluginsLoaded : allPluginsLoadedEvent
   } 

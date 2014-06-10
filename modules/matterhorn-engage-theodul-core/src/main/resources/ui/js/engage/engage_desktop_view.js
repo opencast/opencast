@@ -20,6 +20,31 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
   'use strict'; // strict mode in all our application
   //
   /*
+   * Init logic function
+   */
+  var initDesktopView = function(){
+    //load bootstrap css
+    var link = $("<link>");
+    link.attr({
+      type : 'text/css',
+      rel : 'stylesheet',
+      href : 'css/bootstrap/css/bootstrap.css'
+    });
+    $("head").append(link);
+    link = $("<link>");
+    link.attr({
+      type : 'text/css',
+      rel : 'stylesheet',
+      href : 'css/bootstrap/css/bootstrap-responsive.css'
+    });
+    $("head").append(link);
+    //build timeline plugins
+    $("#engage_timeline_expand_btn").click(function() {
+      $("#engage_timeline_plugin").slideToggle("fast");
+      $("#engage_timeline_expand_btn_img").toggleClass("engage_timeline_expand_btn_rotate180");
+    });
+  }
+  /*
    * Logic to insert a plugin with name and type to the player in desktop mode
    */
   var insertPluginToDOM = function(processed_template, plugin_type, plugin_name) {
@@ -68,6 +93,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
   
   // public functions fo the module
   return {
+    initView : initDesktopView,
     insertPlugin : insertPluginToDOM,
     allPluginsLoaded : allPluginsLoadedEvent
   }

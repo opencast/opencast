@@ -109,11 +109,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
             //set template, render it and add it to DOM
             engageCore.template = template;
             $(engageCore.el).html(_.template(template));
-            //build timeline plugins
-            $("#engage_timeline_expand_btn").click(function() {
-              $("#engage_timeline_plugin").slideToggle("fast");
-              $("#engage_timeline_expand_btn_img").toggleClass("engage_timeline_expand_btn_rotate180");
-            });
+            //run init function of the view
+            engageCore.pluginView.initView();
             /*BEGIN LOAD PLUGINS*/
             // fetch plugin information
             engageCore.model.get('pluginsInfo').fetch({
