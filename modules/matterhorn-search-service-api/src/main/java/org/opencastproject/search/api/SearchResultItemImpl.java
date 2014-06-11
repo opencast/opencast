@@ -167,7 +167,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getId()
    */
   public String getId() {
@@ -184,7 +184,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getOrganization()
    */
   @Override
@@ -202,7 +202,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcExtent()
    */
   public long getDcExtent() {
@@ -219,7 +219,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcTitle()
    */
   public String getDcTitle() {
@@ -236,7 +236,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcSubject()
    */
   public String getDcSubject() {
@@ -253,7 +253,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcCreator()
    */
   public String getDcCreator() {
@@ -270,7 +270,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcPublisher()
    */
   public String getDcPublisher() {
@@ -287,7 +287,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcContributor()
    */
   public String getDcContributor() {
@@ -304,7 +304,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcAbstract()
    */
   public String getDcAbstract() {
@@ -321,7 +321,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcDescription()
    */
   public String getDcDescription() {
@@ -338,7 +338,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcCreated()
    */
   public Date getDcCreated() {
@@ -355,7 +355,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcAvailableFrom()
    */
   public Date getDcAvailableFrom() {
@@ -372,7 +372,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcAvailableTo()
    */
   public Date getDcAvailableTo() {
@@ -389,7 +389,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcLanguage()
    */
   public String getDcLanguage() {
@@ -406,7 +406,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcRightsHolder()
    */
   public String getDcRightsHolder() {
@@ -423,7 +423,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcSpatial()
    */
   public String getDcSpatial() {
@@ -440,7 +440,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcTemporal()
    */
   public String getDcTemporal() {
@@ -457,7 +457,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcIsPartOf()
    */
   public String getDcIsPartOf() {
@@ -474,7 +474,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcReplaces()
    */
   public String getDcReplaces() {
@@ -491,7 +491,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcType()
    */
   public String getDcType() {
@@ -508,7 +508,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcAccessRights()
    */
   public String getDcAccessRights() {
@@ -525,7 +525,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getDcLicense()
    */
   public String getDcLicense() {
@@ -542,7 +542,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getType()
    */
   public SearchResultItemType getType() {
@@ -568,7 +568,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * Sets the media package that is associated with the search result item.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    */
@@ -578,7 +578,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getMediaPackage()
    */
   public MediaPackage getMediaPackage() {
@@ -587,7 +587,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getKeywords()
    */
   public String[] getKeywords() {
@@ -596,7 +596,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * Add a keyword to this search item.
-   * 
+   *
    * @param keyword
    *          the keyword
    */
@@ -608,7 +608,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getCover()
    */
   public String getCover() {
@@ -625,7 +625,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getModified()
    */
   public Date getModified() {
@@ -642,7 +642,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getScore()
    */
   public double getScore() {
@@ -659,7 +659,7 @@ public class SearchResultItemImpl implements SearchResultItem {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchResultItem#getSegments()
    */
   public MediaSegment[] getSegments() {
@@ -670,7 +670,7 @@ public class SearchResultItemImpl implements SearchResultItem {
   /**
    * Adds a segment to the list of media segments. The list is backed by a sorted set, so there is no need to add the
    * segments in order, although it is certainly more performant.
-   * 
+   *
    * @param segment
    *          the segment to add
    */

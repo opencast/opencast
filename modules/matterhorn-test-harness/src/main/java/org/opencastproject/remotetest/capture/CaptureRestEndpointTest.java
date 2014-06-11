@@ -37,17 +37,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-/** 
+/**
  * Test the functionality of the capture endpoints. Does not assume capture
  * devices are connected, so only mock captures are tested
  */
 @Ignore
 public class CaptureRestEndpointTest {
-  
+
   private TrustedHttpClient httpClient;
   private ArrayList<NameValuePair> startParams = new ArrayList<NameValuePair>();
   private ArrayList<NameValuePair> stopParams = new ArrayList<NameValuePair>();
-  
+
   @Before
   public void setUp() throws Exception {
     httpClient = Main.getClient();
@@ -65,12 +65,12 @@ public class CaptureRestEndpointTest {
     stopParams.add(new BasicNameValuePair("recordingID", time));
 
   }
-  
+
   @After
   public void tearDown() throws Exception {
     Main.returnClient(httpClient);
   }
-  
+
   @Test
   public void testUnscheduledCapture() throws Exception {
     //Test using only unscheduled calls
@@ -79,7 +79,7 @@ public class CaptureRestEndpointTest {
     sendGet(BASE_URL + "/capture/stopCapture", HttpStatus.SC_OK);
     sendGet(BASE_URL + "/capture/stopCapture", HttpStatus.SC_INTERNAL_SERVER_ERROR);
   }
-  
+
   @Test
   public void testUnscheduledMix() throws Exception {
     //Test using both scheduled and unscheduled calls
@@ -90,7 +90,7 @@ public class CaptureRestEndpointTest {
     sendGet(BASE_URL + "/capture/stopCapture", HttpStatus.SC_INTERNAL_SERVER_ERROR);
   }
 
-  @Test 
+  @Test
   public void testCapturePost() throws Exception {
     //Test using only scheduled calls
     sendPost(BASE_URL + "/capture/startCapture", startParams, HttpStatus.SC_OK);
@@ -123,7 +123,7 @@ public class CaptureRestEndpointTest {
     Assert.assertTrue(postResponse == returnCode);
     post.abort();
   }
-  
+
   @Test
   public void printTestingInfo() {
     System.out.println("\n\nInstructions to test capture agent\n==================================");
@@ -133,6 +133,6 @@ public class CaptureRestEndpointTest {
         "Each property should be assigned to its location instead of setting a boolean.\n" +
         "An example test could be: mvn test -DargLine=\"-DtestHauppauge=/dev/video0 -DtestAlsa=hw:0\"\n\n");
   }
-  
+
 
 }

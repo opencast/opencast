@@ -38,7 +38,7 @@ public class RecordingStateUpdate {
   /**
    * The state of the recording. This should be defined from
    * {@link org.opencastproject.capture.admin.api.RecordingState}.
-   * 
+   *
    * @see RecordingState
    */
   @XmlElement(name = "state")
@@ -59,7 +59,7 @@ public class RecordingStateUpdate {
 
   /**
    * Builds an RecordingStateUpdate object about the Recording r. This calculates the time delta for you.
-   * 
+   *
    * @param r
    *          The recording you wish to know more information about
    */
@@ -71,7 +71,7 @@ public class RecordingStateUpdate {
 
   /**
    * Returns the recording id.
-   * 
+   *
    * @return the id
    */
   public String getId() {
@@ -80,7 +80,7 @@ public class RecordingStateUpdate {
 
   /**
    * Reuturns the recording state.
-   * 
+   *
    * @return the state
    */
   public String getState() {
@@ -89,7 +89,7 @@ public class RecordingStateUpdate {
 
   /**
    * Returns the time where the recording was last updated.
-   * 
+   *
    * @return the update time
    */
   public Long getTimeSinceLastUpdate() {

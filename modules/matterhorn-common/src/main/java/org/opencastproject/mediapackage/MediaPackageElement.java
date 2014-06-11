@@ -36,14 +36,14 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
 
   /**
    * Returns the element identifier.
-   * 
+   *
    * @return the element identifier
    */
   String getIdentifier();
 
   /**
    * Sets the element identifier.
-   * 
+   *
    * @param id
    *          the new element identifier
    */
@@ -51,7 +51,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
 
   /**
    * Returns the element's manifest type.
-   * 
+   *
    * @return the manifest type
    */
   Type getElementType();
@@ -59,14 +59,14 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
   /**
    * Returns a human readable name for this media package element. If no name was provided, the filename is returned
    * instead.
-   * 
+   *
    * @return the element name
    */
   String getElementDescription();
 
   /**
    * Sets the element description of this media package element.
-   * 
+   *
    * @param description
    *          the new element description
    */
@@ -74,7 +74,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
 
   /**
    * Tags the media package element with the given tag.
-   * 
+   *
    * @param tag
    *          the tag
    */
@@ -82,7 +82,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
 
   /**
    * Removes the tag from the media package element.
-   * 
+   *
    * @param tag
    *          the tag
    */
@@ -90,7 +90,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
 
   /**
    * Returns <code>true</code> if the media package element contains the given tag.
-   * 
+   *
    * @param tag
    *          the tag
    * @return <code>true</code> if the element is tagged
@@ -100,7 +100,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
   /**
    * Returns <code>true</code> if the media package element contains at least one of the given tags. If there are no
    * tags contained in the set, then the element is considered to match as well.
-   * 
+   *
    * @param tags
    *          the set of tag
    * @return <code>true</code> if the element is tagged accordingly
@@ -109,7 +109,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
 
   /**
    * Returns the tags for this media package element or an empty array if there are no tags.
-   * 
+   *
    * @return the tags
    */
   String[] getTags();
@@ -119,21 +119,21 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
 
   /**
    * Returns the media package if the element has been added, <code>null</code> otherwise.
-   * 
+   *
    * @return the media package
    */
   MediaPackage getMediaPackage();
 
   /**
    * Returns a reference to another entitiy, both inside or outside the media package.
-   * 
+   *
    * @return the reference
    */
   MediaPackageReference getReference();
 
   /**
    * Sets the element reference.
-   * 
+   *
    * @param reference
    *          the reference
    */
@@ -141,14 +141,14 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
 
   /**
    * Returns a reference to the element location.
-   * 
+   *
    * @return the element location
    */
   URI getURI();
 
   /**
    * Sets the elements location.
-   * 
+   *
    * @param uri
    *          the element location
    */
@@ -156,14 +156,14 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
 
   /**
    * Returns the file's checksum.
-   * 
+   *
    * @return the checksum
    */
   Checksum getChecksum();
 
   /**
    * Sets the new checksum on this media package element.
-   * 
+   *
    * @param checksum
    *          the checksum
    */
@@ -173,14 +173,14 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
    * Returns the element's mimetype as found in the ISO Mime Type Registrations.
    * <p/>
    * For example, in case of motion jpeg slides, this method will return the mime type for <code>video/mj2</code>.
-   * 
+   *
    * @return the mime type
    */
   MimeType getMimeType();
 
   /**
    * Sets the mime type on this media package element.
-   * 
+   *
    * @param mimeType
    *          the new mime type
    */
@@ -190,14 +190,14 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
    * Returns the element's type as defined for the specific media package element.
    * <p/>
    * For example, in case of a video track, the type could be <code>video/x-presentation</code>.
-   * 
+   *
    * @return the element flavor
    */
   MediaPackageElementFlavor getFlavor();
 
   /**
    * Sets the flavor on this media package element.
-   * 
+   *
    * @param flavor
    *          the new flavor
    */
@@ -205,21 +205,21 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
 
   /**
    * Returns the number of bytes that are occupied by this media package element.
-   * 
+   *
    * @return the size
    */
   long getSize();
 
   /**
    * Sets the file size in bytes
-   * 
+   *
    * @param size
    */
   void setSize(long size);
 
   /**
    * Verifies the integrity of the media package element.
-   * 
+   *
    * @throws MediaPackageException
    *           if the media package element is in an incosistant state
    */
@@ -229,7 +229,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
    * Adds a reference to the media package <code>mediaPackage</code>.
    * <p/>
    * Note that an element can only refer to one object. Therefore, any existing reference will be replaced.
-   * 
+   *
    * @param mediaPackage
    *          the media package to refere to
    */
@@ -241,7 +241,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
    * Note that an element can only refere to one object. Therefore, any existing reference will be replaced. Also note
    * that if this element is part of a media package, a consistency check will be made making sure the refered element
    * is also part of the same media package. If not, a {@link MediaPackageException} will be thrown.
-   * 
+   *
    * @param element
    *          the element to refere to
    */
@@ -253,7 +253,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
    * Note that an element can only have one reference. Therefore, any existing reference will be replaced. Also note
    * that if this element is part of a media package, a consistency check will be made making sure the refered element
    * is also part of the same media package. If not, a {@link MediaPackageException} will be thrown.
-   * 
+   *
    * @param reference
    *          the reference
    */
@@ -266,7 +266,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
 
   /**
    * Create a deep copy of this object.
-   * 
+   *
    * @return The copy
    */
   Object clone();

@@ -41,7 +41,7 @@ public final class MediaPackageElementParser {
 
   /**
    * Serializes the media package element to a string.
-   * 
+   *
    * @param element
    *          the element
    * @return the serialized media package element
@@ -74,7 +74,7 @@ public final class MediaPackageElementParser {
 
   /**
    * Parses the serialized media package element and returns its object representation.
-   * 
+   *
    * @param xml
    *          the serialized element
    * @return the media package element instance
@@ -102,7 +102,7 @@ public final class MediaPackageElementParser {
 
   /**
    * Serializes media package element list to a string.
-   * 
+   *
    * @param elements
    *          element list to be serialized
    * @return serialized media package element list
@@ -130,7 +130,7 @@ public final class MediaPackageElementParser {
 
   /**
    * Parses the serialized media package element list.
-   * 
+   *
    * @param xml
    *          String to be parsed
    * @return parsed media package element list

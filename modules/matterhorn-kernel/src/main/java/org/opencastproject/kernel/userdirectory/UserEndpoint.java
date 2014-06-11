@@ -52,7 +52,7 @@ public class UserEndpoint {
 
   /**
    * Sets the user directory service
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */

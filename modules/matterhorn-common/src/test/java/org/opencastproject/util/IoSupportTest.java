@@ -87,7 +87,7 @@ public class IoSupportTest {
 
   /**
    * Test method for {@link org.opencastproject.util.IoSupport#writeUTF8File(java.net.URL, java.lang.String)}.
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -112,7 +112,7 @@ public class IoSupportTest {
 
   /**
    * Test method for {@link org.opencastproject.util.IoSupport#writeUTF8File(java.io.File, java.lang.String)}.
-   * 
+   *
    * @throws IOException
    */
   @Test

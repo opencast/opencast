@@ -25,13 +25,13 @@ import java.util.Iterator;
 
 /**
  * API that defines persistent storage of series.
- * 
+ *
  */
 public interface SeriesServiceDatabase {
 
   /**
    * Store (or update) series.
-   * 
+   *
    * @param dc
    *          {@link DublinCoreCatalog} representing series
    * @return Dublin Core catalog representing newly created series or null if series Dublin Core was updated
@@ -45,7 +45,7 @@ public interface SeriesServiceDatabase {
   /**
    * Store access control associated with specified series. IllegalArgumentException is thrown if accessControl
    * parameter is null.
-   * 
+   *
    * @param seriesID
    *          ID of series to associate access control with
    * @param accessControl
@@ -61,7 +61,7 @@ public interface SeriesServiceDatabase {
 
   /**
    * Removes series from persistent storage.
-   * 
+   *
    * @param seriesId
    *          ID of the series to be removed
    * @throws SeriesServiceDatabaseException
@@ -73,7 +73,7 @@ public interface SeriesServiceDatabase {
 
   /**
    * Returns all series in persistent storage.
-   * 
+   *
    * @return {@link Tuple} array representing stored series
    * @throws SeriesServiceDatabaseException
    *           if exception occurs
@@ -82,7 +82,7 @@ public interface SeriesServiceDatabase {
 
   /**
    * Retrieves ACL for series with given ID.
-   * 
+   *
    * @param seriesID
    *          series for which ACL will be retrieved
    * @return {@link AccessControlList} of series or null if series does not have ACL associated with it
@@ -95,7 +95,7 @@ public interface SeriesServiceDatabase {
 
   /**
    * Gets a single series by its identifier.
-   * 
+   *
    * @param seriesId
    *          the series identifier
    * @return the dublin core catalog for this series

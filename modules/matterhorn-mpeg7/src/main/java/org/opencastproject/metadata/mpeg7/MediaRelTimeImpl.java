@@ -24,7 +24,7 @@ public class MediaRelTimeImpl extends MediaTimeImpl {
   /**
    * Creates a new media time instance, representing a time and duration that is relative to
    * <code>referenceTimePoint</code>.
-   * 
+   *
    * @param time
    *          the time point relative to referenceTimePoint
    * @param duration
@@ -37,7 +37,7 @@ public class MediaRelTimeImpl extends MediaTimeImpl {
   /**
    * Creates a new media time instance, representing a time and duration that is relative to
    * <code>referenceTimePoint</code>.
-   * 
+   *
    * @param hour
    *          the number of hours
    * @param minute

@@ -42,7 +42,7 @@ public class UploadProgressListener implements ProgressListener {
   /**
    * Called by ServeletFileUpload on upload progress. Updates the job object. Persists the job object on upload
    * start/complete and after every X Kb that have arrived.
-   * 
+   *
    * @param rec
    * @param total
    * @param i

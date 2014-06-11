@@ -17,7 +17,7 @@ package org.opencastproject.composer.api;
 
 /**
  * Exception that occurs while embedding.
- * 
+ *
  */
 public class EmbedderException extends Exception {
 
@@ -26,7 +26,7 @@ public class EmbedderException extends Exception {
 
   /**
    * Creates exception with given error message.
-   * 
+   *
    * @param message
    */
   public EmbedderException(String message) {
@@ -35,7 +35,7 @@ public class EmbedderException extends Exception {
 
   /**
    * Creates exception with given error message and {@link Throwable} as cause.
-   * 
+   *
    * @param message
    * @param cause
    */
@@ -45,7 +45,7 @@ public class EmbedderException extends Exception {
 
   /**
    * Creates exception with {@link Throwable} as cause.
-   * 
+   *
    * @param cause
    */
   public EmbedderException(Throwable cause) {

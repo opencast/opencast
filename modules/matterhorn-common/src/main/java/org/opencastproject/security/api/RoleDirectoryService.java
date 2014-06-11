@@ -24,14 +24,14 @@ public interface RoleDirectoryService {
 
   /**
    * Gets all known roles.
-   * 
+   *
    * @return the roles
    */
   Iterator<Role> getRoles();
 
   /**
    * Return the found role's as an iterator.
-   * 
+   *
    * @param query
    *          the query. Use the wildcards "_" to match any single character and "%" to match an arbitrary number of
    *          characters (including zero characters).

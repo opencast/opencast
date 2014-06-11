@@ -21,21 +21,21 @@ package org.opencastproject.authorization.xacml.manager.api;
 public interface SeriesACLTransition extends AclTransition {
   /**
    * Returns the series identifier
-   * 
+   *
    * @return the series identifier
    */
   String getSeriesId();
 
   /**
    * Returns the managed access control list
-   * 
+   *
    * @return the managed access control list
    */
   ManagedAcl getAccessControlList();
 
   /**
    * Returns <code>true</code> if to override the episode ACL's from this series
-   * 
+   *
    * @return <code>true</code> if to override
    */
   boolean isOverride();

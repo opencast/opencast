@@ -70,7 +70,7 @@ public class WorkflowMigrationService {
 
   /**
    * Callback for setting the service registry
-   * 
+   *
    * @param serviceRegistry
    *          the service registry to set
    */
@@ -140,7 +140,7 @@ public class WorkflowMigrationService {
 
   /**
    * Parse an old 1.3 workflow instance
-   * 
+   *
    * @param workflowInstance
    *          the 1.3 workflow instance XML
    * @param organization

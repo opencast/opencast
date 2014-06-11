@@ -23,7 +23,7 @@ import javax.persistence.Table;
 
 /**
  * A JPA annotated version of the JaxbJobContext.
- * 
+ *
  */
 @Entity(name = "JobContext")
 @Table(name = "mh_job_context")
@@ -49,7 +49,7 @@ public class JobPropertyJpaImpl {
 
   /**
    * Creates a new job context property.
-   * 
+   *
    * @param job
    *          the root job
    * @param name

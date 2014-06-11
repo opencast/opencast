@@ -29,7 +29,7 @@ public interface SpeechRecognitionService {
   /**
    * Start the track transcription in the given language. If the given language is null, the speech-recognition service
    * find/define it automatically.
-   * 
+   *
    * @param track
    *          the track to transcribe
    * @param language
@@ -40,7 +40,7 @@ public interface SpeechRecognitionService {
 
   /**
    * Return whether the speech-recognition service support the given language. The language must be in ISO-639-2 format.
-   * 
+   *
    * @param language
    *          the language in ISO 639-2 format.
    * @return whether the service support or not the language
@@ -49,7 +49,7 @@ public interface SpeechRecognitionService {
 
   /**
    * Gets the list of all the languages supported by the speech-recognition service.
-   * 
+   *
    * @return the languages list. the languages are formated in ISO 639-2.
    */
   List<String> getSupportedLanguages();

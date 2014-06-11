@@ -44,7 +44,7 @@ public class SystemLoad {
 
   /**
    * Get the list of nodes and their current loadfactor.
-   * 
+   *
    * @return the nodeLoads
    */
   public List<NodeLoad> getNodeLoads() {
@@ -53,7 +53,7 @@ public class SystemLoad {
 
   /**
    * Sets the list of nodes and their current loadfactor.
-   * 
+   *
    * @param nodeLoads
    *          the nodeLoads to set
    */

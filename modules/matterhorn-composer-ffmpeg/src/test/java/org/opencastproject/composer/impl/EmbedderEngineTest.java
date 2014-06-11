@@ -36,7 +36,7 @@ import java.util.HashMap;
 
 /**
  * Test class for QuickTime embedder engine.
- * 
+ *
  */
 public class EmbedderEngineTest {
 

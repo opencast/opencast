@@ -98,7 +98,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * Creates a new service registration which is online
-   * 
+   *
    * @param hostRegistration
    *          the host registration
    * @param serviceType
@@ -113,7 +113,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * Creates a new service registration which is online and not in maintenance mode.
-   * 
+   *
    * @param processingHost
    *          the host
    * @param serviceId
@@ -128,7 +128,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * Gets the primary key for this service registration.
-   * 
+   *
    * @return the primary key
    */
   @Id
@@ -148,7 +148,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * Sets the primary key identifier.
-   * 
+   *
    * @param id
    *          the identifier
    */
@@ -232,7 +232,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isInMaintenanceMode()
    */
   @Transient
@@ -243,7 +243,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * Gets the associated {@link HostRegistrationJpaImpl}
-   * 
+   *
    * @return the host registration
    */
   @ManyToOne
@@ -276,7 +276,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

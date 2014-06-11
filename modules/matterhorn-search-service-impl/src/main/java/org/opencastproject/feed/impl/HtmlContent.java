@@ -26,7 +26,7 @@ public class HtmlContent extends ContentImpl {
 
   /**
    * Creates new html content container.
-   * 
+   *
    * @param value
    *          the content value
    */
@@ -36,7 +36,7 @@ public class HtmlContent extends ContentImpl {
 
   /**
    * Creates new html content container.
-   * 
+   *
    * @param value
    *          the content value
    * @param mode

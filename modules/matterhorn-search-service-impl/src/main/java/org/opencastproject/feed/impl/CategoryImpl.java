@@ -31,7 +31,7 @@ public class CategoryImpl implements Category {
 
   /**
    * Creates a new category.
-   * 
+   *
    * @param name
    *          the name
    * @param taxonomyUri

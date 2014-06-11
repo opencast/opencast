@@ -132,7 +132,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * OSGi callback on component activation.
-   * 
+   *
    * @param ctx
    *          the bundle context
    */
@@ -142,7 +142,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#encode(org.opencastproject.mediapackage.Track,
    *      java.lang.String)
    */
@@ -159,7 +159,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /**
    * Encodes audio and video track to a file. If both an audio and a video track are given, they are muxed together into
    * one movie container.
-   * 
+   *
    * @param videoTrack
    *          the video track
    * @param audioTrack
@@ -277,7 +277,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#trim(org.opencastproject.mediapackage.Track,
    *      java.lang.String, long, long)
    */
@@ -298,7 +298,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /**
    * Trims the given track using the encoding profile <code>profileId</code> and the given starting point and duration
    * in miliseconds.
-   * 
+   *
    * @param job
    *          the associated job
    * @param sourceTrack
@@ -390,7 +390,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#mux(org.opencastproject.mediapackage.Track,
    *      org.opencastproject.mediapackage.Track, java.lang.String)
    */
@@ -409,7 +409,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#composite(Dimension, LaidOutElement, LaidOutElement, Option,
    *      String, Option)
    */
@@ -905,7 +905,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Muxes the audio and video track into one movie container.
-   * 
+   *
    * @param job
    *          the associated job
    * @param videoTrack
@@ -927,7 +927,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#listProfiles()
    */
   @Override
@@ -938,7 +938,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#getProfile(java.lang.String)
    */
   @Override
@@ -948,7 +948,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#image(Track, String, double...)
    */
   @Override
@@ -978,7 +978,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Extracts an image from <code>sourceTrack</code> at the given point in time.
-   * 
+   *
    * @param job
    *          the associated job
    * @param sourceTrack
@@ -1095,7 +1095,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#convertImage(org.opencastproject.mediapackage.Attachment,
    *      java.lang.String)
    */
@@ -1117,7 +1117,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Converts an image from <code>sourceImage</code> to a new format.
-   * 
+   *
    * @param job
    *          the associated job
    * @param sourceImage
@@ -1206,9 +1206,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * Supports inserting captions in QuickTime files.
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#captions(org.opencastproject.mediapackage.Track,
    *      org.opencastproject.mediapackage.Catalog[])
    */
@@ -1230,7 +1230,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Adds the closed captions contained in the <code>captions</code> catalog collection to <code>mediaTrack</code>.
-   * 
+   *
    * @param job
    *          the associated job
    * @param mediaTrack
@@ -1351,7 +1351,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Helper function that iterates tags and returns language from tag in form lang:&lt;lang&gt;
-   * 
+   *
    * @param tags
    *          catalog tags
    * @return language or null if no corresponding tag was found
@@ -1367,7 +1367,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Deletes any valid file in the list.
-   * 
+   *
    * @param encodingOutput
    *          list of files to be deleted
    */
@@ -1396,7 +1396,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -1523,7 +1523,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the media inspection service
-   * 
+   *
    * @param mediaInspectionService
    *          an instance of the media inspection service
    */
@@ -1533,7 +1533,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the encoder engine factory
-   * 
+   *
    * @param encoderEngineFactory
    *          The encoder engine factory
    */
@@ -1543,7 +1543,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the embedder engine factoy
-   * 
+   *
    * @param embedderEngineFactory
    *          The embedder engine factory
    */
@@ -1553,7 +1553,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the workspace
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -1563,7 +1563,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the service registry
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -1573,7 +1573,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -1583,7 +1583,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets the profile scanner.
-   * 
+   *
    * @param scanner
    *          the profile scanner
    */
@@ -1593,7 +1593,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -1603,7 +1603,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -1613,7 +1613,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -1623,7 +1623,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -1633,7 +1633,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -1643,7 +1643,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override
@@ -1664,7 +1664,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * Encodes a video track with a watermark.
-   * 
+   *
    * @param mediaTrack
    *          the video track
    * @param watermark

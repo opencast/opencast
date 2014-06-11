@@ -25,7 +25,7 @@ public class SearchException extends RuntimeException {
   private static final long serialVersionUID = -7411693851983157126L;
 
   /**
-   * 
+   *
    */
   public SearchException() {
   }

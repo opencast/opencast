@@ -104,7 +104,7 @@ public class JpaUserReference {
 
   /**
    * Constructs a user with the specified username, name, email, login mechanism, last login date and organization.
-   * 
+   *
    * @param username
    *          the username
    * @param name
@@ -133,7 +133,7 @@ public class JpaUserReference {
   /**
    * Constructs a user with the specified username, name, email, login mechanism, last login date, organization and
    * roles.
-   * 
+   *
    * @param username
    *          the username
    * @param name
@@ -213,7 +213,7 @@ public class JpaUserReference {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -226,7 +226,7 @@ public class JpaUserReference {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -236,7 +236,7 @@ public class JpaUserReference {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

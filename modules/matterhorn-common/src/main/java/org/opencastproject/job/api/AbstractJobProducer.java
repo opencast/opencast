@@ -51,7 +51,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * Creates a new abstract job producer for jobs of the given type.
-   * 
+   *
    * @param jobType
    *          the job type
    */
@@ -61,7 +61,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#getJobType()
    */
   @Override
@@ -71,7 +71,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#countJobs(org.opencastproject.job.api.Job.Status)
    */
   @Override
@@ -83,7 +83,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#acceptJob(org.opencastproject.job.api.Job)
    */
   @Override
@@ -99,7 +99,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#isReadyToAcceptJobs(String)
    */
   @Override
@@ -109,7 +109,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#isReadyToAccept(org.opencastproject.job.api.Job)
    */
   @Override
@@ -119,28 +119,28 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * Returns a reference to the service registry.
-   * 
+   *
    * @return the service registry
    */
   protected abstract ServiceRegistry getServiceRegistry();
 
   /**
    * Returns a reference to the security service
-   * 
+   *
    * @return the security service
    */
   protected abstract SecurityService getSecurityService();
 
   /**
    * Returns a reference to the user directory service
-   * 
+   *
    * @return the user directory service
    */
   protected abstract UserDirectoryService getUserDirectoryService();
 
   /**
    * Returns a reference to the organization directory service.
-   * 
+   *
    * @return the organization directory service
    */
   protected abstract OrganizationDirectoryService getOrganizationDirectoryService();
@@ -148,10 +148,10 @@ public abstract class AbstractJobProducer implements JobProducer {
   /**
    * Asks the overriding class to process the arguments using the given operation. The result will be added to the
    * associated job as the payload.
-   * 
+   *
    * @param job
    *          the job to process
-   * 
+   *
    * @return the operation result
    * @throws Exception
    */
@@ -170,7 +170,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
     /**
      * Constructs a new job runner
-     * 
+     *
      * @param job
      *          the job to run
      * @param currentJob
@@ -183,7 +183,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.util.concurrent.Callable#call()
      */
     @Override

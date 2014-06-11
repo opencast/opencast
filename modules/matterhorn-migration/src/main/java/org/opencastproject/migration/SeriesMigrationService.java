@@ -82,7 +82,7 @@ public class SeriesMigrationService {
 
   /**
    * Callback for setting the series service.
-   * 
+   *
    * @param seriesService
    *          the series service to set
    */
@@ -92,7 +92,7 @@ public class SeriesMigrationService {
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the security service to set
    */
@@ -102,7 +102,7 @@ public class SeriesMigrationService {
 
   /**
    * Callback for setting the organization directory service.
-   * 
+   *
    * @param orgDirectoryService
    *          the organization directory service to set
    */
@@ -112,7 +112,7 @@ public class SeriesMigrationService {
 
   /**
    * OSGi callback to set persistence properties.
-   * 
+   *
    * @param persistenceProperties
    *          persistence properties
    */
@@ -122,7 +122,7 @@ public class SeriesMigrationService {
 
   /**
    * OSGi callback to set persistence provider.
-   * 
+   *
    * @param persistenceProvider
    *          {@link PersistenceProvider} object
    */
@@ -210,7 +210,7 @@ public class SeriesMigrationService {
 
   /**
    * Parse the series ACL from Matterhorn 1.3 and returns a valid ACL for 1.4
-   * 
+   *
    * @param serializedForm
    *          The serialized version of the 1.3 ACL
    * @return A valid version of the given ACL for 1.4

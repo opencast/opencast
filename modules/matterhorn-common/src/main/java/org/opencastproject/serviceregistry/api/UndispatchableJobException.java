@@ -28,7 +28,7 @@ public class UndispatchableJobException extends Exception {
 
   /**
    * Creates a new undispatchable job exception
-   * 
+   *
    * @param message
    *          the error message
    * @param t
@@ -40,7 +40,7 @@ public class UndispatchableJobException extends Exception {
 
   /**
    * Creates a new undispatchable job exception
-   * 
+   *
    * @param message
    *          the error message
    */
@@ -50,7 +50,7 @@ public class UndispatchableJobException extends Exception {
 
   /**
    * Creates a new undispatchable job exception
-   * 
+   *
    * @param t
    *          the exception causing the error
    */

@@ -67,7 +67,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -77,7 +77,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the inspection service
-   * 
+   *
    * @param service
    *          the inspection service
    */
@@ -87,7 +87,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Removes the inspection service
-   * 
+   *
    * @param service
    */
   public void unsetService(MediaInspectionService service) {
@@ -96,7 +96,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -145,7 +145,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -158,7 +158,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override
@@ -168,7 +168,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Checks if the service or services are available, if not it handles it by returning a 503 with a message
-   * 
+   *
    * @param services
    *          an array of services to check
    */

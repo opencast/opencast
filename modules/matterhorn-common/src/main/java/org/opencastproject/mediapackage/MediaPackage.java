@@ -34,7 +34,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the media package identifier.
-   * 
+   *
    * @return the identifier
    */
   Id getIdentifier();
@@ -45,7 +45,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the title for the associated series, if any.
-   * 
+   *
    * @return The series title
    */
   String getSeriesTitle();
@@ -54,7 +54,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the title of the episode that this mediapackage represents.
-   * 
+   *
    * @return The episode title
    */
   String getTitle();
@@ -65,7 +65,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the names of the institutions or people who created this mediapackage
-   * 
+   *
    * @return the creators of this mediapackage
    */
   String[] getCreators();
@@ -74,7 +74,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the series, if any, to which this mediapackage belongs
-   * 
+   *
    * @return the series
    */
   String getSeries();
@@ -83,7 +83,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * The license for the content in this mediapackage
-   * 
+   *
    * @return the license
    */
   String getLicense();
@@ -94,7 +94,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the names of the institutions or people who contributed to the content within this mediapackage
-   * 
+   *
    * @return the contributors
    */
   String[] getContributors();
@@ -103,7 +103,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the language written and/or spoken in the media content of this mediapackage
-   * 
+   *
    * @return the language
    */
   String getLanguage();
@@ -114,7 +114,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * The keywords describing the subject(s) or categories describing the content of this mediapackage
-   * 
+   *
    * @return the subjects
    */
   String[] getSubjects();
@@ -123,14 +123,14 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the media package start time.
-   * 
+   *
    * @return the start time
    */
   Date getDate();
 
   /**
    * Returns the media package duration in milliseconds or <code>null</code> if no duration is available.
-   * 
+   *
    * @return the duration
    */
   Long getDuration();
@@ -139,7 +139,7 @@ public interface MediaPackage extends Cloneable {
    * Sets the duration of the media package in milliseconds. This method will throw an {@link IllegalStateException} if
    * tracks have been added to the mediapackage already. Also note that as soon as the first track is added, the
    * duration will be udpated according to the track's length.
-   * 
+   *
    * @param duration
    *          the duration in milliseconds
    * @throws IllegalStateException
@@ -149,7 +149,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns <code>true</code> if the given element is part of the media package.
-   * 
+   *
    * @param element
    *          the element
    * @return <code>true</code> if the element belongs to the media package
@@ -158,21 +158,21 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns an iteration of the media package elements.
-   * 
+   *
    * @return the media package elements
    */
   Iterable<MediaPackageElement> elements();
 
   /**
    * Returns all of the elements.
-   * 
+   *
    * @return the elements
    */
   MediaPackageElement[] getElements();
 
   /**
    * Returns the element that is identified by the given reference or <code>null</code> if no such element exists.
-   * 
+   *
    * @param reference
    *          the reference
    * @return the element
@@ -181,7 +181,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the element that is identified by the given identifier or <code>null</code> if no such element exists.
-   * 
+   *
    * @param id
    *          the element identifier
    * @return the element
@@ -190,7 +190,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the elements that are tagged with the given tag or an empty array if no such elements are found.
-   * 
+   *
    * @param tag
    *          the tag
    * @return the elements
@@ -202,7 +202,7 @@ public interface MediaPackage extends Cloneable {
    * any of the tags in the <code>tags</code> collection start with a '-' character, any elements matching the tag will
    * be excluded from the returned MediaPackageElement[]. If <code>tags</code> is empty or null, all elements are
    * returned.
-   * 
+   *
    * @param tags
    *          the tags
    * @return the elements
@@ -211,14 +211,14 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns all elements of this media package with the given flavor.
-   * 
+   *
    * @return the media package elements
    */
   MediaPackageElement[] getElementsByFlavor(MediaPackageElementFlavor flavor);
 
   /**
    * Returns the track identified by <code>trackId</code> or <code>null</code> if that track doesn't exists.
-   * 
+   *
    * @param trackId
    *          the track identifier
    * @return the tracks
@@ -227,14 +227,14 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the tracks that are part of this media package.
-   * 
+   *
    * @return the tracks
    */
   Track[] getTracks();
 
   /**
    * Returns the tracks that are tagged with the given tag or an empty array if no such tracks are found.
-   * 
+   *
    * @param tag
    *          the tag
    * @return the tracks
@@ -245,7 +245,7 @@ public interface MediaPackage extends Cloneable {
    * Returns the tracks that are tagged with any of the given tags or an empty array if no such elements are found. If
    * any of the tags in the <code>tags</code> collection start with a '-' character, any elements matching the tag will
    * be excluded from the returned Track[]. If <code>tags</code> is empty or null, all tracks are returned.
-   * 
+   *
    * @param tags
    *          the tags
    * @return the tracks
@@ -254,7 +254,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the tracks that are part of this media package and match the given flavor as defined in {@link Track}.
-   * 
+   *
    * @param flavor
    *          the track's flavor
    * @return the tracks with the specified flavor
@@ -264,7 +264,7 @@ public interface MediaPackage extends Cloneable {
   /**
    * Returns the tracks that are part of this media package and are refering to the element identified by
    * <code>reference</code>.
-   * 
+   *
    * @param reference
    *          the reference
    * @return the tracks with the specified reference
@@ -274,7 +274,7 @@ public interface MediaPackage extends Cloneable {
   /**
    * Returns the tracks that are part of this media package and are refering to the element identified by
    * <code>reference</code>.
-   * 
+   *
    * @param reference
    *          the reference
    * @param includeDerived
@@ -286,7 +286,7 @@ public interface MediaPackage extends Cloneable {
   /**
    * Returns the tracks that are part of this media package and are refering to the element identified by
    * <code>reference</code>.
-   * 
+   *
    * @param flavor
    *          the element flavor
    * @param reference
@@ -297,7 +297,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns <code>true</code> if the media package contains media tracks of any kind.
-   * 
+   *
    * @return <code>true</code> if the media package contains tracks
    */
   boolean hasTracks();
@@ -305,7 +305,7 @@ public interface MediaPackage extends Cloneable {
   /**
    * Returns the attachment identified by <code>attachmentId</code> or <code>null</code> if that attachment doesn't
    * exists.
-   * 
+   *
    * @param attachmentId
    *          the attachment identifier
    * @return the attachments
@@ -314,14 +314,14 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the attachments that are part of this media package.
-   * 
+   *
    * @return the attachments
    */
   Attachment[] getAttachments();
 
   /**
    * Returns the attachments that are tagged with the given tag or an empty array if no such attachments are found.
-   * 
+   *
    * @param tag
    *          the tag
    * @return the attachments
@@ -333,7 +333,7 @@ public interface MediaPackage extends Cloneable {
    * found. If any of the tags in the <code>tags</code> collection start with a '-' character, any elements matching the
    * tag will be excluded from the returned Attachment[]. If <code>tags</code> is empty or null, all attachments are
    * returned.
-   * 
+   *
    * @param tags
    *          the tags
    * @return the attachments
@@ -342,7 +342,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the attachments that are part of this media package and match the specified flavor.
-   * 
+   *
    * @param flavor
    *          the attachment flavor
    * @return the attachments
@@ -352,7 +352,7 @@ public interface MediaPackage extends Cloneable {
   /**
    * Returns the attachments that are part of this media package and are refering to the element identified by
    * <code>reference</code>.
-   * 
+   *
    * @param reference
    *          the reference
    * @return the attachments with the specified reference
@@ -362,7 +362,7 @@ public interface MediaPackage extends Cloneable {
   /**
    * Returns the attachments that are part of this media package and are refering to the element identified by
    * <code>reference</code>.
-   * 
+   *
    * @param reference
    *          the reference
    * @param includeDerived
@@ -374,7 +374,7 @@ public interface MediaPackage extends Cloneable {
   /**
    * Returns the attachments that are part of this media package and are refering to the element identified by
    * <code>reference</code>.
-   * 
+   *
    * @param flavor
    *          the element flavor
    * @param reference
@@ -392,14 +392,14 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns <code>true</code> if the media package contains attachments of any kind.
-   * 
+   *
    * @return <code>true</code> if the media package contains attachments
    */
   boolean hasAttachments();
 
   /**
    * Returns the catalog identified by <code>catalogId</code> or <code>null</code> if that catalog doesn't exists.
-   * 
+   *
    * @param catalogId
    *          the catalog identifier
    * @return the catalogs
@@ -408,14 +408,14 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the catalogs associated with this media package.
-   * 
+   *
    * @return the catalogs
    */
   Catalog[] getCatalogs();
 
   /**
    * Returns the catalogs that are tagged with the given tag or an empty array if no such catalogs are found.
-   * 
+   *
    * @param tag
    *          the tag
    * @return the catalogs
@@ -426,7 +426,7 @@ public interface MediaPackage extends Cloneable {
    * Returns the catalogs that are tagged with any of the given tags or an empty array if no such elements are found. If
    * any of the tags in the <code>tags</code> collection start with a '-' character, any elements matching the tag will
    * be excluded from the returned Catalog[]. If <code>tags</code> is empty or null, all catalogs are returned.
-   * 
+   *
    * @param tags
    *          the tags
    * @return the catalogs
@@ -435,7 +435,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns the catalogs associated with this media package that matches the specified flavor.
-   * 
+   *
    * @param flavor
    *          the catalog type
    * @return the media package catalogs
@@ -445,7 +445,7 @@ public interface MediaPackage extends Cloneable {
   /**
    * Returns the catalogs that are part of this media package and are refering to the element identified by
    * <code>reference</code>.
-   * 
+   *
    * @param reference
    *          the reference
    * @return the catalogs with the specified reference
@@ -455,7 +455,7 @@ public interface MediaPackage extends Cloneable {
   /**
    * Returns the catalogs that are part of this media package and are refering to the element identified by
    * <code>reference</code>.
-   * 
+   *
    * @param reference
    *          the reference
    * @param includeDerived
@@ -467,7 +467,7 @@ public interface MediaPackage extends Cloneable {
   /**
    * Returns the catalogs that are part of this media package and are refering to the element identified by
    * <code>reference</code>.
-   * 
+   *
    * @param flavor
    *          the element flavor
    * @param reference
@@ -478,14 +478,14 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns <code>true</code> if the media package contains catalogs of any kind.
-   * 
+   *
    * @return <code>true</code> if the media package contains catalogs
    */
   boolean hasCatalogs();
 
   /**
    * Returns media package elements that are neither, attachments, catalogs nor tracks.
-   * 
+   *
    * @return the other media package elements
    */
   MediaPackageElement[] getUnclassifiedElements();
@@ -493,7 +493,7 @@ public interface MediaPackage extends Cloneable {
   /**
    * Returns media package elements that are neither, attachments, catalogs nor tracks but have the given element
    * flavor.
-   * 
+   *
    * @param flavor
    *          the element flavor
    * @return the other media package elements
@@ -502,14 +502,14 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Returns <code>true</code> if the media package contains unclassified elements.
-   * 
+   *
    * @return <code>true</code> if the media package contains unclassified elements
    */
   boolean hasUnclassifiedElements();
 
   /**
    * Returns <code>true</code> if the media package contains unclassified elements matching the specified element type.
-   * 
+   *
    * @param flavor
    *          element flavor of the unclassified element
    * @return <code>true</code> if the media package contains unclassified elements
@@ -520,7 +520,7 @@ public interface MediaPackage extends Cloneable {
    * Adds an arbitrary {@link URI} to this media package, utilizing a {@link MediaPackageBuilder} to create a suitable
    * media package element out of the url. If the content cannot be recognized as being either a metadata catalog or
    * multimedia track, it is added as an attachment.
-   * 
+   *
    * @param uri
    *          the element location
    */
@@ -530,7 +530,7 @@ public interface MediaPackage extends Cloneable {
    * Adds an arbitrary {@link URI} to this media package, utilizing a {@link MediaPackageBuilder} to create a suitable
    * media package element out of the url. If the content cannot be recognized as being either a metadata catalog or
    * multimedia track, it is added as an attachment.
-   * 
+   *
    * @param uri
    *          the element location
    * @param type
@@ -542,7 +542,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Adds an arbitrary {@link MediaPackageElement} to this media package.
-   * 
+   *
    * @param element
    *          the element
    */
@@ -553,7 +553,7 @@ public interface MediaPackage extends Cloneable {
    * <em>only</em> if you do not need the track in its originial place anymore.
    * <p>
    * Depending on the implementation, this method may provide significant performance benefits over copying the track.
-   * 
+   *
    * @param track
    *          the track
    */
@@ -561,7 +561,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Removes the element with the given identifier from the mediapackage and returns it.
-   * 
+   *
    * @param id
    *          the element identifier
    */
@@ -569,7 +569,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Removes the track from the media package.
-   * 
+   *
    * @param track
    *          the track
    */
@@ -577,7 +577,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Adds catalog information to this media package.
-   * 
+   *
    * @param catalog
    *          the catalog
    */
@@ -585,7 +585,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Removes the catalog from the media package.
-   * 
+   *
    * @param catalog
    *          the catalog
    */
@@ -593,7 +593,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Adds an attachment to this media package.
-   * 
+   *
    * @param attachment
    *          the attachment
    */
@@ -601,7 +601,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Removes an arbitrary media package element.
-   * 
+   *
    * @param element
    *          the media package element
    */
@@ -609,7 +609,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Removes the attachment from the media package.
-   * 
+   *
    * @param attachment
    *          the attachment
    */
@@ -622,7 +622,7 @@ public interface MediaPackage extends Cloneable {
    * This method will add <code>derviedElement</code> to the media package and add a reference to the original element
    * <code>sourceElement</code>. Make sure that <code>derivedElement</code> features the right flavor, so that you are
    * later able to look up derived work using {@link #getDerived(MediaPackageElement, MediaPackageElementFlavor)}.
-   * 
+   *
    * @param derivedElement
    *          the derived element
    * @param sourceElement
@@ -637,7 +637,7 @@ public interface MediaPackage extends Cloneable {
    * This method will add <code>derviedElement</code> to the media package and add a reference to the original element
    * <code>sourceElement</code>. Make sure that <code>derivedElement</code> features the right flavor, so that you are
    * later able to look up derived work using {@link #getDerived(MediaPackageElement, MediaPackageElementFlavor)}.
-   * 
+   *
    * @param derivedElement
    *          the derived element
    * @param sourceElement
@@ -651,7 +651,7 @@ public interface MediaPackage extends Cloneable {
    * Returns those media package elements that are derivates of <code>sourceElement</code> and feature the flavor
    * <code>derivateFlavor</code>. Using this method, you could easily look up e. g. flash-encoded versions of the
    * presenter track or converted versions of a time text captions file.
-   * 
+   *
    * @param sourceElement
    *          the original track, catalog or attachment
    * @param derivateFlavor
@@ -662,7 +662,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Adds <code>observer</code> to the list of observers of this media package.
-   * 
+   *
    * @param observer
    *          the observer
    */
@@ -670,7 +670,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Removes <code>observer</code> from the list of observers of this media package.
-   * 
+   *
    * @param observer
    *          the observer
    */
@@ -678,7 +678,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Verifies the media package consistency by checking the media package elements for mimetypes and checksums.
-   * 
+   *
    * @throws MediaPackageException
    *           if an error occurs while checking the media package
    */
@@ -686,7 +686,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Renames the media package to the new identifier.
-   * 
+   *
    * @param identifier
    *          the identifier TODO @return <code>true</code> if the media package could be renamed
    */
@@ -694,7 +694,7 @@ public interface MediaPackage extends Cloneable {
 
   /**
    * Creates a deep copy of the media package.
-   * 
+   *
    * @return the cloned media package
    */
   Object clone();

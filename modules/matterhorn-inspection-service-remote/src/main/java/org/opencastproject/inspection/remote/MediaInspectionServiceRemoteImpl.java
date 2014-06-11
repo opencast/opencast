@@ -54,7 +54,7 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.api.MediaInspectionService#inspect(java.net.URI)
    */
   @Override
@@ -82,7 +82,7 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(org.opencastproject.mediapackage.AbstractMediaPackageElement,
    *      boolean)
    */

@@ -403,7 +403,7 @@ public abstract class Option<A> implements Iterable<A> {
 
   /**
    * Use this function in <code>getOrElse</code> if it is an error being none.
-   * 
+   *
    * @deprecated use {@link #orError(Throwable)} or {@link #orElse(Function0)} instead since it saves the need for
    *             creating new objects just for the sake of type soundness. Java unfortunately lacks a bottom type.
    */
@@ -418,7 +418,7 @@ public abstract class Option<A> implements Iterable<A> {
 
   /**
    * Create an equals function.
-   * 
+   *
    * <pre>
    *   some("abc").map(eq("bcd")).getOrElse(false) // false
    *   some("abc").map(eq("abc")).getOrElse(false) // true

@@ -21,7 +21,7 @@ import org.opencastproject.caption.impl.TimeImpl;
 
 /**
  * Auxiliary class that contains methods for converting from and to specific time formats.
- * 
+ *
  */
 public final class TimeUtil {
 
@@ -40,7 +40,7 @@ public final class TimeUtil {
 
   /**
    * Parse String representation of SubRip time format.
-   * 
+   *
    * @param timeSrt
    *          SubRip time format
    * @return parsed {@link Time} instance
@@ -62,7 +62,7 @@ public final class TimeUtil {
 
   /**
    * Exports {@link Time} instance to the SubRip time format representation.
-   * 
+   *
    * @param time
    *          {@link Time} instance to be exported
    * @return time exported to SubRip time format
@@ -76,7 +76,7 @@ public final class TimeUtil {
 
   /**
    * Parse String representation of DFXP time format. It does not support parsing of metrics (for example: 34.567s).
-   * 
+   *
    * @param timeDfxp
    *          DFXP time format
    * @return parsed {@link Time} instance
@@ -113,7 +113,7 @@ public final class TimeUtil {
 
   /**
    * Exports {@link Time} instance to the DFXP time format representation. Specifically time format used is 0:00:00.000
-   * 
+   *
    * @param time
    *          {@link Time} instance to be exported
    * @return time exported to DFXP time format

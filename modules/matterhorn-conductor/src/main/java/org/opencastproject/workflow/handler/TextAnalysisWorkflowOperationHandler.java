@@ -134,7 +134,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -144,7 +144,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Callback for the OSGi declarative services configuration that will set the text analysis service.
-   * 
+   *
    * @param analysisService
    *          the text analysis service
    */
@@ -155,7 +155,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -165,7 +165,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param catalogService
    *          the catalog service
    */
@@ -175,7 +175,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
    */
   public void activate(ComponentContext cc) {
@@ -185,7 +185,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -211,7 +211,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Runs the text analysis service on each of the video segments found.
-   * 
+   *
    * @param mediaPackage
    *          the original mediapackage
    * @param operation
@@ -423,10 +423,17 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
           Catalog catalog = null;
           try {
             Job job = serviceRegistry.getJob(j.getId());
+            if (!Job.Status.FINISHED.equals(job.getStatus()))
+              continue;
             catalog = (Catalog) MediaPackageElementParser.getFromXml(job.getPayload());
-            workspace.delete(catalog.getURI());
+            if (catalog != null)
+              workspace.delete(catalog.getURI());
           } catch (Exception e) {
-            logger.warn("Unable to delete temporary text file {}: {}", catalog.getURI(), e);
+            if (catalog != null) {
+              logger.warn("Unable to delete temporary text file {}: {}", catalog.getURI(), e);
+            } else {
+              logger.warn("Unable to parse textextraction payload of job {}", j.getId());
+            }
           }
         }
       }
@@ -438,7 +445,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Loads an mpeg7 catalog from a mediapackage's catalog reference
-   * 
+   *
    * @param catalog
    *          the mediapackage's reference to this catalog
    * @return the mpeg7
@@ -455,18 +462,13 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
       throw new IOException("Unable to open catalog " + catalog + ": " + e.getMessage());
     } finally {
       IOUtils.closeQuietly(in);
-      try {
-        workspace.delete(catalog.getURI());
-      } catch (NotFoundException e) {
-        throw new IOException(e);
-      }
     }
   }
 
   /**
    * Extracts the catalogs from the media package that match the requirements of flavor and tags specified in the
    * operation handler.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param operation
@@ -523,7 +525,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Determine the stability threshold used to select the slide extraction timepoint.
-   * 
+   *
    * @return the stability threshold in seconds
    */
   private int getStabilityThreshold() {
@@ -556,7 +558,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /**
    * Sets the composer service.
-   * 
+   *
    * @param composerService
    */
   public void setComposerService(ComposerService composerService) {
