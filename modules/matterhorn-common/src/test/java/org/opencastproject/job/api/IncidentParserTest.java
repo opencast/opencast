@@ -21,7 +21,7 @@ import static org.opencastproject.fn.juc.Immutables.list;
 import static org.opencastproject.fn.juc.Immutables.map;
 import static org.opencastproject.util.IoSupport.loadFileFromClassPathAsString;
 import static org.opencastproject.util.data.Tuple.tuple;
-import static org.xmlmatchers.XmlMatchers.isEquivalentTo;
+import static org.xmlmatchers.XmlMatchers.isSimilarTo;
 import static org.xmlmatchers.transform.XmlConverters.the;
 
 import org.opencastproject.fn.juc.Immutables;
@@ -35,42 +35,34 @@ import java.util.Date;
 public class IncidentParserTest {
   @Test
   public void testSerializationOfJaxbIncident() throws Exception {
-    final Incident incident = new IncidentImpl(
-            1, 2, "service", "localhost", new Date(0), Severity.FAILURE, "code",
-            list(tuple("title", "content"), tuple("Another title", "...and even more content")),
-            map(tuple("key", "value")));
+    final Incident incident = new IncidentImpl(1, 2, "service", "localhost", new Date(0), Severity.FAILURE, "code",
+            list(tuple("title", "content"), tuple("Another title", "...and even more content")), map(tuple("key",
+                    "value")));
     final String marshaled = IncidentParser.I.toXml(new JaxbIncident(incident));
     System.out.println(marshaled);
-    assertThat(
-            the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-1.xml").get()),
-            isEquivalentTo(the(marshaled)));
+    assertThat(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-1.xml").get()),
+            isSimilarTo(the(marshaled)));
     final Incident unmarshaled = IncidentParser.I.parseIncidentFromXml(IOUtils.toInputStream(marshaled)).toIncident();
     assertEquals(incident, unmarshaled);
   }
 
   @Test
   public void testSerializationOfJaxbIncidentTree() throws Exception {
-    final IncidentTree tree = new IncidentTreeImpl(
-            list(incident(1), incident(2)),
-            Immutables.<IncidentTree>list(new IncidentTreeImpl(
-                    list(incident(3)),
-                    Immutables.<IncidentTree>list(new IncidentTreeImpl(
-                            list(incident(4), incident(5)),
-                            Immutables.<IncidentTree>nil())))));
+    final IncidentTree tree = new IncidentTreeImpl(list(incident(1), incident(2)),
+            Immutables.<IncidentTree> list(new IncidentTreeImpl(list(incident(3)), Immutables
+                    .<IncidentTree> list(new IncidentTreeImpl(list(incident(4), incident(5)), Immutables
+                            .<IncidentTree> nil())))));
     final String marshaled = IncidentParser.I.toXml(new JaxbIncidentTree(tree));
     System.out.println(marshaled);
-    assertThat(
-            the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-tree-1.xml").get()),
-            isEquivalentTo(the(marshaled)));
-    final IncidentTree unmarshaled = IncidentParser.I
-            .parseIncidentTreeFromXml(IOUtils.toInputStream(marshaled)).toIncidentTree();
+    assertThat(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-tree-1.xml").get()),
+            isSimilarTo(the(marshaled)));
+    final IncidentTree unmarshaled = IncidentParser.I.parseIncidentTreeFromXml(IOUtils.toInputStream(marshaled))
+            .toIncidentTree();
     assertEquals(tree, unmarshaled);
   }
 
   public Incident incident(long id) {
-    return new IncidentImpl(
-            id, 2, "service", "localhost", new Date(id), Severity.FAILURE, "code",
-            list(tuple("title", "content")),
-            map(tuple("key", "value")));
+    return new IncidentImpl(id, 2, "service", "localhost", new Date(id), Severity.FAILURE, "code", list(tuple("title",
+            "content")), map(tuple("key", "value")));
   }
 }
