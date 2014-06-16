@@ -40,6 +40,8 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.search.api.SearchException;
+import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
@@ -95,6 +97,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String STREAMING_SOURCE_FLAVORS = "streaming-source-flavors";
   private static final String STREAMING_TARGET_SUBFLAVOR = "streaming-target-subflavor";
   private static final String CHECK_AVAILABILITY = "check-availability";
+
+  /** Workflow configuration option keys to only merge or overwrite element in exiting mediapackage */
+  private static final String OPT_MERGE_ONLY = "merge-only";
 
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
@@ -165,6 +170,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             "Add all of these comma separated tags to elements that have been distributed for download.");
     CONFIG_OPTIONS.put(CHECK_AVAILABILITY,
             "( true | false ) defaults to true. Check if the distributed download artifact is available at its URL");
+    CONFIG_OPTIONS.put(OPT_MERGE_ONLY,
+            "Republish only if it can be merged with or replace existing published data");
   }
 
   @Override
@@ -326,6 +333,18 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       try {
         MediaPackage mediaPackageForSearch = getMediaPackageForSearchIndex(mediaPackage, jobs, downloadSubflavor,
                 targetDownloadTags, downloadElementIds, streamingSubflavor, streamingElementIds, targetStreamingTags);
+
+        // MH-10216, check if only merging into existing mediapackage
+        boolean merge = Boolean.parseBoolean(workflowInstance.getCurrentOperation().getConfiguration(OPT_MERGE_ONLY));
+        if (merge) {
+          // merge() returns merged mediapackage or null mediaPackage is not published
+          mediaPackageForSearch = merge(mediaPackageForSearch);
+          if (mediaPackageForSearch == null) {
+            logger.info("Skipping republish for {} since it is not currently published", mediaPackage.getIdentifier().toString());
+            return createResult(mediaPackage, Action.SKIP);
+          }
+        }
+
         if (!isPublishable(mediaPackageForSearch))
           throw new WorkflowOperationException("Media package does not meet criteria for publication");
 
@@ -535,6 +554,67 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       logger.warn("Media package does not meet criteria for publication: There are no tracks");
 
     return hasTitle && hasTracks;
+  }
+
+  /**
+   * MH-10216, method copied from the original RepublishWorkflowOperationHandler
+   * Merges mediapackage with published mediapackage.
+   *
+   * @param mediaPackageForSearch
+   * @return merged mediapackage or null if a published medipackage was not found
+   * @throws WorkflowOperationException
+   */
+  protected MediaPackage merge(MediaPackage mediaPackageForSearch) throws WorkflowOperationException {
+    MediaPackage mergedMediaPackage = null;
+      SearchQuery query = new SearchQuery().withId(mediaPackageForSearch.toString());
+      SearchResult result = searchService.getByQuery(query);
+      if (result.size() == 0) {
+        logger.info("The search service doesn't know mediapackage {}, cannot be republished.", mediaPackageForSearch);
+        return mergedMediaPackage; // i.e. null
+      } else if (result.size() > 1) {
+        logger.warn("More than one mediapackage with id {} returned from search service", mediaPackageForSearch);
+        throw new WorkflowOperationException("More than one mediapackage with id " + mediaPackageForSearch + " found");
+      } else {
+        // else, merge the new with the existing (new elements will overwrite existing elements)
+        mergedMediaPackage = mergePackages(mediaPackageForSearch, result.getItems()[0].getMediaPackage());
+      }
+
+    return mergedMediaPackage;
+  }
+
+  /**
+   * MH-10216, Copied from the original RepublishWorkflowOperationHandler
+   *
+   * Merges the updated mediapackage with the one that is currently published in a way where the updated elements
+   * replace existing ones in the published mediapackage based on their flavor.
+   * <p>
+   * If <code>publishedMp</code> is <code>null</code>, this method returns the updated mediapackage without any
+   * modifications.
+   *
+   * @param updatedMp
+   *          the updated media package
+   * @param publishedMp
+   *          the mediapackage that is currently published
+   * @return the merged mediapackage
+   */
+  protected MediaPackage mergePackages(MediaPackage updatedMp, MediaPackage publishedMp) {
+    if (publishedMp == null)
+      return updatedMp;
+
+    MediaPackage mergedMediaPackage = (MediaPackage) updatedMp.clone();
+    for (MediaPackageElement element : publishedMp.elements()) {
+      String type = element.getElementType().toString().toLowerCase();
+      if (updatedMp.getElementsByFlavor(element.getFlavor()).length == 0) {
+        logger.info("Merging {} '{}' into the updated mediapackage", type, element.getIdentifier());
+        mergedMediaPackage.add((MediaPackageElement) element.clone());
+      } else {
+        logger.info(String.format("Overwriting existing %s '%s' with '%s' in the updated mediapackage",
+                type, element.getIdentifier(), updatedMp.getElementsByFlavor(element.getFlavor())[0].getIdentifier()));
+
+      }
+    }
+
+    return mergedMediaPackage;
   }
 
 }
