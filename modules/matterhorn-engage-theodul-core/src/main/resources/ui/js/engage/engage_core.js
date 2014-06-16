@@ -15,7 +15,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'engage/engage_tab_logic'], function (require, $, _, Backbone, EngageModel, EngageTabLogic) {
+define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/engage_model', 'engage/engage_tab_logic'], function (require, $, _, Backbone, Mousetrap, EngageModel, EngageTabLogic) {
   //
   "use strict"; // strict mode in all our application
   //
@@ -67,43 +67,96 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
           engageCore.log("EventLog: " + name + " occurs!");
         }   
       });
-      // load Stream Event
+      // Core Initialize Event
       this.dispatcher.on("Core:init", function () {
-        // fetch plugin information
-        engageCore.model.get('pluginsInfo').fetch({
-          success : function (pluginInfos) {
-            // load plugin as requirejs module
-            if (pluginInfos.get('pluginlist') && pluginInfos.get('pluginlist').plugins !== undefined) {
-              if ($.isArray(pluginInfos.get('pluginlist').plugins)) {
-                $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
-                  var plugin_name = value['name'];
-                  plugins_loaded[plugin_name] = false;
-                });
-                $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
-                  // load plugin
-                  var plugin_name = value['name'];
-                  loadPlugin('../../../plugin/' + value['static-path'] + '/', plugin_name);
-                });
-              } else {
-                // load plugin
-                var plugin_name = value['name'];
-                plugins_loaded[plugin_name] = false;
-                loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/', plugin_name);
+        //switch view template and css rules for current player mode
+        //link tag for css file
+        var cssLinkTag = $("<link>");
+        var cssAttr = {
+            type : 'text/css',
+            rel : 'stylesheet'
+        };
+        //template obj
+        var core_template = "none";
+        //path to the require module with the view logic
+        var view_logic_path = "";
+        switch(engageCore.model.get("mode")){
+        case "desktop":
+            cssAttr.href = 'css/core_desktop_style.css';
+            core_template = "templates/core_desktop.html";
+            view_logic_path = "engage/engage_desktop_view"
+            break;
+        case "mobile":
+            cssAttr.href = 'css/core_mobile_style.css';
+            core_template = "templates/core_mobile.html";
+            view_logic_path = "engage/engage_mobile_view"
+            break;
+        case "embed":
+            cssAttr.href = 'css/core_embed_style.css';
+            core_template = "templates/core_embed.html";
+            view_logic_path = "engage/engage_embed_view"
+            break;
+        }
+        cssLinkTag.attr(cssAttr);
+        //add css to DOM
+        $("head").append(cssLinkTag);
+        //load js view logic via require, see files engage_<mode>_view.js
+        require([view_logic_path], function(pluginView) {
+          //link view logic to the core
+          engageCore.pluginView = pluginView;
+          //Get Core template
+          $.get(core_template, function (template) {
+            //set template, render it and add it to DOM
+            engageCore.template = template;
+            $(engageCore.el).html(_.template(template));
+            //run init function of the view
+            engageCore.pluginView.initView();
+            /*BEGIN LOAD PLUGINS*/
+            // fetch plugin information
+            engageCore.model.get('pluginsInfo').fetch({
+              success : function (pluginInfos) {
+                // load plugin as requirejs module
+                if (pluginInfos.get('pluginlist') && pluginInfos.get('pluginlist').plugins !== undefined) {
+                  if ($.isArray(pluginInfos.get('pluginlist').plugins)) {
+                    $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
+                      var plugin_name = value['name'];
+                      plugins_loaded[plugin_name] = false;
+                    });
+                    $.each(pluginInfos.get('pluginlist').plugins, function (index, value) {
+                      // load plugin
+                      var plugin_name = value['name'];
+                      loadPlugin('../../../plugin/' + value['static-path'] + '/', plugin_name);
+                    });
+                  } else {
+                    // load plugin
+                    var plugin_name = value['name'];
+                    plugins_loaded[plugin_name] = false;
+                    loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/', plugin_name);
+                  }
+                }
               }
-            }
-          }
+            });
+            /*END LOAD PLUGINS*/
+            //wait that me infos are loaded
+            while(engageCore.model.get("meInfo").ready === false){}
+            bindHotkeysToEvents(); //bind configured hotkeys to theodul events
+          });
         });
-      });
-      //describe timeline extensions
-      $("#engage_timeline_expand_btn").click(function() {
-        $("#engage_timeline_plugin").slideToggle("fast");
-        $("#engage_timeline_expand_btn_img").toggleClass("engage_timeline_expand_btn_rotate180");
       });
       // load plugins done, hide loading and show content
       this.dispatcher.on("Core:plugin_load_done", function () {
         $(".loading").hide();
         $("#engage_view").show();
       });
+    },
+    //bind a key event as a string to given theodul event
+    bindKeyToEvent : function (hotkey, event) {
+      //only for EngageEvent objects
+      if(event instanceof EngageEvent){
+        Mousetrap.bind(hotkey, function(){
+          engageCore.trigger(event);
+        });        
+      }       
     },
     on : function (event, handler, context) {
       if(event instanceof EngageEvent){
@@ -154,43 +207,78 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
 
   /*
    * BEGIN Private core functions
-   */ 
-  function addPluginLogic() {
-    EngageTabLogic('tabs', 'engage_tab_nav');
-  }
-
-  function insertProcessedTemplate(processed_template, plugin_type, plugin_name) {
-    var container = "";
-    switch (plugin_type) {
-    case "engage_controls":       
-      $("#engage_controls").html(processed_template);
-      container = "#engage_controls";
-      break;
-    case "engage_video":        
-      $("#engage_video").html(processed_template);
-      container = "#engage_video";
-      break;        
-    case "engage_tab":        
-      var tab_ref = plugin_name.replace(/ /g, "_");
-      // insert tab navigation line
-      var tabNavTag = '<li><a href="#engage_' + tab_ref + '_tab">' + plugin_name + '</a></li>';
-      $("#engage_tab_nav").prepend(tabNavTag);
-      // insert tab content
-      var tabTag = '<div class="tab-pane" id="engage_' + tab_ref + '_tab">' + processed_template + '</div>';
-      $("#engage_tab_content").prepend(tabTag);
-      container = "#engage_" + tab_ref + "_tab";
-      break;
-    case "engage_description":
-      $("#engage_description").html(processed_template);
-      container = "#engage_description";
-      break;    
-    case "engage_timeline":
-      $("#engage_timeline_plugin").html(processed_template);
-      container = "#engage_timeline_plugin";
-      break; 
-    default:
-    }
-    return container;
+   */
+  
+  //binds configured hotkeys(see MH org config) to corresponding theodul events
+  function bindHotkeysToEvents(){
+    //process hardcoded keys
+    $.each(engageCore.model.get("meInfo").get("hotkeys"), function(i, val){
+      switch(val.name){
+      case "jumpToX":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Controls:jumpToX");
+        });
+        break;
+      case "nextChapter":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:nextChapter");
+        });
+        break;
+      case "fullscreen":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:goFullscreen");
+        });
+        break;
+      case "jumpToBegin":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:jumpToBegin");
+        });
+        break;
+      case "prevEpisode":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Core:previousEpisode");
+        });
+        break;
+      case "prevChapter":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:previousChapter");
+        });
+        break;
+      case "pause":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:pause");
+        });
+        break;
+      case "mute":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:mute");
+        });
+        break;
+      case "nextEpisode":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Core:nextEpisode");
+        });
+        break;
+      case "volDown":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:volumeUp");
+        });
+        break;
+      case "volUp":
+        Mousetrap.bind(val.key, function(){
+          engageCore.trigger("Video:volumeDown");
+        });
+        break;
+      default:
+        break;
+      }
+    });
+    //process custom hotkeys
+    $.each(engageCore.model.get("meInfo").get("hotkeysCustom"), function(i, val){
+      Mousetrap.bind(val.key, function(){
+        engageCore.trigger(val.app+":"+val.func); //trigger specific custom event
+      });      
+    });
   }
 
   function checkAllPluginsloaded() {
@@ -242,17 +330,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
           }          
           // add full plugin path to the tmeplate data
           template_data.plugin_path =  'engage/theodul/' + plugin_path;
-          // Process the template using underscore
-          var processed_template = _.template(template, template_data);
-          // Load the compiled HTML into the component
-          plugin.container = insertProcessedTemplate(processed_template, plugin.type, plugin.name);
+          // Process the template using underscore and set it in the plugin obj
+          plugin.templateProcessed = _.template(template, template_data);
           plugin.template = template;
           plugin.pluginPath = 'engage/theodul/' + plugin_path;
+          // Load the compiled HTML into the component
+          engageCore.pluginView.insertPlugin(plugin);
           // plugin load done counter
           plugins_loaded[plugin_name] = true;
           // Check if all plugins are ready
           if (checkAllPluginsloaded() === true) {
-            addPluginLogic();
+            engageCore.pluginView.allPluginsLoaded();
             // Trigger done event
             engageCore.trigger("Core:plugin_load_done");
           }
@@ -261,7 +349,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_model', 'e
         plugins_loaded[plugin_name] = true;
         // Check if all plugins are ready
         if (checkAllPluginsloaded() === true) {
-          addPluginLogic();
+          engageCore.pluginView.allPluginsLoaded();
           // Trigger done event
           engageCore.trigger("Core:plugin_load_done");
         }

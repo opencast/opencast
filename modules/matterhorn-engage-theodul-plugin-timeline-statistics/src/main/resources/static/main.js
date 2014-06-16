@@ -183,11 +183,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
   
   function initPlugin() {
-    Engage.log("Timeline: Statistics: init view");
-    //create a new view with the media package model and the template
-    //new StatisticsTimelineView(Engage.model.get("mediaPackage"), plugin.template);
-    //new StatisticsTimelineView(Engage.model.get("videoDataModel"), plugin.template);
-    new StatisticsTimelineView("");
+    //only init if plugin template was inserted into the DOM
+    if(plugin.inserted === true){
+      Engage.log("Timeline: Statistics: init view");
+      //create a new view with the media package model and the template
+      //new StatisticsTimelineView(Engage.model.get("mediaPackage"), plugin.template);
+      //new StatisticsTimelineView(Engage.model.get("videoDataModel"), plugin.template);
+      new StatisticsTimelineView("");
+    }
   }
   
   var relative_plugin_path = Engage.getPluginPath('EngagePluginTimelineStatistics');

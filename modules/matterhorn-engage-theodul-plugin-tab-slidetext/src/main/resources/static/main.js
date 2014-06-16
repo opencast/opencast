@@ -26,6 +26,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
   var PLUGIN_TEMPLATE = "template.html";
   var PLUGIN_STYLES = ["style.css"];
 
+  var plugin = {
+    name: PLUGIN_NAME,
+    type: PLUGIN_TYPE,
+    version: PLUGIN_VERSION,
+    styles: PLUGIN_STYLES,
+    template: PLUGIN_TEMPLATE,
+    timeStrToSeconds: timeStrToSeconds
+  };
+
   var TEMPLATE_TAB_CONTENT_ID = "engage_slidetext_tab_content";
   var segments=[];
 
@@ -40,51 +49,54 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
   }
 
   function initPlugin () {
-    Engage.log("TabSlideText: initializing plugin");
-    Engage.model.get("mediaPackage").on("change", function() {
-      var attachments = this.get("attachments");
-      if(attachments) {
-        // Extract segments which type is "segment+preview" out of the model
-        $(attachments).each(function(index, attachment) {
-          if (attachment.mimetype && attachment.type && attachment.type.match(/presentation\/segment\+preview/g) && attachment.mimetype.match(/image/g)) {
-            // Pull time string out of the ref property
-            // (e.g. "ref": "track:4ea9108d-c1df-4d8e-b729-e7c75c87519e;time=T00:00:00:0F1000")
-            var time = attachment.ref.match(/([0-9]{2}:[0-9]{2}:[0-9]{2})/g);
-            if (time.length > 0) {
-              segments.push(new Segment(time[0], attachment.url));
-            } else {
-              Engage.log("Failure on time evaluation for segment with url: " + attachment.url);
+    //only init if plugin template was inserted into the DOM
+    if(plugin.inserted === true){
+      Engage.log("TabSlideText: initializing plugin");
+      Engage.model.get("mediaPackage").on("change", function() {
+        var attachments = this.get("attachments");
+        if(attachments) {
+          // Extract segments which type is "segment+preview" out of the model
+          $(attachments).each(function(index, attachment) {
+            if (attachment.mimetype && attachment.type && attachment.type.match(/presentation\/segment\+preview/g) && attachment.mimetype.match(/image/g)) {
+              // Pull time string out of the ref property
+              // (e.g. "ref": "track:4ea9108d-c1df-4d8e-b729-e7c75c87519e;time=T00:00:00:0F1000")
+              var time = attachment.ref.match(/([0-9]{2}:[0-9]{2}:[0-9]{2})/g);
+              if (time.length > 0) {
+                segments.push(new Segment(time[0], attachment.url));
+              } else {
+                Engage.log("Failure on time evaluation for segment with url: " + attachment.url);
+              }
             }
-          }
-        });
-        // Sort segments ascending by time
-        segments.sort(function(a, b){
-          return new Date("1970/1/1 " + a.time) - new Date("1970/1/1 " + b.time);
-        });
-        // Building html snippet for a segment and inject each in the template
-        if (segments.length > 0) {
-          $("#" + TEMPLATE_TAB_CONTENT_ID).empty();
-          $(segments).each(function(index, segment) {
-            var html_snippet = "";
-            var html_snippet_id = "tab_slidetext_segment_" + index;
-            var segment_name = "Segment " + index;
-            html_snippet += "<div class=\"media\" id=\"" + html_snippet_id + "\">";
-            html_snippet += "  <img class=\"media-object pull-left\" src=\"" + segment.image_url + "\" alt=\"" + segment_name + "\">";
-            html_snippet += "  <div class=\"media-body\">";
-            html_snippet += "    <h4 class=\"media-heading\">" + segment_name + "</h4>";
-            html_snippet += "    " + segment.time;
-            html_snippet += "  </div>";
-            html_snippet += "</div>";
-            $("#" + TEMPLATE_TAB_CONTENT_ID).append(html_snippet);
-
-            // Add click handler to each segment (slide)
-            $("#" + html_snippet_id).click(function() {
-              Engage.trigger("Video:seek", timeStrToSeconds(segment.time));
-            });
           });
+          // Sort segments ascending by time
+          segments.sort(function(a, b){
+            return new Date("1970/1/1 " + a.time) - new Date("1970/1/1 " + b.time);
+          });
+          // Building html snippet for a segment and inject each in the template
+          if (segments.length > 0) {
+            $("#" + TEMPLATE_TAB_CONTENT_ID).empty();
+            $(segments).each(function(index, segment) {
+              var html_snippet = "";
+              var html_snippet_id = "tab_slidetext_segment_" + index;
+              var segment_name = "Segment " + index;
+              html_snippet += "<div class=\"media\" id=\"" + html_snippet_id + "\">";
+              html_snippet += "  <img class=\"media-object pull-left\" src=\"" + segment.image_url + "\" alt=\"" + segment_name + "\">";
+              html_snippet += "  <div class=\"media-body\">";
+              html_snippet += "    <h4 class=\"media-heading\">" + segment_name + "</h4>";
+              html_snippet += "    " + segment.time;
+              html_snippet += "  </div>";
+              html_snippet += "</div>";
+              $("#" + TEMPLATE_TAB_CONTENT_ID).append(html_snippet);
+
+              // Add click handler to each segment (slide)
+              $("#" + html_snippet_id).click(function() {
+                Engage.trigger("Video:seek", timeStrToSeconds(segment.time));
+              });
+            });
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   //Init Event
@@ -102,12 +114,5 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
       initPlugin();
     });
 
-  return {
-    name: PLUGIN_NAME,
-    type: PLUGIN_TYPE,
-    version: PLUGIN_VERSION,
-    styles: PLUGIN_STYLES,
-    template: PLUGIN_TEMPLATE,
-    timeStrToSeconds: timeStrToSeconds
-  };
+  return plugin;
 });

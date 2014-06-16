@@ -6,7 +6,7 @@ requirejs.config({
     plugins: '/engage/plugin/*/static'
   },
   shim: {
-    'bootstrap' : {
+    'bootstrap': {
       //script dependencies
       deps: ['jquery'],
       //global variable
@@ -21,6 +21,13 @@ requirejs.config({
     'underscore': {
       //global variable
       exports: '_'
+    },
+    'jquery.mobile': {
+      //script dependencies
+      deps: ['jquery'],
+    },
+    'mousetrap': {
+      exports: 'Mousetrap'
     }
   }
 });

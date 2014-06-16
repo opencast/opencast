@@ -18,22 +18,55 @@
 define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
     "use strict"; // strict mode in all our application
     var PLUGIN_NAME = "Engage Controls",
-            PLUGIN_TYPE = "engage_controls",
-            PLUGIN_VERSION = "0.1",
-            PLUGIN_TEMPLATE = "template.html",
-            PLUGIN_STYLES = [
-        "style.css",
-        "js/bootstrap/css/bootstrap.css",
-        "js/bootstrap/css/bootstrap-responsive.css",
-        "js/jqueryui/themes/base/jquery-ui.css"
-    ];
-    var plugin = {
+        PLUGIN_TYPE = "engage_controls",
+        PLUGIN_VERSION = "0.1",
+        PLUGIN_TEMPLATE = "template.html",
+        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
+        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
+        PLUGIN_STYLES = [
+                         "style.css",
+                         "js/bootstrap/css/bootstrap.css",
+                         "js/bootstrap/css/bootstrap-responsive.css",
+                         "js/jqueryui/themes/base/jquery-ui.css"
+                         ],
+        PLUGIN_STYLES_MOBILE = [
+                                "style_mobile.css"
+                                ],
+        PLUGIN_STYLES_EMBED = [
+                                "style_embed.css"
+                              ];
+    var plugin = {};
+    //switch mobile and desktop logic
+    switch(Engage.model.get("mode")){
+    case "desktop":
+      plugin = {
+          name: PLUGIN_NAME,
+          type: PLUGIN_TYPE,
+          version: PLUGIN_VERSION,
+          styles: PLUGIN_STYLES,
+          template: PLUGIN_TEMPLATE
+      };
+      break;
+    case "mobile":
+      plugin = {
         name: PLUGIN_NAME,
         type: PLUGIN_TYPE,
         version: PLUGIN_VERSION,
-        styles: PLUGIN_STYLES,
-        template: PLUGIN_TEMPLATE
-    };
+        styles: PLUGIN_STYLES_MOBILE,
+        template: PLUGIN_TEMPLATE_MOBILE
+      };     
+      break;
+    case "embed":
+      plugin = {
+        name: PLUGIN_NAME,
+        type: PLUGIN_TYPE,
+        version: PLUGIN_VERSION,
+        styles: PLUGIN_STYLES_EMBED,
+        template: PLUGIN_TEMPLATE_EMBED
+      };
+      break;
+    }
+    
     var plugin_path = "";
 
     var initCount = 4; //init resource count
@@ -242,56 +275,57 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     //local function
     function initPlugin() {
-
-      new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
-
-        Engage.on("Video:play", function() {
-            $("#" + id_play_button).hide();
-            $("#" + id_pause_button).show();
-            isPlaying = true;
-        });
-        Engage.on("Video:pause", function() {
-            $("#" + id_play_button).show();
-            $("#" + id_pause_button).hide();
-            isPlaying = false;
-        });
-        Engage.on("Video:muted", function() {
-            $("#" + id_unmuted_button).hide();
-            $("#" + id_muted_button).show();
-            isMuted = true;
-            Engage.trigger("Video:setVolume", 0);
-        });
-        Engage.on("Video:unmuted", function() {
-            $("#" + id_unmuted_button).show();
-            $("#" + id_muted_button).hide();
-            isMuted = false;
-            Engage.trigger("Video:setVolume", getVolume());
-        });
-        Engage.on("Video:fullscreenChange", function() {
-            var isInFullScreen = document.fullScreen ||
-                    document.mozFullScreen ||
-                    document.webkitIsFullScreen;
-            // just trigger the cancel event
-            if (!isInFullScreen) {
-                Engage.trigger("Video:cancelFullscreen");
-            }
-        });
-
-        Engage.on("Video:timeupdate", function(currentTime) {
-            // set slider
-            var duration = Engage.model.get("videoDataModel").get("duration");
-            if (!isSliding && duration) {
-                var normTime = (currentTime / (duration / 1000)) * 1000;
-                $("#" + id_slider).slider("option", "value", normTime);
-                if (!$("#" + id_navigation_time_current).is(":focus")) {
-                    // set time
-                    $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
+        //only init if plugin template was inserted into the DOM
+        if(plugin.inserted === true){
+            new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
+            Engage.on("Video:play", function() {
+                $("#" + id_play_button).hide();
+                $("#" + id_pause_button).show();
+                isPlaying = true;
+            });
+            Engage.on("Video:pause", function() {
+                $("#" + id_play_button).show();
+                $("#" + id_pause_button).hide();
+                isPlaying = false;
+            });
+            Engage.on("Video:muted", function() {
+                $("#" + id_unmuted_button).hide();
+                $("#" + id_muted_button).show();
+                isMuted = true;
+                Engage.trigger("Video:setVolume", 0);
+            });
+            Engage.on("Video:unmuted", function() {
+                $("#" + id_unmuted_button).show();
+                $("#" + id_muted_button).hide();
+                isMuted = false;
+                Engage.trigger("Video:setVolume", getVolume());
+            });
+            Engage.on("Video:fullscreenChange", function() {
+                var isInFullScreen = document.fullScreen ||
+                        document.mozFullScreen ||
+                        document.webkitIsFullScreen;
+                // just trigger the cancel event
+                if (!isInFullScreen) {
+                    Engage.trigger("Video:cancelFullscreen");
                 }
-            }
-        });
-        Engage.on("Video:ended", function() {
-            Engage.trigger("Video:pause");
-        });
+            });
+
+            Engage.on("Video:timeupdate", function(currentTime) {
+                // set slider
+                var duration = Engage.model.get("videoDataModel").get("duration");
+                if (!isSliding && duration) {
+                    var normTime = (currentTime / (duration / 1000)) * 1000;
+                    $("#" + id_slider).slider("option", "value", normTime);
+                    if (!$("#" + id_navigation_time_current).is(":focus")) {
+                        // set time
+                        $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
+                    }
+                }
+            });
+            Engage.on("Video:ended", function() {
+                Engage.trigger("Video:pause");
+            }); 
+        }
     }
 
     //local logic

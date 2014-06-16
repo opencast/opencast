@@ -212,80 +212,83 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     function initPlugin() {
-        // set path to swf player
-        var videojs_swf = plugin.pluginPath + "lib/videojs/video-js.swf";
+        //only init if plugin template was inserted into the DOM
+        if(plugin.inserted === true){
+            // set path to swf player
+            var videojs_swf = plugin.pluginPath + "lib/videojs/video-js.swf";
 
-        Engage.model.on("change:videoDataModel", function() {
-            new VideoDataView(this.get("videoDataModel"), plugin.template, videojs_swf);
-        });
-        Engage.model.get("mediaPackage").on("change", function() {
-            var mediaInfo = {};
-            mediaInfo.tracks = this.get("tracks");
-            mediaInfo.attachments = this.get("attachments");
+            Engage.model.on("change:videoDataModel", function() {
+                new VideoDataView(this.get("videoDataModel"), plugin.template, videojs_swf);
+            });
+            Engage.model.get("mediaPackage").on("change", function() {
+                var mediaInfo = {};
+                mediaInfo.tracks = this.get("tracks");
+                mediaInfo.attachments = this.get("attachments");
 
-            if ((mediaInfo.tracks.length > 0) && (mediaInfo.attachments.length > 0)) {
-                var videoDisplays = [];
-                var videoSources = [];
-                videoSources.presenter = [];
-                videoSources.presentation = [];
+                if ((mediaInfo.tracks.length > 0) && (mediaInfo.attachments.length > 0)) {
+                    var videoDisplays = [];
+                    var videoSources = [];
+                    videoSources.presenter = [];
+                    videoSources.presentation = [];
 
-                // look for video source
-                var duration = 0;
-                if (mediaInfo.tracks) {
-                    $(mediaInfo.tracks).each(function(i, track) {
-                        if (track.mimetype
-                                && track.type
-                                && track.mimetype.match(/video/g)) {
-                            // filter for different video sources
-                            if (track.type.match(/presenter/g)) {
-                                if (track.duration > duration) {
-                                    duration = track.duration;
+                    // look for video source
+                    var duration = 0;
+                    if (mediaInfo.tracks) {
+                        $(mediaInfo.tracks).each(function(i, track) {
+                            if (track.mimetype
+                                    && track.type
+                                    && track.mimetype.match(/video/g)) {
+                                // filter for different video sources
+                                if (track.type.match(/presenter/g)) {
+                                    if (track.duration > duration) {
+                                        duration = track.duration;
+                                    }
+                                    videoSources.presenter.push({
+                                        src: track.url,
+                                        type: track.mimetype,
+                                        typemh: track.type
+                                    });
+                                } else if (track.type.match(/presentation/g)) {
+                                    if (track.duration > duration) {
+                                        duration = track.duration;
+                                    }
+                                    videoSources.presentation.push({
+                                        src: track.url,
+                                        type: track.mimetype,
+                                        typemh: track.type
+                                    });
                                 }
-                                videoSources.presenter.push({
-                                    src: track.url,
-                                    type: track.mimetype,
-                                    typemh: track.type
-                                });
-                            } else if (track.type.match(/presentation/g)) {
-                                if (track.duration > duration) {
-                                    duration = track.duration;
-                                }
-                                videoSources.presentation.push({
-                                    src: track.url,
-                                    type: track.mimetype,
-                                    typemh: track.type
-                                });
                             }
-                        }
-                    });
-                }
-                if (mediaInfo.attachments) {
-                    $(mediaInfo.attachments).each(function(i, attachment) {
-                        if (attachment.mimetype
-                                && attachment.type
-                                && attachment.mimetype.match(/image/g)
-                                && attachment.type.match(/player/g)) {
-                            // filter for different video sources
-                            if (attachment.type.match(/presenter/g)) {
-                                videoSources.presenter.poster = attachment.url;
-                            }
-                            if (attachment.type.match(/presentation/g)) {
-                                videoSources.presentation.poster = attachment.url;
-                            }
-                        }
-                    });
-                }
-                var i = 0;
-                for (var v in videoSources) {
-                    if (videoSources[v].length > 0) {
-                        var name = videoDisplayNamePrefix.concat(i);
-                        videoDisplays.push(name);
-                        ++i;
+                        });
                     }
+                    if (mediaInfo.attachments) {
+                        $(mediaInfo.attachments).each(function(i, attachment) {
+                            if (attachment.mimetype
+                                    && attachment.type
+                                    && attachment.mimetype.match(/image/g)
+                                    && attachment.type.match(/player/g)) {
+                                // filter for different video sources
+                                if (attachment.type.match(/presenter/g)) {
+                                    videoSources.presenter.poster = attachment.url;
+                                }
+                                if (attachment.type.match(/presentation/g)) {
+                                    videoSources.presentation.poster = attachment.url;
+                                }
+                            }
+                        });
+                    }
+                    var i = 0;
+                    for (var v in videoSources) {
+                        if (videoSources[v].length > 0) {
+                            var name = videoDisplayNamePrefix.concat(i);
+                            videoDisplays.push(name);
+                            ++i;
+                        }
+                    }
+                    Engage.model.set("videoDataModel", new VideoDataModel(videoDisplays, videoSources, duration));
                 }
-                Engage.model.set("videoDataModel", new VideoDataModel(videoDisplays, videoSources, duration));
-            }
-        });
+            });
+        }
     }
 
     // init Event
