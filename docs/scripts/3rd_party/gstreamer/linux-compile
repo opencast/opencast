@@ -72,6 +72,14 @@ case `os` in
     [ $? -ne 0 ] && exit 1
     sudox apt-get -y install gstreamer0.10-ffmpeg
     [ $? -ne 0 ] && exit 1
+    sudox apt-get -y install gstreamer0.10-plugins-bad-multiverse
+    [ $? -ne 0 ] && exit 1
+    sudox apt-get -y install libgstreamer0.10
+    [ $? -ne 0 ] && exit 1
+    sudox apt-get -y install libgstreamer-plugins-base0.10
+    [ $? -ne 0 ] && exit 1
+    sudox apt-get -y install gstreamer0.10-gnonlin
+    [ $? -ne 0 ] && exit 1
     ;;
   openSUSE )
     sudox zypper --non-interactive install gstreamer  # gst-launch-0.10
