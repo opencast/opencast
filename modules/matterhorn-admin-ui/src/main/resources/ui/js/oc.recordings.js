@@ -391,6 +391,7 @@ ocRecordings = new (function() {
       stats.processing += parseInt(definition.running);
       stats.finished += parseInt(definition.finished);
       stats.ignored += parseInt(definition.stopped);
+      stats.hold += parseInt(definition.paused);
       stats.failed += parseInt(definition.failed) + parseInt(definition.failing);
     }
   }
@@ -799,22 +800,30 @@ ocRecordings = new (function() {
 
   this.findFirstOperation = function(workflow, state) {
     var out = false;
-    for (var i in ocUtils.ensureArray(workflow.operations.operation)) {
-      if (workflow.operations.operation[i].state == state) {
-        out = workflow.operations.operation[i];
-        break;
-      }
+    if (workflow.operations == undefined || workflow.operations.operation == undefined) {
+      ocUtils.log('Warning: no operations found for workflow id = ' + workflow.id );
+    } else {
+      $.each(ocUtils.ensureArray(workflow.operations.operation), function(index, operation) {
+        if (operation.state == state) {
+          out = operation;
+          return false; //only want first
+        }
+      });
     }
     return out;
   }
 
   this.findLastOperation = function(workflow, state) {
     var out = false;
-    $.each(ocUtils.ensureArray(workflow.operations.operation), function(index, operation) {
-      if (operation.state == state) {
-        out = operation;
-      }
-    });
+    if (workflow.operations == undefined || workflow.operations.operation == undefined) {
+      ocUtils.log('Warning: no operations found for workflow id = ' + workflow.id );
+    } else {
+      $.each(ocUtils.ensureArray(workflow.operations.operation), function(index, operation) {
+        if (operation.state == state) {
+          out = operation;
+        }
+      });
+    }
     return out;
   }
 
