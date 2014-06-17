@@ -1,0 +1,71 @@
+From 133e40ce5171c005d509050cc0a16a7bbf0036fc Mon Sep 17 00:00:00 2001
+From: Karen Dolan <kdolan@dce.harvard.edu>
+Date: Mon, 16 Jun 2014 10:48:17 -0400
+Subject: [PATCH] MATT-355, MH-10216, republish metadata workflow
+
+---
+ etc/workflows/republish.xml                        |  29 ++---
+
+diff --git a/etc/workflows/republish.xml b/etc/workflows/republish.xml
+index a8f961e..f8f1a10 100644
+--- a/etc/workflows/republish.xml
++++ b/etc/workflows/republish.xml
+@@ -9,44 +9,33 @@
+   <operations>
+ 
+     <!-- tag the dublin core catalogs so they will be distributed and added to search -->
++    <!-- omit the + in front of distribute tag to prevent re-distributing media files -->
+ 
+     <operation
+       id="tag"
+       description="Tagging dublin core catalogs for publishing">
+       <configurations>
+         <configuration key="source-flavors">dublincore/*</configuration>
+-        <configuration key="target-tags">+distribute</configuration>
++        <configuration key="target-tags">distribute</configuration>
+       </configurations>
+     </operation>
+ 
+-    <!-- Distribute to download server -->
++    <!-- Distribute and republish the recording dublin core -->
+ 
+     <operation
+-      id="distribute-download"
+-      max-attempts="2"
++      id="publish-engage"
+       fail-on-error="false"
++      max-attempts="2"
+       exception-handler-workflow="error"
+-      description="Distributing to progressive downloads">
++      description="Distribute and published to engage server">
+       <configurations>
++        <configuration key="source-flavors">dublincore/episode, dublincore/series</configuration>
++        <configuration key="merge-only">true</configuration>
+         <configuration key="source-tags">distribute</configuration>
+         <configuration key="check-availability">false</configuration>
+       </configurations>
+     </operation>
+ 
+-    <!-- Republish the recording -->
+-
+-    <operation
+-      id="republish"
+-      fail-on-error="true"
+-      exception-handler-workflow="error"
+-      description="Published">
+-      <configurations>
+-        <configuration key="source-flavors">dublincore/episode, dublincore/series</configuration>
+-        <configuration key="merge">true</configuration>
+-        <configuration key="existing-only">true</configuration>
+-      </configurations>
+-    </operation>
+-
+     <operation
+       id="cleanup"
+       fail-on-error="false"
+@@ -55,4 +44,4 @@
+ 
+   </operations>
+ 
+-</definition>
++</definition>

@@ -609,7 +609,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         mergedMediaPackage.add((MediaPackageElement) element.clone());
       } else {
         logger.info(String.format("Overwriting existing %s '%s' with '%s' in the updated mediapackage",
-                type, element.getIdentifier(), updatedMp.getElementsByFlavor(element.getFlavor())[0].getIdentifier()));
+          type, element.getIdentifier(), updatedMp.getElementsByFlavor(element.getFlavor())[0].getIdentifier()));
 
       }
     }
