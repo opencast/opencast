@@ -96,12 +96,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     }
                 }
                 if (nr >= 2) {
+		    var i = 0;
                     for (var vd in videoDisplays) {
-                        if (vd > 0) {
+                        if (i > 0) {
                             // sync every other videodisplay with the master
-                            $.synchronizeVideos(videoDisplays[0], videoDisplays[vd], true);
+                            $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
                             Engage.log("Videodisplay " + vd + " is now being synchronized with the master videodisplay " + 0);
                         }
+			++i;
                     }
                 }
             }
