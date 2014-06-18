@@ -65,6 +65,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         template: PLUGIN_TEMPLATE_EMBED
       };
       break;
+    default:
+      plugin = {
+          name: PLUGIN_NAME,
+          type: PLUGIN_TYPE,
+          version: PLUGIN_VERSION,
+          styles: PLUGIN_STYLES,
+          template: PLUGIN_TEMPLATE
+      };
     }
     
     var plugin_path = "";
