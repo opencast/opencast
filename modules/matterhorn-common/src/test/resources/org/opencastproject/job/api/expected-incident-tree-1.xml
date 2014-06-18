@@ -5,7 +5,7 @@
     <jobId>2</jobId>
     <serviceType>service</serviceType>
     <processingHost>localhost</processingHost>
-    <timestamp>1970-01-01T01:00:00.001+01:00</timestamp>
+    <timestamp>1970-01-01T00:00:00.001Z</timestamp>
     <severity>FAILURE</severity>
     <code>code</code>
     <descriptionParameters>
@@ -20,7 +20,7 @@
     <jobId>2</jobId>
     <serviceType>service</serviceType>
     <processingHost>localhost</processingHost>
-    <timestamp>1970-01-01T01:00:00.002+01:00</timestamp>
+    <timestamp>1970-01-01T00:00:00.002Z</timestamp>
     <severity>FAILURE</severity>
     <code>code</code>
     <descriptionParameters>
@@ -36,7 +36,7 @@
       <jobId>2</jobId>
       <serviceType>service</serviceType>
       <processingHost>localhost</processingHost>
-      <timestamp>1970-01-01T01:00:00.003+01:00</timestamp>
+      <timestamp>1970-01-01T00:00:00.003Z</timestamp>
       <severity>FAILURE</severity>
       <code>code</code>
       <descriptionParameters>
@@ -52,7 +52,7 @@
         <jobId>2</jobId>
         <serviceType>service</serviceType>
         <processingHost>localhost</processingHost>
-        <timestamp>1970-01-01T01:00:00.004+01:00</timestamp>
+        <timestamp>1970-01-01T00:00:00.004Z</timestamp>
         <severity>FAILURE</severity>
         <code>code</code>
         <descriptionParameters>
@@ -67,7 +67,7 @@
         <jobId>2</jobId>
         <serviceType>service</serviceType>
         <processingHost>localhost</processingHost>
-        <timestamp>1970-01-01T01:00:00.005+01:00</timestamp>
+        <timestamp>1970-01-01T00:00:00.005Z</timestamp>
         <severity>FAILURE</severity>
         <code>code</code>
         <descriptionParameters>

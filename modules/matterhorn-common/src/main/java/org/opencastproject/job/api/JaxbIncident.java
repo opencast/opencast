@@ -22,6 +22,7 @@ import org.opencastproject.fn.juc.Mutables;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
+import org.opencastproject.util.jaxb.UtcTimestampAdapter;
 
 import java.util.Date;
 import java.util.List;
@@ -36,6 +37,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /** 1:1 serialization of a {@link Incident}. */
 @XmlAccessorType(XmlAccessType.NONE)
@@ -55,6 +57,7 @@ public final class JaxbIncident {
   private String processingHost;
 
   @XmlElement(name = "timestamp")
+  @XmlJavaTypeAdapter(UtcTimestampAdapter.class)
   private Date timestamp;
 
   @XmlElement(name = "severity")
@@ -88,31 +91,28 @@ public final class JaxbIncident {
   }
 
   public static final Function<Incident, JaxbIncident> mkFn = new Function<Incident, JaxbIncident>() {
-    @Override public JaxbIncident apply(Incident incident) {
+    @Override
+    public JaxbIncident apply(Incident incident) {
       return new JaxbIncident(incident);
     }
   };
 
   public Incident toIncident() {
-    return new IncidentImpl(
-            id,
-            jobId,
-            serviceType,
-            processingHost,
-            timestamp,
-            severity,
-            code,
-            mlist(nullToNil(details)).map(JaxbIncidentDetail.toDetailFn).value(),
-            mlist(nullToNil(descriptionParameters)).foldl(Mutables.<String, String>hashMap(), new Function2<Map<String, String>, Param, Map<String, String>>() {
-              @Override public Map<String, String> apply(Map<String, String> sum, Param param) {
-                sum.put(param.getName(), param.getValue());
-                return sum;
-              }
-            }));
+    return new IncidentImpl(id, jobId, serviceType, processingHost, timestamp, severity, code,
+            mlist(nullToNil(details)).map(JaxbIncidentDetail.toDetailFn).value(), mlist(
+                    nullToNil(descriptionParameters)).foldl(Mutables.<String, String> hashMap(),
+                    new Function2<Map<String, String>, Param, Map<String, String>>() {
+                      @Override
+                      public Map<String, String> apply(Map<String, String> sum, Param param) {
+                        sum.put(param.getName(), param.getValue());
+                        return sum;
+                      }
+                    }));
   }
 
   public static final Function<JaxbIncident, Incident> toIncidentFn = new Function<JaxbIncident, Incident>() {
-    @Override public Incident apply(JaxbIncident dto) {
+    @Override
+    public Incident apply(JaxbIncident dto) {
       return dto.toIncident();
     }
   };
@@ -145,7 +145,8 @@ public final class JaxbIncident {
     }
 
     public static final Function<Entry<String, String>, Param> mkFn = new Function<Entry<String, String>, Param>() {
-      @Override public Param apply(Entry<String, String> entry) {
+      @Override
+      public Param apply(Entry<String, String> entry) {
         return mk(entry);
       }
     };
