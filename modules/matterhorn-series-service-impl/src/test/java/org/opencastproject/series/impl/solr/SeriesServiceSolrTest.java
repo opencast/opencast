@@ -196,7 +196,7 @@ public class SeriesServiceSolrTest {
 
   @Test
   public void testAccessControlManagmentRewrite() throws Exception {
-    // sample access control list      
+    // sample access control list
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     User user = new JaxbUser("anonymous", new DefaultOrganization(), new JaxbRole("ROLE_ANONYMOUS",
             new DefaultOrganization()));
