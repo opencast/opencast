@@ -1543,8 +1543,8 @@ ocRecordings = new (function() {
         }
 
       } else if (action == 'delete') {
-        links.push('<a href="javascript:ocRecordings.removeRecording(\'' + id + '\',\'' + recording.title + '\')">Delete</a>');
-        
+        links.push('<a href="javascript:ocRecordings.removeRecording(\'' + id + '\',\'' + ocUtils.escapeXML(recording.title).replace(/["']/g, "\\\'") + '\')">Delete</a>');
+
       } else if (action == 'unpublish') {
         links.push('<a href="javascript:ocRecordings.unpublishRecording(\'' + id + '\')">Unpublish</a>');
       

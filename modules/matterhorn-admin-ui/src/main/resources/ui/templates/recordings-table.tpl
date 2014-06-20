@@ -25,13 +25,13 @@
           <input type="checkbox" value="<%= data[j].recordings[i].id %>" class="selectRecording" />
         </td>
         <td class="ui-state-active">
-          <%= data[j].recordings[i].title %>
+          <%! data[j].recordings[i].title %>
         </td>
         <td class="ui-state-active">
-          <%= data[j].recordings[i].creators %>
+          <%! data[j].recordings[i].creators %>
         </td>
         <td class="ui-state-active">
-          <%= (data[j].recordings[i].seriesTitle) ? data[j].recordings[i].seriesTitle : ''  %>
+          <%! (data[j].recordings[i].seriesTitle) ? data[j].recordings[i].seriesTitle : ''  %>
         </td>
         <% if (ocRecordings.Configuration.state == 'upcoming' || ocRecordings.Configuration.state == 'capturing') { %>
         <td class="ui-state-active" style="white-space:nowrap;">
