@@ -111,7 +111,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         }
 			++i;
                     }
-                }
+                } else {
+		    videosReady = true;
+		    Engage.trigger("Video:ready");
+		}
             }
         }
     });
