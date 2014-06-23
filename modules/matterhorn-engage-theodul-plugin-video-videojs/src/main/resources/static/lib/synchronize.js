@@ -1,6 +1,6 @@
 /**
  * Synchronize.js
- * Version 1.1.1
+ * Version 1.1.2
  *
  * Copyright 2013-2014 Denis Meyer
  */
@@ -30,6 +30,10 @@
     var tryToPlayWhenBuffering = true; // flag for trying to play after N seconds of buffering
     var tryToPlayWhenBufferingTimer = null;
     var tryToPlayWhenBufferingMS = 10000;
+
+    var receivedEventLoadeddata = false;
+    var receivedEventLoadeddata_interval = null;
+    var receivedEventLoadeddata_waitTimeout = 5000; // ms
 
     /**
      * Checks whether a number is in an interval [lower, upper]
@@ -413,9 +417,10 @@
      */
     function doWhenDataLoaded(id, func) {
         if (id && func) {
-            //getVideoObj(id).on("loadeddata", function () {
-                func(); // TODO
-            //});
+            getVideoObj(id).on("loadeddata", function () {
+		receivedEventLoadeddata = true;
+                func();
+            });
         }
     }
 
@@ -571,6 +576,17 @@
                                 $(document).trigger("sjs:allPlayersReady", []);
                             }
                         });
+			
+			receivedEventLoadeddata_interval = window.setInterval(function(){
+			    if(!receivedEventLoadeddata) {
+				for (var i = 0; i < videoIds.length; ++i) {
+				    getVideoObj(videoIds[i]).trigger("loadeddata");
+				}
+			    } else {
+				window.clearInterval(receivedEventLoadeddata_interval);
+				receivedEventLoadeddata_interval = null;
+			    }
+			}, receivedEventLoadeddata_waitTimeout);
                     });
                 }
             }

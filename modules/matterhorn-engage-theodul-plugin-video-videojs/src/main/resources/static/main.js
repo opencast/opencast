@@ -32,6 +32,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         styles: PLUGIN_STYLES,
         template: PLUGIN_TEMPLATE,
         events : {
+          ready : new Engage.Event("Video:ready", "when all videos have been successfully loaded", "trigger"),
           play : new Engage.Event("Video:play", "plays the video", "handler"),
           pause : new Engage.Event("Video:pause", "pauses the video", "handler"),
           enablefullscreen : new Engage.Event("Video:goFullscreen", "go to fullscreen of the video", "handler"),
@@ -51,6 +52,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var class_vjsposter = "vjs-poster";
     var id_engage_video = "engage_video";
     var id_videojs_wrapper = "videojs_wrapper";
+    var videosReady = false;
 
     var VideoDataView = Backbone.View.extend({
         el: $("#" + id_engage_video), // every view has an element associated with it
@@ -99,6 +101,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 		    var i = 0;
                     for (var vd in videoDisplays) {
                         if (i > 0) {
+			    $(document).on("sjs:allPlayersReady", function(event) {
+				videosReady = true;
+				Engage.trigger("Video:ready");
+			    });
                             // sync every other videodisplay with the master
                             $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
                             Engage.log("Videodisplay " + vd + " is now being synchronized with the master videodisplay " + 0);
@@ -169,7 +175,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     function registerEvents(videoDisplay) {
         var theodulVideodisplay = videojs(videoDisplay);
         Engage.on(plugin.events.play, function() {
-            theodulVideodisplay.play();
+	    if(videosReady) {
+		theodulVideodisplay.play();
+	    }
         });
         Engage.on(plugin.events.pause, function() {
             theodulVideodisplay.pause();
@@ -189,16 +197,22 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             callback(theodulVideodisplay.volume());
         });
         Engage.on(plugin.events.seek, function(time) {
-            theodulVideodisplay.currentTime(time);
+	    if(videosReady) {
+		theodulVideodisplay.currentTime(time);
+	    }
         });
         Engage.on(plugin.events.sliderStop, function(time) {
-            var duration = Engage.model.get("videoDataModel").get("duration");
-            var normTime = (time / 1000) * (duration / 1000);
-            theodulVideodisplay.currentTime(normTime);
+	    if(videosReady) {
+		var duration = Engage.model.get("videoDataModel").get("duration");
+		var normTime = (time / 1000) * (duration / 1000);
+		theodulVideodisplay.currentTime(normTime);
+	    }
         });
         theodulVideodisplay.on("timeupdate", function() {
-            Engage.log("CurrentTime while timeupdate: " + theodulVideodisplay.currentTime());
-            Engage.trigger("Video:timeupdate", theodulVideodisplay.currentTime());
+	    if(videosReady) {
+		Engage.log("CurrentTime while timeupdate: " + theodulVideodisplay.currentTime());
+		Engage.trigger("Video:timeupdate", theodulVideodisplay.currentTime());
+	    }
         });
         theodulVideodisplay.on("volumechange", function() {
             Engage.trigger(plugin.events.volumechange, theodulVideodisplay.volume());
@@ -207,9 +221,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             Engage.trigger(plugin.events.fullscreenChange);
         });
         theodulVideodisplay.on("ended", function() {
-            Engage.trigger(plugin.events.ended);
-            theodulVideodisplay.pause();
-            theodulVideodisplay.currentTime(theodulVideodisplay.duration());
+	    if(videosReady) {
+		Engage.trigger(plugin.events.ended);
+		theodulVideodisplay.pause();
+		theodulVideodisplay.currentTime(theodulVideodisplay.duration());
+	    }
         });
     }
 
