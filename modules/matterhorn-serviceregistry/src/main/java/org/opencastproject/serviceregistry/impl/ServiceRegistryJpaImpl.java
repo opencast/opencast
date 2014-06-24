@@ -1794,11 +1794,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public Object addingService(ServiceReference reference) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
       String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
-      String publishFlag = (String) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
+      boolean publishFlag = reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY) == null || Boolean.parseBoolean((String)reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY));
       boolean jobProducer = Boolean.parseBoolean((String) reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY));
 
       // Don't register services that have the "publish" flag set to "false"
-      if ("false".equals(StringUtils.trimToEmpty(publishFlag).toLowerCase())) {
+      if (!publishFlag) {
         logger.debug("Not registering service " + serviceType + " in service registry by configuration");
         return super.addingService(reference);
       }
