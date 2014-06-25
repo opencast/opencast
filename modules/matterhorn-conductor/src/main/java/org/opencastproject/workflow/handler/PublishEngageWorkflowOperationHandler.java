@@ -567,6 +567,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   protected MediaPackage merge(MediaPackage mediaPackageForSearch) throws WorkflowOperationException {
     MediaPackage mergedMediaPackage = null;
       SearchQuery query = new SearchQuery().withId(mediaPackageForSearch.toString());
+      query.includeEpisodes(true);
+      query.includeSeries(false);
       SearchResult result = searchService.getByQuery(query);
       if (result.size() == 0) {
         logger.info("The search service doesn't know mediapackage {}, cannot be republished.", mediaPackageForSearch);
