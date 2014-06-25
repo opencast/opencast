@@ -261,12 +261,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
         break;
       case "volDown":
         Mousetrap.bind(val.key, function(){
-          engageCore.trigger("Video:volumeUp");
+          engageCore.trigger("Video:volumeDown");
         });
         break;
       case "volUp":
         Mousetrap.bind(val.key, function(){
-          engageCore.trigger("Video:volumeDown");
+          engageCore.trigger("Video:volumeUp");
         });
         break;
       default:
