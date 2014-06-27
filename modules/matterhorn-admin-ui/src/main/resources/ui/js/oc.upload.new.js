@@ -307,11 +307,18 @@ ocUpload.UI = (function() {
       draggable: false,
       disabled: true
     });
+    window.onbeforeunload = function(e) {
+      var confirmationMessage = "The file has not completed uploading.";
+
+      (e || window.event).returnValue = confirmationMessage;     //Gecko + IE
+      return confirmationMessage;                                //Webkit, Safari, Chrome etc.
+    };
   }
 
   this.hideProgressDialog = function() {
     $('#progressStage').dialog( "destroy" );
     $('#grayOut').css('display','block');
+    window.onbeforeunload = null;
   }
 
   this.setProgress = function(message) {
@@ -821,11 +828,13 @@ ocUpload.Listener = (function() {
     inProgress : false
   }
 
+
   this.uploadComplete = function(jobId, trackUrl) {
     destroyUpdateInterval();
     ocUtils.log("Upload complete " + jobId);
     ocUpload.UI.setProgress('Upload successful');
     ocUpload.Ingest.trackDone(jobId, trackUrl);
+    window.onbeforeunload = null;
   }
 
   this.uploadFailed = function(jobId) {
