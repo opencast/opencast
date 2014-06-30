@@ -27,7 +27,6 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ public class EngagePluginManagerRestService {
     this.manager = manager;
   }
   
-  protected void activate(ComponentContext cc) {
+  protected void activate() {
     log.info("Activated.");
   }
   // </editor-fold>

@@ -31,6 +31,7 @@ import org.opencastproject.engage.theodul.api.EngagePluginRestService;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.rest.StaticResource;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
@@ -40,7 +41,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/* A service that tracks the de-/registration of Engage Player Plugins and 
+/* A service that tracks the de-/registration of Theodul Player Plugins and 
  * de-/installs static resource and REST endpoint servlets under a shared
  * URL.
  */
@@ -48,19 +49,20 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
 
   private static final Logger log = LoggerFactory.getLogger(EngagePluginManagerImpl.class);
   static final String PLUGIN_URL_PREFIX = "/engage/theodul/plugin/";
-  private ComponentContext myContext;
+  private BundleContext bundleContext;
   private static final String pluginServiceFilter = "(objectClass=" + EngagePlugin.class.getName() + ")";
-  private PluginDataStore plugins = new PluginDataStore();
+  private final PluginDataStore plugins = new PluginDataStore();
 
-  protected void activate(ComponentContext cc) {
-    myContext = cc;
+  protected void activate(BundleContext bc) {
+    bundleContext = bc;
+    
     try {
-      cc.getBundleContext().addServiceListener(this, pluginServiceFilter);
+      bundleContext.addServiceListener(this, pluginServiceFilter);
     } catch (InvalidSyntaxException ex) {
       log.error("Could not register as ServiceListener: " + ex.getMessage());
       throw new RuntimeException(ex);
     }
-    log.info("Activated. Listening for Engage Plugins. " + pluginServiceFilter);
+    log.info("Activated. Listening for Theodul Plugins. filter=" + pluginServiceFilter);
   }
 
   protected void deactivate(ComponentContext cc) {
@@ -79,7 +81,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
         try {
           installPlugin(sref);
         } catch (Exception e) {
-          log.error("Failed to install Engage Plugin: " + e.getMessage(), e);
+          log.error("Failed to install Theodul Plugin: " + e.getMessage(), e);
         }
         break;
 
@@ -87,7 +89,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
         try {
           uninstallPlugin(sref);
         } catch (Exception e) {
-          log.error("Error while uninstalling Engage Plugin: " + e.getMessage(), e);
+          log.error("Error while uninstalling Theodul Plugin: " + e.getMessage(), e);
         }
         break;
     }
@@ -124,7 +126,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     
     // construct and log success message
     StringBuilder sb = new StringBuilder();
-    sb.append("Installed Engage plugin ").append(plugin.getName()).append(" (static: ")
+    sb.append("Installed Theodul plugin ").append(plugin.getName()).append(" (static: ")
             .append(plugin.getStaticResourceRegistration() != null ? plugin.getStaticResourcesPath() : "no")
             .append("  REST: ").append(plugin.getRestEndpointRegistration() != null ? plugin.getRestPath() : "no").append(")");
     log.info(sb.toString());
@@ -142,7 +144,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     Dictionary<String, String> props = new Hashtable<String, String>();
     props.put("contextId", RestConstants.HTTP_CONTEXT_ID);
     props.put("alias", PLUGIN_URL_PREFIX + plugin.getStaticResourcesPath());
-    return myContext.getBundleContext().registerService(Servlet.class.getName(), staticResource, props);
+    return bundleContext.registerService(Servlet.class.getName(), staticResource, props);
   }
 
   /** Publishes the REST endpoint implemented by the plugin bundle.
@@ -150,12 +152,12 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
    * @returns ServiceRegistration for the REST endpoint
    */
   private ServiceRegistration installRestEndpoint(PluginData plugin) throws Exception {
-    EngagePlugin service = (EngagePlugin) myContext.getBundleContext().getService(plugin.getServiceReference());
+    EngagePlugin service = (EngagePlugin) bundleContext.getService(plugin.getServiceReference());
     Dictionary<String, String> props = new Hashtable<String, String>();
     props.put("service.description", plugin.getDescription());
     props.put("opencast.service.type", "org.opencast.engage.plugin." + Integer.toString(plugin.getPluginID()));
     props.put("opencast.service.path", PLUGIN_URL_PREFIX + plugin.getRestPath());
-    return myContext.getBundleContext().registerService(EngagePluginRestService.class.getName(), service, props);
+    return bundleContext.registerService(EngagePluginRestService.class.getName(), service, props);
   }
 
   private void uninstallPlugin(ServiceReference sref) {
@@ -191,7 +193,6 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
   @Override
   public List<EngagePluginRegistration> getAllRegisteredPlugins() {
     synchronized(plugins) {
-      //EngagePluginRegistration[] out = new EngagePluginRegistration[plugins.size()];
       List<EngagePluginRegistration> list = new ArrayList<EngagePluginRegistration>();
       for (PluginData plugin : plugins.getAll()) {
         EngagePluginRegistrationImpl reg = new EngagePluginRegistrationImpl(

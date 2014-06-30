@@ -155,13 +155,14 @@
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
             <Export-Package>org.opencastproject.engage.theodul.manager.impl</Export-Package>
             <Private-Package>ui.*</Private-Package>
-            <Http-Alias>/engage/theodul/ui</Http-Alias>
+            <Bundle-Activator>org.opencastproject.engage.theodul.manager.impl.Activator</Bundle-Activator>
+            <!-- Http-Alias>/engage/theodul/ui</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>
             <Service-Component>
               OSGI-INF/theodul-pluginmanager-service.xml,
               OSGI-INF/theodul-pluginmanager-service-rest.xml
-            </Service-Component>
+            </Service-Component -->
           </instructions>
         </configuration>
       </plugin>
