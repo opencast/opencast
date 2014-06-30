@@ -56,6 +56,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         return;
       }
       
+      /*
       Engage.on(plugin.events.timeupdate.getName(), function(currentTime) {
         //add footprint each rounded timeupdate
         var cTime = Math.round(currentTime);
@@ -77,7 +78,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }else{
           lastFootprint = cTime;
         }
-      });      
+      });  
+      */    
     }
     
     // All plugins loaded

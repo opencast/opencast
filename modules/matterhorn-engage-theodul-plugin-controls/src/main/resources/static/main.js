@@ -36,6 +36,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                                 "style_embed.css"
                               ];
     var plugin = {};
+    var videosReady = false;
     //switch mobile and desktop logic
     switch(Engage.model.get("mode")){
     case "desktop":
@@ -65,6 +66,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         template: PLUGIN_TEMPLATE_EMBED
       };
       break;
+    default:
+      plugin = {
+          name: PLUGIN_NAME,
+          type: PLUGIN_TYPE,
+          version: PLUGIN_VERSION,
+          styles: PLUGIN_STYLES,
+          template: PLUGIN_TEMPLATE
+      };
     }
     
     var plugin_path = "";
@@ -278,15 +287,24 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         //only init if plugin template was inserted into the DOM
         if(plugin.inserted === true){
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
+            $("#" + id_play_button).attr("disabled", "disabled");
+	    Engage.on("Video:ready", function() {
+                $("#" + id_play_button).removeAttr("disabled");
+		videosReady = true;
+            });
             Engage.on("Video:play", function() {
-                $("#" + id_play_button).hide();
-                $("#" + id_pause_button).show();
-                isPlaying = true;
+		if(videosReady) {
+                    $("#" + id_play_button).hide();
+                    $("#" + id_pause_button).show();
+                    isPlaying = true;
+		}
             });
             Engage.on("Video:pause", function() {
-                $("#" + id_play_button).show();
-                $("#" + id_pause_button).hide();
-                isPlaying = false;
+		if(videosReady) {
+                    $("#" + id_play_button).show();
+                    $("#" + id_pause_button).hide();
+                    isPlaying = false;
+		}
             });
             Engage.on("Video:muted", function() {
                 $("#" + id_unmuted_button).hide();
@@ -311,19 +329,23 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             });
 
             Engage.on("Video:timeupdate", function(currentTime) {
-                // set slider
-                var duration = Engage.model.get("videoDataModel").get("duration");
-                if (!isSliding && duration) {
-                    var normTime = (currentTime / (duration / 1000)) * 1000;
-                    $("#" + id_slider).slider("option", "value", normTime);
-                    if (!$("#" + id_navigation_time_current).is(":focus")) {
-                        // set time
-                        $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
+		if(videosReady) {
+                    // set slider
+                    var duration = Engage.model.get("videoDataModel").get("duration");
+                    if (!isSliding && duration) {
+			var normTime = (currentTime / (duration / 1000)) * 1000;
+			$("#" + id_slider).slider("option", "value", normTime);
+			if (!$("#" + id_navigation_time_current).is(":focus")) {
+                            // set time
+                            $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
+			}
                     }
-                }
+		}
             });
             Engage.on("Video:ended", function() {
-                Engage.trigger("Video:pause");
+		if(videosReady) {
+                    Engage.trigger("Video:pause");
+		}
             }); 
         }
     }

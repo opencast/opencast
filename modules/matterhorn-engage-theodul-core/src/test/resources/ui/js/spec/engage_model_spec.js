@@ -13,6 +13,9 @@ define(['engage/engage_model'], function (EngageModel) {
     it("should have a URL parameter list", function () {
       expect(engageModel.get("urlParameters")).toBeDefined();
     });
+    it("should have a me info model", function () {
+      expect(engageModel.get("meInfo")).toBeDefined();
+    });
 
   });
 });

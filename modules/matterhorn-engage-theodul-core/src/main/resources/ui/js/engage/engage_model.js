@@ -112,7 +112,9 @@ define(['require', 'jquery', 'underscore', 'backbone'], function (require, $, _,
               this.set("mode", "desktop");
           }             
       }
-      console.log("Player mode: "+this.get("mode"));
+      if (window.console) {
+        console.log("Player mode: "+this.get("mode"));
+      }      
     },
     /*
      * Public properties
