@@ -1244,15 +1244,16 @@ var ocScheduler = (function() {
       },
       {
         getValue: function() {
-          var rrule, dotw, days, date, hour, min, dayOffset;
+          var rrule, dotw, days, date, dur, hour, min, dayOffset;
           if(this.validate()) {
             if(this.fields.scheduleRepeat.val() == 'weekly') {
               rrule     = "FREQ=WEEKLY;BYDAY=";
               dotw      = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
               days      = [];
               date      = new Date(ocScheduler.components.recurrenceStart.getValue());
-              hour      = date.getUTCHours();
-              min       = date.getUTCMinutes();
+              dur       = ocScheduler.components.recurrenceDuration.getValue() / 1000;
+              hour      = Math.floor(dur / 3600);
+              min       = Math.floor( ( dur /60 ) % 60 );
               dayOffset = 0;
               if(date.getDay() != date.getUTCDay()) {
                 dayOffset = date.getDay() < date.getUTCDay() ? 1 : -1;
