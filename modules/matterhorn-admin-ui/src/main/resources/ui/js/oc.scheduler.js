@@ -725,9 +725,6 @@ var ocScheduler = (function() {
         data.end = sched.components.recurrenceEnd.getValue();
         data.duration = sched.components.recurrenceDuration.getValue();
         data.rrule = sched.dublinCore.components.recurrence.getValue();
-        if(sched.timezone == ''){
-          return false;
-        }
         data.timezone = sched.timezone;
       } else {
         return false;
