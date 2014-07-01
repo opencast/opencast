@@ -31,16 +31,16 @@ public class StaticResourceClassloader extends ClassLoader {
 
   private static final Logger logger = LoggerFactory.getLogger(EngagePluginManagerImpl.class);
 
-  private final Bundle bundle;    // Bundle to load resources from
-  private final File odr;         // Override directory
-  private final String bpp;       // prefix path in bundle resources
+  private final Bundle bundle;            // Bundle to load resources from
+  private final File overrideDir;         // Override directory
+  private final String bundlePathPrefix;  // prefix path in bundle resources
 
   public StaticResourceClassloader(Bundle bundle, File overrideDir, String bundleResourcePath) {
     super();
     this.bundle = bundle;
-    this.odr = overrideDir;
-    this.bpp = bundleResourcePath;
-    logger.info("Bundle={} Override={}", bundle.getSymbolicName(), odr.getAbsolutePath());
+    this.overrideDir = overrideDir;
+    this.bundlePathPrefix = bundleResourcePath;
+    logger.info("Bundle={} Override={}", bundle.getSymbolicName(), this.overrideDir.getAbsolutePath());
   }
 
   @Override
@@ -50,8 +50,9 @@ public class StaticResourceClassloader extends ClassLoader {
     if (overrideIsSane()) {
       
       // try to find resource in override dir
-      String fspath = path.replace(bpp+"/", "");
-      File file = new File(odr.getAbsoluteFile() + File.separator + fspath);
+      String fspath = path.replaceAll("../", "");
+      fspath = fspath.replace(bundlePathPrefix, "");
+      File file = new File(overrideDir.getAbsoluteFile() + File.separator + fspath);
       if (file.exists() && file.isFile()) {
         try {
           logger.debug("Resource from filesystem overrides bundle resource: {}", file.getAbsolutePath());
@@ -63,8 +64,9 @@ public class StaticResourceClassloader extends ClassLoader {
     }
     
     // if we did not find the resource in filesystem, try to get it from the bundle
-    logger.debug("Serving resource from bundle: {}", path);
-    return bundle.getResource(path);
+    URL out = bundle.getResource(path);
+    logger.debug("Serving resource from bundle: {}", out);
+    return out;
   }
   
   /** Tests if the specified filesystem path is an existing readable directory.
@@ -72,6 +74,6 @@ public class StaticResourceClassloader extends ClassLoader {
    * @return true, iff override path is an existing, readable directory; false otherwise
    */
   public boolean overrideIsSane() {
-    return odr.exists() && odr.isDirectory() && odr.canRead();
+    return overrideDir.exists() && overrideDir.isDirectory() && overrideDir.canRead();
   }
 }
