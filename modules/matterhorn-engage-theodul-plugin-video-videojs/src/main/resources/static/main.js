@@ -32,7 +32,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         styles: PLUGIN_STYLES,
         template: PLUGIN_TEMPLATE,
         events : {
-          ready : new Engage.Event("Video:ready", "when all videos have been successfully loaded", "trigger"),
+          ready : new Engage.Event("Video:ready", "all videos loaded successfully", "trigger"),
+          playerLoaded : new Engage.Event("Video:playerLoaded", "player loaded successfully", "trigger"),
+          masterPlay : new Engage.Event("Video:masterPlay", "master video play", "trigger"),
+          masterEnded : new Engage.Event("Video:masterEnded", "master video ended", "trigger"),
+          masterTimeupdate : new Engage.Event("Video:masterTimeupdate", "master video timeupdate", "trigger"),
+          synchronizing : new Engage.Event("Video:synchronizing", "synchronizing videos with the master video", "trigger"),
+          buffering : new Engage.Event("Video:buffering", "buffering a video", "trigger"),
+          bufferedAndAutoplaying : new Engage.Event("Video:bufferedAndAutoplaying", "buffering successful, was playing, autoplaying now", "trigger"),
+          bufferedButNotAutoplaying : new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "trigger"),
           play : new Engage.Event("Video:play", "plays the video", "handler"),
           pause : new Engage.Event("Video:pause", "pauses the video", "handler"),
           enablefullscreen : new Engage.Event("Video:goFullscreen", "go to fullscreen of the video", "handler"),
@@ -97,14 +105,41 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         ++nr;
                     }
                 }
+		
                 if (nr >= 2) {
+		    // throw some important synchronize.js-events for other plugins
+		    $(document).on("sjs:allPlayersReady", function(event) {
+			videosReady = true;
+			Engage.trigger(plugin.events.ready);
+		    });
+		    $(document).on("sjs:playerLoaded", function(event) {
+			Engage.trigger(plugin.events.playerLoaded);
+		    });
+		    $(document).on("sjs:masterPlay", function(event) {
+			Engage.trigger(plugin.events.masterPlay);
+		    });
+		    $(document).on("sjs:masterEnded", function(event) {
+			Engage.trigger(plugin.events.masterEnded);
+		    });
+		    $(document).on("sjs:masterTimeupdate", function(event) {
+			Engage.trigger(plugin.events.masterTimeupdate);
+		    });
+		    $(document).on("sjs:synchronizing", function(event) {
+			Engage.trigger(plugin.events.synchronizing);
+		    });
+		    $(document).on("sjs:buffering", function(event) {
+			Engage.trigger(plugin.events.buffering);
+		    });
+		    $(document).on("sjs:bufferedAndAutoplaying", function(event) {
+			Engage.trigger(plugin.events.bufferedAndAutoplaying);
+		    });
+		    $(document).on("sjs:bufferedButNotAutoplaying", function(event) {
+			Engage.trigger(plugin.events.bufferedButNotAutoplaying);
+		    });
+
 		    var i = 0;
                     for (var vd in videoDisplays) {
                         if (i > 0) {
-			    $(document).on("sjs:allPlayersReady", function(event) {
-				videosReady = true;
-				Engage.trigger("Video:ready");
-			    });
                             // sync every other videodisplay with the master
                             $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
                             Engage.log("Videodisplay " + vd + " is now being synchronized with the master videodisplay " + 0);
@@ -113,7 +148,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     }
                 } else {
 		    videosReady = true;
-		    Engage.trigger("Video:ready");
+		    Engage.trigger(plugin.events.ready);
 		}
             }
         }
@@ -214,7 +249,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         theodulVideodisplay.on("timeupdate", function() {
 	    if(videosReady) {
 		Engage.log("CurrentTime while timeupdate: " + theodulVideodisplay.currentTime());
-		Engage.trigger("Video:timeupdate", theodulVideodisplay.currentTime());
+		Engage.trigger(plugin.events.timeupdate, theodulVideodisplay.currentTime());
 	    }
         });
         theodulVideodisplay.on("volumechange", function() {

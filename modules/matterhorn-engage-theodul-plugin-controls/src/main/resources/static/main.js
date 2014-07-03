@@ -35,7 +35,20 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         PLUGIN_STYLES_EMBED = [
                                 "style_embed.css"
                               ];
-    var plugin = {};
+    var plugin;
+    var events = {
+        play : new Engage.Event("Video:play", "plays the video", "both"),
+        pause : new Engage.Event("Video:pause", "pauses the video", "both"),
+        goFullscreen : new Engage.Event("Video:goFullscreen", "", "both"),
+        muted : new Engage.Event("Video:muted", "", "both"),
+        unmuted : new Engage.Event("Video:unmuted", "", "both"),
+        cancelFullscreen : new Engage.Event("Video:cancelFullscreen", "", "trigger"),
+        setVolume : new Engage.Event("Video:setVolume", "", "trigger"),
+        fullscreenChange : new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "handler"),
+        ready : new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
+        timeupdate : new Engage.Event("Video:timeupdate", "notices a timeupdate", "handler"),
+        ended : new Engage.Event("Video:ended", "end of the video", "handler")
+    };
     var videosReady = false;
     //switch mobile and desktop logic
     switch(Engage.model.get("mode")){
@@ -45,7 +58,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
           type: PLUGIN_TYPE,
           version: PLUGIN_VERSION,
           styles: PLUGIN_STYLES,
-          template: PLUGIN_TEMPLATE
+          template: PLUGIN_TEMPLATE,
+	  events: events
       };
       break;
     case "mobile":
@@ -54,7 +68,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         type: PLUGIN_TYPE,
         version: PLUGIN_VERSION,
         styles: PLUGIN_STYLES_MOBILE,
-        template: PLUGIN_TEMPLATE_MOBILE
+        template: PLUGIN_TEMPLATE_MOBILE,
+	events: events
       };     
       break;
     case "embed":
@@ -63,7 +78,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         type: PLUGIN_TYPE,
         version: PLUGIN_VERSION,
         styles: PLUGIN_STYLES_EMBED,
-        template: PLUGIN_TEMPLATE_EMBED
+        template: PLUGIN_TEMPLATE_EMBED,
+	events: events
       };
       break;
     }
@@ -181,8 +197,16 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         return result;
     }
 
+    function enable(id) {
+        $("#" + id).removeAttr("disabled");
+    }
+
     function disable(id) {
         $("#" + id).attr("disabled", "disabled");
+    }
+
+    function greyIn(id) {
+        $("#" + id).animate({opacity: 1.0});
     }
 
     function greyOut(id) {
@@ -193,8 +217,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         // disable not used buttons
         disable(id_backward_button);
         disable(id_forward_button);
+        disable(id_play_button);
         greyOut(id_backward_button);
         greyOut(id_forward_button);
+        greyOut(id_play_button);
         disable(id_navigation_time);
         $("#" + id_navigation_time_current).keyup(function(e) {
             // pressed enter
@@ -221,23 +247,23 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             max: 100,
             value: 100,
             change: function(event, ui) {
-                Engage.trigger("Video:setVolume", (ui.value) / 100);
+                Engage.trigger(plugin.events.setVolume, (ui.value) / 100);
             }
         });
 
         $("#" + id_volumeIcon).click(function() {
             if (isMuted) {
-                Engage.trigger("Video:unmuted");
+                Engage.trigger(plugin.events.unmuted);
             } else {
-                Engage.trigger("Video:muted");
+                Engage.trigger(plugin.events.muted);
             }
         });
 
         $("#" + id_playpause_controls).click(function() {
             if (isPlaying) {
-                Engage.trigger("Video:pause");
+                Engage.trigger(plugin.events.pause);
             } else {
-                Engage.trigger("Video:play");
+                Engage.trigger(plugin.events.play);
             }
         });
 
@@ -247,7 +273,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     document.webkitIsFullScreen;
             // just trigger the go event
             if (!isInFullScreen) {
-                Engage.trigger("Video:goFullscreen");
+                Engage.trigger(plugin.events.goFullscreen);
             }
         });
 
@@ -261,7 +287,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             Engage.trigger("Slider:stop", ui.value);
         });
         $("#" + id_volume).on("slidestop", function(event, ui) {
-            Engage.trigger("Video:unmuted");
+            Engage.trigger(plugin.events.unmuted);
         });
     }
 
@@ -279,48 +305,48 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         //only init if plugin template was inserted into the DOM
         if(plugin.inserted === true){
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
-            $("#" + id_play_button).attr("disabled", "disabled");
-	    Engage.on("Video:ready", function() {
-                $("#" + id_play_button).removeAttr("disabled");
+	    Engage.on(plugin.events.ready, function() {
+		greyIn(id_play_button);
+		enable(id_play_button);
 		videosReady = true;
             });
-            Engage.on("Video:play", function() {
+            Engage.on(plugin.events.play, function() {
 		if(videosReady) {
                     $("#" + id_play_button).hide();
                     $("#" + id_pause_button).show();
                     isPlaying = true;
 		}
             });
-            Engage.on("Video:pause", function() {
+            Engage.on(plugin.events.pause, function() {
 		if(videosReady) {
                     $("#" + id_play_button).show();
                     $("#" + id_pause_button).hide();
                     isPlaying = false;
 		}
             });
-            Engage.on("Video:muted", function() {
+            Engage.on(plugin.events.muted, function() {
                 $("#" + id_unmuted_button).hide();
                 $("#" + id_muted_button).show();
                 isMuted = true;
-                Engage.trigger("Video:setVolume", 0);
+                Engage.trigger(plugin.events.setVolume, 0);
             });
-            Engage.on("Video:unmuted", function() {
+            Engage.on(plugin.events.unmuted, function() {
                 $("#" + id_unmuted_button).show();
                 $("#" + id_muted_button).hide();
                 isMuted = false;
-                Engage.trigger("Video:setVolume", getVolume());
+                Engage.trigger(plugin.events.setVolume, getVolume());
             });
-            Engage.on("Video:fullscreenChange", function() {
+            Engage.on(plugin.events.fullscreenChange, function() {
                 var isInFullScreen = document.fullScreen ||
                         document.mozFullScreen ||
                         document.webkitIsFullScreen;
                 // just trigger the cancel event
                 if (!isInFullScreen) {
-                    Engage.trigger("Video:cancelFullscreen");
+                    Engage.trigger(plugin.events.cancelFullscreen);
                 }
             });
 
-            Engage.on("Video:timeupdate", function(currentTime) {
+            Engage.on(plugin.events.timeupdate, function(currentTime) {
 		if(videosReady) {
                     // set slider
                     var duration = Engage.model.get("videoDataModel").get("duration");
@@ -334,9 +360,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     }
 		}
             });
-            Engage.on("Video:ended", function() {
+            Engage.on(plugin.events.ended, function() {
 		if(videosReady) {
-                    Engage.trigger("Video:pause");
+                    Engage.trigger(plugin.events.pause);
 		}
             }); 
         }
