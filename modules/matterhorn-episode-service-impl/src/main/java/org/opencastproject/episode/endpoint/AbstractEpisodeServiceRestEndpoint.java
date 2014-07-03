@@ -16,6 +16,7 @@
 package org.opencastproject.episode.endpoint;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.opencastproject.episode.api.ArchivedMediaPackageElement;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
@@ -46,6 +47,7 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,8 +67,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -164,6 +169,33 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
     });
   }
 
+  @POST
+  @Path("applyToSeries/{wfDefId}")
+  @RestQuery(name = "applyToSeries", description = "Apply a workflow to a series.", pathParameters = { @RestParameter(name = "wfDefId", type = RestParameter.Type.STRING, description = "The ID of the workflow to apply", isRequired = true) }, restParameters = {
+          @RestParameter(name = "seriesId", type = RestParameter.Type.STRING, description = "The id of a series to apply this workflow to. Either this or the series title is required.", isRequired = false),
+          @RestParameter(name = "seriesTitle", type = RestParameter.Type.STRING, description = "The title of a series to apply this workflow to. Either this or the series title is required.", isRequired = false) }, reponses = { @RestResponse(description = "The workflows have been started.", responseCode = HttpServletResponse.SC_NO_CONTENT) }, returnDescription = "No content is returned.")
+  public Response applyWorkflowToSeries(@PathParam("wfDefId") final String wfId,
+          @FormParam("seriesId") final String seriesId, @FormParam("seriesTitle") final String seriesTitle, @Context final HttpServletRequest req) {
+    final EpisodeQuery search = query(getSecurityService());
+
+    if (StringUtils.isNotBlank(seriesId))
+      search.seriesId(seriesId.trim());
+
+    if (StringUtils.isNotBlank(seriesId))
+      search.seriesTitle(seriesTitle.trim());
+
+    List<String> mpIds = new ArrayList<String>();
+    final SearchResult sr = getEpisodeService().find(search, uriRewriter);
+    for (SearchResultItem searchResult : sr.getItems()) {
+      mpIds.add(searchResult.getId());
+    }
+
+    List<String> ignoredKeys = new ArrayList<String>();
+    ignoredKeys.add("seriesId");
+    ignoredKeys.add("seriesTitle");
+    return applyWorkflowToMediapackageIds(wfId, mpIds, req, ignoredKeys);
+  }
+
 //  @POST
 //  @Path("applyworkflow")
 //  @RestQuery(name = "applyworkflow",
@@ -206,23 +238,46 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
   public Response applyWorkflow(@PathParam("wfDefId") final String wfId,
                                 @FormParam("mediaPackageIds") final List<String> mpIds,
                                 @Context final HttpServletRequest req) {
+    List<String> ignoredKeys = new ArrayList<String>();
+    ignoredKeys.add("mediaPackageIds");
+    return applyWorkflowToMediapackageIds(wfId, mpIds, req, ignoredKeys);
+  }
+
+  /**
+   * Applies a workflow to a list of mediapackage ids
+   * @param workflowId The id of the workflow you want to run against the list of mediapackages.
+   * @param mediaPackageIds The list of mediapackage ids that the workflow will be run on each of them.
+   * @param request The request so that we can get the workflow variables
+   * @return A no content response if the request was sucessful
+   */
+  private Response applyWorkflowToMediapackageIds(final String workflowId, final List<String> mediaPackageIds,
+          final HttpServletRequest request, final List<String> keysToIgnore) {
     return handleException(new Function0.X<Response>() {
-      @Override public Response xapply() throws Exception {
-        final Map<String, String[]> params = (Map<String, String[]>) req.getParameterMap();
+      @Override
+      public Response xapply() throws Exception {
+        Map<String, String[]> params = request.getParameterMap();
+        Map<String, String[]> usefulParams = new HashMap<String, String[]>(params);
+
+        try {
+          for (String key : keysToIgnore) {
+            usefulParams.remove(key);
+          }
+        } catch (Exception e) {
+          logger.error("Trying to remove ignored keys ", e);
+        }
+
         // filter and reduce String[] to String
-        final Map<String, String> wfp = mlist(params.entrySet().iterator()).foldl(
-                Collections.<String, String>map(),
+        final Map<String, String> wfp = mlist(usefulParams.entrySet().iterator()).foldl(Collections.<String, String> map(),
                 new Function2<Map<String, String>, Map.Entry<String, String[]>, Map<String, String>>() {
                   @Override
                   public Map<String, String> apply(Map<String, String> wfConf, Map.Entry<String, String[]> param) {
                     final String key = param.getKey();
-                    if (!"mediaPackageIds".equalsIgnoreCase(key))
-                      wfConf.put(key, param.getValue()[0]);
+                    wfConf.put(key, param.getValue()[0]);
                     return wfConf;
                   }
                 });
-        final WorkflowDefinition wfd = getWorkflowService().getWorkflowDefinitionById(wfId);
-        getEpisodeService().applyWorkflow(workflow(wfd, wfp), uriRewriter, mpIds);
+        final WorkflowDefinition wfd = getWorkflowService().getWorkflowDefinitionById(workflowId);
+        getEpisodeService().applyWorkflow(workflow(wfd, wfp), uriRewriter, mediaPackageIds);
         return Response.noContent().build();
       }
     });
@@ -240,6 +295,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
                                 @RestParameter(name = "contributor", isRequired = false, description = "Filter results by the mediapackage's contributor", type = STRING),
                                 @RestParameter(name = "language", isRequired = false, description = "Filter results by mediapackage's language.", type = STRING),
                                 @RestParameter(name = "series", isRequired = false, description = "Filter results by mediapackage's series identifier.", type = STRING),
+                                @RestParameter(name = "seriesTitle", isRequired = false, description = "Filter results by mediapackage's series title.", type = STRING),
                                 @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
                                 @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
                                 @RestParameter(name = "episodes", type = RestParameter.Type.STRING, defaultValue = "false", description = "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".", isRequired = false),
@@ -260,6 +316,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
                               @QueryParam("contributor") final String contributor,
                               @QueryParam("language") final String language,
                               @QueryParam("series") final String series,
+                              @QueryParam("seriesTitle") final String seriesTitle,
                               @QueryParam("license") final String license,
                               @QueryParam("title") final String title,
                               @QueryParam("tag") final String[] tags,
@@ -309,6 +366,9 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
 
         if (StringUtils.isNotBlank(series))
           search.seriesId(series.trim());
+
+        if (StringUtils.isNotBlank(seriesTitle))
+          search.seriesTitle(seriesTitle.trim());
 
         if (StringUtils.isNotBlank(license))
           search.license(license.trim());
