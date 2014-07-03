@@ -15,17 +15,29 @@
  */
 package org.opencastproject.scheduler.endpoint;
 
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_SPATIAL;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.metadata.dublincore.DCMIPeriod;
+import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.scheduler.impl.CaptureNowProlongingService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
@@ -42,6 +54,7 @@ import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -91,9 +104,20 @@ import javax.ws.rs.core.Response.Status;
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class SchedulerRestService {
+
   private static final Logger logger = LoggerFactory.getLogger(SchedulerRestService.class);
+
+  /** Key for the default workflow definition in config.properties */
+  private static final String DEFAULT_WORKFLOW_DEFINITION = "org.opencastproject.workflow.default.definition";
+
+  private static final String LINE_SEPERATOR = System.getProperty("line.separator");
+
   private SchedulerService service;
+  private CaptureAgentStateService agentService;
+  private CaptureNowProlongingService prolongingService;
+
   private DublinCoreCatalogService dcService;
+  private String defaultWorkflowDefinitionId;
 
   protected String serverUrl = UrlSupport.DEFAULT_BASE_URL;
   protected String serviceUrl = null;
@@ -114,6 +138,42 @@ public class SchedulerRestService {
    */
   public void unsetService(SchedulerService service) {
     this.service = null;
+  }
+
+  /**
+   * Method to set the prolonging service this REST endpoint uses
+   *
+   * @param prolongingService
+   */
+  public void setProlongingService(CaptureNowProlongingService prolongingService) {
+    this.prolongingService = prolongingService;
+  }
+
+  /**
+   * Method to unset the prolonging service this REST endpoint uses
+   *
+   * @param prolongingService
+   */
+  public void unsetProlongingService(CaptureNowProlongingService prolongingService) {
+    this.prolongingService = null;
+  }
+
+  /**
+   * Method to set the capture agent state service this REST endpoint uses
+   *
+   * @param agentService
+   */
+  public void setCaptureAgentStateService(CaptureAgentStateService agentService) {
+    this.agentService = agentService;
+  }
+
+  /**
+   * Method to unset the capture agent state service this REST endpoint uses
+   *
+   * @param agentService
+   */
+  public void unsetCaptureAgentStateService(CaptureAgentStateService agentService) {
+    this.agentService = null;
   }
 
   public void setDublinCoreService(DublinCoreCatalogService dcService) {
@@ -139,7 +199,13 @@ public class SchedulerRestService {
         serverUrl = ccServerUrl;
       }
       serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+      defaultWorkflowDefinitionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(
+
+      DEFAULT_WORKFLOW_DEFINITION));
+      if (defaultWorkflowDefinitionId == null)
+        throw new IllegalStateException("Default workflow definition is null: " + DEFAULT_WORKFLOW_DEFINITION);
     }
+
   }
 
   /**
@@ -233,10 +299,11 @@ public class SchedulerRestService {
           @RestParameter(name = "wfproperties", isRequired = false, type = Type.TEXT, description = "Workflow configuration properties"),
           @RestParameter(name = "event", isRequired = false, type = Type.TEXT, description = "Catalog containing information about the event that doesn't exist in DC (IE: Recurrence rule)") }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event or events were successfully created"),
+          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to create the event. Maybe you need to authenticate."),
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid information for this request") })
   public Response addEvent(@FormParam("dublincore") String dublinCoreXml,
           @FormParam("agentparameters") String agentParameters, @FormParam("wfproperties") String workflowProperties,
-          @FormParam("event") String event) {
+          @FormParam("event") String event) throws UnauthorizedException {
 
     if (StringUtils.isBlank(dublinCoreXml)) {
       logger.warn("Cannot add event without dublin core catalog.");
@@ -292,8 +359,231 @@ public class SchedulerRestService {
                 .header("Location", PathSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".xml" }))
                 .build();
       }
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       logger.warn("Unable to create new event: {}", e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Path("capture/{agent}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "currentcapture", description = "Get the current capture event catalog as JSON", returnDescription = "The current capture event catalog as JSON", pathParameters = { @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "DublinCore of current capture event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no ongoing recording"),
+          @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
+  public Response currentCapture(@PathParam("agent") String agentId) throws NotFoundException {
+    if (service == null || agentService == null)
+      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
+              .entity("Scheduler service is unavailable, please wait...").build();
+
+    try {
+      SchedulerQuery q = new SchedulerQuery().setSpatial(agentId).setStartsTo(new Date()).setEndsFrom(new Date());
+      DublinCoreCatalogList search = service.search(q);
+      if (search.getCatalogList().isEmpty()) {
+        logger.info("No recording to stop found for agent '{}'!", agentId);
+        throw new NotFoundException("No recording to stop found for agent: " + agentId);
+      } else {
+        DublinCoreCatalog catalog = search.getCatalogList().get(0);
+        return Response.ok(catalog.toJson()).build();
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Unable to get the immediate recording for agent '{}': {}", agentId, e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Path("capture/{agent}/upcoming")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "upcomingcapture", description = "Get the upcoming capture event catalog as JSON", returnDescription = "The upcoming capture event catalog as JSON", pathParameters = { @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "DublinCore of the upcomfing capture event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no upcoming recording"),
+          @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
+  public Response upcomingCapture(@PathParam("agent") String agentId) throws NotFoundException {
+    if (service == null || agentService == null)
+      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
+              .entity("Scheduler service is unavailable, please wait...").build();
+
+    try {
+      SchedulerQuery q = new SchedulerQuery().setSpatial(agentId).setStartsFrom(new Date());
+      DublinCoreCatalogList search = service.search(q);
+      if (search.getCatalogList().isEmpty()) {
+        logger.info("No recording to stop found for agent '{}'!", agentId);
+        throw new NotFoundException("No recording to stop found for agent: " + agentId);
+      } else {
+        DublinCoreCatalog catalog = search.getCatalogList().get(0);
+        return Response.ok(catalog.toJson()).build();
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Unable to get the immediate recording for agent '{}': {}", agentId, e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @POST
+  @Path("capture/{agent}")
+  @RestQuery(name = "startcapture", description = "Create an immediate event", returnDescription = "If events were successfully generated, status CREATED is returned", pathParameters = { @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, restParameters = { @RestParameter(name = "workflowDefinitionId", isRequired = false, type = Type.STRING, description = "The workflow definition id to use") }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Recording started"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no such agent"),
+          @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "The agent is already recording"),
+          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to start this immediate capture. Maybe you need to authenticate."),
+          @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
+  public Response startCapture(@PathParam("agent") String agentId, @FormParam("workflowDefinitionId") String wfId)
+          throws NotFoundException, UnauthorizedException {
+    if (service == null || agentService == null || prolongingService == null)
+      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
+              .entity("Scheduler service is unavailable, please wait...").build();
+
+    agentService.getAgent(agentId);
+
+    Date now = new Date();
+    Date temporaryEndDate = DateTime.now().plus(prolongingService.getInitialTime()).toDate();
+    try {
+      DublinCoreCatalogList events = service.findConflictingEvents(agentId, now, temporaryEndDate);
+      if (!events.getCatalogList().isEmpty()) {
+        logger.info("An already existing event is in a conflict with the the one to be created on the agent {}!",
+                agentId);
+        return Response.status(Status.CONFLICT).build();
+      }
+    } catch (SchedulerException e) {
+      logger.warn("Unable to create immediate event on agent {}: {}", agentId, e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+
+    String workflowId = defaultWorkflowDefinitionId;
+    if (StringUtils.isNotBlank(wfId))
+      workflowId = wfId;
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("org.opencastproject.workflow.definition=").append(workflowId).append(LINE_SEPERATOR);
+    sb.append("event.location=".concat(agentId)).append(LINE_SEPERATOR);
+    sb.append("event.title=Capture now event").append(LINE_SEPERATOR);
+    // sb.append("org.opencastproject.workflow.config.captionHold=false").append(LINE_SEPERATOR);
+    // sb.append("org.opencastproject.workflow.config.archiveOp=true").append(LINE_SEPERATOR);
+    // sb.append("org.opencastproject.workflow.config.trimHold=false").append(LINE_SEPERATOR);
+
+    // TODO default metadata? configurable?
+    // A temporal with start and end period is needed! As well PROPERTY_SPATIAL is needed
+    DublinCoreCatalog eventCatalog = dcService.newInstance();
+    eventCatalog.set(PROPERTY_TITLE, "Capture now event");
+    // eventCatalog.set(PROPERTY_CREATOR, "demo");
+    // eventCatalog.set(PROPERTY_SUBJECT, "demo");
+    eventCatalog.set(PROPERTY_TEMPORAL,
+            EncodingSchemeUtils.encodePeriod(new DCMIPeriod(now, temporaryEndDate), Precision.Second));
+    eventCatalog.set(PROPERTY_SPATIAL, agentId);
+    eventCatalog.set(PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(new Date(), Precision.Minute));
+    // eventCatalog.set(PROPERTY_LANGUAGE, "demo");
+    // eventCatalog.set(PROPERTY_CONTRIBUTOR, "demo");
+    // eventCatalog.set(PROPERTY_DESCRIPTION, "demo");
+
+    // TODO workflow properties
+    Map<String, String> wfProperties = new HashMap<String, String>();
+    // if (StringUtils.isNotBlank(workflowProperties)) {
+    // try {
+    // Properties prop = parseProperties(workflowProperties);
+    // wfProperties.putAll((Map) prop);
+    // } catch (IOException e) {
+    // logger.warn("Could not parse workflow configuration properties: {}", workflowProperties);
+    // return Response.status(Status.BAD_REQUEST).build();
+    // }
+    // }
+
+    try {
+      Properties caProperties = parseProperties(sb.toString());
+      prolongingService.schedule(agentId);
+      Long id = service.addEvent(eventCatalog, wfProperties);
+      service.updateCaptureAgentMetadata(caProperties, tuple(id, eventCatalog));
+      return Response.status(Status.CREATED)
+              .header("Location", PathSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".xml" }))
+              .build();
+    } catch (Exception e) {
+      prolongingService.stop(agentId);
+      if (e instanceof UnauthorizedException)
+        throw (UnauthorizedException) e;
+      logger.warn("Unable to create immediate event on agent {}: {}", agentId, e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @DELETE
+  @Path("capture/{agent}")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RestQuery(name = "stopcapture", description = "Stops an immediate capture.", returnDescription = "OK if event were successfully stopped", pathParameters = { @RestParameter(name = "agent", isRequired = true, description = "The agent identifier", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Recording stopped"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "The recording was already stopped"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no such agent"),
+          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to stop this immediate capture. Maybe you need to authenticate."),
+          @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
+  public Response stopCapture(@PathParam("agent") String agentId) throws NotFoundException, UnauthorizedException {
+    if (service == null || agentService == null || prolongingService == null)
+      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
+              .entity("Scheduler service is unavailable, please wait...").build();
+
+    agentService.getAgent(agentId);
+
+    long eventId;
+    DublinCoreCatalog eventCatalog;
+    try {
+      SchedulerQuery q = new SchedulerQuery().setSpatial(agentId).setStartsTo(new Date()).setEndsFrom(new Date());
+      DublinCoreCatalogList search = service.search(q);
+      if (search.getCatalogList().isEmpty()) {
+        logger.info("No recording to stop found for agent '{}'!", agentId);
+        return Response.notModified().build();
+      } else {
+        eventCatalog = search.getCatalogList().get(0);
+        eventId = Integer.parseInt(eventCatalog.getFirst(PROPERTY_IDENTIFIER));
+      }
+    } catch (Exception e) {
+      logger.warn("Unable to get the immediate recording for agent '{}': {}", agentId, e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+
+    try {
+      DCMIPeriod period = EncodingSchemeUtils
+              .decodeMandatoryPeriod(eventCatalog.getFirst(DublinCore.PROPERTY_TEMPORAL));
+      eventCatalog.set(PROPERTY_TEMPORAL,
+              EncodingSchemeUtils.encodePeriod(new DCMIPeriod(period.getStart(), new Date()), Precision.Second));
+
+      service.updateEvent(eventId, eventCatalog, new HashMap<String, String>());
+      prolongingService.stop(agentId);
+      return Response.ok().build();
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Unable to update the temporal of event '{}': {}", eventId, e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("capture/{agent}/prolong")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RestQuery(name = "prolongcapture", description = "Prolong an immediate capture.", returnDescription = "OK if event were successfully prolonged", pathParameters = { @RestParameter(name = "agent", isRequired = true, description = "The agent identifier", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Recording prolonged"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "No recording found for prolonging"),
+          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to prolong this immediate capture. Maybe you need to authenticate."),
+          @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
+  public Response prolongCapture(@PathParam("agent") String agentId) throws NotFoundException, UnauthorizedException {
+    if (service == null || agentService == null || prolongingService == null)
+      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
+              .entity("Scheduler service is unavailable, please wait...").build();
+    try {
+      DublinCoreCatalog eventCatalog = prolongingService.getImmediateEvent(agentId);
+      prolongingService.prolongEvent(eventCatalog, agentId);
+      return Response.ok().build();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Unable to prolong the immediate recording for agent '{}': {}", agentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -353,14 +643,17 @@ public class SchedulerRestService {
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "deleterecordings", description = "Removes scheduled event with specified ID.", returnDescription = "OK if event were successfully removed or NOT FOUND if event with specified ID does not exist", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "Event ID", type = Type.STRING) }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully removed"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
-  public Response deleteEvent(@PathParam("id") long eventId) {
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to remove the event. Maybe you need to authenticate.") })
+  public Response deleteEvent(@PathParam("id") long eventId) throws UnauthorizedException {
     try {
       service.removeEvent(eventId);
       return Response.status(Response.Status.OK).build();
     } catch (NotFoundException e) {
       logger.warn("Event with id '{}' does not exist.", eventId);
       return Response.status(Status.NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       logger.warn("Unable to delete event with id '{}': {}", eventId, e.getMessage());
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -389,7 +682,8 @@ public class SchedulerRestService {
           @RestResponse(responseCode = HttpServletResponse.SC_FORBIDDEN, description = "Event with specified ID cannot be updated"),
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Data is missing or invalid") })
   public Response updateEvent(@PathParam("id") String eventID, @FormParam("dublincore") String dublinCoreXml,
-          @FormParam("agentparameters") String agentParameters, @FormParam("wfproperties") String workflowProperties) {
+          @FormParam("agentparameters") String agentParameters, @FormParam("wfproperties") String workflowProperties)
+          throws UnauthorizedException {
 
     // Update CA properties from dublin core (event.title, etc)
     Long id;
@@ -446,11 +740,13 @@ public class SchedulerRestService {
       return Response.ok().build();
     } catch (SchedulerException e) {
       logger.warn("{}", e.getMessage());
-      //TODO: send the reason message in response body
+      // TODO: send the reason message in response body
       return Response.status(Status.FORBIDDEN).build();
     } catch (NotFoundException e) {
       logger.warn("Event with id '{}' does not exist.", id);
       return Response.status(Status.NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       logger.warn("Unable to update event with id '{}': {}", id, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -902,7 +1198,7 @@ public class SchedulerRestService {
       try {
         Date endDate = new Date(Long.valueOf(cutoff));
         filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId)
-                .setEndsFrom(new Date(System.currentTimeMillis())).setStartsTo(endDate);
+                .setEndsFrom(DateTime.now().minusHours(1).toDate()).setStartsTo(endDate);
       } catch (NumberFormatException e) {
         return Response.status(Status.BAD_REQUEST).build();
       }

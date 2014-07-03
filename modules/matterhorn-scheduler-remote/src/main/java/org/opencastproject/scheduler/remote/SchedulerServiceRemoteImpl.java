@@ -18,6 +18,7 @@ package org.opencastproject.scheduler.remote;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
@@ -88,7 +89,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
               e);
     }
 
-    HttpResponse response = getResponse(post, SC_CREATED);
+    HttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED);
     try {
       if (response != null && SC_CREATED == response.getStatusLine().getStatusCode()) {
         Header header = response.getFirstHeader("Location");
@@ -102,9 +103,14 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         }
         throw new SchedulerException("Event " + eventCatalog
                 + " added to the scheduler service but got not event id in response.");
+      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        logger.info("Unauthorized to create the event");
+        throw new UnauthorizedException("Unauthorized to create the event");
       } else {
         throw new SchedulerException("Unable to add event " + eventCatalog + " to the scheduler service");
       }
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to add event " + eventCatalog + " to the scheduler service: " + e);
     } finally {
@@ -135,7 +141,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       throw new SchedulerException("Unable to assemble a remote scheduler request for adding events " + eventCatalog, e);
     }
 
-    HttpResponse response = getResponse(post, SC_CREATED);
+    HttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED);
     try {
       if (response != null && SC_CREATED == response.getStatusLine().getStatusCode()) {
 
@@ -151,9 +157,14 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         } catch (IOException e) {
           throw new SchedulerException("Unable to parse the events ids from the reponse creation.");
         }
+      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        logger.info("Unauthorized to add reccuring event");
+        throw new UnauthorizedException("Unauthorized to add reccuring event");
       } else {
         throw new SchedulerException("Unable to add event " + eventCatalog + " to the scheduler service");
       }
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to add event " + eventCatalog + " to the scheduler service: " + e);
     } finally {
@@ -234,18 +245,23 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
               e);
     }
 
-    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND);
+    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
           logger.warn("Event {} was not found by the scheduler service", eventId);
         } else if (SC_OK == response.getStatusLine().getStatusCode()) {
           logger.info("Event {} successfully updated with capture agent metadata.", eventId);
+        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+          logger.info("Unauthorized to update the event {}.", eventId);
+          throw new UnauthorizedException("Unauthorized to update the event " + eventId);
         } else {
           throw new SchedulerException("Unexpected status code " + response.getStatusLine());
         }
         return;
       }
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to update event " + eventId + " to the scheduler service: " + e);
     } finally {
@@ -259,7 +275,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     logger.debug("Start removing event {} from scheduling service.", eventId);
     HttpDelete delete = new HttpDelete("/" + eventId);
 
-    HttpResponse response = getResponse(delete, SC_OK, SC_NOT_FOUND);
+    HttpResponse response = getResponse(delete, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null && SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
         logger.warn("Event {} was not found by the scheduler service", eventId);
@@ -267,7 +283,12 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       } else if (response != null && SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
         logger.info("Event {} removed from scheduling service.", eventId);
         return;
+      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        logger.info("Unauthorized to remove the event {}.", eventId);
+        throw new UnauthorizedException("Unauthorized to remove the event " + eventId);
       }
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to remove event " + eventId + " from the scheduler service: " + e);
     } finally {

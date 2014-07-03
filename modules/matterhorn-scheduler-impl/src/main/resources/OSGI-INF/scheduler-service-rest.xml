@@ -12,9 +12,12 @@
   <service>
     <provide interface="org.opencastproject.scheduler.endpoint.SchedulerRestService" />
   </service>
-  <reference name="service-impl"
-    interface="org.opencastproject.scheduler.api.SchedulerService"
+  <reference name="service-impl" interface="org.opencastproject.scheduler.api.SchedulerService"
     cardinality="1..1" policy="dynamic" bind="setService" unbind="unsetService" />
   <reference name="dc" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
     cardinality="1..1" policy="static" bind="setDublinCoreService" />
+  <reference name="agentService" interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
+    cardinality="0..1" policy="dynamic" bind="setCaptureAgentStateService" unbind="unsetCaptureAgentStateService" />
+  <reference name="prolonging-service" interface="org.opencastproject.scheduler.impl.CaptureNowProlongingService"
+    cardinality="1..1" policy="dynamic" bind="setProlongingService" unbind="unsetProlongingService" />
 </scr:component>

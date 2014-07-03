@@ -137,8 +137,9 @@ public class CalendarGenerator {
 
     DateTime startDate = new DateTime(period.getStart());
     DateTime endDate = new DateTime(period.getEnd());
-    if (endDate.before(new Date())) {
-      logger.debug("Event has already passed, skipping!");
+    Date marginEndDate = new org.joda.time.DateTime(endDate.getTime()).plusHours(1).toDate();
+    if (marginEndDate.before(new Date())) {
+      logger.debug("Event has already passed more than an hour, skipping!");
       return false;
     }
     startDate.setUtc(true);

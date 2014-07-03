@@ -41,6 +41,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-capture-admin-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-dublincore</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -76,6 +81,10 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -187,6 +196,7 @@
               net.fortuna.ical4j.*;-split-package:=merge-last
             </Private-Package>
             <Service-Component>
+              OSGI-INF/capture-prolonging-service.xml,
               OSGI-INF/scheduler-service-index.xml,
               OSGI-INF/scheduler-service-persistence.xml,
               OSGI-INF/scheduler-service.xml,
