@@ -544,7 +544,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       try {
         collectJobstats = Boolean.valueOf(jobStatsString);
       } catch (Exception e) {
-        logger.warn("Job statistics collection flag '{}' is malformed, setting to {}", jobStatsString, DEFAULT_JOB_STATISTICS);
+        logger.warn("Job statistics collection flag '{}' is malformed, setting to {}", jobStatsString,
+                DEFAULT_JOB_STATISTICS);
         collectJobstats = DEFAULT_JOB_STATISTICS;
       }
     }
@@ -1794,39 +1795,40 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public Object addingService(ServiceReference reference) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
       String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
-      boolean publishFlag = reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY) == null || Boolean.parseBoolean((String)reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY));
-      boolean jobProducer = Boolean.parseBoolean((String) reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY));
+      boolean publishFlag = reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY) == null
+              || Boolean.parseBoolean((String) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY));
+      boolean jobProducer = Boolean.parseBoolean((String) reference
+              .getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY));
 
-      // Don't register services that have the "publish" flag set to "false"
-      if (!publishFlag) {
+      // Only register services that have the "publish" flag set to "true"
+      if (publishFlag) {
+        try {
+          registerService(serviceType, hostName, servicePath, jobProducer);
+        } catch (ServiceRegistryException e) {
+          logger.warn("Unable to register job producer of type " + serviceType + " on host " + hostName);
+        }
+      } else {
         logger.debug("Not registering service " + serviceType + " in service registry by configuration");
-        return super.addingService(reference);
       }
 
-      try {
-        registerService(serviceType, hostName, servicePath, jobProducer);
-      } catch (ServiceRegistryException e) {
-        logger.warn("Unable to register job producer of type " + serviceType + " on host " + hostName);
-      }
       return super.addingService(reference);
     }
 
     @Override
     public void removedService(ServiceReference reference, Object service) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-      String publishFlag = (String) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
+      boolean publishFlag = reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY) == null
+              || Boolean.parseBoolean((String) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY));
 
-      // Services that have the "publish" flag set to "false" have not been registered before
-      if ("false".equals(StringUtils.trimToEmpty(publishFlag).toLowerCase())) {
+      // Services that have the "publish" flag set to "true" have been registered before.
+      if (publishFlag) {
+        try {
+          unRegisterService(serviceType, hostName);
+        } catch (ServiceRegistryException e) {
+          logger.warn("Unable to unregister job producer of type " + serviceType + " on host " + hostName);
+        }
+      } else {
         logger.trace("Service " + reference + " was never registered");
-        super.removedService(reference, service);
-        return;
-      }
-
-      try {
-        unRegisterService(serviceType, hostName);
-      } catch (ServiceRegistryException e) {
-        logger.warn("Unable to unregister job producer of type " + serviceType + " on host " + hostName);
       }
       super.removedService(reference, service);
     }

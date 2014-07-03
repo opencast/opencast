@@ -4,7 +4,7 @@
   <implementation class="org.opencastproject.series.remote.SeriesServiceRemoteImpl" />
   <property name="service.description" value="Series Remote Service Proxy" />
   
-  <property name="opencast.service.type" value="org.opencastproject.series.remote" />
+  <property name="opencast.service.type" value="org.opencastproject.series" />
   <property name="opencast.service.path" value="/series" />
   <property name="opencast.service.publish" value="false" />
   
