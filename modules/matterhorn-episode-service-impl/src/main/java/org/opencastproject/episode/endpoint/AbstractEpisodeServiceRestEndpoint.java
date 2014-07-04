@@ -171,18 +171,26 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
 
   @POST
   @Path("applyToSeries/{wfDefId}")
-  @RestQuery(name = "applyToSeries", description = "Apply a workflow to a series.", pathParameters = { @RestParameter(name = "wfDefId", type = RestParameter.Type.STRING, description = "The ID of the workflow to apply", isRequired = true) }, restParameters = {
+  @RestQuery(name = "applyToSeries", description = "Apply a workflow to a series or several series if the pattern matches more. You can test the pattern using the find endpoint.", pathParameters = { @RestParameter(name = "wfDefId", type = RestParameter.Type.STRING, description = "The ID of the workflow to apply", defaultValue = "full", isRequired = true) }, restParameters = {
           @RestParameter(name = "seriesId", type = RestParameter.Type.STRING, description = "The id of a series to apply this workflow to. Either this or the series title is required.", isRequired = false),
-          @RestParameter(name = "seriesTitle", type = RestParameter.Type.STRING, description = "The title of a series to apply this workflow to. Either this or the series title is required.", isRequired = false) }, reponses = { @RestResponse(description = "The workflows have been started.", responseCode = HttpServletResponse.SC_NO_CONTENT) }, returnDescription = "No content is returned.")
+          @RestParameter(name = "seriesTitle", type = RestParameter.Type.STRING, description = "The title of a series to apply this workflow to. Either this or the series id is required.", isRequired = false) }, reponses = {
+          @RestResponse(description = "The workflows have been started.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+          @RestResponse(description = "Both the series id and series title is not provided so we can't search for episodes within a series to apply this workflow to.", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "No content is returned.")
   public Response applyWorkflowToSeries(@PathParam("wfDefId") final String wfId,
-          @FormParam("seriesId") final String seriesId, @FormParam("seriesTitle") final String seriesTitle, @Context final HttpServletRequest req) {
+          @FormParam("seriesId") final String seriesId, @FormParam("seriesTitle") final String seriesTitle,
+          @Context final HttpServletRequest req) {
+    if (!StringUtils.isNotBlank(seriesId) && !StringUtils.isNotBlank(seriesTitle)) {
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
     final EpisodeQuery search = query(getSecurityService());
 
-    if (StringUtils.isNotBlank(seriesId))
+    if (StringUtils.isNotBlank(seriesId)) {
       search.seriesId(seriesId.trim());
+    }
 
-    if (StringUtils.isNotBlank(seriesId))
+    if (StringUtils.isNotBlank(seriesTitle)) {
       search.seriesTitle(seriesTitle.trim());
+    }
 
     List<String> mpIds = new ArrayList<String>();
     final SearchResult sr = getEpisodeService().find(search, uriRewriter);
