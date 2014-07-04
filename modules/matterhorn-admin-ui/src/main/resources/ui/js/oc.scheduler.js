@@ -1408,6 +1408,7 @@ var ocScheduler = (function() {
           var end = this.fields.recurEnd.datepicker('getDate') / 1000;
           end += this.fields.recurStartTimeHour.val() * 3600; // start hour
           end += this.fields.recurStartTimeMin.val() * 60; //start min, then add duration
+          end -= sched.tzDiff * 60; //Agent TZ offset
           end += this.fields.recurDurationHour.val() * 3600; // seconds per hour
           end += this.fields.recurDurationMin.val() * 60; // milliseconds per min
           end = end * 1000;
