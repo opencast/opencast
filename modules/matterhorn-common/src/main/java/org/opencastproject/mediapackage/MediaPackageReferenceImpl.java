@@ -56,7 +56,7 @@ public class MediaPackageReferenceImpl implements MediaPackageReference {
 
   /**
    * Creates a reference to the specified media package.
-   * 
+   *
    * @param mediaPackage
    *          the media package to refer to
    */
@@ -77,7 +77,7 @@ public class MediaPackageReferenceImpl implements MediaPackageReference {
    * Note that the referenced element must already be part of the media package, otherwise a
    * <code>MediaPackageException</code> will be thrown as the object holding this reference is added to the media
    * package.
-   * 
+   *
    * @param mediaPackageElement
    *          the media package element to refer to
    */
@@ -93,7 +93,7 @@ public class MediaPackageReferenceImpl implements MediaPackageReference {
 
   /**
    * Creates a reference to the entity identified by <code>type</code> and <code>identifier</code>.
-   * 
+   *
    * @param type
    *          the reference type
    * @param identifier
@@ -111,7 +111,7 @@ public class MediaPackageReferenceImpl implements MediaPackageReference {
 
   /**
    * Returns a media package reference from the given string.
-   * 
+   *
    * @return the media package reference
    * @throws IllegalArgumentException
    *           if the string is malformed
@@ -179,7 +179,7 @@ public class MediaPackageReferenceImpl implements MediaPackageReference {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageReference#getProperty(java.lang.String)
    */
   @Override
@@ -189,7 +189,7 @@ public class MediaPackageReferenceImpl implements MediaPackageReference {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageReference#setProperty(java.lang.String, java.lang.String)
    */
   @Override
@@ -229,7 +229,7 @@ public class MediaPackageReferenceImpl implements MediaPackageReference {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#clone()
    */
   @Override

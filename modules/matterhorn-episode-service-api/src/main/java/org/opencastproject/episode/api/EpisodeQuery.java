@@ -214,7 +214,7 @@ public final class EpisodeQuery {
 
   /**
    * Sort the results by the specified field, either ascending or descending.
-   * 
+   *
    * @param sort
    *          the sort field
    * @param ascending
@@ -228,7 +228,7 @@ public final class EpisodeQuery {
 
   /**
    * Return the field to use in sorting the results of the query.
-   * 
+   *
    * @return the sort field
    */
   public Sort getSort() {
@@ -242,7 +242,7 @@ public final class EpisodeQuery {
 
   /**
    * Return whether to sort the results in ascending order.
-   * 
+   *
    * @return whether the search results should be sorted in ascending order
    */
   public boolean getSortAscending() {

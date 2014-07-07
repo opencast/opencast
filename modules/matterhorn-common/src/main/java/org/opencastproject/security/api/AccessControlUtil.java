@@ -45,14 +45,14 @@ public final class AccessControlUtil {
 
   /**
    * Determines whether the {@link AccessControlList} permits a user to perform an action.
-   * 
+   *
    * There are three ways a user can be allowed to perform an action:
    * <ol>
    * <li>They have the superuser role</li>
    * <li>They have their local organization's admin role</li>
    * <li>They have a role listed in the series ACL, with write permission</li>
    * </ol>
-   * 
+   *
    * @param acl
    *          the {@link AccessControlList}
    * @param user
@@ -102,7 +102,7 @@ public final class AccessControlUtil {
 
   /**
    * Constructor function for ACLs.
-   * 
+   *
    * @see #entry(String, String, boolean)
    * @see #entries(String, org.opencastproject.util.data.Tuple[])
    */

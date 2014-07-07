@@ -27,7 +27,7 @@ public interface HandleBuilder extends IdBuilder {
   /**
    * Creates a new handle by connecting to the handle server and asking it to hand over a new instance for the default
    * url. Do not forget to update the handle once the final url is known.
-   * 
+   *
    * @return the new handle
    */
   Handle createNew();
@@ -35,7 +35,7 @@ public interface HandleBuilder extends IdBuilder {
   /**
    * Creates a new handle by connecting to the handle server and asking it to hand over a new instance for the specified
    * url.
-   * 
+   *
    * @param url
    *          the handle target
    * @return the new handle
@@ -47,7 +47,7 @@ public interface HandleBuilder extends IdBuilder {
   /**
    * Creates a handle object from the specified value. The value must be a valid handle in string form, e. g.
    * <code>10.254/test</code>, optionally preceeded by the handle protocol identifier {@link Handle#PROTOCOL};
-   * 
+   *
    * @param value
    *          the handle value
    * @return the handle
@@ -58,7 +58,7 @@ public interface HandleBuilder extends IdBuilder {
 
   /**
    * Updates the handle to point to the new url.
-   * 
+   *
    * @param handle
    *          the handle
    * @param url
@@ -70,7 +70,7 @@ public interface HandleBuilder extends IdBuilder {
 
   /**
    * Resolves the handle and returns its target url.
-   * 
+   *
    * @param handle
    *          the handle
    * @throws HandleException
@@ -84,7 +84,7 @@ public interface HandleBuilder extends IdBuilder {
    * Note that removing a handle should not occur for urls that have been in handed out. Rather update the handle to
    * some meaningful <code>404</code> page instead.
    * </p>
-   * 
+   *
    * @param handle
    *          the handle
    * @throws HandleException

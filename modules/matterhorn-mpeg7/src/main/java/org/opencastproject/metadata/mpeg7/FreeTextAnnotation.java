@@ -25,7 +25,7 @@ public interface FreeTextAnnotation extends XmlElement {
 
   /**
    * Returns the text of this free text annotation.
-   * 
+   *
    * @return the annotation
    */
   String getText();

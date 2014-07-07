@@ -87,7 +87,7 @@ public class RestDocData extends DocData {
 
   /**
    * Create the base data object for creating REST documentation.
-   * 
+   *
    * @param name
    *          the name of the set of rest endpoints (must be alphanumeric (includes _) and no spaces or special chars)
    * @param title
@@ -117,9 +117,9 @@ public class RestDocData extends DocData {
   /**
    * Verify the integrity of this object. If its data is verified to be okay, it return a map representation of this
    * RestDocData object.
-   * 
+   *
    * @return a map representation of this RestDocData object if this object passes the verification
-   * 
+   *
    * @throws IllegalStateException
    *           if any path parameter is not present in the endpoint's path
    */
@@ -173,7 +173,7 @@ public class RestDocData extends DocData {
 
   /**
    * Gets the path to the default template (a .xhtml file).
-   * 
+   *
    * @return the path to the default template file
    */
   @Override
@@ -183,7 +183,7 @@ public class RestDocData extends DocData {
 
   /**
    * Returns a string representation of this object.
-   * 
+   *
    * @return a string representation of this object
    */
   @Override
@@ -193,7 +193,7 @@ public class RestDocData extends DocData {
 
   /**
    * Add an endpoint to this documentation using and assign it to the correct type group (read/write).
-   * 
+   *
    * @param type
    *          the type of this endpoint (RestEndpointData.Type.READ or RestEndpointData.Type.WRITE)
    * @param endpoint
@@ -217,7 +217,7 @@ public class RestDocData extends DocData {
 
   /**
    * Creates an abstract section which is displayed at the top of the documentation page.
-   * 
+   *
    * @param abstractText
    *          any text to place at the top of the document, can be html markup but must be valid
    */
@@ -232,7 +232,7 @@ public class RestDocData extends DocData {
   /**
    * Validates paths: VALID: /sample , /sample/{thing} , /{my}/{path}.xml , /my/fancy_path/is/{awesome}.{FORMAT}
    * INVALID: sample, /sample/, /sa#$%mple/path
-   * 
+   *
    * @param path
    *          the path value to check
    * @return true if this path is valid, false otherwise
@@ -255,7 +255,7 @@ public class RestDocData extends DocData {
 
   /**
    * Takes a string and replaces any REST doc macros in it with the corresponding values.
-   * 
+   *
    * @param value
    *          the string to check
    * @return a string where all the macros are replaced by the corresponding values
@@ -294,7 +294,7 @@ public class RestDocData extends DocData {
 
   /**
    * Add an endpoint to the Rest documentation.
-   * 
+   *
    * @param restQuery
    *          the RestQuery annotation type storing information of an endpoint
    * @param returnType

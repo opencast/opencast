@@ -40,7 +40,7 @@ public class BlueCherryBT878Producer extends V4L2Producer {
   /**
    * Creates a Producer specifically designed to handle a BlueCherry Provideo Card using the BT 878 chipset. Mainly a
    * duplicate of the V4L2Producer but left as a legacy class so that our install scripts do not have to change yet.
-   * 
+   *
    * @param captureDevice
    *          The Bluecherry {@code CaptureDevice} to create pipeline around
    * @param properties
@@ -68,7 +68,7 @@ public class BlueCherryBT878Producer extends V4L2Producer {
 
   /**
    * Create the v4l2src Element
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the current system cannot create the v4l2src then this Exception is thrown. Since this source is
    *           supported only on Linux a Windows or Mac system will throw this Exception.
@@ -82,7 +82,7 @@ public class BlueCherryBT878Producer extends V4L2Producer {
 
   /**
    * Set the location of the v4l2src
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If the v4l2src is null then this Exception is thrown
    **/
@@ -107,7 +107,7 @@ public class BlueCherryBT878Producer extends V4L2Producer {
 
   /**
    * Link together all of the {@code Element}s in this bin so that we can use them as a Producer.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           When something in the bin doesn't link together correctly we throw an exception.
    **/

@@ -26,7 +26,7 @@ public class PlainTextContent extends ContentImpl {
 
   /**
    * Creates new plain text content.
-   * 
+   *
    * @param value
    *          the content value
    */

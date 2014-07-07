@@ -44,18 +44,18 @@ import java.util.List;
 public class ConcurrentVideosegmenterTest {
   @Rule
   public ContiPerfRule i = new ContiPerfRule();
-  
+
   TrustedHttpClient httpClient;
   String trackXml = "<track id=\"track-1\"><mimetype>video/quicktime</mimetype><tags/><url>https://opencast.jira.com/svn/MH/trunk/modules/matterhorn-analysis-videosegmenter/src/test/resources/scene-change.mov</url><checksum type=\"md5\">89b99cf1efe6614e35b1a765b519f56d</checksum><duration>20000</duration><video id=\"video-1\"><device/><encoder type=\"M-JPEG\"/><bitrate>187396.0</bitrate><framerate>0.95</framerate><resolution>320x240</resolution></video></track>";
 
   @Before
   public void setUp() throws Exception {
     httpClient = Main.getClient();
-    
-    // We run this once in the startup so we don't try to download the same file 10 times at once 
+
+    // We run this once in the startup so we don't try to download the same file 10 times at once
     httpClient.execute(getPost());
-    
-    
+
+
   }
 
   protected HttpPost getPost() throws Exception {
@@ -65,7 +65,7 @@ public class ConcurrentVideosegmenterTest {
     postEncode.setEntity(new UrlEncodedFormEntity(formParams, "UTF-8"));
     return postEncode;
   }
-  
+
   @After
   public void tearDown() throws Exception {
     Main.returnClient(httpClient);

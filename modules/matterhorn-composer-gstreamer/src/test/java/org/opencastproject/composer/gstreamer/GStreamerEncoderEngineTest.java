@@ -149,12 +149,12 @@ public class GStreamerEncoderEngineTest {
       Assert.assertTrue("Invalid file: " + image.getAbsolutePath(), image.exists() && image.length() > 0);
     }
   }
-  
+
   @Test
   public void multipleImageExtraction() throws Exception {
     Map<String, String> properties = new HashMap<String, String>();
     properties.put("gstreamer.image.dimensions", "0x0");
-    
+
     EncoderEngine engine = factory.newEncoderEngine(null);
     EncodingProfile profile = createEncodingProfile("ImageExtractionTest", "_#{time}.jpg", properties);
     List<File> result = engine.extract(videoFile, profile, properties, 3, 1, 7);
@@ -182,7 +182,7 @@ public class GStreamerEncoderEngineTest {
 
   /**
    * Creates EncodingProfile.
-   * 
+   *
    * @param name
    * @param suffix
    * @param properties

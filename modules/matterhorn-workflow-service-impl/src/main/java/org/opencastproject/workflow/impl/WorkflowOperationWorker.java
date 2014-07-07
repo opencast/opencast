@@ -53,7 +53,7 @@ final class WorkflowOperationWorker {
    * Creates a worker that will execute the given handler and thereby the current operation of the workflow instance.
    * When the worker is finished, a callback will be made to the workflow service reporting either success or failure of
    * the current workflow operation.
-   * 
+   *
    * @param handler
    *          the workflow operation handler
    * @param workflow
@@ -72,7 +72,7 @@ final class WorkflowOperationWorker {
    * Creates a worker that will execute the given handler and thereby the current operation of the workflow instance.
    * When the worker is finished, a callback will be made to the workflow service reporting either success or failure of
    * the current workflow operation.
-   * 
+   *
    * @param handler
    *          the workflow operation handler
    * @param workflow
@@ -91,7 +91,7 @@ final class WorkflowOperationWorker {
   /**
    * Creates a worker that still needs an operation handler to be set. When the worker is finished, a callback will be
    * made to the workflow service reporting either success or failure of the current workflow operation.
-   * 
+   *
    * @param workflow
    *          the workflow instance
    * @param properties
@@ -107,7 +107,7 @@ final class WorkflowOperationWorker {
   /**
    * Creates a worker that still needs an operation handler to be set. When the worker is finished, a callback will be
    * made to the workflow service reporting either success or failure of the current workflow operation.
-   * 
+   *
    * @param workflow
    *          the workflow instance
    * @param service
@@ -119,7 +119,7 @@ final class WorkflowOperationWorker {
 
   /**
    * Sets the workflow operation handler to use.
-   * 
+   *
    * @param operationHandler
    *          the handler
    */
@@ -173,7 +173,7 @@ final class WorkflowOperationWorker {
 
   /**
    * Starts executing the workflow operation.
-   * 
+   *
    * @return the workflow operation result
    * @throws WorkflowOperationException
    *           if executing the workflow operation handler fails
@@ -227,7 +227,7 @@ final class WorkflowOperationWorker {
   /**
    * Resumes a previously suspended workflow operation. Note that only workflow operation handlers that implement
    * {@link ResumableWorkflowOperationHandler} can be resumed.
-   * 
+   *
    * @return the workflow operation result
    * @throws WorkflowOperationException
    *           if executing the workflow operation handler fails

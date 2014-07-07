@@ -90,7 +90,7 @@ public class ServiceRegistryEndpoint {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */

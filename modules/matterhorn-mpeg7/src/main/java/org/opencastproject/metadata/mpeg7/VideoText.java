@@ -20,7 +20,7 @@ import java.awt.Rectangle;
 /**
  * The <code>VideoText</code> element represents parts of the video with superimposed text. It is a subtype of a moving
  * region (<code>mpeg7:MovingRegionType</code>).
- * 
+ *
  * <pre>
  * &lt;complexType name="VideoTextType"&gt;
  *   &lt;complexContent&gt;
@@ -62,7 +62,7 @@ public interface VideoText extends MovingRegion {
 
   /**
    * Sets the segment identifier.
-   * 
+   *
    * @param id
    *          the identifier
    */
@@ -70,14 +70,14 @@ public interface VideoText extends MovingRegion {
 
   /**
    * Returns the segment identifier.
-   * 
+   *
    * @return the identifier
    */
   String getIdentifier();
 
   /**
    * Sets the text.
-   * 
+   *
    * @param text
    *          the text
    */
@@ -85,14 +85,14 @@ public interface VideoText extends MovingRegion {
 
   /**
    * Returns the text.
-   * 
+   *
    * @return the text
    */
   Textual getText();
 
   /**
    * Sets the videotext type.
-   * 
+   *
    * @param type
    *          the type
    */
@@ -100,14 +100,14 @@ public interface VideoText extends MovingRegion {
 
   /**
    * Rerturns the videotext type.
-   * 
+   *
    * @return the type
    */
   Type getType();
 
   /**
    * Sets the optional font type.
-   * 
+   *
    * @param fontType
    *          the font type
    */
@@ -115,14 +115,14 @@ public interface VideoText extends MovingRegion {
 
   /**
    * Returns the font type.
-   * 
+   *
    * @return the font type
    */
   String getFontType();
 
   /**
    * Sets the optional font size.
-   * 
+   *
    * @param size
    *          the font size
    */
@@ -130,14 +130,14 @@ public interface VideoText extends MovingRegion {
 
   /**
    * Returns the font size.
-   * 
+   *
    * @return the font size
    */
   int getFontSize();
 
   /**
    * Sets the text's bounding box.
-   * 
+   *
    * @param rectangle
    *          the bounding box
    */
@@ -145,7 +145,7 @@ public interface VideoText extends MovingRegion {
 
   /**
    * Returns the text's bounding box.
-   * 
+   *
    * @return the bounding box
    */
   Rectangle getBoundary();

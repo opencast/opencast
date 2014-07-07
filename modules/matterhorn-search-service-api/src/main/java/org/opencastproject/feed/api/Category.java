@@ -26,14 +26,14 @@ public interface Category {
 
   /**
    * Returns the category name.
-   * 
+   *
    * @return the category name, <b>null</b> if none.
    */
   String getName();
 
   /**
    * Sets the category name.
-   * 
+   *
    * @param name
    *          the category name to set, <b>null</b> if none.
    */
@@ -41,14 +41,14 @@ public interface Category {
 
   /**
    * Returns the category taxonomy URI.
-   * 
+   *
    * @return the category taxonomy URI, <b>null</b> if none.
    */
   String getTaxonomyUri();
 
   /**
    * Sets the category taxonomy URI.
-   * 
+   *
    * @param taxonomyUri
    *          the category taxonomy URI to set, <b>null</b> if none.
    */

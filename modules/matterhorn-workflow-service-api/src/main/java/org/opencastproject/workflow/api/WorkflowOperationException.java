@@ -27,7 +27,7 @@ public class WorkflowOperationException extends Exception {
 
   /**
    * Constructs a new {@link WorkflowOperationException} with a message and a root cause.
-   * 
+   *
    * @param message
    *          The message describing what went wrong
    * @param cause
@@ -39,7 +39,7 @@ public class WorkflowOperationException extends Exception {
 
   /**
    * Constructs a new {@link WorkflowOperationException} with a message, but no root cause.
-   * 
+   *
    * @param message
    *          The message describing what went wrong
    */
@@ -49,7 +49,7 @@ public class WorkflowOperationException extends Exception {
 
   /**
    * Constructs a new {@link WorkflowOperationException} with a root cause.
-   * 
+   *
    * @param cause
    *          The exception that caused this problem
    */
@@ -59,7 +59,7 @@ public class WorkflowOperationException extends Exception {
 
   /**
    * Constructs a new {@link WorkflowOperationException} with a root cause.
-   * 
+   *
    * @param cause
    *          The exception that caused this problem
    * @param operation
@@ -72,7 +72,7 @@ public class WorkflowOperationException extends Exception {
 
   /**
    * Returns the workflow operation instance which caused the failure.
-   * 
+   *
    * @return the operation
    */
   public WorkflowOperationInstance getOperation() {

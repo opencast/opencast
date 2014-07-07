@@ -40,7 +40,7 @@ public class Parallelized extends Parameterized {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.junit.runners.model.RunnerScheduler#finished()
      */
     @Override
@@ -55,7 +55,7 @@ public class Parallelized extends Parameterized {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.junit.runners.model.RunnerScheduler#schedule(java.lang.Runnable)
      */
     @Override
@@ -66,7 +66,7 @@ public class Parallelized extends Parameterized {
 
   /**
    * Constructs a new parallelized runner for the given test class
-   * 
+   *
    * @param clazz
    *          the test class
    * @throws Throwable

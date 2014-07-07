@@ -59,7 +59,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * This REST endpoint provides information about the runtime environment, including the services and user interfaces
  * deployed and the current login context.
- * 
+ *
  * If the 'org.opencastproject.anonymous.feedback.url' is set in config.properties, this service will also update the
  * opencast project with the contents of the {@link #getRuntimeInfo()} json feed.
  */
@@ -256,7 +256,7 @@ public class RuntimeInfo {
 
   /**
    * Returns the array of references sorted by their {@link Constants.SERVICE_DESCRIPTION} property.
-   * 
+   *
    * @param references
    *          the referencens
    * @return the sorted set of references

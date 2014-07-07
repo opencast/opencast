@@ -45,14 +45,14 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * Gets the base URI for this service.
-   * 
+   *
    * @return The base URI
    */
   URI getBaseUri();
 
   /**
    * Store the data stream under the given media package and element IDs with filename as name of the file.
-   * 
+   *
    * @param mediaPackageID
    *          the media package identifier
    * @param mediaPackageElementID
@@ -72,7 +72,7 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * Stream the file stored under the given media package and element IDs.
-   * 
+   *
    * @param mediaPackageID
    *          the media package identifier
    * @param mediaPackageElementID
@@ -87,7 +87,7 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * Get the URL for a file stored under the given collection.
-   * 
+   *
    * @param collectionID
    *          the collection identifier
    * @param fileName
@@ -101,7 +101,7 @@ public interface WorkingFileRepository extends StorageUsage {
   /**
    * Get the URL for a file stored under the given media package and element IDs. This may be called for mediapackages,
    * elements, or files that have not yet been stored in the repository.
-   * 
+   *
    * @param mediaPackageID
    *          the media package identifier
    * @param mediaPackageElementID
@@ -115,7 +115,7 @@ public interface WorkingFileRepository extends StorageUsage {
   /**
    * Get the URL for a file stored under the given media package and element IDs. This may be called for mediapackages,
    * elements, or files that have not yet been stored in the repository.
-   * 
+   *
    * @param mediaPackageID
    *          the media package identifier
    * @param mediaPackageElementID
@@ -130,7 +130,7 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * Delete the file stored at the given media package and element IDs.
-   * 
+   *
    * @param mediaPackageID
    *          the media package identifier
    * @param mediaPackageElementID
@@ -142,7 +142,7 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * Gets the number of files in a collection.
-   * 
+   *
    * @param collectionId
    *          the collection identifier
    * @return the number of files in a collection
@@ -153,7 +153,7 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * Puts a file into a collection, overwriting the existing file if present.
-   * 
+   *
    * @param collectionId
    *          The collection identifier
    * @param fileName
@@ -168,7 +168,7 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * Gets the URIs of the members of this collection
-   * 
+   *
    * @param collectionId
    *          the collection identifier
    * @return the URIs for each member of the collection
@@ -179,7 +179,7 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * Gets data from a collection
-   * 
+   *
    * @param collectionId
    *          the collection identifier
    * @param fileName
@@ -190,7 +190,7 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * Removes a file from a collection
-   * 
+   *
    * @param collectionId
    *          the collection identifier
    * @param fileName
@@ -201,7 +201,7 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * Moves a file from a collection into a mediapackage
-   * 
+   *
    * @param fromCollection
    *          The collection holding the file
    * @param fromFileName
@@ -219,7 +219,7 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * Copies a file from a collection into a mediapackage
-   * 
+   *
    * @param fromCollection
    *          The collection holding the file
    * @param fromFileName
@@ -237,7 +237,7 @@ public interface WorkingFileRepository extends StorageUsage {
 
   /**
    * A textual representation of available and total storage
-   * 
+   *
    * @return Percentage and numeric values of used storage space
    */
   String getDiskSpace();

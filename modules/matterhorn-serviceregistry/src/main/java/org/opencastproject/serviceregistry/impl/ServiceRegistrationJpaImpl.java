@@ -57,10 +57,10 @@ import javax.xml.bind.annotation.XmlType;
 @Table(name = "mh_service_registration", uniqueConstraints = @UniqueConstraint(columnNames = { "host_registration",
         "service_type" }))
 @NamedQueries({
-        @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, "
+        @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT job.processorServiceRegistrationId as serviceRegistration, job.status, "
                 + "count(job.status) as numJobs, "
                 + "avg(job.queueTime) as meanQueue, "
-                + "avg(job.runTime) as meanRun FROM Job job group by job.processorServiceRegistration, job.status"),
+                + "avg(job.runTime) as meanRun FROM Job job group by job.processorServiceRegistrationId, job.status"),
         @NamedQuery(name = "ServiceRegistration.hostload", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, count(job.status) as numJobs "
                 + "FROM Job job "
                 + "WHERE job.processorServiceRegistration.online=true and job.processorServiceRegistration.active=true and job.processorServiceRegistration.hostRegistration.maintenanceMode=false "
@@ -98,7 +98,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * Creates a new service registration which is online
-   * 
+   *
    * @param hostRegistration
    *          the host registration
    * @param serviceType
@@ -113,7 +113,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * Creates a new service registration which is online and not in maintenance mode.
-   * 
+   *
    * @param processingHost
    *          the host
    * @param serviceId
@@ -128,7 +128,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * Gets the primary key for this service registration.
-   * 
+   *
    * @return the primary key
    */
   @Id
@@ -148,7 +148,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * Sets the primary key identifier.
-   * 
+   *
    * @param id
    *          the identifier
    */
@@ -232,7 +232,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isInMaintenanceMode()
    */
   @Transient
@@ -243,7 +243,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * Gets the associated {@link HostRegistrationJpaImpl}
-   * 
+   *
    * @return the host registration
    */
   @ManyToOne
@@ -276,7 +276,7 @@ public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

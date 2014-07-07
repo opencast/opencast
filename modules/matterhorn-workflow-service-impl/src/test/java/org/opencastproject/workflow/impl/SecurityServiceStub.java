@@ -44,7 +44,7 @@ public class SecurityServiceStub implements SecurityService {
   }
 
   /**
-   * 
+   *
    */
   public SecurityServiceStub() {
     setUser(DEFAULT_ORG_ADMIN);
@@ -63,7 +63,7 @@ public class SecurityServiceStub implements SecurityService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.SecurityService#getOrganization()
    */
   @Override
@@ -73,7 +73,7 @@ public class SecurityServiceStub implements SecurityService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.SecurityService#setOrganization(Organization)
    */
   @Override

@@ -142,7 +142,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @Override
@@ -220,7 +220,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * Publishes the element to the publication channel and returns a reference to the published version of the element.
-   * 
+   *
    * @param job
    *          the associated job
    * @param mediaPackage
@@ -416,7 +416,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * Retracts the mediapackage from YouTube.
-   * 
+   *
    * @param job
    *          the associated job
    * @param mediaPackage
@@ -467,7 +467,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -498,7 +498,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * Callback for the OSGi environment to set the workspace reference.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -508,7 +508,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * Callback for the OSGi environment to set the service registry reference.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -518,7 +518,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -528,7 +528,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -538,7 +538,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -548,7 +548,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -558,7 +558,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -568,7 +568,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -578,7 +578,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

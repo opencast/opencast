@@ -26,7 +26,7 @@ public interface StateService {
 
   /**
    * Gets the agent's name
-   * 
+   *
    * @return The name of the agent as defined in the properties file with the appropriate key
    * @see org.opencastproject.capture.CaptureParameters#AGENT_NAME
    */
@@ -35,7 +35,7 @@ public interface StateService {
   /**
    * Gets the state of the agent.
    * This is returning a string so that inter-version compatibility it maintained (eg, a version 2 agent talking to a version 1 core)
-   * 
+   *
    * @return The state of the agent.  Should be defined in AgentState.  May be null in cases where the service implementation is not ready yet.
    * @see org.opencastproject.capture.admin.api.AgentState
    */
@@ -45,14 +45,14 @@ public interface StateService {
    * Gets a map of recording ID and Recording pairs containing all of the recordings the system is aware of.
    * The recording ID is either the DTSTART field in the scheduler iCal feed, or Unscheduled-$AGENTID-$TIMESTAMP if the recording was unscheduled
    * This is returning a string so that inter-version compatibility it maintained (eg, a version 2 agent talking to a version 1 core)
-   * 
+   *
    * @return A map of recording ID-state pairs.  May be null if the implementation is not active yet.
    */
   Map<String, AgentRecording> getKnownRecordings();
 
   /**
    * Gets the state of a recording.
-   * 
+   *
    * @param recordingID The ID of the recording in question.
    * @return A state defined in RecordingState.  May return null if the implementation is not active.
    * @see org.opencastproject.capture.admin.api.RecordingState

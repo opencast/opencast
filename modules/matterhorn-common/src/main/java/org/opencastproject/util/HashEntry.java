@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 /**
  * JaxB implementation of the entry of a Hashtable, so that the element can be serialized in the intendet way The Entry
  * now looks <item key="key"><value>value</value></item>
- * 
+ *
  */
 @XmlType(name = "hash-entry", namespace = "http://util.opencastproject.org")
 @XmlRootElement(name = "hash-entry", namespace = "http://util.opencastproject.org")
@@ -49,7 +49,7 @@ public class HashEntry implements Entry<String, String> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Map.Entry#getKey()
    */
   @Override
@@ -59,7 +59,7 @@ public class HashEntry implements Entry<String, String> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Map.Entry#getValue()
    */
   @Override
@@ -69,7 +69,7 @@ public class HashEntry implements Entry<String, String> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Map.Entry#setValue(java.lang.Object)
    */
   @Override

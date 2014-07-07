@@ -74,7 +74,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
 
   /**
    * Creates a new tesseract command wrapper that will be using the given binary.
-   * 
+   *
    * @param binary
    *          the tesseract binary
    */
@@ -84,7 +84,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
 
   /**
    * Returns the path to the <code>tesseract</code> binary.
-   * 
+   *
    * @return path to the binary
    */
   public String getBinary() {
@@ -111,7 +111,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
 
   /**
    * Sets the path to the <code>tesseract</code> binary.
-   * 
+   *
    * @param binary
    */
   public void setBinary(String binary) {
@@ -169,7 +169,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
 
   /**
    * The only parameter to <code>tesseract</code> is the filename, so this is what this method returns.
-   * 
+   *
    * @param image
    *          the image file
    * @return the options to run analysis on the image

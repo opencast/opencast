@@ -26,14 +26,14 @@ public interface Person {
 
   /**
    * Returns name of person.
-   * 
+   *
    * @return the name
    */
   String getName();
 
   /**
    * Sets name of person.
-   * 
+   *
    * @param name
    *          the name
    */
@@ -41,14 +41,14 @@ public interface Person {
 
   /**
    * Returns URI of person.
-   * 
+   *
    * @return the uri
    */
   String getUri();
 
   /**
    * Sets URI of person.
-   * 
+   *
    * @param uri
    *          the uri identifying the person
    */
@@ -61,7 +61,7 @@ public interface Person {
 
   /**
    * Sets email of person.
-   * 
+   *
    * @param email
    *          the email address
    */

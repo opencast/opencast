@@ -17,7 +17,7 @@ package org.opencastproject.capture.impl;
 
 /** Callback class to call if something goes wrong with a capture. **/
 public interface CaptureFailureHandler {
-  /** Called if something goes wrong in the capture framework. 
+  /** Called if something goes wrong in the capture framework.
    * @param recordingID The recording to try and stop used as a check to make sure that it is the one being recorded. **/
   void resetOnFailure(String recordingID);
 }

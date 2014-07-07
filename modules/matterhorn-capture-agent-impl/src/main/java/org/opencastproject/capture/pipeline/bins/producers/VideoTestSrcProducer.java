@@ -37,7 +37,7 @@ public class VideoTestSrcProducer extends VideoProducer {
   /**
    * Used to create a videotestsrc GStreamer Element Producer great for testing the capture agent without needing any
    * devices installed but still gives that authentic capturing experience.
-   * 
+   *
    * @param captureDevice
    *          The details for this capture device.
    * @param properties
@@ -62,7 +62,7 @@ public class VideoTestSrcProducer extends VideoProducer {
 
   /**
    * Create the video test src
-   * 
+   *
    * @throws UnableToCreateElementException
    *           Thrown if the videotestsrc module is not installed.
    **/
@@ -81,7 +81,7 @@ public class VideoTestSrcProducer extends VideoProducer {
 
   /**
    * Link all of the GStreamer Elements together.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           If any of the Elements can't be linked together this Exception is thrown.
    * **/

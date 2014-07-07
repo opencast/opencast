@@ -57,7 +57,7 @@ public class TrustedHttpClient {
   private TrustedHttpClient() {
     httpClient = new DefaultHttpClient();
   }
-  
+
   public TrustedHttpClient(String user, String pass) {
     this();
     this.user = user;
@@ -96,7 +96,7 @@ public class TrustedHttpClient {
     digestRequest.setURI(httpUriRequest.getURI());
     digestRequest.addHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
     String[] realmAndNonce = getRealmAndNonce(digestRequest);
-    
+
     if(realmAndNonce != null) {
       // Set the user/pass
       UsernamePasswordCredentials creds = new UsernamePasswordCredentials(user, pass);
@@ -104,7 +104,7 @@ public class TrustedHttpClient {
       // Set up the digest authentication with the required values
       DigestScheme digestAuth = new DigestScheme();
       digestAuth.overrideParamter("realm", realmAndNonce[0]);
-      digestAuth.overrideParamter("nonce", realmAndNonce[1]);        
+      digestAuth.overrideParamter("nonce", realmAndNonce[1]);
 
       // Add the authentication header
       try {
@@ -123,7 +123,7 @@ public class TrustedHttpClient {
       throw new TrustedHttpClientException(e);
     }
   }
-  
+
   public <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<T> responseHandler) {
     try {
       return responseHandler.handleResponse(execute(httpUriRequest));
@@ -141,7 +141,7 @@ public class TrustedHttpClient {
 
   /**
    * Perform a request, and extract the realm and nonce values
-   * 
+   *
    * @param request The request to execute in order to obtain the realm and nonce
    * @return A String[] containing the {realm, nonce}
    */

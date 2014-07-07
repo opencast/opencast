@@ -34,21 +34,21 @@ public interface MultimediaContent<T extends MultimediaContentType> extends XmlE
 
   /**
    * Returns the multimedia content type.
-   * 
+   *
    * @return the type
    */
   MultimediaContent.Type getType();
 
   /**
    * Returns the content elements that are enclosed in a multimedia content container.
-   * 
+   *
    * @return the multimedia content elements
    */
   Iterator<T> elements();
 
   /**
    * Returns the content element with the given identifier or <code>null</code> if element does not exist.
-   * 
+   *
    * @param id
    *          the element identifier
    * @return the content element
@@ -57,7 +57,7 @@ public interface MultimediaContent<T extends MultimediaContentType> extends XmlE
 
   /**
    * Returns the number of content elements.
-   * 
+   *
    * @return the number of content elements
    */
   int size();

@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * A List of {@link UserAction}s
- * 
+ *
  */
 public interface UserActionList {
   /** Set the total number of results for this particular query. **/

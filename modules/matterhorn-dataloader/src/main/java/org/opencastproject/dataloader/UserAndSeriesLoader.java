@@ -237,7 +237,7 @@ public class UserAndSeriesLoader {
 
   /**
    * Loads demo users into persistence.
-   * 
+   *
    * @param rolePrefix
    *          the role prefix
    * @param numPerSeries
@@ -274,7 +274,7 @@ public class UserAndSeriesLoader {
 
   /**
    * Loads demo group into persistence
-   * 
+   *
    * @param groupId
    *          the group id
    * @param orgId
@@ -307,7 +307,7 @@ public class UserAndSeriesLoader {
 
   /**
    * Load a user for testing the ldap provider
-   * 
+   *
    * @param organizationId
    *          the organization
    */
@@ -326,7 +326,7 @@ public class UserAndSeriesLoader {
 
   /**
    * Create a new organization from a default organization
-   * 
+   *
    * @param orgId
    *          the organization identifier
    * @return the created organization

@@ -37,7 +37,7 @@ public class ImageImpl implements Image {
 
   /**
    * Creates a new image.
-   * 
+   *
    * @param url
    *          the image url
    */
@@ -47,7 +47,7 @@ public class ImageImpl implements Image {
 
   /**
    * Creates a new image.
-   * 
+   *
    * @param url
    *          the image url
    * @param title
@@ -59,7 +59,7 @@ public class ImageImpl implements Image {
 
   /**
    * Creates a new image.
-   * 
+   *
    * @param url
    *          the image url
    * @param title
@@ -73,7 +73,7 @@ public class ImageImpl implements Image {
 
   /**
    * Creates a new image.
-   * 
+   *
    * @param url
    *          the image url
    * @param title

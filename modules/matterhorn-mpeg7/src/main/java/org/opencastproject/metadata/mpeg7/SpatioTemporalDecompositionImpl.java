@@ -39,7 +39,7 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
 
   /**
    * Creates a new spatio temporal decomposition.
-   * 
+   *
    * @param gap
    *          <code>true</code> if there are gaps in the decomposition
    * @param overlap
@@ -53,7 +53,7 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#hasGap()
    */
   @Override
@@ -63,7 +63,7 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#isOverlapping()
    */
   @Override
@@ -73,7 +73,7 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#setGap(boolean)
    */
   @Override
@@ -83,7 +83,7 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#setOverlapping(boolean)
    */
   @Override
@@ -93,7 +93,7 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#addVideoText(org.opencastproject.metadata.mpeg7.Textual,
    *      java.awt.Rectangle, org.opencastproject.metadata.mpeg7.MediaTime)
    */
@@ -105,7 +105,7 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#addVideoText(org.opencastproject.metadata.mpeg7.VideoText)
    */
   @Override
@@ -115,7 +115,7 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#getVideoText()
    */
   @Override
@@ -125,7 +125,7 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#getVideoText(java.lang.String)
    */
   @Override

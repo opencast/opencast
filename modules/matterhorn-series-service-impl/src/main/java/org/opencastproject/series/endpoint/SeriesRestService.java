@@ -75,7 +75,7 @@ import javax.ws.rs.core.Response;
 
 /**
  * REST endpoint for Series Service.
- * 
+ *
  */
 @Path("/")
 @RestService(name = "seriesservice", title = "Series Service", abstractText = "This service creates, edits and retrieves and helps managing series.", notes = {
@@ -110,7 +110,7 @@ public class SeriesRestService {
 
   /**
    * OSGi callback for setting series service.
-   * 
+   *
    * @param seriesService
    */
   public void setService(SeriesService seriesService) {
@@ -119,7 +119,7 @@ public class SeriesRestService {
 
   /**
    * OSGi callback for setting Dublin Core Catalog service.
-   * 
+   *
    * @param dcService
    */
   public void setDublinCoreService(DublinCoreCatalogService dcService) {
@@ -128,7 +128,7 @@ public class SeriesRestService {
 
   /**
    * Activates REST service.
-   * 
+   *
    * @param cc
    *          ComponentContext
    */
@@ -226,7 +226,7 @@ public class SeriesRestService {
 
   /**
    * Retrieves ACL associated with series.
-   * 
+   *
    * @param seriesID
    *          series of which ACL should be retrieved
    * @return
@@ -567,7 +567,7 @@ public class SeriesRestService {
 
   /**
    * Generates sample Dublin core.
-   * 
+   *
    * @return sample Dublin core
    */
   public String getSampleDublinCore() {
@@ -576,7 +576,7 @@ public class SeriesRestService {
 
   /**
    * Generates sample access control list.
-   * 
+   *
    * @return sample ACL
    */
   public String getSampleAccessControlList() {

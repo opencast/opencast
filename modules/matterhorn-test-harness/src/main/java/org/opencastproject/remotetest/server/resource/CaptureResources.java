@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 
 public class CaptureResources {
   public static String AGENT = "demo_capture_agent";
-  
+
   private static final String getServiceUrl() {
     return Main.getBaseUrl() + "/capture/";
   }
@@ -45,7 +45,7 @@ public class CaptureResources {
   public static HttpResponse startCaptureGet(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "startCapture"));
   }
-  
+
   public static HttpResponse stopCapture(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "stopCapture"));
   }
@@ -57,7 +57,7 @@ public class CaptureResources {
     post.setEntity(new UrlEncodedFormEntity(params));
     return client.execute(post);
   }
-  
+
   public static HttpResponse stopCapturePost(TrustedHttpClient client, String id) throws Exception {
     HttpPost post = new HttpPost(getServiceUrl() + "stopCapture");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -65,11 +65,11 @@ public class CaptureResources {
     post.setEntity(new UrlEncodedFormEntity(params));
     return client.execute(post);
   }
-  
+
   public static String captureProperties() throws Exception {
     return IOUtils.toString(CaptureResources.class.getClassLoader().getResourceAsStream("capture.properties"), "UTF-8");
   }
-  
+
   public static String captureId(HttpResponse response) throws Exception {
     String pattern = "Unscheduled-\\d+";
     Matcher matcher = Pattern.compile(pattern).matcher(EntityUtils.toString(response.getEntity(), "UTF-8"));

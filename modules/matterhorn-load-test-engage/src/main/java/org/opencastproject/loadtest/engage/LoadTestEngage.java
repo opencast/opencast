@@ -51,10 +51,10 @@ public class LoadTestEngage implements Runnable {
   private GuiSettings guiSettings = new GuiSettings();
   /* The name of the current load test thread. */
   private String name = "";
-  
+
   /**
    * Create a new load test for an engage server.
-   * 
+   *
    * @param name
    *          The name of this instance for logging purposes.
    * @param engageServerUrl
@@ -78,7 +78,7 @@ public class LoadTestEngage implements Runnable {
 
     if (browserToUse == Main.BrowserToUse.Chrome) {
       driver = new ChromeDriver();
-    } 
+    }
     else if (browserToUse == Main.BrowserToUse.Safari){
       driver = new SafariDriver();
     }
@@ -90,8 +90,8 @@ public class LoadTestEngage implements Runnable {
     }
   }
 
-  /** 
-   * Runs the load test in its own separate thread. 
+  /**
+   * Runs the load test in its own separate thread.
    * @see java.lang.Runnable#run()
    **/
   @Override
@@ -99,7 +99,7 @@ public class LoadTestEngage implements Runnable {
     while (true) {
       playNewStream();
       try {
-        // Generate a random amount of time to watch between 1/2 the watch time and all of the watch time. 
+        // Generate a random amount of time to watch between 1/2 the watch time and all of the watch time.
         int randomWatchTime = generator.nextInt(watchTime / 2) + watchTime / 2;
         logger.info(name + " is watching the current episode for " + randomWatchTime + " seconds.");
         Thread.sleep(randomWatchTime * MILLISECONDS_IN_SECONDS);
@@ -108,9 +108,9 @@ public class LoadTestEngage implements Runnable {
       }
     }
   }
-  
+
   /**
-   * If opening a page results in a log in page this will authenticate against it. 
+   * If opening a page results in a log in page this will authenticate against it.
    */
   private void authenticate() {
     logger.debug(name + "-Login title is: " + driver.getTitle());
@@ -122,21 +122,21 @@ public class LoadTestEngage implements Runnable {
   }
 
   /**
-   * Start playing a new episode. 
+   * Start playing a new episode.
    */
   public void playNewStream(){
     if(episodeList == null || episodeList.size() <= 0) {
       return;
     }
-    String episodeUrl = engageServerUrl + "/engage/ui/watch.html?id=" + episodeList.get(generator.nextInt(episodeList.size())); 
+    String episodeUrl = engageServerUrl + "/engage/ui/watch.html?id=" + episodeList.get(generator.nextInt(episodeList.size()));
     driver.get(episodeUrl);
     if (!driver.getCurrentUrl().equalsIgnoreCase(episodeUrl)) {
       authenticate();
     }
     logger.info(name + " - Playing episode " + episodeUrl);
     logger.debug("Episode Page title is: " + driver.getTitle());
-    
-    // Play the episode. 
+
+    // Play the episode.
     WebElement play = (new WebDriverWait(driver, 60)).until(new ExpectedCondition<WebElement>() {
       @Override
       public WebElement apply(WebDriver driver) {
@@ -147,10 +147,10 @@ public class LoadTestEngage implements Runnable {
         return null;
       }
     });
-    
+
     play.click();
 
-    // Advance the play using fast forward. 
+    // Advance the play using fast forward.
     WebElement fastForward = (new WebDriverWait(driver, 10000)).until(new ExpectedCondition<WebElement>() {
       @Override
       public WebElement apply(WebDriver driver) {
@@ -161,8 +161,8 @@ public class LoadTestEngage implements Runnable {
         return null;
       }
     });
-    
-    
+
+
     for (int i = 0; i < 5; i++) {
       fastForward.click();
       try {

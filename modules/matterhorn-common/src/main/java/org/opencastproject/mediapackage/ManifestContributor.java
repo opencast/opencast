@@ -31,7 +31,7 @@ public interface ManifestContributor {
    * For creating <em>{@link MediaPackageElement}s</em> from a manifest, please use
    * {@link MediaPackageElementBuilder#elementFromManifest(org.w3c.dom.Node, MediaPackageSerializer)}. All other objects
    * shall provide their own implementation specific reconstruction mechanism.
-   * 
+   *
    * @param document
    *          the parent
    * @param serializer

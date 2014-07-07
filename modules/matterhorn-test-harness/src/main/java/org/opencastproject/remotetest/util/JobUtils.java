@@ -47,7 +47,7 @@ public final class JobUtils {
 
   /**
    * Checks whether the given workflow is in the requested state.
-   * 
+   *
    * @param jobId
    *          identifier of the workflow
    * @param state
@@ -64,7 +64,7 @@ public final class JobUtils {
 
   /**
    * Gets the xml representation of a job.
-   * 
+   *
    * @param jobId
    *          the job identifier
    * @return the job as xml
@@ -87,7 +87,7 @@ public final class JobUtils {
 
   /**
    * Parses the job instance represented by <code>xml</code> and extracts the job identifier.
-   * 
+   *
    * @param xml
    *          the job instance
    * @return the job identifier
@@ -105,7 +105,7 @@ public final class JobUtils {
 
   /**
    * Parses the job instance represented by <code>xml</code> and extracts the job state.
-   * 
+   *
    * @param xml
    *          the job instance
    * @return the job state
@@ -123,7 +123,7 @@ public final class JobUtils {
 
   /**
    * Parses the job instance represented by <code>xml</code> and extracts the job type.
-   * 
+   *
    * @param xml
    *          the job instance
    * @return the job type

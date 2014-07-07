@@ -118,7 +118,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
 
   /**
    * Configures the compression engine wrapper for use with an xmlrpc controller.
-   * 
+   *
    * @param properties
    *          the engine configuration
    */
@@ -194,7 +194,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
    * <p>
    * The hostname parameter is gathered from the configuration file <code>episode.properties</code>.
    * </p>
-   * 
+   *
    * @return the xmlrpc hostname
    */
   public String getXmlrpcHost() {
@@ -206,7 +206,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
    * <p>
    * The port parameter is gathered from the configuration file <code>episode.properties</code>.
    * </p>
-   * 
+   *
    * @return the xmlrpc hostname
    */
   public int getXmlrpcPort() {
@@ -218,7 +218,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
    * <p>
    * The path parameter is gathered from the configuration file <code>episode.properties</code>.
    * </p>
-   * 
+   *
    * @return the xmlrpc path on the server
    */
   public String getXmlrpcPath() {
@@ -227,7 +227,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
 
   /**
    * Returns the number of seconds that are between two calls for a status update.
-   * 
+   *
    * @return the number of seconds for the monitoring interval
    */
   public long getMonitoringFrequency() {
@@ -243,7 +243,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#mux(java.io.File, java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
@@ -258,7 +258,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#encode(java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
@@ -270,7 +270,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
 
   /**
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#extract(File, EncodingProfile, Map, double...)
    */
   @Override
@@ -281,7 +281,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#trim(java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */
@@ -294,7 +294,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.impl.AbstractEncoderEngine#getOutputFile(java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile)
    */
@@ -306,7 +306,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
 
   /**
    * Callback from the engine controllers stating that encoding of the given file has been successful.
-   * 
+   *
    * @param file
    *          the track that was encoded
    * @param profile
@@ -319,7 +319,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
   /**
    * Callback from the engine controllers stating that encoding of the given file has has failed for the specified
    * reason.
-   * 
+   *
    * @param file
    *          the file that was encoded
    * @param profile
@@ -333,7 +333,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
 
   /**
    * Callback from the engine controllers stating that encoding of the given file has progressed to the given value.
-   * 
+   *
    * @param file
    *          the file that is being encoded
    * @param profile
@@ -354,7 +354,7 @@ public final class EpisodeEncoderEngine extends AbstractEncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#extract(java.io.File,
    * org.opencastproject.composer.api.EncodingProfile, java.util.Map, long[])
    */

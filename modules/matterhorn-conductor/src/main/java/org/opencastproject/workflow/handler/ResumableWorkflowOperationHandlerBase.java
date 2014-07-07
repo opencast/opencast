@@ -60,7 +60,7 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
    */
   public void activate(ComponentContext componentContext) {
@@ -79,7 +79,7 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#getHoldStateUserInterfaceURL(org.opencastproject.workflow.api.WorkflowInstance)
    */
   public String getHoldStateUserInterfaceURL(WorkflowInstance workflowInstance) throws WorkflowOperationException {
@@ -90,7 +90,7 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
 
   /**
    * Sets the title that is displayed on the hold state ui.
-   * 
+   *
    * @param title
    *          the title
    */
@@ -100,7 +100,7 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#getHoldActionTitle()
    */
   public String getHoldActionTitle() {
@@ -113,7 +113,7 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
 
   /**
    * Registers the resource identified by <code>resourcePath</code> as the ui to be displayed during hold.
-   * 
+   *
    * @param resourcePath
    *          the path to the resource
    * @return the URL that was created when registering the resource
@@ -135,9 +135,9 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * This default implementation will put the workflow into the hold state.
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -149,7 +149,7 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext, java.util.Map)
    */

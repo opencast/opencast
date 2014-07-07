@@ -35,7 +35,7 @@ public enum RetryStrategy {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see javax.xml.bind.annotation.adapters.XmlAdapter#marshal(java.lang.Object)
      */
     @Override
@@ -45,7 +45,7 @@ public enum RetryStrategy {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see javax.xml.bind.annotation.adapters.XmlAdapter#unmarshal(java.lang.Object)
      */
     @Override

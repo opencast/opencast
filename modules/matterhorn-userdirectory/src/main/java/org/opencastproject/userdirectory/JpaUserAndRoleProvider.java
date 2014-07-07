@@ -107,7 +107,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Callback for activation of this component.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -139,7 +139,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override
@@ -154,7 +154,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#findUsers(String, int, int)
    */
   @Override
@@ -168,7 +168,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
    */
   @Override
@@ -182,7 +182,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#loadUser(java.lang.String)
    */
   @Override
@@ -205,7 +205,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
    */
   @Override
@@ -217,7 +217,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#getOrganization()
    */
   @Override
@@ -227,7 +227,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -237,7 +237,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Loads a user from persistence
-   * 
+   *
    * @param userName
    *          the user name
    * @param organization
@@ -250,7 +250,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Adds a user to the persistence
-   * 
+   *
    * @param user
    *          the user to add
    */
@@ -282,7 +282,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Adds a role to the persistence
-   * 
+   *
    * @param jpaRole
    *          the role
    */
@@ -295,22 +295,22 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   /*
    * This user Endpoint has been moved to the kernel and uses now the UserDirectoryService instead of this class. The
    * update method is now obsolete and could be implemented as part of the UserDirectoryService API.
-   * 
+   *
    * @PUT
-   * 
+   *
    * @Path("{username}.json")
-   * 
+   *
    * @RestQuery(name = "roleupdate", description = "Updates a user's roles", returnDescription = "No content",
    * restParameters = @RestParameter(name = "roles", type = TEXT, isRequired = true, description =
    * "The user roles as a json array"), pathParameters = @RestParameter(name = "username", type = STRING, isRequired =
    * true, description = "The username"), reponses = {
-   * 
+   *
    * @RestResponse(responseCode = SC_NO_CONTENT, description = "The user roles have been updated."),
-   * 
+   *
    * @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found") }) public Response
    * updateUserFromJson(@PathParam("username") String username, @FormParam("roles") String roles) throws
    * NotFoundException { JSONArray rolesArray = (JSONArray) JSONValue.parse(roles);
-   * 
+   *
    * EntityManager em = null; EntityTransaction tx = null; try { em = emf.createEntityManager(); tx =
    * em.getTransaction(); tx.begin(); // Find the existing user Query q = em.createNamedQuery("User.findByUsername");
    * q.setParameter("u", username); q.setParameter("o", securityService.getOrganization().getId()); JpaUser jpaUser =

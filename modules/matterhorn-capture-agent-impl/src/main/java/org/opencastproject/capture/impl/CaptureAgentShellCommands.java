@@ -34,7 +34,7 @@ public class CaptureAgentShellCommands {
 
   /**
    * Creates a command object for the given capture agent.
-   * 
+   *
    * @param agent
    *          the agent
    */
