@@ -1102,14 +1102,14 @@ ocRecordings = new (function() {
     callback(source);
   }
   
-  this.removeRecording = function(id, title) {
-    if(confirm('Are you sure you wish to delete ' + title + '?')){
+  this.removeRecording = function(id) {
+    if(confirm('Are you sure you wish to delete this recording?')){
       $.ajax({
         url: '/recordings/' + id,
         type: 'DELETE',
         dataType: 'text',
         error: function(XHR,status,e){
-          alert('Could not remove Recording ' + title);
+          alert('Could not remove recording');
         },
         success: function(){
           ocRecordings.reload();
@@ -1543,7 +1543,7 @@ ocRecordings = new (function() {
         }
 
       } else if (action == 'delete') {
-        links.push('<a href="javascript:ocRecordings.removeRecording(\'' + id + '\',\'' + recording.title + '\')">Delete</a>');
+        links.push('<a href="javascript:ocRecordings.removeRecording(\'' + id + '\')">Delete</a>');
         
       } else if (action == 'unpublish') {
         links.push('<a href="javascript:ocRecordings.unpublishRecording(\'' + id + '\')">Unpublish</a>');
