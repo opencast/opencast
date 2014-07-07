@@ -179,7 +179,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
   public Response applyWorkflowToSeries(@PathParam("wfDefId") final String wfId,
           @FormParam("seriesId") final String seriesId, @FormParam("seriesTitle") final String seriesTitle,
           @Context final HttpServletRequest req) {
-    if (!StringUtils.isNotBlank(seriesId) && !StringUtils.isNotBlank(seriesTitle)) {
+    if (StringUtils.isBlank(seriesId) && StringUtils.isBlank(seriesTitle)) {
       throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
     final EpisodeQuery search = query(getSecurityService());
