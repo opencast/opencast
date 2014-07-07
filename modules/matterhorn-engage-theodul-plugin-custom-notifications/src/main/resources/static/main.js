@@ -16,7 +16,7 @@
 /*jslint browser: true, nomen: true*/
 /*global define*/
 define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
-    "use strict"; // strict mode in all our application
+    "use strict";
     var PLUGIN_NAME = "Engage Custom Notifications",
             PLUGIN_TYPE = "engage_custom",
             PLUGIN_VERSION = "0.1",
@@ -32,6 +32,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         styles: PLUGIN_STYLES,
         template: PLUGIN_TEMPLATE,
         events : {
+          plugin_load_done : new Engage.Event("Core:plugin_load_done", "when the core loaded the event successfully", "handler"),
           ready : new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
           buffering : new Engage.Event("Video:buffering", "buffering a video", "handler"),
           bufferedAndAutoplaying : new Engage.Event("Video:bufferedAndAutoplaying", "buffering successful, was playing, autoplaying now", "handler"),
@@ -39,38 +40,92 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 	}
     };
 
+    /* change these variables */
+    var alertifyMessageDelay = 5000; // ms
+    var alertifyDisplayDatetime = false;
+    var alertifyPath = "lib/alertify/alertify";
+
+    /* don't change these variables */
     var alertify;
     var initCount = 2;
-    var videoloaded = false;
+    var videoLoaded = false;
+    var videoBuffering = false;
 
+    /* format today's date */
+    Date.prototype.today = function () { 
+	return ((this.getDate() < 10) ? "0" : "") + this.getDate() + "." + (((this.getMonth()+1) < 10) ? "0" : "") + (this.getMonth() + 1) + "." + this.getFullYear();
+    }
+
+    /* format current time */
+    Date.prototype.timeNow = function () {
+	return ((this.getHours() < 10) ? "0" : "") + this.getHours() + ":" + ((this.getMinutes() < 10) ? "0" : "") + this.getMinutes() + ":" + ((this.getSeconds() < 10) ? "0" : "") + this.getSeconds();
+    }
+    
+    /**
+     * Format the current date and time
+     *
+     * @return a formatted current date and time string
+     */
+    function getCurrentDateTime() {
+	var date = new Date(); 
+	var datetime = date.today() + ", " + date.timeNow();
+
+	return datetime;
+    }
+
+    /**
+     * Format a message for alertify
+     *
+     * @param msg message to format
+     * @return the formatted message
+     */
+    function getAlertifyMessage(msg) {
+	return (alertifyDisplayDatetime ? (getCurrentDateTime() + ": ") : "") + msg;
+    }
+
+    /**
+     * Initializes the plugin
+     */
     function initPlugin() {
-	alertify.error("The video is now being loaded. Please wait a moment.");
+	alertify.init();
+	alertify.set({ delay : alertifyMessageDelay });
+
+	alertify.error(getAlertifyMessage("The video is now being loaded. Please wait a moment."));
 
 	Engage.on(plugin.events.ready, function(callback) {
-	    if(!videoloaded) {
-		videoloaded = true;
-		alertify.success("The video has been loaded successfully.");
+	    if(!videoLoaded) {
+		videoLoaded = true;
+		alertify.success(getAlertifyMessage("The video has been loaded successfully."));
 	    }
 	});
 	Engage.on(plugin.events.buffering, function(callback) {
-	    alertify.success("The video is currently buffering. Please wait a moment.");
+	    if(!videoBuffering) {
+		videoBuffering = true;
+		alertify.success(getAlertifyMessage("The video is currently buffering. Please wait a moment."));
+	    }
 	});
 	Engage.on(plugin.events.bufferedAndAutoplaying, function(callback) {
-	    alertify.success("The video has been buffered successfully and is now autoplaying.");
+	    if(videoBuffering) {
+		videoBuffering = false;
+		alertify.success(getAlertifyMessage("The video has been buffered successfully and is now autoplaying."));
+	    }
 	});
 	Engage.on(plugin.events.bufferedButNotAutoplaying, function(callback) {
-	    alertify.success("The video has been buffered successfully.");
+	    if(videoBuffering) {
+		videoBuffering = false;
+		alertify.success(getAlertifyMessage("The video has been buffered successfully."));
+	    }
 	});
     }
 
-    // init Event
+    // init event
     Engage.log("Notifications: init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomNotifications');
     Engage.log('Notifications: relative plugin path ' + relative_plugin_path);
 
     // load alertify.js lib
-    require([relative_plugin_path + "lib/alertify/alertify"], function(_alertify) {
-        Engage.log("Notifications: Load alertify.js done");
+    require([relative_plugin_path + alertifyPath], function(_alertify) {
+        Engage.log("Notifications: Loading 'alertify.js' done");
 	alertify = _alertify;
         initCount -= 1;
         if (initCount == 0) {
@@ -79,7 +134,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 
     // all plugins loaded
-    Engage.on("Core:plugin_load_done", function() {
+    Engage.on(plugin.events.plugin_load_done, function() {
         Engage.log("Notifications: Plugin load done");
         initCount -= 1;
         if (initCount == 0) {
