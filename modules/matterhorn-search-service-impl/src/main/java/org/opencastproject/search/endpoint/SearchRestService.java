@@ -165,6 +165,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     if (StringUtils.isNotBlank(text))
       query.withText(text);
 
+    query.withSort(SearchQuery.Sort.DATE_CREATED, false);
     if (StringUtils.isNotBlank(sort)) {
       // Parse the sort field and direction
       SearchQuery.Sort sortField = null;
@@ -249,6 +250,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       search.withText(text);
     }
 
+    search.withSort(SearchQuery.Sort.DATE_CREATED, false);
     if (StringUtils.isNotBlank(sort)) {
       // Parse the sort field and direction
       SearchQuery.Sort sortField = null;
@@ -306,6 +308,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     if (!StringUtils.isBlank(q))
       query.withQuery(q);
 
+    query.withSort(SearchQuery.Sort.DATE_CREATED, false);
     if (StringUtils.isNotBlank(sort)) {
       // Parse the sort field and direction
       SearchQuery.Sort sortField = null;

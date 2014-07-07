@@ -173,6 +173,17 @@ Opencast.pager = (function ()
     
     /**
      * @memberOf Opencast.pager
+     * @description Gets the current sorting
+     * @return The current sorting
+     */
+    function getCurrentSorting()
+    {
+        var value = $.getURLParameter("sort");
+        return value;
+    }    
+    
+    /**
+     * @memberOf Opencast.pager
      * @description Gets the max page ID
      * @return The maximum number of pages
      */
@@ -188,6 +199,7 @@ Opencast.pager = (function ()
         testGetCurrentPage: testGetCurrentPage,
         getCurrentPageID: getCurrentPageID,
         getCurrentSearchQuery: getCurrentSearchQuery,
+        getCurrentSorting: getCurrentSorting,
         renderPager: renderPager
     };
 }());

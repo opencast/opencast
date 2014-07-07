@@ -23,6 +23,7 @@
             
         var page = Opencast.pager.getCurrentPageID();
         var searchQuery = Opencast.pager.getCurrentSearchQuery();
+        var sortRequest = Opencast.pager.getCurrentSorting();
         var restEndpoint = "../../search/episode.xml?";
                 
         var keywordString = "";
@@ -38,6 +39,11 @@
           $('#searchField').attr("value", unescape(searchQuery));
                     
         }
+        if (sortRequest != null && sortRequest != "") {
+          restEndpoint = restEndpoint + "sort=" + sortRequest + "&";
+                    
+          $('#sort').val(sortRequest);
+        }        
         
         if ($.getURLParameter('series') != "" && $.getURLParameter('series') != null) {
           restEndpoint += "sid=" + $.getURLParameter('series') + "&";
@@ -205,14 +211,33 @@
       document.write('Search Field');
       document.write('</label>');
       document.write('<input id="searchField" type="text" name="q" value="" /><input id="searchSubmit" type="submit" value="Search" />');
+      document.write('<div class="oc-sort-controls">');
+      document.write('Sort by <select name="sort" id="sort" size="1" onchange="submit()">');
+      document.write('<option value="DATE_CREATED_DESC">Recording Date (new to old)</option>');
+      document.write('<option value="DATE_CREATED">Recording Date (old to new)</option>');
+      document.write('<option value="DATE_PUBLISHED_DESC">Publishing Date (new to old)</option>');
+      document.write('<option value="DATE_PUBLISHED">Publishing Date (old to new)</option>');
+      document.write('<option value="TITLE">Title (A-Z)</option>');
+      document.write('<option value="TITLE_DESC">Title (Z-A)</option>');
+      document.write('<option value="CREATOR">Author (A-Z)</option>');
+      document.write('<option value="CREATOR_DESC">Author (Z-A)</option>');
+      document.write('<option value="CONTRIBUTOR">Contributor(A-Z)</option>');
+      document.write('<option value="CONTRIBUTOR_DESC">Contributor(Z-A)</option>');
+      document.write('<option value="PUBLISHER">Publisher (A-Z)</option>');
+      document.write('<option value="PUBLISHER_DESC">Publisher (Z-A)</option>');
+      document.write('<option value="SERIES_ID">Series</option>');
+      document.write('<option value="LANGUAGE">Language</option>');
+      document.write('<option value="LICENSE">License</option>');
+      document.write('<option value="SUBJECT">Subject</option>');
+      document.write('<option value="DESCRIPTION">Description</option>');
+      document.write('</select>'); 
+      document.write('</div>');      
       document.write('</form>');
       document.write('</span>');
       document.write('</div>');
       document.write('</div>');
       document.write('<div class="oc-search-result-header">');
       document.write('<h2>Media Gallery</h2>');
-      document.write('<div class="oc-sort-controls">');
-      document.write('</div>');
       document.write('</div>');
       document.write('<div style="padding-top:20px;">');
       document.write('<span class="title" style="float:left">Results</span>');
