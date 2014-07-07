@@ -1109,7 +1109,7 @@ ocRecordings = new (function() {
         type: 'DELETE',
         dataType: 'text',
         error: function(XHR,status,e){
-          alert('Could not remove recording');
+          alert('Could not remove this recording');
         },
         success: function(){
           ocRecordings.reload();
