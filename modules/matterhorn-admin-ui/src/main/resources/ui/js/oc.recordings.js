@@ -1103,13 +1103,13 @@ ocRecordings = new (function() {
   }
   
   this.removeRecording = function(id) {
-    if(confirm('Are you sure you wish to delete recording?')){
+    if(confirm('Are you sure you wish to delete this recording?')){
       $.ajax({
         url: '/recordings/' + id,
         type: 'DELETE',
         dataType: 'text',
         error: function(XHR,status,e){
-          alert('Could not remove this recording');
+          alert('Could not remove recording');
         },
         success: function(){
           ocRecordings.reload();
