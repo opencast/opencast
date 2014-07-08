@@ -766,6 +766,7 @@
         <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
         <module>modules/matterhorn-engage-theodul-plugin-custom-mhConnection</module>
         <module>modules/matterhorn-engage-theodul-plugin-custom-usertracking</module>
+        <module>modules/matterhorn-engage-theodul-plugin-custom-notifications</module>
       </modules>
     </profile>
 
