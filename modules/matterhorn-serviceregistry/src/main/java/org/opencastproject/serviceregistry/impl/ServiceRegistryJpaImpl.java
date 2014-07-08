@@ -1795,8 +1795,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public Object addingService(ServiceReference reference) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
       String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
-      boolean publishFlag = reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY) == null
-              || ((Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY));
+      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
       boolean jobProducer = (Boolean) reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY);
 
       // Only register services that have the "publish" flag set to "true"
@@ -1816,8 +1815,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     @Override
     public void removedService(ServiceReference reference, Object service) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-      boolean publishFlag = reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY) == null
-              || Boolean.parseBoolean((String) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY));
+      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
 
       // Services that have the "publish" flag set to "true" have been registered before.
       if (publishFlag) {
