@@ -216,7 +216,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         mediaPackageID = "";
     }
 
-    Engage.on(plugin.events.getMediaInfo, function (callback) {
+    Engage.on(plugin.events.getMediaInfo.getName(), function (callback) {
         // check if data is already loaded
         if (!mediaPackage && !mediaInfo) {
             // Get Infos from Search Endpoint
@@ -230,7 +230,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
     });
 
-    Engage.on(plugin.events.getMediaPackage, function (callback) {
+    Engage.on(plugin.events.getMediaPackage.getName(), function (callback) {
         // check if data is already loaded
         if (!mediaPackage) {
             // Get Infos from Search Endpoint
@@ -245,8 +245,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 
     // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done, function () {
-        Engage.log("MhConnection: receive plugin load done");
+    Engage.on(plugin.events.plugin_load_done.getName(), function () {
+        Engage.log("MhConnection: Plugin load done");
         Engage.model.set("mediaPackage", new MediaPackageModel());
         Engage.model.set("footprints", new FootprintCollection());
         initCount -= 1;

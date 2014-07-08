@@ -132,25 +132,25 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
         alertify.error(getAlertifyMessage("The video is now being loaded. Please wait a moment."));
 
-        Engage.on(plugin.events.ready, function (callback) {
+        Engage.on(plugin.events.ready.getName(), function (callback) {
             if (!videoLoaded) {
                 videoLoaded = true;
                 alertify.success(getAlertifyMessage("The video has been loaded successfully."));
             }
         });
-        Engage.on(plugin.events.buffering, function (callback) {
+        Engage.on(plugin.events.buffering.getName(), function (callback) {
             if (!videoBuffering) {
                 videoBuffering = true;
                 alertify.success(getAlertifyMessage("The video is currently buffering. Please wait a moment."));
             }
         });
-        Engage.on(plugin.events.bufferedAndAutoplaying, function (callback) {
+        Engage.on(plugin.events.bufferedAndAutoplaying.getName(), function (callback) {
             if (videoBuffering) {
                 videoBuffering = false;
                 alertify.success(getAlertifyMessage("The video has been buffered successfully and is now autoplaying."));
             }
         });
-        Engage.on(plugin.events.bufferedButNotAutoplaying, function (callback) {
+        Engage.on(plugin.events.bufferedButNotAutoplaying.getName(), function (callback) {
             if (videoBuffering) {
                 videoBuffering = false;
                 alertify.success(getAlertifyMessage("The video has been buffered successfully."));
@@ -174,7 +174,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 
     // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done, function () {
+    Engage.on(plugin.events.plugin_load_done.getName(), function () {
         Engage.log("Notifications: Plugin load done");
         initCount -= 1;
         if (initCount <= 0) {
