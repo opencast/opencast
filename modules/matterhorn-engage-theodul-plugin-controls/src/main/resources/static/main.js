@@ -437,7 +437,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 	
     // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done, function () {
+    Engage.on(plugin.events.plugin_load_done.getName(), function () {
         Engage.log("Controls: Plugin load done");
         initCount -= 1;
         if (initCount <= 0) {

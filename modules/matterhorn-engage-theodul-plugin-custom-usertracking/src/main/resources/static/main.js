@@ -127,15 +127,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomUsertracking');
     Engage.log('Usertracking: Relative plugin path: "' + relative_plugin_path + '"');
 
-    // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function () {
-        Engage.log("Usertracking: Plugin load done");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
-
     // mediapackage model created
     Engage.model.on(mediapackageChange, function () {
         initCount -= 1;
@@ -146,6 +137,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     // footprints model created
     Engage.model.on(footprintsChange, function () {
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
+
+    // all plugins loaded
+    Engage.on(plugin.events.plugin_load_done.getName(), function () {
+        Engage.log("Usertracking: Plugin load done");
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
