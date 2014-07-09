@@ -123,7 +123,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // listen on a change/set of the mediaPackage model
     Engage.model.on(mediapackageChange, function () {
         initCount -= 1;
-        if (initCount === 0) {
+        if (initCount <= 0) {
             initPlugin();
         }
     });
@@ -132,7 +132,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     require([relative_plugin_path + momentPath], function (momentjs) {
         Engage.log("Description: Loaded moment lib");
         initCount -= 1;
-        if (initCount === 0) {
+        if (initCount <= 0) {
             initPlugin();
         }
     });
@@ -140,7 +140,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // all plugins loaded
     Engage.on(plugin.events.plugin_load_done.getName(), function () {
         initCount -= 1;
-        if (initCount === 0) {
+        if (initCount <= 0) {
             initPlugin();
         }
     });
