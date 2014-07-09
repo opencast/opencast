@@ -159,13 +159,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     // init event
-    Engage.log("Notifications: init");
+    Engage.log("Notifications: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomNotifications');
-    Engage.log('Notifications: relative plugin path ' + relative_plugin_path);
+    Engage.log('Notifications: Relative plugin path: "' + relative_plugin_path + '"');
 
     // load alertify lib
     require([relative_plugin_path + alertifyPath], function (_alertify) {
-        Engage.log("Notifications: Loading 'alertify.js' done");
+        Engage.log("Notifications: Lib alertify loaded");
         alertify = _alertify;
         initCount -= 1;
         if (initCount <= 0) {

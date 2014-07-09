@@ -123,7 +123,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     // init event
-    Engage.log("Usertracking: init");
+    Engage.log("Usertracking: Init");
+    var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomUsertracking');
+    Engage.log('Usertracking: Relative plugin path: "' + relative_plugin_path + '"');
 
     // all plugins loaded
     Engage.on(plugin.events.plugin_load_done.getName(), function () {

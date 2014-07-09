@@ -206,9 +206,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     // init event
-    Engage.log("MhConnection: init");
+    Engage.log("MhConnection: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomMhConnection');
-    Engage.log('MhConnection: relative plugin path ' + relative_plugin_path);
+    Engage.log('MhConnection: Relative plugin path: "' + relative_plugin_path + '"');
 
     // get ID
     mediaPackageID = Engage.model.get("urlParameters").id;

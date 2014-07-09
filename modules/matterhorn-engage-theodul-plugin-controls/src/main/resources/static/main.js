@@ -407,12 +407,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     // init event
-    Engage.log("Controls: init");
+    Engage.log("Controls: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginControls');
-    Engage.log('Controls: relative plugin path ' + relative_plugin_path);
+    Engage.log('Controls: Relative plugin path: "' + relative_plugin_path + '"');
 	
     // load jquery-ui lib
     require([relative_plugin_path + jQueryUIPath], function () {
+        Engage.log("Controls: Lib jQuery UI loaded");
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
@@ -421,6 +422,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 	
     // load bootstrap lib
     require([relative_plugin_path + bootstrapPath], function () {
+        Engage.log("Controls: Lib bootstrap loaded");
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
