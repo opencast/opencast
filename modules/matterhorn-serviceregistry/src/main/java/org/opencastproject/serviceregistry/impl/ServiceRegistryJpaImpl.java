@@ -1567,8 +1567,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       List queryResults = query.getResultList();
       for (Object result : queryResults) {
         Object[] oa = (Object[]) result;
-        Long serviceRegistrationId = ((Long) oa[0]);
-        if (serviceRegistrationId == null)
+        Number serviceRegistrationId = ((Number) oa[0]);
+        if (serviceRegistrationId == null || serviceRegistrationId.longValue() == 0)
           break;
         Status status = (Status) oa[1];
         Number count = (Number) oa[2];
@@ -1576,11 +1576,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         Number meanRunTime = (Number) oa[4];
 
         // The statistics query returns a cartesian product, so we need to iterate over them to build up the objects
-        JaxbServiceStatistics stats = statsMap.get(serviceRegistrationId);
-        if (stats == null) {
-          stats = new JaxbServiceStatistics();
-          statsMap.put(serviceRegistrationId, stats);
-        }
+        JaxbServiceStatistics stats = statsMap.get(serviceRegistrationId.longValue());
+
         // the status will be null if there are no jobs at all associated with this service registration
         if (status != null) {
           switch (status) {
