@@ -1,4 +1,4 @@
-/**
+3/**
  * Copyright 2009-2011 The Regents of the University of California Licensed
  * under the Educational Community License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain a
@@ -37,27 +37,27 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var plugin;
     var events = {
         play: new Engage.Event("Video:play", "plays the video", "both"),
+        pause: new Engage.Event("Video:pause", "pauses the video", "both"),
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "trigger"),
+        ended: new Engage.Event("Video:ended", "end of the video", "trigger"),
         playerLoaded: new Engage.Event("Video:playerLoaded", "player loaded successfully", "trigger"),
         masterPlay: new Engage.Event("Video:masterPlay", "master video play", "trigger"),
         masterEnded: new Engage.Event("Video:masterEnded", "master video ended", "trigger"),
         masterTimeupdate: new Engage.Event("Video:masterTimeupdate", "master video timeupdate", "trigger"),
         synchronizing: new Engage.Event("Video:synchronizing", "synchronizing videos with the master video", "trigger"),
-        buffering: new Engage.Event("Video:buffering", "buffering a video", "trigger"),
+        buffering: new Engage.Event("Video:buffering", "video is buffering", "trigger"),
         bufferedAndAutoplaying: new Engage.Event("Video:bufferedAndAutoplaying", "buffering successful, was playing, autoplaying now", "trigger"),
         bufferedButNotAutoplaying: new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "trigger"),
-        timeupdate: new Engage.Event("Video:timeupdate", "notices a timeupdate", "trigger"),
-        volumechange: new Engage.Event("Video:volumechange", "notices a volume change", "trigger"),
-        fullscreenChange: new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "trigger"),
-        ended: new Engage.Event("Video:ended", "end of the video", "trigger"),
+        timeupdate: new Engage.Event("Video:timeupdate", "timeupdate happened", "trigger"),
+        volumechange: new Engage.Event("Video:volumechange", "volume change happened", "trigger"),
+        fullscreenChange: new Engage.Event("Video:fullscreenChange", "fullscreen change happened", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
-        pause: new Engage.Event("Video:pause", "pauses the video", "handler"),
-        enablefullscreen: new Engage.Event("Video:goFullscreen", "go to fullscreen of the video", "handler"),
-        disablefullscreen: new Engage.Event("Video:cancelFullscreen", "cancel fullscreen of the video", "handler"),
-        setVolume: new Engage.Event("Video:setVolume", "set the volume of the player", "handler"),
-        getVolume: new Engage.Event("Video:getVolume", "get the volume of the player", "handler"),
-        sliderStop: new Engage.Event("Slider:stop", "notices a stop of the slider", "handler"),
-        seek: new Engage.Event("Video:seek", "seek video to time position given in seconds", "handler")
+        enablefullscreen: new Engage.Event("Video:goFullscreen", "go to fullscreen", "handler"),
+        disablefullscreen: new Engage.Event("Video:cancelFullscreen", "cancel fullscreen", "handler"),
+        setVolume: new Engage.Event("Video:setVolume", "set the volume", "handler"),
+        getVolume: new Engage.Event("Video:getVolume", "get the volume", "handler"),
+        sliderStop: new Engage.Event("Slider:stop", "slider stopped", "handler"),
+        seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "handler")
     };
 
     // desktop, embed and mobile logic
@@ -307,6 +307,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             if (videosReady) {
                 Engage.trigger(plugin.events.ended.getName());
                 theodulVideodisplay.pause();
+		Engage.trigger(plugin.events.pause.getName());
                 theodulVideodisplay.currentTime(theodulVideodisplay.duration());
             }
         });
