@@ -780,7 +780,7 @@ var ocScheduler = (function() {
       required: false,
       key: 'isPartOf',
       errors: {
-        missingRequired: new ocAdmin.Error('missingSeries', 'seriesLabel'),
+        missingRequired: new ocAdmin.Error('missingSeries', 'seriesSelectLabel'),
         seriesError: new ocAdmin.Error('errorSeries')
       },
       fields: {
@@ -816,7 +816,7 @@ var ocScheduler = (function() {
             error.push(this.errors.seriesError); //failed to create series for some reason.
           }
         }
-        if(this.fields.series.val() === '' && !window.checkForErrors && this.required) {
+        if(this.fields.seriesSelect.val() === '' && window.checkForErrors && this.required) {
           error.push(this.errors.missingRequired);
         }
         return error;
