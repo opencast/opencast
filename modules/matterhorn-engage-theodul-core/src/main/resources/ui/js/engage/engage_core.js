@@ -35,7 +35,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
         coreInit: new EngageEvent("Core:init", "", "trigger"),
         jumpToX: new EngageEvent("Controls:jumpToX", "", "trigger"),
         nextChapter: new EngageEvent("Video:nextChapter", "", "trigger"),
-        fullscreen: new EngageEvent("Video:goFullscreen", "", "trigger"),
+        fullscreenEnable: new EngageEvent("Video:fullscreenEnable", "", "trigger"),
         jumpToBegin: new EngageEvent("Video:jumpToBegin", "", "trigger"),
         previousEpisode: new EngageEvent("Core:previousEpisode", "", "trigger"),
         previousChapter: new EngageEvent("Video:previousChapter", "", "trigger"),
@@ -249,7 +249,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
                 break;
             case hotkey_fullscreen:
                 Mousetrap.bind(val.key, function () {
-                    engageCore.trigger(events.goFullscreen.getName());
+                    engageCore.trigger(events.fullscreenEnable.getName());
                 });
                 break;
             case hotkey_jumpToBegin:
