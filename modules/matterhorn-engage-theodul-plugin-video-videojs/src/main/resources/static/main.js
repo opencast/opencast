@@ -52,10 +52,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         volumechange: new Engage.Event("Video:volumechange", "volume change happened", "trigger"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "fullscreen change happened", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
-        enablefullscreen: new Engage.Event("Video:goFullscreen", "go to fullscreen", "handler"),
-        disablefullscreen: new Engage.Event("Video:cancelFullscreen", "cancel fullscreen", "handler"),
-        setVolume: new Engage.Event("Video:setVolume", "set the volume", "handler"),
-        getVolume: new Engage.Event("Video:getVolume", "get the volume", "handler"),
+        fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "go to fullscreen", "handler"),
+        fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "cancel fullscreen", "handler"),
+        volumeSet: new Engage.Event("Video:volumeSet", "set the volume", "handler"),
+        volumeGet: new Engage.Event("Video:volumeGet", "get the volume", "handler"),
         sliderStop: new Engage.Event("Slider:stop", "slider stopped", "handler"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "handler")
     };
@@ -265,18 +265,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         Engage.on(plugin.events.pause.getName(), function () {
             theodulVideodisplay.pause();
         });
-        Engage.on(plugin.events.enablefullscreen.getName(), function () {
+        Engage.on(plugin.events.fullscreenEnable.getName(), function () {
             $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
             theodulVideodisplay.requestFullScreen();
         });
-        Engage.on(plugin.events.disablefullscreen.getName(), function () {
+        Engage.on(plugin.events.fullscreenCancel.getName(), function () {
             $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
-            theodulVideodisplay.cancelFullScreen();
+            theodulVideodisplay.fullscreenCancel();
         });
-        Engage.on(plugin.events.setVolume.getName(), function (percentAsDecimal) {
+        Engage.on(plugin.events.volumeSet.getName(), function (percentAsDecimal) {
             theodulVideodisplay.volume(percentAsDecimal);
         });
-        Engage.on(plugin.events.getVolume.getName(), function (callback) {
+        Engage.on(plugin.events.volumeGet.getName(), function (callback) {
             callback(theodulVideodisplay.volume());
         });
         Engage.on(plugin.events.seek.getName(), function (time) {

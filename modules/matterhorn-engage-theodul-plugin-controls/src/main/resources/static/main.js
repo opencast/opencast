@@ -39,13 +39,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var events = {
         play: new Engage.Event("Video:play", "plays the video", "both"),
         pause: new Engage.Event("Video:pause", "pauses the video", "both"),
-        goFullscreen: new Engage.Event("Video:goFullscreen", "", "both"),
-        muted: new Engage.Event("Video:muted", "", "both"),
-        unmuted: new Engage.Event("Video:unmuted", "", "both"),
-        cancelFullscreen: new Engage.Event("Video:cancelFullscreen", "", "trigger"),
+        fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "", "both"),
+        mute: new Engage.Event("Video:mute", "", "both"),
+        unmute: new Engage.Event("Video:unmute", "", "both"),
+        fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "", "trigger"),
         sliderStart: new Engage.Event("Slider:start", "", "trigger"),
         sliderStop: new Engage.Event("Slider:stop", "", "trigger"),
-        setVolume: new Engage.Event("Video:setVolume", "", "trigger"),
+        volumeSet: new Engage.Event("Video:volumeSet", "", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "handler"),
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
@@ -103,8 +103,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_navigation_time_current = "navigation_time_current";
     var id_play_button = "play_button";
     var id_pause_button = "pause_button";
-    var id_unmuted_button = "unmuted_button";
-    var id_muted_button = "muted_button";
+    var id_unmute_button = "unmute_button";
+    var id_mute_button = "mute_button";
 
     /* don't change these variables */
 	var videoDataModelChange = 'change:videoDataModel';
@@ -112,7 +112,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var initCount = 4;
     var isPlaying = false;
     var isSliding = false;
-    var isMuted = false;
+    var isMute = false;
 
     var ControlsView = Backbone.View.extend({
         el: $("#" + id_engage_controls), // every view has an element associated with it
@@ -280,15 +280,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             max: 100,
             value: 100,
             change: function (event, ui) {
-                Engage.trigger(plugin.events.setVolume.getName(), (ui.value) / 100);
+                Engage.trigger(plugin.events.volumeSet.getName(), (ui.value) / 100);
             }
         });
 
         $("#" + id_volumeIcon).click(function () {
-            if (isMuted) {
-                Engage.trigger(plugin.events.unmuted.getName());
+            if (isMute) {
+                Engage.trigger(plugin.events.unmute.getName());
             } else {
-                Engage.trigger(plugin.events.muted.getName());
+                Engage.trigger(plugin.events.mute.getName());
             }
         });
 
@@ -306,7 +306,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 document.webkitIsFullScreen;
             // just trigger the go event
             if (!isInFullScreen) {
-                Engage.trigger(plugin.events.goFullscreen.getName());
+                Engage.trigger(plugin.events.fullscreenEnable.getName());
             }
         });
 
@@ -320,7 +320,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             Engage.trigger(plugin.events.sliderStop.getName(), ui.value);
         });
         $("#" + id_volume).on("slidestop", function (event, ui) {
-            Engage.trigger(plugin.events.unmuted.getName());
+            Engage.trigger(plugin.events.unmute.getName());
         });
     }
 
@@ -328,7 +328,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      * getVolume
      */
     function getVolume() {
-        if (isMuted) {
+        if (isMute) {
             return 0;
         } else {
             var vol = $("#" + id_volume).slider("option", "value");
@@ -362,17 +362,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     isPlaying = false;
                 }
             });
-            Engage.on(plugin.events.muted.getName(), function () {
-                $("#" + id_unmuted_button).hide();
-                $("#" + id_muted_button).show();
-                isMuted = true;
-                Engage.trigger(plugin.events.setVolume.getName(), 0);
+            Engage.on(plugin.events.mute.getName(), function () {
+                $("#" + id_unmute_button).hide();
+                $("#" + id_mute_button).show();
+                isMute = true;
+                Engage.trigger(plugin.events.volumeSet.getName(), 0);
             });
-            Engage.on(plugin.events.unmuted.getName(), function () {
-                $("#" + id_unmuted_button).show();
-                $("#" + id_muted_button).hide();
-                isMuted = false;
-                Engage.trigger(plugin.events.setVolume.getName(), getVolume());
+            Engage.on(plugin.events.unmute.getName(), function () {
+                $("#" + id_unmute_button).show();
+                $("#" + id_mute_button).hide();
+                isMute = false;
+                Engage.trigger(plugin.events.volumeSet.getName(), getVolume());
             });
             Engage.on(plugin.events.fullscreenChange.getName(), function () {
                 var isInFullScreen = document.fullScreen ||
@@ -380,7 +380,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     document.webkitIsFullScreen;
                 // just trigger the cancel event
                 if (!isInFullScreen) {
-                    Engage.trigger(plugin.events.cancelFullscreen.getName());
+                    Engage.trigger(plugin.events.fullscreenCancel.getName());
                 }
             });
 
