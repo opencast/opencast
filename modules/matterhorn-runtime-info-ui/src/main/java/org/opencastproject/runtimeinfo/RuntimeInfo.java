@@ -128,7 +128,7 @@ public class RuntimeInfo {
     }
 
     if (targetEngageBaseUrl == null) {
-      logger.info(
+      logger.debug(
               "Using 'org.opencastproject.server.url' as a fallback for the non-existing organization level key '{}' for the components.json response",
               ENGAGE_URL_PROPERTY);
       targetEngageBaseUrl = new URL(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
@@ -146,7 +146,7 @@ public class RuntimeInfo {
     }
 
     if (targetAdminBaseUrl == null) {
-      logger.info(
+      logger.debug(
               "Using 'org.opencastproject.server.url' as a fallback for the non-existing organization level key '{}' for the components.json response",
               ADMIN_URL_PROPERTY);
       targetAdminBaseUrl = new URL(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
