@@ -27,7 +27,7 @@ ocRecordings = new (function() {
     q : 'Any fields',
     title : 'Title',
     creator : 'Presenter',
-    seriestitle : 'Course/Series'
+    seriesTitle : 'Course/Series',
   },
   {
     contributor : 'Contributor',
@@ -1102,14 +1102,14 @@ ocRecordings = new (function() {
     callback(source);
   }
   
-  this.removeRecording = function(id, title) {
-    if(confirm('Are you sure you wish to delete ' + title + '?')){
+  this.removeRecording = function(id) {
+    if(confirm('Are you sure you wish to delete this recording?')){
       $.ajax({
         url: '/recordings/' + id,
         type: 'DELETE',
         dataType: 'text',
         error: function(XHR,status,e){
-          alert('Could not remove Recording ' + title);
+          alert('Could not remove recording');
         },
         success: function(){
           ocRecordings.reload();
@@ -1543,11 +1543,11 @@ ocRecordings = new (function() {
         }
 
       } else if (action == 'delete') {
-        links.push('<a href="javascript:ocRecordings.removeRecording(\'' + id + '\',\'' + ocUtils.escapeXML(recording.title).replace(/["']/g, "\\\'") + '\')">Delete</a>');
+        links.push('<a href="javascript:ocRecordings.removeRecording(\'' + id + '\')">Delete</a>');
 
       } else if (action == 'unpublish') {
         links.push('<a href="javascript:ocRecordings.unpublishRecording(\'' + id + '\')">Unpublish</a>');
-      
+
       } else if (action == 'ignore') {
         links.push('<a title="Remove this Recording from UI only" href="javascript:ocRecordings.stopWorkflow(\'' + id + '\')">Ignore</a>');
 

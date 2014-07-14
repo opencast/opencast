@@ -544,7 +544,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       try {
         collectJobstats = Boolean.valueOf(jobStatsString);
       } catch (Exception e) {
-        logger.warn("Job statistics collection flag '{}' is malformed, setting to {}", jobStatsString, DEFAULT_JOB_STATISTICS);
+        logger.warn("Job statistics collection flag '{}' is malformed, setting to {}", jobStatsString,
+                DEFAULT_JOB_STATISTICS);
         collectJobstats = DEFAULT_JOB_STATISTICS;
       }
     }
@@ -1522,6 +1523,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String, java.lang.String,
    *      java.lang.String, org.opencastproject.job.api.Job.Status)
    */
+  @Override
   public long count(String serviceType, String host, String operation, Status status) throws ServiceRegistryException {
     if (StringUtils.isBlank(serviceType) || StringUtils.isBlank(host) || StringUtils.isBlank(operation)
             || status == null)
@@ -1555,23 +1557,29 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
+      Map<Long, JaxbServiceStatistics> statsMap = new HashMap<Long, JaxbServiceStatistics>();
+
+      // Make sure we also include the services that have no processing history so far
+      List<ServiceRegistrationJpaImpl> services = em.createNamedQuery("ServiceRegistration.getAll").getResultList();
+      for (ServiceRegistrationJpaImpl s : services) {
+        statsMap.put(s.getId(), new JaxbServiceStatistics((ServiceRegistrationJpaImpl) s));
+      }
+
       Query query = em.createNamedQuery("ServiceRegistration.statistics");
-      Map<ServiceRegistration, JaxbServiceStatistics> statsMap = new HashMap<ServiceRegistration, JaxbServiceStatistics>();
       List queryResults = query.getResultList();
       for (Object result : queryResults) {
         Object[] oa = (Object[]) result;
-        ServiceRegistrationJpaImpl serviceRegistration = ((ServiceRegistrationJpaImpl) oa[0]);
-        Status status = ((Status) oa[1]);
+        Number serviceRegistrationId = ((Number) oa[0]);
+        if (serviceRegistrationId == null || serviceRegistrationId.longValue() == 0)
+          break;
+        Status status = (Status) oa[1];
         Number count = (Number) oa[2];
         Number meanQueueTime = (Number) oa[3];
         Number meanRunTime = (Number) oa[4];
 
         // The statistics query returns a cartesian product, so we need to iterate over them to build up the objects
-        JaxbServiceStatistics stats = statsMap.get(serviceRegistration);
-        if (stats == null) {
-          stats = new JaxbServiceStatistics(serviceRegistration);
-          statsMap.put(serviceRegistration, stats);
-        }
+        JaxbServiceStatistics stats = statsMap.get(serviceRegistrationId.longValue());
+
         // the status will be null if there are no jobs at all associated with this service registration
         if (status != null) {
           switch (status) {
@@ -1591,13 +1599,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               break;
           }
         }
-      }
-
-      // Make sure we also include the services that have no processing history so far
-      List<ServiceRegistration> services = em.createNamedQuery("ServiceRegistration.getAll").getResultList();
-      for (ServiceRegistration s : services) {
-        if (!statsMap.containsKey(s))
-          statsMap.put(s, new JaxbServiceStatistics((ServiceRegistrationJpaImpl) s));
       }
 
       List<ServiceStatistics> stats = new ArrayList<ServiceStatistics>(statsMap.values());
@@ -1793,22 +1794,37 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public Object addingService(ServiceReference reference) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
       String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
+      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
       boolean jobProducer = (Boolean) reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY);
-      try {
-        registerService(serviceType, hostName, servicePath, jobProducer);
-      } catch (ServiceRegistryException e) {
-        logger.warn("Unable to register job producer of type " + serviceType + " on host " + hostName);
+
+      // Only register services that have the "publish" flag set to "true"
+      if (publishFlag) {
+        try {
+          registerService(serviceType, hostName, servicePath, jobProducer);
+        } catch (ServiceRegistryException e) {
+          logger.warn("Unable to register job producer of type " + serviceType + " on host " + hostName);
+        }
+      } else {
+        logger.debug("Not registering service " + serviceType + " in service registry by configuration");
       }
+
       return super.addingService(reference);
     }
 
     @Override
     public void removedService(ServiceReference reference, Object service) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-      try {
-        unRegisterService(serviceType, hostName);
-      } catch (ServiceRegistryException e) {
-        logger.warn("Unable to unregister job producer of type " + serviceType + " on host " + hostName);
+      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
+
+      // Services that have the "publish" flag set to "true" have been registered before.
+      if (publishFlag) {
+        try {
+          unRegisterService(serviceType, hostName);
+        } catch (ServiceRegistryException e) {
+          logger.warn("Unable to unregister job producer of type " + serviceType + " on host " + hostName);
+        }
+      } else {
+        logger.trace("Service " + reference + " was never registered");
       }
       super.removedService(reference, service);
     }

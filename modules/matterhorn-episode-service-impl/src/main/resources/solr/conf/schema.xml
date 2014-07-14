@@ -288,8 +288,8 @@
 
     <!-- Series -->
 
-    <field name="s_dc_title-sum" type="text" multiValued="true"/>
-    <dynamicField name="s_dc_title_*" type="text"/>
+    <field name="s_dc_title-sum" type="text" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+    <dynamicField name="s_dc_title_*" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="s_dc_title-sort" type="alphaOnlySort" />
 
     <!--  Opencast fields -->

@@ -53,6 +53,9 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
   /** Path to the hold state ui */
   public static final String UI_RESOURCE_PATH = "/ui/operation/append/index.html";
 
+  /** Title shown in Admin UI for Hold action */
+  public static final String HOLD_ACTION_TITLE = "Select Workflow";
+
   /** The workflow service instance */
   protected WorkflowService workflowService = null;
 
@@ -70,6 +73,9 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
     // Add the ui piece that displays the capture information
     registerHoldStateUserInterface(UI_RESOURCE_PATH);
+
+    /* Replace the default title */
+    this.setHoldActionTitle(HOLD_ACTION_TITLE);
   }
 
   /**
@@ -96,8 +102,8 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
    *      JobContext, java.util.Map)
    */
   @Override
-  public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context,
-          Map<String, String> properties) {
+  public WorkflowOperationResult resume(WorkflowInstance workflowInstance,
+      JobContext context, Map<String, String> properties) {
     String workflowDefinitionId = properties.get(OPT_WORKFLOW);
     for (Entry<String, String> entry : properties.entrySet()) {
       workflowInstance.setConfiguration(entry.getKey(), entry.getValue());
@@ -110,8 +116,10 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
   }
 
   /**
-   * Adds the operations found in the workflow defined by <code>workflowDefintionId</code> to the workflow instance and
-   * returns <code>true</code> if everything worked fine, <code>false</code> otherwhise.
+   * Adds the operations found in the workflow defined by
+   * <code>workflowDefintionId</code> to the workflow instance and returns
+   * <code>true</code> if everything worked fine, <code>false</code>
+   * otherwhise.
    *
    *
    * @param workflowInstance

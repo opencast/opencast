@@ -58,6 +58,13 @@ public class AbstractCmdlineEncoderEngineTest {
   }
 
   @Test
+  public void testSpace() throws EncoderException {
+    engine.setCmdlineOptions("-i in.mp4 -filter:v boxblur=1:1,curves=all=0.4/0#{space}0.6/1 out.mkv");
+    final List<String> list = engine.buildCommand(null);
+    assertEquals("boxblur=1:1,curves=all=0.4/0 0.6/1", list.get(4));
+  }
+
+  @Test
   public void testSplitCommandArgsWithCareSimple() throws EncoderException {
     final String[] args = new String[] {
         "a", "bbb", "c", "ddddddddddd", "98,128"
