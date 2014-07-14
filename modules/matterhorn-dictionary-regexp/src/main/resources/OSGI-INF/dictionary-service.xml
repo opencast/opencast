@@ -7,7 +7,7 @@
 
   <implementation
     class="org.opencastproject.dictionary.regexp.DictionaryServiceImpl" />
-  <property name="service.description" value="Dictionary Service" />
+  <property name="service.description" value="Dictionary Service (Regular Expressions)" />
   <service>
     <provide interface="org.opencastproject.dictionary.api.DictionaryService" />
   </service>

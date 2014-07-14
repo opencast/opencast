@@ -48,8 +48,16 @@ public class DictionaryServiceImpl implements DictionaryService {
   /* The regular expression to use for string matching */
   private String pattern = "\\w+";
 
+  /* The compiles pattern to use for matching */
+  private Pattern compilesPattern = Pattern.compile(pattern);
+
   public void setPattern(String p) {
-    pattern = p;
+    try {
+      compilesPattern = Pattern.compile(p);
+      pattern = p;
+    } catch (RuntimeException e) {
+      logger.error("Failed to compile pattern '{}'", p);
+    }
   }
 
   public String getPattern() {
@@ -73,7 +81,7 @@ public class DictionaryServiceImpl implements DictionaryService {
       /* Fix special characters */
       pattern = new String(pattern.getBytes("ISO-8859-1"), "UTF-8");
       logger.info("Setting pattern for regexp based DictionaryService to '{}'", pattern);
-      this.pattern = pattern;
+      setPattern(pattern);
     }
   }
 
@@ -88,8 +96,8 @@ public class DictionaryServiceImpl implements DictionaryService {
   public Textual cleanUpText(String text) {
 
     logger.info("Text input: “{}”", text);
-    Matcher matcher = Pattern.compile(pattern).matcher(text);
     LinkedList<String> words = new LinkedList<String>();
+    Matcher matcher = compilesPattern.matcher(text);
     while (matcher.find()) {
       words.add(matcher.group());
     }

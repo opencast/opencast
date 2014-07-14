@@ -29,6 +29,15 @@ public class DictionaryServiceImplTest {
   }
 
   @Test
+  public void testSetInvalidPattern() throws Exception {
+    DictionaryServiceImpl service = new DictionaryServiceImpl();
+    String pattern = service.getPattern();
+    /* The service should fail to compile this */
+    service.setPattern("*[[[[");
+    Assert.assertEquals(pattern, service.getPattern());
+  }
+
+  @Test
   public void testEmpty() throws Exception {
     DictionaryServiceImpl service = new DictionaryServiceImpl();
     Assert.assertEquals(null, service.cleanUpText(""));
