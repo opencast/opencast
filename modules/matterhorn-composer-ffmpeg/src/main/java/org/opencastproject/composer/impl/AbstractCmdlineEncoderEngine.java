@@ -358,7 +358,13 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
         result = result.replace("#{" + e.getKey() + "}", e.getValue());
       }
       result = result.replace("#{space}", " ");
-      command.add(result);
+
+      /* Remove unused commandline parts */
+      result = result.replaceAll("#\\{.*?\\}", "");
+
+      if (StringUtils.trimToNull(result) != null) {
+        command.add(result);
+      }
     }
     return command;
   }

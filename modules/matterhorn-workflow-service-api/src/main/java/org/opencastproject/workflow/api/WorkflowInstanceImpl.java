@@ -620,11 +620,20 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    */
   @Override
   public void extend(WorkflowDefinition workflowDefinition) {
-    if (workflowDefinition.getOperations().size() == 0)
+    if (workflowDefinition.getOperations().size() == 0) {
       return;
+    }
     List<WorkflowOperationInstance> operations = new ArrayList<WorkflowOperationInstance>(this.operations);
     for (WorkflowOperationDefinition operationDefintion : workflowDefinition.getOperations()) {
-      operations.add(new WorkflowOperationInstanceImpl(operationDefintion, -1));
+      WorkflowOperationInstanceImpl op = new WorkflowOperationInstanceImpl(operationDefintion, -1);
+      String cond = op.getExecutionCondition();
+      if (cond != null && cond.startsWith("${") && cond.endsWith("}")) {
+        String val = this.getConfiguration(cond.substring(2, cond.length() - 1));
+        if (val != null) {
+          op.setExecutionCondition(val);
+        }
+      }
+      operations.add(op);
     }
     setOperations(operations);
     setTemplate(workflowDefinition.getId());
