@@ -38,17 +38,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
-    case "desktop":
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES,
-            template: PLUGIN_TEMPLATE,
-            events: events,
-            timeStrToSeconds: timeStrToSeconds
-        };
-        break;
     case "mobile":
         plugin = {
             name: PLUGIN_NAME,
@@ -71,7 +60,21 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             timeStrToSeconds: timeStrToSeconds
         };
         break;
+    // fallback to desktop/default mode
+    case "desktop":
+    default:
+        plugin = {
+            name: PLUGIN_NAME,
+            type: PLUGIN_TYPE,
+            version: PLUGIN_VERSION,
+            styles: PLUGIN_STYLES,
+            template: PLUGIN_TEMPLATE,
+            events: events,
+            timeStrToSeconds: timeStrToSeconds
+        };
+        break;
     }
+
 
     /* change these variables */
     // nothing here...
