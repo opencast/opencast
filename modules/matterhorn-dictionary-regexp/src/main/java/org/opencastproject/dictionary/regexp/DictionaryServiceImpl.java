@@ -24,6 +24,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.io.UnsupportedEncodingException;
+import org.osgi.service.cm.ManagedService;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -36,14 +37,13 @@ import org.opencastproject.metadata.mpeg7.TextualImpl;
  * This dictionary implementation is a dummy implementation which which will
  * just let the whole text pass through without any kind of filtering.
  */
-public class DictionaryServiceImpl implements DictionaryService {
+public class DictionaryServiceImpl implements DictionaryService, ManagedService {
 
   /** The logging facility */
   private static final Logger logger =
     LoggerFactory.getLogger(DictionaryServiceImpl.class);
 
-  public static final String PATTERN_CONFIG_KEY =
-    "org.opencastproject.dictionary.regexp.pattern";
+  public static final String PATTERN_CONFIG_KEY = "pattern";
 
   /* The regular expression to use for string matching */
   private String pattern = "\\w+";
@@ -65,30 +65,39 @@ public class DictionaryServiceImpl implements DictionaryService {
   }
 
   /**
-   * OSGi callback on component activation.
-   *
-   * @param  ctx  the bundle context
+   * Load configuration
    */
-  void activate(BundleContext ctx) throws UnsupportedEncodingException {
-    Dictionary<String, String> properties = new Hashtable<String, String>();
-    properties.put(ARTIFACT, "dictionary");
-    ctx.registerService(ReadinessIndicator.class.getName(),
-        new ReadinessIndicator(), properties);
-
-    /* Get regexp pattern from configuration file */
-    String pattern = (String) ctx.getProperty(PATTERN_CONFIG_KEY);
-    if (pattern != null) {
+  public synchronized void updated(Dictionary properties) {
+    if (properties != null && properties.get(PATTERN_CONFIG_KEY) != null) {
+      String pattern = properties.get(PATTERN_CONFIG_KEY).toString();
       /* Fix special characters */
-      pattern = new String(pattern.getBytes("ISO-8859-1"), "UTF-8");
+      try {
+        pattern = new String(pattern.getBytes("ISO-8859-1"), "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+        logger.warn("Error decoding pattern string");
+      }
       logger.info("Setting pattern for regexp based DictionaryService to '{}'", pattern);
       setPattern(pattern);
     }
   }
 
   /**
+   * OSGi callback on component activation.
+   *
+   * @param  ctx  the bundle context
+   */
+  void activate(BundleContext ctx) {
+    logger.info("Activating regexp based DictionaryService");
+    Dictionary<String, String> properties = new Hashtable<String, String>();
+    properties.put(ARTIFACT, "dictionary");
+    ctx.registerService(ReadinessIndicator.class.getName(),
+        new ReadinessIndicator(), properties);
+  }
+
+  /**
    * Filter the text according to the rules defined by the dictionary
-   * implementation used. This implementation will just let the whole text pass
-   * through.
+   * implementation used. This implementation uses a regular expression to find
+   * matching terms.
    *
    * @return filtered text
    **/

@@ -8,7 +8,9 @@
   <implementation
     class="org.opencastproject.dictionary.regexp.DictionaryServiceImpl" />
   <property name="service.description" value="Dictionary Service (Regular Expressions)" />
+  <property name="service.pid" value="org.opencastproject.dictionary.regexp.DictionaryServiceImpl"/>
   <service>
     <provide interface="org.opencastproject.dictionary.api.DictionaryService" />
+    <provide interface="org.osgi.service.cm.ManagedService"/>
   </service>
 </scr:component>
