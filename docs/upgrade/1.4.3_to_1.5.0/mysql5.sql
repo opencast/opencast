@@ -143,6 +143,8 @@ CREATE TABLE mh_user_ref_role (
 
 -- Change type of field 'payload' in table 'mh_job' from TEXT to MEDIUMTEXT, see MH-10139
 ALTER TABLE mh_job MODIFY COLUMN payload MEDIUMTEXT;
+ALTER TABLE mh_search MODIFY COLUMN mediapackage_xml mediumtext;
+ALTER TABLE mh_episode_episode MODIFY COLUMN mediapackage_xml mediumtext;
 
 -- Create additional index on table mh_job for better performance in job statistics query, see MH-8638
 CREATE INDEX IX_mh_job_statistics ON mh_job (processor_service, status, queue_time, run_time); 
