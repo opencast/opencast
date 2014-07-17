@@ -724,6 +724,9 @@
         <module>modules/matterhorn-inspection-service-impl</module>
         <module>modules/matterhorn-dictionary-none</module>
         <module>modules/matterhorn-dictionary-hunspell</module>
+        <module>modules/matterhorn-gstreamer-service-api</module>
+        <module>modules/matterhorn-gstreamer-service-impl</module>
+        <module>modules/matterhorn-gstreamer-service-remote</module>
       </modules>
     </profile>
 
