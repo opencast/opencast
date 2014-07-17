@@ -1,4 +1,4 @@
-<div class="series-schedule current" id="<%= this.id %>">
+<div class="series-schedule current" id="<%! this.id %>">
     <span>
         Active ACL
     </span>
@@ -6,8 +6,8 @@
         <input type="checkbox" class="override" /> Override
     </span>
     <span>
-        <select class="acl" id="acl-<%= this.id %>">
-            <%= this.acl %>
+        <select class="acl" id="acl-<%! this.id %>">
+            <%! this.acl %>
         </select>
         <span class="aclLabel"></span>
     </span>

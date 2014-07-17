@@ -397,4 +397,29 @@ ocUtils.escapeXML = function(string) {
     return String(string).replace(/[&<>]/g, function (s) {
       return ocUtils.entityMap[s];
     });
-  }
+}
+
+/** Return a new object where all of the text has been replaced by XML safe text. */
+ocUtils.escapeXMLInObject = function(jsonObject) {
+    var safeObject = {};
+    if (typeof jsonObject === "string") {
+        return ocUtils.escapeXML(jsonObject);
+    }
+    for (var key in jsonObject) {
+        if (jsonObject.hasOwnProperty(key)) {
+            if (typeof jsonObject[key] === "string") {
+                safeObject[key] = ocUtils.escapeXML(jsonObject);
+            } else if (jsonObject[key] instanceof Array) {
+                safeObject[key] = [];
+                for (item in jsonObject[key]) {
+                    safeObject[key].push(ocUtils.escapeXMLInObject(jsonObject[key][item]));
+                }
+            } else if (typeof jsonObject[key] == "object" && jsonObject[key] !== null) {
+                safeObject[key] = ocUtils.escapeXMLInObject(jsonObject[key]);
+            }
+        } else {
+            safeObject[key] = jsonObject[key];
+        }
+    }
+    return safeObject;
+}

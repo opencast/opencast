@@ -13,13 +13,13 @@
       <% if (typeof value == 'string' || typeof value == 'number') { %>
       <tr>
         <td class="td-key">
-          <%= key %>
+          <%! key %>
         </td>
         <td class="td-value">
           <% if (key == 'url') { %>
-          <a href="<%= value %>"><%= value %></a>
+          <a href="<%= value %>"><%! value %></a>
           <% } else { %>
-          <%= value %>
+          <%! value %>
           <% } %>
         </td>
       </tr>
@@ -33,13 +33,13 @@
       <% if (typeof value == 'string' || typeof value == 'number') { %>
       <tr>
         <td class="td-key">
-          <%= key %>
+          <%! key %>
         </td>
         <td class="td-value">
           <% if (key == 'url') { %>
-          <a href="<%= value %>"><%= value %></a>
+          <a href="<%= value %>"><%! value %></a>
           <% } else { %>
-          <%= value %>
+          <%! value %>
           <% } %>
         </td>
       </tr>
@@ -55,13 +55,13 @@
       <% if (typeof value == 'string' || typeof value == 'number') { %>
       <tr>
         <td class="td-key">
-          <%= key %>
+          <%! key %>
         </td>
         <td class="td-value">
           <% if (key == 'url') { %>
-          <a href="<%= value %>"><%= value %></a>
+          <a href="<%= value %>"><%! value %></a>
           <% } else { %>
-          <%= value %>
+          <%! value %>
           <% } %>
         </td>
       </tr>
@@ -75,23 +75,23 @@
       <% $.each(data[j].workflow.mediapackage.media.track, function(key, track) { %>
       <tr class="unfoldable-tr">
         <td class="td-key">
-          <%= track.type %>
+          <%! track.type %>
         </td>
         <td class="td-value">
-          <%= track.mimetype %>
+          <%! track.mimetype %>
           <div class="unfoldable-content">
             <table class="subtable">
               <% $.each(track, function(key, value) { %>
               <% if (typeof value == 'string' || typeof value == 'number') { %>
               <tr>
                 <td class="td-key">
-                  <%= key %>
+                  <%! key %>
                 </td>
                 <td class="td-value">
                   <% if (key == 'url') { %>
-                  <a href="<%= value %>"><%= value %></a>
+                  <a href="<%= value %>"><%! value %></a>
                   <% } else { %>
-                  <%= value %>
+                  <%! value %>
                   <% } %>
                 </td>
               </tr>
@@ -108,13 +108,13 @@
                   <% if (typeof value == 'string' || typeof value == 'number') { %>
                   <tr>
                     <td class="td-key">
-                      <%= key %>
+                      <%! key %>
                     </td>
                     <td class="td-value">
                       <% if (key == 'url') { %>
-                      <a href="<%= value %>"><%= value %></a>
+                      <a href="<%= value %>"><%! value %></a>
                       <% } else { %>
-                      <%= value %>
+                      <%! value %>
                       <% } %>
                     </td>
                   </tr>
@@ -131,13 +131,13 @@
                   <% if (typeof value == 'string' || typeof value == 'number') { %>
                   <tr>
                     <td class="td-key">
-                      <%= key %>
+                      <%! key %>
                     </td>
                     <td class="td-value">
                       <% if (key == 'url') { %>
-                      <a href="<%= value %>"><%= value %></a>
+                      <a href="<%= value %>"><%! value %></a>
                       <% } else { %>
-                      <%= value %>
+                      <%! value %>
                       <% } %>
                     </td>
                   </tr>
@@ -160,23 +160,23 @@
       <% $.each(data[j].workflow.mediapackage.metadata.catalog, function(key, catalog) { %>
       <tr class="unfoldable-tr">
         <td class="td-key">
-          <%= catalog.type %>
+          <%! catalog.type %>
         </td>
         <td class="td-value">
-          <%= catalog.id %>
+          <%! catalog.id %>
           <div class="unfoldable-content">
             <table class="subtable">
               <% $.each(catalog, function(key, value) { %>
               <% if (typeof value == 'string' || typeof value == 'number') { %>
               <tr>
                 <td class="td-key">
-                  <%= key %>
+                  <%! key %>
                 </td>
                 <td class="td-value">
                   <% if (key == 'url') { %>
-                  <a href="<%= value %>"><%= value %></a>
+                  <a href="<%= value %>"><%! value %></a>
                   <% } else { %>
-                  <%= value %>
+                  <%! value %>
                   <% } %>
                 </td>
               </tr>
@@ -196,23 +196,23 @@
       <% $.each(data[j].workflow.mediapackage.attachments, function(key, item) { %>
       <tr class="unfoldable-tr">
         <td class="td-key">
-          <%= item.type %>
+          <%! item.type %>
         </td>
         <td class="td-value">
-          <%= item.id %>
+          <%! item.id %>
           <div class="unfoldable-content">
             <table class="subtable">
               <% $.each(item, function(key, value) { %>
               <% if (typeof value == 'string' || typeof value == 'number') { %>
               <tr>
                 <td class="td-key">
-                  <%= key %>
+                  <%! key %>
                 </td>
                 <td class="td-value">
                   <% if (key == 'url') { %>
-                  <a href="<%= value %>"><%= value %></a>
+                  <a href="<%= value %>"><%! value %></a>
                   <% } else { %>
-                  <%= value %>
+                  <%! value %>
                   <% } %>
                 </td>
               </tr>
@@ -232,23 +232,23 @@
       <% $.each(data[j].workflow.mediapackage.publications.publication, function(key, item) { %>
       <tr class="unfoldable-tr">
         <td class="td-key">
-          <%= item.channel %>
+          <%! item.channel %>
         </td>
         <td class="td-value">
-          <%= item.id %>
+          <%! item.id %>
           <div class="unfoldable-content">
             <table class="subtable">
               <% $.each(item, function(key, value) { %>
               <% if (typeof value == 'string' || typeof value == 'number') { %>
               <tr>
                 <td class="td-key">
-                  <%= key %>
+                  <%! key %>
                 </td>
                 <td class="td-value">
                   <% if (key == 'url') { %>
-                  <a href="<%= value %>"><%= value %></a>
+                  <a href="<%= value %>"><%! value %></a>
                   <% } else { %>
-                  <%= value %>
+                  <%! value %>
                   <% } %>
                 </td>
               </tr>
@@ -275,26 +275,26 @@
             <% if (op.state=='PAUSED') { %>color:orange;<% } %>
             <% if (op.state=='INSTANTIATED') { %>color:blue;<% } %>
             ">
-          <%= op.state %>
+          <%! op.state %>
         </td>
         <td class="td-key">
-          <%= op.id %>
+          <%! op.id %>
         </td>
         <td class="td-value">
-          <%= op.description %>
+          <%! op.description %>
           <div class="unfoldable-content">
             <table class="subtable">
               <% $.each(op, function(key, value) { %>
               <% if (typeof value == 'string' || typeof value == 'number') { %>
               <tr>
                 <td class="td-key">
-                  <%= key %>
+                  <%! key %>
                 </td>
                 <td class="td-value">
                   <% if (key == 'url') { %>
-                  <a href="<%= value %>"><%= value %></a>
+                  <a href="<%= value %>"><%! value %></a>
                   <% } else { %>
-                  <%= value %>
+                  <%! value %>
                   <% } %>
                 </td>
               </tr>
@@ -308,13 +308,13 @@
               <% if (typeof value == 'string' || typeof value == 'number') { %>
               <tr>
                 <td class="td-key">
-                  <%= key %>
+                  <%! key %>
                 </td>
                 <td class="td-value">
                   <% if (key == 'url') { %>
-                  <a href="<%= value %>"><%= value %></a>
+                  <a href="<%= value %>"><%! value %></a>
                   <% } else { %>
-                  <%= value %>
+                  <%! value %>
                   <% } %>
                 </td>
               </tr>
@@ -327,7 +327,7 @@
       </tr>
       <% }); %>
     </table>
-  </div>     
+  </div>
 
 <!--  <div id="performance">
     <div id="graph" style="width: 760px; height: 400px"></div>  </div> -->

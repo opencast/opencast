@@ -1,4 +1,4 @@
-<div class="series-schedule" id="<%= this.id %>">
+<div class="series-schedule" id="<%! this.id %>">
     <span>
         <span class="currentText">Active</span>
         <input type="text" class="from" />
@@ -7,13 +7,13 @@
         <input type="checkbox" class="override" /> Override
     </span>
     <span>
-        <select class="acl" id="acl-<%= this.id %>">
-            <%= this.acl %>
+        <select class="acl" id="acl-<%! this.id %>">
+            <%! this.acl %>
         </select>
     </span>
     <span>
-        <select class="workflows" id="workflowDef-<%= this.id %>">
-            <%= this.workflows %>
+        <select class="workflows" id="workflowDef-<%! this.id %>">
+            <%! this.workflows %>
         </select>
     </span>
     <span>

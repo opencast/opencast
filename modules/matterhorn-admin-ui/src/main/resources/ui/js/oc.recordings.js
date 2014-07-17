@@ -1544,10 +1544,10 @@ ocRecordings = new (function() {
 
       } else if (action == 'delete') {
         links.push('<a href="javascript:ocRecordings.removeRecording(\'' + id + '\')">Delete</a>');
-        
+
       } else if (action == 'unpublish') {
         links.push('<a href="javascript:ocRecordings.unpublishRecording(\'' + id + '\')">Unpublish</a>');
-      
+
       } else if (action == 'ignore') {
         links.push('<a title="Remove this Recording from UI only" href="javascript:ocRecordings.stopWorkflow(\'' + id + '\')">Ignore</a>');
 
