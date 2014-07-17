@@ -698,6 +698,9 @@
       </activation>
       <modules>
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
+        <module>modules/matterhorn-gstreamer-service-api</module>
+        <module>modules/matterhorn-gstreamer-service-impl</module>
+        <module>modules/matterhorn-gstreamer-service-remote</module>
       </modules>
     </profile>
 
