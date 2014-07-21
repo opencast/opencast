@@ -197,7 +197,7 @@ CREATE TABLE mh_search (
   organization VARCHAR(128),
   deletion_date DATETIME,
   access_control TEXT(65535),
-  mediapackage_xml TEXT(65535),
+  mediapackage_xml MEDIUMTEXT,
   modification_date DATETIME,
   PRIMARY KEY (id),
   CONSTRAINT FK_mh_search_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
@@ -257,7 +257,7 @@ CREATE TABLE mh_episode_episode (
   organization VARCHAR(128),
   deletion_date DATETIME,
   access_control TEXT(65535),
-  mediapackage_xml TEXT(65535),
+  mediapackage_xml MEDIUMTEXT,
   modification_date DATETIME,
   PRIMARY KEY (id, version, organization),
   CONSTRAINT FK_mh_episode_episode_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
