@@ -120,15 +120,17 @@ public class SmilServiceImpl implements SmilService {
     if (track.getFlavor() == null) {
       throw new SmilException("Track flavor isn't set.");
     }
-    if (track.getDuration() == null) {
-      throw new SmilException("Track duration not set");
-    }
-    if (!track.hasAudio() && !track.hasVideo()) {
-      throw new SmilException("Track should have at least one audio or video stream.");
-    }
-    if (start + duration > track.getDuration()) {
-      duration = track.getDuration() - start;
-      //throw new SmilException("Start plus duration is bigger than track length.");
+//    if (track.getDuration() == null) {
+//      throw new SmilException("Track duration not set");
+//    }
+    if (track.getDuration() != null) {
+      if (!track.hasAudio() && !track.hasVideo()) {
+        throw new SmilException("Track should have at least one audio or video stream.");
+      }
+      if (start + duration > track.getDuration()) {
+        duration = track.getDuration() - start;
+        //throw new SmilException("Start plus duration is bigger than track length.");
+      }
     }
 
     SmilMediaParamGroup trackParamGroup = null;
@@ -156,15 +158,18 @@ public class SmilServiceImpl implements SmilService {
         break;
       }
     }
-    // set track-duration meta if not set or the trackduration is longer than old value
-    if (durationMeta == null) {
-      ((SmilHeadImpl) smil.getHead()).addMeta(SmilMeta.SMIL_META_NAME_TRACK_DURATION,
-              String.format("%dms", track.getDuration()));
-    } else {
-      long durationOld = Long.parseLong(durationMeta.getContent().replace("ms", ""));
-      if (track.getDuration() > durationOld) {
+
+    if (track.getDuration() != null) {
+      // set track-duration meta if not set or the trackduration is longer than old value
+      if (durationMeta == null) {
         ((SmilHeadImpl) smil.getHead()).addMeta(SmilMeta.SMIL_META_NAME_TRACK_DURATION,
                 String.format("%dms", track.getDuration()));
+      } else {
+        long durationOld = Long.parseLong(durationMeta.getContent().replace("ms", ""));
+        if (track.getDuration() > durationOld) {
+          ((SmilHeadImpl) smil.getHead()).addMeta(SmilMeta.SMIL_META_NAME_TRACK_DURATION,
+                  String.format("%dms", track.getDuration()));
+        }
       }
     }
 

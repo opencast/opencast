@@ -18,6 +18,7 @@ package org.opencastproject.smil.impl;
 import java.net.URI;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
@@ -242,6 +243,7 @@ public class SmilServiceImplTest {
     fail("SmilException schould be thrown if you try to add an invalid track.");
   }
 
+  @Ignore
   @Test(expected = SmilException.class)
   public void testAddClipWithInvalidTrackDuration() throws Exception {
     TrackImpl videoTrack = new TrackImpl();
