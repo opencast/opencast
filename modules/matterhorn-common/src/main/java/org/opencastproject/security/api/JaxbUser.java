@@ -67,7 +67,7 @@ public final class JaxbUser implements User {
 
   /**
    * Constructs a user which is a member of the given organization that has the specified roles and no password set.
-   * 
+   *
    * @param userName
    *          the username
    * @param organization
@@ -83,7 +83,7 @@ public final class JaxbUser implements User {
 
   /**
    * Constructs a user which is a member of the given organization that has the specified roles.
-   * 
+   *
    * @param userName
    *          the username
    * @param password
@@ -102,7 +102,7 @@ public final class JaxbUser implements User {
 
   /**
    * Constructs a user which is a member of the given organization that has the specified roles.
-   * 
+   *
    * @param userName
    *          the username
    * @param password
@@ -123,7 +123,7 @@ public final class JaxbUser implements User {
 
   /**
    * Constructs a user which is a member of the given organization that has the specified roles.
-   * 
+   *
    * @param userName
    *          the username
    * @param password
@@ -144,7 +144,7 @@ public final class JaxbUser implements User {
 
   /**
    * Constructs a user which is a member of the given organization that has the specified roles and no password set.
-   * 
+   *
    * @param userName
    *          the username
    * @param organization
@@ -160,7 +160,7 @@ public final class JaxbUser implements User {
 
   /**
    * Constructs a user which is a member of the given organization that has the specified roles.
-   * 
+   *
    * @param userName
    *          the username
    * @param password
@@ -195,7 +195,7 @@ public final class JaxbUser implements User {
 
   /**
    * Creates a JAXB user from a regular user object.
-   * 
+   *
    * @param user
    *          the user
    * @return the JAXB user
@@ -267,7 +267,7 @@ public final class JaxbUser implements User {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -280,7 +280,7 @@ public final class JaxbUser implements User {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -290,7 +290,7 @@ public final class JaxbUser implements User {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

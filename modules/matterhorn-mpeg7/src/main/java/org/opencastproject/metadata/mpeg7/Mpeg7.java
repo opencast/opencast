@@ -20,7 +20,7 @@ import java.util.Iterator;
 
 /**
  * Root of an mpeg-7 document.
- * 
+ *
  * <pre>
  * &lt;element name=&quot;Mpeg7&quot;&gt;
  *   &lt;complexType&gt;
@@ -40,7 +40,7 @@ public interface Mpeg7 {
 
   /**
    * Returns an iteration of the multimedia content container contained in this mpeg-7 document.
-   * 
+   *
    * @return the multimedia content container
    */
   Iterator<MultimediaContent<? extends MultimediaContentType>> multimediaContent();
@@ -48,15 +48,15 @@ public interface Mpeg7 {
   /**
    * Returns the multimedia content container element for tracks of the given type (either <code>Audio></code>,
    * <code>Video</code> or <code>Audiovisual</code>).
-   * 
-   * 
+   *
+   *
    * @return the multimedia content container of the specified type
    */
   MultimediaContent<? extends MultimediaContentType> getMultimediaContent(MultimediaContent.Type type);
 
   /**
    * Adds audio content to the catalog.
-   * 
+   *
    * @param id
    *          the audio track id
    * @param time
@@ -68,7 +68,7 @@ public interface Mpeg7 {
 
   /**
    * Removes the audio content with the specified id.
-   * 
+   *
    * @param id
    *          the content id
    */
@@ -76,21 +76,21 @@ public interface Mpeg7 {
 
   /**
    * Returns <code>true</code> if the catalog contains multimedia content of type <code>AudioType</code>.
-   * 
+   *
    * @return <code>true</code> if audio content is contained
    */
   boolean hasAudioContent();
 
   /**
    * Returns an iteration of the tracks of type <code>Audio</code>.
-   * 
+   *
    * @return the audio tracks
    */
   Iterator<Audio> audioContent();
 
   /**
    * Adds video content to the catalog.
-   * 
+   *
    * @param id
    *          the video track id
    * @param time
@@ -102,7 +102,7 @@ public interface Mpeg7 {
 
   /**
    * Removes the video content with the specified id.
-   * 
+   *
    * @param id
    *          the content id
    */
@@ -110,21 +110,21 @@ public interface Mpeg7 {
 
   /**
    * Returns <code>true</code> if the catalog contains multimedia content of type <code>VideoType</code>.
-   * 
+   *
    * @return <code>true</code> if video content is contained
    */
   boolean hasVideoContent();
 
   /**
    * Returns an iteration of the tracks of type <code>Video</code>.
-   * 
+   *
    * @return the video tracks
    */
   Iterator<Video> videoContent();
 
   /**
    * Adds audiovisual content to the catalog.
-   * 
+   *
    * @param id
    *          the track id
    * @param time
@@ -136,7 +136,7 @@ public interface Mpeg7 {
 
   /**
    * Removes the audiovisual content with the specified id.
-   * 
+   *
    * @param id
    *          the content id
    */
@@ -144,21 +144,21 @@ public interface Mpeg7 {
 
   /**
    * Returns <code>true</code> if the catalog contains multimedia content of type <code>AudioVisualType</code>.
-   * 
+   *
    * @return <code>true</code> if audiovisual content is contained
    */
   boolean hasAudioVisualContent();
 
   /**
    * Returns an iteration of the tracks of type <code>AudioVisual</code>.
-   * 
+   *
    * @return the audiovisual tracks
    */
   Iterator<AudioVisual> audiovisualContent();
 
   /**
    * Returns the audio track with the given id or <code>null</code> if the track does not exist.
-   * 
+   *
    * @param id
    *          the audio track id
    * @return the audio track
@@ -167,7 +167,7 @@ public interface Mpeg7 {
 
   /**
    * Returns the video track with the given id or <code>null</code> if the track does not exist.
-   * 
+   *
    * @param id
    *          the video track id
    * @return the video track
@@ -176,7 +176,7 @@ public interface Mpeg7 {
 
   /**
    * Returns the audiovisual track with the given id or <code>null</code> if the track does not exist.
-   * 
+   *
    * @param id
    *          the track id
    * @return the track

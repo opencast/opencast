@@ -29,31 +29,31 @@ public class AdminResources {
   public static HttpResponse recordingsInactive(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "recordings/inactive"));
   }
-  
+
   public static HttpResponse recordingsUpcoming(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "recordings/upcoming"));
   }
-  
+
   public static HttpResponse recordingsCapturing(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "recordings/capturing"));
   }
-  
+
   public static HttpResponse recordingsProcessing(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "recordings/capturing"));
   }
-  
+
   public static HttpResponse recordingsFinished(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "recordings/finished"));
   }
-  
+
   public static HttpResponse recordingsErrors(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "recordings/errors"));
   }
-  
+
   public static HttpResponse countRecordings(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "countRecordings"));
   }
-  
+
   private static final String getServiceUrl() {
     return Main.getBaseUrl() + "/admin/";
   }

@@ -23,56 +23,56 @@ public interface MediaSegment {
 
   /**
    * Get the segment number.
-   * 
+   *
    * @return The number.
    */
   int getIndex();
 
   /**
    * Get the segment time.
-   * 
+   *
    * @return The time.
    */
   long getTime();
 
   /**
    * Get the segment duration.
-   * 
+   *
    * @return The duration.
    */
   long getDuration();
 
   /**
    * Get the image url.
-   * 
+   *
    * @return the image
    */
   String getImageUrl();
 
   /**
    * Get the segment text.
-   * 
+   *
    * @return The text.
    */
   String getText();
 
   /**
    * Get the 'segment is a hit' flag.
-   * 
+   *
    * @return The flag.
    */
   boolean isHit();
 
   /**
    * Get the segment relevance.
-   * 
+   *
    * @return The relevance.
    */
   int getRelevance();
 
   /**
    * Adds a preview url.
-   * 
+   *
    * @param url
    *          url to the preview image
    * @param reference

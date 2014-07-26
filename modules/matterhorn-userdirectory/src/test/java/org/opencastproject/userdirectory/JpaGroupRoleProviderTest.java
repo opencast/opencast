@@ -206,7 +206,7 @@ public class JpaGroupRoleProviderTest {
 
     Assert.assertEquals(4, IteratorUtils.toList(provider.findRoles("%PrIn%", 0, 0)).size());
     Assert.assertEquals(1, IteratorUtils.toList(provider.findRoles("%PrIn%", 0, 1)).size());
-    Role role = provider.findRoles("%PrIn%", 3, 0).next();
+    Role role = provider.findRoles("%24%SPrIn%", 0, 0).next();
     Assert.assertEquals("ROLE_ASTRO_124_SPRING_2012_STUDENT", role.getName());
 
     Assert.assertEquals(6, IteratorUtils.toList(provider.findRoles("%oLe%", 0, 0)).size());

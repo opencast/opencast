@@ -86,7 +86,7 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactListener#canHandle(java.io.File)
    */
   @Override
@@ -96,7 +96,7 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   @Override
@@ -131,7 +131,7 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#uninstall(java.io.File)
    */
   @Override
@@ -147,7 +147,7 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#update(java.io.File)
    */
   @Override
@@ -157,7 +157,7 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
 
   /**
    * Sets the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */

@@ -55,7 +55,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
 
   /**
    * Creates a new selector that will restrict the result of <code>select()</code> to the given flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -65,7 +65,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
 
   /**
    * Creates a new selector that will restrict the result of <code>select()</code> to the given flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -75,7 +75,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
 
   /**
    * Specifies an explicit audio flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -89,7 +89,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
 
   /**
    * Specifies an explicit audio flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -102,7 +102,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
   /**
    * If set to <code>true</code>, this selector requires an audio track to be part of the result set, or a video track
    * containing at least one audio stream.
-   * 
+   *
    * @param require
    *          <code>true</code> to require an audio track
    */
@@ -112,7 +112,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
 
   /**
    * If set to <code>true</code>, this selector requires a video track to be part of the result set.
-   * 
+   *
    * @param require
    *          <code>true</code> to require a video track
    */
@@ -122,7 +122,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
 
   /**
    * Returns the explicit audio flavor or <code>null</code> if none was specified.
-   * 
+   *
    * @return the audio flavor
    */
   public MediaPackageElementFlavor getAudioFlavor() {
@@ -131,7 +131,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
 
   /**
    * Specifies an explicit video flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -145,7 +145,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
 
   /**
    * Specifies an explicit video flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -157,7 +157,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
 
   /**
    * Returns the explicit video flavor or <code>null</code> if none was specified.
-   * 
+   *
    * @return the video flavor
    */
   public MediaPackageElementFlavor getVideoFlavor() {
@@ -167,7 +167,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
   /**
    * Returns the audio track that has been selected by a call to {@link #select(MediaPackage, boolean)}, which might be
    * <code>null</code> if no audio is required or available.
-   * 
+   *
    * @return the audio track
    */
   public Track getAudioTrack() {
@@ -177,7 +177,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
   /**
    * Returns the video track that has been selected by a call to {@link #select(MediaPackage, boolean)}, which might be
    * <code>null</code> if no video is required or available.
-   * 
+   *
    * @return the video track
    */
   public Track getVideoTrack() {
@@ -187,7 +187,7 @@ public class AudioVisualElementSelector extends AbstractMediaPackageElementSelec
   /**
    * Returns a track or a number of tracks from the media package that together contain audio and video. If no such
    * combination can be found, e. g. there is no audio or video at all, an empty array is returned.
-   * 
+   *
    * @see org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage, boolean)
    */
   @Override

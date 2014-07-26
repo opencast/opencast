@@ -37,7 +37,7 @@ public class TimeImpl implements Time {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.Time#getHours()
    */
   @Override
@@ -47,7 +47,7 @@ public class TimeImpl implements Time {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.Time#getMinutes()
    */
   @Override
@@ -57,7 +57,7 @@ public class TimeImpl implements Time {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.Time#getSeconds()
    */
   @Override
@@ -67,7 +67,7 @@ public class TimeImpl implements Time {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.Time#getMilliseconds()
    */
   @Override
@@ -77,7 +77,7 @@ public class TimeImpl implements Time {
 
   /**
    * Checks if hours are inside the boundaries (between 0 and 99 hours).
-   * 
+   *
    * @param h
    *          number of hours
    * @throws IllegalTimeFormatException
@@ -91,7 +91,7 @@ public class TimeImpl implements Time {
 
   /**
    * Checks if minutes are inside the boundaries (between 0 and 59).
-   * 
+   *
    * @param m
    *          number of minutes
    * @throws IllegalTimeFormatException
@@ -105,7 +105,7 @@ public class TimeImpl implements Time {
 
   /**
    * Checks if seconds are inside the boundaries (between 0 and 59).
-   * 
+   *
    * @param s
    *          number of seconds
    * @throws IllegalTimeFormatException
@@ -119,7 +119,7 @@ public class TimeImpl implements Time {
 
   /**
    * Checks if milliseconds are inside the boundaries (between 0 and 999).
-   * 
+   *
    * @param ms
    *          number of milliseconds
    * @throws IllegalTimeFormatException
@@ -141,7 +141,7 @@ public class TimeImpl implements Time {
 
   /**
    * Helper function that converts time to milliseconds. Used for time comparing.
-   * 
+   *
    * @param time
    *          to be converted
    * @return milliseconds

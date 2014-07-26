@@ -26,7 +26,7 @@ ocRecordings = new (function() {
     q : 'Any fields',
     title : 'Title',
     creator : 'Presenter',
-    seriestitle : 'Course/Series',
+    seriesTitle : 'Course/Series',
   },
   {
     contributor : 'Contributor',
@@ -390,6 +390,7 @@ ocRecordings = new (function() {
       stats.processing += parseInt(definition.running);
       stats.finished += parseInt(definition.finished);
       stats.ignored += parseInt(definition.stopped);
+      stats.hold += parseInt(definition.paused);
       stats.failed += parseInt(definition.failed) + parseInt(definition.failing);
     }
   }
@@ -758,22 +759,30 @@ ocRecordings = new (function() {
 
   this.findFirstOperation = function(workflow, state) {
     var out = false;
-    for (var i in ocUtils.ensureArray(workflow.operations.operation)) {
-      if (workflow.operations.operation[i].state == state) {
-        out = workflow.operations.operation[i];
-        break;
-      }
+    if (workflow.operations == undefined || workflow.operations.operation == undefined) {
+      ocUtils.log('Warning: no operations found for workflow id = ' + workflow.id );
+    } else {
+      $.each(ocUtils.ensureArray(workflow.operations.operation), function(index, operation) {
+        if (operation.state == state) {
+          out = operation;
+          return false; //only want first
+        }
+      });
     }
     return out;
   }
 
   this.findLastOperation = function(workflow, state) {
     var out = false;
-    $.each(ocUtils.ensureArray(workflow.operations.operation), function(index, operation) {
-      if (operation.state == state) {
-        out = operation;
-      }
-    });
+    if (workflow.operations == undefined || workflow.operations.operation == undefined) {
+      ocUtils.log('Warning: no operations found for workflow id = ' + workflow.id );
+    } else {
+      $.each(ocUtils.ensureArray(workflow.operations.operation), function(index, operation) {
+        if (operation.state == state) {
+          out = operation;
+        }
+      });
+    }
     return out;
   }
 
@@ -1126,14 +1135,14 @@ ocRecordings = new (function() {
     callback(source);
   }
   
-  this.removeRecording = function(id, title) {
-    if(confirm('Are you sure you wish to delete ' + title + '?')){
+  this.removeRecording = function(id) {
+    if(confirm('Are you sure you wish to delete this recording?')){
       $.ajax({
         url: '/recordings/' + id,
         type: 'DELETE',
         dataType: 'text',
         error: function(XHR,status,e){
-          alert('Could not remove Recording ' + title);
+          alert('Could not remove recording');
         },
         success: function(){
           ocRecordings.reload();
@@ -1571,7 +1580,7 @@ ocRecordings = new (function() {
         }
 
       } else if (action == 'delete') {
-        links.push('<a href="javascript:ocRecordings.removeRecording(\'' + id + '\',\'' + recording.title + '\')">Delete</a>');
+        links.push('<a href="javascript:ocRecordings.removeRecording(\'' + id + '\')">Delete</a>');
         
       } else if (action == 'unpublish') {
         links.push('<a href="javascript:ocRecordings.unpublishRecording(\'' + id + '\')">Unpublish</a>');

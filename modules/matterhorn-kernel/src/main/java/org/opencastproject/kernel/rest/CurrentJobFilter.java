@@ -48,7 +48,7 @@ public class CurrentJobFilter implements Filter {
 
   /**
    * Sets the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the serviceRegistry to set
    */
@@ -58,7 +58,7 @@ public class CurrentJobFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
    */
   @Override
@@ -67,7 +67,7 @@ public class CurrentJobFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
    *      javax.servlet.FilterChain)
    */
@@ -86,7 +86,7 @@ public class CurrentJobFilter implements Filter {
 
   /**
    * Sets the current job on the new thread
-   * 
+   *
    * @param httpRequest
    *          the HTTP request
    * @param httpResponse
@@ -110,7 +110,7 @@ public class CurrentJobFilter implements Filter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.Filter#destroy()
    */
   @Override

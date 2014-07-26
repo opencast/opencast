@@ -70,7 +70,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowDefinition#getId()
    */
   public String getId() {
@@ -79,7 +79,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowDefinition#setId(java.lang.String)
    */
   public void setId(String id) {
@@ -88,7 +88,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowDefinition#getDescription()
    */
   public String getDescription() {
@@ -97,7 +97,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowDefinition#setDescription(java.lang.String)
    */
   public void setDescription(String description) {
@@ -106,7 +106,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * Sets the configuration panel for this workflow.
-   * 
+   *
    * @param panelXML
    *          the xml for the configuration panel
    */
@@ -116,7 +116,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowDefinition#getConfigurationPanel()
    */
   public String getConfigurationPanel() {
@@ -125,7 +125,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowDefinition#getOperations()
    */
   public List<WorkflowOperationDefinition> getOperations() {
@@ -136,7 +136,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowDefinition#get(int)
    */
   @Override
@@ -150,7 +150,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowDefinition#add(org.opencastproject.workflow.api.WorkflowOperationDefinition)
    */
   @Override
@@ -162,7 +162,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowDefinition#add(org.opencastproject.workflow.api.WorkflowOperationDefinition,
    *      int)
    */
@@ -184,7 +184,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowDefinition#remove(int)
    */
   @Override
@@ -259,7 +259,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    * Since we are posting workflow definitions as one post parameter in a multi-parameter post, we can not rely on
    * "automatic" JAXB deserialization. We therefore need to provide a static valueOf(String) method to transform an XML
    * string into a WorkflowDefinition.
-   * 
+   *
    * @param xmlString
    *          The xml describing the workflow
    * @return A {@link WorkflowDefinitionImpl} instance based on xmlString
@@ -312,7 +312,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   public String toString() {

@@ -36,9 +36,9 @@ import java.util.zip.Deflater;
  * to overcome this inconvenience. TrueZip also. However, it seems file-roller (and probably others) doesn't "understand" how to restore the
  * original filenames and shows strange (and un-readable) characters in the unzipped filenames
  * However, the inverse process (unzipping zip archives made with file-roller and containing files with special characters) seems to work fine
- * 
+ *
  * N.B. By "special characters" I mean those not present in the original ASCII specification, such as accents, special letters, etc
- * 
+ *
  * ruben.perez
  */
 
@@ -60,7 +60,7 @@ public final class ZipUtil {
 
   /**
    * Utility class to ease the process of umounting a zip file
-   * 
+   *
    * @param zipFile
    *          The file to umount
    * @throws IOException
@@ -83,7 +83,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive
-   * 
+   *
    * @param files
    *          A {@link java.io.File} array with the files to include in the root of the archive
    * @param destination
@@ -195,7 +195,7 @@ public final class ZipUtil {
 
   /**
    * Extracts a zip file to a directory.
-   * 
+   *
    * @param zipFile
    *          A {@link String} with the path to the source zip archive
    * @param destination
@@ -277,7 +277,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (no recursive, default compression)
-   * 
+   *
    * @param sourceFiles
    *          A {@link String} array with the file names to be included in the root of the archive
    * @param destination
@@ -292,7 +292,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (no recursive)
-   * 
+   *
    * @param sourceFiles
    *          A {@link String} array with the file names to be included in the root of the archive
    * @param destination
@@ -309,7 +309,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (default compression)
-   * 
+   *
    * @param sourceFiles
    *          A {@link String} array with the file names to be included in the root of the archive
    * @param destination
@@ -326,7 +326,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive
-   * 
+   *
    * @param sourceFiles
    *          A {@link String} array with the file names to be included in the root of the archive
    * @param destination
@@ -375,7 +375,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (no recursive, default compression)
-   * 
+   *
    * @param sourceFiles
    *          A {@link String} array with the file names to be included in the root of the archive
    * @param destination
@@ -390,7 +390,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (no recursive)
-   * 
+   *
    * @param sourceFiles
    *          A {@link String} array with the file names to be included in the root of the archive
    * @param destination
@@ -407,7 +407,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (default compression)
-   * 
+   *
    * @param sourceFiles
    *          A {@link String} array with the file names to be included in the root of the archive
    * @param destination
@@ -424,7 +424,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive
-   * 
+   *
    * @param sourceFiles
    *          A {@link String} array with the file names to be included in the root of the archive
    * @param destination
@@ -463,7 +463,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (no recursive, default compression)
-   * 
+   *
    * @param sourceFiles
    *          A {@link java.io.File} array with the file names to be included in the root of the archive
    * @param destination
@@ -478,7 +478,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (no recursive)
-   * 
+   *
    * @param sourceFiles
    *          A {@link java.io.File} array with the file names to be included in the root of the archive
    * @param destination
@@ -495,7 +495,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (default compression)
-   * 
+   *
    * @param sourceFiles
    *          A {@link java.io.File} array with the file names to be included in the root of the archive
    * @param destination
@@ -513,7 +513,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive
-   * 
+   *
    * @param sourceFiles
    *          A {@link java.io.File} array with the file names to be included in the root of the archive
    * @param destination
@@ -545,7 +545,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (no recursive, default compression)
-   * 
+   *
    * @param sourceFiles
    *          A {@link java.io.File} array with the file names to be included in the root of the archive
    * @param destination
@@ -560,7 +560,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (default compression)
-   * 
+   *
    * @param sourceFiles
    *          A {@link java.io.File} array with the file names to be included in the root of the archive
    * @param destination
@@ -578,7 +578,7 @@ public final class ZipUtil {
 
   /**
    * Compresses source files into a zip archive (no recursive)
-   * 
+   *
    * @param sourceFiles
    *          A {@link java.io.File} array with the file names to be included in the root of the archive
    * @param destination
@@ -595,7 +595,7 @@ public final class ZipUtil {
 
   /**
    * Extracts a zip file to a directory.
-   * 
+   *
    * @param zipFile
    *          A {@link String} with the path to the source zip archive
    * @param destination
@@ -633,7 +633,7 @@ public final class ZipUtil {
 
   /**
    * Extracts a zip file to a directory.
-   * 
+   *
    * @param zipFile
    *          A {@link java.io.File} with the path to the source zip archive
    * @param destination
@@ -660,7 +660,7 @@ public final class ZipUtil {
 
   /**
    * Extracts a zip file to a directory.
-   * 
+   *
    * @param zipFile
    *          A {@link String} with the path to the source zip archive
    * @param destination

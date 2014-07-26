@@ -85,7 +85,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#getIdentifier()
    */
   public String getIdentifier() {
@@ -94,7 +94,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#getName()
    */
   public String getName() {
@@ -104,7 +104,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#getDescription()
    */
   public String getDescription() {
@@ -118,7 +118,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#loadFeedData(org.opencastproject.feed.api.Feed.Type,
    *      java.lang.String[], int, int)
    */
@@ -132,7 +132,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedService#initialize(java.util.Properties)
    */
   @Override
@@ -145,7 +145,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
   /**
    * Find if a series exists in the seriesService and return it's dublinCore as a search result. This call should be
    * used when searchService returns null as a series may exist but not have had any episodes yet published.
-   * 
+   *
    * @param id
    *          the series to lookup
    * @return search result, null if series not found

@@ -35,9 +35,9 @@ import java.util.List;
 
 /**
  * A sample OAuth consumer details service, hard coded to authenticate a consumer with the following information:
- * 
+ *
  * <li>key=consumerkey <li>name=consumername <li>secret=consumersecret
- * 
+ *
  * A UserDetailsService must be provided for delegating user lookup requests.
  */
 public class OAuthSingleConsumerDetailsService implements ConsumerDetailsService, UserDetailsService {
@@ -53,7 +53,7 @@ public class OAuthSingleConsumerDetailsService implements ConsumerDetailsService
 
   /**
    * Full constructor that accepts all the consumer details
-   * 
+   *
    * @param delegate
    *          the user detail service to handle user lookups
    * @param consumerKey
@@ -71,7 +71,7 @@ public class OAuthSingleConsumerDetailsService implements ConsumerDetailsService
 
   /**
    * Creates a spring security consumer details object, suitable to achieve two-legged OAuth.
-   * 
+   *
    * @param consumerKey
    *          the consumer key
    * @param consumerName

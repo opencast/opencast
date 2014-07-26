@@ -33,7 +33,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
   /**
    * OSGi callback on component activation.
-   * 
+   *
    * @param ctx
    *          the bundle context
    */

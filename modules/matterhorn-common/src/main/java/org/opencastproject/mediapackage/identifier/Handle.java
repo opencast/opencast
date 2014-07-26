@@ -32,14 +32,14 @@ public interface Handle extends Id {
 
   /**
    * Returns the naming authority (or prefix) for the handle.
-   * 
+   *
    * @return the naming authority
    */
   String getNamingAuthority();
 
   /**
    * Returs the handle local name.
-   * 
+   *
    * @return the handle local name
    */
   String getLocalName();
@@ -53,7 +53,7 @@ public interface Handle extends Id {
   /**
    * Resolves this handle to the target url by using the configured handle server. If the server cannot be reached, or
    * resolving fails, a {@link HandleException} is thrown.
-   * 
+   *
    * @return the handle target
    */
   URL resolve() throws HandleException;

@@ -23,14 +23,14 @@ import java.util.Map;
 /**
  * Interface for tools that analyze media files.
  * Implement this and register it as a factory service.
- * 
+ *
  * MediaAnalyzers are not guaranteed to be thread safe.
  */
 public interface MediaAnalyzer {
 
   /**
    * Analyze a media file and return the metadata that is found
-   * 
+   *
    * @param media any media file
    * @return the metadata that is found
    * @throws MediaAnalyzerException if the analyzer fails

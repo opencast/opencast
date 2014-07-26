@@ -15,21 +15,16 @@
  */
 package org.opencastproject.security.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import org.apache.commons.io.IOUtils;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Before;
-import org.junit.Test;
-
+import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.transform.stream.StreamSource;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Tests JAXB un/marshalling of the user
@@ -49,7 +44,7 @@ public class UserParsingTest {
 
   @Test
   public void testMarshalUser() throws Exception {
-    StringWriter writer = new StringWriter();
+    StringWriter writer  = new StringWriter();
 
     Set<JaxbRole> roles = new HashSet<JaxbRole>();
     roles.add(new JaxbRole("ROLE_COURSE_ADMIN", ORGANIZATION));
@@ -59,9 +54,13 @@ public class UserParsingTest {
     JaxbUser user = new JaxbUser("admin", "123456", ORGANIZATION, roles);
     jaxbContext.createMarshaller().marshal(user, writer);
 
-    String expectedOutput = IOUtils.toString(getClass().getResourceAsStream(USER_XML_FILE), "UTF-8");
+    StreamSource streamSource = new StreamSource(getClass().getResourceAsStream(USER_XML_FILE));
+    JaxbUser userFromFile = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbUser.class).getValue();
 
-    assertTrue("User XML not formed as expected", XMLUnit.compareXML(expectedOutput, writer.toString()).identical());
+    streamSource = new StreamSource(new ByteArrayInputStream(writer.toString().getBytes()));
+    JaxbUser userFromXML = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbUser.class).getValue();
+
+    assertEquals(userFromXML, userFromFile);
   }
 
   @Test

@@ -43,7 +43,7 @@ public final class ComponentsJsonParser {
 
   /**
    * Main method
-   * 
+   *
    * @param args
    *          a string array containing the program args. The first arg should be the file path to the json.
    */

@@ -35,7 +35,7 @@ import java.util.Properties;
 
 /**
  * Tests persistent storage.
- * 
+ *
  */
 public class SchedulerServiceDatabaseImplTest {
 

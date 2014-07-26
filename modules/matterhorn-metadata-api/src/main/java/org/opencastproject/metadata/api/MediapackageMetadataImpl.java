@@ -34,7 +34,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageMetadata#getTitle()
    */
   public String getTitle() {
@@ -43,7 +43,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * Sets the media package's title.
-   * 
+   *
    * @param title
    *          the title
    */
@@ -53,7 +53,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageMetadata#getSeriesTitle()
    */
   public String getSeriesTitle() {
@@ -62,7 +62,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * Sets the series title.
-   * 
+   *
    * @param seriesTitle
    *          the series title
    */
@@ -72,7 +72,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageMetadata#getSeriesIdentifier()
    */
   public String getSeriesIdentifier() {
@@ -81,7 +81,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * Sets the series identifier
-   * 
+   *
    * @param seriesIdentifier
    *          the series identifier
    */
@@ -91,7 +91,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageMetadata#getCreators()
    */
   public String[] getCreators() {
@@ -102,7 +102,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * Sets the list of creators.
-   * 
+   *
    * @param creators
    *          the creators
    */
@@ -118,7 +118,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * Sets the mediapackage's contributors.
-   * 
+   *
    * @param contributors
    *          the contributors
    */
@@ -128,7 +128,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageMetadata#getSubjects()
    */
   public String[] getSubjects() {
@@ -139,7 +139,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * Sets the mediapackage's subjects.
-   * 
+   *
    * @param subjects
    *          the subjects
    */
@@ -149,7 +149,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageMetadata#getLanguage()
    */
   public String getLanguage() {
@@ -158,7 +158,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * Sets the mediapackage's language.
-   * 
+   *
    * @param language
    *          the language
    */
@@ -168,7 +168,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageMetadata#getLicense()
    */
   public String getLicense() {
@@ -177,7 +177,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * Sets the mediapackage license.
-   * 
+   *
    * @param license
    *          the license
    */
@@ -187,7 +187,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageMetadata#getDate()
    */
   public Date getDate() {
@@ -196,7 +196,7 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * Sets the mediapackage's creation date.
-   * 
+   *
    * @param date
    *          the creation date
    */

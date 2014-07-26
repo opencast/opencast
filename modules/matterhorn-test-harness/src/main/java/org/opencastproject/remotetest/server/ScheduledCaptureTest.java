@@ -47,9 +47,9 @@ import javax.xml.xpath.XPathConstants;
 
 /**
  * Integration test for scheduled capture
- * 
+ *
  * @author jamiehodge
- * 
+ *
  */
 
 public class ScheduledCaptureTest {

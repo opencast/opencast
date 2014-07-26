@@ -27,7 +27,7 @@ public class ServiceUnavailableException extends Exception {
 
   /**
    * Creates an exception with an error message.
-   * 
+   *
    * @param message
    *          the error message
    */
@@ -37,7 +37,7 @@ public class ServiceUnavailableException extends Exception {
 
   /**
    * Creates an exception with a cause.
-   * 
+   *
    * @param cause
    *          the original cause for failure
    */
@@ -47,7 +47,7 @@ public class ServiceUnavailableException extends Exception {
 
   /**
    * Creates an exception with an error message and a cause.
-   * 
+   *
    * @param message
    *          the error message
    * @param cause

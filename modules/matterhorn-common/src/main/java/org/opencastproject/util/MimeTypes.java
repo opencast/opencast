@@ -182,7 +182,7 @@ public final class MimeTypes {
    * For example, if the suffix is <code>mj2</code>, the mime type will be that of a ISO Motion JPEG 2000 document.
    * <p>
    * If no mime type is found for the suffix, a <code>UnknownFileTypeException</code> is thrown.
-   * 
+   *
    * @param suffix
    *          the file suffix
    * @return the corresponding mime type
@@ -206,7 +206,7 @@ public final class MimeTypes {
    * <p>
    * If no mime type can be derived from either the file name or its contents, a <code>UnknownFileTypeException</code>
    * is thrown.
-   * 
+   *
    * @param url
    *          the file
    * @return the corresponding mime type
@@ -226,7 +226,7 @@ public final class MimeTypes {
    * <p>
    * If no mime type can be derived from either the file name or its contents, a <code>UnknownFileTypeException</code>
    * is thrown.
-   * 
+   *
    * @param uri
    *          the file
    * @return the corresponding mime type
@@ -246,7 +246,7 @@ public final class MimeTypes {
    * <p>
    * If no mime type can be derived from either the file name or its contents, a <code>UnknownFileTypeException</code>
    * is thrown.
-   * 
+   *
    * @param name
    *          the file
    * @return the corresponding mime type
@@ -311,7 +311,7 @@ public final class MimeTypes {
 
     /**
      * Creates a new mime type reader.
-     * 
+     *
      * @param registry
      *          the registry
      */
@@ -327,7 +327,7 @@ public final class MimeTypes {
 
     /**
      * Returns the element content.
-     * 
+     *
      * @return the element content
      */
     private String getContent() {

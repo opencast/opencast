@@ -52,7 +52,7 @@ import java.util.Map;
 
 /**
  * Tests persistence: storing, merging, retrieving and removing.
- * 
+ *
  */
 public class SeriesServicePersistenceTest {
 

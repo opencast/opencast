@@ -36,7 +36,7 @@ public class SearchResources {
   private static final String getServiceUrl() {
     return Main.getBaseUrl() + "/search/";
   }
-  
+
   public static HttpResponse add(TrustedHttpClient client, String mediapackage) throws Exception {
     HttpPost post = new HttpPost(getServiceUrl() + "add");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -44,16 +44,16 @@ public class SearchResources {
     post.setEntity(new UrlEncodedFormEntity(params));
     return client.execute(post);
   }
-  
+
   // TODO add remaining query parameters (episode and series)
   public static HttpResponse episode(TrustedHttpClient client, String id) throws Exception {
     return client.execute(new HttpGet(getServiceUrl() + "episode?id=" + id));
   }
-  
+
   public static HttpResponse all(TrustedHttpClient client, String q) throws Exception {
     return client.execute(new HttpGet(getServiceUrl() + "episode?q=" + q));
   }
-  
+
   public static HttpResponse series(TrustedHttpClient client, String id) throws Exception {
     return client.execute(new HttpGet(getServiceUrl() + "series?id=" + id));
   }

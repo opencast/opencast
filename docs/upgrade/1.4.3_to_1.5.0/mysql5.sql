@@ -1,5 +1,7 @@
 ALTER TABLE mh_user rename to mh_user_tmp;
 ALTER TABLE mh_role rename to mh_role_tmp;
+ALTER TABLE mh_role_tmp drop foreign key FK_mh_role_organization; 
+ALTER TABLE mh_user_tmp drop foreign key FK_mh_user_organization;
 
 CREATE TABLE mh_role (
   id bigint(20) NOT NULL,
@@ -141,3 +143,6 @@ CREATE TABLE mh_user_ref_role (
 
 -- Change type of field 'payload' in table 'mh_job' from TEXT to MEDIUMTEXT, see MH-10139
 ALTER TABLE mh_job MODIFY COLUMN payload MEDIUMTEXT;
+
+-- Create additional index on table mh_job for better performance in job statistics query, see MH-8638
+CREATE INDEX IX_mh_job_statistics ON mh_job (processor_service, status, queue_time, run_time); 

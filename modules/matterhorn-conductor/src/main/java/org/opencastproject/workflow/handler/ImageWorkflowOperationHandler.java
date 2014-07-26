@@ -81,7 +81,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param composerService
    *          the composer service
    */
@@ -92,7 +92,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -102,7 +102,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -112,7 +112,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -132,7 +132,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /**
    * Encode tracks from MediaPackage using profiles stored in properties and updates current MediaPackage.
-   * 
+   *
    * @param mediaPackage
    * @param properties
    * @return the operation result

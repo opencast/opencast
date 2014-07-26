@@ -127,7 +127,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationDefinition#getExceptionHandlingWorkflow()
    */
   public String getExceptionHandlingWorkflow() {
@@ -140,7 +140,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationDefinition#isFailWorkflowOnException()
    */
   public boolean isFailWorkflowOnException() {
@@ -166,7 +166,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getConfiguration(java.lang.String)
    */
   public String getConfiguration(String key) {
@@ -181,7 +181,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#removeConfiguration(java.lang.String)
    */
   public void removeConfiguration(String key) {
@@ -198,7 +198,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#setConfiguration(java.lang.String, java.lang.String)
    */
   public void setConfiguration(String key, String value) {
@@ -216,7 +216,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationDefinition#getConfigurationKeys()
    */
   @Override
@@ -231,9 +231,9 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationDefinition#getRetryStrategy()
    */
   @Override
@@ -251,7 +251,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationDefinition#getMaxAttempts()
    */
   @Override
@@ -269,7 +269,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

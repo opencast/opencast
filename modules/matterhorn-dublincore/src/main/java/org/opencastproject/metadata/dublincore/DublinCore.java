@@ -334,7 +334,7 @@ public interface DublinCore {
 
   /**
    * Get all values of a property, either in a certain language or in all contained languages.
-   * 
+   *
    * @param property
    *          the property qname
    * @param language
@@ -345,7 +345,7 @@ public interface DublinCore {
 
   /**
    * Get all values of a property no matter what language they have.
-   * 
+   *
    * @param property
    *          the property qname
    * @return a list of values
@@ -363,7 +363,7 @@ public interface DublinCore {
    * <p/>
    * Please note, that if you pass {@link #LANGUAGE_ANY}, values with an {@link #LANGUAGE_UNDEFINED undefined language}
    * are returned preferably.
-   * 
+   *
    * @param property
    *          the property qname
    * @param language
@@ -376,7 +376,7 @@ public interface DublinCore {
    * Get the first value of a property, no matter what language it is in. Like a call of
    * {@link #getFirst(EName, String)} with <code>language = {@link #LANGUAGE_ANY}</code>. Please not that values with an {@link #LANGUAGE_UNDEFINED undefined
    * language} are returned preferably.
-   * 
+   *
    * @param property
    *          the property qname
    * @return the value or null
@@ -386,7 +386,7 @@ public interface DublinCore {
 
   /**
    * Return all values separated by a delimiter.
-   * 
+   *
    * @param property
    *          the property qname
    * @param language
@@ -399,7 +399,7 @@ public interface DublinCore {
 
   /**
    * Return all languages this property has values in.
-   * 
+   *
    * @param property
    *          the property qname
    * @return a set of languages which may be empty in case the property does not have any value. Note that the state of
@@ -409,7 +409,7 @@ public interface DublinCore {
 
   /**
    * Check, if a property has multiple values assigned.
-   * 
+   *
    * @param property
    *          the property qname
    * @param language
@@ -419,7 +419,7 @@ public interface DublinCore {
 
   /**
    * Check if a property has multiple values, ignoring any language information.
-   * 
+   *
    * @param property
    *          the property qname
    */
@@ -427,7 +427,7 @@ public interface DublinCore {
 
   /**
    * Check if a property has at least one value assigned.
-   * 
+   *
    * @param property
    *          the property qname
    * @param language
@@ -438,7 +438,7 @@ public interface DublinCore {
   /**
    * Check if a property has at least on value without language information assigned. Like a call of
    * {@link #hasValue(EName)} with <code>language = {@link #LANGUAGE_ANY}</code>
-   * 
+   *
    * @param property
    *          the property qname
    */
@@ -448,7 +448,7 @@ public interface DublinCore {
    * Set a property to the given value, overwriting an existing value in the given language.
    * <p/>
    * Please note that it is not allowed to pass {@link #LANGUAGE_ANY} as <code>language</code>.
-   * 
+   *
    * @param property
    *          the property qname
    * @param value
@@ -461,7 +461,7 @@ public interface DublinCore {
   /**
    * Set a value without language information to a property, overwriting an existing value. This is like calling
    * {@link #set(EName, String, String)} with <code>language = {@link #LANGUAGE_UNDEFINED}</code>
-   * 
+   *
    * @param property
    *          the property qname
    * @param value
@@ -471,7 +471,7 @@ public interface DublinCore {
 
   /**
    * Set a property to a value, overwriting an existing value.
-   * 
+   *
    * @param property
    *          the property qname
    * @param value
@@ -481,7 +481,7 @@ public interface DublinCore {
 
   /**
    * Set a property to a list of values, overwriting any existing.
-   * 
+   *
    * @param property
    *          the property name
    * @param values
@@ -493,7 +493,7 @@ public interface DublinCore {
    * Add a value to a property.
    * <p/>
    * Please note that it is not allowed to pass {@link #LANGUAGE_ANY} as <code>language</code>.
-   * 
+   *
    * @param property
    *          the property qname
    * @param value
@@ -506,7 +506,7 @@ public interface DublinCore {
   /**
    * Add a value without language information to a property. This is like calling {@link #add(EName, String, String)}
    * with <code>language = {@link #LANGUAGE_UNDEFINED}</code>
-   * 
+   *
    * @param property
    *          the property qname
    * @param value
@@ -516,7 +516,7 @@ public interface DublinCore {
 
   /**
    * Add a value to a property.
-   * 
+   *
    * @param property
    *          the property qname
    * @param value
@@ -531,7 +531,7 @@ public interface DublinCore {
    * <li> {@link #LANGUAGE_UNDEFINED}: remove only values with no language information
    * <li>language code: remove values of that language
    * </ul>
-   * 
+   *
    * @param property
    *          the property qname
    * @param language
@@ -541,7 +541,7 @@ public interface DublinCore {
 
   /**
    * Remove a complete property.
-   * 
+   *
    * @param property
    *          the property qname
    */
@@ -554,7 +554,7 @@ public interface DublinCore {
 
   /**
    * Return all supported properties.
-   * 
+   *
    * @return a set of property names
    */
   Set<EName> getProperties();
@@ -563,7 +563,7 @@ public interface DublinCore {
    * Bind a prefix to a namespace name to support proprietary metadata properties. For further information about
    * namespaces and their binding, please see <a
    * href="http://www.w3.org/TR/xml-names">http://www.w3.org/TR/xml-names</a>
-   * 
+   *
    * @param prefix
    *          the prefix
    * @param namespaceName

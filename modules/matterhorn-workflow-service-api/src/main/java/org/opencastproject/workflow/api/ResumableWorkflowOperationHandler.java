@@ -28,9 +28,9 @@ public interface ResumableWorkflowOperationHandler extends WorkflowOperationHand
    * Continues a suspended {@link WorkflowInstance}. If the execution fails for some reason, this must throw a
    * {@link WorkflowOperationException} in order to handle the problem gracefully. Runtime exceptions will cause the
    * entire workflow instance to fail.
-   * 
+   *
    * If the workflow instance is not in a suspended state, this method should throw an {@link IllegalStateException}.
-   * 
+   *
    * @param workflowInstance
    *          The workflow instance
    * @param context
@@ -47,14 +47,14 @@ public interface ResumableWorkflowOperationHandler extends WorkflowOperationHand
   /**
    * Whether this operation handler will always pause. The workflow service may give preferential dispatching to
    * operations that are guaranteed to pause.
-   * 
+   *
    * @return whether this handler always pauses
    */
   boolean isAlwaysPause();
 
   /**
    * Gets the URL for the user interface for resuming the workflow.
-   * 
+   *
    * @param workflowInstance
    *          The workflow instance
    * @return The URL for the user interface
@@ -65,7 +65,7 @@ public interface ResumableWorkflowOperationHandler extends WorkflowOperationHand
 
   /**
    * Returns the title for the link to this operations hold state UI.
-   * 
+   *
    * @return title to be displayed
    */
   String getHoldActionTitle();

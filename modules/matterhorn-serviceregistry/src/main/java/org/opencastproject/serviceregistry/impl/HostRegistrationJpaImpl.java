@@ -103,7 +103,7 @@ public class HostRegistrationJpaImpl extends JaxbHostRegistration {
 
   /**
    * Sets the primary key identifier.
-   * 
+   *
    * @param id
    *          the identifier
    */

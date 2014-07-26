@@ -88,7 +88,7 @@ import java.util.UUID;
 
 /**
  * Implementation of {@link SchedulerService}.
- * 
+ *
  */
 public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
@@ -142,7 +142,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * OSGi callback for setting Series Service.
-   * 
+   *
    * @param seriesService
    */
   public void setSeriesService(SeriesService seriesService) {
@@ -156,7 +156,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * OSGi callback for setting Workflow Service.
-   * 
+   *
    * @param workflowService
    */
   public void setWorkflowService(WorkflowService workflowService) {
@@ -165,7 +165,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * OSGi callback to set Persistence Service.
-   * 
+   *
    * @param persistence
    */
   public void setPersistence(SchedulerServiceDatabase persistence) {
@@ -174,7 +174,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * OSGi callback to set indexer.
-   * 
+   *
    * @param index
    */
   public void setIndex(SchedulerServiceIndex index) {
@@ -185,7 +185,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * Activates Scheduler Service. Checks whether we are using synchronous or asynchronous indexing. If asynchronous is
    * used, Executor service is set. If index is empty, persistent storage is queried if it contains any series. If that
    * is the case, events are retrieved and indexed.
-   * 
+   *
    * @param cc
    *          ComponentContext
    * @throws Exception
@@ -224,7 +224,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * Returns WorkflowDefinition for executing when event is created.
-   * 
+   *
    * @return {@link WorkflowDefinition}
    * @throws IllegalStateException
    *           if definition cannot be loaded
@@ -247,7 +247,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   /**
    * Starts workflow for new event. Creates {@link MediaPackage} and populates it with values from
    * {@link DublinCoreCatalog}.
-   * 
+   *
    * @param event
    *          {@link DublinCoreCatalog} associated with event
    * @param startDate
@@ -289,7 +289,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * <p>
    * This method will only allow updates to workflows that are either in the "schedule" operation or are in instantiated
    * or paused state.
-   * 
+   *
    * @param event
    *          {@link DublinCoreCatalog} of updated event
    * @param startDate
@@ -368,7 +368,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   /**
    * Populates MediaPackage with standard values from DublinCore such as: title, language, license, series id, creators,
    * contributors and subjects.
-   * 
+   *
    * @param mp
    *          {@link MediaPackage} to be updated
    * @param dc
@@ -446,7 +446,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * Adds a catalog to the working file repository.
-   * 
+   *
    * @param in
    *          the catalog's input stream
    * @param fileName
@@ -475,7 +475,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * Stops workflow with specified ID.
-   * 
+   *
    * @param eventID
    *          workflow to be stopped
    * @throws NotFoundException
@@ -498,7 +498,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @Override
@@ -508,7 +508,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.scheduler.api.SchedulerService#addEvent(org.opencastproject.metadata.dublincore.DublinCoreCatalog
    * , java.lang.String)
@@ -573,7 +573,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#addReccuringEvent(org.opencastproject.metadata.dublincore.
    * DublinCoreCatalog, java.lang.String, java.util.Date, java.util.Date, long)
    */
@@ -662,7 +662,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#updateCaptureAgentMetadata(java.lang.Long[],
    * java.util.Properties)
    */
@@ -700,7 +700,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#updateEvent(org.opencastproject.metadata.dublincore.
    * DublinCoreCatalog)
    */
@@ -809,7 +809,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
    * Given recurrence pattern and template DublinCore, DublinCores for multiple events are generated. Each event will
    * have template's title plus sequential number. Spatial property of DublinCore is set to represent time period in
    * which event will take place.
-   * 
+   *
    * @param template
    *          {@link DublinCoreCatalog} used as template
    * @return list of {@link DublinCoreCatalog}s
@@ -894,7 +894,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#removeEvent(long)
    */
   @Override
@@ -917,7 +917,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#getEventDublinCore(long)
    */
   @Override
@@ -932,7 +932,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#getEventCaptureAgentConfiguration(long)
    */
   @Override
@@ -947,7 +947,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#search(org.opencastproject.scheduler.api.SchedulerQuery)
    */
   @Override
@@ -962,7 +962,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#findConflictingEvents(java.lang.String, java.util.Date,
    * java.util.Date)
    */
@@ -981,7 +981,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#findConflictingEvents(java.lang.String, java.lang.String,
    * java.util.Date, java.util.Date, long)
    */
@@ -1037,7 +1037,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#getCalendarForCaptureAgent(java.lang.String)
    */
   @Override
@@ -1087,7 +1087,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#getScheduleLastModified(java.lang.String)
    */
   @Override
@@ -1103,7 +1103,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
 
   /**
    * Verifies if existing event is found and has not already ended
-   * 
+   *
    * @param eventId
    * @throws SchedulerException
    *           if event has ended, or NotFoundException if event it not found
@@ -1134,7 +1134,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
   /**
    * Returns current system Date. Enables date to be mocked to simulate the future and the past for testing. Reference:
    * http://neovibrant.com/2011/08/05/junit-with-new-date/
-   * 
+   *
    * @return current system date
    */
   public Date getCurrentDate() {

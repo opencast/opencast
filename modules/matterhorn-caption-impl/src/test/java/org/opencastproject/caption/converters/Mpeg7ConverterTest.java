@@ -36,7 +36,7 @@ import java.util.List;
 
 /**
  * Test class for Mpeg7 format.
- * 
+ *
  */
 public class Mpeg7ConverterTest {
 

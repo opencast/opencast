@@ -27,7 +27,7 @@ public final class AnchorOffset {
 
   /**
    * Create a new offset.
-   * 
+   *
    * @param referenceAnchor
    *          anchor point of the reference shape
    * @param referringAnchor

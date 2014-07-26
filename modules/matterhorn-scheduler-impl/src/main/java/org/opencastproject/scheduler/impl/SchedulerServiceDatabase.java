@@ -23,13 +23,13 @@ import java.util.Properties;
 /**
  * Permanent storage for events. Each event consist of {@link DublinCoreCatalog} and optionally capture agent
  * Properties. Does not support searching.
- * 
+ *
  */
 public interface SchedulerServiceDatabase {
 
   /**
    * Removes event from persistent storage.
-   * 
+   *
    * @param eventId
    *          ID of event to be removed
    * @throws NotFoundException
@@ -41,7 +41,7 @@ public interface SchedulerServiceDatabase {
 
   /**
    * Returns all events in persistent storage.
-   * 
+   *
    * @return {@link DublinCoreCatalog} array representing events
    * @throws SchedulerServiceDatabaseException
    */
@@ -49,7 +49,7 @@ public interface SchedulerServiceDatabase {
 
   /**
    * Returns CA metadata associated with specified event
-   * 
+   *
    * @param eventId
    *          event of which metadata should be returned
    * @return metadata as properties
@@ -62,7 +62,7 @@ public interface SchedulerServiceDatabase {
 
   /**
    * Store event(s).
-   * 
+   *
    * @param event
    *          {@link DublinCoreCatalog} representing event
    * @throws SchedulerServiceDatabaseException
@@ -72,7 +72,7 @@ public interface SchedulerServiceDatabase {
 
   /**
    * Updates event.
-   * 
+   *
    * @param event
    *          {@link DublinCoreCatalog} representing event to be updated
    * @throws NotFoundException
@@ -84,7 +84,7 @@ public interface SchedulerServiceDatabase {
 
   /**
    * Adds metadata to events. Event must already be created, otherwise not found exception will be fired.
-   * 
+   *
    * @param eventId
    *          ID of events for which metadata will be added
    * @param caProperties

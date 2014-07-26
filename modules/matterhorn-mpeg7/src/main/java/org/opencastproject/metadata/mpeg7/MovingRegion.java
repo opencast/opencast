@@ -19,7 +19,7 @@ import org.opencastproject.mediapackage.XmlElement;
 
 /**
  * A <code>MovingRegion</code> describes the location, the movement and contents of elements on a video segment:
- * 
+ *
  * <pre>
  * &lt;complexType name="MovingRegionType"&gt;
  *   &lt;complexContent&gt;
@@ -52,7 +52,7 @@ public interface MovingRegion extends XmlElement {
 
   /**
    * Sets the spatio temporal locator.
-   * 
+   *
    * @param locator
    *          the region locator
    */
@@ -60,7 +60,7 @@ public interface MovingRegion extends XmlElement {
 
   /**
    * Returns the spatio temporal locator.
-   * 
+   *
    * @return the locator
    */
   SpatioTemporalLocator getSpatioTemporalLocator();

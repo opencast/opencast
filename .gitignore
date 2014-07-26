@@ -2,11 +2,11 @@
 #
 
 # ignore runtime artifacts
-lib/matterhorn/
-lib/ext/
-inbox/
-logs/
-work/
+lib/matterhorn/*
+lib/ext/*
+inbox/*
+logs/*
+work/*
 
 # ignore maven target directories
 target/
@@ -18,26 +18,18 @@ target/
 .settings/
 
 # ignore NetBeans project data
-nbproject/
+*/nbproject/*
 
 # just in case.. ignore SVN subdir
-.svn/
+*/.svn/*
 
-# OS X: related files
-.DS_Store
-.AppleDouble
-.LSOverride
-Icon
-
-# OS X: Thumbnails
-._*
-
-# OS X: Files that might appear on external disk
-.Spotlight-V100
-.Trashes
 # Ignore all temporary editor files
-.*.swp
+*.swp
 
 # Ignore Maven files and local repository
 /.m2/
 /settings.xml
+
+# Ignore Makefiles
+# Sometimes they help, but they should never be tracked
+Makefile

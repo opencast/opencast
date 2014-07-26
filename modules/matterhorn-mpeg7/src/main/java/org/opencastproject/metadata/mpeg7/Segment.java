@@ -23,7 +23,7 @@ import java.util.Iterator;
 /**
  * A video segment represents a temporal decomposition of the video stream that may have properties like text
  * annotations attached to it.
- * 
+ *
  * <pre>
  * &lt;complexType name="SegmentType" abstract="true"&gt;
  *   &lt;complexContent&gt;
@@ -78,14 +78,14 @@ public interface Segment extends XmlElement {
 
   /**
    * Returns the segment identifier.
-   * 
+   *
    * @return the identifier
    */
   String getIdentifier();
 
   /**
    * Sets the segment's media time constraints.
-   * 
+   *
    * @param mediaTime
    *          the media time
    */
@@ -93,14 +93,14 @@ public interface Segment extends XmlElement {
 
   /**
    * Returns the segment's time constraints.
-   * 
+   *
    * @return the media time
    */
   MediaTime getMediaTime();
 
   /**
    * Returns <code>true</code> if the segment contains any text annotations.
-   * 
+   *
    * @return <code>true</code> if there are text annotations
    */
   boolean hasTextAnnotations();
@@ -108,14 +108,14 @@ public interface Segment extends XmlElement {
   /**
    * Returns the number of text annotations. Note that text annotations are containers themselves, containing a number
    * of keywords and free text entries.
-   * 
+   *
    * @return the number of text annotations
    */
   int getTextAnnotationCount();
 
   /**
    * Returns <code>true</code> if the segment contains text annotations in the specified language.
-   * 
+   *
    * @return <code>true</code> if there are text annotations
    */
   boolean hasTextAnnotations(String language);
@@ -123,7 +123,7 @@ public interface Segment extends XmlElement {
   /**
    * Returns <code>true</code> if the segment contains text annotations that satisfy the given relevance and confidence
    * values.
-   * 
+   *
    * @return <code>true</code> if there are text annotations
    */
   boolean hasTextAnnotations(float relevance, float confidence);
@@ -131,14 +131,14 @@ public interface Segment extends XmlElement {
   /**
    * Returns <code>true</code> if the segment contains text annotations that satisfy the given relevance, confidence and
    * language constraints.
-   * 
+   *
    * @return <code>true</code> if there are text annotations
    */
   boolean hasTextAnnotations(float relevance, float confidence, String language);
 
   /**
    * Creates a new text annotation that will hold keywords and free text comments.
-   * 
+   *
    * @param relevance
    *          the relevance value
    * @param confidence
@@ -151,21 +151,21 @@ public interface Segment extends XmlElement {
 
   /**
    * Returns this segment's text annotations.
-   * 
+   *
    * @return the text annotations
    */
   Iterator<TextAnnotation> textAnnotations();
 
   /**
    * Returns this segment's text annotations, sorted by relevance.
-   * 
+   *
    * @return the text annotations
    */
   Iterator<TextAnnotation> textAnnotationsByRelevance();
 
   /**
    * Returns this segment's text annotations, sorted by relevance.
-   * 
+   *
    * @return the text annotations
    */
   Iterator<TextAnnotation> textAnnotationsByConfidence();

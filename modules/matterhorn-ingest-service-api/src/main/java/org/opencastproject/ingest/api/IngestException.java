@@ -25,7 +25,7 @@ public class IngestException extends Exception {
 
   /**
    * Constructs an ingest exception
-   * 
+   *
    * @param message
    *          the failure message
    */
@@ -35,7 +35,7 @@ public class IngestException extends Exception {
 
   /**
    * Constructs an ingest exception
-   * 
+   *
    * @param cause
    *          the original cause
    */
@@ -45,7 +45,7 @@ public class IngestException extends Exception {
 
   /**
    * Constructs an ingest exception
-   * 
+   *
    * @param message
    *          the failure message
    * @param cause

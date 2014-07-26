@@ -30,7 +30,7 @@ public final class HorizontalCoverageLayoutSpec {
 
   /**
    * Create a new specification.
-   * 
+   *
    * @param anchorOffset
    *          The distance of the anchor points of canvas and shape. The canvas is the "reference", the shape the
    *          "referring" part of the distance object.

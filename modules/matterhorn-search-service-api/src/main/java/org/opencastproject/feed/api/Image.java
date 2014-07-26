@@ -26,14 +26,14 @@ public interface Image {
 
   /**
    * Returns the image title.
-   * 
+   *
    * @return the image title, <b>null</b> if none
    */
   String getTitle();
 
   /**
    * Sets the image title.
-   * 
+   *
    * @param title
    *          the image title to set, <b>null</b> if none
    */
@@ -41,14 +41,14 @@ public interface Image {
 
   /**
    * Returns the image URL.
-   * 
+   *
    * @return the image URL, <b>null</b> if none
    */
   String getUrl();
 
   /**
    * Sets the image URL.
-   * 
+   *
    * @param url
    *          the image URL to set, <b>null</b> if none
    */
@@ -56,14 +56,14 @@ public interface Image {
 
   /**
    * Returns the image link.
-   * 
+   *
    * @return the image link, <b>null</b> if none
    */
   String getLink();
 
   /**
    * Sets the image link.
-   * 
+   *
    * @param link
    *          the image link to set, <b>null</b> if none
    */
@@ -71,14 +71,14 @@ public interface Image {
 
   /**
    * Returns the image description.
-   * 
+   *
    * @return the image description, <b>null</b> if none
    */
   String getDescription();
 
   /**
    * Sets the image description.
-   * 
+   *
    * @param description
    *          the image description to set, <b>null</b> if none
    */

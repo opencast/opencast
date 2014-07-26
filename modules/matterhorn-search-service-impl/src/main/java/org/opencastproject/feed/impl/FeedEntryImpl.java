@@ -77,7 +77,7 @@ public class FeedEntryImpl implements FeedEntry {
 
   /**
    * Creates a new feed entry for the given feed.
-   * 
+   *
    * @param feed
    *          the containing feed
    * @param title
@@ -93,7 +93,7 @@ public class FeedEntryImpl implements FeedEntry {
 
   /**
    * Creates a new feed entry for the given feed.
-   * 
+   *
    * @param feed
    *          the containing feed
    * @param title
@@ -381,7 +381,7 @@ public class FeedEntryImpl implements FeedEntry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

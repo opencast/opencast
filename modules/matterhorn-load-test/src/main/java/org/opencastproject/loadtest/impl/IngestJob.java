@@ -74,7 +74,7 @@ public class IngestJob implements Runnable {
 
   /**
    * Prepares and ingests a single media package to the core for load testing.
-   * 
+   *
    * @param id
    *          The mediapackage id to ingest
    * @param startDelay
@@ -126,7 +126,7 @@ public class IngestJob implements Runnable {
 
   /**
    * Unzips the manifest.xml and changes the id from the mediapackage.
-   * 
+   *
    * @param workingDirectory
    *          The location of the media package.
    */
@@ -140,7 +140,7 @@ public class IngestJob implements Runnable {
 
   /**
    * Parse and change the manifest.xml's id to match the mediapackage id we will be ingesting.
-   * 
+   *
    * @param filepath
    *          The path to the manifest.xml file.
    */
@@ -182,7 +182,7 @@ public class IngestJob implements Runnable {
 
   /**
    * Unzips and changes the mediapackage id in the episode.xml file.
-   * 
+   *
    * @param workingDirectory
    *          The path to the mediapackage location.
    */
@@ -196,7 +196,7 @@ public class IngestJob implements Runnable {
 
   /**
    * Parse the episode.xml file and change the mediapackage id.
-   * 
+   *
    * @param filepath
    *          The location of the episode.xml.
    */
@@ -229,7 +229,7 @@ public class IngestJob implements Runnable {
 
   /**
    * Update the changed manifest.xml and episode.xml with the changed mediapackage ids in the zip file.
-   * 
+   *
    * @param workingDirectory
    *          The location of the media package.
    */
@@ -241,7 +241,7 @@ public class IngestJob implements Runnable {
 
   /**
    * Use the TrustedHttpClient from matterhorn to ingest the mediapackage.
-   * 
+   *
    * @param workingDirectory
    *          The path to the working directory for the LoadTesting.
    * @param mediaPackageLocation
@@ -306,7 +306,7 @@ public class IngestJob implements Runnable {
 
   /**
    * Get the mediapackage id for this ingest.
-   * 
+   *
    * @return The mediapackage id.
    */
   public String getID() {

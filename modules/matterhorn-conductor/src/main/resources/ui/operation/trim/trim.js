@@ -57,9 +57,35 @@ $(document).ready(function () {
         url: WORKFLOW_RESTSERVICE + id + ".json",
         async:false,
         success: function(data) {
+            var sourceFlavor = null;
+            operations = data.workflow.operations.operation;
+            for (var i = 0; i < operations.length; i++) {
+              /* Find the trim operation */
+              if (operations[i].id === 'trim' && operations[i].state === 'PAUSED'
+                && !sourceFlavor) {
+                var cfg = operations[i].configurations.configuration;
+                for (var j = 0; j < cfg.length; j++) {
+                  if (cfg[j].key === 'source-flavor') {
+                    sourceFlavor = cfg[j]['$'];
+                    break;
+                  }
+                }
+              }
+            }
+
+            /* Stop if we did not get any source-flavor */
+            if (!sourceFlavor) {
+              return False;
+            }
+
+            /* Build regular expression */
+            sourceFlavor = '^' + sourceFlavor.replace(/\*/g, '.*').replace(/\//, '\\/') + '$';
+            r = new RegExp(sourceFlavor);
+
+            /* Find matching tracks */
             data = data.workflow.mediapackage.media.track;
-            for (i = 0; i < data.length; i++) {
-                if (data[i].type.indexOf("work") !== -1) {
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].type.match(r)) {
                     tracks.tracks.push(data[i]);
                 }
             }
@@ -103,7 +129,7 @@ $(document).ready(function () {
     $("#continueBtn").button("disable");
 
     $("#trimming-hint").toggle();
-
+    $("#errorMessage").hide(0);
     window.parent.$("#controlsTop").hide(0);
     window.parent.$("#searchBox").hide(0);
     window.parent.$("#tableContainer").hide(0);
@@ -167,7 +193,7 @@ $(document).ready(function () {
             $("#inPoint").val($("#player-container").contents().find("#oc_duration").text());
         }
         if (getTimeInMilliseconds($("#inPoint").val()) >= getTimeInMilliseconds($("#outPoint").val())) {
-            $("div#errorMessage").html("Out point must be later than In point");
+            $("div#errorMessage").html("WARNING: Out point must be later than In point");
             $("#trimming-hint").hide();
             $("div#errorMessage").show();
         } else {
@@ -519,8 +545,9 @@ function continueWorkflow () {
             }
             $.when(parent.ocRecordings.continueWorkflow(postData)).then(function(){ def.resolve(); });
         } else {
-          $("div#errorMessage").html("The In-Point must not be bigger than the Out-Point");
-          def.resolve();
+          $("div#errorMessage").html("ERROR: The In point is before the Out point. Please change to valid values before continuing processing.");
+          mpe.find(".loading").hide();
+          def.reject();
         }
     });
 

@@ -189,6 +189,7 @@ table#agentsTable th, table#seriesTable th, table#recordingsTable th, table#stat
 .scheduler-day-table td, .scheduler-day-table th { padding: 4px; border: 1px solid #AAAAAA;}
 #recordingType { width: 140px; text-align: left; }
 .scheduler-radio-list { display: inline-block; width: 200px; }
+.scheduler-required-text { color: red;}
 
 /*Statistics*/
 #tableContainer h2 { color: #000; margin: 16px 3px 3px}

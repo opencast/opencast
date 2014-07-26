@@ -51,7 +51,7 @@ public class JaxbJobContext implements JobContext {
 
   /**
    * Constructs a jaxb job context from another context.
-   * 
+   *
    * @param jobContext
    *          the template
    */
@@ -109,7 +109,7 @@ public class JaxbJobContext implements JobContext {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobContext#getProperties()
    */
   @XmlElement(name = "properties")
@@ -120,7 +120,7 @@ public class JaxbJobContext implements JobContext {
 
   /**
    * Sets the context properties.
-   * 
+   *
    * @param properties
    *          the properties
    */
@@ -133,7 +133,7 @@ public class JaxbJobContext implements JobContext {
 
   /**
    * Gets the identifier for this context.
-   * 
+   *
    * @return the context identifier
    */
   @XmlAttribute(name = "id")
@@ -143,7 +143,7 @@ public class JaxbJobContext implements JobContext {
 
   /**
    * Sets the context identifier.
-   * 
+   *
    * @param id
    *          the context id to set the id
    */

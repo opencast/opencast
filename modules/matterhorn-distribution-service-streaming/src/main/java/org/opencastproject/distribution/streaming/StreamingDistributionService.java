@@ -128,7 +128,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.distribution.api.DistributionService#distribute(String,
    *      org.opencastproject.mediapackage.MediaPackage, String)
    */
@@ -158,7 +158,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Distribute a Mediapackage element to the download distribution service.
-   * 
+   *
    * @param mediapackage
    *          The media package that contains the element to distribute.
    * @param elementId
@@ -168,7 +168,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
    *           cannot be copied or another unexpected exception occurs.
    */
-  public MediaPackageElement[] distributeElement(String channelId, final MediaPackage mediapackage, String elementId)
+  public MediaPackageElement distributeElement(String channelId, final MediaPackage mediapackage, String elementId)
           throws DistributionException {
     if (mediapackage == null)
       throw new IllegalArgumentException("Mediapackage must be specified");
@@ -225,7 +225,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       distributedElement.setIdentifier(null);
 
       logger.info("Finished distribution of {}", element);
-      return new MediaPackageElement[] {distributedElement};
+      return distributedElement;
 
     } catch (Exception e) {
       logger.warn("Error distributing " + element, e);
@@ -239,7 +239,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.distribution.api.DistributionService#retract(String,
    *      org.opencastproject.mediapackage.MediaPackage, String) java.lang.String)
    */
@@ -262,7 +262,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Retracts the mediapackage with the given identifier from the distribution channel.
-   * 
+   *
    * @param channelId
    *          the channel id
    * @param mediapackage
@@ -271,7 +271,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    *          the element identifier
    * @return the retracted element or <code>null</code> if the element was not retracted
    */
-  protected MediaPackageElement[] retractElement(String channelId, MediaPackage mediapackage, String elementId)
+  protected MediaPackageElement retractElement(String channelId, MediaPackage mediapackage, String elementId)
           throws DistributionException {
 
     if (mediapackage == null)
@@ -291,7 +291,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       // Does the file exist? If not, the current element has not been distributed to this channel
       // or has been removed otherwise
       if (!elementFile.exists())
-        return new MediaPackageElement[] {element};
+        return element;
 
       // Try to remove the file and - if possible - the parent folder
       FileUtils.forceDelete(elementFile);
@@ -304,7 +304,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       }
       logger.info("Finished rectracting element {} of media package {}", elementId, mediapackage);
 
-      return new MediaPackageElement[] {element};
+      return element;
     } catch (Exception e) {
       logger.warn("Error retracting element " + elementId + " of mediapackage " + mediapackage, e);
       if (e instanceof DistributionException) {
@@ -318,7 +318,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Gets the destination file to copy the contents of a mediapackage element.
-   * 
+   *
    * @return The file to copy the content to
    */
   protected File getDistributionFile(String channelId, MediaPackage mp, MediaPackageElement element) {
@@ -347,7 +347,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Gets the directory containing the distributed files for this mediapackage.
-   * 
+   *
    * @return the filesystem directory
    */
   protected File getMediaPackageDirectory(String channelId, MediaPackage mediaPackage) {
@@ -356,7 +356,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Gets the URI for the element to be distributed.
-   * 
+   *
    * @return The resulting URI after distribution
    * @throws URISyntaxException
    *           if the concrete implementation tries to create a malformed uri
@@ -376,7 +376,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -391,14 +391,14 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       String elementId = arguments.get(2);
       switch (op) {
         case Distribute:
-          MediaPackageElement[] distributedElement = distributeElement(channelId, mediapackage, elementId);
-          return (distributedElement != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(distributedElement)) : null;
+          MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, elementId);
+          return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
         case Retract:
-          MediaPackageElement[] retractedElement = null;
+          MediaPackageElement retractedElement = null;
           if (distributionDirectory != null && StringUtils.isNotBlank(streamingUrl)) {
             retractedElement = retractElement(channelId, mediapackage, elementId);
           }
-          return (retractedElement != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(retractedElement)) : null;
+          return (retractedElement != null) ? MediaPackageElementParser.getAsXml(retractedElement) : null;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
@@ -413,7 +413,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Callback for the OSGi environment to set the workspace reference.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -423,7 +423,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Callback for the OSGi environment to set the service registry reference.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -433,7 +433,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -443,7 +443,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -453,7 +453,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -463,7 +463,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -473,7 +473,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -483,7 +483,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -493,7 +493,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

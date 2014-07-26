@@ -57,7 +57,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.composer.api.EncoderEngine#addEncoderListener(org.opencastproject.composer.api.EncoderListener)
    */
@@ -69,7 +69,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.composer.api.EncoderEngine#removeEncoderListener(org.opencastproject.composer.api.EncoderListener
    * )
@@ -81,7 +81,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#encode(java.io.File,
    * org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
@@ -92,7 +92,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#mux(java.io.File, java.io.File,
    * org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
@@ -104,7 +104,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#trim(java.io.File,
    * org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */
@@ -120,10 +120,10 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
     return process(null, mediaSource, format, properties);
   }
-  
+
   /**
    * Substitutes template values from template with actual values from properties.
-   * 
+   *
    * @param template
    *          String that represents template
    * @param properties
@@ -173,7 +173,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /**
    * Executes encoding job. At least one source has to be specified.
-   * 
+   *
    * @param audioSource
    *          File that contains audio source (if used)
    * @param videoSource
@@ -229,12 +229,12 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
       if (new File(outDir, outFileName + outSuffix).exists()) {
         outFileName += "_" + UUID.randomUUID().toString();
       }
-      
+
       params.put("out.dir", outDir);
       params.put("out.name", outFileName);
       params.put("out.suffix", outSuffix);
-      
-      
+
+
       File encodedFile = new File(outDir, outFileName + outSuffix);
       params.put("out.file.path", encodedFile.getAbsolutePath());
 
@@ -274,7 +274,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /**
    * Creates Pipeline from profile and additional properties and launches it.
-   * 
+   *
    * @param profile
    *          EncodingProfile used for creating Pipeline
    * @param properties
@@ -287,7 +287,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#extract(java.io.File,
    * org.opencastproject.composer.api.EncodingProfile, java.util.Map, long[])
    */
@@ -333,7 +333,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
       if (!outSuffix.contains("#{time}")) {
         outFileName += "_#{time}";
       }
-      
+
       File encodedFileTemplate = new File(outDir, outFileName + outSuffix);
       params.put("out.file.path", encodedFileTemplate.getAbsolutePath());
 
@@ -365,7 +365,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
    * Extracts multiple images from video stream. Profile is looked for the following template: &lt;time in
    * seconds&gt;:&lt;image width&gt;x&lt;image height&gt;. Multiple image definitions can be separated with comma. If
    * image width or image height is less or equal to zero, original image size will be retained.
-   * 
+   *
    * @param profile
    *          EncodeingProfile used for image extraction
    * @param properties
@@ -379,7 +379,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#supportsMultithreading()
    */
   @Override
@@ -389,7 +389,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#supportsProfile(java.lang.String,
    * org.opencastproject.composer.api.EncodingProfile.MediaType)
    */
@@ -404,7 +404,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#needsLocalWorkCopy()
    */
   @Override
@@ -414,7 +414,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /**
    * This method is called to send the <code>formatEncoded</code> event to registered encoding listeners.
-   * 
+   *
    * @param engine
    *          the encoding engine
    * @param profile
@@ -434,7 +434,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /**
    * This method is called to send the <code>trackEncodingFailed</code> event to registered encoding listeners.
-   * 
+   *
    * @param engine
    *          the encoding engine
    * @param sourceFiles
@@ -456,7 +456,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /**
    * This method is called to send the <code>trackEncodingProgressed</code> event to registered encoding listeners.
-   * 
+   *
    * @param engine
    *          the encoding engine
    * @param sourceFile
@@ -479,7 +479,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
   /**
    * Parses image extraction configuration in the following format: #{image_time_1}:#{image_width}x#{image_height}.
    * Multiple extraction configurations can be separated by comma.
-   * 
+   *
    * @param configuration
    *          Configuration for image extraction
    * @param outputTemplate
@@ -506,13 +506,13 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
       if (output.equals(outputTemplate)) {
         logger.warn("Output filename does not contain #{time} template: multiple images will overwrite");
       }
-      
+
       if (new File(output).exists()) {
         String outputFile = FilenameUtils.removeExtension(output);
         String extension = FilenameUtils.getExtension(output);
         output = outputFile + "_reencode." + extension;
       }
-      
+
       ImageExtractionProperties imageProperties = new ImageExtractionProperties(counter++,
               Long.parseLong(properties[0]), Integer.parseInt(properties[1]), Integer.parseInt(properties[2]), output);
 
@@ -531,7 +531,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /**
    * Reorder images to the same way as they were specified in profile and returns only list of filenames.
-   * 
+   *
    * @param extractionProperties
    *          extraction properties for images
    * @return List of image filenames
@@ -552,7 +552,7 @@ public abstract class AbstractGSEncoderEngine implements EncoderEngine {
 
   /**
    * Removes any existing file from image extraction properties.
-   * 
+   *
    * @param extractionProperties
    */
   protected void cleanup(List<ImageExtractionProperties> extractionProperties) {

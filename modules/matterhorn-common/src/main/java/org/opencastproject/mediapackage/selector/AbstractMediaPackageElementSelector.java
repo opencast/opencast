@@ -53,7 +53,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
   /**
    * This base implementation will return those media package elements that match the type specified as the type
    * parameter to the class and that flavor (if specified) AND at least one of the tags (if specified) match.
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage,
    *      boolean)
    */
@@ -132,7 +132,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
    * Sets the flavors.
    * <p>
    * Note that the order is relevant to the selection of the track returned by this selector.
-   * 
+   *
    * @param flavors
    *          the list of flavors
    * @throws IllegalArgumentException
@@ -148,7 +148,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
    * Adds the given flavor to the list of flavors.
    * <p>
    * Note that the order is relevant to the selection of the track returned by this selector.
-   * 
+   *
    * @param flavor
    */
   public void addFlavor(MediaPackageElementFlavor flavor) {
@@ -162,7 +162,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
    * Adds the given flavor to the list of flavors.
    * <p>
    * Note that the order is relevant to the selection of the track returned by this selector.
-   * 
+   *
    * @param flavor
    */
   public void addFlavor(String flavor) {
@@ -177,7 +177,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
    * Adds the given flavor to the list of flavors.
    * <p>
    * Note that the order is relevant to the selection of the track returned by this selector.
-   * 
+   *
    * @param index
    *          the position in the list
    * @param flavor
@@ -197,7 +197,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
    * Adds the given flavor to the list of flavors.
    * <p>
    * Note that the order is relevant to the selection of the track returned by this selector.
-   * 
+   *
    * @param index
    *          the position in the list
    * @param flavor
@@ -216,7 +216,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
 
   /**
    * Removes all occurences of the given flavor from the list of flavors.
-   * 
+   *
    * @param flavor
    *          the flavor to remove
    */
@@ -228,7 +228,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
 
   /**
    * Removes all occurences of the given flavor from the list of flavors.
-   * 
+   *
    * @param flavor
    *          the flavor to remove
    */
@@ -240,7 +240,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
 
   /**
    * Removes all occurences of the given flavor from the list of flavors.
-   * 
+   *
    * @param index
    *          the position in the list
    */
@@ -250,7 +250,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
 
   /**
    * Returns the list of flavors.
-   * 
+   *
    * @return the flavors
    */
   public MediaPackageElementFlavor[] getFlavors() {
@@ -259,7 +259,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
 
   /**
    * Adds <code>tag</code> to the list of tags that are used to select the media.
-   * 
+   *
    * @param tag
    *          the tag to include
    */
@@ -273,7 +273,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
 
   /**
    * Adds <code>tag</code> to the list of tags that are used to select the media.
-   * 
+   *
    * @param tag
    *          the tag to include
    */
@@ -283,7 +283,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
 
   /**
    * Returns the tags.
-   * 
+   *
    * @return the tags
    */
   public String[] getTags() {
