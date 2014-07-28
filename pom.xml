@@ -750,7 +750,7 @@
                 </goals>
                 <configuration>
                   <target if="harness">
-                    <java classname="org.opencastproject.remotetest.Main" fork="true">
+                    <java classname="org.opencastproject.remotetest.Main" fork="true" failOnError="true">
                       <classpath>
                         <pathelement path="modules/matterhorn-test-harness/target/matterhorn-test-harness-${project.version}-jar-with-dependencies.jar"/>
                       </classpath>
