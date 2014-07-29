@@ -59,7 +59,7 @@ case `os` in
     sudox yum -y install gstreamer-ffmpeg
     [ $? -ne 0 ] && exit 1
     ;;
-  Ubuntu )
+  Ubuntu | Debian )
     sudox apt-get -y install gstreamer0.10-tools  # gst-launch-0.10
     [ $? -ne 0 ] && exit 1
     sudox apt-get -y install gstreamer0.10-plugins-base
