@@ -7,6 +7,7 @@ ocRecordings = new (function() {
   var SERIES_URL = '/series';
   var SEARCH_URL = '../search';
   var ENGAGE_URL = '';
+  var ANOYMOUS_URL = '/info/me.json';
 
   var STATISTICS_DELAY = 3000;     // time interval for statistics update
 
@@ -1474,13 +1475,26 @@ ocRecordings = new (function() {
         if(this.fields.seriesSelect !== ''){
           series = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + this.fields.seriesSelect.val() + '</dcterms:title></dublincore>'
           seriesComponent = this;
+          var anonymous_role = 'ROLE_ANONYMOUS';
+          $.ajax({
+              url: ANOYMOUS_URL,
+              type: 'GET',
+              dataType: 'json',
+              async: false,
+              error: function () {
+                  ocUtils.log("Could not retrieve anonymous role " + ANOYMOUS_URL);
+              },
+              success: function(data) {
+                  anonymous_role = data.org.anonymousRole;
+              }
+          });
           $.ajax({
             async: false,
             type: 'POST',
             url: SERIES_URL + '/',
             data: { 
               series: series,
-              acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="org.opencastproject.security"><ace><role>anonymous</role><action>read</action><allow>true</allow></ace></acl>'
+              acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="org.opencastproject.security"><ace><role>' + anonymous_role + '</role><action>read</action><allow>true</allow></ace></acl>'
             },
             dataType: 'xml',
             success: function(data){
