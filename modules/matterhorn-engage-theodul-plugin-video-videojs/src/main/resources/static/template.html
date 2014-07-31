@@ -1,9 +1,11 @@
-<div id="videojs_wrapper">
+<div class="videojs_wrapper clearfix">
     <% if(typeof ids !== "undefined" ){ var i = 1;%>
         <% _.each(ids, function(id) { %>
-            <div id="videoDisplay<%= i%>">
-                <video id="<%= id %>" class="video-js vjs-default-skin container"></video>
-            </div>
+	<div class="videoDisplay">
+	  <div id="videoDisplay<%= i%>_wrapper" class="videoFrame">
+            <video id="<%= id %>" class="video-js vjs-default-skin container" data-setup="{}"></video>
+          </div>
+	</div>
         <% i++;}); %>
     <% } %>
 </div>
