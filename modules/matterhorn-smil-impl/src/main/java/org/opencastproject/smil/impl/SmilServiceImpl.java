@@ -120,16 +120,16 @@ public class SmilServiceImpl implements SmilService {
     if (track.getFlavor() == null) {
       throw new SmilException("Track flavor isn't set.");
     }
-//    if (track.getDuration() == null) {
-//      throw new SmilException("Track duration not set");
-//    }
+
     if (track.getDuration() != null) {
       if (!track.hasAudio() && !track.hasVideo()) {
         throw new SmilException("Track should have at least one audio or video stream.");
       }
+      if (start >= track.getDuration()) {
+        throw new SmilException("Start value is bigger than track length.");
+      }
       if (start + duration > track.getDuration()) {
         duration = track.getDuration() - start;
-        //throw new SmilException("Start plus duration is bigger than track length.");
       }
     }
 
