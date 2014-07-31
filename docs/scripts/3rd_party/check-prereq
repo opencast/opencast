@@ -866,7 +866,7 @@ preinstall_scons() {
 disable_cdrom_src() {
   TMPFILE=`mktemp /tmp/${0##*/}-sources.list.XXXXX`
   sudox awk '{
-    if (match($0, "deb(|-src)[ \t]+cdrom:")) {
+    if (match($0, "(deb|deb-src)[ \t]+cdrom:")) {
       sub("^[ \t]*", "");
       if (!match($0, "^#")) { printf("# "); }
     }
