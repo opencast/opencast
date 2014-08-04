@@ -6,25 +6,14 @@
 
 .videoDisplay {
     float: left;
-    width: 47%;
-    margin: 10px;
+    width: 49%;
+    margin: 1px;
 }
 
 .videoFrame {
     width: 100%;
     height: 100%;
 }
-
-/*
-@media (max-width:800px) {
-    .videoDisplay {
-        float: none;
-        width: 80%;
-        margin: 0 auto;
-        padding-bottom: 10px;
-    }
-}
-*/
 
 .clearfix:before,
 .clearfix:after {

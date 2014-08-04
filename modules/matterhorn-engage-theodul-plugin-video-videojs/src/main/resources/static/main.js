@@ -137,6 +137,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
 	    // get aspect ratio
 	    aspectRatio = null;
+	    as1 = 0;
 	    for(var i = 0; i < videoDisplays.length; ++i) {
 		if(videoSources.presenter && videoSources.presenter[i] && videoSources.presenter[i].resolution) {
 		    for(var j = 0; j < videoSources.presenter.length; ++j) {
@@ -144,7 +145,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 			var t_tmp = $.type(aspectRatio_tmp);
 			if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) { 
 			    aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
-			    if((aspectRatio == null) || (parseInt(aspectRatio[1]) > parseInt(aspectRatio_tmp[1]))) {
+			    if((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
+				as1 = parseInt(aspectRatio_tmp[1]);
 				aspectRatio = videoSources.presenter[j].resolution;
 			    }
 			}
@@ -154,11 +156,29 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 		    
 		    if ((t === 'string') && (/\d+x\d+/.test(aspectRatio))) { 
 			aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
-			// $("#" + videoDisplays[i]).css({"width":aspectRatio[1], "height":aspectRatio[2]});
 			break;
 		    }
-		} else if(videoSources.presentation && videoSources.presentation[i] && videoSources.presentation[i].resolution) {
-		    // TODO
+		}
+		// TODO: Same code as above...
+		else if(videoSources.presentation && videoSources.presentation[i] && videoSources.presentation[i].resolution) {
+		    for(var j = 0; j < videoSources.presenter.length; ++j) {
+			var aspectRatio_tmp = videoSources.presenter[j].resolution;
+			var t_tmp = $.type(aspectRatio_tmp);
+			if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) { 
+			    aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
+			    if((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
+				as1 = parseInt(aspectRatio_tmp[1]);
+				aspectRatio = videoSources.presenter[j].resolution;
+			    }
+			}
+		    }
+
+		    var t = $.type(aspectRatio);
+		    
+		    if ((t === 'string') && (/\d+x\d+/.test(aspectRatio))) { 
+			aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
+			break;
+		    }
 		}
 	    }
 	    
@@ -179,8 +199,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 	    if((aspectRatio != null) && (videoDisplays.length > 0)) {
 		aspectRatio[1] = parseInt(aspectRatio[1]);
 		aspectRatio[2] = parseInt(aspectRatio[2]);
-		console.log("Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-		$(".videoDisplay").css("width", (((1 / videoDisplays.length) * 100) - 2) + "%");
+		Engage.log("Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+		$(".videoDisplay").css("width", (((1 / videoDisplays.length) * 100) - 1) + "%");
 		for(i = 0; i < videoDisplays.length; ++i) {
 		    $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
 		}
