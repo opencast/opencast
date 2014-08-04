@@ -263,16 +263,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 } else {
                     videosReady = true;
                     Engage.trigger(plugin.events.ready.getName());
-		    /*
-		    $("#videoDisplay1").css({
-			"float":"none",
-			"margin-left":"0%",
-			"width":"100%"
-		    });
-		    $("#" + videoDisplays[0]).css({
-			"width":"100%"
-		    });
-		    */
                 }
             }
         }
