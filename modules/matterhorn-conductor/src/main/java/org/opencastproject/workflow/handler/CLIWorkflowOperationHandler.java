@@ -76,7 +76,7 @@ public class CLIWorkflowOperationHandler implements WorkflowOperationHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
@@ -205,7 +205,7 @@ public class CLIWorkflowOperationHandler implements WorkflowOperationHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
@@ -216,13 +216,13 @@ public class CLIWorkflowOperationHandler implements WorkflowOperationHandler {
   /**
    * Returns a list of strings broken on whitespace characters except where those whitespace characters are escaped or
    * quoted.
-   * 
+   *
    * @return list of individual arguments
    */
   ArrayList<String> splitParameters(String input) {
     // This code modifies control variables from within loops, which upsets checkstyle.  Consider rewriting this method.
     // CHECKSTYLE:OFF
-    
+
     // this list stores the parsed input
     ArrayList<String> parsedInput = new ArrayList<String>();
 
@@ -303,7 +303,7 @@ public class CLIWorkflowOperationHandler implements WorkflowOperationHandler {
   /**
    * Replaces instances of the substring #{x} with values from the media package. Requires that x is a valid xpath
    * expression.
-   * 
+   *
    * @param params
    *          May contains xpath expressions in #{}, e.g. "/backups/#{//mediapackage[@id]}"
    * @param mp
@@ -406,7 +406,7 @@ public class CLIWorkflowOperationHandler implements WorkflowOperationHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override

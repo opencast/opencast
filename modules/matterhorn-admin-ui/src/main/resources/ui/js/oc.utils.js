@@ -398,3 +398,15 @@ ocUtils.last = function(a) {
   var aa = ocUtils.ensureArray(a);
   return aa[aa.length - 1];
 }
+
+ocUtils.entityMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+  };
+
+ocUtils.escapeXML = function(string) {
+    return String(string).replace(/[&<>]/g, function (s) {
+      return ocUtils.entityMap[s];
+    });
+  }

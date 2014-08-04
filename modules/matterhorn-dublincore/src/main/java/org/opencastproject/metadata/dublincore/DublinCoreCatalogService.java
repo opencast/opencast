@@ -77,7 +77,7 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.CatalogService#serialize(org.opencastproject.metadata.api.MetadataCatalog)
    */
   @Override
@@ -95,7 +95,7 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.MetadataService#getMetadata(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
@@ -172,9 +172,9 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.CatalogService#load(java.io.InputStream)
    */
   @Override
@@ -186,7 +186,7 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.CatalogService#accepts(org.opencastproject.mediapackage.Catalog)
    */
   @Override
@@ -199,7 +199,7 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.CatalogService#newInstance()
    */
   @Override
@@ -208,9 +208,9 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.MetadataService#getPriority()
    */
   @Override

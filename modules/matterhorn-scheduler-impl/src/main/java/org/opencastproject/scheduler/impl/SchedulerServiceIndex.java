@@ -25,7 +25,7 @@ import java.util.Properties;
 
 /**
  * Index for scheduled events. Supports all kinds of advanced searching over stored events.
- * 
+ *
  */
 public interface SchedulerServiceIndex {
 
@@ -41,7 +41,7 @@ public interface SchedulerServiceIndex {
 
   /**
    * Returns number of instances currently in index.
-   * 
+   *
    * @return number of instances in solr index
    * @throws SchedulerServiceDatabaseException
    *           if query cannot be completed
@@ -50,7 +50,7 @@ public interface SchedulerServiceIndex {
 
   /**
    * Index event catalog.
-   * 
+   *
    * @param dc
    *          {@link DublinCoreCatalog} describing event
    * @throws SchedulerServiceDatabaseException
@@ -60,7 +60,7 @@ public interface SchedulerServiceIndex {
 
   /**
    * Index event catalog.
-   * 
+   *
    * @param dc
    *          {@link DublinCoreCatalog} describing event
    * @param captureAgentProperties
@@ -72,7 +72,7 @@ public interface SchedulerServiceIndex {
 
   /**
    * Index CA properties for existing event.
-   * 
+   *
    * @param eventId
    *          ID of event to which properties will be added
    * @param captureAgentProperties
@@ -87,7 +87,7 @@ public interface SchedulerServiceIndex {
 
   /**
    * Search over indexed events. Search parameters are specified with {@link SchedulerQuery} object.
-   * 
+   *
    * @param query
    *          {@link SchedulerQuery} object representing query parameters
    * @return list of all matching events
@@ -98,7 +98,7 @@ public interface SchedulerServiceIndex {
 
   /**
    * Removes event from index.
-   * 
+   *
    * @param id
    *          ID of event to be removed
    * @throws SchedulerServiceDatabaseException
@@ -108,7 +108,7 @@ public interface SchedulerServiceIndex {
 
   /**
    * Retrieves Dublin core of event with specified ID.
-   * 
+   *
    * @param eventId
    *          Dublin core to be retrieved
    * @return {@link DublinCoreCatalog} of event
@@ -121,7 +121,7 @@ public interface SchedulerServiceIndex {
 
   /**
    * Retrieves capture agent properties for specified ID
-   * 
+   *
    * @param eventId
    *          ID of event for which properties should be retrieved
    * @return capture agent properties
@@ -134,7 +134,7 @@ public interface SchedulerServiceIndex {
 
   /**
    * Returns date of last modification of event belonging to specified capture agent.
-   * 
+   *
    * @param filter
    *          filter of events
    * @return Date of last modification

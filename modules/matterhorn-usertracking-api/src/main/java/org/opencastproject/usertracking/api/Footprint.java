@@ -17,7 +17,7 @@ package org.opencastproject.usertracking.api;
 
 /**
  * A class that represents a footprint
- * 
+ *
  */
 public interface Footprint {
 

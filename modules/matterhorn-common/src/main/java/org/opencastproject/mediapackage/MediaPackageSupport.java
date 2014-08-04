@@ -108,7 +108,7 @@ public final class MediaPackageSupport {
 
   /**
    * Returns <code>true</code> if the media package contains an element with the specified identifier.
-   * 
+   *
    * @param identifier
    *          the identifier
    * @return <code>true</code> if the media package contains an element with this identifier

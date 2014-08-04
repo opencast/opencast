@@ -63,7 +63,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * Constructs a new HostRegistration with the parameters provided
-   * 
+   *
    * @param baseUrl
    *          the base URL for this host
    * @param maxJobs
@@ -83,7 +83,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * Creates a new JAXB host registration based on an existing host registration
-   * 
+   *
    * @param hostRegistration
    */
   public JaxbHostRegistration(HostRegistration hostRegistration) {
@@ -96,7 +96,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#getBaseUrl()
    */
   @Override
@@ -106,7 +106,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#setBaseUrl(String)
    */
   @Override
@@ -116,7 +116,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#getMaxJobs()
    */
   @Override
@@ -126,7 +126,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#setMaxJobs(int)
    */
   @Override
@@ -136,7 +136,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#isActive()
    */
   @Override
@@ -146,7 +146,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#setActive(boolean)
    */
   @Override
@@ -156,7 +156,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#isOnline()
    */
   @Override
@@ -166,7 +166,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#setOnline(boolean)
    */
   @Override
@@ -176,7 +176,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#isMaintenanceMode()
    */
   @Override
@@ -186,7 +186,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#setMaintenanceMode(boolean)
    */
   @Override
@@ -196,7 +196,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -206,7 +206,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -219,7 +219,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

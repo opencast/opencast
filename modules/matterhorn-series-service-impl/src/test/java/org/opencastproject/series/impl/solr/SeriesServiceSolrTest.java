@@ -193,6 +193,43 @@ public class SeriesServiceSolrTest {
     }
   }
 
+
+  @Test
+  public void testAccessControlManagmentRewrite() throws Exception {
+    // sample access control list
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    User user = new JaxbUser("anonymous", new DefaultOrganization(), new JaxbRole("ROLE_ANONYMOUS",
+            new DefaultOrganization()));
+    EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+    EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
+    EasyMock.replay(securityService);
+
+    index = new SeriesServiceSolrIndex();
+    index.solrRoot = PathSupport.concat("target", Long.toString(System.currentTimeMillis()));
+    dcService = new DublinCoreCatalogService();
+    index.setDublinCoreService(dcService);
+    index.setSecurityService(securityService);
+    index.activate(null);
+
+    AccessControlList accessControlList = new AccessControlList();
+    List<AccessControlEntry> acl = accessControlList.getEntries();
+    acl.add(new AccessControlEntry("ROLE_ANONYMOUS", "read", true));
+
+    index.updateIndex(testCatalog);
+    String seriesID = testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+    index.updateSecurityPolicy(seriesID, accessControlList);
+
+    SeriesQuery q = new SeriesQuery();
+    DublinCoreCatalogList result = index.search(q);
+    Assert.assertTrue("Only one anomymous series", result.size() == 1);
+
+
+    index.updateSecurityPolicy(seriesID, new AccessControlList());
+    q = new SeriesQuery();
+    result = index.search(q);
+    Assert.assertTrue("No anomymous series", result.size() == 0);
+  }
+
   /**
    * @throws java.lang.Exception
    */

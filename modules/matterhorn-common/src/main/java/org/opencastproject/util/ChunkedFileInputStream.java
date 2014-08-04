@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * input stream to get only a part of a file
- * 
+ *
  */
 public class ChunkedFileInputStream extends FileInputStream {
 
@@ -46,7 +46,7 @@ public class ChunkedFileInputStream extends FileInputStream {
 
   /**
    * constructor
-   * 
+   *
    * @param name the name of the file
    * @throws FileNotFoundException if the file was not found
    */
@@ -56,7 +56,7 @@ public class ChunkedFileInputStream extends FileInputStream {
 
   /**
    * constructor
-   * 
+   *
    * @param file the file to load
    * @param offset the starting offset
    * @param endOffset the ending offset
@@ -80,7 +80,7 @@ public class ChunkedFileInputStream extends FileInputStream {
 
   /**
    * read the next byte
-   * 
+   *
    * @return the next byte or -1 if the expected offset has been reached
    */
   public int read() throws IOException {
@@ -93,7 +93,7 @@ public class ChunkedFileInputStream extends FileInputStream {
 
   /**
    * get the ending offset
-   * 
+   *
    * @return the ending offset
    */
   public long getEndOffset() {
@@ -102,7 +102,7 @@ public class ChunkedFileInputStream extends FileInputStream {
 
   /**
    * set the ending offset
-   * 
+   *
    * @param endOffset the ending offset
    */
   public void setEndOffset(long endOffset) {
@@ -111,7 +111,7 @@ public class ChunkedFileInputStream extends FileInputStream {
 
   /***
    * get the starting offset
-   * 
+   *
    * @return the starting offset
    */
   public long getOffset() {
@@ -120,7 +120,7 @@ public class ChunkedFileInputStream extends FileInputStream {
 
   /**
    * set the starting offset
-   * 
+   *
    * @param offset the starting offset
    */
   public void setOffset(long offset) {

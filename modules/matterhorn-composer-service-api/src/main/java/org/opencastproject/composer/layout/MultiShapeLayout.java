@@ -26,7 +26,7 @@ public final class MultiShapeLayout {
 
   /**
    * Create a new layout for multiple shapes on a common canvas.
-   * 
+   *
    * @param canvas
    *          the dimension of the target canvas
    * @param shapes

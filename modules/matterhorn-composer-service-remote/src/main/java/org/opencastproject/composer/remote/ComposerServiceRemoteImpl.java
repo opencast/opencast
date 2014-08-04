@@ -64,7 +64,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#encode(org.opencastproject.mediapackage.Track,
    *      java.lang.String)
    */
@@ -98,7 +98,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#trim(Track, String, long, long)
    */
   @Override
@@ -133,7 +133,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#mux(org.opencastproject.mediapackage.Track,
    *      org.opencastproject.mediapackage.Track, java.lang.String)
    */
@@ -169,7 +169,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#getProfile(java.lang.String)
    */
   @Override
@@ -192,7 +192,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#image(org.opencastproject.mediapackage.Track,
    *      java.lang.String, long)
    */
@@ -227,7 +227,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#convertImage(org.opencastproject.mediapackage.Attachment,
    *      java.lang.String)
    */
@@ -260,7 +260,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#captions(org.opencastproject.mediapackage.Track,
    *      org.opencastproject.mediapackage.Attachment, java.lang.String)
    */
@@ -294,7 +294,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#listProfiles()
    */
   @Override
@@ -320,7 +320,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * Builds string containing times in seconds separated by comma.
-   * 
+   *
    * @param times
    *          time array to be converted to string
    * @return string represented specified time array

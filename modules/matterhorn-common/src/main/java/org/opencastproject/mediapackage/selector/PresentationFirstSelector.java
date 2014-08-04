@@ -28,7 +28,7 @@ import org.opencastproject.mediapackage.Track;
  * <li>{@link MediaPackageElements#AUDIENCE_SOURCE}</li>
  * <li></li>
  * <ul>
- * 
+ *
  * This basically means that if there is a presenter track, this is the one that will be returnd. If not, then the
  * selctor will try to find a presentation track and so on.
  */

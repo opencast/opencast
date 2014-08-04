@@ -105,7 +105,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.MetadataService#getMetadata(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
@@ -269,9 +269,9 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.api.MetadataService#getPriority()
    */
   @Override

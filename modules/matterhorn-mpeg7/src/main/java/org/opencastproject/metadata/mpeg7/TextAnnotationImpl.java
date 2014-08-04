@@ -56,7 +56,7 @@ public class TextAnnotationImpl implements TextAnnotation {
 
   /**
    * Creates a new text annotation.
-   * 
+   *
    * @param confidence
    *          the confidence value <code>[0.0..1.0]</code>
    * @param relevance
@@ -74,7 +74,7 @@ public class TextAnnotationImpl implements TextAnnotation {
 
   /**
    * Adds the keyword to this annotation.
-   * 
+   *
    * @param keyword
    *          the keyword
    */
@@ -84,7 +84,7 @@ public class TextAnnotationImpl implements TextAnnotation {
 
   /**
    * Adds the keyword to this annotation.
-   * 
+   *
    * @param keyword
    *          the keyword
    * @param type
@@ -103,7 +103,7 @@ public class TextAnnotationImpl implements TextAnnotation {
 
   /**
    * Adds free text to this annotation.
-   * 
+   *
    * @param text
    *          the free text
    */

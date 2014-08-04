@@ -96,7 +96,7 @@ public class VideoSegmenterTest {
   /**
    * Copies test files to the local file system, since jmf is not able to access movies from the resource section of a
    * bundle.
-   * 
+   *
    * @throws Exception
    *           if setup fails
    */
@@ -113,7 +113,7 @@ public class VideoSegmenterTest {
 
   /**
    * Setup for the video segmenter service, including creation of a mock workspace.
-   * 
+   *
    * @throws Exception
    *           if setup fails
    */

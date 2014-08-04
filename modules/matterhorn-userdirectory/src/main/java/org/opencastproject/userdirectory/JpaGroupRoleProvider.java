@@ -123,7 +123,7 @@ public class JpaGroupRoleProvider implements RoleProvider {
 
   /**
    * Callback for activation of this component.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -145,7 +145,7 @@ public class JpaGroupRoleProvider implements RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#getRoles()
    */
   @Override
@@ -156,7 +156,7 @@ public class JpaGroupRoleProvider implements RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override
@@ -167,7 +167,7 @@ public class JpaGroupRoleProvider implements RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#getOrganization()
    */
   @Override
@@ -177,7 +177,7 @@ public class JpaGroupRoleProvider implements RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
    */
   @Override
@@ -207,7 +207,7 @@ public class JpaGroupRoleProvider implements RoleProvider {
 
   /**
    * Loads a group from persistence
-   * 
+   *
    * @param groupId
    *          the group id
    * @param orgId
@@ -220,7 +220,7 @@ public class JpaGroupRoleProvider implements RoleProvider {
 
   /**
    * Adds or updates a group to the persistence.
-   * 
+   *
    * @param group
    *          the group to add
    */
@@ -261,7 +261,7 @@ public class JpaGroupRoleProvider implements RoleProvider {
 
   /**
    * Returns all roles from a given group list
-   * 
+   *
    * @param groups
    *          the group list
    * @return the role list

@@ -61,7 +61,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowSet#getItems()
    */
   @Override
@@ -72,7 +72,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /**
    * Adds an item to the result set.
-   * 
+   *
    * @param item
    *          the item to add
    */
@@ -86,7 +86,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowSet#size()
    */
   @Override
@@ -96,7 +96,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowSet#getStartPage()
    */
   public long getStartPage() {
@@ -105,7 +105,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /**
    * Set the start page offset.
-   * 
+   *
    * @param startPage
    *          The start page offset.
    */
@@ -115,7 +115,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowSet#getPageSize()
    */
   @Override
@@ -125,7 +125,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /**
    * Set the pageSize.
-   * 
+   *
    * @param pageSize
    *          The pageSize.
    */
@@ -135,7 +135,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowSet#getSearchTime()
    */
   public long getSearchTime() {
@@ -144,7 +144,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /**
    * Set the search time.
-   * 
+   *
    * @param searchTime
    *          The time in ms.
    */
@@ -154,7 +154,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowSet#getTotalCount()
    */
   @Override

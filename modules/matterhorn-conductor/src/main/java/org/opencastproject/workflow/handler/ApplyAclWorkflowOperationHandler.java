@@ -49,7 +49,7 @@ public class ApplyAclWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param authorizationService
    *          the authorization service
    */
@@ -59,7 +59,7 @@ public class ApplyAclWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param seriesService
    *          the series service
    */
@@ -69,7 +69,7 @@ public class ApplyAclWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -79,7 +79,7 @@ public class ApplyAclWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */

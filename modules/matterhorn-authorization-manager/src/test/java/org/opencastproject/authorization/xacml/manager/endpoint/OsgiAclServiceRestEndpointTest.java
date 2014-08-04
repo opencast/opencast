@@ -17,6 +17,7 @@ package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForCustomConfig;
@@ -229,6 +230,10 @@ public class OsgiAclServiceRestEndpointTest {
     String episodeId = "22d026a7-e311-4f4a-9241-111d5cda7d33";
 
     String workflowParams = "{\"videoPreview\":\"true\",\"distribution\":\"Matterhorn Media Module\",\"archiveOp\":\"true\",\"trimHold\":\"true\"}";
+    String workflowParamsPart1 = "\"videoPreview\":\"true\"";
+    String workflowParamsPart2 = "\"distribution\":\"Matterhorn Media Module\"";
+    String workflowParamsPart3 = "\"archiveOp\":\"true\"";
+    String workflowParamsPart4 = "\"trimHold\":\"true\"";
 
     String applicationDate = DateTimeSupport.toUTC(new Date().getTime());
     String applicationDate2 = DateTimeSupport.toUTC(new Date().getTime() + 50000L);
@@ -245,35 +250,42 @@ public class OsgiAclServiceRestEndpointTest {
             .statusCode(OK).body("applicationDate", equalTo(applicationDate2)).body("episodeId", equalTo(episodeId))
             .when().post(host("/episode/{episodeId}")));
 
+    final String episode = "episodes[\"" + episodeId + "\"].transitions[0]";
+    final String series = "series[\"SERIES_1\"].transitions[0].";
     // Test json
     given().expect()
             .statusCode(OK)
-            .body("episodes[\"22d026a7-e311-4f4a-9241-111d5cda7d33\"].transitions[0].applicationDate",
-                    equalTo(applicationDate2))
-            .body("episodes[\"22d026a7-e311-4f4a-9241-111d5cda7d33\"].transitions[0].transitionId",
-                    equalTo((int) episodeTransitionId))
-            .body("episodes[\"22d026a7-e311-4f4a-9241-111d5cda7d33\"].transitions[0].done", equalTo(false))
-            .body("episodes[\"22d026a7-e311-4f4a-9241-111d5cda7d33\"].transitions[0].episodeId",
-                    equalTo("22d026a7-e311-4f4a-9241-111d5cda7d33"))
-            .body("episodes[\"22d026a7-e311-4f4a-9241-111d5cda7d33\"].transitions[0].organizationId",
-                    equalTo("mh_default_org"))
-            .body("episodes[\"22d026a7-e311-4f4a-9241-111d5cda7d33\"].transitions[0].workflowId", equalTo("full"))
-            .body("episodes[\"22d026a7-e311-4f4a-9241-111d5cda7d33\"].transitions[0].workflowParams",
-                    equalTo(workflowParams))
-            .body("episodes[\"22d026a7-e311-4f4a-9241-111d5cda7d33\"].transitions[0].acl.id",
-                    equalTo(privateAclId.intValue()))
-            .body("episodes[\"22d026a7-e311-4f4a-9241-111d5cda7d33\"].transitions[0].acl.name", equalTo("Private"))
-            .body("episodes[\"22d026a7-e311-4f4a-9241-111d5cda7d33\"].activeAcl.unmanagedAcl", notNullValue())
-            .body("series[\"SERIES_1\"].transitions[0].applicationDate", equalTo(applicationDate))
-            .body("series[\"SERIES_1\"].transitions[0].transitionId", equalTo((int) seriesTransitionId))
-            .body("series[\"SERIES_1\"].transitions[0].done", equalTo(false))
-            .body("series[\"SERIES_1\"].transitions[0].seriesId", equalTo("SERIES_1"))
-            .body("series[\"SERIES_1\"].transitions[0].organizationId", equalTo("mh_default_org"))
-            .body("series[\"SERIES_1\"].transitions[0].override", equalTo(false))
-            .body("series[\"SERIES_1\"].transitions[0].workflowId", equalTo("full"))
-            .body("series[\"SERIES_1\"].transitions[0].workflowParams", equalTo(workflowParams))
-            .body("series[\"SERIES_1\"].transitions[0].acl.id", equalTo(publicAclId.intValue()))
-            .body("series[\"SERIES_1\"].transitions[0].acl.name", equalTo("Public"))
+            .body(episode + ".applicationDate", equalTo(applicationDate2))
+            .body(episode + ".transitionId", equalTo((int)
+                  episodeTransitionId))
+            .body(episode + ".done", equalTo(false))
+            .body(episode + ".episodeId", equalTo(episodeId))
+            .body(episode + ".organizationId", equalTo("mh_default_org"))
+            .body(episode + ".workflowId", equalTo("full"))
+            .body(episode + ".workflowParams",
+                containsString(workflowParamsPart1))
+            .body(episode + ".workflowParams",
+                containsString(workflowParamsPart2))
+            .body(episode + ".workflowParams",
+                containsString(workflowParamsPart3))
+            .body(episode + ".workflowParams",
+                containsString(workflowParamsPart4))
+            .body(episode + ".acl.id", equalTo(privateAclId.intValue()))
+            .body(episode + ".acl.name", equalTo("Private"))
+            .body("episodes[\"" + episodeId + "\"].activeAcl.unmanagedAcl", notNullValue())
+            .body(series + "applicationDate", equalTo(applicationDate))
+            .body(series + "transitionId", equalTo((int) seriesTransitionId))
+            .body(series + "done", equalTo(false))
+            .body(series + "seriesId", equalTo("SERIES_1"))
+            .body(series + "organizationId", equalTo("mh_default_org"))
+            .body(series + "override", equalTo(false))
+            .body(series + "workflowId", equalTo("full"))
+            .body(series + "workflowParams", containsString(workflowParamsPart1))
+            .body(series + "workflowParams", containsString(workflowParamsPart2))
+            .body(series + "workflowParams", containsString(workflowParamsPart3))
+            .body(series + "workflowParams", containsString(workflowParamsPart4))
+            .body(series + "acl.id", equalTo(publicAclId.intValue()))
+            .body(series + "acl.name", equalTo("Public"))
             .body("series[\"SERIES_1\"].activeAcl.unmanagedAcl", notNullValue()).when().get(host("/transitions.json"));
 
     given().pathParam("transitionId", episodeTransitionId).expect().statusCode(NO_CONTENT).when()
@@ -288,6 +300,10 @@ public class OsgiAclServiceRestEndpointTest {
     String episodeId = "12dd16a7-e321-4f4a-9241-111d53457d33";
 
     String workflowParams = "{\"videoPreview\":\"true\",\"distribution\":\"Matterhorn Media Module\",\"archiveOp\":\"true\",\"trimHold\":\"true\"}";
+    String workflowParamsPart1 = "\"videoPreview\":\"true\"";
+    String workflowParamsPart2 = "\"distribution\":\"Matterhorn Media Module\"";
+    String workflowParamsPart3 = "\"archiveOp\":\"true\"";
+    String workflowParamsPart4 = "\"trimHold\":\"true\"";
 
     String applicationDate = DateTimeSupport.toUTC(new Date().getTime() + 50000L);
     String applicationDate2 = DateTimeSupport.toUTC(new Date().getTime() + 150000L);
@@ -304,6 +320,8 @@ public class OsgiAclServiceRestEndpointTest {
             .statusCode(OK).body("applicationDate", equalTo(applicationDate2)).body("episodeId", equalTo(episodeId))
             .when().post(host("/episode/{episodeId}")));
 
+    final String episode = "episodes[\"" + episodeId + "\"].transitions[0]";
+    final String series = "series[\"SERIES_2\"].transitions[0].";
     // Test json
     given().queryParam("episodeIds", episodeId)
             .queryParam("seriesIds", "SERIES_2")
@@ -314,39 +332,48 @@ public class OsgiAclServiceRestEndpointTest {
             .statusCode(OK)
             .log()
             .all()
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].transitions[0].applicationDate",
-                    equalTo(applicationDate2))
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].transitions[0].transitionId",
+            .body(episode + ".applicationDate", equalTo(applicationDate2))
+            .body(episode + ".transitionId",
                     equalTo((int) episodeTransitionId))
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].transitions[0].done", equalTo(false))
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].transitions[0].episodeId",
-                    equalTo("12dd16a7-e321-4f4a-9241-111d53457d33"))
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].transitions[0].organizationId",
-                    equalTo("mh_default_org"))
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].transitions[0].workflowId", equalTo("full"))
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].transitions[0].workflowParams",
-                    equalTo(workflowParams))
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].transitions[0].acl.id",
-                    equalTo(privateAclId.intValue()))
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].transitions[0].acl.name", equalTo("Private"))
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].activeAcl.unmanagedAcl", notNullValue())
-            .body("series[\"SERIES_2\"].transitions[0].applicationDate", equalTo(applicationDate))
-            .body("series[\"SERIES_2\"].transitions[0].transitionId", equalTo((int) seriesTransitionId))
-            .body("series[\"SERIES_2\"].transitions[0].done", equalTo(false))
-            .body("series[\"SERIES_2\"].transitions[0].seriesId", equalTo("SERIES_2"))
-            .body("series[\"SERIES_2\"].transitions[0].organizationId", equalTo("mh_default_org"))
-            .body("series[\"SERIES_2\"].transitions[0].override", equalTo(false))
-            .body("series[\"SERIES_2\"].transitions[0].workflowId", equalTo("full"))
-            .body("series[\"SERIES_2\"].transitions[0].workflowParams", equalTo(workflowParams))
-            .body("series[\"SERIES_2\"].transitions[0].acl.id", equalTo(privateAclId.intValue()))
-            .body("series[\"SERIES_2\"].transitions[0].acl.name", equalTo("Private"))
+            .body(episode + ".done", equalTo(false))
+            .body(episode + ".episodeId", equalTo(episodeId))
+            .body(episode + ".organizationId", equalTo("mh_default_org"))
+            .body(episode + ".workflowId", equalTo("full"))
+            .body(episode + ".workflowParams",
+                containsString(workflowParamsPart1))
+            .body(episode + ".workflowParams",
+                containsString(workflowParamsPart2))
+            .body(episode + ".workflowParams",
+                containsString(workflowParamsPart3))
+            .body(episode + ".workflowParams",
+                containsString(workflowParamsPart4))
+            .body(episode + ".acl.id", equalTo(privateAclId.intValue()))
+            .body(episode + ".acl.name", equalTo("Private"))
+            .body("episodes[\"" + episodeId + "\"].activeAcl.unmanagedAcl", notNullValue())
+            .body(series + "applicationDate", equalTo(applicationDate))
+            .body(series + "transitionId", equalTo((int) seriesTransitionId))
+            .body(series + "done", equalTo(false))
+            .body(series + "seriesId", equalTo("SERIES_2"))
+            .body(series + "organizationId", equalTo("mh_default_org"))
+            .body(series + "override", equalTo(false))
+            .body(series + "workflowId", equalTo("full"))
+            .body(series + "workflowParams",
+                containsString(workflowParamsPart1))
+            .body(series + "workflowParams",
+                containsString(workflowParamsPart2))
+            .body(series + "workflowParams",
+                containsString(workflowParamsPart3))
+            .body(series + "workflowParams",
+                containsString(workflowParamsPart4))
+            .body(series + "acl.id", equalTo(privateAclId.intValue()))
+            .body(series + "acl.name", equalTo("Private"))
             .body("series[\"SERIES_2\"].activeAcl.unmanagedAcl", notNullValue()).when()
             .get(host("/transitionsfor.json"));
 
     given().queryParam("episodeIds", episodeId).queryParam("seriesIds", "SERIES_2").queryParam("done", true).log()
             .all().expect().statusCode(OK).log().all()
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].transitions[0]", nullValue())
-            .body("episodes[\"12dd16a7-e321-4f4a-9241-111d53457d33\"].activeAcl.unmanagedAcl", notNullValue())
+            .body(episode + "", nullValue())
+            .body("episodes[\"" + episodeId + "\"].activeAcl.unmanagedAcl", notNullValue())
             .body("series[\"SERIES_2\"].transitions[0]", nullValue())
             .body("series[\"SERIES_2\"].activeAcl.unmanagedAcl", notNullValue()).when()
             .get(host("/transitionsfor.json"));

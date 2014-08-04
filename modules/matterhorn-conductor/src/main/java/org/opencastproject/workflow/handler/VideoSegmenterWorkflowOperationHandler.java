@@ -76,7 +76,7 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -86,7 +86,7 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -154,7 +154,7 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
   /**
    * Callback for declarative services configuration that will introduce us to the videosegmenter service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param videosegmenter
    *          the video segmenter
    */
@@ -165,7 +165,7 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */

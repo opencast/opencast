@@ -70,7 +70,7 @@ public final class Monadics {
 
     /**
      * Apply <code>f</code> to each elements building a new list. This is the list functor.
-     * 
+     *
      * @see #map(Function)
      */
     public abstract <B> ListMonadic<B> fmap(Function<? super A, ? extends B> f);

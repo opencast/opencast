@@ -198,7 +198,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * Callback from the OSGi environment on component registration. The indexing behavior can be set using component
    * context properties. <code>synchronousIndexing=true|false</code> determines whether threads performing workflow
    * updates block on adding the workflow instances to the search index.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -332,7 +332,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Prepares the embedded solr environment.
-   * 
+   *
    * @param solrRoot
    *          the solr root directory
    */
@@ -430,7 +430,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Adds the workflow instance to the search index.
-   * 
+   *
    * @param instance
    *          the instance
    * @return the solr input document
@@ -519,7 +519,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Adds authorization fields to the solr document.
-   * 
+   *
    * @param doc
    *          the solr document
    * @param acl
@@ -565,7 +565,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.impl.WorkflowServiceIndex#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState,
    *      java.lang.String)
    */
@@ -603,7 +603,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.impl.WorkflowServiceIndex#getStatistics()
    */
   @Override
@@ -763,7 +763,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Appends query parameters to a solr query
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -793,7 +793,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   /**
    * Appends query parameters to a solr query in a way that they are found even though they are not treated as a full
    * word in solr.
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -819,7 +819,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Appends query parameters to a solr query
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -845,7 +845,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Builds a solr search query from a {@link WorkflowQuery}.
-   * 
+   *
    * @param query
    *          the workflow query
    * @param action
@@ -868,8 +868,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     append(sb, CREATED_KEY, query.getFromDate(), query.getToDate());
     appendFuzzy(sb, CREATOR_KEY, query.getCreator());
     appendFuzzy(sb, CONTRIBUTOR_KEY, query.getContributor());
-    append(sb, LANGUAGE_KEY, query.getLanguage(), true);
-    append(sb, LICENSE_KEY, query.getLicense(), true);
+    appendFuzzy(sb, LANGUAGE_KEY, query.getLanguage());
+    appendFuzzy(sb, LICENSE_KEY, query.getLicense());
     appendFuzzy(sb, TITLE_KEY, query.getTitle());
     appendFuzzy(sb, SUBJECT_KEY, query.getSubject());
     appendMap(sb, OPERATION_KEY, query.getCurrentOperations());
@@ -905,7 +905,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Returns the search index' field name that corresponds to the sort field.
-   * 
+   *
    * @param sort
    *          the sort field
    * @return the field name in the search index
@@ -941,7 +941,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Appends query parameters from a {@link java.util.Map} to a solr query. The map
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -987,7 +987,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.impl.WorkflowServiceIndex#getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery,
    *      String, boolean)
    */
@@ -1047,7 +1047,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.impl.WorkflowServiceIndex#remove(long)
    */
   @Override
@@ -1064,7 +1064,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.impl.WorkflowServiceIndex#update(org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
@@ -1088,7 +1088,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Callback for the OSGi environment to register with the <code>ServiceRegistry</code>.
-   * 
+   *
    * @param registry
    *          the service registry
    */
@@ -1098,7 +1098,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Callback for setting the organization directory service.
-   * 
+   *
    * @param orgDirectory
    *          the organization directory service
    */
@@ -1108,7 +1108,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Callback for setting the authorization service.
-   * 
+   *
    * @param authorizationService
    *          the authorizationService to set
    */
@@ -1118,7 +1118,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */

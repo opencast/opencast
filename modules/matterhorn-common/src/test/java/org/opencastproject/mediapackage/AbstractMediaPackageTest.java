@@ -91,7 +91,7 @@ public abstract class AbstractMediaPackageTest {
 
   /**
    * Creates everything that is needed to test a media package.
-   * 
+   *
    * @throws java.lang.Exception
    */
   @Before
@@ -148,7 +148,7 @@ public abstract class AbstractMediaPackageTest {
 
   /**
    * Cleans up after every test method.
-   * 
+   *
    * @throws Exception
    */
   @After

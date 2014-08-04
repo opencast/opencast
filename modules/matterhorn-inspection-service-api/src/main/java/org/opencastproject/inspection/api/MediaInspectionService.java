@@ -33,7 +33,7 @@ public interface MediaInspectionService {
 
   /**
    * Inspect a track based on a given uri to the track and put the gathered data into the track
-   * 
+   *
    * @param uri
    *          the uri to a track in a media package
    * @return the receipt of this job, that can be used to check the current status of inspect method and retrieve track
@@ -47,7 +47,7 @@ public interface MediaInspectionService {
 
   /**
    * Equip an existing media package element with automatically generated metadata
-   * 
+   *
    * @param original
    *          The original media package element that will be inspected
    * @param override

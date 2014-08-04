@@ -101,6 +101,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var synchronizePath = "lib/synchronize";
 
     /* don't change these variables */
+    var aspectRatio = "";
     var initCount = 4;
     var videoDisplayNamePrefix = "videojs_videodisplay_";
     var class_vjsposter = "vjs-poster";
@@ -133,12 +134,78 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             var i = 0;
             var videoDisplays = this.model.get("ids");
             var videoSources = this.model.get("videoSources");
+
+	    // get aspect ratio
+	    aspectRatio = null;
+	    as1 = 0;
+	    for(var i = 0; i < videoDisplays.length; ++i) {
+		if(videoSources.presenter && videoSources.presenter[i] && videoSources.presenter[i].resolution) {
+		    for(var j = 0; j < videoSources.presenter.length; ++j) {
+			var aspectRatio_tmp = videoSources.presenter[j].resolution;
+			var t_tmp = $.type(aspectRatio_tmp);
+			if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) { 
+			    aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
+			    if((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
+				as1 = parseInt(aspectRatio_tmp[1]);
+				aspectRatio = videoSources.presenter[j].resolution;
+			    }
+			}
+		    }
+
+		    var t = $.type(aspectRatio);
+		    
+		    if ((t === 'string') && (/\d+x\d+/.test(aspectRatio))) { 
+			aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
+			break;
+		    }
+		}
+		// TODO: Same code as above...
+		else if(videoSources.presentation && videoSources.presentation[i] && videoSources.presentation[i].resolution) {
+		    for(var j = 0; j < videoSources.presenter.length; ++j) {
+			var aspectRatio_tmp = videoSources.presenter[j].resolution;
+			var t_tmp = $.type(aspectRatio_tmp);
+			if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) { 
+			    aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
+			    if((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
+				as1 = parseInt(aspectRatio_tmp[1]);
+				aspectRatio = videoSources.presenter[j].resolution;
+			    }
+			}
+		    }
+
+		    var t = $.type(aspectRatio);
+		    
+		    if ((t === 'string') && (/\d+x\d+/.test(aspectRatio))) { 
+			aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
+			break;
+		    }
+		}
+	    }
+	    
             for (var v in videoSources) {
                 if (videoSources[v].length > 0) {
                     initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
                     ++i;
                 }
             }
+
+            for (var v in videoSources) {
+                if (videoSources[v].length > 0) {
+                    initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
+                    ++i;
+                }
+            }
+
+	    if((aspectRatio != null) && (videoDisplays.length > 0)) {
+		aspectRatio[1] = parseInt(aspectRatio[1]);
+		aspectRatio[2] = parseInt(aspectRatio[2]);
+		Engage.log("Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+		$(".videoDisplay").css("width", (((1 / videoDisplays.length) * 100) - 1) + "%");
+		for(i = 0; i < videoDisplays.length; ++i) {
+		    $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+		}
+	    }
+
             // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
             $("." + class_vjsposter).show();
 
@@ -230,8 +297,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     "preload": "auto",
                     "poster": videoSource.poster,
                     "loop": false,
-                    "width": 640,
-                    "height": 480
+                    "width": "100%",
+                    "height": "100%"
                 };
 
                 // init videoJS
@@ -259,6 +326,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     function registerEvents(videoDisplay) {
         var theodulVideodisplay = videojs(videoDisplay);
+	
         Engage.on(plugin.events.play.getName(), function () {
             if (videosReady) {
                 theodulVideodisplay.play();
@@ -340,6 +408,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     if (mediaInfo.tracks) {
                         $(mediaInfo.tracks).each(function (i, track) {
                             if (track.mimetype && track.type && track.mimetype.match(/video/g)) {
+				var resolution = (track.video && track.video.resolution) ? track.video.resolution : "";
                                 // filter for different video sources
                                 if (track.type.match(/presenter/g)) {
                                     if (track.duration > duration) {
@@ -348,7 +417,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                                     videoSources.presenter.push({
                                         src: track.url,
                                         type: track.mimetype,
-                                        typemh: track.type
+                                        typemh: track.type,
+					resolution: resolution
                                     });
                                 } else if (track.type.match(/presentation/g)) {
                                     if (track.duration > duration) {
@@ -357,7 +427,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                                     videoSources.presentation.push({
                                         src: track.url,
                                         type: track.mimetype,
-                                        typemh: track.type
+                                        typemh: track.type,
+					resolution: resolution
                                     });
                                 }
                             }

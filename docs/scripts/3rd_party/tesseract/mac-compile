@@ -43,7 +43,7 @@ cp ../configure.ac .
 #
 ./autogen.sh
 [ $? -ne 0 ] && exit 1
-./configure \
+./configure --prefix=$LOCAL_PREFIX \
 LIBS=-lgif
 [ $? -ne 0 ] && exit 1
 make

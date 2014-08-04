@@ -267,7 +267,7 @@ public class DistributeWorkflowOperationHandlerTest {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.opencastproject.job.api.JobProducer#isReadyToAcceptJobs(String)
      */
     @Override
@@ -277,7 +277,7 @@ public class DistributeWorkflowOperationHandlerTest {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.opencastproject.job.api.JobProducer#isReadyToAccept(org.opencastproject.job.api.Job)
      */
     @Override

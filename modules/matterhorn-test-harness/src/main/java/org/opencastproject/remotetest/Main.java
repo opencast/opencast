@@ -130,8 +130,8 @@ public class Main {
     }
     if (line.hasOption("password")) {
       PASSWORD = line.getOptionValue("password");
-    }    
-    
+    }
+
     if (line.hasOption("help")) {
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp("java -jar matterhorn-test-harness-<version>-jar-with-dependencies.jar>", options);
@@ -203,20 +203,20 @@ public class Main {
       System.exit(1);
     }
   }
-  
+
   private static void loadSeleneseData() throws Exception {
     System.out.println("Loading sample data for selenium HTML tests");
     // get the zipped mediapackage from the classpath
     byte[] bytesToPost = IOUtils.toByteArray(Main.class.getResourceAsStream("/ingest.zip"));
-    
+
     // post it to the ingest service
     HttpPost post = new HttpPost(BASE_URL + "/ingest/addZippedMediaPackage");
     post.setEntity(new ByteArrayEntity(bytesToPost));
     TrustedHttpClient client = getClient();
     HttpResponse response = client.execute(post);
-    Assert.assertEquals(200, response.getStatusLine().getStatusCode());    
+    Assert.assertEquals(200, response.getStatusLine().getStatusCode());
     String workflowXml = EntityUtils.toString(response.getEntity());
-    
+
     // Poll the workflow service to ensure this recording processes successfully
     String workflowId = WorkflowUtils.getWorkflowInstanceId(workflowXml);
     while(true) {
@@ -232,10 +232,10 @@ public class Main {
     }
     returnClient(client);
   }
-  
+
   /**
    * Runs the selenese test suite in src/main/resources/selenium/suite.html
-   * 
+   *
    * @throws Exception
    *           if the selenese tests fail to run
    */
@@ -308,7 +308,7 @@ public class Main {
 
     /**
      * Constructs the sax parser that injects login html to a selenium test
-     * 
+     *
      * @param config
      *          the html cofiguration
      */
@@ -325,7 +325,7 @@ public class Main {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.cyberneko.html.filters.DefaultFilter#startElement(org.apache.xerces.xni.QName,
      *      org.apache.xerces.xni.XMLAttributes, org.apache.xerces.xni.Augmentations)
      */
@@ -342,7 +342,7 @@ public class Main {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.cyberneko.html.filters.DefaultFilter#endElement(org.apache.xerces.xni.QName,
      *      org.apache.xerces.xni.Augmentations)
      */
@@ -362,7 +362,7 @@ public class Main {
 
   /**
    * Adds the login steps to a selenium test
-   * 
+   *
    * @param the
    *          input stream containing the test
    * @return the input stream containing the test augmented with the login instructions
@@ -383,7 +383,7 @@ public class Main {
 
   /**
    * List directory contents for a resource folder.
-   * 
+   *
    * @param path
    *          The classpath to scan for resources
    * @return URLs for each item

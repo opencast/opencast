@@ -7,15 +7,15 @@ public class ThreadCounter {
 		threadCount++;
 		hasChanged = true;
 	}
-	
+
 	public synchronized static void subtract(){
 		threadCount--;
 	}
-	
+
 	public synchronized static boolean allDone(){
 		return hasChanged && threadCount <= 0;
 	}
-	
+
 	public synchronized static int getCount(){
 		return threadCount;
 	}

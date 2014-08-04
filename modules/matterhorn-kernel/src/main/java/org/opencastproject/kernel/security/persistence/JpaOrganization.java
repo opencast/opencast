@@ -83,7 +83,7 @@ public class JpaOrganization implements Organization {
 
   /**
    * Constructs an organization with its attributes.
-   * 
+   *
    * @param orgId
    *          the unique identifier
    * @param name
@@ -113,7 +113,7 @@ public class JpaOrganization implements Organization {
 
   /**
    * Constructs an organization with its attributes.
-   * 
+   *
    * @param orgId
    *          the unique identifier
    * @param name
@@ -200,7 +200,7 @@ public class JpaOrganization implements Organization {
 
   /**
    * Replaces the existing servers.
-   * 
+   *
    * @param servers
    *          the servers
    */
@@ -210,7 +210,7 @@ public class JpaOrganization implements Organization {
 
   /**
    * Adds the server - port mapping.
-   * 
+   *
    * @param serverName
    *          the server name
    * @param port
@@ -224,7 +224,7 @@ public class JpaOrganization implements Organization {
 
   /**
    * Removes the given server - port mapping.
-   * 
+   *
    * @param serverName
    *          the server name
    * @param port
@@ -238,7 +238,7 @@ public class JpaOrganization implements Organization {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -250,7 +250,7 @@ public class JpaOrganization implements Organization {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -260,7 +260,7 @@ public class JpaOrganization implements Organization {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

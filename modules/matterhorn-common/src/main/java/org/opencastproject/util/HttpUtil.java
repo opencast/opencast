@@ -106,7 +106,7 @@ public final class HttpUtil {
 
   /**
    * Wait for a certain status of a resource.
-   * 
+   *
    * @return either an exception or the status code of the last http response
    */
   public static Either<Exception, Integer> waitForResource(final TrustedHttpClient http, final URI resourceUri,

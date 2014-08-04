@@ -180,7 +180,7 @@ public class SolrIndexManager {
 
   /**
    * Creates a new management instance for the search index.
-   * 
+   *
    * @param connection
    *          connection to the database
    */
@@ -197,7 +197,7 @@ public class SolrIndexManager {
 
   /**
    * Clears the search index. Make sure you know what you are doing.
-   * 
+   *
    * @throws SolrServerException
    *           if an errors occurs while talking to solr
    */
@@ -212,7 +212,7 @@ public class SolrIndexManager {
 
   /**
    * Removes the entry with the given <code>id</code> from the database. The entry can either be a series or an episode.
-   * 
+   *
    * @param id
    *          identifier of the series or episode to delete
    * @param deletionDate
@@ -258,9 +258,9 @@ public class SolrIndexManager {
   /**
    * Posts the media package to solr. Depending on what is referenced in the media package, the method might create one
    * or two entries: one for the episode and one for the series that the episode belongs to.
-   * 
+   *
    * This implementation of the search service removes all references to non "engage/download" media tracks
-   * 
+   *
    * @param sourceMediaPackage
    *          the media package to post
    * @param acl
@@ -301,9 +301,9 @@ public class SolrIndexManager {
   /**
    * Posts the media package to solr. Depending on what is referenced in the media package, the method might create one
    * or two entries: one for the episode and one for the series that the episode belongs to.
-   * 
+   *
    * This implementation of the search service removes all references to non "engage/download" media tracks
-   * 
+   *
    * @param sourceMediaPackage
    *          the media package to post
    * @param acl
@@ -345,7 +345,7 @@ public class SolrIndexManager {
 
   /**
    * Creates a solr input document for the episode metadata of the media package.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param acl
@@ -623,7 +623,7 @@ public class SolrIndexManager {
 
   /**
    * Adds authorization fields to the solr document.
-   * 
+   *
    * @param doc
    *          the solr document
    * @param acl
@@ -696,7 +696,7 @@ public class SolrIndexManager {
 
   /**
    * Creates a solr input document for the series metadata of the media package.
-   * 
+   *
    * @param seriesId
    *          the id of the series
    * @param acl
@@ -756,7 +756,7 @@ public class SolrIndexManager {
 
   /**
    * Add the standard dublin core fields to a series document.
-   * 
+   *
    * @param doc
    *          the solr document to fill
    * @param dc
@@ -934,7 +934,7 @@ public class SolrIndexManager {
 
   /**
    * Add the mpeg 7 catalog data to the solr document.
-   * 
+   *
    * @param doc
    *          the input document to the solr index
    * @param mpeg7
@@ -1076,7 +1076,7 @@ public class SolrIndexManager {
 
   /**
    * Generates a string with the most important kewords from the text annotation.
-   * 
+   *
    * @param sortedAnnotations
    * @return The keyword string.
    */
@@ -1150,7 +1150,7 @@ public class SolrIndexManager {
 
   /**
    * Gets the maximum confidence for a given keyword in the text annotation.
-   * 
+   *
    * @param keyword
    * @param sortedAnnotations
    * @return The maximum confidence value.
@@ -1178,7 +1178,7 @@ public class SolrIndexManager {
 
   /**
    * Gets the maximum relevance for a given keyword in the text annotation.
-   * 
+   *
    * @param keyword
    * @param sortedAnnotations
    * @return The maximum relevance value.
@@ -1248,7 +1248,7 @@ public class SolrIndexManager {
 
   /**
    * Returns number of entries in search index, across all organizations.
-   * 
+   *
    * @return number of entries in search index
    * @throws SearchServiceDatabaseException
    *           if count cannot be retrieved

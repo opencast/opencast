@@ -105,7 +105,7 @@ public class SeriesUpdatedEventHandler {
 
   /**
    * OSGI callback for component activation.
-   * 
+   *
    * @param bundleContext
    *          the OSGI bundle context
    */

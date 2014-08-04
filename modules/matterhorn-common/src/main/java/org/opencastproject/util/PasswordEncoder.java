@@ -30,7 +30,7 @@ public final class PasswordEncoder {
 
   /**
    * Encode a clear text password.
-   * 
+   *
    * @param clearText
    *          the password
    * @param salt

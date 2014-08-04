@@ -69,7 +69,7 @@ public class StaticResourceServlet extends HttpServlet {
 
   /**
    * OSGI Activation callback
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -107,7 +107,7 @@ public class StaticResourceServlet extends HttpServlet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */
@@ -205,7 +205,7 @@ public class StaticResourceServlet extends HttpServlet {
 
   /**
    * Computes an etag for a file using the filename, last modified, and length of the file.
-   * 
+   *
    * @param file
    *          the file
    * @return the etag
@@ -257,7 +257,7 @@ public class StaticResourceServlet extends HttpServlet {
 
   /**
    * Parse the range header.
-   * 
+   *
    * @param req
    *          The servlet request we are processing
    * @param response
@@ -366,7 +366,7 @@ public class StaticResourceServlet extends HttpServlet {
   /**
    * Copy the contents of the specified input stream to the specified output stream, and ensure that both streams are
    * closed before returning (even in the face of an exception).
-   * 
+   *
    * @param istream
    *          The input stream to read from
    * @param ostream

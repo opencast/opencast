@@ -25,7 +25,7 @@ patch -p0 < ../mp4v2-1.9.1.patch
 [ $? -ne 0 ] && exit 1
 patch -p0 < ../mp4v2-1.9.1-llvm.patch
 [ $? -ne 0 ] && exit 1
-./configure
+./configure --prefix=$LOCAL_PREFIX
 [ $? -ne 0 ] && exit 1
 make
 [ $? -ne 0 ] && exit 1

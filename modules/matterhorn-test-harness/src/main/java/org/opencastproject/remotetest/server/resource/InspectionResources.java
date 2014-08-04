@@ -32,7 +32,7 @@ public class InspectionResources {
     return Main.getBaseUrl() + "/inspection/";
   }
 
-  
+
   public static HttpResponse inspect(TrustedHttpClient client, String url) throws Exception {
     return client.execute(new HttpGet(getServiceUrl() + "inspect?url=" + url));
   }

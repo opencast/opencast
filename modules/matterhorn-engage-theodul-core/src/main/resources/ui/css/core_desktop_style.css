@@ -14,6 +14,10 @@ h1,h2,h3 {
   padding: 0px 20px;
 }
 
+#engage_content {
+    width: 98%;
+}
+
 #engage_video {
   margin-top: 110px;
 }
