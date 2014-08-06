@@ -23,16 +23,16 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         PLUGIN_TEMPLATE_MOBILE = "none",
         PLUGIN_TEMPLATE_EMBED = "none",
         PLUGIN_STYLES = [
-            "lib/alertify/alertify.core.css",
-            "lib/alertify/alertify.default.css"
+            "lib/alertify/alertify.css",
+            "lib/alertify/alertify-bootstrap-3.css"
         ],
         PLUGIN_STYLES_MOBILE = [
-            "lib/alertify/alertify.core.css",
-            "lib/alertify/alertify.default.css"
+            "lib/alertify/alertify.css",
+            "lib/alertify/alertify-bootstrap-3.css"
         ],
         PLUGIN_STYLES_EMBED = [
-            "lib/alertify/alertify.core.css",
-            "lib/alertify/alertify.default.css"
+            "lib/alertify/alertify.css",
+            "lib/alertify/alertify-bootstrap-3.css"
         ];
 
     var plugin;
@@ -41,7 +41,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
         buffering: new Engage.Event("Video:buffering", "buffering a video", "handler"),
         bufferedAndAutoplaying: new Engage.Event("Video:bufferedAndAutoplaying", "buffering successful, was playing, autoplaying now", "handler"),
-        bufferedButNotAutoplaying: new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "handler")
+        bufferedButNotAutoplaying: new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "handler"),
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     // desktop, embed and mobile logic
@@ -82,6 +83,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     /* change these variables */
     var alertifyMessageDelay = 5000; // ms
+    var alertifyVideoLoadMessageThreshold = 1500; // ms
     var alertifyDisplayDatetime = false;
     var alertifyPath = "lib/alertify/alertify";
 
@@ -89,6 +91,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var alertify;
     var initCount = 2;
     var videoLoaded = false;
+	var videoLoadMsgDisplayed = false;
     var videoBuffering = false;
 
     /* format today's date */
@@ -132,13 +135,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             delay: alertifyMessageDelay
         });
 
-        alertify.error(getAlertifyMessage("The video is now being loaded. Please wait a moment."));
+		window.setTimeout(function() {
+			if(!videoLoaded) {
+				videoLoadMsgDisplayed = true;
+				alertify.error(getAlertifyMessage("The video is loading. Please wait a moment."));
+			}
+		}, alertifyVideoLoadMessageThreshold);
 
         Engage.on(plugin.events.ready.getName(), function (callback) {
-            if (!videoLoaded) {
-                videoLoaded = true;
+            if (!videoLoaded && videoLoadMsgDisplayed) {
                 alertify.success(getAlertifyMessage("The video has been loaded successfully."));
             }
+			videoLoaded = true;
         });
         Engage.on(plugin.events.buffering.getName(), function (callback) {
             if (!videoBuffering) {
@@ -157,6 +165,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 videoBuffering = false;
                 alertify.success(getAlertifyMessage("The video has been buffered successfully."));
             }
+        });
+        Engage.on(plugin.events.mediaPackageModelError.getName(), function (callback) {
+            alertify.error(getAlertifyMessage("Error: " + callback));
         });
     }
 

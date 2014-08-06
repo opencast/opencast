@@ -165,7 +165,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     val0 *= 60 * 60 * 1000; // 1 hour = 60 minutes = 60 * 60 Seconds = 60 * 60 * 1000 milliseconds
                     val1 *= 60 * 1000; // 1 minute = 60 seconds = 60 * 1000 milliseconds
                     val2 *= 1000; // 1 second = 1000 milliseconds
-                    // add the milliseconds and return it
                     return val0 + val1 + val2;
                 }
             }
@@ -306,7 +305,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             var isInFullScreen = document.fullScreen ||
                 document.mozFullScreen ||
                 document.webkitIsFullScreen;
-            // just trigger the go event
             if (!isInFullScreen) {
                 Engage.trigger(plugin.events.fullscreenEnable.getName());
             }
@@ -380,7 +378,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 var isInFullScreen = document.fullScreen ||
                     document.mozFullScreen ||
                     document.webkitIsFullScreen;
-                // just trigger the cancel event
                 if (!isInFullScreen) {
                     Engage.trigger(plugin.events.fullscreenCancel.getName());
                 }
