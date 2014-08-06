@@ -200,7 +200,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 		aspectRatio[1] = parseInt(aspectRatio[1]);
 		aspectRatio[2] = parseInt(aspectRatio[2]);
 		Engage.log("Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-		$(".videoDisplay").css("width", (((1 / videoDisplays.length) * 100) - 1) + "%");
+		$(".videoDisplay").css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
+		$(".videoDisplay").each(function(index) {
+		    if((index % 2) == 1) {
+			$(this).css("float", "right");
+		    }
+		});
 		for(i = 0; i < videoDisplays.length; ++i) {
 		    $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
 		}
@@ -326,6 +331,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     function registerEvents(videoDisplay) {
         var theodulVideodisplay = videojs(videoDisplay);
+	
+	/*
+	$(window).resize(function() {
+	    // TODO: Make sure the video height is not greater than the window height
+	    // $(window).height();
+	});
+	*/
 	
         Engage.on(plugin.events.play.getName(), function () {
             if (videosReady) {
