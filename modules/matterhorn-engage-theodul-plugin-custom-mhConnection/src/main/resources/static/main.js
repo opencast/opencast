@@ -34,6 +34,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     var plugin;
     var events = {
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "A mediapackage model error occured", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "when the core loaded the event successfully", "handler"),
         getMediaInfo: new Engage.Event("MhConnection:getMediaInfo", "", "handler"),
         getMediaPackage: new Engage.Event("MhConnection:getMediaPackage", "", "handler")
@@ -124,7 +125,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         }
                         model.trigger("change");
                     } else {
-                        // TODO: error
+                		Engage.trigger(plugin.events.mediaPackageModelError.getName(), "Media information could not be loaded successfully.");
                     }
                 }
             });
@@ -180,7 +181,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             mediaInfo.title = mediaPackage.dcTitle;
             mediaInfo.creator = mediaPackage.dcCreator;
             mediaInfo.date = mediaPackage.dcCreated;
-        }
+        } else {
+			Engage.trigger(plugin.events.mediaPackageModelError.getName(), "No media information are available.");
+		}
     }
 
     /**
@@ -201,7 +204,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 mediaPackage = data['search-results'].result;
                 extractMediaInfo();
             } else {
-                // TODO: error
+				Engage.trigger(plugin.events.mediaPackageModelError.getName(), "A requested search endpoint is currently not available.");
             }
             callback();
         });
@@ -221,7 +224,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     Engage.on(plugin.events.getMediaInfo.getName(), function (callback) {
         // check if data is already loaded
         if (!mediaPackage && !mediaInfo) {
-            // Get Infos from Search Endpoint
+            // get info from search endpoint
             callSearchEndpoint(function () {
                 // trigger callback
                 callback(mediaInfo);
@@ -235,7 +238,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     Engage.on(plugin.events.getMediaPackage.getName(), function (callback) {
         // check if data is already loaded
         if (!mediaPackage) {
-            // Get Infos from Search Endpoint
+            // get info from search endpoint
             callSearchEndpoint(function () {
                 // trigger callback
                 callback(mediaPackage);
