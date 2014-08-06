@@ -194,6 +194,7 @@ CREATE TABLE mh_scheduled_event (
 
 CREATE TABLE mh_search (
   id VARCHAR(128) NOT NULL,
+  series_id VARCHAR(128),
   organization VARCHAR(128),
   deletion_date DATETIME,
   access_control TEXT(65535),
