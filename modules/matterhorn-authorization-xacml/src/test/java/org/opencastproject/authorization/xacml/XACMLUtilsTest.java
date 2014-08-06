@@ -63,7 +63,7 @@ public class XACMLUtilsTest {
    */
   @Test
   public void testParseXacml() throws Exception {
-    assertEquals(acl, XACMLUtils.parseXacml(this.getClass().getResourceAsStream("/xacml.xml")));
+    assertEquals(acl.getEntries(), XACMLUtils.parseXacml(this.getClass().getResourceAsStream("/xacml.xml")).getEntries());
   }
 
 }

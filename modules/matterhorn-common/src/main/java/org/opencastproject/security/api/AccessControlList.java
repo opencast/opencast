@@ -62,34 +62,6 @@ public final class AccessControlList {
   /**
    * {@inheritDoc}
    *
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this)
-      return true;
-
-    if (obj instanceof AccessControlList) {
-      AccessControlList other = (AccessControlList) obj;
-      return entries.equals(other.entries);
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    return entries.hashCode();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see java.lang.Object#toString()
    */
   @Override
