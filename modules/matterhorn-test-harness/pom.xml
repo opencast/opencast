@@ -5,7 +5,7 @@
   <artifactId>matterhorn-test-harness</artifactId>
   <packaging>jar</packaging>
   <name>matterhorn-test-harness</name>
-  <version>1.5.0-SNAPSHOT</version>
+  <version>1.5.0-rc5</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
