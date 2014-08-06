@@ -82,6 +82,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var videoDataModelChange = "change:videoDataModel";
     var initCount = 6;
 
+	function setSize() {
+		$("#engage_timeline_statistics_chart").attr("width", $(window).width() - 40).attr("height", 60).css({
+			"width": $(window).width() - 40,
+			"height": 60
+		});
+	}
+
     var StatisticsTimelineView = Backbone.View.extend({
         initialize: function () {
             this.setElement($(plugin.container)); // every plugin view has it's own container associated with it
@@ -94,15 +101,21 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.videoData.bind("change", this.render);
             this.footprints.bind("change", this.render);
             this.render();
+			var _this = this;
+			$(window).resize(function() {
+            	_this.render();
+			});
         },
         render: function () {
             // format values
             var tempVars = {
-                width: $(window).width(),
+                width: $(window).width() - 40,
                 height: "60"
             };
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
+
+			setSize();
 
             var duration = this.videoData.get("duration");
 
@@ -116,29 +129,16 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 }, this);
                 data.push([i, cView]);
             }
-            /*
-            var labels = new Array();
-            var data = new Array();
-            for(i=0;i<100;i++){
-              labels.push("");
-              if(i>50 && i<80){
-                data.push(5);
-              }else if(i>0 && i<10){
-                data.push(10);
-              }else{
-                data.push(0);
-              }
-            }*/
             var labels = new Array(); // chart label array
             var data = new Array(); // chart data array
-            var int = (duration / 1000) / 500; // interval length
+            var intvl = (duration / 1000) / 500; // interval length
             var cTime = 0; // current time in process
             var tmpViews = 0; // views per interval
             var tmpViewsCount = 0; // view entry count per interval
             for (i = 1; i <= 500; i++) {
                 tmpViews = 0;
                 tmpViewsCount = 0;
-                for (j = 1; j <= int; j++) { //real time loop
+                for (j = 1; j <= intvl; j++) { //real time loop
                     cTime++;
                     // count views for interval length
                     _.each(this.footprints, function (element, index, list) {
@@ -157,9 +157,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             }
 
             var options = {
-                // if we show the scale above the chart data     
+                // whether scale above the chart data     
                 scaleOverlay: true,
-                // if we want to override with a hard coded scale
+                // whether override with a hard coded scale
                 scaleOverride: false,
                 //** required if scaleOverride is true **
                 // the number of steps in a hard coded scale
@@ -182,11 +182,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 scaleFontSize: 12,
                 // scale label font weight style  
                 scaleFontStyle: "normal",
-                // scale label font colour  
+                // scale label font color  
                 scaleFontColor: "#666",
                 // whether grid lines are shown across the chart
                 scaleShowGridLines: false,
-                // colour of the grid lines
+                // color of the grid lines
                 scaleGridLineColor: "rgba(0,0,0,.05)",
                 // width of the grid lines
                 scaleGridLineWidth: 1,
@@ -211,7 +211,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 // animation easing effect
                 animationEasing: "easeOutQuart",
                 // function to fire when the animation is complete
-                onAnimationComplete: null
+                onAnimationComplete: function(){}
             }
 
             var lineChartData = {
@@ -220,7 +220,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     fillColor: "rgba(151,187,205,0.5)",
                     strokeColor: "rgba(151,187,205,1)",
                     pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
+                    pointStrokeColor: "#FFFFFF",
                     data: data
                 }]
             }
@@ -287,7 +287,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     // all plugins loaded
     Engage.on(plugin.events.plugin_load_done.getName(), function () {
-        Engage.log("Tab:Slidetext: Plugin load done");
+        Engage.log("Timeline:Statistics: Plugin load done");
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
