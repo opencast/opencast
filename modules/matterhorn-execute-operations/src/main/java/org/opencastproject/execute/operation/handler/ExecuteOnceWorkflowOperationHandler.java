@@ -143,7 +143,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
     // Process the result element
     MediaPackageElement resultElement = null;
     
-    try{
+    try {
       Job job = executeService.execute(exec, params, mediaPackage, outputFilename, expectedType);
 
       // Wait for all jobs to be finished                                                                                                                                                                                              

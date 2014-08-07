@@ -134,7 +134,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
 
     MediaPackageElementFlavor matchingFlavor = null;
     if (sourceFlavor != null)
-	matchingFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavor);
+    matchingFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavor);
 
     // Unmarshall target flavor
     MediaPackageElementFlavor targetFlavor = null;
@@ -173,7 +173,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
 
     MediaPackageElement[] inputElements = inputSet.toArray(new MediaPackageElement[inputSet.size()]);
 
-    try{
+    try {
       Job[] jobs = new Job[inputElements.length];
       MediaPackageElement[] resultElements = new MediaPackageElement[inputElements.length];
       long totalTimeInQueue = 0;

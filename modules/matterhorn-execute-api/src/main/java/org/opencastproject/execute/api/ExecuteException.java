@@ -1,4 +1,3 @@
-package org.opencastproject.execute.api;
 /**
  *  Copyright 2009, 2010 The Regents of the University of California
  *  Licensed under the Educational Community License, Version 2.0
@@ -15,14 +14,17 @@ package org.opencastproject.execute.api;
  *
  */
 
+package org.opencastproject.execute.api;
+
+
 /**
  * The class for any exceptions related with the ExecuteService
  */
 public class ExecuteException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-/**
+  /**
    * Constructs a new execute exception without a message or a cause.
    */
   public ExecuteException() {
