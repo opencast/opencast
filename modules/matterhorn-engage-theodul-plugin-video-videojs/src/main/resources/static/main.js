@@ -99,6 +99,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     /* change these variables */
     var videoPath = "lib/videojs/video";
     var synchronizePath = "lib/synchronize";
+    var videojs_swf_path = "lib/videojs/video-js.swf";
 
     /* don't change these variables */
     var aspectRatio = "";
@@ -107,8 +108,25 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var class_vjsposter = "vjs-poster";
     var id_engage_video = "engage_video";
     var id_videojs_wrapper = "videojs_wrapper";
+    var id_videoDisplayClass = "videoDisplay";
+    var id_engageContent = "engage_content";
+    var id_videojs_wrapperClass = "videojs_wrapper";
     var videosReady = false;
     var mediapackageChange = "change:mediaPackage";
+    var engageModelChange = "change:videoDataModel";
+    var event_html5player_timeupdate = "timeupdate";
+    var event_html5player_volumechange = "volumechange";
+    var event_html5player_fullscreenchange = "fullscreenchange";
+    var event_html5player_ended = "ended";
+    var event_sjs_allPlayersReady = "sjs:allPlayersReady";
+    var event_sjs_playerLoaded = "sjs:playerLoaded";
+    var event_sjs_masterPlay = "sjs:masterPlay";
+    var event_sjs_masterEnded = "sjs:masterEnded";
+    var event_sjs_masterTimeupdate = "sjs:masterTimeupdate";
+    var event_sjs_synchronizing = "sjs:synchronizing";
+    var event_sjs_buffering = "sjs:buffering";
+    var event_sjs_bufferedAndAutoplaying = "sjs:bufferedAndAutoplaying";
+    var event_sjs_bufferedButNotAutoplaying = "sjs:bufferedButNotAutoplaying";
 
     var VideoDataView = Backbone.View.extend({
         el: $("#" + id_engage_video), // every view has an element associated with it
@@ -200,8 +218,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 		aspectRatio[1] = parseInt(aspectRatio[1]);
 		aspectRatio[2] = parseInt(aspectRatio[2]);
 		Engage.log("Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-		$(".videoDisplay").css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
-		$(".videoDisplay").each(function(index) {
+		$("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
+		$("." + id_videoDisplayClass).each(function(index) {
 		    if((index % 2) == 1) {
 			$(this).css("float", "right");
 		    }
@@ -227,32 +245,32 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
                 if (nr >= 2) {
                     // throw some important synchronize.js-events for other plugins
-                    $(document).on("sjs:allPlayersReady", function (event) {
+                    $(document).on(event_sjs_allPlayersReady, function (event) {
                         videosReady = true;
                         Engage.trigger(plugin.events.ready.getName());
                     });
-                    $(document).on("sjs:playerLoaded", function (event) {
+                    $(document).on(event_sjs_playerLoaded, function (event) {
                         Engage.trigger(plugin.events.playerLoaded.getName());
                     });
-                    $(document).on("sjs:masterPlay", function (event) {
+                    $(document).on(event_sjs_masterPlay, function (event) {
                         Engage.trigger(plugin.events.masterPlay.getName());
                     });
-                    $(document).on("sjs:masterEnded", function (event) {
+                    $(document).on(event_sjs_masterEnded, function (event) {
                         Engage.trigger(plugin.events.masterEnded.getName());
                     });
-                    $(document).on("sjs:masterTimeupdate", function (event) {
+                    $(document).on(event_sjs_masterTimeupdate, function (event) {
                         Engage.trigger(plugin.events.masterTimeupdate.getName());
                     });
-                    $(document).on("sjs:synchronizing", function (event) {
+                    $(document).on(event_sjs_synchronizing, function (event) {
                         Engage.trigger(plugin.events.synchronizing.getName());
                     });
-                    $(document).on("sjs:buffering", function (event) {
+                    $(document).on(event_sjs_buffering, function (event) {
                         Engage.trigger(plugin.events.buffering.getName());
                     });
-                    $(document).on("sjs:bufferedAndAutoplaying", function (event) {
+                    $(document).on(event_sjs_bufferedAndAutoplaying, function (event) {
                         Engage.trigger(plugin.events.bufferedAndAutoplaying.getName());
                     });
-                    $(document).on("sjs:bufferedButNotAutoplaying", function (event) {
+                    $(document).on(event_sjs_bufferedButNotAutoplaying, function (event) {
                         Engage.trigger(plugin.events.bufferedButNotAutoplaying.getName());
                     });
 
@@ -270,6 +288,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     Engage.trigger(plugin.events.ready.getName());
                 }
             }
+	    checkVideoDisplaySize();
         }
     });
 
@@ -306,13 +325,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     "height": "100%"
                 };
 
-                // init videoJS
+                // init video.js
                 videojs(id, videoOptions, function () {
                     var theodulVideodisplay = this;
                     // set sources
                     theodulVideodisplay.src(videoSource);
                 });
-                // URL to the Flash SWF
+                // URL to the flash swf
                 if (videojs_swf) {
                     Engage.log("Loaded flash component");
                     videojs.options.flash.swf = videojs_swf;
@@ -329,15 +348,24 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
     }
 
+    function checkVideoDisplaySize() {
+	// make sure the video height is not greater than the window height
+	$("#" + id_engageContent).css("max-width", "");
+	for(i = 0; i < 10; ++i) {
+	    if($(window).height() < ($("." + id_videojs_wrapperClass).position().top + $("." + id_videojs_wrapperClass).height())) {
+		$("#" + id_engageContent).css("max-width", $("#" + id_engageContent).width() / 2);
+	    } else {
+		break;
+	    }
+	}
+    }
+
     function registerEvents(videoDisplay) {
         var theodulVideodisplay = videojs(videoDisplay);
 	
-	/*
 	$(window).resize(function() {
-	    // TODO: Make sure the video height is not greater than the window height
-	    // $(window).height();
+	    checkVideoDisplaySize();
 	});
-	*/
 	
         Engage.on(plugin.events.play.getName(), function () {
             if (videosReady) {
@@ -373,19 +401,19 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 theodulVideodisplay.currentTime(normTime);
             }
         });
-        theodulVideodisplay.on("timeupdate", function () {
+        theodulVideodisplay.on(event_html5player_timeupdate, function () {
             if (videosReady) {
-                Engage.log("CurrentTime while timeupdate: " + theodulVideodisplay.currentTime());
+                Engage.log("Current time: " + theodulVideodisplay.currentTime());
                 Engage.trigger(plugin.events.timeupdate.getName(), theodulVideodisplay.currentTime());
             }
         });
-        theodulVideodisplay.on("volumechange", function () {
+        theodulVideodisplay.on(event_html5player_volumechange, function () {
             Engage.trigger(plugin.events.volumechange.getName(), theodulVideodisplay.volume());
         });
-        theodulVideodisplay.on("fullscreenchange", function () {
+        theodulVideodisplay.on(event_html5player_fullscreenchange, function () {
             Engage.trigger(plugin.events.fullscreenChange.getName());
         });
-        theodulVideodisplay.on("ended", function () {
+        theodulVideodisplay.on(event_html5player_ended, function () {
             if (videosReady) {
                 Engage.trigger(plugin.events.ended.getName());
                 theodulVideodisplay.pause();
@@ -399,9 +427,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         //only init if plugin template was inserted into the DOM
         if (plugin.inserted === true) {
             // set path to swf player
-            var videojs_swf = plugin.pluginPath + "lib/videojs/video-js.swf";
+            var videojs_swf = plugin.pluginPath + videojs_swf_path;
 
-            Engage.model.on("change:videoDataModel", function () {
+            Engage.model.on(engageModelChange, function () {
                 new VideoDataView(this.get("videoDataModel"), plugin.template, videojs_swf);
             });
             Engage.model.get("mediaPackage").on("change", function () {
