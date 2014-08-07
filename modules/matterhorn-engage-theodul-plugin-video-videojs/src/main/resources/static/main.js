@@ -100,6 +100,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var videoPath = "lib/videojs/video";
     var synchronizePath = "lib/synchronize";
     var videojs_swf_path = "lib/videojs/video-js.swf";
+    var videoDisplaySizeFactor = 1.1;
+    var videoDisplaySizeTimesCheck = 100; // the smaller the factor, the higher the times check!
 
     /* don't change these variables */
     var aspectRatio = "";
@@ -351,9 +353,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     function checkVideoDisplaySize() {
 	// make sure the video height is not greater than the window height
 	$("#" + id_engageContent).css("max-width", "");
-	for(i = 0; i < 10; ++i) {
+	for(i = 0; i < videoDisplaySizeTimesCheck; ++i) {
 	    if($(window).height() < ($("." + id_videojs_wrapperClass).position().top + $("." + id_videojs_wrapperClass).height())) {
-		$("#" + id_engageContent).css("max-width", $("#" + id_engageContent).width() / 2);
+		$("#" + id_engageContent).css("max-width", $("#" + id_engageContent).width() / videoDisplaySizeFactor);
 	    } else {
 		break;
 	    }
