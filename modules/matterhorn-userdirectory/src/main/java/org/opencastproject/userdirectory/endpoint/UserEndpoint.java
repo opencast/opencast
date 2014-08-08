@@ -112,6 +112,8 @@ public class UserEndpoint {
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
   public JaxbUserList getUsersAsJson(@QueryParam("limit") int limit, @QueryParam("offset") int offset)
           throws IOException {
+
+    // Set the maximum number of items to return to 100 if this limit parameter is not given
     if (limit < 1)
       limit = 100;
 
@@ -140,7 +142,7 @@ public class UserEndpoint {
   @RestQuery(name = "createUser", description = "Create a new  user", returnDescription = "The location of the new ressource", restParameters = {
           @RestParameter(description = "The username.", isRequired = true, name = "username", type = STRING),
           @RestParameter(description = "The password.", isRequired = true, name = "password", type = STRING),
-          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array, for example: ['ROLE_USER', 'ROLE_ADMIN']") }, reponses = {
+          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]") }, reponses = {
           @RestResponse(responseCode = SC_CREATED, description = "User has been created."),
           @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.") })
   public Response createUser(@FormParam("username") String username, @FormParam("password") String password,
@@ -176,7 +178,7 @@ public class UserEndpoint {
   @Path("{username}.json")
   @RestQuery(name = "updateUser", description = "Update an user", returnDescription = "Status ok", restParameters = {
           @RestParameter(description = "The password.", isRequired = false, name = "password", type = STRING),
-          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array, for example: ['ROLE_USER', 'ROLE_ADMIN']") }, pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
+          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]") }, pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
           @RestResponse(responseCode = SC_OK, description = "User has been updated."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
   public Response updateUser(@PathParam("username") String username, @FormParam("password") String password,
