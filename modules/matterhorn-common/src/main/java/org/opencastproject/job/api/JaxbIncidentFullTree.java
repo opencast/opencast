@@ -34,7 +34,6 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "incidentFullTree", namespace = "http://job.opencastproject.org")
 @XmlRootElement(name = "incidentFullTree", namespace = "http://job.opencastproject.org")
-// CHECKSTYLE:OFF
 public final class JaxbIncidentFullTree {
   @XmlElement(name = JaxbIncidentUtil.ELEM_NESTED_INCIDENT)
   private List<JaxbIncidentFull> incidents;
@@ -46,15 +45,16 @@ public final class JaxbIncidentFullTree {
   public JaxbIncidentFullTree() {
   }
 
-  public JaxbIncidentFullTree(IncidentService svc, Locale locale, IncidentTree tree)
-          throws IncidentServiceException, NotFoundException {
+  public JaxbIncidentFullTree(IncidentService svc, Locale locale, IncidentTree tree) throws IncidentServiceException,
+          NotFoundException {
     this.incidents = mlist(tree.getIncidents()).map(JaxbIncidentFull.mkFn(svc, locale)).value();
     this.descendants = mlist(tree.getDescendants()).map(mkFn(svc, locale)).value();
   }
 
   public static Function<IncidentTree, JaxbIncidentFullTree> mkFn(final IncidentService svc, final Locale locale) {
     return new Function.X<IncidentTree, JaxbIncidentFullTree>() {
-      @Override public JaxbIncidentFullTree xapply(IncidentTree tree) throws Exception {
+      @Override
+      public JaxbIncidentFullTree xapply(IncidentTree tree) throws Exception {
         return new JaxbIncidentFullTree(svc, locale, tree);
       }
     };

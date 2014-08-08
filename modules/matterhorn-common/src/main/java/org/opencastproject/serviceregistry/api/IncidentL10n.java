@@ -17,8 +17,6 @@ package org.opencastproject.serviceregistry.api;
 
 /** Locale dependent information for a {@link org.opencastproject.job.api.Incident}. */
 public interface IncidentL10n {
-  /** Return the effective locale of the localized texts */
-//  Locale getLocale();
 
   /** Get the fully processed, localized title. */
   String getTitle();

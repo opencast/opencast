@@ -35,7 +35,6 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "incidentFull", namespace = "http://job.opencastproject.org")
 @XmlRootElement(name = "incidentFull", namespace = "http://job.opencastproject.org")
-// CHECKSTYLE:OFF
 public final class JaxbIncidentFull {
   @XmlElement(name = "id")
   private long id;
@@ -86,7 +85,8 @@ public final class JaxbIncidentFull {
 
   public static Function<Incident, JaxbIncidentFull> mkFn(final IncidentService svc, final Locale locale) {
     return new Function.X<Incident, JaxbIncidentFull>() {
-      @Override public JaxbIncidentFull xapply(Incident incident) throws Exception {
+      @Override
+      public JaxbIncidentFull xapply(Incident incident) throws Exception {
         return new JaxbIncidentFull(incident, svc.getLocalization(incident.getId(), locale));
       }
     };

@@ -33,7 +33,6 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "incidentFullList", namespace = "http://job.opencastproject.org")
 @XmlRootElement(name = "incidentFullList", namespace = "http://job.opencastproject.org")
-// CHECKSTYLE:OFF
 public final class JaxbIncidentFullList {
   @XmlElement(name = JaxbIncidentUtil.ELEM_NESTED_INCIDENT)
   private List<JaxbIncidentFull> incidents;

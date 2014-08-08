@@ -34,7 +34,6 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "incidentDigestTree", namespace = "http://job.opencastproject.org")
 @XmlRootElement(name = "incidentDigestTree", namespace = "http://job.opencastproject.org")
-// CHECKSTYLE:OFF
 public final class JaxbIncidentDigestTree {
   @XmlElement(name = JaxbIncidentUtil.ELEM_NESTED_INCIDENT)
   private List<JaxbIncidentDigest> incidents;
@@ -46,15 +45,16 @@ public final class JaxbIncidentDigestTree {
   public JaxbIncidentDigestTree() {
   }
 
-  public JaxbIncidentDigestTree(IncidentService svc, Locale locale, IncidentTree tree)
-          throws IncidentServiceException, NotFoundException {
+  public JaxbIncidentDigestTree(IncidentService svc, Locale locale, IncidentTree tree) throws IncidentServiceException,
+          NotFoundException {
     this.incidents = mlist(tree.getIncidents()).map(JaxbIncidentDigest.mkFn(svc, locale)).value();
     this.descendants = mlist(tree.getDescendants()).map(mkFn(svc, locale)).value();
   }
 
   public static Function<IncidentTree, JaxbIncidentDigestTree> mkFn(final IncidentService svc, final Locale locale) {
     return new Function.X<IncidentTree, JaxbIncidentDigestTree>() {
-      @Override public JaxbIncidentDigestTree xapply(IncidentTree tree) throws Exception {
+      @Override
+      public JaxbIncidentDigestTree xapply(IncidentTree tree) throws Exception {
         return new JaxbIncidentDigestTree(svc, locale, tree);
       }
     };

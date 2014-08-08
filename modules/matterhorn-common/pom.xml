@@ -187,7 +187,7 @@
     </dependency>
     <!-- for xml matchers equivalence tests -->
     <dependency>
-	  <groupId>xmlunit</groupId>
+      <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
       <version>1.5</version>
       <scope>test</scope>

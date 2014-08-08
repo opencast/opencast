@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "incidentDigestList", namespace = "http://job.opencastproject.org")
 @XmlRootElement(name = "incidentDigestList", namespace = "http://job.opencastproject.org")
 public final class JaxbIncidentDigestList {
-  // CHECKSTYLE:OFF
+
   @XmlElement(name = JaxbIncidentUtil.ELEM_NESTED_INCIDENT)
   private List<JaxbIncidentDigest> incidents;
 
