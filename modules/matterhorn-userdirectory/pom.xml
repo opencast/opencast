@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-userdirectory</artifactId>
   <name>matterhorn-userdirectory</name>
@@ -41,7 +40,6 @@
       <groupId>com.googlecode.guava-osgi</groupId>
       <artifactId>guava-osgi</artifactId>
     </dependency>
-    
     <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -78,6 +76,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <version>1.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>c3p0</groupId>
       <artifactId>c3p0</artifactId>
       <scope>test</scope>
@@ -104,13 +108,12 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.0.1</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-<Build-Number>${build.number}</Build-Number>
-<Mh-Db-Version>${mh.db.version}</Mh-Db-Version>
+            <Build-Number>${build.number}</Build-Number>
+            <Mh-Db-Version>${mh.db.version}</Mh-Db-Version>
             <Export-Package>
               org.opencastproject.userdirectory;version=${project.version},
             </Export-Package>

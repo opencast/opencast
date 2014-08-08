@@ -6,6 +6,8 @@ set -x
 source "${HOME3P}/utilx"
 [ $? -ne 0 ] && exit 1
 #
-compile flac mac || exit 1
+compile flac   mac || exit 1
+compile mad    mac || exit 1
+compile id3tag mac || exit 1
 #
 exit 0

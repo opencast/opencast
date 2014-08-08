@@ -42,7 +42,7 @@ import java.util.Properties;
 
 /**
  * The unit test for scheduling the workflow
- * 
+ *
  */
 public class SchedulingTest {
   private static final Logger logger = LoggerFactory.getLogger(SchedulingTest.class);

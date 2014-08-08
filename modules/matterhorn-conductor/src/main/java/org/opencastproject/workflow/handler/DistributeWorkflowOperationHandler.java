@@ -70,7 +70,7 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param distributionService
    *          the distribution service
    */
@@ -80,7 +80,7 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param authorizationService
    *          the authorization service
    */
@@ -107,7 +107,7 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -117,7 +117,7 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */

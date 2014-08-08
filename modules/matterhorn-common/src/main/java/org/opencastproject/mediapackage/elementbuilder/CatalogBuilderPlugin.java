@@ -107,7 +107,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#destroy()
    */
   @Override
@@ -116,7 +116,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#elementFromManifest(org.w3c.dom.Node,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
@@ -206,7 +206,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#newElement(org.opencastproject.mediapackage.MediaPackageElement.Type,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
@@ -219,7 +219,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#init()
    */
   @Override

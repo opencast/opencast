@@ -67,7 +67,7 @@ public final class DCMIPeriod {
 
   /**
    * Returns the optional name of the period.
-   * 
+   *
    * @return the name of the period or null
    */
   public String getName() {

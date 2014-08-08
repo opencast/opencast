@@ -48,7 +48,7 @@ public class JaxbMediaSegmentPreview implements MediaSegmentPreview {
 
   /**
    * Creates a new preview url.
-   * 
+   *
    * @param url
    *          url to the preview image
    * @param reference
@@ -61,7 +61,7 @@ public class JaxbMediaSegmentPreview implements MediaSegmentPreview {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.episode.api.MediaSegmentPreview#getReference()
    */
   @Override
@@ -71,7 +71,7 @@ public class JaxbMediaSegmentPreview implements MediaSegmentPreview {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.episode.api.MediaSegmentPreview#getUrl()
    */
   @Override

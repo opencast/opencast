@@ -24,7 +24,7 @@ import org.junit.Test;
 
 /**
  * Test for {@link TimeImpl} and {@link TimeUtil}.
- * 
+ *
  */
 public class TimeTest {
 

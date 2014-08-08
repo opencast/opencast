@@ -27,7 +27,7 @@ public final class Anchor {
 
   /**
    * Create a new anchor point.
-   * 
+   *
    * @param left
    *          width ratio measured from the left. 0 <= left <= 1
    * @param top

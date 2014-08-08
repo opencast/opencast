@@ -27,7 +27,7 @@ public class MediaPackageException extends Exception {
 
   /**
    * Creates a new media package exception with the specified message.
-   * 
+   *
    * @param msg
    *          the error message
    */
@@ -37,7 +37,7 @@ public class MediaPackageException extends Exception {
 
   /**
    * Creates a new media package exception caused by Throwable <code>t</code>.
-   * 
+   *
    * @param t
    *          the original exception
    */
@@ -47,7 +47,7 @@ public class MediaPackageException extends Exception {
 
   /**
    * Creates a new media package exception caused by Throwable <code>t</code>.
-   * 
+   *
    * @param msg
    *          individual error message
    * @param t

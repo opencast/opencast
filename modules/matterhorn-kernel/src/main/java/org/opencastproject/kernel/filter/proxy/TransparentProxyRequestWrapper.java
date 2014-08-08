@@ -30,7 +30,7 @@ class TransparentProxyRequestWrapper extends HttpServletRequestWrapper {
 
   /**
    * Wraps the request.
-   * 
+   *
    * @param request
    *          the original request
    */
@@ -42,7 +42,7 @@ class TransparentProxyRequestWrapper extends HttpServletRequestWrapper {
   /**
    * Overwrites the original behavior by returning the address transported in the <code>X-FORWARDED-FOR</code> request
    * header instead of the proxy's ip.
-   * 
+   *
    * @see javax.servlet.ServletRequestWrapper#getRemoteAddr()
    */
   @Override
@@ -53,7 +53,7 @@ class TransparentProxyRequestWrapper extends HttpServletRequestWrapper {
   /**
    * Overwrites the original behavior by returning the address transported in the <code>X-FORWARDED-FOR</code> request
    * header instead of the proxy's hostname.
-   * 
+   *
    * @see javax.servlet.ServletRequestWrapper#getRemoteHost()
    */
   @Override

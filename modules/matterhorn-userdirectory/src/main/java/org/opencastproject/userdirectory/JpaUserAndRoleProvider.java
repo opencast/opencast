@@ -108,7 +108,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Callback for activation of this component.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -140,7 +140,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override
@@ -155,7 +155,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#findUsers(String, int, int)
    */
   @Override
@@ -169,7 +169,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
    */
   @Override
@@ -183,7 +183,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#loadUser(java.lang.String)
    */
   @Override
@@ -206,7 +206,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
    */
   @Override
@@ -218,7 +218,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#getOrganization()
    */
   @Override
@@ -228,7 +228,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -238,7 +238,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Loads a user from persistence
-   * 
+   *
    * @param userName
    *          the user name
    * @param organization
@@ -251,7 +251,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Adds a user to the persistence
-   * 
+   *
    * @param user
    *          the user to add
    */
@@ -323,7 +323,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Adds a role to the persistence
-   * 
+   *
    * @param jpaRole
    *          the role
    */
@@ -332,5 +332,4 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     roles.add(jpaRole);
     UserDirectoryPersistenceUtil.saveRoles(roles, emf);
   }
-
 }

@@ -83,7 +83,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -93,7 +93,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the caption service
-   * 
+   *
    * @param service
    *          the caption service to set
    */
@@ -103,7 +103,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Removes the caption service
-   * 
+   *
    * @param service
    *          the caption service to remove
    */
@@ -113,7 +113,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -123,7 +123,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Convert captions in catalog from one format to another.
-   * 
+   *
    * @param inputType
    *          input format
    * @param outputType
@@ -170,7 +170,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Parses captions in catalog for language information.
-   * 
+   *
    * @param inputType
    *          caption format
    * @param catalogAsXml
@@ -226,7 +226,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -239,7 +239,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

@@ -87,7 +87,7 @@ public class WorkingFileRepoRestEndpointTest {
     HttpGet get = new HttpGet(BASE_URL + "/files/mediapackage/" + mediapackageId + "/" + elementId);
     HttpResponse getResponse = client.execute(get);
     byte[] bytesFromGet = IOUtils.toByteArray(getResponse.getEntity().getContent());
-    
+
     // Ensure that the bytes that we posted are the same we received
     Assert.assertTrue(Arrays.equals(bytesFromGet, bytesFromPost));
   }

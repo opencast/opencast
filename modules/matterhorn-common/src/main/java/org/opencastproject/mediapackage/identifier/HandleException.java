@@ -26,7 +26,7 @@ public class HandleException extends Exception {
 
   /**
    * Creates a new handle exception with the specified message.
-   * 
+   *
    * @param msg
    *          the error message
    */
@@ -36,7 +36,7 @@ public class HandleException extends Exception {
 
   /**
    * Creates a new handle exception caused by Throwable <code>t</code>.
-   * 
+   *
    * @param t
    *          the original exception
    */
@@ -46,7 +46,7 @@ public class HandleException extends Exception {
 
   /**
    * Creates a new handle exception caused by Throwable <code>t</code>.
-   * 
+   *
    * @param msg
    *          individual error message
    * @param t

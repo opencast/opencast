@@ -96,7 +96,7 @@ public final class AssetDto {
 
   /**
    * Delete assets by media package ID.
-   * 
+   *
    * @return true if at least on asset has been deleted
    */
   public static boolean deleteByMediaPackageId(EntityManager em, String mpId) {

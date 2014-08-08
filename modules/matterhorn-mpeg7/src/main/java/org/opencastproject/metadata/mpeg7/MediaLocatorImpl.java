@@ -38,7 +38,7 @@ public class MediaLocatorImpl implements MediaLocator {
 
   /**
    * Creates a new media locator with the specified uri.
-   * 
+   *
    * @param mediaURI
    *          the media uri
    */
@@ -57,7 +57,7 @@ public class MediaLocatorImpl implements MediaLocator {
 
   /**
    * Sets the media uri.
-   * 
+   *
    * @param mediaURI
    *          the uri
    */

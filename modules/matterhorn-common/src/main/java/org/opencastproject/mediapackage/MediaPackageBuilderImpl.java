@@ -33,18 +33,24 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class provides factory methods for the creation of media packages from manifest files, directories or from
  * scratch. This class is not thread safe, so create a new builder in each method invocation.
  */
 public class MediaPackageBuilderImpl implements MediaPackageBuilder {
 
+  /** The logging instance */
+  private static final Logger logger = LoggerFactory.getLogger(MediaPackageBuilderImpl.class);
+
   /** The media package serializer */
   protected MediaPackageSerializer serializer = null;
 
   /**
    * Creates a new media package builder.
-   * 
+   *
    * @throws IllegalStateException
    *           if the temporary directory cannot be created or is not accessible
    */
@@ -54,7 +60,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
   /**
    * Creates a new media package builder that uses the given serializer to resolve urls while reading manifests and
    * adding new elements.
-   * 
+   *
    * @param serializer
    *          the media package serializer
    * @throws IllegalStateException
@@ -68,7 +74,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#createNew()
    */
   public MediaPackage createNew() throws MediaPackageException {
@@ -77,7 +83,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#createNew(org.opencastproject.mediapackage.identifier.Id)
    */
   public MediaPackage createNew(Id identifier) throws MediaPackageException {
@@ -86,7 +92,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#loadFromXml(java.io.InputStream)
    */
   public MediaPackage loadFromXml(InputStream is) throws MediaPackageException {
@@ -120,7 +126,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#loadFromXml(java.lang.String)
    */
   @Override
@@ -160,8 +166,18 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
     NodeList nodes = (NodeList) xPath.evaluate("//*[local-name() = 'url']", xml, XPathConstants.NODESET);
     for (int i = 0; i < nodes.getLength(); i++) {
       Node uri = nodes.item(i).getFirstChild();
-      if (uri != null)
-        uri.setNodeValue(serializer.resolvePath(uri.getNodeValue()).toString());
+      if (uri != null) {
+        String uriStr = uri.getNodeValue();
+        String trimmedUriStr = uriStr.trim();
+        /* Warn the user if trimming is necessary as this means that the URI
+         * was technically invalid.
+         */
+        if (!trimmedUriStr.equals(uriStr)) {
+          logger.warn("Detected invalid URI. Trying to fix it by "
+              + "removing spaces from beginning/end.");
+        }
+        uri.setNodeValue(serializer.resolvePath(trimmedUriStr).toString());
+      }
     }
   }
 

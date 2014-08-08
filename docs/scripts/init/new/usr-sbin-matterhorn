@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 
 prog="matterhorn"
@@ -170,13 +170,20 @@ clean_felix_cache
 
 if [ "$1" == "--daemon" ]
 then
-	su -c "java $MATTERHORN_OPTS -jar $MATTERHORN/bin/felix.jar \
+	su -c "cd $MATTERHORN; \
+		java $MATTERHORN_OPTS -jar $MATTERHORN/bin/felix.jar \
 		$FELIX_CACHE_DIR &> /dev/null & echo \$! 1>&3" \
 		$MATTERHORN_USER 3> $pidfile || ( rm -f $pidfile && exit 1 )
 else
-	su -c "/bin/sh -c \"set -o monitor; \
+	# We set the pid to the process id of this script as in this case
+	# Matterhorn runs synchronous and the pid will indicate that
+	# Matterhorn is active.
+	echo $$ > $pidfile
+	set -o monitor
+	pushd $MATTERHORN &> /dev/null
+	sudo -u $MATTERHORN_USER \
 		java $MATTERHORN_OPTS -jar $MATTERHORN/bin/felix.jar \
-		$FELIX_CACHE_DIR 3>&- & echo \\\$! 1>&3 && fg %% \"" \
-		$MATTERHORN_USER 3> $pidfile
-	stop_matterhorn
+		$FELIX_CACHE_DIR
+	rm -f $pidfile
+	popd &> /dev/null
 fi

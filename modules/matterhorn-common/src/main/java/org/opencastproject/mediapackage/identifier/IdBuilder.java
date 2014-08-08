@@ -26,7 +26,7 @@ public interface IdBuilder {
    * <p>
    * The default implementation will return a uuid-style identifier.
    * </p>
-   * 
+   *
    * @return the new identifier
    */
   Id createNew();
@@ -34,7 +34,7 @@ public interface IdBuilder {
   /**
    * This method can be used to determine if <code>id</code> is in fact a vaild identifier as expected by this id
    * builder. If this is not the case, an {@link IllegalArgumentException} is thrown.
-   * 
+   *
    * @return the id
    * @throws IllegalArgumentException
    *           if the identifier is malformed

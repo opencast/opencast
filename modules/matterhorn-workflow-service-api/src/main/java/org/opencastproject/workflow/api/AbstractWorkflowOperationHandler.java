@@ -59,7 +59,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Activates this component with its properties once all of the collaborating services have been set
-   * 
+   *
    * @param cc
    *          The component's context, containing the properties used for configuration
    */
@@ -70,7 +70,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -80,7 +80,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -92,7 +92,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#destroy(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -102,7 +102,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -112,7 +112,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Adds a configuration option to the list of possible configuration options.
-   * 
+   *
    * @param name
    *          the option name
    * @param description
@@ -124,7 +124,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Removes the configuration option from the list of possible configuration options.
-   * 
+   *
    * @param name
    *          the option name
    */
@@ -135,7 +135,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * Converts a comma separated string into a set of values. Useful for converting operation configuration strings into
    * multi-valued sets.
-   * 
+   *
    * @param elements
    *          The comma space separated string
    * @return the set of values
@@ -162,7 +162,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Generates a filename using the base name of a source element and the extension of a derived element.
-   * 
+   *
    * @param source
    *          the source media package element
    * @param derived
@@ -177,7 +177,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getId()
    */
   @Override
@@ -187,7 +187,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getDescription()
    */
   @Override
@@ -197,7 +197,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Creates a result for the execution of this workflow operation handler.
-   * 
+   *
    * @param action
    *          the action to take
    * @return the result
@@ -211,7 +211,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * <p>
    * Since there is no way for the workflow service to determine the queuing time (e. g. waiting on services), it needs
    * to be provided by the handler.
-   * 
+   *
    * @param action
    *          the action to take
    * @param timeInQueue
@@ -224,7 +224,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Creates a result for the execution of this workflow operation handler.
-   * 
+   *
    * @param mediaPackage
    *          the modified mediapackage
    * @param action
@@ -240,7 +240,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * <p>
    * Since there is no way for the workflow service to determine the queuing time (e. g. waiting on services), it needs
    * to be provided by the handler.
-   * 
+   *
    * @param mediaPackage
    *          the modified mediapackage
    * @param action
@@ -258,7 +258,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * <p>
    * Since there is no way for the workflow service to determine the queuing time (e. g. waiting on services), it needs
    * to be provided by the handler.
-   * 
+   *
    * @param mediaPackage
    *          the modified mediapackage
    * @param properties
@@ -277,7 +277,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * Sets the service registry. This method is here as a convenience for developers that need the registry to do job
    * waiting.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -293,7 +293,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * <li>{@link Job.Status#DELETED}</li>
    * </ul>
    * After that, the method returns with the actual outcomes of the jobs.
-   * 
+   *
    * @param jobs
    *          the jobs
    * @return the jobs and their outcomes
@@ -314,7 +314,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * <li>{@link Job.Status#DELETED}</li>
    * </ul>
    * After that, the method returns with the actual outcomes of the jobs.
-   * 
+   *
    * @param timeout
    *          the maximum amount of time in miliseconds to wait
    * @param jobs
@@ -355,7 +355,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -365,7 +365,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -381,7 +381,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

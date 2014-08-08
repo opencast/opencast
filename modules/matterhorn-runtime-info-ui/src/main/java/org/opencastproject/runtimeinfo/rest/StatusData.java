@@ -46,7 +46,7 @@ public class StatusData {
 
   /**
    * A constructor that takes a RestResponse annotation type object and constructs a StatusData object.
-   * 
+   *
    * @param restResponse
    *          a RestResponse annotation type object that stores a response code and its description
    * @throws IllegalArgumentException
@@ -61,7 +61,7 @@ public class StatusData {
    * response and constructs a StatusData object. A reference of response code constants can be found in <a
    * href="http://download.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html"
    * >javax.servlet.http.HttpServletResponse</a>.
-   * 
+   *
    * @param code
    *          a HTTP response code
    * @param description
@@ -88,7 +88,7 @@ public class StatusData {
    * object. A reference of response code constants can be found in <a
    * href="http://download.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html"
    * >javax.servlet.http.HttpServletResponse</a>.
-   * 
+   *
    * @param code
    *          a HTTP response code
    * @param description
@@ -133,7 +133,7 @@ public class StatusData {
 
   /**
    * This will resolve a human readable name for all known status codes.
-   * 
+   *
    * @param code
    *          the status code
    * @return the name OR UNKNOWN if none found

@@ -81,7 +81,7 @@ public final class AccessControlParser {
 
   /**
    * Parses a string into an ACL.
-   * 
+   *
    * @param serializedForm
    *          the string containing the xml or json formatted access control list.
    * @return the access control list
@@ -130,7 +130,7 @@ public final class AccessControlParser {
 
   /**
    * Unmarshals an ACL from an xml input stream.
-   * 
+   *
    * @param in
    *          the xml input stream
    * @return the acl
@@ -145,7 +145,7 @@ public final class AccessControlParser {
 
   /**
    * Parses a JSON stream to an ACL.
-   * 
+   *
    * @param content
    *          the JSON stream
    * @return the access control list
@@ -180,7 +180,7 @@ public final class AccessControlParser {
 
   /**
    * Converts a JSON representation of an access control entry to an {@link AccessControlEntry}.
-   * 
+   *
    * @param jsonAce
    *          the json object
    * @return the access control entry
@@ -194,7 +194,7 @@ public final class AccessControlParser {
 
   /**
    * Parses an XML stream to an ACL.
-   * 
+   *
    * @param in
    *          the XML stream
    * @throws IOException
@@ -218,7 +218,7 @@ public final class AccessControlParser {
 
   /**
    * Serializes an AccessControlList to its XML form.
-   * 
+   *
    * @param acl
    *          the access control list
    * @return the xml as a string

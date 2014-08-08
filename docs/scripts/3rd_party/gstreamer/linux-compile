@@ -20,8 +20,16 @@ case `os` in
     [ $? -ne 0 ] && exit 1
     sudox yum -y install gstreamer-plugins-bad
     [ $? -ne 0 ] && exit 1
-    sudox yum -y install gstreamer-plugins-ugly
-    [ $? -ne 0 ] && exit 1
+    case `os_ver` in
+      5.* )
+        ./install-plugins-ugly-rhel-5.x
+        [ $? -ne 0 ] && exit 1
+        ;;
+      * )
+        sudox yum -y install gstreamer-plugins-ugly
+        [ $? -ne 0 ] && exit 1
+        ;;
+    esac
     sudox yum -y install gstreamer-ffmpeg
     [ $? -ne 0 ] && exit 1
     ;;
@@ -34,10 +42,20 @@ case `os` in
     [ $? -ne 0 ] && exit 1
     sudox yum -y install gstreamer-plugins-good
     [ $? -ne 0 ] && exit 1
-    ./install-plugins-bad-rhel-6.x
-    [ $? -ne 0 ] && exit 1
-    ./install-plugins-ugly-rhel-6.x
-    [ $? -ne 0 ] && exit 1
+    case `os_ver` in
+      5.* )
+        sudox yum -y install gstreamer-plugins-bad
+        [ $? -ne 0 ] && exit 1
+        ./install-plugins-ugly-rhel-5.x
+        [ $? -ne 0 ] && exit 1
+        ;;
+      * )
+        ./install-plugins-bad-rhel-6.x
+        [ $? -ne 0 ] && exit 1
+        ./install-plugins-ugly-rhel-6.x
+        [ $? -ne 0 ] && exit 1
+        ;;
+    esac
     sudox yum -y install gstreamer-ffmpeg
     [ $? -ne 0 ] && exit 1
     ;;

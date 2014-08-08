@@ -34,7 +34,7 @@ public class WildcardQueryParserPlugin extends QParserPlugin {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.solr.util.plugin.NamedListInitializedPlugin#init(org.apache.solr.common.util.NamedList)
    */
   @SuppressWarnings("unchecked")
@@ -44,7 +44,7 @@ public class WildcardQueryParserPlugin extends QParserPlugin {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.solr.search.QParserPlugin#createParser(java.lang.String, org.apache.solr.common.params.SolrParams,
    *      org.apache.solr.common.params.SolrParams, org.apache.solr.request.SolrQueryRequest)
    */
@@ -60,7 +60,7 @@ public class WildcardQueryParserPlugin extends QParserPlugin {
 
     /**
      * Creates a new wildcard query parser.
-     * 
+     *
      * @param qstr
      *          the query string
      * @param localParams
@@ -76,7 +76,7 @@ public class WildcardQueryParserPlugin extends QParserPlugin {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.apache.solr.search.QParser#parse()
      */
     @Override

@@ -71,7 +71,7 @@ public final class JaxbGroup implements Group {
 
   /**
    * Constructs a group with the specified groupId, name, description and group role.
-   * 
+   *
    * @param groupId
    *          the group id
    * @param organization
@@ -93,7 +93,7 @@ public final class JaxbGroup implements Group {
 
   /**
    * Constructs a group with the specified groupId, name, description, group role and roles.
-   * 
+   *
    * @param groupId
    *          the group id
    * @param organization
@@ -112,7 +112,7 @@ public final class JaxbGroup implements Group {
 
   /**
    * Constructs a group with the specified groupId, name, description, group role and roles.
-   * 
+   *
    * @param groupId
    *          the group id
    * @param organization
@@ -202,7 +202,7 @@ public final class JaxbGroup implements Group {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -212,7 +212,7 @@ public final class JaxbGroup implements Group {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -225,7 +225,7 @@ public final class JaxbGroup implements Group {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

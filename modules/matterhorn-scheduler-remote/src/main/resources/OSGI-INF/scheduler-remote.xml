@@ -3,8 +3,6 @@
   name="org.opencastproject.scheduler.remote.SchedulerServiceRemoteImpl" immediate="true">
   <implementation class="org.opencastproject.scheduler.remote.SchedulerServiceRemoteImpl" />
   <property name="service.description" value="Scheduler Remote Service Proxy" />
-  <property name="opencast.service.type" value="org.opencastproject.scheduler.remote" />
-  <property name="opencast.service.path" value="/recordings" />
   <service>
     <provide interface="org.opencastproject.scheduler.api.SchedulerService" />
   </service>

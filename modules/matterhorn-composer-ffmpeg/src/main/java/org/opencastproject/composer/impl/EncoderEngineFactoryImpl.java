@@ -35,7 +35,7 @@ public class EncoderEngineFactoryImpl implements EncoderEngineFactory {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngineFactory#newEncoderEngine(org.opencastproject.composer.api.EncodingProfile)
    */
   @Override

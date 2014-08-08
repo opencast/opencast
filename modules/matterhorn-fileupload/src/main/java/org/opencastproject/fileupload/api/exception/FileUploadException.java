@@ -16,7 +16,7 @@
 package org.opencastproject.fileupload.api.exception;
 
 /** An Exception indicating a problem in the FileUploadService.
- * 
+ *
  */
 public class FileUploadException extends Exception {
 

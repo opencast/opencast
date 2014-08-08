@@ -118,7 +118,7 @@ public class AgentImpl implements Agent {
 
   /**
    * Builds a representation of the agent.
-   * 
+   *
    * @param agentName
    *          The name of the agent.
    * @param organization
@@ -139,7 +139,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Agent#getName()
    */
   public String getName() {
@@ -148,7 +148,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Agent#setState(java.lang.String)
    */
   public void setState(String newState) {
@@ -158,7 +158,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Agent#getState()
    */
   public String getState() {
@@ -167,7 +167,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Agent#setUrl(java.lang.String)
    */
   public void setUrl(String agentUrl) {
@@ -176,7 +176,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Agent#getUrl()
    */
   public String getUrl() {
@@ -185,7 +185,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Agent#setLastHeardFrom(java.lang.Long)
    */
   public void setLastHeardFrom(Long time) {
@@ -194,7 +194,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Agent#getLastHeardFrom()
    */
   public Long getLastHeardFrom() {
@@ -203,7 +203,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Agent#getCapabilities()
    */
   public Properties getCapabilities() {
@@ -212,7 +212,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Agent#getConfiguration()
    */
   public Properties getConfiguration() {
@@ -251,7 +251,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Agent#setConfiguration(java.util.Properties)
    */
   public void setConfiguration(Properties configuration) {
@@ -328,7 +328,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -345,7 +345,7 @@ public class AgentImpl implements Agent {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override

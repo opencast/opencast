@@ -12,7 +12,7 @@ ivtv-utils
 libglib2.0-dev
 libgstreamer0.10-dev
 libgstreamer-plugins-base0.10-dev
-maven2
+maven
 ntp
 openssh-server
 openjdk-6-jdk

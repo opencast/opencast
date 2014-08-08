@@ -20,14 +20,14 @@ import java.util.Map;
 
 /**
  * Interface for embedding engines.
- * 
+ *
  */
 public interface EmbedderEngine {
 
   /**
    * Creates soft subtitles/captions in given media source from given caption source. Throws {@link EmbedderException}
    * if embedding is unsuccessful.
-   * 
+   *
    * @param mediaSource
    *          media in which captions will be embedded
    * @param captionSources
