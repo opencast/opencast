@@ -57,7 +57,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         volumeSet: new Engage.Event("Video:volumeSet", "set the volume", "handler"),
         volumeGet: new Engage.Event("Video:volumeGet", "get the volume", "handler"),
         sliderStop: new Engage.Event("Slider:stop", "slider stopped", "handler"),
-        seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "handler")
+        seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "handler"),
+        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "", "handler")
     };
 
     // desktop, embed and mobile logic
@@ -318,13 +319,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         if (id) {
             if (videoSource) {
                 var videoOptions = {
-                    "controls": false,
+		    "controls": false,
                     "autoplay": false,
                     "preload": "auto",
                     "poster": videoSource.poster,
                     "loop": false,
                     "width": "100%",
-                    "height": "100%"
+                    "height": "100%",
+		    "playbackRates": [0.5, 1, 1.5, 2]
                 };
 
                 // init video.js
@@ -379,11 +381,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         });
         Engage.on(plugin.events.fullscreenEnable.getName(), function () {
             $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
-            theodulVideodisplay.requestFullScreen();
+            theodulVideodisplay.requestFullscreen();
         });
         Engage.on(plugin.events.fullscreenCancel.getName(), function () {
             $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
-            theodulVideodisplay.fullscreenCancel();
         });
         Engage.on(plugin.events.volumeSet.getName(), function (percentAsDecimal) {
             theodulVideodisplay.volume(percentAsDecimal);

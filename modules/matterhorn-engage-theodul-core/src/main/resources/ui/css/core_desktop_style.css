@@ -39,9 +39,9 @@ h1,h2,h3 {
 /* Expanded Header */
 
 #engage_timeline_expand_btn {
-  width: 23px;
-  height: 23px;
-  padding: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 7px;
   background: #dddddd;
   position: fixed;
   right: 20px;
@@ -50,6 +50,7 @@ h1,h2,h3 {
   border-bottom: 1px solid #aaa;
   border-radius: 0px 0px 4px 4px;
   box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+  margin-top: -2px;
 }
 
 #engage_timeline_expand_btn:hover {

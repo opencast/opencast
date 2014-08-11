@@ -43,10 +43,23 @@
 
     <div id="menu">
 
-        <a id="fullscreen_button" class="btn btn-small">
-            <img src="<%= plugin_path %>images/fullscreen.png" />
-        </a>
-
+      <div class="btn-group">
+	<button id="fullscreen_button" type="button" class="btn btn-default btn-small">
+	  <span class="glyphicon glyphicon-fullscreen"></span>
+	</button>
+	<!--
+	<button class="btn btn-default btn-small dropdown-toggle" type="button" id="dropdownMenu_playbackRate" data-toggle="dropdown">
+	  <span class="glyphicon glyphicon-time"></span>
+	  <span class="caret"></span>
+	</button>
+	<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu_playbackRate">
+	  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">0.5</a></li>
+	  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">1.0</a></li>
+	  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">1.5</a></li>
+	  <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2.0</a></li>
+	</ul>
+	-->
+      </div>
         <!--
         <div class="btn-group">
             <a class="btn btn-small dropdown-toggle" data-toggle="dropdown"
