@@ -104,7 +104,8 @@
      */
     function getVideoId(videojsVideo) {
         if (useVideoJs() && videojsVideo) {
-            return videojsVideo.Q;
+	    var id = videojsVideo.Q ? videojsVideo.Q : videojsVideo.U;
+            return id;
         } else {
             return videojsVideo;
         }
@@ -416,10 +417,12 @@
      * @param func function to call after data has been loaded
      */
     function doWhenDataLoaded(id, func) {
-        if (id && func) {
+        if (id != "") {
             getVideoObj(id).on("loadeddata", function () {
 		receivedEventLoadeddata = true;
-                func();
+		if(func) {
+                    func();
+		}
             });
         }
     }

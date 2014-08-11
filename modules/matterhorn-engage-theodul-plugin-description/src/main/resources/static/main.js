@@ -74,7 +74,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     /* change these variables */
-    var momentPath = 'lib/moment.min';
+    var momentPath = 'lib/moment';
 
     /* don't change these variables */
     var initCount = 3;

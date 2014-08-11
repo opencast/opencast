@@ -25,7 +25,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         PLUGIN_STYLES = [
             "style.css",
             "js/bootstrap/css/bootstrap.css",
-            "js/bootstrap/css/bootstrap-responsive.css",
             "js/jqueryui/themes/base/jquery-ui.css"
         ],
         PLUGIN_STYLES_MOBILE = [
@@ -46,6 +45,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         sliderStart: new Engage.Event("Slider:start", "", "trigger"),
         sliderStop: new Engage.Event("Slider:stop", "", "trigger"),
         volumeSet: new Engage.Event("Video:volumeSet", "", "trigger"),
+        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "handler"),
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
@@ -92,7 +92,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     /* change these variables */
     var videosReady = false;
     var bootstrapPath = 'js/bootstrap/js/bootstrap';
-    var jQueryUIPath = 'js/jqueryui/jquery-ui.min';
+    var jQueryUIPath = 'js/jqueryui/jquery-ui';
     var id_engage_controls = "engage_controls";
     var id_slider = "slider";
     var id_volume = "volume";
@@ -301,7 +301,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             }
         });
 
-        $("#" + id_fullscreen_button).click(function () {
+        $("#" + id_fullscreen_button).click(function (e) {
+	    e.preventDefault();
             var isInFullScreen = document.fullScreen ||
                 document.mozFullScreen ||
                 document.webkitIsFullScreen;
@@ -340,6 +341,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      * Initializes the plugin
      */
     function initPlugin() {
+	$('.dropdown-toggle').dropdown();
         // only init if plugin template was inserted into the DOM
         if (plugin.inserted === true) {
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);

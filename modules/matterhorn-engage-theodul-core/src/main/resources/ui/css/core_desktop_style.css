@@ -39,9 +39,9 @@ h1,h2,h3 {
 /* Expanded Header */
 
 #engage_timeline_expand_btn {
-  width: 23px;
-  height: 23px;
-  padding: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 7px;
   background: #dddddd;
   position: fixed;
   right: 20px;
