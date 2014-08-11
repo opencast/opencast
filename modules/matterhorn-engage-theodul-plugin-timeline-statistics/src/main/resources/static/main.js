@@ -73,8 +73,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     /* change these variables */
-    var chartPath = "lib/Chart.min";
-    var momentPath = "lib/moment.min";
+    var chartPath = "lib/Chart";
+    var momentPath = "lib/moment";
 
     /* don't change these variables */
     var mediapackageChange = "change:mediaPackage";

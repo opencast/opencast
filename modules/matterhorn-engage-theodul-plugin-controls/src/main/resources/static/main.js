@@ -25,7 +25,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         PLUGIN_STYLES = [
             "style.css",
             "js/bootstrap/css/bootstrap.css",
-            "js/bootstrap/css/bootstrap-responsive.css",
             "js/jqueryui/themes/base/jquery-ui.css"
         ],
         PLUGIN_STYLES_MOBILE = [
@@ -93,7 +92,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     /* change these variables */
     var videosReady = false;
     var bootstrapPath = 'js/bootstrap/js/bootstrap';
-    var jQueryUIPath = 'js/jqueryui/jquery-ui.min';
+    var jQueryUIPath = 'js/jqueryui/jquery-ui';
     var id_engage_controls = "engage_controls";
     var id_slider = "slider";
     var id_volume = "volume";
