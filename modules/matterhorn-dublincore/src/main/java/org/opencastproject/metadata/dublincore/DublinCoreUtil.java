@@ -43,7 +43,7 @@ public final class DublinCoreUtil {
 
   /**
    * Load the episode DublinCore catalog contained in a media package.
-   * 
+   *
    * @return the catalog or none if the media package does not contain an episode DublinCore
    */
   public static Option<DublinCoreCatalog> loadEpisodeDublinCore(final Workspace ws, MediaPackage mp) {
@@ -52,7 +52,7 @@ public final class DublinCoreUtil {
 
   /**
    * Load the series DublinCore catalog contained in a media package.
-   * 
+   *
    * @return the catalog or none if the media package does not contain a series DublinCore
    */
   public static Option<DublinCoreCatalog> loadSeriesDublinCore(final Workspace ws, MediaPackage mp) {
@@ -61,7 +61,7 @@ public final class DublinCoreUtil {
 
   /**
    * Load a DublinCore catalog of a media package identified by predicate <code>p</code>.
-   * 
+   *
    * @return the catalog or none if no media package element matches predicate <code>p</code>.
    */
   public static Option<DublinCoreCatalog> loadDublinCore(final Workspace ws, MediaPackage mp,
@@ -77,7 +77,7 @@ public final class DublinCoreUtil {
   /**
    * Load the DublinCore catalog identified by <code>mpe</code>. Throws an exception if it does not exist or cannot be
    * loaded by any reason.
-   * 
+   *
    * @return the catalog
    */
   public static DublinCoreCatalog loadDublinCore(Workspace workspace, MediaPackageElement mpe) {

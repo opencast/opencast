@@ -171,7 +171,7 @@ public abstract class AbstractIncidentService implements IncidentService {
   /**
    * Find a localization text in the database. The keys to look for are made from the locale, the incident code and the
    * type.
-   * 
+   *
    * @param locale
    *          The locale as a list. See {@link AbstractIncidentService#localeToList(java.util.Locale)}
    * @param incidentCode

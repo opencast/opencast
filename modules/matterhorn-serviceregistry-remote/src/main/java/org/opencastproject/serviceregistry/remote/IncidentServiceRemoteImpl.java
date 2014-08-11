@@ -121,26 +121,27 @@ public class IncidentServiceRemoteImpl extends RemoteBase implements IncidentSer
   @Override
   public Incident getIncident(long incidentId) throws IncidentServiceException, NotFoundException {
     final Function<InputStream, Incident> handler = new Function.X<InputStream, Incident>() {
-      @Override public Incident xapply(InputStream in) throws IOException {
+      @Override
+      public Incident xapply(InputStream in) throws IOException {
         return parser.parseIncidentFromXml(in).toIncident();
       }
     };
     return getIncidentXml(handler, incidentId);
   }
 
-  public <A> A getIncidentXml(Function<InputStream, A> handler, long incidentId)
-          throws IncidentServiceException, NotFoundException {
+  public <A> A getIncidentXml(Function<InputStream, A> handler, long incidentId) throws IncidentServiceException,
+          NotFoundException {
     final HttpGet get = new HttpGet(incidentId + ".xml");
     final HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
     try {
       if (response != null) {
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
           throw new NotFoundException("Incident from incident id " + incidentId
-                                              + " not found in remote incident service!");
+                  + " not found in remote incident service!");
         } else {
           final A result = closeAfterwards(handler).apply(response.getEntity().getContent());
           logger.debug("Successfully received incident from incident id {} from the remote incident service",
-                       incidentId);
+                  incidentId);
           return result;
         }
       }
@@ -191,18 +192,18 @@ public class IncidentServiceRemoteImpl extends RemoteBase implements IncidentSer
   }
 
   @Override
-  public IncidentTree getIncidentsOfJob(long jobId, boolean cascade) throws NotFoundException,
-          IncidentServiceException {
+  public IncidentTree getIncidentsOfJob(long jobId, boolean cascade) throws NotFoundException, IncidentServiceException {
     final Function<InputStream, IncidentTree> handler = new Function.X<InputStream, IncidentTree>() {
-      @Override public IncidentTree xapply(InputStream in) throws Exception {
+      @Override
+      public IncidentTree xapply(InputStream in) throws Exception {
         return parser.parseIncidentTreeFromXml(in).toIncidentTree();
       }
     };
     return getIncidentsOfJobXml(handler, jobId, cascade);
   }
 
-  public <A> A getIncidentsOfJobXml(Function<InputStream, A> handler, long jobId, boolean cascade) throws NotFoundException,
-          IncidentServiceException {
+  public <A> A getIncidentsOfJobXml(Function<InputStream, A> handler, long jobId, boolean cascade)
+          throws NotFoundException, IncidentServiceException {
     HttpGet get = new HttpGet("job/" + jobId + ".xml?cascade=" + Boolean.toString(cascade) + "&format=sys");
     HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
     try {
@@ -229,14 +230,16 @@ public class IncidentServiceRemoteImpl extends RemoteBase implements IncidentSer
   @Override
   public List<Incident> getIncidentsOfJob(List<Long> jobIds) throws IncidentServiceException {
     final Function<InputStream, List<Incident>> handler = new Function.X<InputStream, List<Incident>>() {
-      @Override public List<Incident> xapply(InputStream in) throws Exception {
+      @Override
+      public List<Incident> xapply(InputStream in) throws Exception {
         return parser.parseIncidentsFromXml(in).toIncidents();
       }
     };
     return getIncidentsOfJobXml(handler, jobIds);
   }
 
-  public <A> A getIncidentsOfJobXml(Function<InputStream, A> handler, List<Long> jobIds) throws IncidentServiceException {
+  public <A> A getIncidentsOfJobXml(Function<InputStream, A> handler, List<Long> jobIds)
+          throws IncidentServiceException {
     StringBuilder url = new StringBuilder("job/incidents.xml?format=sys");
     if (!jobIds.isEmpty()) {
       for (Long jobId : jobIds) {
@@ -262,7 +265,7 @@ public class IncidentServiceRemoteImpl extends RemoteBase implements IncidentSer
   /**
    * Converts a Map<String, String> to s key=value\n string, suitable for the properties form parameter expected by the
    * workflow rest endpoint.
-   * 
+   *
    * @param props
    *          The map of strings
    * @return the string representation

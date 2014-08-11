@@ -238,7 +238,7 @@ public interface WorkflowService {
 
   /**
    * Permanently removes a workflow instance.
-   * 
+   *
    * @param workflowInstanceId
    *          the workflow instance identifier
    * @throws WorkflowDatabaseException

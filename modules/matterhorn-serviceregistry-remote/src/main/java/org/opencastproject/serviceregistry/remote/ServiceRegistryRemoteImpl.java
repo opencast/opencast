@@ -63,7 +63,7 @@ public final class ServiceRegistryRemoteImpl extends ServiceRegistryRemoteBase {
 
   /**
    * Callback for the OSGi environment that is called upon service activation.
-   * 
+   *
    * @param cc
    *          the component context
    */

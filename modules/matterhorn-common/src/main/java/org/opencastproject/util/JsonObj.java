@@ -107,7 +107,7 @@ public final class JsonObj {
 
   /**
    * Get mandatory value of type <code>ev</code>.
-   * 
+   *
    * @return the requested value if it exists and has the required type
    * @deprecated
    */
@@ -127,7 +127,7 @@ public final class JsonObj {
 
   /**
    * Get optional value of type <code>ev</code>.
-   * 
+   *
    * @return some if the value exists and has the required type, none otherwise
    * @deprecated
    */
@@ -146,7 +146,7 @@ public final class JsonObj {
 
   /**
    * Get mandatory JSON object.
-   * 
+   *
    * @deprecated
    */
   public JsonObj getObj(String key) {
@@ -155,7 +155,7 @@ public final class JsonObj {
 
   /**
    * Get an optional JSON object.
-   * 
+   *
    * @deprecated
    */
   public Option<JsonObj> optObj(String key) {

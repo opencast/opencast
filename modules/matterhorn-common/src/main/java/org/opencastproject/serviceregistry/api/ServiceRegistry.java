@@ -316,7 +316,7 @@ public interface ServiceRegistry {
 
   /**
    * Return a facility to record job incidents.
-   * 
+   *
    * @see org.opencastproject.job.api.Incident
    */
   Incidents incident();

@@ -59,7 +59,7 @@ public class IncidentMigrationService {
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the security service to set
    */
@@ -69,7 +69,7 @@ public class IncidentMigrationService {
 
   /**
    * Callback for setting the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry to set
    */
@@ -79,7 +79,7 @@ public class IncidentMigrationService {
 
   /**
    * Callback for setting the organization directory service.
-   * 
+   *
    * @param organizationDirectoryService
    *          the organization directory service to set
    */

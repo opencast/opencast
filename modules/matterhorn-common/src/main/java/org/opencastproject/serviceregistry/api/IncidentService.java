@@ -35,7 +35,7 @@ public interface IncidentService {
 
   /**
    * Stores a new job incident.
-   * 
+   *
    * @throws IllegalStateException
    *           if no job related job exists
    * @throws IncidentServiceException
@@ -47,7 +47,7 @@ public interface IncidentService {
 
   /**
    * Gets a job incident by a given incident identifier.
-   * 
+   *
    * @param id
    *          the incident indentifier
    * @return the job incident
@@ -60,7 +60,7 @@ public interface IncidentService {
 
   /**
    * Get the hierarchy of incidents for a given job identifier.
-   * 
+   *
    * @param jobId
    *          the job identifier
    * @param cascade
@@ -78,7 +78,7 @@ public interface IncidentService {
   /**
    * Get the directly related incidents of all given jobs and return them concatenated into a single list. No incidents
    * of any descendants will be returned.
-   * 
+   *
    * @param jobIds
    *          the job identifiers
    * @return the concatenated list of directly related incidents
@@ -90,7 +90,7 @@ public interface IncidentService {
   /**
    * Gets the localized texts for an incident by a given incident identifier and locale. If there are no localized texts
    * of the given locale, the default localized texts are returned.
-   * 
+   *
    * @param id
    *          the incident identifier
    * @param locale

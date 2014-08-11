@@ -61,7 +61,7 @@ public final class Incidents {
   /**
    * Record an incident for a given job. This method is intended to record client incidents, i.e. incidents crafted by
    * the programmer.
-   * 
+   *
    * @param code
    *          A code number. This incident factory method enforces an incident code schema of <code>job_type.code</code>
    *          , e.g. <code>org.opencastproject.service.1511</code> . So instead of aligning
@@ -81,7 +81,7 @@ public final class Incidents {
   /**
    * Record an incident for a given job. This method is intended to record client incidents, i.e. incidents crafted by
    * the programmer.
-   * 
+   *
    * @see #record(org.opencastproject.job.api.Job, org.opencastproject.job.api.Incident.Severity, int, java.util.Map,
    *      java.util.List)
    * @see org.opencastproject.job.api.Incident
@@ -92,7 +92,7 @@ public final class Incidents {
 
   /**
    * Record a failure incident for a given job.
-   * 
+   *
    * @see #record(org.opencastproject.job.api.Job, org.opencastproject.job.api.Incident.Severity, int, java.util.Map,
    *      java.util.List)
    * @see org.opencastproject.job.api.Incident
@@ -103,7 +103,7 @@ public final class Incidents {
 
   /**
    * Record a failure incident for a given job.
-   * 
+   *
    * @see #record(org.opencastproject.job.api.Job, org.opencastproject.job.api.Incident.Severity, int, java.util.Map,
    *      java.util.List)
    * @see org.opencastproject.job.api.Incident
@@ -114,7 +114,7 @@ public final class Incidents {
 
   /**
    * Record a failure incident for a given job.
-   * 
+   *
    * @see #record(org.opencastproject.job.api.Job, org.opencastproject.job.api.Incident.Severity, int, java.util.Map,
    *      java.util.List)
    * @see org.opencastproject.job.api.Incident
@@ -125,7 +125,7 @@ public final class Incidents {
 
   /**
    * Record a failure incident for a given job.
-   * 
+   *
    * @see #record(org.opencastproject.job.api.Job, org.opencastproject.job.api.Incident.Severity, int, java.util.Map,
    *      java.util.List)
    * @see org.opencastproject.job.api.Incident
@@ -136,7 +136,7 @@ public final class Incidents {
 
   /**
    * Record a failure incident for a given job.
-   * 
+   *
    * @see #record(org.opencastproject.job.api.Job, org.opencastproject.job.api.Incident.Severity, int, java.util.Map,
    *      java.util.List)
    * @see org.opencastproject.job.api.Incident
@@ -147,7 +147,7 @@ public final class Incidents {
 
   /**
    * Record a failure incident for a given job.
-   * 
+   *
    * @see #record(org.opencastproject.job.api.Job, org.opencastproject.job.api.Incident.Severity, int, java.util.Map,
    *      java.util.List)
    * @see org.opencastproject.job.api.Incident

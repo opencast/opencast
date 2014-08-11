@@ -102,7 +102,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   /**
    * Constructs a new workflow instance from the given definition, mediapackage, and optional parent workflow ID and
    * properties.
-   * 
+   *
    * @param def
    *          the workflow definition
    * @param mediaPackage
@@ -140,34 +140,37 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getId()
    */
+  @Override
   public long getId() {
     return id;
   }
 
   /**
    * Sets the identifier of this workflow instance
-   * 
+   *
    * @param id
    */
+  @Override
   public void setId(long id) {
     this.id = id;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getTitle()
    */
+  @Override
   public String getTitle() {
     return title;
   }
 
   /**
    * Sets the title of this workflow instance
-   * 
+   *
    * @param title
    */
   public void setTitle(String title) {
@@ -176,16 +179,17 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getCreator()
    */
+  @Override
   public User getCreator() {
     return creator;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getOrganization()
    */
   @Override
@@ -203,7 +207,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * Sets the workflow's organization.
-   * 
+   *
    * @param organization
    *          the organization
    */
@@ -216,16 +220,17 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getDescription()
    */
+  @Override
   public String getDescription() {
     return description;
   }
 
   /**
    * Sets the description of this workflow instance
-   * 
+   *
    * @param description
    */
   public void setDescription(String description) {
@@ -235,6 +240,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   /**
    * @return the parentId
    */
+  @Override
   public Long getParentId() {
     return parentId;
   }
@@ -249,27 +255,30 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getState()
    */
+  @Override
   public WorkflowState getState() {
     return state;
   }
 
   /**
    * Sets the state of this workflow instance
-   * 
+   *
    * @param state
    */
+  @Override
   public void setState(WorkflowState state) {
     this.state = state;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getCurrentOperation()
    */
+  @Override
   public WorkflowOperationInstance getCurrentOperation() throws IllegalStateException {
     if (!initialized)
       init();
@@ -341,9 +350,10 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getOperations()
    */
+  @Override
   public List<WorkflowOperationInstance> getOperations() {
     if (operations == null)
       operations = new ArrayList<WorkflowOperationInstance>();
@@ -355,7 +365,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * Sets the workflow operations on this workflow instance
-   * 
+   *
    * @param workflowOperationInstanceList
    */
   @Override
@@ -378,16 +388,17 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getMediaPackage()
    */
+  @Override
   public MediaPackage getMediaPackage() {
     return mediaPackage;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#setMediaPackage(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
@@ -397,7 +408,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.Configurable#getConfiguration(java.lang.String)
    */
   @Override
@@ -413,7 +424,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.Configurable#getConfigurationKeys()
    */
   @Override
@@ -429,7 +440,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.Configurable#removeConfiguration(java.lang.String)
    */
   @Override
@@ -447,7 +458,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.Configurable#setConfiguration(java.lang.String, java.lang.String)
    */
   @Override
@@ -471,7 +482,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#next()
    */
   @Override
@@ -499,9 +510,10 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#hasNext()
    */
+  @Override
   public boolean hasNext() {
     if (!initialized)
       init();
@@ -519,16 +531,17 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return "Workflow {" + id + "}";
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -538,7 +551,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -554,10 +567,12 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    * Allows JAXB handling of {@link WorkflowInstance} interfaces.
    */
   static class Adapter extends XmlAdapter<WorkflowInstanceImpl, WorkflowInstance> {
+    @Override
     public WorkflowInstanceImpl marshal(WorkflowInstance instance) throws Exception {
       return (WorkflowInstanceImpl) instance;
     }
 
+    @Override
     public WorkflowInstance unmarshal(WorkflowInstanceImpl instance) throws Exception {
       instance.init();
       return instance;
@@ -568,6 +583,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    * Allows JAXB handling of {@link Organization} interfaces.
    */
   static class OrganizationAdapter extends XmlAdapter<JaxbOrganization, Organization> {
+    @Override
     public JaxbOrganization marshal(Organization org) throws Exception {
       if (org == null)
         return null;
@@ -576,6 +592,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
       return JaxbOrganization.fromOrganization(org);
     }
 
+    @Override
     public Organization unmarshal(JaxbOrganization org) throws Exception {
       return org;
     }
@@ -585,6 +602,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    * Allows JAXB handling of {@link Organization} interfaces.
    */
   static class UserAdapter extends XmlAdapter<JaxbUser, User> {
+    @Override
     public JaxbUser marshal(User user) throws Exception {
       if (user == null)
         return null;
@@ -593,6 +611,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
       return JaxbUser.fromUser(user);
     }
 
+    @Override
     public User unmarshal(JaxbUser user) throws Exception {
       return user;
     }
@@ -601,6 +620,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   /**
    * @return the template
    */
+  @Override
   public String getTemplate() {
     return template;
   }
@@ -615,7 +635,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowInstance#extend(org.opencastproject.workflow.api.WorkflowDefinition)
    */
   @Override

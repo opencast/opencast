@@ -88,6 +88,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    *
    * @see org.opencastproject.composer.api.EncoderEngine#needsLocalWorkCopy()
    */
+  @Override
   public boolean needsLocalWorkCopy() {
     return false;
   }
@@ -106,7 +107,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#trim(java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */

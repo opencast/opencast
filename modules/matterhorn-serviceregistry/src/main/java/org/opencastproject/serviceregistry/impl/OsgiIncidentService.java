@@ -71,13 +71,14 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
     return workflowService;
   }
 
-  @Override protected PersistenceEnv getPenv() {
+  @Override
+  protected PersistenceEnv getPenv() {
     return penv;
   }
 
   /**
    * OSGi callback to set persistence provider.
-   * 
+   *
    * @param persistenceProvider
    *          {@link PersistenceProvider} object
    */
@@ -87,7 +88,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
 
   /**
    * OSGi callback to set persistence properties.
-   * 
+   *
    * @param persistenceProperties
    *          persistence properties
    */
@@ -97,7 +98,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
 
   /**
    * Sets the service registry
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -107,7 +108,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
 
   /**
    * Sets the workflow service
-   * 
+   *
    * @param workflowService
    *          the workflow service
    */
@@ -120,8 +121,8 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
    */
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for job incidents");
-    penv = PersistenceEnvs.persistenceEnvironment(
-            persistenceProvider.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, persistenceProperties));
+    penv = PersistenceEnvs.persistenceEnvironment(persistenceProvider.createEntityManagerFactory(PERSISTENCE_UNIT_NAME,
+            persistenceProperties));
     // scan bundles for incident localizations
     cc.getBundleContext().addBundleListener(this);
     for (Bundle b : cc.getBundleContext().getBundles()) {
@@ -157,8 +158,8 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
   private static final String PROPERTIES_GLOB = "*.properties";
 
   private void storeIncidentTexts(Bundle bundle) {
-    logger.info(format("Scanning bundle %s, %d for incident localizations...",
-                       bundle.getSymbolicName(), bundle.getBundleId()));
+    logger.info(format("Scanning bundle %s, %d for incident localizations...", bundle.getSymbolicName(),
+            bundle.getBundleId()));
     final Enumeration l10n = bundle.findEntries(INCIDENT_L10N_DIR, PROPERTIES_GLOB, false);
     while (l10n != null && l10n.hasMoreElements()) {
       final URL resourceUrl = (URL) l10n.nextElement();
