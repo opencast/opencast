@@ -45,14 +45,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
       rel : 'stylesheet',
       href : 'css/jqueryMobile/jquery.mobile.inline-png-1.4.2.css'
     });
-    $("head").append(link);
+    //$("head").append(link);
     link = $("<link>");
     link.attr({
       type : 'text/css',
       rel : 'stylesheet',
       href : 'css/jqueryMobile/jquery.mobile.inline-svg-1.4.2.css'
     });
-    $("head").append(link);
+    //$("head").append(link);
     link = $("<link>");
     link.attr({
       type : 'text/css',
