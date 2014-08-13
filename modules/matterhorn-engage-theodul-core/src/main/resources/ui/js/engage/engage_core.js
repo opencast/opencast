@@ -133,7 +133,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
                     $.get(core_template, function (template) {
                         // set template, render it and add it to DOM
                         engageCore.template = template;
-                        $(engageCore.el).html(_.template(template));
+                        $(engageCore.el).html(_.template(template)).trigger("create");
                         // run init function of the view
                         engageCore.pluginView.initView();
                         // BEGIN LOAD PLUGINS

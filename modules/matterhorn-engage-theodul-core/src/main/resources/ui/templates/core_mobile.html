@@ -1,1 +1,27 @@
 <!-- Core Mobile Modus -->
+<div data-role="header" id="mobile-header">
+	<a href="#sidebar" class="ui-btn ui-icon-bars ui-btn-icon-notext ui-corner-all" />  
+    <h2>Theodul Player</h2>
+</div>
+
+<div role="main" class="ui-content" id="content-box">
+	<div id="engage_content" class="container">
+    	<!-- Videodisplay plugin container -->
+    	<div id="engage_video" align="center"></div>
+	</div>
+</div>
+ 
+<!-- Sidebar  -->
+<div data-role="panel" id="sidebar" data-display="overlay" data-theme="b">
+	<div class="panel-content">
+    	<h4>Description</h4>
+      	<div id="engage_description"></div>
+      	<div id="tab-container"></div>
+      	<a id="close-panel" href="#demo-links" data-rel="close" data-role="button" data-theme="a" data-icon="delete" data-inline="true">Schließen</a>
+    </div><!-- /content wrapper for padding -->
+</div><!-- /Sidebar -->
+
+<!-- Footer with Control Elements -->
+<div data-role="footer" data-position="fixed" id="mobile-footer">
+	<div id="engage_controls"></div>
+</div>

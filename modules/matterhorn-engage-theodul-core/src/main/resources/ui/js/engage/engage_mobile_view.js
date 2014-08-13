@@ -28,9 +28,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
     link.attr({
       type : 'text/css',
       rel : 'stylesheet',
-      href : 'css/jqueryMobile/jquery.mobile.external-png-1.4.2.css'
+      href : 'css/jqueryMobile/matterhorn-alpha-theme.min.css'
     });
     $("head").append(link);
+
     link = $("<link>");
     link.attr({
       type : 'text/css',
@@ -65,40 +66,44 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
       rel : 'stylesheet',
       href : 'css/jqueryMobile/jquery.mobile.theme-1.4.2.css'
     });
-    $("head").append(link);
+   // $("head").append(link);
     link = $("<link>");
     link.attr({
       type : 'text/css',
       rel : 'stylesheet',
       href : 'css/jqueryMobile/jquery.mobile-1.4.2.css'
     });
-    $("head").append(link);
+    //$("head").append(link);
   }
   
   /*
    * Logic to insert a plugin with name and type to the player in mobile mode
    */
   var insertPluginToDOM = function(plugin) {
-    //DEBUG, currently no impl here, so please init no plugin
-    plugin.inserted = false;
-    //switch plugin type to insert the plugin to the right DOM element and execute custom view code
-    switch (plugin.type) {
-    case "engage_controls":       
 
+    switch (plugin.type) {
+    case "engage_controls":    
+      $("#engage_controls").html(plugin.templateProcessed);
+      plugin.inserted = true;
+      plugin.container = "#engage_controls";
       break;
     case "engage_video":        
-
+      $('#engage_video').html(plugin.templateProcessed);
+      plugin.inserted = true;
+      plugin.container = "#engage_video";
       break;        
     case "engage_tab":        
-
       break;
     case "engage_description":
-
+      $('#engage_description').html(plugin.templateProcessed);
+      plugin.inserted = true;
+      plugin.container = "#engage_description";
       break;    
     case "engage_timeline":
-
-    break; 
+      break; 
     default:
+      plugin.inserted = false;
+      plugin.container = "";
     }
   }
   
