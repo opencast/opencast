@@ -47,6 +47,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         synchronizing: new Engage.Event("Video:synchronizing", "synchronizing videos with the master video", "trigger"),
         buffering: new Engage.Event("Video:buffering", "video is buffering", "trigger"),
         bufferedAndAutoplaying: new Engage.Event("Video:bufferedAndAutoplaying", "buffering successful, was playing, autoplaying now", "trigger"),
+        customError: new Engage.Event("Error:customError", "an error occured", "trigger"),
         bufferedButNotAutoplaying: new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "trigger"),
         timeupdate: new Engage.Event("Video:timeupdate", "timeupdate happened", "trigger"),
         volumechange: new Engage.Event("Video:volumechange", "volume change happened", "trigger"),
@@ -380,11 +381,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             theodulVideodisplay.pause();
         });
         Engage.on(plugin.events.fullscreenEnable.getName(), function () {
-            $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
-            theodulVideodisplay.requestFullscreen();
+            // $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
+	    Engage.trigger(plugin.events.customError.getName(), "Fullscreen will be available soon.");
         });
         Engage.on(plugin.events.fullscreenCancel.getName(), function () {
-            $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
+            // $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
         });
         Engage.on(plugin.events.volumeSet.getName(), function (percentAsDecimal) {
             theodulVideodisplay.volume(percentAsDecimal);
