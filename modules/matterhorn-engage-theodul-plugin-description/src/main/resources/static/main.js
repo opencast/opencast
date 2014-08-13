@@ -20,7 +20,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var PLUGIN_TYPE = "engage_description";
     var PLUGIN_VERSION = "0.1",
 		PLUGIN_TEMPLATE = "template.html",
-        PLUGIN_TEMPLATE_MOBILE = "template.html",
+        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
         PLUGIN_TEMPLATE_EMBED = "template.html",
         PLUGIN_STYLES = [
             "style.css"
