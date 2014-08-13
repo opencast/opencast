@@ -221,16 +221,35 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 		aspectRatio[1] = parseInt(aspectRatio[1]);
 		aspectRatio[2] = parseInt(aspectRatio[2]);
 		Engage.log("Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-		$("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
-		$("." + id_videoDisplayClass).each(function(index) {
-		    if((index % 2) == 1) {
-			$(this).css("float", "right");
-		    }
-		});
-		for(i = 0; i < videoDisplays.length; ++i) {
-		    $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
-		}
-	    }
+		
+        if (Engage.model.get("mode") == "desktop") {
+            $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
+    		$("." + id_videoDisplayClass).each(function(index) {
+    		    if((index % 2) == 1) {
+    			$(this).css("float", "right");
+    		    }
+    		});
+    		for(i = 0; i < videoDisplays.length; ++i) {
+    		    $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+    		}
+
+	    } else if (Engage.model.get("mode") == "mobile") {
+            if (Engage.model.get("orientation") == "portrait") {
+                $("." + id_videoDisplayClass).css("width", "99.5%");
+            } else if (Engage.model.get("orientation") == "landscape") {
+                $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
+            }
+            
+            for(i = 0; i < videoDisplays.length; ++i) {
+                $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+            }
+
+        }
+        }
+        $(window).on("orientationchange", function (event) {
+            Engage.log("Device twisted!");
+            orderVideoDisplays(videoDisplays);
+        })
 
             // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
             $("." + class_vjsposter).show();
@@ -298,6 +317,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var VideoDataModel = Backbone.Model.extend({
         initialize: function (ids, videoSources, duration) {
             Engage.log("Video: Init VideoDataModel");
+            Engage.log(Engage.model.get("orientation"));
             this.attributes.ids = ids;
             this.attributes.videoSources = videoSources;
             this.attributes.duration = duration;
@@ -352,8 +372,25 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
     }
 
-    function checkVideoDisplaySize() {
+    function orderVideoDisplays (videoDisplays) {
+        Engage.log(Engage.model.get("orientation"));
+        if (Engage.model.get("orientation") == "portrait") {
+            $("." + id_videoDisplayClass).css("width", "99.5%");
+        } else if (Engage.model.get("orientation") == "landscape") {
+            $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
+        }
+    }
+
+    function checkVideoDisplaySize() {        
 	// make sure the video height is not greater than the window height
+    if (Engage.model.get("mode") == "mobile") {
+        if (Engage.model.get("orientation") == "landscape") {
+            $("#" + id_engageContent).css("max-height", $(window).height() * 0.63)
+        } else {
+            $("#" + id_engageContent).css("max-height", "");
+        }
+    };
+
 	$("#" + id_engageContent).css("max-width", "");
 	for(i = 0; i < videoDisplaySizeTimesCheck; ++i) {
 	    if($(window).height() < ($("." + id_videojs_wrapperClass).position().top + $("." + id_videojs_wrapperClass).height())) {
@@ -367,10 +404,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     function registerEvents(videoDisplay) {
         var theodulVideodisplay = videojs(videoDisplay);
 	
-	$(window).resize(function() {
-	    checkVideoDisplaySize();
-	});
-	
+    	$(window).resize(function() {
+    	    checkVideoDisplaySize();
+    	});
+
         Engage.on(plugin.events.play.getName(), function () {
             if (videosReady) {
                 theodulVideodisplay.play();

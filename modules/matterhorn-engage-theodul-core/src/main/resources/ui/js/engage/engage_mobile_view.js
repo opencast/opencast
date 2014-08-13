@@ -74,6 +74,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
       href : 'css/jqueryMobile/jquery.mobile-1.4.2.css'
     });
     //$("head").append(link);
+
+    // Set Viewport for mobile Devices
+    $("head").append('<meta name="viewport" content="width=device-width, initial-scale=1">');
   }
   
   /*
@@ -111,7 +114,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
    * This function is triggered when all plugins are loaded and inserted into the DOM
    */
   var allPluginsLoadedEvent = function(){
-
+    var orientation = "";
+    $(window).on("orientationchange", function(event) {
+      EngageCore.model.set("orientation", event.orientation);
+    });
+    $(window).orientationchange();
   }
   
   // public functions fo the module

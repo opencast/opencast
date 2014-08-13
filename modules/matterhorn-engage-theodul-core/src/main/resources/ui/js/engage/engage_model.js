@@ -112,6 +112,9 @@ define(['require', 'jquery', 'underscore', 'backbone'], function (require, $, _,
               this.set("mode", "desktop");
           }             
       }
+      
+      this.set("orientation", "");
+
       if (window.console) {
         console.log("Player mode: "+this.get("mode"));
       }      
