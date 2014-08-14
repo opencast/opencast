@@ -386,7 +386,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         });
         Engage.on(plugin.events.fullscreenEnable.getName(), function() {
             // $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
-            Engage.trigger(plugin.events.customError.getName(), "Fullscreen will be available soon."); // TODO: Implement "fake" fullscreen
+            Engage.trigger(plugin.events.customNotification.getName(), "Fullscreen will be available soon."); // TODO: Implement "fake" fullscreen
         });
         Engage.on(plugin.events.fullscreenCancel.getName(), function() {
             // $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");

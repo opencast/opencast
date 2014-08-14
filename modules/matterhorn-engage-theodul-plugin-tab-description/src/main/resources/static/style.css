@@ -1,15 +1,20 @@
 .engage_description_tab_entry {
   
 }
-#engage_description_tab_content{
+#engage_description_tab_content {
 	width: 60%;
+	padding-top: 10px;
 }
 
-#engage_description_tab_left {
-  float: left;
-  padding: 0px 0px 0px 10px;
+.description-item {
 }
-#engage_description_tab_right {
-  float: right;
-  padding: 0px 0px 0px 10px;
+
+.description-item-header {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+.description-item-body {
+	margin-left: 8px;
+	padding-bottom: 10px;
 }

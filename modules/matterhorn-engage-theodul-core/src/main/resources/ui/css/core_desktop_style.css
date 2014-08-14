@@ -11,7 +11,9 @@ h1,h2,h3 {
 }
 
 #engage_tab_content {
-  padding: 0px 20px;
+  padding: 5px 0px 0px 20px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
 }
 
 #engage_content {

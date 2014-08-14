@@ -4,18 +4,56 @@
     && typeof creator !== "undefined" 
     && typeof series !== "undefined" 
     && typeof contributor !== "undefined" 
-    && typeof date !== "undefined"){ %>
-    <div id="engage_description_tab_left">
-      <p class="engage_description_tab_entry"> Title: <%= title %> </p>
-      <p class="engage_description_tab_entry"> Presenter: <%= creator %> </p>
-      <p class="engage_description_tab_entry"> Contributor: <%= contributor %> </p>
-    </div>
-    <div id="engage_description_tab_right">
-      <p class="engage_description_tab_entry"> Series: <%= series %> </p>
-      <p class="engage_description_tab_entry"> Recording Date: <%= date %> </p>
-      <p class="engage_description_tab_entry"> Description: <%= description %> </p>
-    </div>
-
-
+    && typeof date !== "undefined") { %>
+	<span class="description-item">
+		<p class="description-item-header">Title</p>
+		<p class="description-item-body">
+			<% if(title != "" ) {%>
+			<%= title %>
+			<% } else {%>
+				No title
+			<% }%>
+		</p>
+	</span>
+	<% if(creator != "" ) {%>
+	<span class="description-item">
+		<p class="description-item-header">Creator</p>
+		<p class="description-item-body">
+			<%= creator %>
+		</p>
+	</span>
+	<% }%>
+	<% if(contributor != "" ) {%>
+	<span class="description-item">
+		<p class="description-item-header">Presenter</p>
+		<p class="description-item-body">
+			<%= contributor %>
+		</p>
+	</span>
+	<% }%>
+	<% if(series != "" ) {%>
+	<span class="description-item">
+		<p class="description-item-header">Series</p>
+		<p class="description-item-body">
+			<%= series %>
+		</p>
+	</span>
+	<% }%>
+	<% if(date != "" ) {%>
+	<span class="description-item">
+		<p class="description-item-header">Recording Date</p>
+		<p class="description-item-body">
+			<%= date %>
+		</p>
+	</span>
+	<% }%>
+	<% if(description != "" ) {%>
+	<span class="description-item">
+		<p class="description-item-header">Description</p>
+		<p class="description-item-body">
+			<%= description %>
+		</p>
+	</span>
+	<% }%>
   <% } %>
 </div>
