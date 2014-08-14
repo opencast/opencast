@@ -43,9 +43,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
                 $("#engage_timeline_expand_btn_img").toggleClass("engage_timeline_expand_btn_rotate180");
             });
         }
-        /*
-         * logic to insert a plugin with name and type to the player in desktop mode
-         */
+	/*
+     * logic to insert a plugin with name and type to the player in desktop mode
+     */
     var insertPluginToDOM = function(plugin) {
         // switch plugin type to insert the plugin to the right DOM element and execute custom view code
         switch (plugin.type) {
