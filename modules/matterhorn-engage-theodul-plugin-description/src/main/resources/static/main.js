@@ -102,7 +102,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             };
             // try to format the date
             if (moment(tempVars.date) !== null) {
-                tempVars.date = moment(this.model.get("date")).format("MMMM Do YYYY");
+                tempVars.date = moment(tempVars.date).format("MMMM Do YYYY");
             }
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
