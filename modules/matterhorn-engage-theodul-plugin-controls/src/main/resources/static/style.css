@@ -25,16 +25,23 @@
 
 #navigation_time {
 	float: left;
-	margin-top: 13px;
 	margin-left: 20px;
 	font-size: 16px;
 }
 
 #navigation_time input {
 	font-size: 16px;
-	width: 78px;
+	width: 90px;
 	margin-bottom: 3px !important;
 	min-height: 25px;
+	float: left;
+	margin-top: 13px;
+	margin-right: 5px;
+}
+
+#navigation_time_current_overview {
+	float: left;
+	margin-top: 19px;
 }
 
 #menu {
@@ -53,17 +60,18 @@
 
 #navigation_logo {
 	float: right;
-	margin-right: 20px;
-	margin-top: 13px;
+	margin-right: 24px;
+	margin-top: 18px;
 }
 
 /* SLIDER */
 #volume {
 	position: relative;
-	margin-top: 24px;
+	margin-top: 26px;
 	width: 100px;
 	float: left;
 	margin-left: 20px;
+	margin-right: 2px;
 	border-width: 1px;
 	border-style: solid;
 	border-color: #333 #333 #777 #333;
@@ -77,7 +85,7 @@
 
 .volume_icon {
 	float: left;
-	margin-top: 15px;
+	margin-top: 17px;
 	margin-left: 15px;
 }
 

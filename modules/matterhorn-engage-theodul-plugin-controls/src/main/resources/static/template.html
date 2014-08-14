@@ -21,7 +21,7 @@
 
     <div id="navigation_time">
         <% if((typeof startTime !== "undefined") && (typeof duration !== "undefined")) { %>
-        <input id="navigation_time_current" type="text" value="<%= startTime %>" /><span> / <span id="navigation_time_duration"><%= duration %></span></span>
+        <input id="navigation_time_current" class="form-control" type="text" value="<%= startTime %>" /><span id="navigation_time_current_overview"> / <span id="navigation_time_duration"><%= duration %></span></span>
         <% } else { %>
         <input id="navigation_time_current" type="text" value="00:00:00" /><span> / <span id="navigation_time_duration">00:00:00</span></span>
         <% } %>
@@ -44,10 +44,10 @@
     <div id="menu">
 
       <div class="btn-group">
-	<button id="fullscreen_button" type="button" class="btn btn-default btn-small">
+	<button id="fullscreen_button" type="button" class="btn btn-default">
 	  <span class="glyphicon glyphicon-fullscreen"></span>
 	</button>
-	<button class="btn btn-default btn-small dropdown-toggle" type="button" id="dropdownMenuPlaybackRate" data-toggle="dropdown">
+	<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuPlaybackRate" data-toggle="dropdown">
 	  <span class="glyphicon glyphicon-time"></span>
 	  <span class="caret"></span>
 	</button>
@@ -60,7 +60,7 @@
       </div>
         <!--
         <div class="btn-group">
-            <a class="btn btn-small dropdown-toggle" data-toggle="dropdown"
+            <a class="btn dropdown-toggle" data-toggle="dropdown"
                href="#"> <img src="<%= plugin_path %>images/gear.png" /> <span
                     class="caret"></span>
             </a>
