@@ -91,6 +91,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     /* change these variables */
+    var logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
     var bootstrapPath = 'js/bootstrap/js/bootstrap';
     var jQueryUIPath = 'js/jqueryui/jquery-ui';
     var id_engage_controls = "engage_controls";
@@ -147,7 +148,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 plugin_path: this.pluginPath,
                 startTime: formatSeconds(0),
                 duration: (duration ? formatSeconds(duration / 1000) : formatSeconds(0)),
-                logoLink: ""
+                logoLink: logoLink
             };
 
             // compile template and load into the html
