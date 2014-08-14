@@ -51,7 +51,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
         timeupdate: new Engage.Event("Video:timeupdate", "notices a timeupdate", "handler"),
         ended: new Engage.Event("Video:ended", "end of the video", "handler"),
-        usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "trigger")
+        usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "handler")
     };
 
     // desktop, embed and mobile logic
