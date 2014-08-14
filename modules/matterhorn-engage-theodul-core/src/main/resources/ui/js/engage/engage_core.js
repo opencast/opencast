@@ -86,11 +86,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
             this.dispatcher = _.clone(Backbone.Events);
             // link to the engage model
             this.model = new EngageModel();
-            // watch on all events
+            // listen to all events
             this.dispatcher.on("all", function (name) {
-                if (engageCore.model.get("isDebug")) {
-                    engageCore.log("EventLog: " + name + " occurs!");
-                }
+		if (engageCore.model.get("isEventDebug")) {
+                    engageCore.log("Event log: '" + name + "'");
+		}
             });
             // core init event
             this.dispatcher.on(events.coreInit.getName(), function () {
@@ -163,7 +163,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
                         });
                         // END LOAD PLUGINS
                         // wait that me infos are loaded
-                        while (engageCore.model.get("meInfo").ready === false) {}
+                        while (engageCore.model.get("meInfo").ready == false) {}
                         bindHotkeysToEvents(); // bind configured hotkeys to theodul events
                     });
                 });
@@ -199,10 +199,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
         },
         Event: EngageEvent,
         log: function (data) {
-            if (this.model.get("isDebug")) {
-                if (window.console) {
-                    console.log(data);
-                }
+            if (this.model.get("isDebug") && window.console) {
+                console.log(data);
             }
         },
         getPluginPath: function (pluginName) {

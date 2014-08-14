@@ -211,13 +211,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 }
             }
 
-            for (var v in videoSources) {
-                if (videoSources[v].length > 0) {
-                    initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
-                    ++i;
-                }
-            }
-
 	    if((aspectRatio != null) && (videoDisplays.length > 0)) {
 		aspectRatio[1] = parseInt(aspectRatio[1]);
 		aspectRatio[2] = parseInt(aspectRatio[2]);
@@ -313,9 +306,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 
     function initVideojsVideo(id, videoSource, videojs_swf) {
-        Engage.log("Initializing video.js-display: " + id);
-        Engage.log("Initializing video source: ");
-        Engage.log(videoSource);
+        Engage.log("Initializing video.js-display: '" + id + "'");
 
         if (id) {
             if (videoSource) {
@@ -407,7 +398,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         });
         theodulVideodisplay.on(event_html5player_timeupdate, function () {
             if (videosReady) {
-                Engage.log("Current time: " + theodulVideodisplay.currentTime());
                 Engage.trigger(plugin.events.timeupdate.getName(), theodulVideodisplay.currentTime());
             }
         });

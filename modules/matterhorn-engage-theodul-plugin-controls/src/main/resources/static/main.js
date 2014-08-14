@@ -109,12 +109,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_mute_button = "mute_button";
 
     /* don't change these variables */
-	var videoDataModelChange = 'change:videoDataModel';
+    var videoDataModelChange = 'change:videoDataModel';
     var plugin_path = "";
     var initCount = 4;
     var isPlaying = false;
     var isSliding = false;
     var isMute = false;
+    var duration;
 
     var ControlsView = Backbone.View.extend({
         el: $("#" + id_engage_controls), // every view has an element associated with it
@@ -130,7 +131,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.render();
         },
         render: function () {
-            var duration = this.model.get("duration");
+            duration = this.model.get("duration");
             // format values
             var tempVars = {
                 plugin_path: this.pluginPath,
