@@ -52,6 +52,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         timeupdate: new Engage.Event("Video:timeupdate", "timeupdate happened", "trigger"),
         volumechange: new Engage.Event("Video:volumechange", "volume change happened", "trigger"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "fullscreen change happened", "trigger"),
+        usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "go to fullscreen", "handler"),
         fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "cancel fullscreen", "handler"),
@@ -59,7 +60,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         volumeGet: new Engage.Event("Video:volumeGet", "get the volume", "handler"),
         sliderStop: new Engage.Event("Slider:stop", "slider stopped", "handler"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "handler"),
-        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "", "handler")
+        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "handler")
     };
 
     // desktop, embed and mobile logic
@@ -331,6 +332,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 if (videojs_swf) {
                     Engage.log("Loaded flash component");
                     videojs.options.flash.swf = videojs_swf;
+		    Engage.trigger(plugin.events.usingFlash.getName());
+		    
                 } else {
                     Engage.log("No flash component loaded");
                 }
@@ -363,6 +366,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 	    checkVideoDisplaySize();
 	});
 	
+	Engage.on(plugin.events.playbackRateChanged.getName(), function(rate) {
+	    console.log("Changing rate to " + rate);
+	    theodulVideodisplay.playbackRate(rate); // TODO: Check if this is the correct function!
+	});
         Engage.on(plugin.events.play.getName(), function () {
             if (videosReady) {
                 theodulVideodisplay.play();
