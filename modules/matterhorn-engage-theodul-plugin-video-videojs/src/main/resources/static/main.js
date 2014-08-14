@@ -318,8 +318,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     "poster": videoSource.poster,
                     "loop": false,
                     "width": "100%",
-                    "height": "100%" //,
-		    // "playbackRates": [0.5, 1, 1.5, 2]
+                    "height": "100%",
+		    "playbackRates": [0.5, 1, 1.5, 2]
                 };
 
                 // init video.js
