@@ -46,6 +46,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         sliderStop: new Engage.Event("Slider:stop", "", "trigger"),
         volumeSet: new Engage.Event("Video:volumeSet", "", "trigger"),
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "trigger"),
+        seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
+        customError: new Engage.Event("Notification:customError", "an error occured", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "handler"),
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
@@ -272,14 +274,21 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         greyOut(id_play_button);
         disable(id_navigation_time);
         $("#" + id_navigation_time_current).keyup(function(e) {
+            e.preventDefault();
             // pressed enter
             if (e.keyCode == 13) {
-                var time = getTimeInMilliseconds($(this).val()) / 1000;
-                var duration = Engage.model.get("videoDataModel").get("duration");
-                if (duration && (time <= duration)) {
-                    var videoDisplay = Engage.model.get("videoDataModel").get("ids")[0];
-                    videojs(videoDisplay).currentTime(time);
+                try {
+                    var time = getTimeInMilliseconds($(this).val()) / 1000;
+                    var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
+                    if (duration && (time <= duration)) {
+                        Engage.trigger(plugin.events.seek.getName(), time);
+                    } else {
+                        Engage.trigger(plugin.events.customError.getName(), "The given time (" + formatSeconds(time) + ") has to be smaller than the duration (" + formatSeconds(duration) + ").");
+                    }
+                } catch (e) {
+                    $("#" + id_navigation_time_current).val(formatSeconds(0));
                 }
+                $(this).blur();
             }
         });
 
