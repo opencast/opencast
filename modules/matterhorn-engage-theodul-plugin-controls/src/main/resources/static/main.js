@@ -45,12 +45,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         sliderStart: new Engage.Event("Slider:start", "", "trigger"),
         sliderStop: new Engage.Event("Slider:stop", "", "trigger"),
         volumeSet: new Engage.Event("Video:volumeSet", "", "trigger"),
-        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "", "trigger"),
+        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "handler"),
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
         timeupdate: new Engage.Event("Video:timeupdate", "notices a timeupdate", "handler"),
-        ended: new Engage.Event("Video:ended", "end of the video", "handler")
+        ended: new Engage.Event("Video:ended", "end of the video", "handler"),
+        usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "trigger")
     };
 
     // desktop, embed and mobile logic
@@ -90,13 +91,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     /* change these variables */
-    var videosReady = false;
     var bootstrapPath = 'js/bootstrap/js/bootstrap';
     var jQueryUIPath = 'js/jqueryui/jquery-ui';
     var id_engage_controls = "engage_controls";
     var id_slider = "slider";
     var id_volume = "volume";
     var id_volumeIcon = "volumeIcon";
+    var id_dropdownMenuPlaybackRate = "dropdownMenuPlaybackRate";
+    var id_playbackRate05 = "playback05";
+    var id_playbackRate10 = "playback10";
+    var id_playbackRate15 = "playback15";
+    var id_playbackRate20 = "playback20";
     var id_playpause_controls = "playpause_controls";
     var id_fullscreen_button = "fullscreen_button";
     var id_backward_button = "backward_button";
@@ -107,15 +112,20 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_pause_button = "pause_button";
     var id_unmute_button = "unmute_button";
     var id_mute_button = "mute_button";
+    var class_dropdown = "dropdown-toggle";
 
     /* don't change these variables */
+    var videosReady = false;
     var videoDataModelChange = 'change:videoDataModel';
+    var event_slidestart = "slidestart";
+    var event_slidestop = "slidestop";
     var plugin_path = "";
     var initCount = 4;
     var isPlaying = false;
     var isSliding = false;
     var isMute = false;
     var duration;
+    var usingFlash = false;
 
     var ControlsView = Backbone.View.extend({
         el: $("#" + id_engage_controls), // every view has an element associated with it
@@ -139,6 +149,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 duration: (duration ? formatSeconds(duration / 1000) : formatSeconds(0)),
                 logoLink: ""
             };
+
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
             initControlsEvents();
@@ -311,17 +322,39 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 Engage.trigger(plugin.events.fullscreenEnable.getName());
             }
         });
+	
+	if(!usingFlash) {
+	    // init dropdown menu
+	    $("." + class_dropdown).dropdown();
+	    // setup listeners for the playback rate
+	    $("#" + id_playbackRate05).click(function (e) {
+		e.preventDefault();
+		Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5);
+	    });
+	    $("#" + id_playbackRate10).click(function (e) {
+		e.preventDefault();
+		Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0);
+	    });
+	    $("#" + id_playbackRate15).click(function (e) {
+		e.preventDefault();
+		Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5);
+	    });
+	    $("#" + id_playbackRate20).click(function (e) {
+		e.preventDefault();
+		Engage.trigger(plugin.events.playbackRateChanged.getName(), 2.0);
+	    });
+	}
 
         // slider events
-        $("#" + id_slider).on("slidestart", function (event, ui) {
+        $("#" + id_slider).on(event_slidestart, function (event, ui) {
             isSliding = true;
             Engage.trigger(plugin.events.sliderStart.getName(), ui.value);
         });
-        $("#" + id_slider).on("slidestop", function (event, ui) {
+        $("#" + id_slider).on(event_slidestop, function (event, ui) {
             isSliding = false;
             Engage.trigger(plugin.events.sliderStop.getName(), ui.value);
         });
-        $("#" + id_volume).on("slidestop", function (event, ui) {
+        $("#" + id_volume).on(event_slidestop, function (event, ui) {
             Engage.trigger(plugin.events.unmute.getName());
         });
     }
@@ -342,10 +375,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      * Initializes the plugin
      */
     function initPlugin() {
-	$('.dropdown-toggle').dropdown();
         // only init if plugin template was inserted into the DOM
         if (plugin.inserted === true) {
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
+	    Engage.on(plugin.events.usingFlash.getName(), function () {
+		usingFlash = true;
+		$("#" + id_dropdownMenuPlaybackRate).addClass("disabled");
+	    });
             Engage.on(plugin.events.ready.getName(), function () {
                 greyIn(id_play_button);
                 enable(id_play_button);
