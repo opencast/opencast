@@ -40,7 +40,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "when the core loaded the event successfully", "handler"),
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
         buffering: new Engage.Event("Video:buffering", "buffering a video", "handler"),
-        customError: new Engage.Event("Error:customError", "an error occurred", "handler"),
+        customNotification: new Engage.Event("Notification:customNotification", "a custom message", "handler"),
+        customSuccess: new Engage.Event("Notification:customSuccess", "a custom success message", "handler"),
+        customError: new Engage.Event("Notification:customError", "an error occurred", "handler"),
         bufferedAndAutoplaying: new Engage.Event("Video:bufferedAndAutoplaying", "buffering successful, was playing, autoplaying now", "handler"),
         bufferedButNotAutoplaying: new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
@@ -166,6 +168,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 videoBuffering = false;
                 alertify.success(getAlertifyMessage("The video has been buffered successfully."));
             }
+        });
+        Engage.on(plugin.events.customNotification.getName(), function(msg) {
+            alertify.log(getAlertifyMessage(msg));
+        });
+        Engage.on(plugin.events.customSuccess.getName(), function(msg) {
+            alertify.success(getAlertifyMessage(msg));
         });
         Engage.on(plugin.events.customError.getName(), function(msg) {
             alertify.error(getAlertifyMessage(msg));
