@@ -39,6 +39,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -201,7 +202,7 @@ public class WorkflowServiceImplAuthzTest {
 
     // Service Registry
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     service.setServiceRegistry(serviceRegistry);
 
     // Search Index
