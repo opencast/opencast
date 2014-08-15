@@ -108,50 +108,13 @@
     <div id="slider"></div>
 
     <div id="segment_wrapper">
-        <div class="row-fluid">
-            <div class="span12">
-                <div class="row-fluid">
-					<!--
-                    <a class="span3 segment segment1" data-original-title="00:00:00"
-                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
-                       data-placement="bottom"></a>
-					<a class="span2 segment segment2"
-                       data-original-title="00:09:10"
-                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
-                       data-placement="bottom"></a>
-					<a class="span1 segment segment3"
-                       data-original-title="00:18:25"
-                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
-                       data-placement="bottom"></a>
-					<a class="span3 segment segment4"
-                       data-original-title="00:23:54"
-                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
-                       data-placement="bottom"></a>
-					<a class="span1 segment segment5"
-                       data-original-title="00:27:57"
-                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
-                       data-placement="bottom"></a>
-					<a class="span2 segment segment6"
-                       data-original-title="00:30:11"
-                       data-content="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
-                       data-placement="bottom"></a>
-					-->
-                </div>
-            </div>
-        </div>
+      <% if((typeof durationMS !== "undefined") && (typeof segments !== "undefined") && (segments.length > 0)) { var i = 0; %>
+      <% _.each(segments, function(segment) { %>
+      <div id="segment_<%= i %>" class="segment" style="width: <%= parseFloat((segment.duration) / durationMS * 100).toFixed(2) %>%">
+	<span id="segment_<%= i %>_span" class="segmentspan"><%= segment.time %></span>
+      </div>
+      <% ++i; }); %>
+      <% } %>
     </div>
-
-    <!-- ##### Expanded Content ##### -->
-    <!-- 
-            <div class="expanded_content">
-                    <img src="<%= plugin_path %>images/statistic.png" />
-                    <div class="clear"></div>
-            </div>
-    
-            <div class="expand_button">
-                    <img class="pulldown_image"
-                            src="<%= plugin_path %>images/pulldown.png" />
-            </div>
-    -->
 </div>
 <!-- end Navigation -->

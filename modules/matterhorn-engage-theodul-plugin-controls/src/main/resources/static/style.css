@@ -141,9 +141,7 @@
 
 #segment_wrapper {
 	margin: 0px 22px;
-	height: 14px;
-	border-left: 1px solid #000000;
-	border-right: 1px solid #000000;
+	height: 13px;
 	margin-bottom: 15px;
 }
 
@@ -152,15 +150,25 @@
 }
 
 .segment {
-	height: 10px !important;
-	min-height: 10px !important;
+	height: 20px !important;
+	min-height: 20px !important;
 	border-right: 1px solid #000000;
+	border-bottom: 1px solid #000000;
 	margin: 0px !important;
-	padding-left: 2% !important;
+	padding-left: 0 !important;
 	transition: background-color 0.3s;
 	-moz-transition: background-color 0.3s;
 	-webkit-transition: background-color 0.3s;
 	-o-transition: background-color 0.3s;
+	float: left;
+}
+
+.segment:first-child {
+	border-left: 1px solid #000000;
+}
+
+.segmentspan {
+    display: none;
 }
 
 .segment:hover {
