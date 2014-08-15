@@ -277,6 +277,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             e.preventDefault();
             // pressed enter
             if (e.keyCode == 13) {
+                $(this).blur();
                 try {
                     var time = getTimeInMilliseconds($(this).val()) / 1000;
                     var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
@@ -288,7 +289,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 } catch (e) {
                     $("#" + id_navigation_time_current).val(formatSeconds(0));
                 }
-                $(this).blur();
             }
         });
 
