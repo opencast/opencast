@@ -402,6 +402,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 theodulVideodisplay.currentTime(time);
             } else {
                 Engage.trigger(plugin.events.customNotification.getName(), "Start playing the video before setting a time.");
+                Engage.trigger(plugin.events.timeupdate.getName(), 0);
             }
         });
         Engage.on(plugin.events.sliderStop.getName(), function(time) {
@@ -409,7 +410,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 var duration = Engage.model.get("videoDataModel").get("duration");
                 var normTime = (time / 1000) * (duration / 1000);
                 theodulVideodisplay.currentTime(normTime);
-            }
+            } else {
+                Engage.trigger(plugin.events.customNotification.getName(), "Start playing the video before seeking.");
+                Engage.trigger(plugin.events.timeupdate.getName(), 0);
+	    }
         });
         theodulVideodisplay.on(event_html5player_timeupdate, function() {
             if (videosReady && pressedPlayOnce) {
