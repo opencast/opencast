@@ -1,6 +1,6 @@
 <ul class="oc-ui-form-list">
      <li>
-       <label class="scheduler-label" for="titleField" id="titleLabel"><span class="scheduler-required-text" style="color: red;">* </span><span id="i18n_title_label">Title</span>:</label>
+       <label class="scheduler-label" for="title" id="titleLabel"><span class="scheduler-required-text" style="color: red;">* </span><span id="i18n_title_label">Title</span>:</label>
        <input type="text" id="title" name="title" class="oc-ui-form-field requiredField dc-metadata-field dcMetaField" maxlength="255" />
      </li>
      <li id="titleNote" class="ui-helper-hidden">
@@ -14,8 +14,8 @@
        <input type="text" id="creator" name="creator" class="oc-ui-form-field dc-metadata-field dcMetaField"  maxlength="255"/>
      </li>
      <li id="seriesContainer">
-       <label class="scheduler-label" for="seriesSelect" id="seriesLabel"><span id="i18n_series_label">Course/Series</span>:</label>
-       <input type="text" class="oc-ui-form-field ui-autocomplete-input dcMetaField" name="seriesSelect" id="seriesSelect" maxlength="255" />
+       <label class="scheduler-label" for="seriesSelect" id="seriesSelectLabel"><span id="i18n_series_label">Course/Series</span>:</label>
+       <input type="text" class="oc-ui-form-field ui-autocomplete-input requiredField dcMetaField" name="seriesSelect" id="seriesSelect" maxlength="255" />
        <input type="hidden" class="oc-ui-form-field dc-metadata-field" id="isPartOf" name="isPartOf">
        <input type="hidden" id="series" />
      </li>

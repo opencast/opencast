@@ -37,6 +37,8 @@ import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.IncidentService;
+import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistration;
 import org.opencastproject.serviceregistry.api.JaxbServiceStatistics;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
@@ -98,9 +100,7 @@ import javax.persistence.RollbackException;
 import javax.persistence.TypedQuery;
 import javax.persistence.spi.PersistenceProvider;
 
-/**
- * JPA implementation of the {@link ServiceRegistry}
- */
+/** JPA implementation of the {@link ServiceRegistry} */
 public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Id of the workflow's start operation operation, need to match the corresponding enum value in WorkflowServiceImpl */
@@ -147,7 +147,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the dispatch interval in milliseconds */
   protected static final String OPT_DISPATCHINTERVAL = "dispatchinterval";
 
-  /** Configuration key for the interval to check whether the hosts in the service registry are still alive [sec] **/
+  /** Configuration key for the interval to check whether the hosts in the service registry are still alive [sec] * */
   protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
 
   /** Configuration key for the collection of job statistics */
@@ -174,7 +174,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Number of failed jobs on a service before to set it in error state */
   protected int maxAttemptsBeforeErrorState = MAX_FAILURE_BEFORE_ERROR_STATE;
 
-  /** Default delay between checking if hosts are still alive in seconds **/
+  /** Default delay between checking if hosts are still alive in seconds * */
   static final long DEFAULT_HEART_BEAT = 60;
 
   /** The JPA provider */
@@ -192,9 +192,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Tracks services published locally and adds them to the service registry */
   protected RestServiceTracker tracker = null;
 
-  /** The maximum number of parallel jobs possible on this host. */
-  protected int maxJobs = 1;
-
   /** The thread pool to use for dispatching queued jobs and checking on phantom services. */
   protected ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 
@@ -207,14 +204,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService = null;
 
+  protected Incidents incidents;
+
   /** Whether to collect detailed job statistics */
   protected boolean collectJobstats = DEFAULT_JOB_STATISTICS;
 
   protected Map<String, Object> persistenceProperties;
 
-  /**
-   * A static list of statuses that influence how load balancing is calculated
-   */
+  /** A static list of statuses that influence how load balancing is calculated */
   protected static final List<Status> JOB_STATUSES_INFLUENCING_LOAD_BALANCING;
 
   static {
@@ -279,6 +276,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Register this host
     try {
+      int maxJobs = -1;
       if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OPT_MAXLOAD))) {
         maxJobs = Runtime.getRuntime().availableProcessors();
       } else {
@@ -308,7 +306,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
 
     // Schedule the heartbeat with the default interval
-    scheduledExecutor.scheduleWithFixedDelay(new JobProducerHearbeat(), DEFAULT_HEART_BEAT, DEFAULT_HEART_BEAT,
+    scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), DEFAULT_HEART_BEAT, DEFAULT_HEART_BEAT,
             TimeUnit.SECONDS);
 
     // Schedule the job dispatching with the default interval
@@ -397,9 +395,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob);
   }
 
-  /**
-   * Creates a job on a remote host.
-   */
+  /** Creates a job on a remote host. */
   public Job createJob(String host, String serviceType, String operation, List<String> arguments, String payload,
           boolean dispatchable, Job parentJob) throws ServiceRegistryException {
     if (StringUtils.isBlank(host)) {
@@ -444,7 +440,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           try {
             jpaParentJob = (JobJpaImpl) getJob(parentJob.getId());
           } catch (NotFoundException e) {
-            logger.error("{} not found in the persitence context", parentJob);
+            logger.error("{} not found in the persistence context", parentJob);
             throw new ServiceRegistryException(e);
           }
         }
@@ -458,7 +454,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           try {
             jpaRootJob = (JobJpaImpl) getJob(parentJob.getRootJobId());
           } catch (NotFoundException e) {
-            logger.error("job with id {} not found in the persitence context", parentJob.getRootJobId());
+            logger.error("job with id {} not found in the persistence context", parentJob.getRootJobId());
             throw new ServiceRegistryException(e);
           }
         }
@@ -684,7 +680,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     // Schedule the service heartbeat if the interval is > 0
     if (heartbeatInterval > 0) {
       logger.debug("Starting service heartbeat at a custom interval of {}s", heartbeatInterval);
-      scheduledExecutor.scheduleWithFixedDelay(new JobProducerHearbeat(), heartbeatInterval, heartbeatInterval,
+      scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), heartbeatInterval, heartbeatInterval,
               TimeUnit.SECONDS);
     }
 
@@ -997,7 +993,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         }
         em.merge(existingHostRegistration);
       }
-      logger.info("Unregistering {}", host, maxJobs);
+      logger.info("Unregistering {}", host);
       tx.commit();
       hostsStatistics.updateHost(existingHostRegistration);
     } catch (Exception e) {
@@ -1214,9 +1210,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     cleanRunningJobs(serviceType, baseUrl);
   }
 
-  /**
-   * Find all undispatchable jobs and set them to CANCELED.
-   */
+  /** Find all undispatchable jobs and set them to CANCELED. */
   private void cleanUndispatchableJobs() {
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -1375,6 +1369,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (em != null)
         em.close();
     }
+  }
+
+  @Override
+  public Incidents incident() {
+    return incidents;
   }
 
   @SuppressWarnings("unchecked")
@@ -1648,6 +1647,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String, java.lang.String,
    *      java.lang.String, org.opencastproject.job.api.Job.Status)
    */
+  @Override
   public long count(String serviceType, String host, String operation, Status status) throws ServiceRegistryException {
     if (StringUtils.isBlank(serviceType) || StringUtils.isBlank(host) || StringUtils.isBlank(operation)
             || status == null)
@@ -1681,23 +1681,29 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
+      Map<Long, JaxbServiceStatistics> statsMap = new HashMap<Long, JaxbServiceStatistics>();
+
+      // Make sure we also include the services that have no processing history so far
+      List<ServiceRegistrationJpaImpl> services = em.createNamedQuery("ServiceRegistration.getAll").getResultList();
+      for (ServiceRegistrationJpaImpl s : services) {
+        statsMap.put(s.getId(), new JaxbServiceStatistics((ServiceRegistrationJpaImpl) s));
+      }
+
       Query query = em.createNamedQuery("ServiceRegistration.statistics");
-      Map<ServiceRegistration, JaxbServiceStatistics> statsMap = new HashMap<ServiceRegistration, JaxbServiceStatistics>();
       List queryResults = query.getResultList();
       for (Object result : queryResults) {
         Object[] oa = (Object[]) result;
-        ServiceRegistrationJpaImpl serviceRegistration = ((ServiceRegistrationJpaImpl) oa[0]);
-        Status status = ((Status) oa[1]);
+        Number serviceRegistrationId = ((Number) oa[0]);
+        if (serviceRegistrationId == null || serviceRegistrationId.longValue() == 0)
+          break;
+        Status status = (Status) oa[1];
         Number count = (Number) oa[2];
         Number meanQueueTime = (Number) oa[3];
         Number meanRunTime = (Number) oa[4];
 
         // The statistics query returns a cartesian product, so we need to iterate over them to build up the objects
-        JaxbServiceStatistics stats = statsMap.get(serviceRegistration);
-        if (stats == null) {
-          stats = new JaxbServiceStatistics(serviceRegistration);
-          statsMap.put(serviceRegistration, stats);
-        }
+        JaxbServiceStatistics stats = statsMap.get(serviceRegistrationId.longValue());
+
         // the status will be null if there are no jobs at all associated with this service registration
         if (status != null) {
           switch (status) {
@@ -1717,13 +1723,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               break;
           }
         }
-      }
-
-      // Make sure we also include the services that have no processing history so far
-      List<ServiceRegistration> services = em.createNamedQuery("ServiceRegistration.getAll").getResultList();
-      for (ServiceRegistration s : services) {
-        if (!statsMap.containsKey(s))
-          statsMap.put(s, new JaxbServiceStatistics((ServiceRegistrationJpaImpl) s));
       }
 
       List<ServiceStatistics> stats = new ArrayList<ServiceStatistics>(statsMap.values());
@@ -1919,22 +1918,37 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public Object addingService(ServiceReference reference) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
       String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
+      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
       boolean jobProducer = (Boolean) reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY);
-      try {
-        registerService(serviceType, hostName, servicePath, jobProducer);
-      } catch (ServiceRegistryException e) {
-        logger.warn("Unable to register job producer of type " + serviceType + " on host " + hostName);
+
+      // Only register services that have the "publish" flag set to "true"
+      if (publishFlag) {
+        try {
+          registerService(serviceType, hostName, servicePath, jobProducer);
+        } catch (ServiceRegistryException e) {
+          logger.warn("Unable to register job producer of type " + serviceType + " on host " + hostName);
+        }
+      } else {
+        logger.debug("Not registering service " + serviceType + " in service registry by configuration");
       }
+
       return super.addingService(reference);
     }
 
     @Override
     public void removedService(ServiceReference reference, Object service) {
       String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-      try {
-        unRegisterService(serviceType, hostName);
-      } catch (ServiceRegistryException e) {
-        logger.warn("Unable to unregister job producer of type " + serviceType + " on host " + hostName);
+      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
+
+      // Services that have the "publish" flag set to "true" have been registered before.
+      if (publishFlag) {
+        try {
+          unRegisterService(serviceType, hostName);
+        } catch (ServiceRegistryException e) {
+          logger.warn("Unable to unregister job producer of type " + serviceType + " on host " + hostName);
+        }
+      } else {
+        logger.trace("Service " + reference + " was never registered");
       }
       super.removedService(reference, service);
     }
@@ -1988,6 +2002,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
+  }
+
+  /** OSGi DI. */
+  public void setIncidentService(IncidentService incidentService) {
+    this.incidents = new Incidents(this, incidentService);
   }
 
   /**
@@ -2388,8 +2407,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *          the complete list of host registrations
    * @param loadByHost
    *          the map of hosts to the number of running jobs
-   * @param job
-   *          the job which for the services registrations are filtered
+   * @param jobType
+   *          the job type for which the services registrations are filtered
    */
   protected List<ServiceRegistration> getServiceRegistrationsWithCapacity(String jobType,
           List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
@@ -2446,8 +2465,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *          the complete list of host registrations
    * @param loadByHost
    *          the map of hosts to the number of running jobs
-   * @param job
-   *          the job which for the services registrations are filtered
+   * @param jobType
+   *          the job type for which the services registrations are filtered
    */
   protected List<ServiceRegistration> getServiceRegistrationsByLoad(String jobType,
           List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
@@ -2499,8 +2518,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * This dispatcher implementation will check for jobs in the QUEUED {@link #org.opencastproject.job.api.Job.Status}. If new jobs are found, the
-   * dispatcher will attempt to dispatch each job to the least loaded service.
+   * This dispatcher implementation will check for jobs in the QUEUED {@link org.opencastproject.job.api.Job.Status}. If
+   * new jobs are found, the dispatcher will attempt to dispatch each job to the least loaded service.
    */
   class JobDispatcher implements Runnable {
 
@@ -2533,8 +2552,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           String jobType = job.getJobType();
 
           // Skip jobs that we already know can't be dispatched
-          String jobSiganture = new StringBuilder(jobType).append('@').append(job.getOperation()).toString();
-          if (undispatchableJobTypes.contains(jobSiganture)) {
+          String jobSignature = new StringBuilder(jobType).append('@').append(job.getOperation()).toString();
+          if (undispatchableJobTypes.contains(jobSignature)) {
             logger.trace("Skipping dispatching of jobs {} with type '{}' for this round of dispatching", job.getId(),
                     jobType);
             continue;
@@ -2611,15 +2630,15 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             try {
               hostAcceptingJob = dispatchJob(em, job, candidateServices);
             } catch (ServiceUnavailableException e) {
-              ServiceRegistryJpaImpl.logger.debug("Jobs of type {} currently cannot be dispatched", job.getOperation());
-              undispatchableJobTypes.add(jobSiganture);
+              logger.debug("Jobs of type {} currently cannot be dispatched", job.getOperation());
+              undispatchableJobTypes.add(jobSignature);
               continue;
             } catch (UndispatchableJobException e) {
-              ServiceRegistryJpaImpl.logger.debug("Job {} currently cannot be dispatched", job.getId());
+              logger.debug("Job {} currently cannot be dispatched", job.getId());
               continue;
             }
 
-            ServiceRegistryJpaImpl.logger.debug("Job {} dispatched to {}", job.getId(), hostAcceptingJob);
+            logger.debug("Job {} dispatched to {}", job.getId(), hostAcceptingJob);
             if (hostLoads.containsKey(hostAcceptingJob)) {
               Integer previousServiceLoad = hostLoads.get(hostAcceptingJob);
               hostLoads.put(hostAcceptingJob, ++previousServiceLoad);
@@ -2629,14 +2648,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
           } catch (ServiceRegistryException e) {
             Throwable cause = (e.getCause() != null) ? e.getCause() : e;
-            ServiceRegistryJpaImpl.logger.error("Error dispatching job " + job, cause);
+            logger.error("Error dispatching job " + job, cause);
           } finally {
             securityService.setUser(null);
             securityService.setOrganization(null);
           }
         }
       } catch (Throwable t) {
-        ServiceRegistryJpaImpl.logger.warn("Error dispatching jobs", t);
+        logger.warn("Error dispatching jobs", t);
       } finally {
         if (em != null)
           em.close();
@@ -2644,10 +2663,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
   }
 
-  /**
-   * A periodic check on each service registration to ensure that it is still alive.
-   */
-  class JobProducerHearbeat implements Runnable {
+  /** A periodic check on each service registration to ensure that it is still alive. */
+  class JobProducerHeartbeat implements Runnable {
 
     /** List of service registrations that have been found unresponsive last time we checked */
     private List<ServiceRegistration> unresponsive = new ArrayList<ServiceRegistration>();

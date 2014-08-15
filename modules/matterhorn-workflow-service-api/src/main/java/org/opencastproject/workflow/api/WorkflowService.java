@@ -239,7 +239,7 @@ public interface WorkflowService {
   /**
    * Permanently removes a workflow instance. Only workflow instances with state {@link WorkflowState#SUCCEEDED},
    * {@link WorkflowState#STOPPED} or {@link WorkflowState#FAILED} may be removed.
-   * 
+   *
    * @param workflowInstanceId
    *          the workflow instance identifier
    * @throws WorkflowDatabaseException
@@ -328,7 +328,7 @@ public interface WorkflowService {
 
   /**
    * Starts a cleanup of workflow instances with a given lifetime and a specific state
-   * 
+   *
    * @param lifetime
    *          minimum lifetime of the workflow instances
    * @param state

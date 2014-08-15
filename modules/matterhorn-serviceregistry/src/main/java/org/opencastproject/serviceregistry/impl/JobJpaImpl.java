@@ -132,6 +132,8 @@ public class JobJpaImpl extends JaxbJob {
   /** The service that is processing, or processed, this job */
   protected ServiceRegistrationJpaImpl processorServiceRegistration;
 
+  protected long processorServiceRegistrationId;
+
   protected List<JobPropertyJpaImpl> properties;
 
   /** The job context, to be created after loading by JPA */
@@ -469,6 +471,26 @@ public class JobJpaImpl extends JaxbJob {
     } else {
       super.setProcessingHost(processorServiceRegistration.getHost());
     }
+  }
+
+  /**
+   * Returns the identifier of the processor service
+   * <p>
+   * Use this method instead of {@link #getProcessorServiceRegistration()} when you only need/want the identifier of the
+   * service and not the service registration object.
+   *
+   * @return the processor service identifier
+   */
+  @Column(name = "processor_service", insertable = false, updatable = false)
+  public long getProcessorServiceRegistrationId() {
+    return processorServiceRegistrationId;
+  }
+
+  /**
+   * This method MUST NOT be used - it's for JPA only!
+   */
+  protected void setProcessorServiceRegistrationId(long id) {
+    this.processorServiceRegistrationId = id;
   }
 
   @PreUpdate

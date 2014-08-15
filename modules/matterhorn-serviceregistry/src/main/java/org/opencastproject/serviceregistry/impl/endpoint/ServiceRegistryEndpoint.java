@@ -426,20 +426,16 @@ public class ServiceRegistryEndpoint {
   @GET
   @Path("job/{id}/children.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "childrenjobsasxml", description = "Returns all children from a job as XML.", returnDescription = "A list of children jobs as XML", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Jobs found."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No children jobs found.") })
-  public JaxbJobList getChildrenJobsAsXml(@PathParam("id") long id) throws NotFoundException {
+  @RestQuery(name = "childrenjobsasxml", description = "Returns all children from a job as XML.", returnDescription = "A list of children jobs as XML", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = { @RestResponse(responseCode = SC_OK, description = "Jobs found.") })
+  public JaxbJobList getChildrenJobsAsXml(@PathParam("id") long id) {
     return getChildrenJobsAsJson(id);
   }
 
   @GET
   @Path("job/{id}/children.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "childrenjobsasjson", description = "Returns all children from a job as JSON.", returnDescription = "A list of children jobs as JSON", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Jobs found."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No children jobs found.") })
-  public JaxbJobList getChildrenJobsAsJson(@PathParam("id") long id) throws NotFoundException {
+  @RestQuery(name = "childrenjobsasjson", description = "Returns all children from a job as JSON.", returnDescription = "A list of children jobs as JSON", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = { @RestResponse(responseCode = SC_OK, description = "Jobs found.") })
+  public JaxbJobList getChildrenJobsAsJson(@PathParam("id") long id) {
     try {
       return new JaxbJobList(serviceRegistry.getChildJobs(id));
     } catch (ServiceRegistryException e) {

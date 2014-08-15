@@ -24,6 +24,11 @@ import org.json.JSONException;
 import org.junit.Test;
 import org.opencastproject.manager.system.configeditor.Config;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+
 
 
 public class ConfigTest {
@@ -32,7 +37,7 @@ public class ConfigTest {
   private Config config;
 
   @Test
-  public void testConfigConstructor() {
+  public void testConfigConstructor() throws ParseException {
 
     URL url = this.getClass().getResource("/configs");
     String absFile = url.getFile();
@@ -45,7 +50,10 @@ public class ConfigTest {
 
       String json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":false,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
-      Assert.assertEquals(config.toJSON(), json);
+      JSONParser parser = new JSONParser();
+      JSONObject obj1 = (JSONObject) parser.parse(config.toJSON());
+      JSONObject obj2 = (JSONObject) parser.parse(json);
+      Assert.assertTrue(obj1.equals(obj2));
 
       this.config = config;
 
@@ -57,7 +65,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void testUpdateProperty() {
+  public void testUpdateProperty() throws ParseException {
 
     URL url = this.getClass().getResource("/configs");
     String absFile = url.getFile();
@@ -75,7 +83,10 @@ public class ConfigTest {
     String json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":true,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
     try {
-      Assert.assertEquals(config.toJSON(), json);
+      JSONParser parser = new JSONParser();
+      JSONObject obj1 = (JSONObject) parser.parse(config.toJSON());
+      JSONObject obj2 = (JSONObject) parser.parse(json);
+      Assert.assertTrue(obj1.equals(obj2));
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -86,7 +97,10 @@ public class ConfigTest {
     json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":true,\"value\":\"commented.property.new_value\",\"key\":\"commented.property.name\"}]}";
 
     try {
-      Assert.assertEquals(config.toJSON(), json);
+      JSONParser parser = new JSONParser();
+      JSONObject obj1 = (JSONObject) parser.parse(config.toJSON());
+      JSONObject obj2 = (JSONObject) parser.parse(json);
+      Assert.assertTrue(obj1.equals(obj2));
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -94,7 +108,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void testAddProperty() {
+  public void testAddProperty() throws ParseException {
 
     URL url = this.getClass().getResource("/configs");
     String absFile = url.getFile();
@@ -111,16 +125,17 @@ public class ConfigTest {
     String json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},{\"enabled\":true,\"value\":\"new.property.value\",\"key\":\"new.property.name\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":false,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
     try {
-
-      Assert.assertEquals(config.toJSON(), json);
-
+      JSONParser parser = new JSONParser();
+      JSONObject obj1 = (JSONObject) parser.parse(config.toJSON());
+      JSONObject obj2 = (JSONObject) parser.parse(json);
+      Assert.assertTrue(obj1.equals(obj2));
     } catch (JSONException e) {
       e.printStackTrace();
     }
   }
 
   @Test
-  public void testSaveConfig() {
+  public void testSaveConfig() throws ParseException {
 
     String absFile = this.getClass().getResource("/temp").getFile();
 
@@ -147,7 +162,10 @@ public class ConfigTest {
       // compare
       String json = "{\"path\":\"/system_new.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},{\"enabled\":true,\"value\":\"new.property.value\",\"key\":\"new.property.name\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":false,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
-      Assert.assertEquals(config.toJSON(), json);
+      JSONParser parser = new JSONParser();
+      JSONObject obj1 = (JSONObject) parser.parse(config.toJSON());
+      JSONObject obj2 = (JSONObject) parser.parse(json);
+      Assert.assertTrue(obj1.equals(obj2));
 
     } catch (JSONException e) {
       e.printStackTrace();
