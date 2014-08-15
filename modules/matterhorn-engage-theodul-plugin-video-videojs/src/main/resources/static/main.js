@@ -26,7 +26,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             "lib/videojs/video-js.css"
         ],
         PLUGIN_STYLES_MOBILE = [
-            "style.css",
+            "style_mobile.css",
             "lib/videojs/video-js.css"
         ],
         PLUGIN_STYLES_EMBED = [
@@ -237,14 +237,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             if (Engage.model.get("orientation") == "portrait") {
                 $("." + id_videoDisplayClass).css("width", "99.5%");
             } else if (Engage.model.get("orientation") == "landscape") {
-                $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
+                $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 2) + "%");
             }
-            
             for(i = 0; i < videoDisplays.length; ++i) {
                 $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
             }
-
         }
+
         }
         $(window).on("orientationchange", function (event) {
             Engage.log("Device twisted!");
@@ -377,28 +376,32 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         if (Engage.model.get("orientation") == "portrait") {
             $("." + id_videoDisplayClass).css("width", "99.5%");
         } else if (Engage.model.get("orientation") == "landscape") {
-            $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
+            $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 2) + "%");
         }
     }
 
     function checkVideoDisplaySize() {        
 	// make sure the video height is not greater than the window height
     if (Engage.model.get("mode") == "mobile") {
-        if (Engage.model.get("orientation") == "landscape") {
-            $("#" + id_engageContent).css("max-height", $(window).height() * 0.63)
-        } else {
-            $("#" + id_engageContent).css("max-height", "");
-        }
-    };
+        if (Engage.model.get("orientation") == "portrait") {
+            $("#" + id_engageContent).css("height", $(window).height() * 0.79);
+            $("#" + id_engageContent).css("width", $(window).width() * 0.9);
+        } else if (Engage.model.get("orientation") == "landscape") {
+            $("#" + id_engageContent).css("height", $(window).height() * 0.67);
+            $("#" + id_engageContent).css("width", $(window).width() * 0.9);
+        };
 
-	$("#" + id_engageContent).css("max-width", "");
-	for(i = 0; i < videoDisplaySizeTimesCheck; ++i) {
-	    if($(window).height() < ($("." + id_videojs_wrapperClass).position().top + $("." + id_videojs_wrapperClass).height())) {
-		$("#" + id_engageContent).css("max-width", $("#" + id_engageContent).width() / videoDisplaySizeFactor);
-	    } else {
-		break;
-	    }
-	}
+    } else {
+
+    	$("#" + id_engageContent).css("max-width", "");
+    	for(i = 0; i < videoDisplaySizeTimesCheck; ++i) {
+    	    if($(window).height() < ($("." + id_videojs_wrapperClass).position().top + $("." + id_videojs_wrapperClass).height())) {
+    		  $("#" + id_engageContent).css("max-width", $("#" + id_engageContent).width() / videoDisplaySizeFactor);
+    	    } else {
+    		  break;
+    	    }
+        }
+    }
     }
 
     function registerEvents(videoDisplay) {

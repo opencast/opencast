@@ -1,0 +1,19 @@
+.videoDisplay {
+	padding-bottom: 2%;
+}
+
+.videojs_wrapper {
+	height: inherit;
+}
+
+#engage_video {
+}
+
+.videoDisplay:nth-child(even) {
+	float: right;
+}
+
+.videoDisplay:nth-child(odd) {
+	float: left;
+	padding-right: 2%;
+}
