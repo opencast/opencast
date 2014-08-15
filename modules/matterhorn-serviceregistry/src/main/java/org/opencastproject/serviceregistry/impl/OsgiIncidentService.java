@@ -158,7 +158,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
   private static final String PROPERTIES_GLOB = "*.properties";
 
   private void storeIncidentTexts(Bundle bundle) {
-    logger.info(format("Scanning bundle %s, %d for incident localizations...", bundle.getSymbolicName(),
+    logger.info(format("Scanning bundle %s, (ID %d) for incident localizations", bundle.getSymbolicName(),
             bundle.getBundleId()));
     final Enumeration l10n = bundle.findEntries(INCIDENT_L10N_DIR, PROPERTIES_GLOB, false);
     while (l10n != null && l10n.hasMoreElements()) {
@@ -174,7 +174,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
       for (String key : texts.stringPropertyNames()) {
         final String text = texts.getProperty(key);
         final String dbKey = mlist(keyBase, key).concat(locale).mkString(".");
-        logger.info(format("Storing text %s=%s", dbKey, text));
+        logger.debug(format("Storing text %s=%s", dbKey, text));
         penv.tx(Queries.persistOrUpdate(IncidentTextDto.mk(dbKey, text)));
       }
     }
