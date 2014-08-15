@@ -23,6 +23,9 @@ import org.opencastproject.security.api.JaxbRole;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
+import org.custommonkey.xmlunit.XMLAssert;
 
 import java.io.StringWriter;
 import java.util.HashSet;
@@ -49,7 +52,8 @@ public class GroupParsingTest {
 
   @Test
   public void testMarshalUser() throws Exception {
-    StringWriter writer = new StringWriter();
+    StringWriter writer  = new StringWriter();
+    StringWriter writer2 = new StringWriter();
 
     Set<JaxbRole> roles = new HashSet<JaxbRole>();
     roles.add(new JaxbRole("ROLE_COURSE_ADMIN", ORGANIZATION));
@@ -63,8 +67,14 @@ public class GroupParsingTest {
     jaxbContext.createMarshaller().marshal(group, writer);
 
     String expectedOutput = IOUtils.toString(getClass().getResourceAsStream(GROUP_XML_FILE), "UTF-8");
+    StreamSource streamSource = new StreamSource(getClass().getResourceAsStream(GROUP_XML_FILE));
+    JaxbGroup groupFromFile = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbGroup.class).getValue();
+    jaxbContext.createMarshaller().marshal(groupFromFile, writer2);
 
-    assertEquals("Group XML not formed as expected", expectedOutput, writer.toString());
+    Diff diff = new Diff(writer2.toString(), writer.toString());
+    /* We don't care about ordering. */
+    diff.overrideElementQualifier(new ElementNameAndTextQualifier());
+    XMLAssert.assertXMLEqual(diff, true);
   }
 
   @Test

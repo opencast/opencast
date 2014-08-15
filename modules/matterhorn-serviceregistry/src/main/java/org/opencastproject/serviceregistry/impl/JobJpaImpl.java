@@ -20,8 +20,15 @@ import org.opencastproject.job.api.JaxbJobContext;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -55,11 +62,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A long running, asynchronously executed job. This concrete implementations adds JPA annotations to {@link JaxbJob}.
@@ -128,6 +130,8 @@ public class JobJpaImpl extends JaxbJob {
 
   /** The service that is processing, or processed, this job */
   protected ServiceRegistrationJpaImpl processorServiceRegistration;
+
+  protected long processorServiceRegistrationId;
 
   protected List<JobPropertyJpaImpl> properties;
 
@@ -466,6 +470,26 @@ public class JobJpaImpl extends JaxbJob {
     } else {
       super.setProcessingHost(processorServiceRegistration.getHost());
     }
+  }
+
+  /**
+   * Returns the identifier of the processor service
+   * <p>
+   * Use this method instead of {@link #getProcessorServiceRegistration()} when you only need/want the identifier of the
+   * service and not the service registration object.
+   *
+   * @return the processor service identifier
+   */
+  @Column(name = "processor_service", insertable = false, updatable = false)
+  public long getProcessorServiceRegistrationId() {
+    return processorServiceRegistrationId;
+  }
+
+  /**
+   * This method MUST NOT be used - it's for JPA only!
+   */
+  protected void setProcessorServiceRegistrationId(long id) {
+    this.processorServiceRegistrationId = id;
   }
 
   @PreUpdate

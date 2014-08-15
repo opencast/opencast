@@ -559,7 +559,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           WorkflowParsingException, NotFoundException {
 
     try {
-      logger.endUnitOfWork();
+      logger.startUnitOfWork();
       if (workflowDefinition == null)
         throw new IllegalArgumentException("workflow definition must not be null");
       if (sourceMediaPackage == null)
@@ -1287,17 +1287,14 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    *
    * @param workflow
    *          the workflow instance
-   * @param e
-   *          the exception
+   * @param operation
+   *          the current workflow operation
    * @return the workflow instance
    * @throws WorkflowParsingException
    */
-  protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationException e)
+  protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationInstance operation)
           throws WorkflowDatabaseException, WorkflowParsingException, UnauthorizedException {
-    // Add the exception's localized message to the workflow instance
-    workflow.addErrorMessage(e.getLocalizedMessage());
-
-    WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) e.getOperation();
+    WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) operation;
     int failedAttempt = currentOperation.getFailedAttempts() + 1;
     currentOperation.setFailedAttempts(failedAttempt);
     currentOperation.addToExecutionHistory(currentOperation.getId());
@@ -1942,6 +1939,10 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    */
   protected void setServiceRegistry(ServiceRegistry registry) {
     this.serviceRegistry = registry;
+  }
+
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
   }
 
   /**

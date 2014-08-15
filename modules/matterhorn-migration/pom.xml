@@ -17,27 +17,11 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
-      <version>1.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-search-service-api</artifactId>
-      <version>1.4.0</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workflow-service-api</artifactId>
-      <version>1.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-series-service-impl</artifactId>
-      <version>1.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-search-service-impl</artifactId>
-      <!-- This should be replaced by 1.4.1 -->
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -113,9 +97,7 @@
               org.opencastproject.migration;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/search-migration-service.xml,
-              OSGI-INF/series-migration-service.xml,
-              OSGI-INF/workflow-migration-service.xml
+              OSGI-INF/incident-migration-service.xml
             </Service-Component>
           </instructions>
         </configuration>

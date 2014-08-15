@@ -19,6 +19,7 @@ import static org.opencastproject.workflow.impl.WorkflowServiceImpl.NO;
 import static org.opencastproject.workflow.impl.WorkflowServiceImpl.PROPERTY_PATTERN;
 import static org.opencastproject.workflow.impl.WorkflowServiceImpl.YES;
 
+import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
@@ -161,8 +162,10 @@ final class WorkflowOperationWorker {
       } else {
         logger.error("Workflow operation '" + operation + "' failed", e);
       }
+      // the associated job shares operation's id
+      service.getServiceRegistry().incident().unhandledException(operation.getId(), Severity.FAILURE, e);
       try {
-        workflow = service.handleOperationException(workflow, new WorkflowOperationException(e, operation));
+        workflow = service.handleOperationException(workflow, operation);
       } catch (Exception e2) {
         logger.error("Error handling workflow operation '{}' failure: {}", new Object[] { operation, e2.getMessage(),
                 e2 });

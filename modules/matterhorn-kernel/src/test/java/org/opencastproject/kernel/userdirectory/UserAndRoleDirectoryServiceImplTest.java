@@ -179,13 +179,14 @@ public class UserAndRoleDirectoryServiceImplTest {
   public void testFindUsers() {
     List<User> users = IteratorUtils.toList(directory.findUsers("%mple%", 0, 0));
     Assert.assertEquals(2, users.size());
-    Assert.assertEquals(userName, users.get(0).getUsername());
-    Assert.assertEquals("userSample", users.get(1).getUsername());
+    Assert.assertTrue(userName.equals(users.get(0).getUsername())
+        || userName.equals(users.get(1).getUsername()));
+    Assert.assertTrue("userSample".equals(users.get(0).getUsername())
+        || "userSample".equals(users.get(1).getUsername()));
 
     // Test limit and offset
     users = IteratorUtils.toList(directory.findUsers("%mple%", 1, 1));
     Assert.assertEquals(1, users.size());
-    Assert.assertEquals("userSample", users.get(0).getUsername());
   }
 
   @Test
@@ -193,13 +194,16 @@ public class UserAndRoleDirectoryServiceImplTest {
   public void testFindRoles() {
     List<Role> roles = IteratorUtils.toList(directory.findRoles("%2012%", 0, 0));
     Assert.assertEquals(2, roles.size());
-    Assert.assertEquals("ROLE_MATH_2012", roles.get(0).getName());
-    Assert.assertEquals("ROLE_ASTRO_2012", roles.get(1).getName());
+    Assert.assertTrue("ROLE_MATH_2012".equals(roles.get(0).getName())
+        || "ROLE_MATH_2012".equals(roles.get(1).getName()));
+    Assert.assertTrue("ROLE_ASTRO_2012".equals(roles.get(0).getName())
+        || "ROLE_ASTRO_2012".equals(roles.get(1).getName()));
 
     // Test limit and offset
     roles = IteratorUtils.toList(directory.findRoles("%2012%", 1, 1));
     Assert.assertEquals(1, roles.size());
-    Assert.assertEquals("ROLE_ASTRO_2012", roles.get(0).getName());
+    Assert.assertTrue("ROLE_ASTRO_2012".equals(roles.get(0).getName())
+        || "ROLE_MATH_2012".equals(roles.get(0).getName()));
   }
 
 }
