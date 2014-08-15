@@ -171,7 +171,7 @@
     display: none;
 }
 
-.segment:hover {
+.segmentHover {
 	cursor: pointer;
 	background-color: #dddddd;
 	border-bottom: 1px solid #cccccc;

@@ -41,6 +41,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "", "both"),
         mute: new Engage.Event("Video:mute", "", "both"),
         unmute: new Engage.Event("Video:unmute", "", "both"),
+        segmentMouseover: new Engage.Event("Segment:mouseOver", "the mouse is over a segment", "both"),
+        segmentMouseout: new Engage.Event("Segment:mouseOut", "the mouse is off a segment", "both"),
         fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "", "trigger"),
         sliderStart: new Engage.Event("Slider:start", "", "trigger"),
         sliderStop: new Engage.Event("Slider:stop", "", "trigger"),
@@ -115,6 +117,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_pause_button = "pause_button";
     var id_unmute_button = "unmute_button";
     var id_mute_button = "mute_button";
+    var id_segmentNo = "segment_";
     var class_dropdown = "dropdown-toggle";
 
     /* don't change these variables */
@@ -152,27 +155,33 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             var tempVars = {
                 plugin_path: this.pluginPath,
                 startTime: formatSeconds(0),
-		durationMS: (duration && (duration > 0)) ? duration : 1,
+                durationMS: (duration && (duration > 0)) ? duration : 1,
                 duration: (duration ? formatSeconds(duration / 1000) : formatSeconds(0)),
                 logoLink: logoLink,
-		segments: segments
+                segments: segments
             };
 
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
             initControlsEvents();
             if (segments && (segments.length > 0)) {
-		Engage.log("Controls: " + segments.length + " segments are available.");
-		for(var i = 0; i < segments.length; ++i) {
-		    var j = i;
-		    $("#segment_" + i).click(function (e) {
-			e.preventDefault();
-			var time = parseInt($(this).children().html());
-			if(!isNaN(time)) {
+                Engage.log("Controls: " + segments.length + " segments are available.");
+                $.each(segments, function(i, v) {
+                    $("#" + id_segmentNo + i).click(function(e) {
+                        e.preventDefault();
+                        var time = parseInt($(this).children().html());
+                        if (!isNaN(time)) {
                             Engage.trigger(plugin.events.seek.getName(), time / 1000);
-			}
-		    });
-		}
+                        }
+                    });
+                    $("#" + id_segmentNo + i).mouseover(function(e) {
+                        e.preventDefault();
+                        Engage.trigger(plugin.events.segmentMouseover.getName(), i);
+                    }).mouseout(function(e) {
+                        e.preventDefault();
+                        Engage.trigger(plugin.events.segmentMouseout.getName(), i);
+                    });
+                });
             }
         }
     });
@@ -457,7 +466,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         var normTime = (currentTime / (duration / 1000)) * 1000;
                         $("#" + id_slider).slider("option", "value", normTime);
                         if (!$("#" + id_navigation_time_current).is(":focus")) {
-                            // set time
                             $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
                         }
                     }
@@ -467,6 +475,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 if (videosReady) {
                     Engage.trigger(plugin.events.pause);
                 }
+            });
+            Engage.on(plugin.events.segmentMouseover.getName(), function(no) {
+                $("#" + id_segmentNo + no).addClass("segmentHover");
+            });
+            Engage.on(plugin.events.segmentMouseout.getName(), function(no) {
+                $("#" + id_segmentNo + no).removeClass("segmentHover");
             });
         }
     }
