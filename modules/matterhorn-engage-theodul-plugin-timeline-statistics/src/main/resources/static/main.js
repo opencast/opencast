@@ -74,13 +74,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     /* change these variables */
     var chartPath = "lib/Chart";
-    var momentPath = "lib/moment";
 
     /* don't change these variables */
     var mediapackageChange = "change:mediaPackage";
     var footprintChange = "change:footprints";
     var videoDataModelChange = "change:videoDataModel";
-    var initCount = 6;
+    var initCount = 5;
 
 	function setSize() {
 		$("#engage_timeline_statistics_chart").attr("width", $(window).width() - 40).attr("height", 60).css({
@@ -107,7 +106,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 			});
         },
         render: function () {
-            // format values
             var tempVars = {
                 width: $(window).width() - 40,
                 height: "60"
@@ -270,15 +268,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // load highchart lib
     require([relative_plugin_path + chartPath], function (videojs) {
         Engage.log("Timeline:Statistics: Lib chart loaded");
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
-
-    // load moment lib
-    require([relative_plugin_path + momentPath], function (momentjs) {
-        Engage.log("Timeline:Statistics: Lib Moment loaded");
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
