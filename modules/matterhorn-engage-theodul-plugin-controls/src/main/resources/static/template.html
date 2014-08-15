@@ -111,7 +111,7 @@
       <% if((typeof durationMS !== "undefined") && (typeof segments !== "undefined") && (segments.length > 0)) { var i = 0; %>
       <% _.each(segments, function(segment) { %>
       <div id="segment_<%= i %>" class="segment" style="width: <%= parseFloat((segment.duration) / durationMS * 100).toFixed(2) %>%">
-	<span id="segment_<%= i %>_span" class="segmentspan"><%= segment.time %></span>
+        <span id="segment_<%= i %>_span" class="segmentspan"><%= segment.time %></span>
       </div>
       <% ++i; }); %>
       <% } %>

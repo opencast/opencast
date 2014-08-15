@@ -5,7 +5,7 @@
     && typeof series !== "undefined" 
     && typeof contributor !== "undefined" 
     && typeof date !== "undefined") { %>
-	<span class="description-item">
+	<div class="description-item description-itemColor">
 		<p class="description-item-header">Title</p>
 		<p class="description-item-body">
 			<% if(title != "" ) {%>
@@ -14,46 +14,46 @@
 				No title
 			<% }%>
 		</p>
-	</span>
+	</div>
 	<% if(creator != "" ) {%>
-	<span class="description-item">
+	<div class="description-item description-itemColor">
 		<p class="description-item-header">Creator</p>
 		<p class="description-item-body">
 			<%= creator %>
 		</p>
-	</span>
+	</div>
 	<% }%>
 	<% if(contributor != "" ) {%>
-	<span class="description-item">
+	<div class="description-item description-itemColor">
 		<p class="description-item-header">Presenter</p>
 		<p class="description-item-body">
 			<%= contributor %>
 		</p>
-	</span>
+	</div>
 	<% }%>
 	<% if(series != "" ) {%>
-	<span class="description-item">
+	<div class="description-item description-itemColor">
 		<p class="description-item-header">Series</p>
 		<p class="description-item-body">
 			<%= series %>
 		</p>
-	</span>
+	</div>
 	<% }%>
 	<% if(date != "" ) {%>
-	<span class="description-item">
+	<div class="description-item description-itemColor">
 		<p class="description-item-header">Recording Date</p>
 		<p class="description-item-body">
 			<%= date %>
 		</p>
-	</span>
+	</div>
 	<% }%>
 	<% if(description != "" ) {%>
-	<span class="description-item">
+	<div class="description-item description-itemColor">
 		<p class="description-item-header">Description</p>
 		<p class="description-item-body">
 			<%= description %>
 		</p>
-	</span>
+	</div>
 	<% }%>
   <% } %>
 </div>

@@ -100,9 +100,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 contributor: this.model.get("contributor"),
                 date: this.model.get("date")
             };
-			moment.locale('en', {
-			    // customizations
-			});
+            moment.locale('en', {
+                // customizations
+            });
             // try to format the date
             if (moment(tempVars.date) !== null) {
                 tempVars.date = moment(tempVars.date).format("MMMM Do YYYY, h:mm:ss a");
@@ -127,6 +127,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             }
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
+			$(".description-item").mouseover(function() {
+				$(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
+			}).mouseout(function() {
+				$(this).removeClass("description-itemColor-hover").addClass("description-itemColor");
+			});
         }
     });
 
@@ -144,7 +149,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     Engage.log('Tab:Description: Relative plugin path: "' + relative_plugin_path + '"');
 
     // load moment lib
-    require([relative_plugin_path + momentPath], function (momentjs) {
+    require([relative_plugin_path + momentPath], function(momentjs) {
         Engage.log("Tab:Description: Loaded moment lib");
         initCount -= 1;
         if (initCount <= 0) {
