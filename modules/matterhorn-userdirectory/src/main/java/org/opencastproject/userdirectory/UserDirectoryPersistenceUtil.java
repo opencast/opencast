@@ -468,7 +468,7 @@ public final class UserDirectoryPersistenceUtil {
       if (user == null) {
         throw new NotFoundException("User with name " + username + " does not exist");
       }
-      em.remove(user);
+      em.remove(em.merge(user));
       tx.commit();
     } catch (NotFoundException e) {
       throw e;
