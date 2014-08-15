@@ -54,6 +54,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.PathSupport;
@@ -217,7 +218,7 @@ public class SearchServiceImplTest {
     service = new SearchServiceImpl();
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
     StaticMetadataService mdService = newStaticMetadataService(workspace);
 

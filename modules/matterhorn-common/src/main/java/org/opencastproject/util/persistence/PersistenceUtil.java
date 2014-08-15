@@ -16,30 +16,13 @@
 
 package org.opencastproject.util.persistence;
 
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Tuple.tuple;
-
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.opencastproject.fn.juc.Immutables;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
-
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import org.osgi.service.component.ComponentContext;
-
-import java.beans.PropertyVetoException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -49,6 +32,20 @@ import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.spi.PersistenceProvider;
 import javax.sql.DataSource;
+import java.beans.PropertyVetoException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Tuple.tuple;
 /** Functions supporting persistence. */
 
 /**
@@ -382,9 +379,10 @@ public final class PersistenceUtil {
     pooledDataSource.setPassword(pwd);
 
     // Set up the persistence properties
-    final Map<String, Object> props = new HashMap<String, Object>(persistenceProps);
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.target-database", vendor);
+    final Map<String, Object> props = Immutables.<String, Object>map(
+            persistenceProps,
+            tuple("javax.persistence.nonJtaDataSource", pooledDataSource),
+            tuple("eclipselink.target-database", vendor));
 
     final EntityManagerFactory emf = pp.createEntityManagerFactory(emName, props);
     if (emf == null) {
@@ -408,9 +406,14 @@ public final class PersistenceUtil {
             "jdbc:h2:./target/db" + System.currentTimeMillis(),
             "sa",
             "sa",
-            map(tuple("eclipselink.ddl-generation", "create-tables"),
-                    tuple("eclipselink.ddl-generation.output-mode", "database")),
-            new org.eclipse.persistence.jpa.PersistenceProvider());
+            Immutables.map(tuple("eclipselink.ddl-generation", "create-tables"),
+                           tuple("eclipselink.ddl-generation.output-mode", "database")),
+            testPersistenceProvider());
+  }
+
+  /** Create a new persistence provider for unit tests. */
+  public static PersistenceProvider testPersistenceProvider() {
+    return new org.eclipse.persistence.jpa.PersistenceProvider();
   }
 
   /**
@@ -419,6 +422,7 @@ public final class PersistenceUtil {
    *
    * @param emName
    *          name of the persistence unit (see META-INF/persistence.xml)
+   * @deprecated use {@link PersistenceEnvs#testPersistenceEnv(String)}
    */
   public static PersistenceEnv newTestPersistenceEnv(String emName) {
     return newPersistenceEnvironment(newTestEntityManagerFactory(emName));
