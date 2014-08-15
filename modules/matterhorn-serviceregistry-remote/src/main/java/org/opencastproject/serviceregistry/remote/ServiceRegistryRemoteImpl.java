@@ -17,7 +17,6 @@ package org.opencastproject.serviceregistry.remote;
 
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.IncidentService;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.UrlSupport;
 
@@ -28,19 +27,11 @@ import org.osgi.service.component.ComponentContext;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * This implementation of the remote service registry is able to provide the functionality specified by the api over
- * <code>HTTP</code> rather than by directly connecting to the database that is backing the service.
- * <p>
- * This means that it is suited to run inside protected environments as long as there is an implementation of the
- * service running somewhere that provides the matching communication endpoint, which is the case with the default
- * implementation at {@link org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl}.
- * <p>
- * Other than with the other <code>-remote</code> implementations, this one needs to be configured to find it's
- * counterpart implementation. It may either point to a load balancer hiding a number of running instances or to one
- * specific instance.
- */
-public class ServiceRegistryRemoteImpl implements ServiceRegistry {
+/** OSGi bound implementation. */
+public final class ServiceRegistryRemoteImpl extends ServiceRegistryRemoteBase {
+
+  /** The http client to use when connecting to remote servers */
+  private TrustedHttpClient client;
 
   /** The incident service */
   private IncidentService incidentService;
