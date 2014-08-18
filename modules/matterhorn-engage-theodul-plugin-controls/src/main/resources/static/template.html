@@ -12,13 +12,11 @@
         </div>
         <div class="clear"></div>
     </div>
-
     <div id="volume"></div>
     <div class="volume_icon" id="volumeIcon">
         <img id="unmute_button" class="mute_btn" src="<%= plugin_path %>images/volume.png" />
         <img id="mute_button" class="mute_btn" style="display: none;" src="<%= plugin_path %>images/volumeMuted.png" /> 
     </div>
-
     <div id="navigation_time">
         <% if((typeof startTime !== "undefined") && (typeof duration !== "undefined")) { %>
         <input id="navigation_time_current" class="form-control" type="text" value="<%= startTime %>" /><span id="navigation_time_current_overview"> / <span id="navigation_time_duration"><%= duration %></span></span>
@@ -26,95 +24,84 @@
         <input id="navigation_time_current" type="text" value="00:00:00" /><span> / <span id="navigation_time_duration">00:00:00</span></span>
         <% } %>
     </div>
-
     <!-- ##### Logo ##### -->
-
     <div id="navigation_logo">
         <% if(typeof logoLink !== "undefined") { %>
         <a href="<%= logoLink %>">
-            <% } %>
-            <img src="<%= plugin_path %>images/logo.png" />
-            <% if(typeof logoLink !== "undefined") { %>
+        <% } %>
+        <img src="<%= plugin_path %>images/logo.png" />
+        <% if(typeof logoLink !== "undefined") { %>
         </a>
         <% } %>
     </div>
-
     <!-- ##### Navigation ##### -->
-
     <div id="menu">
-
-      <div class="btn-group">
-	<button id="fullscreen_button" type="button" class="btn btn-default">
-	  <span class="glyphicon glyphicon-fullscreen"></span>
-	</button>
-	<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuPlaybackRate" data-toggle="dropdown">
-	  <span class="glyphicon glyphicon-time"></span>
-	  <span class="caret"></span>
-	</button>
-	<ul class="dropdown-menu" role="menu">
-	  <li role="presentation"><a id="playback05" role="menuitem" tabindex="-1" href="#">0.5</a></li>
-	  <li role="presentation"><a id="playback10" role="menuitem" tabindex="-1" href="#">1.0</a></li>
-	  <li role="presentation"><a id="playback15" role="menuitem" tabindex="-1" href="#">1.5</a></li>
-	  <li role="presentation"><a id="playback20" role="menuitem" tabindex="-1" href="#">2.0</a></li>
-	</ul>
-      </div>
-        <!--
         <div class="btn-group">
-            <a class="btn dropdown-toggle" data-toggle="dropdown"
-               href="#"> <img src="<%= plugin_path %>images/gear.png" /> <span
-                    class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-                <li class="disabled"><a href="#">Quality</a></li>
-                <li class="divider"></li>
-                <li><a href="#">low</a></li>
-                <li><a href="#">medium</a></li>
-                <li><a href="#">high</a></li>
-                <li><a href="#">HD</a></li>
+            <button id="fullscreen_button" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-fullscreen"></span>
+            </button>
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuPlaybackRate" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-time"></span>
+            <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation"><a id="playback05" role="menuitem" tabindex="-1" href="#">0.5</a></li>
+                <li role="presentation"><a id="playback10" role="menuitem" tabindex="-1" href="#">1.0</a></li>
+                <li role="presentation"><a id="playback15" role="menuitem" tabindex="-1" href="#">1.5</a></li>
+                <li role="presentation"><a id="playback20" role="menuitem" tabindex="-1" href="#">2.0</a></li>
             </ul>
         </div>
-        -->
-
         <!--
-        <div class="btn-group" style="margin: 0px;">
-            <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                <img src="<%= plugin_path %>images/share.png" /> <span
-                    class="caret"></span>
+            <div class="btn-group">
+                <a class="btn dropdown-toggle" data-toggle="dropdown"
+                   href="#"> <img src="<%= plugin_path %>images/gear.png" /> <span
+                        class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="disabled"><a href="#">Quality</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">low</a></li>
+                    <li><a href="#">medium</a></li>
+                    <li><a href="#">high</a></li>
+                    <li><a href="#">HD</a></li>
+                </ul>
+            </div>
+            -->
+        <!--
+            <div class="btn-group" style="margin: 0px;">
+                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                    <img src="<%= plugin_path %>images/share.png" /> <span
+                        class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="disabled"><a href="#">Share</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">embed</a></li>
+                    <li><a href="#">email</a></li>
+                    <li><a href="#">video at current time</a></li>
+                </ul>
+            </div>
+            -->
+        <!--
+            <a class="btn btn-small" id="shortcuts" href="#openShortcuts"
+               role="button" data-toggle="modal"> <img
+                    src="<%= plugin_path %>images/shortcuts.png" />
+            </a> <a class="btn btn-small"> <img
+                    src="<%= plugin_path %>images/logout.png" />
             </a>
-            <ul class="dropdown-menu">
-                <li class="disabled"><a href="#">Share</a></li>
-                <li class="divider"></li>
-                <li><a href="#">embed</a></li>
-                <li><a href="#">email</a></li>
-                <li><a href="#">video at current time</a></li>
-            </ul>
-        </div>
-        -->
-
-        <!--
-        <a class="btn btn-small" id="shortcuts" href="#openShortcuts"
-           role="button" data-toggle="modal"> <img
-                src="<%= plugin_path %>images/shortcuts.png" />
-        </a> <a class="btn btn-small"> <img
-                src="<%= plugin_path %>images/logout.png" />
-        </a>
-        -->
+            -->
     </div>
-
     <div class="clear"></div>
-
     <!-- ##### Slider ##### -->
-
     <div id="slider"></div>
-
     <div id="segment_wrapper">
-      <% if((typeof durationMS !== "undefined") && (typeof segments !== "undefined") && (segments.length > 0)) { var i = 0; %>
-      <% _.each(segments, function(segment) { %>
-      <div id="segment_<%= i %>" class="segment" style="width: <%= parseFloat((segment.duration) / durationMS * 100).toFixed(2) %>%">
-        <span id="segment_<%= i %>_span" class="segmentspan"><%= segment.time %></span>
-      </div>
-      <% ++i; }); %>
-      <% } %>
+        <% if((typeof durationMS !== "undefined") && (typeof segments !== "undefined") && (segments.length > 0)) { var i = 0; %>
+        <% _.each(segments, function(segment) { %>
+        <div id="segment_<%= i %>" class="segment" style="width: <%= parseFloat((segment.duration) / durationMS * 100).toFixed(2) %>%">
+            <span id="segment_<%= i %>_span" class="segmentspan"><%= segment.time %></span>
+        </div>
+        <% ++i; }); %>
+        <% } %>
     </div>
 </div>
 <!-- end Navigation -->

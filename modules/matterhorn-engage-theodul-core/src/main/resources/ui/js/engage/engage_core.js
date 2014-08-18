@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/engage_model', 'engage/engage_tab_logic'], function(require, $, _, Backbone, Mousetrap, EngageModel, EngageTabLogic) {
+define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'engage/engage_model', 'engage/engage_tab_logic'], function(require, $, _, Backbone, Mousetrap, Bowser, EngageModel, EngageTabLogic) {
     "use strict";
 
     var hotkey_jumpToX = "jumpToX",
@@ -46,6 +46,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
         volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
     };
+
+    function browserSupported() {
+        return (Bowser.firefox && Bowser.version >= 24) || (Bowser.chrome && Bowser.version >= 30) || (Bowser.opera && Bowser.version >= 20) || (Bowser.safari && Bowser.version >= 7);
+    }
 
     // global private core variables
     var plugins_loaded = {};
@@ -92,6 +96,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
                     engageCore.log("Event log: '" + name + "'");
                 }
             });
+            this.model.browserSupported = browserSupported();
+            this.model.desktopOrEmbed = false;
             // core init event
             this.dispatcher.on(events.coreInit.getName(), function() {
                 // switch view template and css rules for current player mode
@@ -107,6 +113,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
                 var view_logic_path = "";
                 switch (engageCore.model.get("mode")) {
                     case "desktop":
+                        engageCore.model.desktopOrEmbed = true;
                         cssAttr.href = 'css/core_desktop_style.css';
                         core_template = "templates/core_desktop.html";
                         view_logic_path = "engage/engage_desktop_view"
@@ -117,6 +124,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
                         view_logic_path = "engage/engage_mobile_view"
                         break;
                     case "embed":
+                        engageCore.model.desktopOrEmbed = true;
                         cssAttr.href = 'css/core_embed_style.css';
                         core_template = "templates/core_embed.html";
                         view_logic_path = "engage/engage_embed_view"
@@ -136,42 +144,52 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
                         $(engageCore.el).html(_.template(template));
                         // run init function of the view
                         engageCore.pluginView.initView();
-                        // BEGIN LOAD PLUGINS
-                        // fetch plugin information
-                        engageCore.model.get('pluginsInfo').fetch({
-                            success: function(pluginInfos) {
-                                // load plugin as requirejs module
-                                if (pluginInfos.get('pluginlist') && pluginInfos.get('pluginlist').plugins !== undefined) {
-                                    if ($.isArray(pluginInfos.get('pluginlist').plugins)) {
-                                        $.each(pluginInfos.get('pluginlist').plugins, function(index, value) {
-                                            var plugin_name = value['name'];
-                                            plugins_loaded[plugin_name] = false;
-                                        });
-                                        $.each(pluginInfos.get('pluginlist').plugins, function(index, value) {
+                        if (!engageCore.model.desktopOrEmbed || (engageCore.model.desktopOrEmbed && engageCore.model.browserSupported)) {
+                            // BEGIN LOAD PLUGINS
+                            // fetch plugin information
+                            engageCore.model.get('pluginsInfo').fetch({
+                                success: function(pluginInfos) {
+                                    // load plugin as requirejs module
+                                    if (pluginInfos.get('pluginlist') && pluginInfos.get('pluginlist').plugins !== undefined) {
+                                        if ($.isArray(pluginInfos.get('pluginlist').plugins)) {
+                                            $.each(pluginInfos.get('pluginlist').plugins, function(index, value) {
+                                                var plugin_name = value['name'];
+                                                plugins_loaded[plugin_name] = false;
+                                            });
+                                            $.each(pluginInfos.get('pluginlist').plugins, function(index, value) {
+                                                // load plugin
+                                                var plugin_name = value['name'];
+                                                loadPlugin('../../../plugin/' + value['static-path'] + '/', plugin_name);
+                                            });
+                                        } else {
                                             // load plugin
                                             var plugin_name = value['name'];
-                                            loadPlugin('../../../plugin/' + value['static-path'] + '/', plugin_name);
-                                        });
-                                    } else {
-                                        // load plugin
-                                        var plugin_name = value['name'];
-                                        plugins_loaded[plugin_name] = false;
-                                        loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/', plugin_name);
+                                            plugins_loaded[plugin_name] = false;
+                                            loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/', plugin_name);
+                                        }
                                     }
                                 }
-                            }
-                        });
-                        // END LOAD PLUGINS
-                        // wait that me infos are loaded
-                        while (engageCore.model.get("meInfo").ready == false) {}
-                        bindHotkeysToEvents(); // bind configured hotkeys to theodul events
+                            });
+                            // END LOAD PLUGINS
+                            // wait that me infos are loaded
+                            while (engageCore.model.get("meInfo").ready == false) {}
+                            bindHotkeysToEvents(); // bind configured hotkeys to theodul events
+                        } else {
+                            engageCore.trigger(events.plugin_load_done.getName());
+                        }
                     });
                 });
             });
             // load plugins done, hide loading and show content
             this.dispatcher.on(events.plugin_load_done.getName(), function() {
                 $(".loading").hide();
-                $("#engage_view").show();
+                if (!engageCore.model.desktopOrEmbed || (engageCore.model.desktopOrEmbed && engageCore.model.browserSupported)) {
+                    $("#browserWarning").detach();
+                    $("#engage_view").show();
+                } else {
+                    $("#engage_view").detach();
+                    $("#browserWarning").show();
+                }
             });
         },
         // bind a key event as a string to given theodul event
@@ -318,7 +336,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'engage/enga
     }
 
     function loadPlugin(plugin_path, plugin_name) {
-
             require([plugin_path + 'main'], function(plugin) {
                 // load styles in link tags via jquery
                 if ($.isArray(plugin.styles)) {

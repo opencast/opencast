@@ -151,38 +151,20 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         render: function() {
             duration = this.model.get("duration");
             segments = Engage.model.get("mediaPackage").get("segments");
-            // format values
+			
             var tempVars = {
                 plugin_path: this.pluginPath,
                 startTime: formatSeconds(0),
-                durationMS: (duration && (duration > 0)) ? duration : 1,
-                duration: (duration ? formatSeconds(duration / 1000) : formatSeconds(0)),
+                durationMS: (duration && (duration > 0)) ? duration : 1, // duration in ms
+                duration: (duration ? formatSeconds(duration / 1000) : formatSeconds(0)), // formatted duration
                 logoLink: logoLink,
                 segments: segments
             };
 
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
+
             initControlsEvents();
-            if (segments && (segments.length > 0)) {
-                Engage.log("Controls: " + segments.length + " segments are available.");
-                $.each(segments, function(i, v) {
-                    $("#" + id_segmentNo + i).click(function(e) {
-                        e.preventDefault();
-                        var time = parseInt($(this).children().html());
-                        if (!isNaN(time)) {
-                            Engage.trigger(plugin.events.seek.getName(), time / 1000);
-                        }
-                    });
-                    $("#" + id_segmentNo + i).mouseover(function(e) {
-                        e.preventDefault();
-                        Engage.trigger(plugin.events.segmentMouseover.getName(), i);
-                    }).mouseout(function(e) {
-                        e.preventDefault();
-                        Engage.trigger(plugin.events.segmentMouseout.getName(), i);
-                    });
-                });
-            }
         }
     });
 
@@ -394,6 +376,26 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         $("#" + id_volume).on(event_slidestop, function(event, ui) {
             Engage.trigger(plugin.events.unmute.getName());
         });
+
+        if (segments && (segments.length > 0)) {
+            Engage.log("Controls: " + segments.length + " segments are available.");
+            $.each(segments, function(i, v) {
+                $("#" + id_segmentNo + i).click(function(e) {
+                    e.preventDefault();
+                    var time = parseInt($(this).children().html());
+                    if (!isNaN(time)) {
+                        Engage.trigger(plugin.events.seek.getName(), time / 1000);
+                    }
+                });
+                $("#" + id_segmentNo + i).mouseover(function(e) {
+                    e.preventDefault();
+                    Engage.trigger(plugin.events.segmentMouseover.getName(), i);
+                }).mouseout(function(e) {
+                    e.preventDefault();
+                    Engage.trigger(plugin.events.segmentMouseout.getName(), i);
+                });
+            });
+        }
     }
 
     /**
