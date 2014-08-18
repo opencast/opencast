@@ -53,6 +53,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
 
     // global private core variables
     var plugins_loaded = {};
+    var loadingDelay = 1500;
+    var errorCheckDelay = 3500;
 
     // theodul core init
     if (window.console) {
@@ -86,6 +88,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
     var EngageCore = Backbone.View.extend({
         el: $("#engage_view"),
         initialize: function() {
+            $(".loading").show();
             // the main core is our global event system
             this.dispatcher = _.clone(Backbone.Events);
             // link to the engage model
@@ -184,14 +187,28 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
             });
             // load plugins done, hide loading and show content
             this.dispatcher.on(events.plugin_load_done.getName(), function() {
-                $(".loading").hide();
-                if (!engageCore.model.desktopOrEmbed || (engageCore.model.desktopOrEmbed && engageCore.model.browserSupported)) {
-                    $("#browserWarning").detach();
-                    $("#engage_view").show();
-                } else {
-                    $("#engage_view").detach();
-                    $("#browserWarning").show();
-                }
+                window.setTimeout(function() {
+                    $(".loading").hide().detach();
+                    if (!engageCore.model.desktopOrEmbed || (engageCore.model.desktopOrEmbed && engageCore.model.browserSupported)) {
+                        $("#browserWarning").hide().detach();
+                        $("#engage_view").show();
+                        window.setTimeout(function() {
+                            if ($("#volume").html() == "") {
+                                $("#btn_reloadPage").click(function(e) {
+                                    e.preventDefault();
+                                    location.reload();
+                                });
+                                $("#engage_view").hide().detach();
+                                $("#customError").show();
+                            } else {
+                                $("#customError").detach();
+                            }
+                        }, errorCheckDelay);
+                    } else {
+                        $("#engage_view, #customError").hide().detach();
+                        $("#browserWarning").show();
+                    }
+                }, loadingDelay);
             });
         },
         // bind a key event as a string to given theodul event

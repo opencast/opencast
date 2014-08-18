@@ -16,7 +16,7 @@
                 Please <a href="http://www.enable-javascript.com" target="_blank">enable JavaScript</a> to display the content of this site correctly.
             </div>
         </noscript>
-        <div id="browserWarning" class="alert alert-warning" role="alert">
+        <div id="browserWarning" class="alert alert-danger" role="alert">
             Your browser is not supported by Matterhorn. Please download one of the following browsers to get all of the provided features:
             <ul>
                 <li>
@@ -32,6 +32,30 @@
                     <a href="https://www.apple.com/safari" class=".alert-link" target="_blank">Safari (version 7 or higher)</a>
                 </li>
             </ul>
+        </div>
+        <div id="customError" class="alert alert-danger" role="alert">
+            <p>
+                <span class="glyphicon glyphicon-exclamation-sign"></span>&nbsp;<span id="customError_str">An error occurred. Please reload the page.</span>
+            </p>
+            <p>
+                <button id="btn_reloadPage" type="button" class="btn btn-default btn-lg">
+                	<span class="glyphicon glyphicon-repeat"></span>&nbsp;Reload page
+                </button>
+            </p>
+        </div>
+        <!-- loading animation container -->
+        <div class="loading">
+            The player is loading...
+            <div id="loading-outer">
+                <div id="loading-front" class="loading-anim">
+                    <div class="loading-bar-line"></div>
+                    <div class="loading-bar-line"></div>
+                    <div class="loading-bar-line"></div>
+                    <div class="loading-bar-line"></div>
+                    <div class="loading-bar-line"></div>
+                    <div class="loading-bar-line"></div>
+                </div>
+            </div>
         </div>
         <!-- Global Main View -->	
         <div id="engage_view"></div>
