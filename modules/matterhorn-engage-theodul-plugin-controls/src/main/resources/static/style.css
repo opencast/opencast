@@ -1,5 +1,5 @@
 #navigation_wrapper {
-	min-width: 700px;
+	min-width: 750px;
 	width: 100%;
 	border-bottom: 1px solid #999999;
 	box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
@@ -174,5 +174,5 @@
 .segmentHover {
 	cursor: pointer;
 	background-color: #dddddd;
-	border-bottom: 1px solid #cccccc;
+	/* border-bottom: 1px solid #cccccc; */
 }

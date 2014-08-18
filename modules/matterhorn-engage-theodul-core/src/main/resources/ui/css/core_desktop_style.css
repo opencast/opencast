@@ -14,6 +14,7 @@ h1,h2,h3 {
   padding: 5px 0px 10px 20px;
   margin-bottom: 20px;
   border: 1px solid #ddd;
+  min-width: 750px;
 }
 
 #engage_content {

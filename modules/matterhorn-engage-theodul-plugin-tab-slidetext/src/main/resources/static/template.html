@@ -7,7 +7,14 @@
 			<h4 class="media-heading">
 				Segment <%= i %>
 			</h4>
-			<%= segment.time %>
+			<div class="media-time">
+			  <%= segment.time %>
+			</div>
+			<div class="media-text">
+			  <% if((segment.text !== "undefined") && (segment.text != "")) { %>
+			    <%= segment.text %>
+			  <% } %>
+			</div>
 		</div>
 	</div>
 	<% ++i; }); %>

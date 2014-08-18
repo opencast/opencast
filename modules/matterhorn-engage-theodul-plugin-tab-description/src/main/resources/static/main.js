@@ -127,11 +127,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             }
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
-			$(".description-item").mouseover(function() {
-				$(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
-			}).mouseout(function() {
-				$(this).removeClass("description-itemColor-hover").addClass("description-itemColor");
-			});
+	    /*
+	      $(".description-item").mouseover(function() {
+	      $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
+	      }).mouseout(function() {
+	      $(this).removeClass("description-itemColor-hover").addClass("description-itemColor");
+	      });
+	    */
         }
     });
 

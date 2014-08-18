@@ -1,59 +1,66 @@
 <div id="engage_description_tab_content">		
   <% if(typeof description !== "undefined" 
-    && typeof title !== "undefined" 
-    && typeof creator !== "undefined" 
-    && typeof series !== "undefined" 
-    && typeof contributor !== "undefined" 
-    && typeof date !== "undefined") { %>
-	<div class="description-item description-itemColor">
+     && typeof title !== "undefined" 
+     && typeof creator !== "undefined" 
+     && typeof series !== "undefined" 
+     && typeof contributor !== "undefined" 
+     && typeof date !== "undefined") { %>
+     <div class="descriptionTabLeft">
+	<div class="description-item">
 		<p class="description-item-header">Title</p>
 		<p class="description-item-body">
-			<% if(title != "" ) {%>
+			<% if(title != "") { %>
 			<%= title %>
-			<% } else {%>
-				No title
-			<% }%>
+			<% } else { %>
+			  No title
+			<% } %>
 		</p>
 	</div>
-	<% if(creator != "" ) {%>
-	<div class="description-item description-itemColor">
+	<% if(creator != "") { %>
+	<div class="description-item">
 		<p class="description-item-header">Creator</p>
 		<p class="description-item-body">
 			<%= creator %>
 		</p>
 	</div>
-	<% }%>
-	<% if(contributor != "" ) {%>
-	<div class="description-item description-itemColor">
+	<% } %>
+	<% if(contributor != "") { %>
+	<div class="description-item">
 		<p class="description-item-header">Presenter</p>
 		<p class="description-item-body">
 			<%= contributor %>
 		</p>
 	</div>
-	<% }%>
-	<% if(series != "" ) {%>
-	<div class="description-item description-itemColor">
+	<% } %>
+     </div>
+     <div class="descriptionTabRight">
+	<% if(series != "") { %>
+	<div class="description-item ">
 		<p class="description-item-header">Series</p>
 		<p class="description-item-body">
 			<%= series %>
 		</p>
 	</div>
-	<% }%>
-	<% if(date != "" ) {%>
-	<div class="description-item description-itemColor">
+	<% } %>
+	<% if(date != "") { %>
+	<div class="description-item">
 		<p class="description-item-header">Recording Date</p>
 		<p class="description-item-body">
 			<%= date %>
 		</p>
 	</div>
-	<% }%>
-	<% if(description != "" ) {%>
-	<div class="description-item description-itemColor">
+	<% } %>
+	<% if(description != "") { %>
+	<div class="description-item">
 		<p class="description-item-header">Description</p>
 		<p class="description-item-body">
 			<%= description %>
 		</p>
 	</div>
-	<% }%>
+	<% } %>
+     </div>
+     <div class="clear"></div>
+  <% } else { %>
+    No description available.
   <% } %>
 </div>
