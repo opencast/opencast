@@ -91,7 +91,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.model.bind("change", this.render);
         },
         render: function() {
-            // format values
             var tempVars = {
                 description: this.model.get("description"),
                 creator: this.model.get("creator"),
@@ -148,7 +147,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // init event
     Engage.log("Tab:Description: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginTabDescription');
-    Engage.log('Tab:Description: Relative plugin path: "' + relative_plugin_path + '"');
 
     // load moment lib
     require([relative_plugin_path + momentPath], function(momentjs) {

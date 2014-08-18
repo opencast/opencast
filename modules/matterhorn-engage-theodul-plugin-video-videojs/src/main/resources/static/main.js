@@ -217,7 +217,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             if ((aspectRatio != null) && (videoDisplays.length > 0)) {
                 aspectRatio[1] = parseInt(aspectRatio[1]);
                 aspectRatio[2] = parseInt(aspectRatio[2]);
-                Engage.log("Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+                Engage.log("Video: Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
                 $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
                 $("." + id_videoDisplayClass).each(function(index) {
                     if ((index % 2) == 1) {
@@ -279,7 +279,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         if (i > 0) {
                             // sync every other videodisplay with the master
                             $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
-                            Engage.log("Videodisplay " + vd + " is now being synchronized with the master videodisplay " + 0);
+                            Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay " + 0);
                         }
                         ++i;
                     }
@@ -309,7 +309,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 
     function initVideojsVideo(id, videoSource, videojs_swf) {
-        Engage.log("Initializing video.js-display: '" + id + "'");
+        Engage.log("Video: Initializing video.js-display: '" + id + "'");
 
         if (id) {
             if (videoSource) {
@@ -332,19 +332,19 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 });
                 // URL to the flash swf
                 if (videojs_swf) {
-                    Engage.log("Loaded flash component");
+                    Engage.log("Video: Loaded flash component");
                     videojs.options.flash.swf = videojs_swf;
                     Engage.trigger(plugin.events.usingFlash.getName());
 
                 } else {
-                    Engage.log("No flash component loaded");
+                    Engage.log("Video: No flash component loaded");
                 }
             } else {
-                Engage.log("Error: No video source available");
+                Engage.log("Video: Error: No video source available");
                 $("#" + id_videojs_wrapper).html("No video sources available.");
             }
         } else {
-            Engage.log("Error: No ID available");
+            Engage.log("Video: Error: No ID available");
             $("#" + id_videojs_wrapper).html("No video available.");
         }
     }
@@ -413,7 +413,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             } else {
                 Engage.trigger(plugin.events.customNotification.getName(), "Start playing the video before seeking.");
                 Engage.trigger(plugin.events.timeupdate.getName(), 0);
-	    }
+            }
         });
         theodulVideodisplay.on(event_html5player_timeupdate, function() {
             if (videosReady && pressedPlayOnce) {
@@ -515,17 +515,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     // init Event
-    Engage.log("Video: init");
+    Engage.log("Video: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginVideoVideoJS');
-    Engage.log('Video: Relative plugin path: "' + relative_plugin_path + '"');
-
-    // listen on a change/set of the mediaPackage model
-    Engage.model.on(mediapackageChange, function() {
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
 
     // load video.js lib
     require([relative_plugin_path + videoPath], function(videojs) {
@@ -539,6 +530,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // load synchronize.js lib
     require([relative_plugin_path + synchronizePath], function(videojs) {
         Engage.log("Video: Lib synchronize loaded");
+        initCount -= 1;
+        if (initCount === 0) {
+            initPlugin();
+        }
+    });
+
+    // listen on a change/set of the mediaPackage model
+    Engage.model.on(mediapackageChange, function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();

@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function (require, $, _, Backbone, Engage) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
     var PLUGIN_NAME = "Timeline Usertracking Statistics";
     var PLUGIN_TYPE = "engage_timeline";
     var PLUGIN_VERSION = "0.1",
@@ -38,38 +38,38 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
-    case "mobile":
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES_MOBILE,
-            template: PLUGIN_TEMPLATE_MOBILE,
-            events: events
-        };
-        break;
-    case "embed":
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES_EMBED,
-            template: PLUGIN_TEMPLATE_EMBED,
-            events: events
-        };
-        break;
-    // fallback to desktop/default mode
-    case "desktop":
-    default:
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES,
-            template: PLUGIN_TEMPLATE,
-            events: events
-        };
-        break;
+        case "mobile":
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_MOBILE,
+                template: PLUGIN_TEMPLATE_MOBILE,
+                events: events
+            };
+            break;
+        case "embed":
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_EMBED,
+                template: PLUGIN_TEMPLATE_EMBED,
+                events: events
+            };
+            break;
+            // fallback to desktop/default mode
+        case "desktop":
+        default:
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES,
+                template: PLUGIN_TEMPLATE,
+                events: events
+            };
+            break;
     }
 
     /* change these variables */
@@ -81,15 +81,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var videoDataModelChange = "change:videoDataModel";
     var initCount = 5;
 
-	function setSize() {
-		$("#engage_timeline_statistics_chart").attr("width", $(window).width() - 40).attr("height", 60).css({
-			"width": $(window).width() - 40,
-			"height": 60
-		});
-	}
+    function setSize() {
+        $("#engage_timeline_statistics_chart").attr("width", $(window).width() - 40).attr("height", 60).css({
+            "width": $(window).width() - 40,
+            "height": 60
+        });
+    }
 
     var StatisticsTimelineView = Backbone.View.extend({
-        initialize: function () {
+        initialize: function() {
             this.setElement($(plugin.container)); // every plugin view has it's own container associated with it
             this.videoData = Engage.model.get("videoDataModel");
             this.footprints = Engage.model.get("footprints");
@@ -100,12 +100,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.videoData.bind("change", this.render);
             this.footprints.bind("change", this.render);
             this.render();
-			var _this = this;
-			$(window).resize(function() {
-            	_this.render();
-			});
+            var _this = this;
+            $(window).resize(function() {
+                _this.render();
+            });
         },
-        render: function () {
+        render: function() {
             var tempVars = {
                 width: $(window).width() - 40,
                 height: "60"
@@ -113,7 +113,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
 
-			setSize();
+            setSize();
 
             var duration = this.videoData.get("duration");
 
@@ -121,7 +121,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             var data = new Array();
             var cView = 0;
             for (i = 0; i < duration / 1000; i++) {
-                _.each(this.footprints, function (element, index, list) {
+                _.each(this.footprints, function(element, index, list) {
                     if (this.footprints.at(index).get("position") == i)
                         cView = this.footprints.at(index).get("views");
                 }, this);
@@ -139,7 +139,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 for (j = 1; j <= intvl; j++) { //real time loop
                     cTime++;
                     // count views for interval length
-                    _.each(this.footprints, function (element, index, list) {
+                    _.each(this.footprints, function(element, index, list) {
                         if (this.footprints.at(index).get("position") == cTime)
                             tmpViews += this.footprints.at(index).get("views");
                         tmpViewsCount++;
@@ -209,7 +209,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 // animation easing effect
                 animationEasing: "easeOutQuart",
                 // function to fire when the animation is complete
-                onAnimationComplete: function(){}
+                onAnimationComplete: function() {}
             }
 
             var lineChartData = {
@@ -230,35 +230,30 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (plugin.inserted === true) {
-            Engage.log("Timeline:Statistics: init view");
-            // create a new view with the media package model and the template
-            // new StatisticsTimelineView(Engage.model.get("mediaPackage"), plugin.template);
-            // new StatisticsTimelineView(Engage.model.get("videoDataModel"), plugin.template);
             new StatisticsTimelineView("");
         }
     }
 
     // init event
-    Engage.log("Timeline:Statistics: init");
+    Engage.log("Timeline:Statistics: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginTimelineStatistics');
-    Engage.log('Timeline:Statistics: Relative plugin path: "' + relative_plugin_path + '"');
 
     // listen on a change/set of the mediaPackage model
-    Engage.model.on(mediapackageChange, function () {
+    Engage.model.on(mediapackageChange, function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
         }
     });
 
-    Engage.model.on(footprintChange, function () {
+    Engage.model.on(footprintChange, function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
         }
     });
 
-    Engage.model.on(videoDataModelChange, function () {
+    Engage.model.on(videoDataModelChange, function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
@@ -266,7 +261,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 
     // load highchart lib
-    require([relative_plugin_path + chartPath], function (videojs) {
+    require([relative_plugin_path + chartPath], function(videojs) {
         Engage.log("Timeline:Statistics: Lib chart loaded");
         initCount -= 1;
         if (initCount === 0) {
@@ -275,7 +270,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 
     // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function () {
+    Engage.on(plugin.events.plugin_load_done.getName(), function() {
         Engage.log("Timeline:Statistics: Plugin load done");
         initCount -= 1;
         if (initCount === 0) {

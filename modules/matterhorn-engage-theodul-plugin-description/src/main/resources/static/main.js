@@ -14,12 +14,12 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function (require, $, _, Backbone, Engage) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Basic Engage Description";
     var PLUGIN_TYPE = "engage_description";
     var PLUGIN_VERSION = "0.1",
-		PLUGIN_TEMPLATE = "template.html",
+        PLUGIN_TEMPLATE = "template.html",
         PLUGIN_TEMPLATE_MOBILE = "template.html",
         PLUGIN_TEMPLATE_EMBED = "template.html",
         PLUGIN_STYLES = [
@@ -39,38 +39,38 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
-    case "mobile":
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES_MOBILE,
-            template: PLUGIN_TEMPLATE_MOBILE,
-            events: events
-        };
-        break;
-    case "embed":
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES_EMBED,
-            template: PLUGIN_TEMPLATE_EMBED,
-            events: events
-        };
-        break;
-    // fallback to desktop/default mode
-    case "desktop":
-    default:
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES,
-            template: PLUGIN_TEMPLATE,
-            events: events
-        };
-        break;
+        case "mobile":
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_MOBILE,
+                template: PLUGIN_TEMPLATE_MOBILE,
+                events: events
+            };
+            break;
+        case "embed":
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_EMBED,
+                template: PLUGIN_TEMPLATE_EMBED,
+                events: events
+            };
+            break;
+            // fallback to desktop/default mode
+        case "desktop":
+        default:
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES,
+                template: PLUGIN_TEMPLATE,
+                events: events
+            };
+            break;
     }
 
     /* change these variables */
@@ -85,7 +85,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     var DescriptionView = Backbone.View.extend({
         el: $("#" + id_engage_description), // every view has a element associated with it
-        initialize: function (mediaPackageModel, template) {
+        initialize: function(mediaPackageModel, template) {
             this.model = mediaPackageModel;
             this.template = template;
             // bind the render function always to the view
@@ -93,13 +93,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             // listen for changes of the model and bind the render function to this
             this.model.bind("change", this.render);
         },
-        render: function () {
-            // format values
+        render: function() {
             var tempVars = {
                 title: this.model.get("title"),
                 creator: this.model.get("creator"),
                 date: this.model.get("date")
             };
+            moment.locale('en', {
+                // customizations
+            });
             // try to format the date
             if (moment(tempVars.date) !== null) {
                 tempVars.date = moment(tempVars.date).format("MMMM Do YYYY");
@@ -111,7 +113,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if (plugin.inserted === true) {
+        if (plugin.inserted == true) {
             // create a new view with the media package model and the template
             new DescriptionView(Engage.model.get("mediaPackage"), plugin.template);
         }
@@ -120,18 +122,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // init event
     Engage.log("Description: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginDescription');
-    Engage.log('Description: Relative plugin path: "' + relative_plugin_path + '"');
-
-    // listen on a change/set of the mediaPackage model
-    Engage.model.on(mediapackageChange, function () {
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
 
     // load moment lib
-    require([relative_plugin_path + momentPath], function (momentjs) {
+    require([relative_plugin_path + momentPath], function(momentjs) {
         Engage.log("Description: Loaded moment lib");
         initCount -= 1;
         if (initCount <= 0) {
@@ -139,8 +132,16 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
     });
 
+    // listen on a change/set of the mediaPackage model
+    Engage.model.on(mediapackageChange, function() {
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
+
     // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function () {
+    Engage.on(plugin.events.plugin_load_done.getName(), function() {
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();

@@ -106,34 +106,34 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                             // format silent the model data, see dublin core for reference names
                             if (mediaPackage.mediapackage.media.track) {
                                 model.attributes.tracks = mediaPackage.mediapackage.media.track;
-			    }
+                            }
                             if (mediaPackage.mediapackage.attachments.attachment) {
                                 model.attributes.attachments = mediaPackage.mediapackage.attachments.attachment;
-			    }
+                            }
                             if (mediaPackage.dcTitle) {
                                 model.attributes.title = mediaPackage.dcTitle;
-			    }
+                            }
                             if (mediaPackage.dcCreator) {
                                 model.attributes.creator = mediaPackage.dcCreator;
-			    }
+                            }
                             if (mediaPackage.dcCreated) {
                                 model.attributes.date = mediaPackage.dcCreated;
-			    }
+                            }
                             if (mediaPackage.dcDescription) {
                                 model.attributes.description = mediaPackage.dcDescription;
-			    }
+                            }
                             if (mediaPackage.dcSubject) {
                                 model.attributes.subject = mediaPackage.dcSubject;
-			    }
+                            }
                             if (mediaPackage.dcContributor) {
                                 model.attributes.contributor = mediaPackage.dcContributor;
-			    }
+                            }
                             if (mediaPackage.mediapackage.seriestitle) {
                                 model.attributes.series = mediaPackage.mediapackage.seriestitle;
-			    }
-			    if(mediaPackage.segments && mediaPackage.segments.segment) {
-				model.attributes.segments = mediaPackage.segments.segment;
-			    }
+                            }
+                            if (mediaPackage.segments && mediaPackage.segments.segment) {
+                                model.attributes.segments = mediaPackage.segments.segment;
+                            }
                         }
                         model.trigger("change");
                     } else {
@@ -222,10 +222,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         });
     }
 
+    /**
+     * Initialize the plugin
+     */
+    function initPlugin() {
+        Engage.model.set("mediaPackage", new MediaPackageModel());
+        Engage.model.set("footprints", new FootprintCollection());
+    }
+
     // init event
     Engage.log("MhConnection: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomMhConnection');
-    Engage.log('MhConnection: Relative plugin path: "' + relative_plugin_path + '"');
 
     // get ID
     mediaPackageID = Engage.model.get("urlParameters").id;
@@ -264,11 +271,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // all plugins loaded
     Engage.on(plugin.events.plugin_load_done.getName(), function() {
         Engage.log("MhConnection: Plugin load done");
-        Engage.model.set("mediaPackage", new MediaPackageModel());
-        Engage.model.set("footprints", new FootprintCollection());
         initCount -= 1;
         if (initCount <= 0) {
-            // do something
+            initPlugin();
         }
     });
 

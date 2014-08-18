@@ -415,7 +415,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      */
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if (plugin.inserted === true) {
+        if (plugin.inserted == true) {
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
             Engage.on(plugin.events.usingFlash.getName(), function() {
                 usingFlash = true;
@@ -490,7 +490,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // init event
     Engage.log("Controls: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginControls');
-    Engage.log('Controls: Relative plugin path: "' + relative_plugin_path + '"');
 
     // load jquery-ui lib
     require([relative_plugin_path + jQueryUIPath], function() {
@@ -513,7 +512,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // listen on a change/set of the video data model
     Engage.model.on(videoDataModelChange, function() {
         initCount -= 1;
-        if (initCount === 0) {
+        if (initCount == 0) {
             initPlugin();
         }
     });
@@ -521,7 +520,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // listen on a change/set of the mediaPackage model
     Engage.model.on(mediapackageChange, function() {
         initCount -= 1;
-        if (initCount === 0) {
+        if (initCount == 0) {
             initPlugin();
         }
     });

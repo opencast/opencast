@@ -37,7 +37,7 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
                 result = document.cookie.match(new RegExp(name + '=([^;]+)'));
                 result && (result = JSON.parse(result[1]));
             } else {
-                console.log('Cookies disabled. Can not read from cookie.');
+                console.log('TabLogic: Cookies disabled. Can not read from cookie.');
             }
             return result;
         };
@@ -52,7 +52,7 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
         var sortBootstrapTabsAlphabetically = function(selector) {
             // Get tabs
             var tabs = [];
-            console.log('Sorting tabs alphabetically');
+            console.log('TabLogic: Sorting tabs alphabetically');
             $.each($('#' + selector + ' a'), function(index, value) {
                 tabs[index] = $(this).detach();
             });
@@ -76,7 +76,7 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
         // Based on an example from javascript documentation
         var addDraggingToBootstrapTabs = function(selector) {
             var drag = null;
-            console.log('Activating dragging of tabs');
+            console.log('TabLogic: Activating dragging of tabs');
             $.each($('#' + selector + ' a'), function(index, value) {
                 $(this).addClass('draggable');
                 $(this).addClass('dropzone');
@@ -156,7 +156,7 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
 
         var addBootstrapTabClickBehaviour = function(selector) {
             // click listener to change tab
-            console.log('Adding click behaviour to tabs');
+            console.log('TabLogic: Adding click behaviour to tabs');
             $('#' + selector + ' a').click(function(e) {
                 e.preventDefault();
                 $(this).tab('show');
@@ -166,10 +166,10 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
 
         var saveBootstrapActiveTab = function(tab) {
             if (navigator.cookieEnabled) {
-                console.log('Saving active tab');
+                console.log('TabLogic: Saving active tab');
                 document.cookie = TAB_IDS_PREFIX + '_active=' + JSON.stringify(tab.attr('id'));
             } else {
-                console.log('Cookies disabled. Active tab not saved.');
+                console.log('TabLogic: Cookies disabled. Active tab could not be saved');
             }
         };
 
@@ -177,13 +177,13 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
             var ahref = null;
             // save tabs in cookie
             if (navigator.cookieEnabled) {
-                console.log('Saving tabs positions to cookie');
+                console.log('TabLogic: Saving tabs positions to cookie');
                 $.each($('#' + selector + ' a'), function(index, value) {
                     ahref = extractIdFromHref(this);
                     document.cookie = $(this).parent().attr('id') + '=' + JSON.stringify(ahref);
                 });
             } else {
-                console.log('Cookies disabled. Tabs positions not saved.');
+                console.log('TabLogic: Cookies disabled. Tab positions not saved');
             }
         };
 
@@ -192,12 +192,12 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
             var activation_class = 'active';
             var activated = $('#' + selector + ' li:nth-child(' + tabnr + ')');
             if (activated.length > 0) {
-                console.log('Activating tab with number ' + tabnr);
+                console.log('TabLogic: Activating tab #' + tabnr);
                 activated.addClass(activation_class);
                 ahref = extractIdFromHref(activated[0].firstElementChild);
                 $('#' + ahref).addClass(activation_class);
             } else {
-                console.log('Activating first tab');
+                console.log('TabLogic: Activating first tab');
                 activated = $('#' + selector + ' li:first').addClass(activation_class);
                 ahref = extractIdFromHref(activated[0].firstElementChild);
                 $('#' + ahref).addClass(activation_class);
@@ -207,7 +207,7 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
         var restoreActiveBootstrapTabFromCookie = function(selector) {
             if (navigator.cookieEnabled) {
                 var active_tab = readCookie(TAB_IDS_PREFIX + '_active');
-                console.log('Reactiving last selected tab from cookie');
+                console.log('TabLogic: Reactiving last selected tab from cookie');
                 if (active_tab !== undefined && active_tab !== null) {
                     // Reduce to tab number and add one for the child selector
                     active_tab = active_tab.replace(TAB_IDS_PREFIX, '');
@@ -217,7 +217,7 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
                 }
                 activateBootstrapTabOnPosition(selector, parseInt(active_tab, 10) + 1);
             } else {
-                console.log('Cookies not available. Last active tab not restored.');
+                console.log('TabLogic: Cookies not available. Last active tab could not be restored');
             }
         };
 
@@ -227,13 +227,13 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
             var detached_tabs = {};
             if (navigator.cookieEnabled) {
                 var cookies = readCookie(TAB_IDS_PREFIX + '1');
-                console.log('Restoring tab positions from cookie');
+                console.log('TabLogic: Restoring tab positions from cookie');
                 // Try to find tab links in html from saved data in cookie by href
                 $.each($('#' + selector + ' li'), function(index, value) {
                     var tab_link_id = readCookie(TAB_IDS_PREFIX + index);
                     // No tab content id for tab position found
                     if (tab_link_id === undefined || tab_link_id === null) {
-                        console.log('No tab content saved for ' + value.id + '.');
+                        console.log('TabLogic: No tab content saved for ' + value.id);
                     } else {
                         // Search link in html and store on last/saved postition in array
                         var found = false;
@@ -247,7 +247,7 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
                         // No node for saved tab content id found
                         if (!found) {
                             restore_tab_positions[index] = null;
-                            console.log('No tab content found for tab with id ' + tab_link_id + '.');
+                            console.log('TabLogic: No tab content found for tab with id ' + tab_link_id);
                         }
                     }
                 });
