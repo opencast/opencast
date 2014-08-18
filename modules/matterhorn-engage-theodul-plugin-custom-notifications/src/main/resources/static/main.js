@@ -186,7 +186,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // init event
     Engage.log("Notifications: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomNotifications');
-    Engage.log('Notifications: Relative plugin path: "' + relative_plugin_path + '"');
 
     // load alertify lib
     require([relative_plugin_path + alertifyPath], function(_alertify) {

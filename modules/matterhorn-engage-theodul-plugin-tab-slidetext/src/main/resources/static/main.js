@@ -96,7 +96,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var Segment = function(time, image_url, text) {
         this.time = time;
         this.image_url = image_url;
-	this.text = text;
+        this.text = text;
     };
 
     /**
@@ -148,7 +148,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.model.bind("change", this.render);
         },
         render: function() {
-	    var segments = [];
+            var segments = [];
             var segmentInformation = this.model.get("segments");
             var attachments = this.model.get("attachments");
             if (segmentInformation && attachments && (segmentInformation.length > 0) && (attachments.length > 0)) {
@@ -159,25 +159,25 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         // (e.g. "ref": "track:4ea9108d-c1df-4d8e-b729-e7c75c87519e;time=T00:00:00:0F1000")
                         var time = attachment.ref.match(/([0-9]{2}:[0-9]{2}:[0-9]{2})/g);
                         if (time.length > 0) {
-			    var si = "No slide text available.";
-			    for(var i = 0; i < segmentInformation.length; ++i) {
-				if(getTimeInMilliseconds(time[0]) == parseInt(segmentInformation[i].time)) {
-				    si = segmentInformation[i].text;
-				    break;
-				}
-			    }
+                            var si = "No slide text available.";
+                            for (var i = 0; i < segmentInformation.length; ++i) {
+                                if (getTimeInMilliseconds(time[0]) == parseInt(segmentInformation[i].time)) {
+                                    si = segmentInformation[i].text;
+                                    break;
+                                }
+                            }
                             segments.push(new Segment(time[0], attachment.url, si));
                         } else {
-                            Engage.log("Error on time evaluation for segment with url: " + attachment.url);
+                            Engage.log("Tab:Slidetext: Error on time evaluation for segment with url: " + attachment.url);
                         }
                     }
                 });
-		if(segments.length > 0) {
+                if (segments.length > 0) {
                     // sort segments ascending by time
                     segments.sort(function(a, b) {
-			return new Date("1970/1/1 " + a.time) - new Date("1970/1/1 " + b.time);
+                        return new Date("1970/1/1 " + a.time) - new Date("1970/1/1 " + b.time);
                     });
-		}
+                }
             }
             var tempVars = {
                 segments: segments
@@ -221,9 +221,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     // init event
-    Engage.log("Tab:Slidetext: init");
+    Engage.log("Tab:Slidetext: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginTabSlidetext');
-    Engage.log('Tab:Slidetext: Relative plugin path: "' + relative_plugin_path + '"');
 
     // listen on a change/set of the mediaPackage model
     Engage.model.on(mediapackageChange, function() {

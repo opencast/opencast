@@ -159,12 +159,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                                             $.each(pluginInfos.get('pluginlist').plugins, function(index, value) {
                                                 // load plugin
                                                 var plugin_name = value['name'];
+                                                engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ('../../../plugin/' + value['static-path'] + '/') + "'...");
                                                 loadPlugin('../../../plugin/' + value['static-path'] + '/', plugin_name);
                                             });
                                         } else {
                                             // load plugin
                                             var plugin_name = value['name'];
                                             plugins_loaded[plugin_name] = false;
+                                            engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ('../../../plugin/' + value['static-path'] + '/') + "'...");
                                             loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/', plugin_name);
                                         }
                                     }

@@ -116,7 +116,7 @@ define(['require', 'jquery', 'underscore', 'backbone'], function(require, $, _, 
                 }
             }
             if (window.console) {
-                console.log("Player mode: " + this.get("mode"));
+                console.log("EngageModel: Player mode: " + this.get("mode"));
             }
         },
         defaults: {

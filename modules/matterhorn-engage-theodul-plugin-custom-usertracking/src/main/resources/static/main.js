@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function (require, $, _, Backbone, Engage) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage Plugin Custom Usertracking",
         PLUGIN_TYPE = "engage_custom",
@@ -40,62 +40,59 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
-    case "mobile":
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES_MOBILE,
-            template: PLUGIN_TEMPLATE_MOBILE,
-            events: events
-        };
-        break;
-    case "embed":
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES_EMBED,
-            template: PLUGIN_TEMPLATE_EMBED,
-            events: events
-        };
-        break;
-    // fallback to desktop/default mode
-    case "desktop":
-    default:
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES,
-            template: PLUGIN_TEMPLATE,
-            events: events
-        };
-        break;
+        case "mobile":
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_MOBILE,
+                template: PLUGIN_TEMPLATE_MOBILE,
+                events: events
+            };
+            break;
+        case "embed":
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_EMBED,
+                template: PLUGIN_TEMPLATE_EMBED,
+                events: events
+            };
+            break;
+            // fallback to desktop/default mode
+        case "desktop":
+        default:
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES,
+                template: PLUGIN_TEMPLATE,
+                events: events
+            };
+            break;
     }
 
     /* change these variables */
     var USERTRACKING_ENDPOINT = '/usertracking';
-	var mediapackageChange = 'change:mediaPackage';
-	var footprintsChange = 'change:footprints';
+    var mediapackageChange = 'change:mediaPackage';
+    var footprintsChange = 'change:footprints';
 
     /* don't change these variables */
     var initCount = 3;
     var lastFootprint = undefined;
     var mediapackageID;
 
-    //local function
     function initPlugin() {
-        //Set Mediapackage ID
         mediapackageID = Engage.model.get("urlParameters").id;
         if (!mediapackageID) {
             mediapackageID = "";
             return;
         }
-		
-		/*
-        Engage.on(plugin.events.timeupdate.getName(), function (currentTime) {
-            //add footprint each rounded timeupdate
+
+        Engage.on(plugin.events.timeupdate.getName(), function(currentTime) {
+            // add footprint each rounded timeupdate
             var cTime = Math.round(currentTime);
             if (lastFootprint != undefined) {
                 if (lastFootprint != cTime) {
@@ -111,8 +108,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                             type: "FOOTPRINT"
                         },
                         type: 'PUT',
-                        success: function (result) {
-                            //update current footprint model
+                        success: function(result) {
+                            // update current footprint model
                             Engage.model.get("footprints").update();
                         }
                     });
@@ -121,16 +118,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 lastFootprint = cTime;
             }
         });
-		*/
     }
 
     // init event
     Engage.log("Usertracking: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomUsertracking');
-    Engage.log('Usertracking: Relative plugin path: "' + relative_plugin_path + '"');
 
     // mediapackage model created
-    Engage.model.on(mediapackageChange, function () {
+    Engage.model.on(mediapackageChange, function() {
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
@@ -138,7 +133,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 
     // footprints model created
-    Engage.model.on(footprintsChange, function () {
+    Engage.model.on(footprintsChange, function() {
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
@@ -146,7 +141,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 
     // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function () {
+    Engage.on(plugin.events.plugin_load_done.getName(), function() {
         Engage.log("Usertracking: Plugin load done");
         initCount -= 1;
         if (initCount <= 0) {
