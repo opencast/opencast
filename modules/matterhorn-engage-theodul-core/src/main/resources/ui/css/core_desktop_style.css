@@ -1,7 +1,7 @@
 /*Core desktop css rules*/
 
 body {
-  min-width: 485px;
+  min-width: 750px;
   font-family: Arial, sans-serif;
 }
 
@@ -70,6 +70,7 @@ h1,h2,h3 {
 #engage_timeline_plugin {
   display: none;
   width: 100%;
+  min-width: 750px;
   background: #f9f9f9;
   border-top: 1px solid #e3e3e3;
   border-bottom: 1px solid #e3e3e3;
