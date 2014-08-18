@@ -10,7 +10,15 @@
   clear: both;
 }
 
-#engage_view{
+.noJavaScript {
+	margin: 5%;
+}
+
+.alert>ul {
+	margin: 10px 0px 0px 50px;
+}
+
+#engage_view, #browserWarning {
   display: none;
 }
 
