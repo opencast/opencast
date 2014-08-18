@@ -805,6 +805,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           mp = factory.newMediaPackageBuilder().loadFromXml(formData.getFirst(key));
         }
       }
+      if (mp == null) {
+        logger.warn("Refused to ingest empty mediapackage");
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
       return ingest(mp, wfConfig);
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
