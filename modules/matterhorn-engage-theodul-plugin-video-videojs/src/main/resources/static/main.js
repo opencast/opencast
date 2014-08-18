@@ -234,16 +234,21 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     		}
 
 	    } else if (Engage.model.get("mode") == "mobile") {
+            console.group("Ordering Modus: Mobile");
             if (Engage.model.get("orientation") == "portrait") {
+                console.log("Portrait");
                 $("." + id_videoDisplayClass).css("width", "99.5%");
             } else if (Engage.model.get("orientation") == "landscape") {
+                console.log("landscape");
                 $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 2) + "%");
             }
+
             for(i = 0; i < videoDisplays.length; ++i) {
                 $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+                ///$("#" + videoDisplays[i]).addClass("auto-height");
             }
         }
-
+        console.groupEnd();
         }
         $(window).on("orientationchange", function (event) {
             Engage.log("Device twisted!");

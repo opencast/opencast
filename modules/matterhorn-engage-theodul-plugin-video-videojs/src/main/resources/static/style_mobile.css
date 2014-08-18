@@ -6,7 +6,9 @@
 	height: inherit;
 }
 
-#engage_video {
+#engage_content {
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .videoDisplay:nth-child(even) {
