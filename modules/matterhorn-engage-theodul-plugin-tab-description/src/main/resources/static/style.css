@@ -1,36 +1,37 @@
-.engage_description_tab_entry {
-  
-}
-
 #engage_description_tab_content {
-	width: 100%;
-	padding-top: 15px;
-	padding-right: 20px;
+    width: 100%;
+    padding-top: 15px;
+    padding-right: 20px;
 }
 
 .description-item {
-	border-radius: 4px;
-	padding: 5px;
-	margin-bottom: 10px;
-}
-
-.description-itemColor {
-	color: #000000;
-	background-color: #F1F1F1;
-	border-color: #969696;
-}
-
-.description-itemColor-hover {
-	color: #31708f;
-	background-color: #d9edf7;
-	border-color: #bce8f1;
+    border-radius: 4px;
+    padding: 5px;
+  /*
+    color: #000000;
+    background-color: #F1F1F1;
+    border-color: #969696;
+  */
 }
 
 .description-item-header {
-	font-size: 1.2em;
-	font-weight: bold;
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 .description-item-body {
-	margin-left: 8px;
+    margin-left: 8px;
+}
+
+.descriptionTabLeft {
+    float: left;
+    width: 50%;
+}
+
+.descriptionTabRight {
+    float: left;
+}
+
+.clear {
+    clear: both;
 }

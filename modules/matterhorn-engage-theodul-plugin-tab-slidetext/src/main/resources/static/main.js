@@ -84,7 +84,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var TEMPLATE_TAB_CONTENT_ID = "engage_slidetext_tab_content";
     var html_snippet_id = "engage_slidetext_tab_content";
     var id_segmentNo = "tab_slidetext_segment_";
-    var segments = [];
     var mediapackageChange = "change:mediaPackage";
     var initCount = 2;
 
@@ -94,10 +93,39 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      * @param time
      * @param image_url
      */
-    var Segment = function(time, image_url) {
+    var Segment = function(time, image_url, text) {
         this.time = time;
         this.image_url = image_url;
+	this.text = text;
     };
+
+    /**
+     * Returns the input time in milliseconds
+     *
+     * @param data data in the format ab:cd:ef
+     * @return time from the data in milliseconds
+     */
+    function getTimeInMilliseconds(data) {
+        if ((data !== undefined) && (data !== null) && (data != 0) && (data.length) && (data.indexOf(':') != -1)) {
+            var values = data.split(':');
+            // when the format is correct
+            if (values.length == 3) {
+                // try to convert to numbers
+                var val0 = values[0] * 1;
+                var val1 = values[1] * 1;
+                var val2 = values[2] * 1;
+                // check and parse the seconds
+                if (!isNaN(val0) && !isNaN(val1) && !isNaN(val2)) {
+                    // convert hours, minutes and seconds to milliseconds
+                    val0 *= 60 * 60 * 1000; // 1 hour = 60 minutes = 60 * 60 Seconds = 60 * 60 * 1000 milliseconds
+                    val1 *= 60 * 1000; // 1 minute = 60 seconds = 60 * 1000 milliseconds
+                    val2 *= 1000; // 1 second = 1000 milliseconds
+                    return val0 + val1 + val2;
+                }
+            }
+        }
+        return 0;
+    }
 
     /**
      * timeStrToSeconds
@@ -120,8 +148,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.model.bind("change", this.render);
         },
         render: function() {
+	    var segments = [];
+            var segmentInformation = this.model.get("segments");
             var attachments = this.model.get("attachments");
-            if (attachments) {
+            if (segmentInformation && attachments && (segmentInformation.length > 0) && (attachments.length > 0)) {
                 // extract segments which type is "segment+preview" out of the model
                 $(attachments).each(function(index, attachment) {
                     if (attachment.mimetype && attachment.type && attachment.type.match(/presentation\/segment\+preview/g) && attachment.mimetype.match(/image/g)) {
@@ -129,16 +159,25 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         // (e.g. "ref": "track:4ea9108d-c1df-4d8e-b729-e7c75c87519e;time=T00:00:00:0F1000")
                         var time = attachment.ref.match(/([0-9]{2}:[0-9]{2}:[0-9]{2})/g);
                         if (time.length > 0) {
-                            segments.push(new Segment(time[0], attachment.url));
+			    var si = "No slide text available.";
+			    for(var i = 0; i < segmentInformation.length; ++i) {
+				if(getTimeInMilliseconds(time[0]) == parseInt(segmentInformation[i].time)) {
+				    si = segmentInformation[i].text;
+				    break;
+				}
+			    }
+                            segments.push(new Segment(time[0], attachment.url, si));
                         } else {
                             Engage.log("Error on time evaluation for segment with url: " + attachment.url);
                         }
                     }
                 });
-                // sort segments ascending by time
-                segments.sort(function(a, b) {
-                    return new Date("1970/1/1 " + a.time) - new Date("1970/1/1 " + b.time);
-                });
+		if(segments.length > 0) {
+                    // sort segments ascending by time
+                    segments.sort(function(a, b) {
+			return new Date("1970/1/1 " + a.time) - new Date("1970/1/1 " + b.time);
+                    });
+		}
             }
             var tempVars = {
                 segments: segments

@@ -7,7 +7,7 @@
 .media {
 	border-radius: 4px;
 	padding: 10px;
-	margin-bottom: 5px;
+	margin-bottom: -10px;
 }
 
 .mediaColor {
@@ -20,4 +20,8 @@
 	color: #31708f;
 	background-color: #d9edf7;
 	border-color: #bce8f1;
+}
+
+.media-time {
+    color: rgba(98, 98, 98, 1);
 }
