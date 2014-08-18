@@ -1,5 +1,5 @@
 <div id="engage_slidetext_tab_content">
-  <% if(typeof segments !== "undefined") { var i = 0; %>
+  <% if((typeof segments !== "undefined") && (segments.length > 0)) { var i = 0; %>
 	<% _.each(segments, function(segment) { %>
 	<div class="media mediaColor" id="tab_slidetext_segment_<%= i %>">
 		<img class="media-object pull-left" src="<%= segment.image_url %>" alt="Segment <%= i %>" />
