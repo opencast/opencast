@@ -18,6 +18,9 @@
 define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'engage/engage_model', 'engage/engage_tab_logic'], function(require, $, _, Backbone, EngageCore, EngageModel, EngageTabLogic) {
     'use strict';
 
+    var timelineplugin_opened = "Engage:timelineplugin_opened";
+    var timelineplugin_closed = "Engage:timelineplugin_closed";
+
     /*
      * init logic function
      */
@@ -41,6 +44,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
             $("#engage_timeline_expand_btn").click(function() {
                 $("#engage_timeline_plugin").slideToggle("fast");
                 $("#engage_timeline_expand_btn_img").toggleClass("engage_timeline_expand_btn_rotate180");
+				if($("#engage_timeline_expand_btn_img").hasClass("engage_timeline_expand_btn_rotate180")) {
+					EngageCore.trigger(timelineplugin_opened);
+				} else {
+					EngageCore.trigger(timelineplugin_closed);
+				}
             });
         }
 	/*

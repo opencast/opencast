@@ -74,18 +74,178 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     /* change these variables */
     var chartPath = "lib/Chart";
+    var timelineplugin_opened = "Engage:timelineplugin_opened";
+    var chartOptions = {
+        // Boolean - Whether to animate the chart
+        animation: false,
+        // Number - Number of animation steps
+        animationSteps: 60,
+        // String - Animation easing effect
+        animationEasing: "easeOutQuart",
+        // Boolean - If we should show the scale at all
+        showScale: false,
+        // Boolean - If we want to override with a hard coded scale
+        scaleOverride: false,
+        // ** Required if scaleOverride is true **
+        // Number - The number of steps in a hard coded scale
+        scaleSteps: 1,
+        // Number - The value jump in the hard coded scale
+        scaleStepWidth: null,
+        // Number - The scale starting value
+        scaleStartValue: 0,
+        // String - Colour of the scale line
+        scaleLineColor: "rgba(0,0,0,.1)",
+        // Number - Pixel width of the scale line
+        scaleLineWidth: 1,
+        // Boolean - Whether to show labels on the scale
+        scaleShowLabels: false,
+        // Interpolated JS string - can access value
+        scaleLabel: "<%=value%>",
+        // Boolean - Whether the scale should stick to integers, not floats even if drawing space is there
+        scaleIntegersOnly: false,
+        // Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
+        scaleBeginAtZero: true,
+        // String - Scale label font declaration for the scale label
+        scaleFontFamily: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
+        // Number - Scale label font size in pixels
+        scaleFontSize: 12,
+        // String - Scale label font weight style
+        scaleFontStyle: "normal",
+        // String - Scale label font colour
+        scaleFontColor: "#666",
+        // Boolean - whether or not the chart should be responsive and resize when the browser does.
+        responsive: true,
+        // Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
+        maintainAspectRatio: true,
+        // Boolean - Determines whether to draw tooltips on the canvas or not
+        showTooltips: false,
+        // Array - Array of string names to attach tooltip events
+        tooltipEvents: ["mousemove", "touchstart", "touchmove"],
+        // String - Tooltip background colour
+        tooltipFillColor: "rgba(0,0,0,0.8)",
+        // String - Tooltip label font declaration for the scale label
+        tooltipFontFamily: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
+        // Number - Tooltip label font size in pixels
+        tooltipFontSize: 14,
+        // String - Tooltip font weight style
+        tooltipFontStyle: "normal",
+        // String - Tooltip label font colour
+        tooltipFontColor: "#fff",
+        // String - Tooltip title font declaration for the scale label
+        tooltipTitleFontFamily: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
+        // Number - Tooltip title font size in pixels
+        tooltipTitleFontSize: 14,
+        // String - Tooltip title font weight style
+        tooltipTitleFontStyle: "bold",
+        // String - Tooltip title font colour
+        tooltipTitleFontColor: "#fff",
+        // Number - pixel width of padding around tooltip text
+        tooltipYPadding: 6,
+        // Number - pixel width of padding around tooltip text
+        tooltipXPadding: 6,
+        // Number - Size of the caret on the tooltip
+        tooltipCaretSize: 8,
+        // Number - Pixel radius of the tooltip border
+        tooltipCornerRadius: 6,
+        // Number - Pixel offset from point x to tooltip edge
+        tooltipXOffset: 10,
+        // String - Template string for single tooltips
+        tooltipTemplate: "<%if (label){%><%=label%>: <%}%><%= value %>",
+        // String - Template string for single tooltips
+        multiTooltipTemplate: "<%= value %>",
+        // Function - Will fire on animation progression.
+        onAnimationProgress: function() {},
+        // Function - Will fire on animation completion.
+        onAnimationComplete: function() {}
+    }
+    var chartLineOptions = {
+        // Boolean - Whether grid lines are shown across the chart
+        scaleShowGridLines: false,
+        // String - Colour of the grid lines
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        // Number - Width of the grid lines
+        scaleGridLineWidth: 1,
+        // Boolean - Whether the line is curved between points
+        bezierCurve: true,
+        // Number - Tension of the bezier curve between points
+        bezierCurveTension: 0.4,
+        // Boolean - Whether to show a dot for each point
+        pointDot: false,
+        // Number - Radius of each point dot in pixels
+        pointDotRadius: 4,
+        // Number - Pixel width of point dot stroke
+        pointDotStrokeWidth: 1,
+        // Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+        pointHitDetectionRadius: 20,
+        // Boolean - Whether to show a stroke for datasets
+        datasetStroke: false,
+        // Number - Pixel width of dataset stroke
+        datasetStrokeWidth: 2,
+        // Boolean - Whether to fill the dataset with a colour
+        datasetFill: true,
+    }
 
     /* don't change these variables */
     var mediapackageChange = "change:mediaPackage";
     var footprintChange = "change:footprints";
     var videoDataModelChange = "change:videoDataModel";
     var initCount = 5;
+    var intLen = 500;
+    var statisticsTimelineView;
 
     function setSize() {
         $("#engage_timeline_statistics_chart").attr("width", $(window).width() - 40).attr("height", 60).css({
             "width": $(window).width() - 40,
             "height": 60
         });
+    }
+
+    function rerender() {
+        setSize();
+
+        var duration = statisticsTimelineView.videoData.get("duration");
+
+        // fill array 
+        var labels = new Array(); // chart label array
+        var data = new Array(); // chart data array
+        var intvl = (duration / 1000) / intLen; // interval length
+        var cTime = 0; // current time in process
+        var tmpViews = 0; // views per interval
+        var tmpViewsCount = 0; // view entry count per interval
+        for (i = 1; i <= intLen; ++i) {
+            tmpViews = 0;
+            tmpViewsCount = 0;
+            for (j = 1; j <= intvl; ++j) {
+                ++cTime;
+                _.each(statisticsTimelineView.footprints, function(element, index, list) {
+                    if (statisticsTimelineView.footprints.at(index).get("position") == cTime) {
+                        tmpViews += statisticsTimelineView.footprints.at(index).get("views");
+                    }
+                    ++tmpViewsCount;
+                }, statisticsTimelineView);
+            }
+            // push chart data each point
+            labels.push("");
+            if (tmpViews != 0 && tmpViewsCount != 0) {
+                data.push(tmpViews / tmpViewsCount);
+            } else {
+                data.push(0);
+            }
+        }
+
+        var lineChartData = {
+            labels: labels,
+            datasets: [{
+                fillColor: "rgba(151,187,205,0.5)",
+                strokeColor: "rgba(151,187,205,1)",
+                pointColor: "rgba(151,187,205,1)",
+                pointStrokeColor: "#FFFFFF",
+                data: data
+            }]
+        }
+
+        statisticsTimelineView.chart = new Chart(document.getElementById("engage_timeline_statistics_chart").getContext("2d")).Line(lineChartData, chartLineOptions);
+        statisticsTimelineView.chart.update();
     }
 
     var StatisticsTimelineView = Backbone.View.extend({
@@ -100,9 +260,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.videoData.bind("change", this.render);
             this.footprints.bind("change", this.render);
             this.render();
-            var _this = this;
             $(window).resize(function() {
-                _this.render();
+                setSize();
             });
         },
         render: function() {
@@ -112,125 +271,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             };
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
-
-            setSize();
-
-            var duration = this.videoData.get("duration");
-
-            // fill array 
-            var data = new Array();
-            var cView = 0;
-            for (i = 0; i < duration / 1000; i++) {
-                _.each(this.footprints, function(element, index, list) {
-                    if (this.footprints.at(index).get("position") == i)
-                        cView = this.footprints.at(index).get("views");
-                }, this);
-                data.push([i, cView]);
-            }
-            var labels = new Array(); // chart label array
-            var data = new Array(); // chart data array
-            var intvl = (duration / 1000) / 500; // interval length
-            var cTime = 0; // current time in process
-            var tmpViews = 0; // views per interval
-            var tmpViewsCount = 0; // view entry count per interval
-            for (i = 1; i <= 500; i++) {
-                tmpViews = 0;
-                tmpViewsCount = 0;
-                for (j = 1; j <= intvl; j++) { //real time loop
-                    cTime++;
-                    // count views for interval length
-                    _.each(this.footprints, function(element, index, list) {
-                        if (this.footprints.at(index).get("position") == cTime)
-                            tmpViews += this.footprints.at(index).get("views");
-                        tmpViewsCount++;
-                    }, this);
-                }
-                // push chart data each point
-                labels.push("");
-                if (tmpViews != 0 && tmpViewsCount != 0) {
-                    data.push(tmpViews / tmpViewsCount);
-                } else {
-                    data.push(0);
-                }
-            }
-
-            var options = {
-                // whether scale above the chart data     
-                scaleOverlay: true,
-                // whether override with a hard coded scale
-                scaleOverride: false,
-                //** required if scaleOverride is true **
-                // the number of steps in a hard coded scale
-                scaleSteps: 1,
-                // the value jump in the hard coded scale
-                scaleStepWidth: null,
-                // the scale starting value
-                scaleStartValue: 0,
-                // colour of the scale line 
-                scaleLineColor: "rgba(0,0,0,.1)",
-                // pixel width of the scale line  
-                scaleLineWidth: 1,
-                // whether to show labels on the scale 
-                scaleShowLabels: false,
-                // interpolated JS string - can access value
-                scaleLabel: "<%=value%>",
-                // scale label font declaration for the scale label
-                scaleFontFamily: "'Arial'",
-                // scale label font size in pixels  
-                scaleFontSize: 12,
-                // scale label font weight style  
-                scaleFontStyle: "normal",
-                // scale label font color  
-                scaleFontColor: "#666",
-                // whether grid lines are shown across the chart
-                scaleShowGridLines: false,
-                // color of the grid lines
-                scaleGridLineColor: "rgba(0,0,0,.05)",
-                // width of the grid lines
-                scaleGridLineWidth: 1,
-                // whether the line is curved between points
-                bezierCurve: true,
-                // whether to show a dot for each point
-                pointDot: false,
-                // radius of each point dot in pixels
-                pointDotRadius: 3,
-                // pixel width of point dot stroke
-                pointDotStrokeWidth: 1,
-                // whether to show a stroke for datasets
-                datasetStroke: false,
-                // pixel width of dataset stroke
-                datasetStrokeWidth: 1,
-                // whether to fill the dataset with a colour
-                datasetFill: true,
-                // whether to animate the chart
-                animation: false,
-                // number of animation steps
-                animationSteps: 60,
-                // animation easing effect
-                animationEasing: "easeOutQuart",
-                // function to fire when the animation is complete
-                onAnimationComplete: function() {}
-            }
-
-            var lineChartData = {
-                labels: labels,
-                datasets: [{
-                    fillColor: "rgba(151,187,205,0.5)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#FFFFFF",
-                    data: data
-                }]
-            }
-
-            this.chart = new Chart(document.getElementById("engage_timeline_statistics_chart").getContext("2d")).Line(lineChartData, options);
         }
     });
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (plugin.inserted === true) {
-            new StatisticsTimelineView("");
+            Chart.defaults.global = chartOptions;
+            statisticsTimelineView = new StatisticsTimelineView("");
+            Engage.on(timelineplugin_opened, function() {
+                rerender();
+            });
         }
     }
 
