@@ -1,9 +1,111 @@
-/*Core global css rules*/
+/* core global css rules*/
 
 * {
   margin: 0;
   padding: 0;
   outline: none !important;
+}
+ 
+/* loading animation container */
+.loading {
+	display: none;
+	position: absolute;
+    top: 10%;
+    left: 10%;
+}
+
+#loading-outer {
+	height:23px;
+	width:180px;
+	border:2px solid #000000;
+	overflow:hidden;
+	background-color:#FFFFFF;
+}
+
+.loading-bar-line {
+	background-color:#000000;
+	float:left;
+	width:16px;
+	height:135px;
+	margin-right:27px;
+	margin-top:-32px;
+	-moz-transform:rotate(45deg);
+	-webkit-transform:rotate(45deg);
+	-o-transform:rotate(45deg);
+	-ms-transform:rotate(45deg);
+	transform:rotate(45deg);
+}
+
+.loading-anim {
+	width:266px;
+	-moz-animation-name:loading-anim;
+	-moz-animation-duration:1.2s;
+	-moz-animation-iteration-count:infinite;
+	-moz-animation-timing-function:linear;
+	-webkit-animation-name:loading-anim;
+	-webkit-animation-duration:1.2s;
+	-webkit-animation-iteration-count:infinite;
+	-webkit-animation-timing-function:linear;
+	-o-animation-name:loading-anim;
+	-o-animation-duration:1.2s;
+	-o-animation-iteration-count:infinite;
+	-o-animation-timing-function:linear;
+	-ms-animation-name:loading-anim;
+	-ms-animation-duration:1.2s;
+	-ms-animation-iteration-count:infinite;
+	-ms-animation-timing-function:linear;
+	animation-name:loading-anim;
+	animation-duration:1.2s;
+	animation-iteration-count:infinite;
+	animation-timing-function:linear;
+}
+
+#loading-front {
+}
+
+@-moz-keyframes loading-anim {
+	0%{
+	margin-left: 0px;
+	}
+	100%{
+	margin-left: -43px;
+	}
+}
+
+@-webkit-keyframes loading-anim {
+	0%{
+		margin-left: 0px;
+	}
+	100%{
+		margin-left: -43px;
+	}
+}
+
+@-ms-keyframes loading-anim {
+	0%{
+		margin-left: 0px;
+	}
+	100%{
+		margin-left: -43px;
+	}
+}
+
+@-o-keyframes loading-anim {
+	0%{
+		margin-left: 0px;
+	}
+	100%{
+		margin-left: -43px;
+	}
+}
+
+@keyframes loading-anim {
+	0%{
+		margin-left: 0px;
+	}
+	100%{
+		margin-left: -43px;
+	}
 }
 
 .clear {
@@ -12,6 +114,10 @@
 
 .noJavaScript {
 	margin: 5%;
+}
+
+#customError {
+	display: none;
 }
 
 .alert>ul {
@@ -42,41 +148,3 @@ to { -o-transform: rotate(360deg); }
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
- 
-/* Loading animation container */
-.loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 28px;
-    height: 28px;
-    margin: -14px 0 0 -14px;
-}
- 
-/* Spinning circle (inner circle) */
-.loading .maskedCircle {
-    width: 20px;
-    height: 20px;
-    border-radius: 12px;
-    border: 3px solid black;
-}
- 
-/* Spinning circle mask */
-.loading .mask {
-    width: 12px;
-    height: 12px;
-    overflow: hidden;
-}
- 
-/* Spinner */
-.loading .spinner {
-    position: absolute;
-    left: 1px;
-    top: 1px;
-    width: 26px;
-    height: 26px;
-  -webkit-animation: spin 1s infinite linear;
-  -moz-animation: spin 1s infinite linear;
-  -o-animation: spin 1s infinite linear;
-  animation: spin 1s infinite linear;
-}}
