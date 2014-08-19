@@ -12,100 +12,20 @@
 	position: absolute;
     top: 10%;
     left: 10%;
+	width: 50%;
+	font-weight: bold;
 }
 
-#loading-outer {
-	height:23px;
-	width:180px;
-	border:2px solid #000000;
-	overflow:hidden;
-	background-color:#FFFFFF;
+#loading1 {
+	display: none;
 }
 
-.loading-bar-line {
-	background-color:#000000;
-	float:left;
-	width:16px;
-	height:135px;
-	margin-right:27px;
-	margin-top:-32px;
-	-moz-transform:rotate(45deg);
-	-webkit-transform:rotate(45deg);
-	-o-transform:rotate(45deg);
-	-ms-transform:rotate(45deg);
-	transform:rotate(45deg);
+#loading2 {
+	display: none;
 }
 
-.loading-anim {
-	width:266px;
-	-moz-animation-name:loading-anim;
-	-moz-animation-duration:1.2s;
-	-moz-animation-iteration-count:infinite;
-	-moz-animation-timing-function:linear;
-	-webkit-animation-name:loading-anim;
-	-webkit-animation-duration:1.2s;
-	-webkit-animation-iteration-count:infinite;
-	-webkit-animation-timing-function:linear;
-	-o-animation-name:loading-anim;
-	-o-animation-duration:1.2s;
-	-o-animation-iteration-count:infinite;
-	-o-animation-timing-function:linear;
-	-ms-animation-name:loading-anim;
-	-ms-animation-duration:1.2s;
-	-ms-animation-iteration-count:infinite;
-	-ms-animation-timing-function:linear;
-	animation-name:loading-anim;
-	animation-duration:1.2s;
-	animation-iteration-count:infinite;
-	animation-timing-function:linear;
-}
-
-#loading-front {
-}
-
-@-moz-keyframes loading-anim {
-	0%{
-	margin-left: 0px;
-	}
-	100%{
-	margin-left: -43px;
-	}
-}
-
-@-webkit-keyframes loading-anim {
-	0%{
-		margin-left: 0px;
-	}
-	100%{
-		margin-left: -43px;
-	}
-}
-
-@-ms-keyframes loading-anim {
-	0%{
-		margin-left: 0px;
-	}
-	100%{
-		margin-left: -43px;
-	}
-}
-
-@-o-keyframes loading-anim {
-	0%{
-		margin-left: 0px;
-	}
-	100%{
-		margin-left: -43px;
-	}
-}
-
-@keyframes loading-anim {
-	0%{
-		margin-left: 0px;
-	}
-	100%{
-		margin-left: -43px;
-	}
+.progress {
+	margin: 10px 0px 0px 0px;
 }
 
 .clear {
@@ -117,6 +37,7 @@
 }
 
 #customError {
+	margin: 5%;
 	display: none;
 }
 
@@ -124,27 +45,11 @@
 	margin: 10px 0px 0px 50px;
 }
 
-#engage_view, #browserWarning {
+#browserWarning {
+	display: none;
+	margin: 5%;
+}
+
+#engage_view {
   display: none;
-}
-
-/* Loading Aninimation*/
-@-webkit-keyframes spin {
-from { -webkit-transform: rotate(0deg); }
-to { -webkit-transform: rotate(360deg); }
-}
-
-@-moz-keyframes spin {
-from { -moz-transform: rotate(0deg); }
-to { -moz-transform: rotate(360deg); }
-}
-
-@-o-keyframes spin {
-from { -o-transform: rotate(0deg); }
-to { -o-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
