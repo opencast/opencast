@@ -201,51 +201,51 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     function rerender() {
-        setSize();
+		if(statisticsTimelineView && statisticsTimelineView.videoData) {
+	        var duration = statisticsTimelineView.videoData.get("duration");
 
-        var duration = statisticsTimelineView.videoData.get("duration");
+	        // fill array 
+	        var labels = new Array(); // chart label array
+	        var data = new Array(); // chart data array
+	        var intvl = (duration / 1000) / intLen; // interval length
+	        var cTime = 0; // current time in process
+	        var tmpViews = 0; // views per interval
+	        var tmpViewsCount = 0; // view entry count per interval
+	        for (i = 1; i <= intLen; ++i) {
+	            tmpViews = 0;
+	            tmpViewsCount = 0;
+	            for (j = 1; j <= intvl; ++j) {
+	                ++cTime;
+	                _.each(statisticsTimelineView.footprints, function(element, index, list) {
+	                    if (statisticsTimelineView.footprints.at(index).get("position") == cTime) {
+	                        tmpViews += statisticsTimelineView.footprints.at(index).get("views");
+	                    }
+	                    ++tmpViewsCount;
+	                }, statisticsTimelineView);
+	            }
+	            // push chart data each point
+	            labels.push("");
+	            if (tmpViews != 0 && tmpViewsCount != 0) {
+	                data.push(tmpViews / tmpViewsCount);
+	            } else {
+	                data.push(0);
+	            }
+	        }
 
-        // fill array 
-        var labels = new Array(); // chart label array
-        var data = new Array(); // chart data array
-        var intvl = (duration / 1000) / intLen; // interval length
-        var cTime = 0; // current time in process
-        var tmpViews = 0; // views per interval
-        var tmpViewsCount = 0; // view entry count per interval
-        for (i = 1; i <= intLen; ++i) {
-            tmpViews = 0;
-            tmpViewsCount = 0;
-            for (j = 1; j <= intvl; ++j) {
-                ++cTime;
-                _.each(statisticsTimelineView.footprints, function(element, index, list) {
-                    if (statisticsTimelineView.footprints.at(index).get("position") == cTime) {
-                        tmpViews += statisticsTimelineView.footprints.at(index).get("views");
-                    }
-                    ++tmpViewsCount;
-                }, statisticsTimelineView);
-            }
-            // push chart data each point
-            labels.push("");
-            if (tmpViews != 0 && tmpViewsCount != 0) {
-                data.push(tmpViews / tmpViewsCount);
-            } else {
-                data.push(0);
-            }
-        }
+	        var lineChartData = {
+	            labels: labels,
+	            datasets: [{
+	                fillColor: "rgba(151,187,205,0.5)",
+	                strokeColor: "rgba(151,187,205,1)",
+	                pointColor: "rgba(151,187,205,1)",
+	                pointStrokeColor: "#FFFFFF",
+	                data: data
+	            }]
+	        }
 
-        var lineChartData = {
-            labels: labels,
-            datasets: [{
-                fillColor: "rgba(151,187,205,0.5)",
-                strokeColor: "rgba(151,187,205,1)",
-                pointColor: "rgba(151,187,205,1)",
-                pointStrokeColor: "#FFFFFF",
-                data: data
-            }]
-        }
-
-        statisticsTimelineView.chart = new Chart(document.getElementById("engage_timeline_statistics_chart").getContext("2d")).Line(lineChartData, chartLineOptions);
-        statisticsTimelineView.chart.update();
+	        statisticsTimelineView.chart = new Chart(document.getElementById("engage_timeline_statistics_chart").getContext("2d")).Line(lineChartData, chartLineOptions);
+	        statisticsTimelineView.chart.update();
+		}
     }
 
     var StatisticsTimelineView = Backbone.View.extend({
@@ -261,16 +261,23 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.footprints.bind("change", this.render);
             this.render();
             $(window).resize(function() {
-                setSize();
+				setSize();
+                rerender();
             });
         },
         render: function() {
-            var tempVars = {
-                width: $(window).width() - 40,
-                height: "60"
-            };
-            // compile template and load into the html
-            this.$el.html(_.template(this.template, tempVars));
+			if(this.videoData && this.footprints) {
+	            var tempVars = {
+	                width: $(window).width() - 40,
+	                height: "60"
+	            };
+	            // compile template and load into the html
+	            this.$el.html(_.template(this.template, tempVars));
+				rerender();
+				if(this.chart && this.chart.update) {
+		        	this.chart.update();
+				}
+			}
         }
     });
 
