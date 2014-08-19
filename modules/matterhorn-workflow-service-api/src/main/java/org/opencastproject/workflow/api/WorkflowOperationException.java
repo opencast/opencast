@@ -22,9 +22,6 @@ public class WorkflowOperationException extends Exception {
 
   private static final long serialVersionUID = 5840096157653799867L;
 
-  /** The failing workflow operation */
-  private WorkflowOperationInstance operation = null;
-
   /**
    * Constructs a new {@link WorkflowOperationException} with a message and a root cause.
    *
@@ -55,28 +52,6 @@ public class WorkflowOperationException extends Exception {
    */
   public WorkflowOperationException(Throwable cause) {
     super(cause);
-  }
-
-  /**
-   * Constructs a new {@link WorkflowOperationException} with a root cause.
-   *
-   * @param cause
-   *          The exception that caused this problem
-   * @param operation
-   *          the failing operation
-   */
-  public WorkflowOperationException(Throwable cause, WorkflowOperationInstance operation) {
-    super(cause);
-    this.operation = operation;
-  }
-
-  /**
-   * Returns the workflow operation instance which caused the failure.
-   *
-   * @return the operation
-   */
-  public WorkflowOperationInstance getOperation() {
-    return operation;
   }
 
 }
