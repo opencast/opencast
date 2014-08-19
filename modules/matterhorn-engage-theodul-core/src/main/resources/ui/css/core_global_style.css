@@ -16,6 +16,10 @@
 	font-weight: bold;
 }
 
+#loadingProgressbar1, #loadingProgressbar2 {
+	background-color: #9C9C9C;
+}
+
 #loading1 {
 	display: none;
 }
