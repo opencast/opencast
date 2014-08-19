@@ -16,9 +16,8 @@
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
 define(['jquery', 'bootstrap'], function($, Bootstrap) {
-    //
-    'use strict'; // strict mode in all our application
-    //
+    'use strict';
+
     // Sorts bootstrap tabs and stores the current state
     // * The ul tag must have an id.
     // * id's of the li tags are overridden with the tab_id_prefix and a tab count
