@@ -723,6 +723,19 @@
     </profile>
 
     <profile>
+      <id>migration</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-migration</module>
+      </modules>
+    </profile>
+
+    <profile>
       <id>test</id>
       <activation>
         <activeByDefault>false</activeByDefault>

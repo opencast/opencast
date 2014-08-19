@@ -15,11 +15,15 @@
  */
 package org.opencastproject.util;
 
+import static java.lang.String.format;
+
 import org.opencastproject.fn.juc.Immutables;
 import org.opencastproject.fn.juc.Iterables;
 import org.opencastproject.fn.juc.Mutables;
 import org.opencastproject.util.data.Prelude;
+
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
 
 import java.util.Collection;
@@ -27,10 +31,8 @@ import java.util.List;
 import java.util.Stack;
 import java.util.UUID;
 
-import static java.lang.String.format;
-
 /**
- * A logger that maintains a "unit of work" context" to facilitate the grouping of log statements.
+ * A logger that maintains a "unit of work" context to facilitate the grouping of log statements.
  * <p/>
  * Log methods that take message formats and arguments use the
  * {@link String#format(java.util.Locale, String, Object...)} string format syntax.
@@ -39,8 +41,8 @@ public final class Log {
   private static final String FQCN = Log.class.getName();
   private static final String JVM_SESSION = randomString();
 
-  /** Hold the unit of work stack. */
-  private static final ThreadLocal<Stack<String>> uows = new ThreadLocal<Stack<String>>() {
+  /** Hold the context stack. */
+  private static final ThreadLocal<Stack<String>> ctx = new ThreadLocal<Stack<String>>() {
     @Override protected Stack<String> initialValue() {
       return Mutables.stack(JVM_SESSION);
     }
@@ -49,7 +51,7 @@ public final class Log {
   /** Hold the current unit of work hierarchy as a string ready to use for the log methods. */
   private static final ThreadLocal<String> current = new ThreadLocal<String>() {
     @Override protected String initialValue() {
-      return uowString();
+      return ctxAsString();
     }
   };
 
@@ -62,12 +64,21 @@ public final class Log {
     this.isLocationAware = logger instanceof LocationAwareLogger;
   }
 
-  private static void updateCurrent() {
-    current.set(uowString());
+  /**
+   * Create a new log instance based on an slf4j logger for class <code>clazz</code>.
+   *
+   * @see org.slf4j.LoggerFactory#getLogger(Class)
+   */
+  public static Log mk(Class<?> clazz) {
+    return new Log(LoggerFactory.getLogger(clazz));
   }
 
-  private static String uowString() {
-    return Iterables.mkString(uows.get(), "_", "[>", "] ");
+  private static void updateCurrent() {
+    current.set(ctxAsString());
+  }
+
+  private static String ctxAsString() {
+    return Iterables.mkString(ctx.get(), "_", "[>", "] ");
   }
 
   private static String randomString() {
@@ -76,27 +87,27 @@ public final class Log {
 
   /** Start a new unit of work. */
   public void startUnitOfWork() {
-    uows.get().push(randomString());
+    ctx.get().push(randomString());
     updateCurrent();
   }
 
   /** End a unit of work. */
   public void endUnitOfWork() {
-    if (uows.get().size() > 1) {
-      uows.get().pop();
+    if (ctx.get().size() > 1) {
+      ctx.get().pop();
       updateCurrent();
     }
   }
 
-  /** Continue a unit of work. */
-  public void continueUnitOfWork(Collection<String> init) {
-    uows.set(Mutables.stack(init));
+  /** Continue a log context. */
+  public void continueContext(Collection<String> init) {
+    ctx.set(Mutables.stack(init));
     updateCurrent();
   }
 
-  /** Return the current unit of work. */
-  public List<String> getUnitOfWork() {
-    return Immutables.mk(uows.get());
+  /** Return the current log context. */
+  public List<String> getContext() {
+    return Immutables.mk(ctx.get());
   }
 
   public void debug(String msg) {

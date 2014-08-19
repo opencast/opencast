@@ -16,11 +16,14 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import static org.opencastproject.util.data.Option.option;
+
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
 import org.joda.time.Duration;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,8 +32,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.opencastproject.util.data.Option.option;
 
 /**
  * Utility class to facilitate the work with DCMI encoding schemes.
@@ -77,7 +78,7 @@ public final class EncodingSchemeUtils {
     return new DublinCoreValue(formatDate(date, precision), DublinCore.LANGUAGE_UNDEFINED, DublinCore.ENC_SCHEME_W3CDTF);
   }
 
-  private static String formatDate(Date date, Precision precision) {
+  public static String formatDate(Date date, Precision precision) {
     SimpleDateFormat f = new SimpleDateFormat(formats.get(precision));
     if (precision == Precision.Minute || precision == Precision.Second || precision == Precision.Fraction)
       f.setTimeZone(TimeZone.getTimeZone("UTC"));
