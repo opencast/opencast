@@ -17,25 +17,29 @@
             </div>
         </noscript>
         <div id="browserWarning" class="alert alert-danger" role="alert">
-            Your browser is not supported by Matterhorn. Please download one of the following browsers to get all of the provided features:
+			<h1>Browser not supported</h1>
+			<p>
+            	Your browser is not supported by Matterhorn. Please download one of the following browsers to get all of the provided features:
+			</p>
             <ul>
                 <li>
-                    <a href="https://www.mozilla.org/firefox" class=".alert-link" target="_blank">Mozilla Firefox (version 24 or higher)</a>
+                    <a href="https://www.mozilla.org/firefox" class="alert-link" target="_blank">Mozilla Firefox (version 24 or higher)</a>
                 </li>
                 <li>
-                    <a href="https://www.google.com/chrome" class=".alert-link" target="_blank">Google Chrome (version 30 or higher)</a>
+                    <a href="https://www.google.com/chrome" class="alert-link" target="_blank">Google Chrome (version 30 or higher)</a>
                 </li>
                 <li>
-                    <a href="http://www.opera.com/download" class=".alert-link" target="_blank">Opera (version 20 or higher)</a>
+                    <a href="http://www.opera.com/download" class="alert-link" target="_blank">Opera (version 20 or higher)</a>
                 </li>
                 <li>
-                    <a href="https://www.apple.com/safari" class=".alert-link" target="_blank">Safari (version 7 or higher)</a>
+                    <a href="https://www.apple.com/safari" class="alert-link" target="_blank">Safari (version 7 or higher)</a>
                 </li>
             </ul>
         </div>
         <div id="customError" class="alert alert-danger" role="alert">
+			<h1><span class="glyphicon glyphicon-exclamation-sign"></span>&nbsp;Error</h1>
             <p>
-                <span class="glyphicon glyphicon-exclamation-sign"></span>&nbsp;<span id="customError_str">An error occurred. Please reload the page.</span>
+                <span id="customError_str">An error occurred. Please reload the page.</span>
             </p>
             <p>
                 <button id="btn_reloadPage" type="button" class="btn btn-default btn-lg">
@@ -45,17 +49,22 @@
         </div>
         <!-- loading animation container -->
         <div class="loading">
-            The player is loading...
-            <div id="loading-outer">
-                <div id="loading-front" class="loading-anim">
-                    <div class="loading-bar-line"></div>
-                    <div class="loading-bar-line"></div>
-                    <div class="loading-bar-line"></div>
-                    <div class="loading-bar-line"></div>
-                    <div class="loading-bar-line"></div>
-                    <div class="loading-bar-line"></div>
-                </div>
-            </div>
+	        <div id="loading1">
+	            The player is loading...
+				<div class="progress">
+					<div class="progress-bar progress-bar-striped active" id="loadingProgressbar1" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+						<span class="sr-only">The player is loading...</span>
+					</div>
+				</div>
+	        </div>
+	        <div id="loading2">
+	            The player is loading...
+				<div class="progress">
+					<div class="progress-bar progress-bar-striped active" id="loadingProgressbar2" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+						<span class="sr-only">The player is loading...</span>
+					</div>
+				</div>
+	        </div>
         </div>
         <!-- Global Main View -->	
         <div id="engage_view"></div>
