@@ -21,10 +21,12 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.usertracking.api.UserSession;
 import org.opencastproject.usertracking.api.UserTrackingException;
 import org.opencastproject.usertracking.api.UserTrackingService;
 import org.opencastproject.usertracking.impl.UserActionImpl;
 import org.opencastproject.usertracking.impl.UserActionListImpl;
+import org.opencastproject.usertracking.impl.UserSessionImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -279,23 +281,26 @@ public class UserTrackingRestService {
       }
     }
 
-    UserActionImpl a = new UserActionImpl();
-    a.setMediapackageId(mediapackageId);
-    a.setUserId(userId);
-    a.setSessionId(sessionId);
-    a.setInpoint(in);
-    a.setOutpoint(out);
-    a.setType(type);
-    a.setIsPlaying(Boolean.valueOf(isPlaying));
-
-    // MH-8616 the connection might be via a proxy
+    //MH-8616 the connection might be via a proxy
     String clientIP = request.getHeader("X-FORWARDED-FOR");
 
     if (clientIP == null) {
       clientIP = request.getRemoteAddr();
     }
     logger.debug("Got client ip: {}", clientIP);
-    a.setUserIp(clientIP);
+
+    UserSession s = new UserSessionImpl();
+    s.setSessionId(sessionId);
+    s.setUserIp(clientIP);
+    s.setUserId(userId);
+
+    UserActionImpl a = new UserActionImpl();
+    a.setMediapackageId(mediapackageId);
+    a.setSession(s);
+    a.setInpoint(in);
+    a.setOutpoint(out);
+    a.setType(type);
+    a.setIsPlaying(Boolean.valueOf(isPlaying));
 
     try {
       if ("FOOTPRINT".equals(type)) {

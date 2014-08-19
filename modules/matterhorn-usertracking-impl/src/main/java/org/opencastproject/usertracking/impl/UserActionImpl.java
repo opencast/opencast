@@ -16,15 +16,19 @@
 package org.opencastproject.usertracking.impl;
 
 import org.opencastproject.usertracking.api.UserAction;
+import org.opencastproject.usertracking.api.UserSession;
 
 import java.util.Date;
 
 import javax.persistence.Basic;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -79,20 +83,9 @@ public class UserActionImpl implements UserAction {
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;
 
-  @Lob
-  @Column(name = "user_id", length = 255)
-  @XmlElement(name = "userId")
-  private String userId;
-
-  @Lob
-  @Column(name = "user_ip", length = 255)
-  @XmlElement(name = "userIp")
-  private String userIp;
-
-  @Lob
-  @Column(name = "session", length = 50)
-  @XmlElement(name = "sessionId")
-  private String sessionId;
+  //This needs to be a joincolumn I'm pretty sure
+  @XmlElement(name = "session")
+  private UserSession session;
 
   @Column(name = "inpoint")
   @XmlElement(name = "inpoint")
@@ -135,36 +128,20 @@ public class UserActionImpl implements UserAction {
     this.id = id;
   }
 
+  public void setSession(UserSession session) {
+    this.session = session;
+  }
+
+  public UserSession getSession() {
+    return session;
+  }
+
   public String getMediapackageId() {
     return mediapackageId;
   }
 
   public void setMediapackageId(String mediapackageId) {
     this.mediapackageId = mediapackageId;
-  }
-
-  public String getUserId() {
-    return userId;
-  }
-
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
-
-  public String getUserIp() {
-    return userIp;
-  }
-
-  public void setUserIp(String userIp) {
-    this.userIp = userIp;
-  }
-
-  public String getSessionId() {
-    return sessionId;
-  }
-
-  public void setSessionId(String sessionId) {
-    this.sessionId = sessionId;
   }
 
   public int getInpoint() {
