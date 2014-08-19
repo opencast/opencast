@@ -11,9 +11,13 @@
     <body>
         <noscript>
             <div class="noJavaScript">
-                JavaScript is not enabled in your browser.
-                <br />
-                Please <a href="http://www.enable-javascript.com" target="_blank">enable JavaScript</a> to display the content of this site correctly.
+	            <img src="img/MatterhornLogo_loading.png" id="loadingImg" />
+	            <h1>Error</h1>
+	            <p id="noJavaScript-container">
+	                JavaScript is not enabled in your browser.
+	                <br />
+	                Please <a href="http://www.enable-javascript.com" class="noJavaScriptLink" target="_blank">enable JavaScript</a> to display the content of this site correctly.
+				</p>
             </div>
         </noscript>
         <div id="browserWarning" class="alert alert-danger" role="alert">
@@ -37,12 +41,13 @@
             </ul>
         </div>
         <div id="customError" class="alert alert-danger" role="alert">
-            <h1><span class="glyphicon glyphicon-exclamation-sign"></span>&nbsp;Error</h1>
+            <img src="img/MatterhornLogo_loading.png" id="loadingImg" />
+            <h1>Error</h1>
             <p>
                 <span id="customError_str">An error occurred. Please reload the page.</span>
             </p>
-            <p>
-                <button id="btn_reloadPage" type="button" class="btn btn-default btn-lg">
+            <p id="customError_btn-container">
+                <button id="btn_reloadPage" type="button" class="btn btn-primary btn-lg">
                 <span class="glyphicon glyphicon-repeat"></span>&nbsp;Reload page
                 </button>
             </p>
