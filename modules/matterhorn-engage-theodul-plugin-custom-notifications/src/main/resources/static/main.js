@@ -86,7 +86,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     /* change these variables */
     var alertifyMessageDelay = 5000; // ms
-    var alertifyVideoLoadMessageThreshold = 1500; // ms
+    var alertifyVideoLoadMessageThreshold = 2000; // ms
     var alertifyDisplayDatetime = false;
     var alertifyPath = "lib/alertify/alertify";
 
