@@ -41,9 +41,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "trigger"),
         ended: new Engage.Event("Video:ended", "end of the video", "trigger"),
         playerLoaded: new Engage.Event("Video:playerLoaded", "player loaded successfully", "trigger"),
-        masterPlay: new Engage.Event("Video:masterPlay", "master video play", "trigger"),
-        masterEnded: new Engage.Event("Video:masterEnded", "master video ended", "trigger"),
-        masterTimeupdate: new Engage.Event("Video:masterTimeupdate", "master video timeupdate", "trigger"),
         synchronizing: new Engage.Event("Video:synchronizing", "synchronizing videos with the master video", "trigger"),
         buffering: new Engage.Event("Video:buffering", "video is buffering", "trigger"),
         bufferedAndAutoplaying: new Engage.Event("Video:bufferedAndAutoplaying", "buffering successful, was playing, autoplaying now", "trigger"),
@@ -123,13 +120,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var pressedPlayOnce = false;
     var mediapackageChange = "change:mediaPackage";
     var engageModelChange = "change:videoDataModel";
-    var event_html5player_timeupdate = "timeupdate";
     var event_html5player_volumechange = "volumechange";
     var event_html5player_fullscreenchange = "fullscreenchange";
-    var event_html5player_ended = "ended";
     var event_sjs_allPlayersReady = "sjs:allPlayersReady";
     var event_sjs_playerLoaded = "sjs:playerLoaded";
     var event_sjs_masterPlay = "sjs:masterPlay";
+    var event_sjs_masterPause = "sjs:masterPause";
     var event_sjs_masterEnded = "sjs:masterEnded";
     var event_sjs_masterTimeupdate = "sjs:masterTimeupdate";
     var event_sjs_synchronizing = "sjs:synchronizing";
@@ -208,7 +204,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     }
                 }
             }
-
+	    
             for (var v in videoSources) {
                 if (videoSources[v].length > 0) {
                     initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
@@ -258,13 +254,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         Engage.trigger(plugin.events.playerLoaded.getName());
                     });
                     $(document).on(event_sjs_masterPlay, function(event) {
-                        Engage.trigger(plugin.events.masterPlay.getName());
+                        Engage.trigger(plugin.events.play.getName(), true);
+			pressedPlayOnce = true;
+                    });
+                    $(document).on(event_sjs_masterPause, function(event) {
+                        Engage.trigger(plugin.events.pause.getName(), true);
                     });
                     $(document).on(event_sjs_masterEnded, function(event) {
-                        Engage.trigger(plugin.events.masterEnded.getName());
+                        Engage.trigger(plugin.events.ended.getName(), true);
                     });
-                    $(document).on(event_sjs_masterTimeupdate, function(event) {
-                        Engage.trigger(plugin.events.masterTimeupdate.getName());
+                    $(document).on(event_sjs_masterTimeupdate, function(event, time) {
+                        Engage.trigger(plugin.events.timeupdate.getName(), time, true);
                     });
                     $(document).on(event_sjs_synchronizing, function(event) {
                         Engage.trigger(plugin.events.synchronizing.getName());
@@ -339,11 +339,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 if (videojs_swf) {
                     Engage.log("Video: Loaded flash component");
                     videojs.options.flash.swf = videojs_swf;
-                    Engage.trigger(plugin.events.usingFlash.getName());
-
                 } else {
                     Engage.log("Video: No flash component loaded");
                 }
+                Engage.trigger(plugin.events.usingFlash.getName(), videojs_swf);
             } else {
                 Engage.log("Video: Error: No video source available");
                 $("#" + id_videojs_wrapper).html("No video sources available.");
@@ -367,7 +366,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     function registerEvents(videoDisplay) {
-        var theodulVideodisplay = videojs(videoDisplay);
+	var theodulVideodisplayMaster = videojs(videoDisplay);
 
         $(window).resize(function() {
             checkVideoDisplaySize();
@@ -375,40 +374,50 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
         Engage.on(plugin.events.playbackRateChanged.getName(), function(rate) {
             if (pressedPlayOnce) {
-                theodulVideodisplay.playbackRate(rate); // TODO: Check if this is the correct function!
+                theodulVideodisplayMaster.playbackRate(rate); // TODO: Check if this is the correct function!
             }
         });
-        Engage.on(plugin.events.play.getName(), function() {
-            if (videosReady) {
-                theodulVideodisplay.play();
+        Engage.on(plugin.events.play.getName(), function(triggeredByMaster) {
+            if (!triggeredByMaster && videosReady) {
+                theodulVideodisplayMaster.play();
                 pressedPlayOnce = true;
             }
         });
-        Engage.on(plugin.events.pause.getName(), function() {
-            if (pressedPlayOnce) {
-                theodulVideodisplay.pause();
+        Engage.on(plugin.events.pause.getName(), function(triggeredByMaster) {
+            if (!triggeredByMaster && pressedPlayOnce) {
+                theodulVideodisplayMaster.pause();
             }
         });
         Engage.on(plugin.events.fullscreenEnable.getName(), function() {
+            $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
             if (numberOfVideodisplays == 1) {
-                theodulVideodisplay.requestFullscreen();
-                $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
+                theodulVideodisplayMaster.requestFullscreen();
             } else {
-                Engage.trigger(plugin.events.customNotification.getName(), "Fullscreen will be available soon."); // TODO: Implement "fake" fullscreen
+		$("#page-cover").css("opacity", 0.9).fadeIn(300, function () {            
+		    $("#engage_video").css("z-index", 999).css("position", "relative");
+		}).click(function(e) {
+		    e.preventDefault();
+		    Engage.trigger(plugin.events.fullscreenCancel.getName());
+		});
             }
         });
         Engage.on(plugin.events.fullscreenCancel.getName(), function() {
             $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
+            if (numberOfVideodisplays > 1) {
+		$("#page-cover").css("opacity", 0.9).fadeOut(300, function () {            
+		    $("#engage_video").css("z-index", 0).css("position", "");
+		});
+	    }
         });
         Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {
-            theodulVideodisplay.volume(percentAsDecimal);
+            theodulVideodisplayMaster.volume(percentAsDecimal);
         });
         Engage.on(plugin.events.volumeGet.getName(), function(callback) {
-            callback(theodulVideodisplay.volume());
+            callback(theodulVideodisplayMaster.volume());
         });
         Engage.on(plugin.events.seek.getName(), function(time) {
             if (videosReady && pressedPlayOnce) {
-                theodulVideodisplay.currentTime(time);
+                theodulVideodisplayMaster.currentTime(time);
             } else {
                 Engage.trigger(plugin.events.customNotification.getName(), "Start playing the video before setting a time.");
                 Engage.trigger(plugin.events.timeupdate.getName(), 0);
@@ -418,30 +427,24 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             if (videosReady && pressedPlayOnce) {
                 var duration = Engage.model.get("videoDataModel").get("duration");
                 var normTime = (time / 1000) * (duration / 1000);
-                theodulVideodisplay.currentTime(normTime);
+                theodulVideodisplayMaster.currentTime(normTime);
             } else {
                 Engage.trigger(plugin.events.customNotification.getName(), "Start playing the video before seeking.");
                 Engage.trigger(plugin.events.timeupdate.getName(), 0);
             }
         });
-        theodulVideodisplay.on(event_html5player_timeupdate, function() {
-            if (videosReady && pressedPlayOnce) {
-                Engage.trigger(plugin.events.timeupdate.getName(), theodulVideodisplay.currentTime());
-            }
-        });
-        theodulVideodisplay.on(event_html5player_volumechange, function() {
-            Engage.trigger(plugin.events.volumechange.getName(), theodulVideodisplay.volume());
-        });
-        theodulVideodisplay.on(event_html5player_fullscreenchange, function() {
-            Engage.trigger(plugin.events.fullscreenChange.getName());
-        });
-        theodulVideodisplay.on(event_html5player_ended, function() {
+        Engage.on(plugin.events.ended.getName(), function(time) {
             if (videosReady) {
-                Engage.trigger(plugin.events.ended.getName());
-                theodulVideodisplay.pause();
+                theodulVideodisplayMaster.pause();
                 Engage.trigger(plugin.events.pause.getName());
-                theodulVideodisplay.currentTime(theodulVideodisplay.duration());
+                theodulVideodisplayMaster.currentTime(theodulVideodisplayMaster.duration());
             }
+        });
+        theodulVideodisplayMaster.on(event_html5player_volumechange, function() {
+            Engage.trigger(plugin.events.volumechange.getName(), theodulVideodisplayMaster.volume());
+        });
+        theodulVideodisplayMaster.on(event_html5player_fullscreenchange, function() {
+            Engage.trigger(plugin.events.fullscreenChange.getName());
         });
     }
 
