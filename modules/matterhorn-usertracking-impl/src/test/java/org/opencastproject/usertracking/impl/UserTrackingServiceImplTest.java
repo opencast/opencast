@@ -19,6 +19,7 @@ import org.opencastproject.usertracking.api.FootprintList;
 import org.opencastproject.usertracking.api.Report;
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserActionList;
+import org.opencastproject.usertracking.api.UserSession;
 import org.opencastproject.usertracking.api.UserSummary;
 import org.opencastproject.usertracking.api.UserSummaryList;
 
@@ -1321,11 +1322,12 @@ public class UserTrackingServiceImplTest {
    * @throws Exception
    */
   private UserAction createAndVerifyUserAction(String type, String sessionId, String mediapackageId, String userId, String userIp, int inpoint, int outpoint, Date createdDate) throws Exception {
-    UserAction userAction = createUserAction(type, sessionId, mediapackageId, userId, userIp, inpoint, outpoint, createdDate);
+    UserSession userSession = createUserSession(sessionId, userId, userIp);
+    UserAction userAction = createUserAction(type, mediapackageId, inpoint, outpoint, createdDate, userSession);
     if (UserTrackingServiceImpl.FOOTPRINT_KEY.equals(type)) {
-      userAction = service.addUserFootprint(userAction);
+      userAction = service.addUserFootprint(userAction, userSession);
     } else {
-      userAction = service.addUserTrackingEvent(userAction);
+      userAction = service.addUserTrackingEvent(userAction, userSession);
     }
     Long id = userAction.getId();
 
@@ -1338,29 +1340,39 @@ public class UserTrackingServiceImplTest {
     Assert.assertNotNull(fromDb.getCreated());
     Assert.assertEquals(id, fromDb.getId());
     Assert.assertEquals(userAction.getMediapackageId(), fromDb.getMediapackageId());
-    Assert.assertEquals(userAction.getSessionId(), fromDb.getSessionId());
+    Assert.assertEquals(userAction.getSession().getSessionId(), fromDb.getSession().getSessionId());
     Assert.assertEquals(userAction.getType(), fromDb.getType());
-    Assert.assertEquals(userAction.getUserId(), fromDb.getUserId());
-    Assert.assertEquals(userAction.getUserIp(), fromDb.getUserIp());
+    Assert.assertEquals(userAction.getSession().getUserId(), fromDb.getSession().getUserId());
+    Assert.assertEquals(userAction.getSession().getUserIp(), fromDb.getSession().getUserIp());
     Assert.assertEquals(userAction.getInpoint(), fromDb.getInpoint());
     Assert.assertEquals(userAction.getOutpoint(), fromDb.getOutpoint());
     Assert.assertEquals(userAction.getIsPlaying(), fromDb.getIsPlaying());
-    Assert.assertEquals(userAction.getUserIp(), fromDb.getUserIp());
+    Assert.assertEquals(userAction.getSession().getUserIp(), fromDb.getSession().getUserIp());
     return userAction;
   }
 
   /**
+   * Creates a user session
+   * @throws Exception
+   */
+  private UserSession createUserSession(String sessionId, String userId, String userIp) {
+    UserSession userSession = new UserSessionImpl();
+    userSession.setSessionId(sessionId);
+    userSession.setUserId(userId);
+    userSession.setUserIp(userIp);
+    return userSession;
+  }
+  
+  /**
    * Creates a user action with an arbitrary date
    * @throws Exception
    */
-  private UserAction createUserAction(String type, String sessionId, String mediapackageId, String userId, String userIp, int inpoint, int outpoint, Date createdDate) {
+  private UserAction createUserAction(String type, String mediapackageId, int inpoint, int outpoint, Date createdDate, UserSession userSession) {
     UserAction userAction = new UserActionImpl();
     userAction.setInpoint(inpoint);
     userAction.setOutpoint(outpoint);
     userAction.setMediapackageId(mediapackageId);
-    userAction.setSessionId(sessionId);
-    userAction.setUserId(userId);
-    userAction.setUserIp(userIp);
+    userAction.setSession(userSession);
     userAction.setType(type);
     ((UserActionImpl) userAction).setCreated(createdDate);
     return userAction;

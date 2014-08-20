@@ -21,6 +21,7 @@ import org.opencastproject.usertracking.api.Report;
 import org.opencastproject.usertracking.api.ReportItem;
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserActionList;
+import org.opencastproject.usertracking.api.UserSession;
 import org.opencastproject.usertracking.api.UserTrackingException;
 import org.opencastproject.usertracking.api.UserTrackingService;
 import org.opencastproject.usertracking.endpoint.FootprintImpl;
@@ -47,6 +48,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.spi.PersistenceProvider;
@@ -156,7 +158,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   }
 
   @SuppressWarnings("unchecked")
-  public UserAction addUserFootprint(UserAction a) throws UserTrackingException {
+  public UserAction addUserFootprint(UserAction a, UserSession session) throws UserTrackingException {
     a.setType(FOOTPRINT_KEY);
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -167,9 +169,21 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      Query q = em.createNamedQuery("findLastUserFootprintOfSession");
+      //Try and find the session.  If not found, persist it
+      Query q = em.createNamedQuery("findUserSessionBySessionId");
       q.setMaxResults(1);
-      q.setParameter("sessionId", a.getSessionId());
+      q.setParameter("sessionId", session.getSessionId());
+      UserSession userSession = null;
+      try {
+        userSession = (UserSession) q.getSingleResult();
+      } catch (NoResultException n) {
+        userSession = session;
+        em.persist(userSession);
+      }
+
+      q = em.createNamedQuery("findLastUserFootprintOfSession");
+      q.setMaxResults(1);
+      q.setParameter("session", userSession);
       Collection<UserAction> userActions = q.getResultList();
 
       if (userActions.size() >= 1) {
@@ -199,7 +213,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     }
   }
 
-  public UserAction addUserTrackingEvent(UserAction a) throws UserTrackingException {
+  public UserAction addUserTrackingEvent(UserAction a, UserSession session) throws UserTrackingException {
     EntityManager em = null;
     EntityTransaction tx = null;
     if (!logIp) a.setUserIp("-omitted-");
@@ -209,6 +223,17 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
+      Query q = em.createNamedQuery("findUserSessionBySessionId");
+      q.setMaxResults(1);
+      q.setParameter("sessionId", session.getSessionId());
+      UserSession userSession = null;
+      try {
+        userSession = (UserSession) q.getSingleResult();
+      } catch (NoResultException n) {
+        userSession = session;
+        em.persist(userSession);
+      }
+
       em.persist(a);
       tx.commit();
       return a;

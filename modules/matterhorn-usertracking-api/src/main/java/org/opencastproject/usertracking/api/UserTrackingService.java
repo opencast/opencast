@@ -32,11 +32,13 @@ public interface UserTrackingService {
    *
    * @param a
    *          The UserAction that will be added to the database
+   * @param session
+   *          The UserSession associated with this footprint
    * @return the updated annotation, with a new ID. NULL if there are errors while adding the annotation.
    * @throws UserTrackingException
    *           if the user tracking service encounters an error
    */
-  UserAction addUserFootprint(UserAction a) throws UserTrackingException;
+  UserAction addUserFootprint(UserAction a, UserSession session) throws UserTrackingException;
 
   /**
    * Adds a new tracking event to the database and returns the event with an updated annotationId, to make sure the
@@ -44,11 +46,13 @@ public interface UserTrackingService {
    *
    * @param a
    *          The UserAction that will be added to the database
+   * @param session
+   *          The UserSession associated with this footprint
    * @return the updated annotation, with a new ID. NULL if there are errors while adding the annotation.
    * @throws UserTrackingException
    *           if the user tracking service encounters an error
    */
-  UserAction addUserTrackingEvent(UserAction a) throws UserTrackingException;
+  UserAction addUserTrackingEvent(UserAction a, UserSession session) throws UserTrackingException;
 
   /**
    * Returns annotations

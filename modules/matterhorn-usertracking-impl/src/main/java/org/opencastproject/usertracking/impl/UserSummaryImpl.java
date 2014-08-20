@@ -26,8 +26,6 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -42,7 +40,8 @@ import javax.xml.bind.annotation.XmlType;
  */
 @Entity(name = "UserSummary")
 @Table(name = "mh_user_action")
-@NamedQueries({ @NamedQuery(name = "userSummaryByMediapackageByType", query = "SELECT a.userId, COUNT(distinct a.sessionId), COUNT(distinct a.mediapackageId), SUM(a.length), MAX(a.created) FROM UserAction a WHERE a.type = :type AND a.mediapackageId = :mediapackageId GROUP BY a.userId") })
+/*@NamedQueries({ 
+ @NamedQuery(name = "userSummaryByMediapackageByType", query = "SELECT a.userId, COUNT(distinct a.sessionId), COUNT(distinct a.mediapackageId), SUM(a.length), MAX(a.created) FROM UserAction a WHERE a.type = :type AND a.mediapackageId = :mediapackageId GROUP BY a.userId") })*/
 @XmlType(name = "summary", namespace = "http://usertracking.opencastproject.org")
 @XmlRootElement(name = "summary", namespace = "http://usertracking.opencastproject.org")
 @XmlAccessorType(XmlAccessType.NONE)

@@ -249,8 +249,9 @@ public class UserTrackingRestService {
   @RestQuery(name = "add", description = "Record a user action", returnDescription = "An XML representation of the user action", restParameters = {
           @RestParameter(name = "id", description = "The episode identifier", isRequired = true, type = Type.STRING),
           @RestParameter(name = "type", description = "The episode identifier", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "in", description = "The beginning of the time range", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "out", description = "The end of the time range", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_CREATED, description = "An XML representation of the user action") })
+          @RestParameter(name = "in", description = "The beginning of the time range", isRequired = true, type = Type.STRING),
+          @RestParameter(name = "out", description = "The end of the time range", isRequired = false, type = Type.STRING),
+          @RestParameter(name = "playing", description = "Whether the player is currently playing", isRequired = false, type = Type.STRING)}, reponses = { @RestResponse(responseCode = SC_CREATED, description = "An XML representation of the user action") })
   public Response addFootprint(@FormParam("id") String mediapackageId, @FormParam("in") String inString,
           @FormParam("out") String outString, @FormParam("type") String type, @FormParam("playing") String isPlaying,
           @Context HttpServletRequest request) {
@@ -277,7 +278,7 @@ public class UserTrackingRestService {
       try {
         out = Integer.parseInt(StringUtils.trim(outString));
       } catch (NumberFormatException e) {
-        throw new WebApplicationException(e, Response.status(Status.BAD_REQUEST).entity("in must be a non null integer").build());
+        throw new WebApplicationException(e, Response.status(Status.BAD_REQUEST).entity("out must be a non null integer").build());
       }
     }
 
@@ -304,9 +305,9 @@ public class UserTrackingRestService {
 
     try {
       if ("FOOTPRINT".equals(type)) {
-        a = (UserActionImpl) usertrackingService.addUserFootprint(a);
+        a = (UserActionImpl) usertrackingService.addUserFootprint(a, s);
       } else {
-        a = (UserActionImpl) usertrackingService.addUserTrackingEvent(a);
+        a = (UserActionImpl) usertrackingService.addUserTrackingEvent(a, s);
       }
     } catch (UserTrackingException e) {
       throw new WebApplicationException(e);

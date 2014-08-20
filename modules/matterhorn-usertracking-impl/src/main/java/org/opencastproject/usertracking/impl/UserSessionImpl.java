@@ -1,13 +1,31 @@
+/**
+ *  Copyright 2009, 2010 The Regents of the University of California
+ *  Licensed under the Educational Community License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance
+ *  with the License. You may obtain a copy of the License at
+ *
+ *  http://www.osedu.org/licenses/ECL-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an "AS IS"
+ *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ *  or implied. See the License for the specific language governing
+ *  permissions and limitations under the License.
+ *
+ */
 package org.opencastproject.usertracking.impl;
 
+import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserSession;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -18,17 +36,20 @@ import javax.xml.bind.annotation.XmlType;
 @Entity(name = "UserSession")
 @Table(name = "mh_user_session")
 @NamedQueries({
-        @NamedQuery(name = "findUserActionsByMediaPackageAndTypeDescendingByDate", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type ORDER BY a.created DESC") })
+        @NamedQuery(name = "findUserSessionBySessionId", query = "SELECT s FROM UserSession s WHERE s.sessionId = :sessionId") })
 @XmlType(name = "session", namespace = "http://usertracking.opencastproject.org")
 @XmlRootElement(name = "session", namespace = "http://usertracking.opencastproject.org")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserSessionImpl implements UserSession {
 
   @Id
-  @Lob
   @Column(name = "session", length = 50)
   @XmlElement(name = "sessionId")
   private String sessionId;
+
+  @OneToOne(cascade = CascadeType.PERSIST, mappedBy = "session", targetEntity = UserActionImpl.class)
+  @XmlElement(name = "action")
+  private UserAction action;
 
   @Lob
   @Column(name = "user_id", length = 255)
@@ -44,6 +65,14 @@ public class UserSessionImpl implements UserSession {
   @Column(name = "user_agent", length = 255)
   @XmlElement(name = "userAgent")
   private String userAgent;
+
+  public UserAction getAction() {
+    return action;
+  }
+  
+  public void setAction(UserAction action) {
+    this.action = action;
+  }
 
   public String getUserId() {
     return userId;
@@ -73,7 +102,7 @@ public class UserSessionImpl implements UserSession {
     return userAgent;
   }
 
-  public void setUserAgent(String userAgent) {{
+  public void setUserAgent(String userAgent) {
     this.userAgent = userAgent;
   }
 }
