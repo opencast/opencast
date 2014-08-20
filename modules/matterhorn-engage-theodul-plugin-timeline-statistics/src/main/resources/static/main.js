@@ -73,6 +73,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     /* change these variables */
+    var renderEveryTimes = 10;
     var chartPath = "lib/Chart";
     var timelineplugin_opened = "Engage:timelineplugin_opened";
     var chartOptions = {
@@ -102,7 +103,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         // Interpolated JS string - can access value
         scaleLabel: "<%=value%>",
         // Boolean - Whether the scale should stick to integers, not floats even if drawing space is there
-        scaleIntegersOnly: false,
+        scaleIntegersOnly: true,
         // Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
         scaleBeginAtZero: true,
         // String - Scale label font declaration for the scale label
@@ -116,7 +117,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         // Boolean - whether or not the chart should be responsive and resize when the browser does.
         responsive: false,
         // Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         // Boolean - Determines whether to draw tooltips on the canvas or not
         showTooltips: false,
         // Array - Array of string names to attach tooltip events
@@ -192,6 +193,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var initCount = 5;
     var intLen = 500;
     var statisticsTimelineView;
+    var renderEveryTimes_count = 0;
+    var data; // chart data array
+    var lineChartData;
 
     function setSize() {
         $("#engage_timeline_statistics_chart").attr("width", $(window).width() - 40).attr("height", 60).css({
@@ -201,53 +205,50 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     function rerender() {
-		setSize();
-		
+        setSize();
         if (statisticsTimelineView && statisticsTimelineView.videoData) {
             var duration = parseInt(statisticsTimelineView.videoData.get("duration"));
 
-            if (duration && duration > 0) {
-                // fill array 
-                var labels = new Array(); // chart label array
-                var data = new Array(); // chart data array
-                var intvl = (duration / 1000) / intLen; // interval length
-                var cTime = 0; // current time in process
-                var tmpViews = 0; // views per interval
-                var tmpViewsCount = 0; // view entry count per interval
-                for (i = 1; i <= intLen; ++i) {
-                    tmpViews = 0;
-                    tmpViewsCount = 0;
-                    for (j = 1; j <= intvl; ++j) {
-                        ++cTime;
-                        _.each(statisticsTimelineView.footprints, function(element, index, list) {
-                            if (statisticsTimelineView.footprints.at(index).get("position") == cTime) {
-                                tmpViews += statisticsTimelineView.footprints.at(index).get("views");
+            if (duration && (duration > 0)) {
+                --renderEveryTimes_count;
+                if (renderEveryTimes_count <= 0) {
+                    renderEveryTimes_count = renderEveryTimes;
+
+                    duration /= 1000;
+                    data = new Array();
+                    var labels = new Array(); // chart label array
+                    var tmpViews = 0; // views per interval
+                    var tmpViewsCount = 0; // view entry count per interval
+                    for (var cTime = 0; cTime <= duration; ++cTime) {
+                        tmpViews = 0;
+                        _.each(statisticsTimelineView.footprints, function(value, key, list) {
+                            value = list.at(key);
+                            if (value.get("position") == cTime) {
+                                tmpViews += value.get("views");
+                                return false; // break the foreach-loop
                             }
-                            ++tmpViewsCount;
-                        }, statisticsTimelineView);
-                    }
-                    // push chart data each point
-                    labels.push("");
-                    if (tmpViews != 0 && tmpViewsCount != 0) {
-                        data.push(tmpViews / tmpViewsCount);
-                    } else {
-                        data.push(0);
+                        });
+                        // push chart data each point
+                        labels.push("");
+                        data.push(tmpViews);
+
+                        lineChartData = {
+                            labels: labels,
+                            datasets: [{
+                                fillColor: "rgba(151,187,205,0.5)",
+                                strokeColor: "rgba(151,187,205,1)",
+                                pointColor: "rgba(151,187,205,1)",
+                                pointStrokeColor: "#FFFFFF",
+                                data: data
+                            }]
+                        }
                     }
                 }
 
-                var lineChartData = {
-                    labels: labels,
-                    datasets: [{
-                        fillColor: "rgba(151,187,205,0.5)",
-                        strokeColor: "rgba(151,187,205,1)",
-                        pointColor: "rgba(151,187,205,1)",
-                        pointStrokeColor: "#FFFFFF",
-                        data: data
-                    }]
+                if (lineChartData) {
+                    statisticsTimelineView.chart = new Chart(document.getElementById("engage_timeline_statistics_chart").getContext("2d")).Line(lineChartData, chartLineOptions);
+                    statisticsTimelineView.chart.update();
                 }
-
-                statisticsTimelineView.chart = new Chart(document.getElementById("engage_timeline_statistics_chart").getContext("2d")).Line(lineChartData, chartLineOptions);
-                statisticsTimelineView.chart.update();
             }
         }
     }
@@ -289,6 +290,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         if (plugin.inserted === true) {
             Chart.defaults.global = chartOptions;
             statisticsTimelineView = new StatisticsTimelineView("");
+
             Engage.on(timelineplugin_opened, function() {
                 rerender();
             });
@@ -299,24 +301,24 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     Engage.log("Timeline:Statistics: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginTimelineStatistics');
 
-    // listen on a change/set of the mediaPackage model
-    Engage.model.on(mediapackageChange, function() {
+    Engage.model.on(footprintChange, function() {
         initCount -= 1;
-        if (initCount === 0) {
+        if (initCount == 0) {
             initPlugin();
         }
     });
 
-    Engage.model.on(footprintChange, function() {
+    // listen on a change/set of the mediaPackage model
+    Engage.model.on(mediapackageChange, function() {
         initCount -= 1;
-        if (initCount === 0) {
+        if (initCount == 0) {
             initPlugin();
         }
     });
 
     Engage.model.on(videoDataModelChange, function() {
         initCount -= 1;
-        if (initCount === 0) {
+        if (initCount == 0) {
             initPlugin();
         }
     });
