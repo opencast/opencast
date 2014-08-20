@@ -18,6 +18,23 @@
 define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'engage/engage_model', 'engage/engage_tab_logic'], function(require, $, _, Backbone, EngageCore, EngageModel, EngageTabLogic) {
     'use strict';
 
+    /* change these variables */
+    var id_engage_timeline_expand_btn = "engage_timeline_expand_btn";
+    var id_engage_timeline_plugin = "engage_timeline_plugin";
+    var id_engage_timeline_expand_btn_img = "engage_timeline_expand_btn_img";
+    var id_engage_controls = "engage_controls";
+    var id_engage_video = "engage_video";
+    var id_engage_tab = "engage_tab";
+    var id_engage_tab_split1 = "engage_";
+    var id_engage_tab_split2 = "_tab";
+    var id_engage_tab_nav = "engage_tab_nav";
+    var id_engage_tab_content = "engage_tab_content";
+    var id_engage_description = "engage_description";
+    var id_engage_timeline = "engage_timeline";
+    var class_engage_timeline_expand_btn_rotate180 = "engage_timeline_expand_btn_rotate180";
+    var class_tab_pane = "tab-pane";
+
+    /* don't change these variables */
     var timelineplugin_opened = "Engage:timelineplugin_opened";
     var timelineplugin_closed = "Engage:timelineplugin_closed";
 
@@ -41,10 +58,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
             });
             $("head").append(link);
             // build timeline plugins
-            $("#engage_timeline_expand_btn").click(function() {
-                $("#engage_timeline_plugin").slideToggle("fast");
-                $("#engage_timeline_expand_btn_img").toggleClass("engage_timeline_expand_btn_rotate180");
-                if ($("#engage_timeline_expand_btn_img").hasClass("engage_timeline_expand_btn_rotate180")) {
+            $("#" + id_engage_timeline_expand_btn).click(function() {
+                $("#" + id_engage_timeline_plugin).slideToggle("fast");
+                $("#" + id_engage_timeline_expand_btn_img).toggleClass(class_engage_timeline_expand_btn_rotate180);
+                if ($("#" + id_engage_timeline_expand_btn_img).hasClass(class_engage_timeline_expand_btn_rotate180)) {
                     EngageCore.trigger(timelineplugin_opened);
                 } else {
                     EngageCore.trigger(timelineplugin_closed);
@@ -57,36 +74,36 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
     var insertPluginToDOM = function(plugin) {
         // switch plugin type to insert the plugin to the right DOM element and execute custom view code
         switch (plugin.type) {
-            case "engage_controls":
-                $("#engage_controls").html(plugin.templateProcessed);
+            case id_engage_controls:
+                $("#" + id_engage_controls).html(plugin.templateProcessed);
                 plugin.inserted = true;
-                plugin.container = "#engage_controls";
+                plugin.container = "#" + id_engage_controls;
                 break;
-            case "engage_video":
-                $("#engage_video").html(plugin.templateProcessed);
+            case id_engage_video:
+                $("#" + id_engage_video).html(plugin.templateProcessed);
                 plugin.inserted = true;
-                plugin.container = "#engage_video";
+                plugin.container = "#" + id_engage_video;
                 break;
-            case "engage_tab":
+            case id_engage_tab:
                 var tab_ref = plugin.name.replace(/ /g, "_");
                 // insert tab navigation line
-                var tabNavTag = '<li><a href="#engage_' + tab_ref + '_tab">' + plugin.name + '</a></li>';
-                $("#engage_tab_nav").prepend(tabNavTag);
+                var tabNavTag = '<li><a href="#' + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + '">' + plugin.name + '</a></li>';
+                $("#" + id_engage_tab_nav).prepend(tabNavTag);
                 // insert tab content
-                var tabTag = '<div class="tab-pane" id="engage_' + tab_ref + '_tab">' + plugin.templateProcessed + '</div>';
-                $("#engage_tab_content").prepend(tabTag);
+                var tabTag = '<div class="' + class_tab_pane + '" id="' + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + '">' + plugin.templateProcessed + '</div>';
+                $("#" + id_engage_tab_content).prepend(tabTag);
                 plugin.inserted = true;
-                plugin.container = "#engage_" + tab_ref + "_tab";
+                plugin.container = "#" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2;
                 break;
-            case "engage_description":
-                $("#engage_description").html(plugin.templateProcessed);
+            case id_engage_description:
+                $("#" + id_engage_description).html(plugin.templateProcessed);
                 plugin.inserted = true;
-                plugin.container = "#engage_description";
+                plugin.container = "#" + id_engage_description;
                 break;
-            case "engage_timeline":
-                $("#engage_timeline_plugin").html(plugin.templateProcessed);
+            case id_engage_timeline:
+                $("#" + id_engage_timeline_plugin).html(plugin.templateProcessed);
                 plugin.inserted = true;
-                plugin.container = "#engage_timeline_plugin";
+                plugin.container = "#" + id_engage_timeline_plugin;
                 break;
             default:
                 plugin.inserted = false;
@@ -99,7 +116,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
      */
     var allPluginsLoadedEvent = function() {
         // add tab sorted tab logic to the view
-        EngageTabLogic('tabs', 'engage_tab_nav');
+        EngageTabLogic('tabs', id_engage_tab_nav);
     }
 
     // public functions for the module

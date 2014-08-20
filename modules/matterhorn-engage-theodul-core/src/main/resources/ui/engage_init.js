@@ -28,6 +28,9 @@ requirejs.config({
         },
         'mousetrap': {
             exports: 'Mousetrap'
+        },
+        'moment': {
+            exports: 'Moment'
         }
     }
 });

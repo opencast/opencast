@@ -115,6 +115,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_videoDisplayClass = "videoDisplay";
     var id_engageContent = "engage_content";
     var id_videojs_wrapperClass = "videojs_wrapper";
+    var id_engage_video = "engage_video";
+    var id_page_cover = "page-cover";
+    var id_btn_fullscreenCancel = "btn_fullscreenCancel";
     var videosReady = false;
     var pressedPlayOnce = false;
     var mediapackageChange = "change:mediaPackage";
@@ -385,6 +388,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 Engage.trigger(plugin.events.timeupdate.getName(), theodulVideodisplayMaster.currentTime(), true);
             });
         }
+        $("#" + id_btn_fullscreenCancel).click(function(e) {
+            e.preventDefault();
+            Engage.trigger(plugin.events.fullscreenCancel.getName());
+        });
         Engage.on(plugin.events.fullscreenEnable.getName(), function() {
             $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
             if (numberOfVideodisplays == 1) {
@@ -395,12 +402,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 $(window).scroll(function() {
                     $(this).scrollTop(0);
                 });
-                $("#engage_video").css("z-index", 995).css("position", "relative");
-                $("#page-cover").css("opacity", 0.9).fadeIn(300, function() {});
-                $("#btn_fullscreenCancel").click(function(e) {
-                    e.preventDefault();
-                    Engage.trigger(plugin.events.fullscreenCancel.getName());
-                });
+                $("#" + id_engage_video).css("z-index", 995).css("position", "relative");
+                $("#" + id_page_cover).css("opacity", 0.9).fadeIn(300, function() {});
             }
         });
         Engage.on(plugin.events.fullscreenCancel.getName(), function() {
@@ -408,8 +411,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             if (numberOfVideodisplays > 1) {
                 $('body').css('overflow', 'auto');
                 $(window).unbind('scroll');
-                $("#page-cover").css("opacity", 0.9).fadeOut(300, function() {
-                    $("#engage_video").css("z-index", 0).css("position", "");
+                $("#" + id_page_cover).css("opacity", 0.9).fadeOut(300, function() {
+                    $("#" + id_engage_video).css("z-index", 0).css("position", "");
                 });
             }
         });

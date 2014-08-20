@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'moment'], function(require, $, _, Backbone, Engage, Moment) {
     "use strict";
     var PLUGIN_NAME = "Engage Custom Notifications",
         PLUGIN_TYPE = "engage_custom",
@@ -97,16 +97,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var videoLoadMsgDisplayed = false;
     var videoBuffering = false;
 
-    /* format today's date */
-    Date.prototype.today = function() {
-        return ((this.getDate() < 10) ? "0" : "") + this.getDate() + "." + (((this.getMonth() + 1) < 10) ? "0" : "") + (this.getMonth() + 1) + "." + this.getFullYear();
-    }
-
-    /* format current time */
-    Date.prototype.timeNow = function() {
-        return ((this.getHours() < 10) ? "0" : "") + this.getHours() + ":" + ((this.getMinutes() < 10) ? "0" : "") + this.getMinutes() + ":" + ((this.getSeconds() < 10) ? "0" : "") + this.getSeconds();
-    }
-
     /**
      * Format the current date and time
      *
@@ -114,9 +104,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      */
     function getCurrentDateTime() {
         var date = new Date();
-        var datetime = date.today() + ", " + date.timeNow();
 
-        return datetime;
+        // try to format the date
+        if (Moment(date) !== null) {
+            date = Moment(new Date()).format("MMMM Do YYYY, h:mm:ss a");
+        }
+        return date;
     }
 
     /**
@@ -133,6 +126,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      * Initialize the plugin
      */
     function initPlugin() {
+        Moment.locale('en', {
+            // customizations
+        });
+
         alertify.init();
         alertify.set({
             delay: alertifyMessageDelay

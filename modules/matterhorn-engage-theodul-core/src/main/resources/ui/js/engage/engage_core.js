@@ -17,19 +17,6 @@
 define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'engage/engage_model', 'engage/engage_tab_logic'], function(require, $, _, Backbone, Mousetrap, Bowser, EngageModel, EngageTabLogic) {
     "use strict";
 
-    var hotkey_jumpToX = "jumpToX",
-        hotkey_nextChapter = "nextChapter",
-        hotkey_fullscreen = "fullscreen",
-        hotkey_jumpToBegin = "jumpToBegin",
-        hotkey_prevEpisode = "prevEpisode",
-        hotkey_prevChapter = "prevChapter",
-        hotkey_play = "play",
-        hotkey_pause = "pause",
-        hotkey_mute = "mute",
-        hotkey_nextEpisode = "nextEpisode",
-        hotkey_volDown = "volDown",
-        hotkey_volUp = "volUp";
-
     var events = {
         plugin_load_done: new EngageEvent("Core:plugin_load_done", "when the core loaded the event successfully", "both"),
         coreInit: new EngageEvent("Core:init", "", "trigger"),
@@ -44,18 +31,45 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
         mute: new EngageEvent("Video:mute", "", "trigger"),
         nextEpisode: new EngageEvent("Core:nextEpisode", "", "trigger"),
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
-        volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
+        volumeDown: new EngageEvent("Video:volumeDown", "", "trigger")
     };
 
-    function browserSupported() {
-        return (Bowser.firefox && Bowser.version >= 24) || (Bowser.chrome && Bowser.version >= 30) || (Bowser.opera && Bowser.version >= 20) || (Bowser.safari && Bowser.version >= 7);
-    }
+    /* change these variables */
+    var browser_minVersion_firefox = 24;
+    var browser_minVersion_chrome = 30;
+    var browser_minVersion_opera = 20;
+    var browser_minVersion_safari = 7;
+    var id_engage_view = "engage_view";
+    var id_loading1 = "loading1";
+    var id_loading2 = "loading2";
+    var id_loadingProgressbar2 = "loadingProgressbar2";
+    var id_browserWarning = "browserWarning";
+    var id_volume = "volume";
+    var id_btn_reloadPage = "btn_reloadPage";
+    var id_customError = "customError";
+    var class_loading = "loading";
 
-    // global private core variables
+    /* don't change these variables */
     var plugins_loaded = {};
     var loadingDelay1 = 500;
     var loadingDelay2 = 1000;
     var errorCheckDelay = 3500;
+    var hotkey_jumpToX = "jumpToX";
+    var hotkey_nextChapter = "nextChapter";
+    var hotkey_fullscreen = "fullscreen";
+    var hotkey_jumpToBegin = "jumpToBegin";
+    var hotkey_prevEpisode = "prevEpisode";
+    var hotkey_prevChapter = "prevChapter";
+    var hotkey_play = "play";
+    var hotkey_pause = "pause";
+    var hotkey_mute = "mute";
+    var hotkey_nextEpisode = "nextEpisode";
+    var hotkey_volDown = "volDown";
+    var hotkey_volUp = "volUp";
+
+    function browserSupported() {
+        return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari);
+    }
 
     // theodul core init
     if (window.console) {
@@ -87,10 +101,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
 
     // core main
     var EngageCore = Backbone.View.extend({
-        el: $("#engage_view"),
+        el: $("#" + id_engage_view),
         initialize: function() {
-            $(".loading").show();
-            $("#loading1").show();
+            $("." + class_loading).show();
+            $("#" + id_loading1).show();
             // the main core is our global event system
             this.dispatcher = _.clone(Backbone.Events);
             // link to the engage model
@@ -189,30 +203,30 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
             });
             // load plugins done, hide loading and show content
             this.dispatcher.on(events.plugin_load_done.getName(), function() {
-                $("#loading1").hide().detach();
-                $("#loading2").show();
+                $("#" + id_loading1).hide().detach();
+                $("#" + id_loading2).show();
                 window.setTimeout(function() {
-                    $("#loadingProgressbar2").css("width", "100%");
+                    $("#" + id_loadingProgressbar2).css("width", "100%");
                     window.setTimeout(function() {
-                        $(".loading").hide().detach();
+                        $("." + class_loading).hide().detach();
                         if (!engageCore.model.desktopOrEmbed || (engageCore.model.desktopOrEmbed && engageCore.model.browserSupported)) {
-                            $("#browserWarning").hide().detach();
-                            $("#engage_view").show();
+                            $("#" + id_browserWarning).hide().detach();
+                            $("#" + id_engage_view).show();
                             window.setTimeout(function() {
-                                if ($("#volume").html() == "") {
-                                    $("#btn_reloadPage").click(function(e) {
+                                if ($("#" + id_volume).html() == "") {
+                                    $("#" + id_btn_reloadPage).click(function(e) {
                                         e.preventDefault();
                                         location.reload();
                                     });
-                                    $("#engage_view").hide().detach();
-                                    $("#customError").show();
+                                    $("#" + id_engage_view).hide().detach();
+                                    $("#" + id_customError).show();
                                 } else {
-                                    $("#customError").detach();
+                                    $("#" + id_customError).detach();
                                 }
                             }, errorCheckDelay);
                         } else {
-                            $("#engage_view, #customError").hide().detach();
-                            $("#browserWarning").show();
+                            $("#" + id_engage_view + ", #" + id_customError).hide().detach();
+                            $("#" + browserWarning).show();
                         }
                     }, loadingDelay2);
                 }, loadingDelay1);
