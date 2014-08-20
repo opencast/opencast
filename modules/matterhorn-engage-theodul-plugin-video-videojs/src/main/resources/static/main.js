@@ -54,6 +54,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         volumechange: new Engage.Event("Video:volumechange", "volume change happened", "trigger"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "fullscreen change happened", "trigger"),
         usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "trigger"),
+        numberOfVideodisplaysSet: new Engage.Event("Video:numberOfVideodisplaysSet", "the number of videodisplays has been set", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "go to fullscreen", "handler"),
         fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "cancel fullscreen", "handler"),
@@ -110,6 +111,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     /* don't change these variables */
     var aspectRatio = "";
     var initCount = 4;
+    var numberOfVideodisplays;
     var videoDisplayNamePrefix = "videojs_videodisplay_";
     var class_vjsposter = "vjs-poster";
     var id_engage_video = "engage_video";
@@ -231,6 +233,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
             // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
             $("." + class_vjsposter).show();
+
+            numberOfVideodisplays = videoDisplays.length;
+            Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), numberOfVideodisplays);
 
             if (videoDisplays.length > 0) {
                 // set first videoDisplay as master
@@ -385,11 +390,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             }
         });
         Engage.on(plugin.events.fullscreenEnable.getName(), function() {
-            // $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
-            Engage.trigger(plugin.events.customNotification.getName(), "Fullscreen will be available soon."); // TODO: Implement "fake" fullscreen
+            if (numberOfVideodisplays == 1) {
+                theodulVideodisplay.requestFullscreen();
+                $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
+            } else {
+                Engage.trigger(plugin.events.customNotification.getName(), "Fullscreen will be available soon."); // TODO: Implement "fake" fullscreen
+            }
         });
         Engage.on(plugin.events.fullscreenCancel.getName(), function() {
-            // $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
+            $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
         });
         Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {
             theodulVideodisplay.volume(percentAsDecimal);
