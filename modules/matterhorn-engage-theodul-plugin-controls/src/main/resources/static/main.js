@@ -417,14 +417,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         // only init if plugin template was inserted into the DOM
         if (plugin.inserted == true) {
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
-            Engage.on(plugin.events.usingFlash.getName(), function() {
-                usingFlash = true;
-                $("#" + id_dropdownMenuPlaybackRate).addClass("disabled");
+            Engage.on(plugin.events.usingFlash.getName(), function(flash) {
+                usingFlash = flash;
+		if(!usingFlash) {
+                    $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
+		}
             });
             Engage.on(plugin.events.ready.getName(), function() {
                 greyIn(id_play_button);
                 enable(id_play_button);
                 videosReady = true;
+                $("#" + id_fullscreen_button).removeClass("disabled");
             });
             Engage.on(plugin.events.play.getName(), function() {
                 if (videosReady) {
