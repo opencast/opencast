@@ -398,9 +398,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             }
         });
         Engage.on(plugin.events.fullscreenCancel.getName(), function() {
-            if (numberOfVideodisplays == 1) {
-                $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
-            }
+            $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
         });
         Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {
             theodulVideodisplay.volume(percentAsDecimal);
