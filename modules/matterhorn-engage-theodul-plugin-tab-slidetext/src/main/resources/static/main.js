@@ -203,6 +203,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     });
                 });
             }
+	        Engage.on(plugin.events.segmentMouseover.getName(), function(no) {
+	            $("#" + id_segmentNo + no).removeClass("mediaColor").addClass("mediaColor-hover");
+	        });
+	        Engage.on(plugin.events.segmentMouseout.getName(), function(no) {
+	            $("#" + id_segmentNo + no).removeClass("mediaColor-hover").addClass("mediaColor");
+	        });
         }
     });
 
@@ -211,12 +217,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         if (plugin.inserted === true) {
             // create a new view with the media package model and the template
             new SlidetextTabView(Engage.model.get("mediaPackage"), plugin.template);
-            Engage.on(plugin.events.segmentMouseover.getName(), function(no) {
-                $("#" + id_segmentNo + no).removeClass("mediaColor").addClass("mediaColor-hover");
-            });
-            Engage.on(plugin.events.segmentMouseout.getName(), function(no) {
-                $("#" + id_segmentNo + no).removeClass("mediaColor-hover").addClass("mediaColor");
-            });
         }
     }
 

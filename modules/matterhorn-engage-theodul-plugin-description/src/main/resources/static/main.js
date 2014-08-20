@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'moment'], function(require, $, _, Backbone, Engage, Moment) {
     "use strict";
     var PLUGIN_NAME = "Basic Engage Description";
     var PLUGIN_TYPE = "engage_description";
@@ -74,10 +74,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     /* change these variables */
-    var momentPath = 'lib/moment';
+    // nothing to see here...
 
     /* don't change these variables */
-    var initCount = 3;
+    var initCount = 2;
     var id_engage_description = "engage_description";
     var mediapackageChange = "change:mediaPackage";
 
@@ -99,12 +99,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 creator: this.model.get("creator"),
                 date: this.model.get("date")
             };
-            moment.locale('en', {
-                // customizations
-            });
             // try to format the date
-            if (moment(tempVars.date) !== null) {
-                tempVars.date = moment(tempVars.date).format("MMMM Do YYYY");
+            if (Moment(tempVars.date) !== null) {
+                tempVars.date = Moment(tempVars.date).format("MMMM Do YYYY");
             }
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
@@ -114,6 +111,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (plugin.inserted == true) {
+            Moment.locale('en', {
+                // customizations
+            });
             // create a new view with the media package model and the template
             new DescriptionView(Engage.model.get("mediaPackage"), plugin.template);
         }
@@ -122,15 +122,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // init event
     Engage.log("Description: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginDescription');
-
-    // load moment lib
-    require([relative_plugin_path + momentPath], function(momentjs) {
-        Engage.log("Description: Loaded moment lib");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
 
     // listen on a change/set of the mediaPackage model
     Engage.model.on(mediapackageChange, function() {

@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'moment'], function(require, $, _, Backbone, Engage, Moment) {
     var PLUGIN_NAME = "Description";
     var PLUGIN_TYPE = "engage_tab";
     var PLUGIN_VERSION = "0.1",
@@ -74,11 +74,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     /* change these variables */
     var class_tabGroupItem = "tab-group-item";
-    var momentPath = 'lib/moment';
 
     /* don't change these variables */
     var mediapackageChange = "change:mediaPackage";
-    var initCount = 3;
+    var initCount = 2;
 
     var DescriptionTabView = Backbone.View.extend({
         initialize: function(mediaPackageModel, template) {
@@ -99,12 +98,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 contributor: this.model.get("contributor"),
                 date: this.model.get("date")
             };
-            moment.locale('en', {
-                // customizations
-            });
             // try to format the date
-            if (moment(tempVars.date) !== null) {
-                tempVars.date = moment(tempVars.date).format("MMMM Do YYYY, h:mm:ss a");
+            if (Moment(tempVars.date) !== null) {
+                tempVars.date = Moment(tempVars.date).format("MMMM Do YYYY, h:mm:ss a");
             }
             if (!tempVars.creator) {
                 tempVars.creator = "";
@@ -139,6 +135,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (plugin.inserted === true) {
+            Moment.locale('en', {
+                // customizations
+            });
             // create a new view with the media package model and the template
             new DescriptionTabView(Engage.model.get("mediaPackage"), plugin.template);
         }
@@ -147,15 +146,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     // init event
     Engage.log("Tab:Description: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginTabDescription');
-
-    // load moment lib
-    require([relative_plugin_path + momentPath], function(momentjs) {
-        Engage.log("Tab:Description: Loaded moment lib");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
 
     // listen on a change/set of the mediaPackage model
     Engage.model.on(mediapackageChange, function() {

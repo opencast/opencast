@@ -1,11 +1,17 @@
-#engage_basic_description h1 {
-  font-size: 22px;
+#engage_basic_description_title {
+	font-size: 22px;
+	font-weight: bold;
 }
 
-#engage_basic_description h2 {
-  font-size: 18px;
+#engage_basic_description_info {
+	font-size: 18px;
+	font-weight: normal;
+}
+
+#engage_basic_description_title {
+	margin-bottom: 2px;
 }
 
 .engage_basic_description_wrap {
-	float:left;
+	float: left;
 }

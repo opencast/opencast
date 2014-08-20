@@ -151,7 +151,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         render: function() {
             duration = this.model.get("duration");
             segments = Engage.model.get("mediaPackage").get("segments");
-			
+
             var tempVars = {
                 plugin_path: this.pluginPath,
                 startTime: formatSeconds(0),
@@ -419,9 +419,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
             Engage.on(plugin.events.usingFlash.getName(), function(flash) {
                 usingFlash = flash;
-		if(!usingFlash) {
+                if (!usingFlash) {
                     $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
-		}
+                }
             });
             Engage.on(plugin.events.ready.getName(), function() {
                 greyIn(id_play_button);
