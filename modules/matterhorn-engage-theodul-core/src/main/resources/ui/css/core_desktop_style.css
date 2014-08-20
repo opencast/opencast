@@ -16,6 +16,12 @@ body {
     left: 0;
 }
 
+#btn_fullscreenCancel {
+    z-index: 999;
+	float: right;
+	margin: 30px 30px 0px 0px;
+}
+
 h1,h2,h3 {
   font-weight: normal !important;
   line-height: 22px !important;

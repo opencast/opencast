@@ -108,7 +108,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     /* don't change these variables */
     var aspectRatio = "";
     var initCount = 4;
-    var numberOfVideodisplays;
     var videoDisplayNamePrefix = "videojs_videodisplay_";
     var class_vjsposter = "vjs-poster";
     var id_engage_video = "engage_video";
@@ -204,7 +203,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     }
                 }
             }
-	    
+
             for (var v in videoSources) {
                 if (videoSources[v].length > 0) {
                     initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
@@ -230,19 +229,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
             $("." + class_vjsposter).show();
 
-            numberOfVideodisplays = videoDisplays.length;
-            Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), numberOfVideodisplays);
+            Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
             if (videoDisplays.length > 0) {
-                // set first videoDisplay as master
-                registerEvents(videoDisplays[0]);
-
                 var nr = 0;
                 for (var v in videoSources) {
                     if (videoSources[v].length > 0) {
                         ++nr;
                     }
                 }
+
+                // set first videoDisplay as master
+                registerEvents(videoDisplays[0], videoDisplays.length);
 
                 if (nr >= 2) {
                     // throw some important synchronize.js-events for other plugins
@@ -255,7 +253,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     });
                     $(document).on(event_sjs_masterPlay, function(event) {
                         Engage.trigger(plugin.events.play.getName(), true);
-			pressedPlayOnce = true;
+                        pressedPlayOnce = true;
                     });
                     $(document).on(event_sjs_masterPause, function(event) {
                         Engage.trigger(plugin.events.pause.getName(), true);
@@ -292,6 +290,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     videosReady = true;
                     Engage.trigger(plugin.events.ready.getName());
                 }
+
+                $(window).resize(function() {
+                    checkVideoDisplaySize();
+                });
             }
             checkVideoDisplaySize();
         }
@@ -325,8 +327,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     "poster": videoSource.poster,
                     "loop": false,
                     "width": "100%",
-                    "height": "100%",
-                    "playbackRates": [0.5, 1, 1.5, 2]
+                    "height": "100%" // ,
+                        // "playbackRates": [0.5, 1, 1.5, 2]
                 };
 
                 // init video.js
@@ -365,16 +367,55 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
     }
 
-    function registerEvents(videoDisplay) {
-	var theodulVideodisplayMaster = videojs(videoDisplay);
+    function registerEvents(videoDisplay, numberOfVideodisplays) {
+        var theodulVideodisplayMaster = videojs(videoDisplay);
 
-        $(window).resize(function() {
-            checkVideoDisplaySize();
+        if (numberOfVideodisplays == 1) {
+            theodulVideodisplayMaster.on("play", function() {
+                Engage.trigger(plugin.events.play.getName(), true);
+                pressedPlayOnce = true;
+            });
+            theodulVideodisplayMaster.on("pause", function() {
+                Engage.trigger(plugin.events.pause.getName(), true);
+            });
+            theodulVideodisplayMaster.on("ended", function() {
+                Engage.trigger(plugin.events.ended.getName(), true);
+            });
+            theodulVideodisplayMaster.on("timeupdate", function() {
+                Engage.trigger(plugin.events.timeupdate.getName(), theodulVideodisplayMaster.currentTime(), true);
+            });
+        }
+        Engage.on(plugin.events.fullscreenEnable.getName(), function() {
+            $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
+            if (numberOfVideodisplays == 1) {
+                theodulVideodisplayMaster.requestFullscreen();
+            } else {
+                $(window).scrollTop(0);
+                $('body').css('overflow', 'hidden');
+                $(window).scroll(function() {
+                    $(this).scrollTop(0);
+                });
+                $("#engage_video").css("z-index", 995).css("position", "relative");
+                $("#page-cover").css("opacity", 0.9).fadeIn(300, function() {});
+                $("#btn_fullscreenCancel").click(function(e) {
+                    e.preventDefault();
+                    Engage.trigger(plugin.events.fullscreenCancel.getName());
+                });
+            }
         });
-
+        Engage.on(plugin.events.fullscreenCancel.getName(), function() {
+            $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
+            if (numberOfVideodisplays > 1) {
+                $('body').css('overflow', 'auto');
+                $(window).unbind('scroll');
+                $("#page-cover").css("opacity", 0.9).fadeOut(300, function() {
+                    $("#engage_video").css("z-index", 0).css("position", "");
+                });
+            }
+        });
         Engage.on(plugin.events.playbackRateChanged.getName(), function(rate) {
             if (pressedPlayOnce) {
-                theodulVideodisplayMaster.playbackRate(rate); // TODO: Check if this is the correct function!
+                theodulVideodisplayMaster.playbackRate(rate);
             }
         });
         Engage.on(plugin.events.play.getName(), function(triggeredByMaster) {
@@ -387,27 +428,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             if (!triggeredByMaster && pressedPlayOnce) {
                 theodulVideodisplayMaster.pause();
             }
-        });
-        Engage.on(plugin.events.fullscreenEnable.getName(), function() {
-            $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
-            if (numberOfVideodisplays == 1) {
-                theodulVideodisplayMaster.requestFullscreen();
-            } else {
-		$("#page-cover").css("opacity", 0.9).fadeIn(300, function () {            
-		    $("#engage_video").css("z-index", 999).css("position", "relative");
-		}).click(function(e) {
-		    e.preventDefault();
-		    Engage.trigger(plugin.events.fullscreenCancel.getName());
-		});
-            }
-        });
-        Engage.on(plugin.events.fullscreenCancel.getName(), function() {
-            $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
-            if (numberOfVideodisplays > 1) {
-		$("#page-cover").css("opacity", 0.9).fadeOut(300, function () {            
-		    $("#engage_video").css("z-index", 0).css("position", "");
-		});
-	    }
         });
         Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {
             theodulVideodisplayMaster.volume(percentAsDecimal);
