@@ -15,20 +15,21 @@
 /*jslint browser: true, nomen: true*/
 /*global define*/
 define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+    "use strict";
     var PLUGIN_NAME = "Slide text";
     var PLUGIN_TYPE = "engage_tab";
     var PLUGIN_VERSION = "0.1",
         PLUGIN_TEMPLATE = "template.html",
-        PLUGIN_TEMPLATE_MOBILE = "template.html",
-        PLUGIN_TEMPLATE_EMBED = "template.html",
+        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
+        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
         PLUGIN_STYLES = [
             "style.css"
         ],
         PLUGIN_STYLES_MOBILE = [
-            "style.css"
+            "style_mobile.css"
         ],
         PLUGIN_STYLES_EMBED = [
-            "style.css"
+            "style_embed.css"
         ];
 
     var plugin;
@@ -63,7 +64,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 timeStrToSeconds: timeStrToSeconds
             };
             break;
-            // fallback to desktop/default mode
         case "desktop":
         default:
             plugin = {

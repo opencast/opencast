@@ -15,22 +15,23 @@
 /*jslint browser: true, nomen: true*/
 /*global define*/
 define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+    "use strict";
     var PLUGIN_NAME = "Engage VideoJS Videodisplay";
     var PLUGIN_TYPE = "engage_video";
     var PLUGIN_VERSION = "0.1",
         PLUGIN_TEMPLATE = "template.html",
-        PLUGIN_TEMPLATE_MOBILE = "template.html",
-        PLUGIN_TEMPLATE_EMBED = "template.html",
+        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
+        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
         PLUGIN_STYLES = [
             "style.css",
             "lib/videojs/video-js.css"
         ],
         PLUGIN_STYLES_MOBILE = [
-            "style.css",
+            "style_mobile.css",
             "lib/videojs/video-js.css"
         ],
         PLUGIN_STYLES_EMBED = [
-            "style.css",
+            "style_embed.css",
             "lib/videojs/video-js.css"
         ];
 
@@ -84,7 +85,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 events: events
             };
             break;
-            // fallback to desktop/default mode
         case "desktop":
         default:
             plugin = {
@@ -163,7 +163,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
             // get aspect ratio
             aspectRatio = null;
-            as1 = 0;
+            var as1 = 0;
             for (var i = 0; i < videoDisplays.length; ++i) {
                 if (videoSources.presenter && videoSources.presenter[i] && videoSources.presenter[i].resolution) {
                     for (var j = 0; j < videoSources.presenter.length; ++j) {
@@ -363,7 +363,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     function checkVideoDisplaySize() {
         // make sure the video height is not greater than the window height
         $("#" + id_engageContent).css("max-width", "");
-        for (i = 0; i < videoDisplaySizeTimesCheck; ++i) {
+        for (var i = 0; i < videoDisplaySizeTimesCheck; ++i) {
             if ($(window).height() < ($("." + id_videojs_wrapperClass).position().top + $("." + id_videojs_wrapperClass).height())) {
                 $("#" + id_engageContent).css("max-width", $("#" + id_engageContent).width() / videoDisplaySizeFactor);
             } else {

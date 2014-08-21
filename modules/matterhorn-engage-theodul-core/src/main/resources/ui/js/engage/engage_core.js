@@ -145,6 +145,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                         view_logic_path = "engage/engage_embed_view";
                         engageCore.model.embed = true;
                         break;
+                    case "desktop":
                     default:
                         cssAttr.href = 'css/core_desktop_style.css';
                         core_template = "templates/core_desktop.html";

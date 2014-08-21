@@ -62,7 +62,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 events: events
             };
             break;
-            // fallback to desktop/default mode
         case "desktop":
         default:
             plugin = {
