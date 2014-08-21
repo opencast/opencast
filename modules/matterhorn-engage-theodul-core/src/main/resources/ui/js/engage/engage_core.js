@@ -116,7 +116,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                 }
             });
             this.model.browserSupported = browserSupported();
-            this.model.desktopOrEmbed = false;
+            this.model.desktop = false;
+            this.model.embed = false;
+            this.model.mobile = false;
             // core init event
             this.dispatcher.on(events.coreInit.getName(), function() {
                 // switch view template and css rules for current player mode
@@ -131,22 +133,23 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                 // path to the require module with the view logic
                 var view_logic_path = "";
                 switch (engageCore.model.get("mode")) {
-                    case "desktop":
-                        engageCore.model.desktopOrEmbed = true;
-                        cssAttr.href = 'css/core_desktop_style.css';
-                        core_template = "templates/core_desktop.html";
-                        view_logic_path = "engage/engage_desktop_view"
-                        break;
                     case "mobile":
                         cssAttr.href = 'css/core_mobile_style.css';
                         core_template = "templates/core_mobile.html";
-                        view_logic_path = "engage/engage_mobile_view"
+                        view_logic_path = "engage/engage_mobile_view";
+                        engageCore.model.mobile = true;
                         break;
                     case "embed":
-                        engageCore.model.desktopOrEmbed = true;
                         cssAttr.href = 'css/core_embed_style.css';
                         core_template = "templates/core_embed.html";
-                        view_logic_path = "engage/engage_embed_view"
+                        view_logic_path = "engage/engage_embed_view";
+                        engageCore.model.embed = true;
+                        break;
+                    default:
+                        cssAttr.href = 'css/core_desktop_style.css';
+                        core_template = "templates/core_desktop.html";
+                        view_logic_path = "engage/engage_desktop_view";
+                        engageCore.model.desktop = true;
                         break;
                 }
                 cssLinkTag.attr(cssAttr);
@@ -163,7 +166,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                         $(engageCore.el).html(_.template(template));
                         // run init function of the view
                         engageCore.pluginView.initView();
-                        if (!engageCore.model.desktopOrEmbed || (engageCore.model.desktopOrEmbed && engageCore.model.browserSupported)) {
+                        if (!(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                             // BEGIN LOAD PLUGINS
                             // fetch plugin information
                             engageCore.model.get('pluginsInfo').fetch({
@@ -209,21 +212,23 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                     $("#" + id_loadingProgressbar2).css("width", "100%");
                     window.setTimeout(function() {
                         $("." + class_loading).hide().detach();
-                        if (!engageCore.model.desktopOrEmbed || (engageCore.model.desktopOrEmbed && engageCore.model.browserSupported)) {
+                        if (!(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                             $("#" + id_browserWarning).hide().detach();
                             $("#" + id_engage_view).show();
-                            window.setTimeout(function() {
-                                if ($("#" + id_volume).html() == "") {
-                                    $("#" + id_btn_reloadPage).click(function(e) {
-                                        e.preventDefault();
-                                        location.reload();
-                                    });
-                                    $("#" + id_engage_view).hide().detach();
-                                    $("#" + id_customError).show();
-                                } else {
-                                    $("#" + id_customError).detach();
-                                }
-                            }, errorCheckDelay);
+                            if (engageCore.model.desktop) {
+                                window.setTimeout(function() {
+                                    if ($("#" + id_volume).html() == "") {
+                                        $("#" + id_btn_reloadPage).click(function(e) {
+                                            e.preventDefault();
+                                            location.reload();
+                                        });
+                                        $("#" + id_engage_view).hide().detach();
+                                        $("#" + id_customError).show();
+                                    } else {
+                                        $("#" + id_customError).detach();
+                                    }
+                                }, errorCheckDelay);
+                            }
                         } else {
                             $("#" + id_engage_view + ", #" + id_customError).hide().detach();
                             $("#" + browserWarning).show();
@@ -325,12 +330,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                     break;
                 case hotkey_play:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.play.getName());
+                        engageCore.trigger(events.play.getName(), false);
                     });
                     break;
                 case hotkey_pause:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.pause.getName());
+                        engageCore.trigger(events.pause.getName(), false);
                     });
                     break;
                 case hotkey_mute:

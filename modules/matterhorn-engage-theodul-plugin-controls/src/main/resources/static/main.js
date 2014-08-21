@@ -351,9 +351,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
         $("#" + id_playpause_controls).click(function() {
             if (isPlaying) {
-                Engage.trigger(plugin.events.pause.getName());
+                Engage.trigger(plugin.events.pause.getName(), false);
             } else {
-                Engage.trigger(plugin.events.play.getName());
+                Engage.trigger(plugin.events.play.getName(), false);
             }
         });
 
