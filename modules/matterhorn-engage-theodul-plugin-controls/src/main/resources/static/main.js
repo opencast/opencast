@@ -165,6 +165,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.$el.html(_.template(this.template, tempVars));
 
             initControlsEvents();
+
+            // init dropdown menus
+            $("." + class_dropdown).dropdown();
         }
     });
 
@@ -268,6 +271,28 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         });
     }
 
+    function addNonFlashEvents() {
+        if (!usingFlash) {
+            // setup listeners for the playback rate
+            $("#" + id_playbackRate05).click(function(e) {
+                e.preventDefault();
+                Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5);
+            });
+            $("#" + id_playbackRate10).click(function(e) {
+                e.preventDefault();
+                Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0);
+            });
+            $("#" + id_playbackRate15).click(function(e) {
+                e.preventDefault();
+                Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5);
+            });
+            $("#" + id_playbackRate20).click(function(e) {
+                e.preventDefault();
+                Engage.trigger(plugin.events.playbackRateChanged.getName(), 2.0);
+            });
+        }
+    }
+
     /**
      * getVolume
      */
@@ -342,28 +367,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             }
         });
 
-        if (!usingFlash) {
-            // init dropdown menu
-            $("." + class_dropdown).dropdown();
-            // setup listeners for the playback rate
-            $("#" + id_playbackRate05).click(function(e) {
-                e.preventDefault();
-                Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5);
-            });
-            $("#" + id_playbackRate10).click(function(e) {
-                e.preventDefault();
-                Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0);
-            });
-            $("#" + id_playbackRate15).click(function(e) {
-                e.preventDefault();
-                Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5);
-            });
-            $("#" + id_playbackRate20).click(function(e) {
-                e.preventDefault();
-                Engage.trigger(plugin.events.playbackRateChanged.getName(), 2.0);
-            });
-        }
-
         // slider events
         $("#" + id_slider).on(event_slidestart, function(event, ui) {
             isSliding = true;
@@ -422,6 +425,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 if (!usingFlash) {
                     $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
                 }
+                addNonFlashEvents();
             });
             Engage.on(plugin.events.ready.getName(), function() {
                 greyIn(id_play_button);
