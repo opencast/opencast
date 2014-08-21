@@ -534,7 +534,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
-            String value = Streams.asString(item.openStream());
+            String value = Streams.asString(item.openStream(), "UTF-8");
             /* Ignore empty fields */
             if ("".equals(value)) {
               continue;
