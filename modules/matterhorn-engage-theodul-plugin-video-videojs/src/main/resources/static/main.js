@@ -118,6 +118,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_engage_video = "engage_video";
     var id_page_cover = "page-cover";
     var id_btn_fullscreenCancel = "btn_fullscreenCancel";
+    var id_generated_videojs_flash_component = "videojs_videodisplay_0_flash_api";
     var videosReady = false;
     var pressedPlayOnce = false;
     var mediapackageChange = "change:mediaPackage";
@@ -347,7 +348,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 } else {
                     Engage.log("Video: No flash component loaded");
                 }
-                Engage.trigger(plugin.events.usingFlash.getName(), videojs_swf);
+                var flashComponentUsed = $("#" + id_generated_videojs_flash_component).length > 0;
+                Engage.trigger(plugin.events.usingFlash.getName(), flashComponentUsed);
             } else {
                 Engage.log("Video: Error: No video source available");
                 $("#" + id_videojs_wrapper).html("No video sources available.");
