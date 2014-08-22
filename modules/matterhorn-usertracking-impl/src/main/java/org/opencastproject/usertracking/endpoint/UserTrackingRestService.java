@@ -271,6 +271,13 @@ public class UserTrackingRestService {
     s.setSessionId(sessionId);
     s.setUserIp(clientIP);
     s.setUserId(userId);
+    //Column length is currently 255, let's limit it to that.
+    String userAgent = StringUtils.trimToNull(request.getHeader("User-Agent"));
+    if (userAgent != null && userAgent.length() > 255) {
+      s.setUserAgent(userAgent.substring(0, 255));
+    } else {
+      s.setUserAgent(userAgent);
+    }
 
     UserActionImpl a = new UserActionImpl();
     a.setMediapackageId(mediapackageId);

@@ -42,14 +42,13 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * A JAXB-annotated implementation of {@link UserAction}
- * //@NamedQuery(name = "findUserActionsByTypeAndMediapackageIdByUserOrderByOutpointDESC", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type AND a.session.userId = :userid ORDER BY a.outpoint DESC"),
  */
 @Entity(name = "UserAction")
 @Table(name = "mh_user_action")
 @NamedQueries({
         @NamedQuery(name = "findUserActions", query = "SELECT a FROM UserAction a"),
         @NamedQuery(name = "countSessionsGroupByMediapackage", query = "SELECT a.mediapackageId, COUNT(distinct a.session), SUM(a.length) FROM UserAction a GROUP BY a.mediapackageId"),
-        @NamedQuery(name = "countSessionsGroupByMediapackageByIntervall", query = "SELECT a.mediapackageId, COUNT(distinct a.session), SUM(a.length) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end GROUP BY a.mediapackageId"),
+        @NamedQuery(name = "countSessionsGroupByMediapackageByIntervall", query = "SELECT a.mediapackageId, COUNT(distinct a.session.sessionId), SUM(a.length) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end GROUP BY a.mediapackageId"),
         @NamedQuery(name = "countSessionsOfMediapackage", query = "SELECT COUNT(distinct a.session) FROM UserAction a WHERE a.mediapackageId = :mediapackageId"),
         @NamedQuery(name = "findLastUserFootprintOfSession", query = "SELECT a FROM UserAction a  WHERE a.session = :session AND a.type = \'FOOTPRINT\'  ORDER BY a.created DESC"),
         @NamedQuery(name = "findLastUserActionsOfSession", query = "SELECT a FROM UserAction a  WHERE a.session = :session ORDER BY a.created DESC"),
@@ -85,7 +84,7 @@ public class UserActionImpl implements UserAction {
   @ManyToOne(targetEntity = UserSessionImpl.class)
   @JoinColumn(name = "session", nullable = false)
   @XmlElement(name = "session")
-  private UserSession session;
+  private UserSessionImpl session;
 
   @Column(name = "inpoint")
   @XmlElement(name = "inpoint")
@@ -129,7 +128,7 @@ public class UserActionImpl implements UserAction {
   }
 
   public void setSession(UserSession session) {
-    this.session = session;
+    this.session = (UserSessionImpl) session;
   }
 
   public UserSession getSession() {

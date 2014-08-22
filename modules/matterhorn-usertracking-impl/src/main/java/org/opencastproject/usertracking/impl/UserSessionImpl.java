@@ -15,17 +15,14 @@
  */
 package org.opencastproject.usertracking.impl;
 
-import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserSession;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -43,13 +40,9 @@ import javax.xml.bind.annotation.XmlType;
 public class UserSessionImpl implements UserSession {
 
   @Id
-  @Column(name = "session", length = 50)
+  @Column(name = "sessionId", length = 50)
   @XmlElement(name = "sessionId")
   private String sessionId;
-
-  @OneToOne(cascade = CascadeType.PERSIST, mappedBy = "session", targetEntity = UserActionImpl.class)
-  @XmlElement(name = "action")
-  private UserAction action;
 
   @Lob
   @Column(name = "user_id", length = 255)
@@ -66,12 +59,11 @@ public class UserSessionImpl implements UserSession {
   @XmlElement(name = "userAgent")
   private String userAgent;
 
-  public UserAction getAction() {
-    return action;
-  }
-  
-  public void setAction(UserAction action) {
-    this.action = action;
+  /**
+   * No Arg Constructor for JAXB
+   */
+  public UserSessionImpl() {
+    
   }
 
   public String getUserId() {

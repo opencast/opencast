@@ -17,10 +17,6 @@ package org.opencastproject.usertracking.api;
 
 public interface UserSession {
 
-  UserAction getAction();
-
-  void setAction(UserAction action);
-
   String getUserId();
 
   void setUserId(String userId);

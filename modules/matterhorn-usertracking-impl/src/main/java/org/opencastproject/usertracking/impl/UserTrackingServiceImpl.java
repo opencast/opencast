@@ -169,19 +169,9 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      //Try and find the session.  If not found, persist it
-      Query q = em.createNamedQuery("findUserSessionBySessionId");
-      q.setMaxResults(1);
-      q.setParameter("sessionId", session.getSessionId());
-      UserSession userSession = null;
-      try {
-        userSession = (UserSession) q.getSingleResult();
-      } catch (NoResultException n) {
-        userSession = session;
-        em.persist(userSession);
-      }
+      UserSession userSession = populateSession(em, session);
 
-      q = em.createNamedQuery("findLastUserFootprintOfSession");
+      Query q = em.createNamedQuery("findLastUserFootprintOfSession");
       q.setMaxResults(1);
       q.setParameter("session", userSession);
       Collection<UserAction> userActions = q.getResultList();
@@ -190,13 +180,16 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
         UserAction last = userActions.iterator().next();
         if (last.getMediapackageId().equals(a.getMediapackageId()) && last.getType().equals(a.getType())
                 && last.getOutpoint() == a.getInpoint()) {
+          //We are assuming in this case that the sessions match and are unchanged (IP wise, for example)
           last.setOutpoint(a.getOutpoint());
           a = last;
           a.setId(last.getId());
         } else {
+          a.setSession(userSession);
           em.persist(a);
         }
       } else {
+        a.setSession(userSession);
         em.persist(a);
       }
       tx.commit();
@@ -223,17 +216,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      Query q = em.createNamedQuery("findUserSessionBySessionId");
-      q.setMaxResults(1);
-      q.setParameter("sessionId", session.getSessionId());
-      UserSession userSession = null;
-      try {
-        userSession = (UserSession) q.getSingleResult();
-      } catch (NoResultException n) {
-        userSession = session;
-        em.persist(userSession);
-      }
-
+      UserSession userSession = populateSession(em, session);
+      a.setSession(userSession);
       em.persist(a);
       tx.commit();
       return a;
@@ -247,6 +231,21 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
         em.close();
       }
     }
+  }
+
+  private UserSession populateSession(EntityManager em, UserSession session) {
+    //Try and find the session.  If not found, persist it
+    Query q = em.createNamedQuery("findUserSessionBySessionId");
+    q.setMaxResults(1);
+    q.setParameter("sessionId", session.getSessionId());
+    UserSession userSession = null;
+    try {
+      userSession = (UserSession) q.getSingleResult();
+    } catch (NoResultException n) {
+      userSession = session;
+      em.persist(userSession);
+    }
+    return userSession;
   }
 
   @SuppressWarnings("unchecked")
