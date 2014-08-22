@@ -50,6 +50,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "trigger"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
         customError: new Engage.Event("Notification:customError", "an error occured", "trigger"),
+        customOKMessage: new Engage.Event("Notification:customOKMessage", "a custom message with an OK button", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "handler"),
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
@@ -115,6 +116,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_playbackRate20 = "playback20";
     var id_playpause_controls = "playpause_controls";
     var id_fullscreen_button = "fullscreen_button";
+    var id_embed_button = "embed_button";
     var id_backward_button = "backward_button";
     var id_forward_button = "forward_button";
     var id_navigation_time = "navigation_time";
@@ -178,6 +180,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             }
         }
     });
+
+    function escapeRegExp(string) {
+        return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    }
+
+    function replaceAll(string, find, replace) {
+        return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+    }
 
     /**
      * Returns the input time in milliseconds
@@ -370,6 +380,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             if (!isInFullScreen) {
                 Engage.trigger(plugin.events.fullscreenEnable.getName());
             }
+        });
+
+        $("#" + id_embed_button).click(function(e) {
+            e.preventDefault();
+            var str = window.location.href;
+            if (str.indexOf("mode=desktop") == -1) {
+                str += "&mode=embed";
+            } else {
+                str = replaceAll(str, "mode=desktop", "mode=embed");
+            }
+            Engage.trigger(plugin.events.customOKMessage.getName(), "To embed the player use the following link:<br /><a href=\"" + str + "\" target=\"_blank\">" + str + "</a>");
         });
 
         // slider events

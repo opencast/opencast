@@ -116,7 +116,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var aspectRatio = "";
     var initCount = 4;
     var videoDisplayNamePrefix = "videojs_videodisplay_";
-    var class_vjsposter = "vjs-poster";
     var id_engage_video = "engage_video";
     var id_videojs_wrapper = "videojs_wrapper";
     var id_videoDisplayClass = "videoDisplay";
@@ -126,6 +125,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_page_cover = "page-cover";
     var id_btn_fullscreenCancel = "btn_fullscreenCancel";
     var id_generated_videojs_flash_component = "videojs_videodisplay_0_flash_api";
+    var id_btn_openInPlayer = "btn_openInPlayer";
+    var class_vjsposter = "vjs-poster";
+    var class_vjs_openInPlayer = "vjs-openInPlayer";
+    var class_vjs_control = "vjs-control";
+    var class_vjs_control_text = "vjs-control-text";
+    var class_vjs_mute_control = "vjs-mute-control";
     var videosReady = false;
     var pressedPlayOnce = false;
     var mediapackageChange = "change:mediaPackage";
@@ -325,15 +330,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     }
                 }
 
-                $(".vjs-mute-control").after("<div id=\"btn_openInPlayer\" class=\"vjs-openInPlayer vjs-control\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"vjs-control-text\">Open in player</span></div></div>");
+                $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">Open in player</span></div></div>");
 
-                $("#btn_openInPlayer").click(function(e) {
+                $("#" + id_btn_openInPlayer).click(function(e) {
                     e.preventDefault();
                     var str = window.location.href;
                     if (str.indexOf("mode=embed") == -1) {
                         str += "&mode=embed";
                     } else {
-                        str = replaceAll(str, "embed", "desktop");
+                        str = replaceAll(str, "mode=embed", "mode=desktop");
                     }
                     window.location = str;
                 });

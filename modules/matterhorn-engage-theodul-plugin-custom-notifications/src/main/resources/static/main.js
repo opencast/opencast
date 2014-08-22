@@ -43,6 +43,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
         customNotification: new Engage.Event("Notification:customNotification", "a custom message", "handler"),
         customSuccess: new Engage.Event("Notification:customSuccess", "a custom success message", "handler"),
         customError: new Engage.Event("Notification:customError", "an error occurred", "handler"),
+        customOKMessage: new Engage.Event("Notification:customOKMessage", "a custom message with an OK button", "handler"),
         bufferedAndAutoplaying: new Engage.Event("Video:bufferedAndAutoplaying", "buffering successful, was playing, autoplaying now", "handler"),
         bufferedButNotAutoplaying: new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
@@ -180,6 +181,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
         });
         Engage.on(plugin.events.customError.getName(), function(msg) {
             alertify.error(getAlertifyMessage(msg));
+        });
+        Engage.on(plugin.events.customOKMessage.getName(), function(msg) {
+            alertify.alert(getAlertifyMessage(msg));
         });
         Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
             alertify.error(getAlertifyMessage("Error: " + msg));
