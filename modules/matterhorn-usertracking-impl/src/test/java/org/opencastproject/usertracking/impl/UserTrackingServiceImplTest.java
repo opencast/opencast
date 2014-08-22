@@ -20,8 +20,6 @@ import org.opencastproject.usertracking.api.Report;
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserActionList;
 import org.opencastproject.usertracking.api.UserSession;
-import org.opencastproject.usertracking.api.UserSummary;
-import org.opencastproject.usertracking.api.UserSummaryList;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -38,7 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -664,50 +661,6 @@ public class UserTrackingServiceImplTest {
     verifyUserActionLists(0, 1, 0, 1);
     verifyUserActionLists(0, 1, 1, 1);
     verifyUserActionLists(1, 0, 10, 1);
-  }
-
-  /**
-   * Tests user summaries
-   * @throws Exception
-   */
-  @Test
-  public void testUserSummary() throws Exception {
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 20, 30);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
-
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 40, 50);
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
-
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "other", "me", "127.0.0.1", 60, 70);
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(1, service.getViews("other"));
-
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "mp", "someone else", "127.0.01", 20, 30);
-    Assert.assertEquals(3, service.getViews("mp"));
-    Assert.assertEquals(1, service.getViews("other"));
-
-    UserSummaryList list = service.getUserSummaryByTypeAndMediaPackage(UserTrackingServiceImpl.FOOTPRINT_KEY, "empty");
-    Assert.assertEquals(0, list.getTotal());
-
-    list = service.getUserSummaryByTypeAndMediaPackage(UserTrackingServiceImpl.FOOTPRINT_KEY, "mp");
-    Assert.assertEquals(2, list.getTotal());
-    List<UserSummary> summaries = list.getUserSummaries();
-    //Urgh, lame.  Not sure what the order I'm getting is going to be.
-    for (UserSummary summary : summaries) {
-      if ("me".equals(summary.getUserId())) {
-        Assert.assertEquals(2, summary.getSessionCount());
-        Assert.assertEquals(1, summary.getUniqueMediapackages());
-        Assert.assertEquals(20,  summary.getLength());
-      } else if ("someone else".equals(summary.getUserId())) {
-        Assert.assertEquals(1, summary.getSessionCount());
-        Assert.assertEquals(1, summary.getUniqueMediapackages());
-        Assert.assertEquals(10, summary.getLength());
-      } else {
-        Assert.fail("There should not be another username in this summary!");
-      }
-    }
   }
 
   /**

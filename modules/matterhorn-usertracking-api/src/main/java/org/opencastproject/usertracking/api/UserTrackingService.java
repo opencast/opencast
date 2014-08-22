@@ -211,21 +211,6 @@ public interface UserTrackingService {
   Report getReport(int offset, int limit) throws UserTrackingException;
 
   /**
-   * Gets the summary of user activity for a given media package and type of activity.
-   *
-   * @param key
-   *          The annotation key to look for.
-   * @param mediapackageId
-   *          The mediapackage to collect the summaries from.
-   * @param offset
-   *          The offset
-   * @param limit
-   *          The limit
-   * @return A summary of all user activity that the user is able to see.
-   */
-  UserSummaryList getUserSummaryByTypeAndMediaPackage(String key, String mediapackageId);
-
-  /**
    * Returns a list of footprints, if a userId is passed only the footprints of that user are returned.
    *
    * @param mediapackageId

@@ -178,29 +178,6 @@ public class UserTrackingRestService {
 
   @GET
   @Produces(MediaType.TEXT_XML)
-  @Path("/stats.xml")
-  @RestQuery(name = "statsasxml", description = "Get the statistics for an episode", returnDescription = "The statistics.", restParameters = { @RestParameter(name = "id", description = "The ID of the single episode to return the statistics for, if it exists", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the episode's statistics") })
-  public StatsImpl statsAsXml(@QueryParam("id") String mediapackageId) {
-    StatsImpl s = new StatsImpl();
-    s.setMediapackageId(mediapackageId);
-    try {
-      s.setViews(usertrackingService.getViews(mediapackageId));
-    } catch (UserTrackingException e) {
-      throw new WebApplicationException(e);
-    }
-    return s;
-  }
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("/stats.json")
-  @RestQuery(name = "statsasjson", description = "Get the statistics for an episode", returnDescription = "The statistics.", restParameters = { @RestParameter(name = "id", description = "The ID of the single episode to return the statistics for, if it exists", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the episode's statistics") })
-  public StatsImpl statsAsJson(@QueryParam("id") String mediapackageId) {
-    return statsAsXml(mediapackageId); // same logic, different @Produces annotation
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_XML)
   @Path("/report.xml")
   @RestQuery(name = "reportasxml", description = "Get a report for a time range", returnDescription = "The report.", restParameters = {
           @RestParameter(name = "from", description = "The beginning of the time range", isRequired = false, type = Type.STRING),

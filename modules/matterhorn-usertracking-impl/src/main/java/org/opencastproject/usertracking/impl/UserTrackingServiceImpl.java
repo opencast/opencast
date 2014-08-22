@@ -459,33 +459,6 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public UserSummaryListImpl getUserSummaryByTypeAndMediaPackage(String type, String mediapackageId) {
-    UserSummaryListImpl result = new UserSummaryListImpl();
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("userSummaryByMediapackageByType");
-      q.setParameter("type", type);
-      q.setParameter("mediapackageId", mediapackageId);
-      List<Object[]> users = q.getResultList();
-      for (Object[] user : users) {
-        UserSummaryImpl userSummary = new UserSummaryImpl();
-        userSummary.ingest(user);
-        result.add(userSummary);
-      }
-      return result;
-    } catch (Exception e) {
-      logger.warn("Unable to return any results from mediapackage " + mediapackageId + " of type " + type + " because of ", e);
-      return result;
-    }
-    finally {
-      if (em != null && em.isOpen()) {
-        em.close();
-      }
-    }
-  }
-
   private int getTotal(String type, Calendar calBegin, Calendar calEnd) {
     EntityManager em = null;
     try {
