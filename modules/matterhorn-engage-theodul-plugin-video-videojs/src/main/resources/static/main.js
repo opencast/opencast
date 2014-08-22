@@ -63,6 +63,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "handler")
     };
 
+    var isDesktopMode = false;
+    var isEmbedMode = false;
+    var isMobileMode = false;
+
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
         case "mobile":
@@ -74,6 +78,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 template: PLUGIN_TEMPLATE_MOBILE,
                 events: events
             };
+            isMobileMode = true;
             break;
         case "embed":
             plugin = {
@@ -84,6 +89,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 template: PLUGIN_TEMPLATE_EMBED,
                 events: events
             };
+            isEmbedMode = true;
             break;
         case "desktop":
         default:
@@ -95,6 +101,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 template: PLUGIN_TEMPLATE,
                 events: events
             };
+            isDesktopMode = true;
             break;
     }
 
@@ -520,8 +527,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     function initPlugin() {
-        //only init if plugin template was inserted into the DOM
-        if (plugin.inserted === true) {
+        // only init if plugin template was inserted into the DOM
+        if (isDesktopMode && plugin.inserted) {
             // set path to swf player
             var videojs_swf = plugin.pluginPath + videojs_swf_path;
 
@@ -597,44 +604,46 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
     }
 
-    // init Event
-    Engage.log("Video: Init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginVideoVideoJS');
+    if (isDesktopMode) {
+        // init Event
+        Engage.log("Video: Init");
+        var relative_plugin_path = Engage.getPluginPath('EngagePluginVideoVideoJS');
 
-    // load video.js lib
-    require([relative_plugin_path + videoPath], function(videojs) {
-        Engage.log("Video: Lib video loaded");
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
+        // load video.js lib
+        require([relative_plugin_path + videoPath], function(videojs) {
+            Engage.log("Video: Lib video loaded");
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
 
-    // load synchronize.js lib
-    require([relative_plugin_path + synchronizePath], function(videojs) {
-        Engage.log("Video: Lib synchronize loaded");
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
+        // load synchronize.js lib
+        require([relative_plugin_path + synchronizePath], function(videojs) {
+            Engage.log("Video: Lib synchronize loaded");
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
 
-    // listen on a change/set of the mediaPackage model
-    Engage.model.on(mediapackageChange, function() {
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
+        // listen on a change/set of the mediaPackage model
+        Engage.model.on(mediapackageChange, function() {
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
 
-    // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function() {
-        Engage.log("Video: Plugin load done");
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
+        // all plugins loaded
+        Engage.on(plugin.events.plugin_load_done.getName(), function() {
+            Engage.log("Video: Plugin load done");
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
+    }
 
     return plugin;
 });

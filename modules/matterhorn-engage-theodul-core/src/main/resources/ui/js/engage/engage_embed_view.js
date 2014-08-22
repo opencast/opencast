@@ -3,66 +3,70 @@
  * under the Educational Community License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain a
  * copy of the License at
- * 
+ *
  * http://www.osedu.org/licenses/ECL-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- * 
+ *
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'engage/engage_model'], function (require, $, _, Backbone, EngageCore, EngageModel) {
-  //
-  'use strict'; // strict mode in all our application
-  //
-  /*
-   * Init logic function
-   */
-  var initEmbedView = function(){
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'engage/engage_model'], function(require, $, _, Backbone, EngageCore, EngageModel) {
+    'use strict';
 
-  }
-  /*
-   * Logic to insert a plugin with name and type to the player in embed mode
-   */
-  var insertPluginToDOM = function(plugin) {
-    //DEBUG, currently no impl here, so please init no plugin
-    plugin.inserted = false;
-    //switch plugin type to insert the plugin to the right DOM element and execute custom view code
-    switch (plugin.type) {
-    case "engage_controls":       
+    var id_engage_controls = "engage_controls";
+    var id_engage_video = "engage_video";
+    var id_engage_tab = "engage_tab";
+    var id_engage_description = "engage_description";
+    var id_engage_timeline = "engage_timeline";
 
-      break;
-    case "engage_video":        
+    /*
+     * Init logic function
+     */
+    var initEmbedView = function() {}
 
-      break;        
-    case "engage_tab":        
+    /*
+     * Logic to insert a plugin with name and type to the player in embed mode
+     */
+    var insertPluginToDOM = function(plugin) {
+        plugin.inserted = false; // TODO
+        switch (plugin.type) {
+            case id_engage_controls:
 
-      break;
-    case "engage_description":
+                break;
+            case id_engage_video:
 
-      break;    
-    case "engage_timeline":
+                break;
+            case id_engage_tab:
 
-    break; 
-    default:
+                break;
+            case id_engage_description:
+
+                break;
+            case id_engage_timeline:
+
+                break;
+            default:
+                plugin.inserted = false;
+                plugin.container = "";
+        }
     }
-  }
-  
-  /*
-   * This function is triggered when all plugins are loaded and inserted into the DOM
-   */
-  var allPluginsLoadedEvent = function(){
 
-  }
-  
-  // public functions fo the module
-  return {
-    initView : initEmbedView,
-    insertPlugin : insertPluginToDOM,
-    allPluginsLoaded : allPluginsLoadedEvent
-  } 
+    /*
+     * This function is triggered when all plugins are loaded and inserted into the DOM
+     */
+    var allPluginsLoadedEvent = function() {
+
+    }
+
+    // public functions fo the module
+    return {
+        initView: initEmbedView,
+        insertPlugin: insertPluginToDOM,
+        allPluginsLoaded: allPluginsLoadedEvent
+    }
 });

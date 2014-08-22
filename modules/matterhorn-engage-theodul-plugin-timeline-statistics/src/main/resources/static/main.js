@@ -37,6 +37,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler")
     };
 
+    var isDesktopMode = false;
+    var isEmbedMode = false;
+    var isMobileMode = false;
+
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
         case "mobile":
@@ -48,6 +52,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 template: PLUGIN_TEMPLATE_MOBILE,
                 events: events
             };
+            isMobileMode = true;
             break;
         case "embed":
             plugin = {
@@ -58,6 +63,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 template: PLUGIN_TEMPLATE_EMBED,
                 events: events
             };
+            isEmbedMode = true;
             break;
         case "desktop":
         default:
@@ -69,6 +75,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 template: PLUGIN_TEMPLATE,
                 events: events
             };
+            isDesktopMode = true;
             break;
     }
 
@@ -287,7 +294,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if (plugin.inserted === true) {
+        if (isDesktopMode && plugin.inserted) {
             Chart.defaults.global = chartOptions;
             statisticsTimelineView = new StatisticsTimelineView("");
 
@@ -301,45 +308,47 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     Engage.log("Timeline:Statistics: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginTimelineStatistics');
 
-    Engage.model.on(footprintChange, function() {
-        initCount -= 1;
-        if (initCount == 0) {
-            initPlugin();
-        }
-    });
+    if (isDesktopMode) {
+        Engage.model.on(footprintChange, function() {
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
 
-    // listen on a change/set of the mediaPackage model
-    Engage.model.on(mediapackageChange, function() {
-        initCount -= 1;
-        if (initCount == 0) {
-            initPlugin();
-        }
-    });
+        // listen on a change/set of the mediaPackage model
+        Engage.model.on(mediapackageChange, function() {
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
 
-    Engage.model.on(videoDataModelChange, function() {
-        initCount -= 1;
-        if (initCount == 0) {
-            initPlugin();
-        }
-    });
+        Engage.model.on(videoDataModelChange, function() {
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
 
-    // load highchart lib
-    require([relative_plugin_path + chartPath], function(videojs) {
-        Engage.log("Timeline:Statistics: Lib chart loaded");
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
+        // load highchart lib
+        require([relative_plugin_path + chartPath], function(videojs) {
+            Engage.log("Timeline:Statistics: Lib chart loaded");
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
 
-    // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function() {
-        Engage.log("Timeline:Statistics: Plugin load done");
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
+        // all plugins loaded
+        Engage.on(plugin.events.plugin_load_done.getName(), function() {
+            Engage.log("Timeline:Statistics: Plugin load done");
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
+    }
 
     return plugin;
 });

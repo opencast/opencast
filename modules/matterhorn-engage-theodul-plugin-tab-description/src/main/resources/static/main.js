@@ -37,6 +37,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler")
     };
 
+    var isDesktopMode = false;
+    var isEmbedMode = false;
+    var isMobileMode = false;
+
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
         case "mobile":
@@ -48,6 +52,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
                 template: PLUGIN_TEMPLATE_MOBILE,
                 events: events
             };
+            isMobileMode = true;
             break;
         case "embed":
             plugin = {
@@ -58,6 +63,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
                 template: PLUGIN_TEMPLATE_EMBED,
                 events: events
             };
+            isEmbedMode = true;
             break;
         case "desktop":
         default:
@@ -69,6 +75,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
                 template: PLUGIN_TEMPLATE,
                 events: events
             };
+            isDesktopMode = true;
             break;
     }
 
@@ -99,7 +106,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
                 date: this.model.get("date")
             };
             // try to format the date
-            if (Moment(tempVars.date) !== null) {
+            if (Moment(tempVars.date) != null) {
                 tempVars.date = Moment(tempVars.date).format("MMMM Do YYYY, h:mm:ss a");
             }
             if (!tempVars.creator) {
@@ -122,7 +129,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
             }
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
-	    /*
+            /*
 	      $(".description-item").mouseover(function() {
 	      $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
 	      }).mouseout(function() {
@@ -134,7 +141,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if (plugin.inserted === true) {
+        if (isDesktopMode && plugin.inserted) {
             Moment.locale('en', {
                 // customizations
             });
@@ -143,26 +150,28 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
         }
     }
 
-    // init event
-    Engage.log("Tab:Description: Init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginTabDescription');
+    if (isDesktopMode) {
+        // init event
+        Engage.log("Tab:Description: Init");
+        var relative_plugin_path = Engage.getPluginPath('EngagePluginTabDescription');
 
-    // listen on a change/set of the mediaPackage model
-    Engage.model.on(mediapackageChange, function() {
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
+        // listen on a change/set of the mediaPackage model
+        Engage.model.on(mediapackageChange, function() {
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
 
-    // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function() {
-        Engage.log("Tab:Description: Plugin load done");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
+        // all plugins loaded
+        Engage.on(plugin.events.plugin_load_done.getName(), function() {
+            Engage.log("Tab:Description: Plugin load done");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+    }
 
     return plugin;
 });
