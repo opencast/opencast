@@ -40,6 +40,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler")
     };
 
+    var isDesktopMode = false;
+    var isEmbedMode = false;
+    var isMobileMode = false;
+
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
         case "mobile":
@@ -52,6 +56,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 events: events,
                 timeStrToSeconds: timeStrToSeconds
             };
+            isMobileMode = true;
             break;
         case "embed":
             plugin = {
@@ -63,6 +68,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 events: events,
                 timeStrToSeconds: timeStrToSeconds
             };
+            isEmbedMode = true;
             break;
         case "desktop":
         default:
@@ -75,6 +81,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 events: events,
                 timeStrToSeconds: timeStrToSeconds
             };
+            isDesktopMode = true;
             break;
     }
 
@@ -214,7 +221,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if (plugin.inserted === true) {
+        if (plugin.inserted) {
             // create a new view with the media package model and the template
             new SlidetextTabView(Engage.model.get("mediaPackage"), plugin.template);
         }

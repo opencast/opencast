@@ -48,6 +48,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
+    var isDesktopMode = false;
+    var isEmbedMode = false;
+    var isMobileMode = false;
+
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
         case "mobile":
@@ -59,6 +63,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
                 template: PLUGIN_TEMPLATE_MOBILE,
                 events: events
             };
+            isMobileMode = true;
             break;
         case "embed":
             plugin = {
@@ -69,6 +74,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
                 template: PLUGIN_TEMPLATE_EMBED,
                 events: events
             };
+            isEmbedMode = true;
             break;
         case "desktop":
         default:
@@ -80,6 +86,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
                 template: PLUGIN_TEMPLATE,
                 events: events
             };
+            isDesktopMode = true;
             break;
     }
 
@@ -105,7 +112,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
         var date = new Date();
 
         // try to format the date
-        if (Moment(date) !== null) {
+        if (Moment(date) != null) {
             date = Moment(new Date()).format("MMMM Do YYYY, h:mm:ss a");
         }
         return date;

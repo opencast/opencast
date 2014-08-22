@@ -58,6 +58,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "handler")
     };
 
+    var isDesktopMode = false;
+    var isEmbedMode = false;
+    var isMobileMode = false;
+
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
         case "mobile":
@@ -69,6 +73,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 template: PLUGIN_TEMPLATE_MOBILE,
                 events: events
             };
+            isMobileMode = true;
             break;
         case "embed":
             plugin = {
@@ -79,8 +84,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 template: PLUGIN_TEMPLATE_EMBED,
                 events: events
             };
+            isEmbedMode = true;
             break;
-            // fallback to desktop/default mode
         case "desktop":
         default:
             plugin = {
@@ -91,6 +96,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 template: PLUGIN_TEMPLATE,
                 events: events
             };
+            isDesktopMode = true;
             break;
     }
 
@@ -164,10 +170,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             // compile template and load into the html
             this.$el.html(_.template(this.template, tempVars));
 
-            initControlsEvents();
+            if (isDesktopMode) {
+                initControlsEvents();
 
-            // init dropdown menus
-            $("." + class_dropdown).dropdown();
+                // init dropdown menus
+                $("." + class_dropdown).dropdown();
+            }
         }
     });
 
@@ -178,7 +186,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      * @return time from the data in milliseconds
      */
     function getTimeInMilliseconds(data) {
-        if ((data !== undefined) && (data !== null) && (data != 0) && (data.length) && (data.indexOf(':') != -1)) {
+        if ((data != undefined) && (data != null) && (data != 0) && (data.length) && (data.indexOf(':') != -1)) {
             var values = data.split(':');
             // when the format is correct
             if (values.length == 3) {
@@ -415,7 +423,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      */
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if (plugin.inserted == true) {
+        if (isDesktopMode && plugin.inserted) {
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
             Engage.on(plugin.events.usingFlash.getName(), function(flash) {
                 usingFlash = flash;
@@ -493,52 +501,54 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
     }
 
-    // init event
-    Engage.log("Controls: Init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginControls');
+    if (isDesktopMode) {
+        // init event
+        Engage.log("Controls: Init");
+        var relative_plugin_path = Engage.getPluginPath('EngagePluginControls');
 
-    // load jquery-ui lib
-    require([relative_plugin_path + jQueryUIPath], function() {
-        Engage.log("Controls: Lib jQuery UI loaded");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
+        // load jquery-ui lib
+        require([relative_plugin_path + jQueryUIPath], function() {
+            Engage.log("Controls: Lib jQuery UI loaded");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
 
-    // load bootstrap lib
-    require([relative_plugin_path + bootstrapPath], function() {
-        Engage.log("Controls: Lib bootstrap loaded");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
+        // load bootstrap lib
+        require([relative_plugin_path + bootstrapPath], function() {
+            Engage.log("Controls: Lib bootstrap loaded");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
 
-    // listen on a change/set of the video data model
-    Engage.model.on(videoDataModelChange, function() {
-        initCount -= 1;
-        if (initCount == 0) {
-            initPlugin();
-        }
-    });
+        // listen on a change/set of the video data model
+        Engage.model.on(videoDataModelChange, function() {
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
 
-    // listen on a change/set of the mediaPackage model
-    Engage.model.on(mediapackageChange, function() {
-        initCount -= 1;
-        if (initCount == 0) {
-            initPlugin();
-        }
-    });
+        // listen on a change/set of the mediaPackage model
+        Engage.model.on(mediapackageChange, function() {
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
 
-    // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function() {
-        Engage.log("Controls: Plugin load done");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
+        // all plugins loaded
+        Engage.on(plugin.events.plugin_load_done.getName(), function() {
+            Engage.log("Controls: Plugin load done");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+    }
 
     return plugin;
 });

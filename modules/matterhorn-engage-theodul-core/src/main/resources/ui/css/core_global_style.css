@@ -1,97 +1,108 @@
 /* core global css rules*/
 
 * {
-  margin: 0;
-  padding: 0;
-  outline: none !important;
+    margin: 0;
+    padding: 0;
+    outline: none !important;
 }
 
 #engage_view {
-  display: none;
+    display: none;
+}
+
+#page-cover {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    z-index: 990;
+    top: 0;
+    left: 0;
 }
 
 /* loading animation container */
 .loading {
-	display: none;
-	position: absolute;
+    display: none;
+    position: absolute;
     top: 10%;
     left: 10%;
-	width: 50%;
-	font-weight: bold;
+    width: 50%;
+    font-weight: bold;
 }
 
 #loadingProgressbar1, #loadingProgressbar2 {
-	background-color: #9C9C9C;
+    background-color: #9C9C9C;
 }
 
 #loading1 {
-	display: none;
+    display: none;
 }
 
 #loading2 {
-	display: none;
+    display: none;
 }
 
 .progress {
-	margin: 10px 0px 0px 0px;
+    margin: 10px 0px 0px 0px;
 }
 
 #noJavaScript-container {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 #noJavaScript-container a {
-	color: #843512;
-	font-weight: 700;
-	text-decoration: none;
+    color: #843512;
+    font-weight: 700;
+    text-decoration: none;
 }
 
 #noJavaScript-container a:hover {
-	text-decoration: underline;
-	outline: 0;
+    text-decoration: underline;
+    outline: 0;
 }
 
 :before, :after {
-	box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .clear {
-  clear: both;
+    clear: both;
 }
 
 .noJavaScript {
-	margin: 20px 0px 0px 20px;
-	color: #a94442;
-	background-color: #f2dede;
-	border-color: #ebccd1;
-	padding: 15px;
-	border: 1px solid transparent;
-	border-radius: 4px;
-	width: 350px;
+    margin: 20px 0px 0px 20px;
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    padding: 15px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    width: 350px;
 }
 
 #customError {
-	margin: 20px 0px 0px 20px;
-	display: none;
-	width: 350px;
+    margin: 20px 0px 0px 20px;
+    display: none;
+    width: 350px;
 }
 
 #customError_btn-container {
-	margin: 0 auto;
-	margin-top: 10px;
-	text-align: center;
+    margin: 0 auto;
+    margin-top: 10px;
+    text-align: center;
 }
 
 #customError_str {
-	margin-left: 3px;
-	font-weight: bold;
+    margin-left: 3px;
+    font-weight: bold;
 }
 
 .alert>ul {
-	margin: 10px 0px 0px 50px;
+    margin: 10px 0px 0px 50px;
 }
 
 #browserWarning {
-	display: none;
-	margin: 5%;
+    display: none;
+    margin: 5%;
 }
