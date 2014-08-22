@@ -31,7 +31,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
         mute: new EngageEvent("Video:mute", "", "trigger"),
         nextEpisode: new EngageEvent("Core:nextEpisode", "", "trigger"),
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
-        volumeDown: new EngageEvent("Video:volumeDown", "", "trigger")
+        volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
+        mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     /* change these variables */
@@ -47,6 +48,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
     var id_volume = "volume";
     var id_btn_reloadPage = "btn_reloadPage";
     var id_customError = "customError";
+    var id_customError_str = "customError_str";
     var class_loading = "loading";
 
     /* don't change these variables */
@@ -66,6 +68,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
     var hotkey_nextEpisode = "nextEpisode";
     var hotkey_volDown = "volDown";
     var hotkey_volUp = "volUp";
+    var mediapackageError = false;
 
     function browserSupported() {
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari);
@@ -206,36 +209,46 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                 });
             });
             // load plugins done, hide loading and show content
+            this.dispatcher.on(events.mediaPackageModelError.getName(), function(str) {
+                mediapackageError = true;
+                $("." + class_loading).hide().detach();
+                $("#" + id_engage_view + ", #" + id_btn_reloadPage).hide().detach();
+                $("#" + id_customError_str).html(str);
+                $("#" + id_customError).show();
+            });
+            // load plugins done, hide loading and show content
             this.dispatcher.on(events.plugin_load_done.getName(), function() {
-                $("#" + id_loading1).hide().detach();
-                $("#" + id_loading2).show();
-                window.setTimeout(function() {
-                    $("#" + id_loadingProgressbar2).css("width", "100%");
+                if (!mediapackageError) {
+                    $("#" + id_loading1).hide().detach();
+                    $("#" + id_loading2).show();
                     window.setTimeout(function() {
-                        $("." + class_loading).hide().detach();
-                        if (!(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
-                            $("#" + id_browserWarning).hide().detach();
-                            $("#" + id_engage_view).show();
-                            if (engageCore.model.desktop) {
-                                window.setTimeout(function() {
-                                    if ($("#" + id_volume).html() == "") {
-                                        $("#" + id_btn_reloadPage).click(function(e) {
-                                            e.preventDefault();
-                                            location.reload();
-                                        });
-                                        $("#" + id_engage_view).hide().detach();
-                                        $("#" + id_customError).show();
-                                    } else {
-                                        $("#" + id_customError).detach();
-                                    }
-                                }, errorCheckDelay);
+                        $("#" + id_loadingProgressbar2).css("width", "100%");
+                        window.setTimeout(function() {
+                            $("." + class_loading).hide().detach();
+                            if (!(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
+                                $("#" + id_browserWarning).hide().detach();
+                                $("#" + id_engage_view).show();
+                                if (engageCore.model.desktop) {
+                                    window.setTimeout(function() {
+                                        if ($("#" + id_volume).html() == "") {
+                                            $("#" + id_btn_reloadPage).click(function(e) {
+                                                e.preventDefault();
+                                                location.reload();
+                                            });
+                                            $("#" + id_engage_view).hide().detach();
+                                            $("#" + id_customError).show();
+                                        } else {
+                                            $("#" + id_customError).detach();
+                                        }
+                                    }, errorCheckDelay);
+                                }
+                            } else {
+                                $("#" + id_engage_view + ", #" + id_customError).hide().detach();
+                                $("#" + browserWarning).show();
                             }
-                        } else {
-                            $("#" + id_engage_view + ", #" + id_customError).hide().detach();
-                            $("#" + browserWarning).show();
-                        }
-                    }, loadingDelay2);
-                }, loadingDelay1);
+                        }, loadingDelay2);
+                    }, loadingDelay1);
+                }
             });
         },
         // bind a key event as a string to given theodul event

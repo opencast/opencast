@@ -34,7 +34,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     var plugin;
     var events = {
-        plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler")
+        plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -203,6 +204,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var renderEveryTimes_count = 0;
     var data; // chart data array
     var lineChartData;
+    var mediapackageError = false;
 
     function setSize() {
         $("#engage_timeline_statistics_chart").attr("width", $(window).width() - 40).attr("height", 60).css({
@@ -213,7 +215,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     function rerender() {
         setSize();
-        if (statisticsTimelineView && statisticsTimelineView.videoData) {
+        if (!mediapackageError && statisticsTimelineView && statisticsTimelineView.videoData) {
             var duration = parseInt(statisticsTimelineView.videoData.get("duration"));
 
             if (duration && (duration > 0)) {
@@ -277,7 +279,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             });
         },
         render: function() {
-            if (this.videoData && this.footprints) {
+            if (!mediapackageError && this.videoData && this.footprints) {
                 var tempVars = {
                     width: $(window).width() - 40,
                     height: "60"
@@ -300,6 +302,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
             Engage.on(timelineplugin_opened, function() {
                 rerender();
+            });
+
+            Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
+                mediapackageError = true;
             });
         }
     }

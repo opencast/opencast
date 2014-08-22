@@ -99,6 +99,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
 
     /* don't change these variables */
     var alertify;
+    var mediapackageError = false;
     var initCount = 2;
     var videoLoaded = false;
     var videoLoadMsgDisplayed = false;
@@ -143,32 +144,32 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
         });
 
         window.setTimeout(function() {
-            if (!videoLoaded) {
+            if (!videoLoaded && !mediapackageError) {
                 videoLoadMsgDisplayed = true;
                 alertify.error(getAlertifyMessage("The video is loading. Please wait a moment."));
             }
         }, alertifyVideoLoadMessageThreshold);
 
         Engage.on(plugin.events.ready.getName(), function() {
-            if (!videoLoaded && videoLoadMsgDisplayed) {
+            if (!videoLoaded && videoLoadMsgDisplayed && !mediapackageError) {
                 alertify.success(getAlertifyMessage("The video has been loaded successfully."));
             }
             videoLoaded = true;
         });
         Engage.on(plugin.events.buffering.getName(), function() {
-            if (!videoBuffering) {
+            if (!videoBuffering && !mediapackageError) {
                 videoBuffering = true;
                 alertify.success(getAlertifyMessage("The video is currently buffering. Please wait a moment."));
             }
         });
         Engage.on(plugin.events.bufferedAndAutoplaying.getName(), function() {
-            if (videoBuffering) {
+            if (videoBuffering && !mediapackageError) {
                 videoBuffering = false;
                 alertify.success(getAlertifyMessage("The video has been buffered successfully and is now autoplaying."));
             }
         });
         Engage.on(plugin.events.bufferedButNotAutoplaying.getName(), function() {
-            if (videoBuffering) {
+            if (videoBuffering && !mediapackageError) {
                 videoBuffering = false;
                 alertify.success(getAlertifyMessage("The video has been buffered successfully."));
             }
@@ -186,6 +187,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
             alertify.alert(getAlertifyMessage(msg));
         });
         Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
+            mediapackageError = true;
             alertify.error(getAlertifyMessage("Error: " + msg));
         });
     }

@@ -56,7 +56,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
         timeupdate: new Engage.Event("Video:timeupdate", "notices a timeupdate", "handler"),
         ended: new Engage.Event("Video:ended", "end of the video", "handler"),
-        usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "handler")
+        usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "handler"),
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -142,6 +143,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var duration;
     var usingFlash = false;
     var segments = {};
+    var mediapackageError = false;
 
     var ControlsView = Backbone.View.extend({
         el: $("#" + id_engage_controls), // every view has an element associated with it
@@ -157,26 +159,28 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.render();
         },
         render: function() {
-            duration = parseInt(this.model.get("duration"));
-            segments = Engage.model.get("mediaPackage").get("segments");
+            if (!mediapackageError) {
+                duration = parseInt(this.model.get("duration"));
+                segments = Engage.model.get("mediaPackage").get("segments");
 
-            var tempVars = {
-                plugin_path: this.pluginPath,
-                startTime: formatSeconds(0),
-                durationMS: (duration && (duration > 0)) ? duration : 1, // duration in ms
-                duration: (duration ? formatSeconds(duration / 1000) : formatSeconds(0)), // formatted duration
-                logoLink: logoLink,
-                segments: segments
-            };
+                var tempVars = {
+                    plugin_path: this.pluginPath,
+                    startTime: formatSeconds(0),
+                    durationMS: (duration && (duration > 0)) ? duration : 1, // duration in ms
+                    duration: (duration ? formatSeconds(duration / 1000) : formatSeconds(0)), // formatted duration
+                    logoLink: logoLink,
+                    segments: segments
+                };
 
-            // compile template and load into the html
-            this.$el.html(_.template(this.template, tempVars));
+                // compile template and load into the html
+                this.$el.html(_.template(this.template, tempVars));
 
-            if (isDesktopMode) {
-                initControlsEvents();
+                if (isDesktopMode) {
+                    initControlsEvents();
 
-                // init dropdown menus
-                $("." + class_dropdown).dropdown();
+                    // init dropdown menus
+                    $("." + class_dropdown).dropdown();
+                }
             }
         }
     });
@@ -290,7 +294,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     function addNonFlashEvents() {
-        if (!usingFlash) {
+        if (!mediapackageError && !usingFlash) {
             // setup listeners for the playback rate
             $("#" + id_playbackRate05).click(function(e) {
                 e.preventDefault();
@@ -315,115 +319,117 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      * getVolume
      */
     function initControlsEvents() {
-        // disable not used buttons
-        disable(id_backward_button);
-        disable(id_forward_button);
-        disable(id_play_button);
-        greyOut(id_backward_button);
-        greyOut(id_forward_button);
-        greyOut(id_play_button);
-        disable(id_navigation_time);
-        $("#" + id_navigation_time_current).keyup(function(e) {
-            e.preventDefault();
-            // pressed enter
-            if (e.keyCode == 13) {
-                $(this).blur();
-                try {
-                    var time = getTimeInMilliseconds($(this).val());
-                    if (!isNaN(time)) {
-                        Engage.trigger(plugin.events.seek.getName(), time / 1000);
+        if (!mediapackageError) {
+            // disable not used buttons
+            disable(id_backward_button);
+            disable(id_forward_button);
+            disable(id_play_button);
+            greyOut(id_backward_button);
+            greyOut(id_forward_button);
+            greyOut(id_play_button);
+            disable(id_navigation_time);
+            $("#" + id_navigation_time_current).keyup(function(e) {
+                e.preventDefault();
+                // pressed enter
+                if (e.keyCode == 13) {
+                    $(this).blur();
+                    try {
+                        var time = getTimeInMilliseconds($(this).val());
+                        if (!isNaN(time)) {
+                            Engage.trigger(plugin.events.seek.getName(), time / 1000);
+                        }
+                    } catch (e) {
+                        Engage.trigger(plugin.events.seek.getName(), 0);
                     }
-                } catch (e) {
-                    Engage.trigger(plugin.events.seek.getName(), 0);
                 }
-            }
-        });
-
-        $("#" + id_slider).slider({
-            range: "min",
-            min: 0,
-            max: 1000,
-            value: 0
-        });
-
-        $("#" + id_volume).slider({
-            range: "min",
-            min: 1,
-            max: 100,
-            value: 100,
-            change: function(event, ui) {
-                Engage.trigger(plugin.events.volumeSet.getName(), (ui.value) / 100);
-            }
-        });
-
-        $("#" + id_volumeIcon).click(function() {
-            if (isMute) {
-                Engage.trigger(plugin.events.unmute.getName());
-            } else {
-                Engage.trigger(plugin.events.mute.getName());
-            }
-        });
-
-        $("#" + id_playpause_controls).click(function() {
-            if (isPlaying) {
-                Engage.trigger(plugin.events.pause.getName(), false);
-            } else {
-                Engage.trigger(plugin.events.play.getName(), false);
-            }
-        });
-
-        $("#" + id_fullscreen_button).click(function(e) {
-            e.preventDefault();
-            var isInFullScreen = document.fullScreen ||
-                document.mozFullScreen ||
-                document.webkitIsFullScreen;
-            if (!isInFullScreen) {
-                Engage.trigger(plugin.events.fullscreenEnable.getName());
-            }
-        });
-
-        $("#" + id_embed_button).click(function(e) {
-            e.preventDefault();
-            var str = window.location.href;
-            if (str.indexOf("mode=desktop") == -1) {
-                str += "&mode=embed";
-            } else {
-                str = replaceAll(str, "mode=desktop", "mode=embed");
-            }
-            Engage.trigger(plugin.events.customOKMessage.getName(), "To embed the player use the following link:<br /><a href=\"" + str + "\" target=\"_blank\">" + str + "</a>");
-        });
-
-        // slider events
-        $("#" + id_slider).on(event_slidestart, function(event, ui) {
-            isSliding = true;
-            Engage.trigger(plugin.events.sliderStart.getName(), ui.value);
-        });
-        $("#" + id_slider).on(event_slidestop, function(event, ui) {
-            isSliding = false;
-            Engage.trigger(plugin.events.sliderStop.getName(), ui.value);
-        });
-        $("#" + id_volume).on(event_slidestop, function(event, ui) {
-            Engage.trigger(plugin.events.unmute.getName());
-        });
-
-        if (segments && (segments.length > 0)) {
-            Engage.log("Controls: " + segments.length + " segments are available.");
-            $.each(segments, function(i, v) {
-                $("#" + id_segmentNo + i).click(function(e) {
-                    e.preventDefault();
-                    var time = parseInt($(this).children().html());
-                    if (!isNaN(time)) {
-                        Engage.trigger(plugin.events.seek.getName(), time / 1000);
-                    }
-                });
-                $("#" + id_segmentNo + i).mouseover(function(e) {
-                    e.preventDefault();
-                    Engage.trigger(plugin.events.segmentMouseover.getName(), i);
-                }).mouseout(function(e) {
-                    e.preventDefault();
-                    Engage.trigger(plugin.events.segmentMouseout.getName(), i);
-                });
             });
+
+            $("#" + id_slider).slider({
+                range: "min",
+                min: 0,
+                max: 1000,
+                value: 0
+            });
+
+            $("#" + id_volume).slider({
+                range: "min",
+                min: 1,
+                max: 100,
+                value: 100,
+                change: function(event, ui) {
+                    Engage.trigger(plugin.events.volumeSet.getName(), (ui.value) / 100);
+                }
+            });
+
+            $("#" + id_volumeIcon).click(function() {
+                if (isMute) {
+                    Engage.trigger(plugin.events.unmute.getName());
+                } else {
+                    Engage.trigger(plugin.events.mute.getName());
+                }
+            });
+
+            $("#" + id_playpause_controls).click(function() {
+                if (isPlaying) {
+                    Engage.trigger(plugin.events.pause.getName(), false);
+                } else {
+                    Engage.trigger(plugin.events.play.getName(), false);
+                }
+            });
+
+            $("#" + id_fullscreen_button).click(function(e) {
+                e.preventDefault();
+                var isInFullScreen = document.fullScreen ||
+                    document.mozFullScreen ||
+                    document.webkitIsFullScreen;
+                if (!isInFullScreen) {
+                    Engage.trigger(plugin.events.fullscreenEnable.getName());
+                }
+            });
+
+            $("#" + id_embed_button).click(function(e) {
+                e.preventDefault();
+                var str = window.location.href;
+                if (str.indexOf("mode=desktop") == -1) {
+                    str += "&mode=embed";
+                } else {
+                    str = replaceAll(str, "mode=desktop", "mode=embed");
+                }
+                Engage.trigger(plugin.events.customOKMessage.getName(), "To embed the player use the following link:<br /><a href=\"" + str + "\" target=\"_blank\">" + str + "</a>");
+            });
+
+            // slider events
+            $("#" + id_slider).on(event_slidestart, function(event, ui) {
+                isSliding = true;
+                Engage.trigger(plugin.events.sliderStart.getName(), ui.value);
+            });
+            $("#" + id_slider).on(event_slidestop, function(event, ui) {
+                isSliding = false;
+                Engage.trigger(plugin.events.sliderStop.getName(), ui.value);
+            });
+            $("#" + id_volume).on(event_slidestop, function(event, ui) {
+                Engage.trigger(plugin.events.unmute.getName());
+            });
+
+            if (segments && (segments.length > 0)) {
+                Engage.log("Controls: " + segments.length + " segments are available.");
+                $.each(segments, function(i, v) {
+                    $("#" + id_segmentNo + i).click(function(e) {
+                        e.preventDefault();
+                        var time = parseInt($(this).children().html());
+                        if (!isNaN(time)) {
+                            Engage.trigger(plugin.events.seek.getName(), time / 1000);
+                        }
+                    });
+                    $("#" + id_segmentNo + i).mouseover(function(e) {
+                        e.preventDefault();
+                        Engage.trigger(plugin.events.segmentMouseover.getName(), i);
+                    }).mouseout(function(e) {
+                        e.preventDefault();
+                        Engage.trigger(plugin.events.segmentMouseout.getName(), i);
+                    });
+                });
+            }
         }
     }
 
@@ -446,6 +452,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
+
+            Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
+                mediapackageError = true;
+            });
             Engage.on(plugin.events.usingFlash.getName(), function(flash) {
                 usingFlash = flash;
                 if (!usingFlash) {
@@ -454,70 +464,80 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 addNonFlashEvents();
             });
             Engage.on(plugin.events.ready.getName(), function() {
-                greyIn(id_play_button);
-                enable(id_play_button);
-                videosReady = true;
-                $("#" + id_fullscreen_button).removeClass("disabled");
+                if (!mediapackageError) {
+                    greyIn(id_play_button);
+                    enable(id_play_button);
+                    videosReady = true;
+                    $("#" + id_fullscreen_button).removeClass("disabled");
+                }
             });
             Engage.on(plugin.events.play.getName(), function() {
-                if (videosReady) {
+                if (!mediapackageError && videosReady) {
                     $("#" + id_play_button).hide();
                     $("#" + id_pause_button).show();
                     isPlaying = true;
                 }
             });
             Engage.on(plugin.events.pause.getName(), function() {
-                if (videosReady) {
+                if (!mediapackageError && videosReady) {
                     $("#" + id_play_button).show();
                     $("#" + id_pause_button).hide();
                     isPlaying = false;
                 }
             });
             Engage.on(plugin.events.mute.getName(), function() {
-                $("#" + id_unmute_button).hide();
-                $("#" + id_mute_button).show();
-                isMute = true;
-                Engage.trigger(plugin.events.volumeSet.getName(), 0);
+                if (!mediapackageError) {
+                    $("#" + id_unmute_button).hide();
+                    $("#" + id_mute_button).show();
+                    isMute = true;
+                    Engage.trigger(plugin.events.volumeSet.getName(), 0);
+                }
             });
             Engage.on(plugin.events.unmute.getName(), function() {
-                $("#" + id_unmute_button).show();
-                $("#" + id_mute_button).hide();
-                isMute = false;
-                Engage.trigger(plugin.events.volumeSet.getName(), getVolume());
+                if (!mediapackageError) {
+                    $("#" + id_unmute_button).show();
+                    $("#" + id_mute_button).hide();
+                    isMute = false;
+                    Engage.trigger(plugin.events.volumeSet.getName(), getVolume());
+                }
             });
             Engage.on(plugin.events.fullscreenChange.getName(), function() {
-                var isInFullScreen = document.fullScreen ||
-                    document.mozFullScreen ||
-                    document.webkitIsFullScreen;
+                var isInFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
                 if (!isInFullScreen) {
                     Engage.trigger(plugin.events.fullscreenCancel.getName());
                 }
             });
             Engage.on(plugin.events.timeupdate.getName(), function(currentTime) {
-                if (videosReady) {
-                    // set slider
-                    var duration = parseInt(Engage.model.get("videoDataModel").get("duration"));
-                    if (!isSliding && duration) {
-                        var normTime = (currentTime / (duration / 1000)) * 1000;
-                        $("#" + id_slider).slider("option", "value", normTime);
-                        if (!$("#" + id_navigation_time_current).is(":focus")) {
-                            $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
+                if (!mediapackageError) {
+                    if (videosReady) {
+                        // set slider
+                        var duration = parseInt(Engage.model.get("videoDataModel").get("duration"));
+                        if (!isSliding && duration) {
+                            var normTime = (currentTime / (duration / 1000)) * 1000;
+                            $("#" + id_slider).slider("option", "value", normTime);
+                            if (!$("#" + id_navigation_time_current).is(":focus")) {
+                                $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
+                            }
                         }
+                    } else {
+                        $("#" + id_slider).slider("option", "value", 0);
                     }
-                } else {
-                    $("#" + id_slider).slider("option", "value", 0);
                 }
             });
             Engage.on(plugin.events.ended.getName(), function() {
-                if (videosReady) {
+                if (!mediapackageError && videosReady) {
                     Engage.trigger(plugin.events.pause);
                 }
             });
             Engage.on(plugin.events.segmentMouseover.getName(), function(no) {
-                $("#" + id_segmentNo + no).addClass("segmentHover");
+                if (!mediapackageError) {
+                    $("#" + id_segmentNo + no).addClass("segmentHover");
+                }
             });
             Engage.on(plugin.events.segmentMouseout.getName(), function(no) {
-                $("#" + id_segmentNo + no).removeClass("segmentHover");
+                if (!mediapackageError) {
+                    $("#" + id_segmentNo + no).removeClass("segmentHover");
+                }
             });
         }
     }

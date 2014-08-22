@@ -35,6 +35,7 @@
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
     <sec:intercept-url pattern="/engage/ui/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/engage/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/engage-player/**" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/search/**" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/usertracking/**" method="GET" access="ROLE_ANONYMOUS" />
@@ -157,6 +158,7 @@
         <entry key="ROLE_COURSE_ADMIN" value="/welcome.html" />
         <entry key="ROLE_INSTRUCTOR" value="/welcome.html" />
         <entry key="ROLE_USER" value="/engage/ui/index.html" />
+        <entry key="ROLE_USER" value="/engage/theodul/ui/core.html" />
         <entry key="*" value="/engage/ui/index.html" /> <!-- Any role not listed explicitly will redirect here -->
       </map>
     </property>

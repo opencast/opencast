@@ -60,7 +60,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         volumeGet: new Engage.Event("Video:volumeGet", "get the volume", "handler"),
         sliderStop: new Engage.Event("Slider:stop", "slider stopped", "handler"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "handler"),
-        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "handler")
+        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "handler"),
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -115,6 +116,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     /* don't change these variables */
     var aspectRatio = "";
     var initCount = 4;
+    var mediapackageError = false;
     var videoDisplayNamePrefix = "videojs_videodisplay_";
     var id_engage_video = "engage_video";
     var id_videojs_wrapper = "videojs_wrapper";
@@ -183,193 +185,195 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             var videoDisplays = this.model.get("ids");
             var videoSources = this.model.get("videoSources");
 
-            // get aspect ratio
-            aspectRatio = null;
-            var as1 = 0;
-            for (var i = 0; i < videoDisplays.length; ++i) {
-                if (videoSources.presenter && videoSources.presenter[i] && videoSources.presenter[i].resolution) {
-                    for (var j = 0; j < videoSources.presenter.length; ++j) {
-                        var aspectRatio_tmp = videoSources.presenter[j].resolution;
-                        var t_tmp = $.type(aspectRatio_tmp);
-                        if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) {
-                            aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
-                            if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
-                                as1 = parseInt(aspectRatio_tmp[1]);
-                                aspectRatio = videoSources.presenter[j].resolution;
+            if (!mediapackageError) {
+                // get aspect ratio
+                aspectRatio = null;
+                var as1 = 0;
+                for (var i = 0; i < videoDisplays.length; ++i) {
+                    if (videoSources.presenter && videoSources.presenter[i] && videoSources.presenter[i].resolution) {
+                        for (var j = 0; j < videoSources.presenter.length; ++j) {
+                            var aspectRatio_tmp = videoSources.presenter[j].resolution;
+                            var t_tmp = $.type(aspectRatio_tmp);
+                            if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) {
+                                aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
+                                if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
+                                    as1 = parseInt(aspectRatio_tmp[1]);
+                                    aspectRatio = videoSources.presenter[j].resolution;
+                                }
                             }
                         }
-                    }
 
-                    var t = $.type(aspectRatio);
+                        var t = $.type(aspectRatio);
 
-                    if ((t === 'string') && (/\d+x\d+/.test(aspectRatio))) {
-                        aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
-                        break;
+                        if ((t === 'string') && (/\d+x\d+/.test(aspectRatio))) {
+                            aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
+                            break;
+                        }
                     }
-                }
-                // TODO: Same code as above...
-                else if (videoSources.presentation && videoSources.presentation[i] && videoSources.presentation[i].resolution) {
-                    for (var j = 0; j < videoSources.presenter.length; ++j) {
-                        var aspectRatio_tmp = videoSources.presenter[j].resolution;
-                        var t_tmp = $.type(aspectRatio_tmp);
-                        if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) {
-                            aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
-                            if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
-                                as1 = parseInt(aspectRatio_tmp[1]);
-                                aspectRatio = videoSources.presenter[j].resolution;
+                    // TODO: Same code as above...
+                    else if (videoSources.presentation && videoSources.presentation[i] && videoSources.presentation[i].resolution) {
+                        for (var j = 0; j < videoSources.presenter.length; ++j) {
+                            var aspectRatio_tmp = videoSources.presenter[j].resolution;
+                            var t_tmp = $.type(aspectRatio_tmp);
+                            if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) {
+                                aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
+                                if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
+                                    as1 = parseInt(aspectRatio_tmp[1]);
+                                    aspectRatio = videoSources.presenter[j].resolution;
+                                }
                             }
                         }
-                    }
 
-                    var t = $.type(aspectRatio);
+                        var t = $.type(aspectRatio);
 
-                    if ((t === 'string') && (/\d+x\d+/.test(aspectRatio))) {
-                        aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
-                        break;
-                    }
-                }
-            }
-
-            if (isDesktopMode) {
-                for (var v in videoSources) {
-                    if (videoSources[v].length > 0) {
-                        initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
-                        ++i;
-                    }
-                }
-
-                if ((aspectRatio != null) && (videoDisplays.length > 0)) {
-                    aspectRatio[1] = parseInt(aspectRatio[1]);
-                    aspectRatio[2] = parseInt(aspectRatio[2]);
-                    Engage.log("Video: Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-                    $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
-                    $("." + id_videoDisplayClass).each(function(index) {
-                        if ((index % 2) == 1) {
-                            $(this).css("float", "right");
+                        if ((t === 'string') && (/\d+x\d+/.test(aspectRatio))) {
+                            aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
+                            break;
                         }
-                    });
-                    for (i = 0; i < videoDisplays.length; ++i) {
-                        $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
                     }
                 }
 
-                // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
-                $("." + class_vjsposter).show();
-
-                Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
-
-                if (videoDisplays.length > 0) {
-                    var nr = 0;
+                if (isDesktopMode) {
                     for (var v in videoSources) {
                         if (videoSources[v].length > 0) {
-                            ++nr;
-                        }
-                    }
-
-                    // set first videoDisplay as master
-                    registerEvents(videoDisplays[0], videoDisplays.length);
-
-                    if (nr >= 2) {
-                        // throw some important synchronize.js-events for other plugins
-                        $(document).on(event_sjs_allPlayersReady, function(event) {
-                            videosReady = true;
-                            Engage.trigger(plugin.events.ready.getName());
-                        });
-                        $(document).on(event_sjs_playerLoaded, function(event) {
-                            Engage.trigger(plugin.events.playerLoaded.getName());
-                        });
-                        $(document).on(event_sjs_masterPlay, function(event) {
-                            Engage.trigger(plugin.events.play.getName(), true);
-                            pressedPlayOnce = true;
-                        });
-                        $(document).on(event_sjs_masterPause, function(event) {
-                            Engage.trigger(plugin.events.pause.getName(), true);
-                        });
-                        $(document).on(event_sjs_masterEnded, function(event) {
-                            Engage.trigger(plugin.events.ended.getName(), true);
-                        });
-                        $(document).on(event_sjs_masterTimeupdate, function(event, time) {
-                            Engage.trigger(plugin.events.timeupdate.getName(), time, true);
-                        });
-                        $(document).on(event_sjs_synchronizing, function(event) {
-                            Engage.trigger(plugin.events.synchronizing.getName());
-                        });
-                        $(document).on(event_sjs_buffering, function(event) {
-                            Engage.trigger(plugin.events.buffering.getName());
-                        });
-                        $(document).on(event_sjs_bufferedAndAutoplaying, function(event) {
-                            Engage.trigger(plugin.events.bufferedAndAutoplaying.getName());
-                        });
-                        $(document).on(event_sjs_bufferedButNotAutoplaying, function(event) {
-                            Engage.trigger(plugin.events.bufferedButNotAutoplaying.getName());
-                        });
-
-                        var i = 0;
-                        for (var vd in videoDisplays) {
-                            if (i > 0) {
-                                // sync every other videodisplay with the master
-                                $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
-                                Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay " + 0);
-                            }
+                            initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
                             ++i;
                         }
-                    } else {
+                    }
+
+                    if ((aspectRatio != null) && (videoDisplays.length > 0)) {
+                        aspectRatio[1] = parseInt(aspectRatio[1]);
+                        aspectRatio[2] = parseInt(aspectRatio[2]);
+                        Engage.log("Video: Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+                        $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
+                        $("." + id_videoDisplayClass).each(function(index) {
+                            if ((index % 2) == 1) {
+                                $(this).css("float", "right");
+                            }
+                        });
+                        for (i = 0; i < videoDisplays.length; ++i) {
+                            $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+                        }
+                    }
+
+                    // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
+                    $("." + class_vjsposter).show();
+
+                    Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
+
+                    if (videoDisplays.length > 0) {
+                        var nr = 0;
+                        for (var v in videoSources) {
+                            if (videoSources[v].length > 0) {
+                                ++nr;
+                            }
+                        }
+
+                        // set first videoDisplay as master
+                        registerEvents(videoDisplays[0], videoDisplays.length);
+
+                        if (nr >= 2) {
+                            // throw some important synchronize.js-events for other plugins
+                            $(document).on(event_sjs_allPlayersReady, function(event) {
+                                videosReady = true;
+                                Engage.trigger(plugin.events.ready.getName());
+                            });
+                            $(document).on(event_sjs_playerLoaded, function(event) {
+                                Engage.trigger(plugin.events.playerLoaded.getName());
+                            });
+                            $(document).on(event_sjs_masterPlay, function(event) {
+                                Engage.trigger(plugin.events.play.getName(), true);
+                                pressedPlayOnce = true;
+                            });
+                            $(document).on(event_sjs_masterPause, function(event) {
+                                Engage.trigger(plugin.events.pause.getName(), true);
+                            });
+                            $(document).on(event_sjs_masterEnded, function(event) {
+                                Engage.trigger(plugin.events.ended.getName(), true);
+                            });
+                            $(document).on(event_sjs_masterTimeupdate, function(event, time) {
+                                Engage.trigger(plugin.events.timeupdate.getName(), time, true);
+                            });
+                            $(document).on(event_sjs_synchronizing, function(event) {
+                                Engage.trigger(plugin.events.synchronizing.getName());
+                            });
+                            $(document).on(event_sjs_buffering, function(event) {
+                                Engage.trigger(plugin.events.buffering.getName());
+                            });
+                            $(document).on(event_sjs_bufferedAndAutoplaying, function(event) {
+                                Engage.trigger(plugin.events.bufferedAndAutoplaying.getName());
+                            });
+                            $(document).on(event_sjs_bufferedButNotAutoplaying, function(event) {
+                                Engage.trigger(plugin.events.bufferedButNotAutoplaying.getName());
+                            });
+
+                            var i = 0;
+                            for (var vd in videoDisplays) {
+                                if (i > 0) {
+                                    // sync every other videodisplay with the master
+                                    $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
+                                    Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay " + 0);
+                                }
+                                ++i;
+                            }
+                        } else {
+                            videosReady = true;
+                            Engage.trigger(plugin.events.ready.getName());
+                        }
+
+                        $(window).resize(function() {
+                            checkVideoDisplaySize();
+                        });
+                    }
+                } else if (isEmbedMode) {
+                    for (var v in videoSources) {
+                        if (videoSources[v].length > 0) {
+                            initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
+                            break; // just init the first video
+                        }
+                    }
+
+                    $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">Open in player</span></div></div>");
+
+                    $("#" + id_btn_openInPlayer).click(function(e) {
+                        e.preventDefault();
+                        var str = window.location.href;
+                        if (str.indexOf("mode=embed") == -1) {
+                            str += "&mode=embed";
+                        } else {
+                            str = replaceAll(str, "mode=embed", "mode=desktop");
+                        }
+                        window.location = str;
+                    });
+
+                    if ((aspectRatio != null) && (videoDisplays.length > 0)) {
+                        aspectRatio[1] = parseInt(aspectRatio[1]);
+                        aspectRatio[2] = parseInt(aspectRatio[2]);
+                        Engage.log("Video: Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+                        $("." + id_videoDisplayClass).css("width", "100%");
+                        for (i = 0; i < videoDisplays.length; ++i) {
+                            $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+                        }
+                    }
+
+                    // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
+                    $("." + class_vjsposter).show();
+                    Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
+
+                    if (videoDisplays.length > 0) {
+                        // set first videoDisplay as master
+                        registerEvents(videoDisplays[0], 1);
+
                         videosReady = true;
                         Engage.trigger(plugin.events.ready.getName());
-                    }
 
-                    $(window).resize(function() {
-                        checkVideoDisplaySize();
-                    });
-                }
-            } else if (isEmbedMode) {
-                for (var v in videoSources) {
-                    if (videoSources[v].length > 0) {
-                        initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
-                        break; // just init the first video
+                        $(window).resize(function() {
+                            checkVideoDisplaySize();
+                        });
                     }
                 }
-
-                $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">Open in player</span></div></div>");
-
-                $("#" + id_btn_openInPlayer).click(function(e) {
-                    e.preventDefault();
-                    var str = window.location.href;
-                    if (str.indexOf("mode=embed") == -1) {
-                        str += "&mode=embed";
-                    } else {
-                        str = replaceAll(str, "mode=embed", "mode=desktop");
-                    }
-                    window.location = str;
-                });
-
-                if ((aspectRatio != null) && (videoDisplays.length > 0)) {
-                    aspectRatio[1] = parseInt(aspectRatio[1]);
-                    aspectRatio[2] = parseInt(aspectRatio[2]);
-                    Engage.log("Video: Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-                    $("." + id_videoDisplayClass).css("width", "100%");
-                    for (i = 0; i < videoDisplays.length; ++i) {
-                        $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
-                    }
-                }
-
-                // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
-                $("." + class_vjsposter).show();
-                Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
-
-                if (videoDisplays.length > 0) {
-                    // set first videoDisplay as master
-                    registerEvents(videoDisplays[0], 1);
-
-                    videosReady = true;
-                    Engage.trigger(plugin.events.ready.getName());
-
-                    $(window).resize(function() {
-                        checkVideoDisplaySize();
-                    });
-                }
+                checkVideoDisplaySize();
             }
-            checkVideoDisplaySize();
         }
     });
 
@@ -600,6 +604,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
             Engage.model.on(engageModelChange, function() {
                 new VideoDataView(this.get("videoDataModel"), plugin.template, videojs_swf);
+            });
+            Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
+                mediapackageError = true;
             });
             Engage.model.get("mediaPackage").on("change", function() {
                 var mediaInfo = {};
