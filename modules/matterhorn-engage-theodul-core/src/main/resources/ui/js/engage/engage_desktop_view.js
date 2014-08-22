@@ -42,32 +42,32 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
      * init logic function
      */
     var initDesktopView = function() {
-            // load bootstrap css
-            var link = $("<link>");
-            link.attr({
-                type: 'text/css',
-                rel: 'stylesheet',
-                href: 'css/bootstrap/css/bootstrap.css'
-            });
-            $("head").append(link);
-            link = $("<link>");
-            link.attr({
-                type: 'text/css',
-                rel: 'stylesheet',
-                href: 'css/bootstrap/css/bootstrap-responsive.css'
-            });
-            $("head").append(link);
-            // build timeline plugins
-            $("#" + id_engage_timeline_expand_btn).click(function() {
-                $("#" + id_engage_timeline_plugin).slideToggle("fast");
-                $("#" + id_engage_timeline_expand_btn_img).toggleClass(class_engage_timeline_expand_btn_rotate180);
-                if ($("#" + id_engage_timeline_expand_btn_img).hasClass(class_engage_timeline_expand_btn_rotate180)) {
-                    EngageCore.trigger(timelineplugin_opened);
-                } else {
-                    EngageCore.trigger(timelineplugin_closed);
-                }
-            });
-        }
+        // load bootstrap css
+        var link = $("<link>");
+        link.attr({
+            type: 'text/css',
+            rel: 'stylesheet',
+            href: 'css/bootstrap/css/bootstrap.css'
+        });
+        $("head").append(link);
+        link = $("<link>");
+        link.attr({
+            type: 'text/css',
+            rel: 'stylesheet',
+            href: 'css/bootstrap/css/bootstrap-responsive.css'
+        });
+        $("head").append(link);
+        // build timeline plugins
+        $("#" + id_engage_timeline_expand_btn).click(function() {
+            $("#" + id_engage_timeline_plugin).slideToggle("fast");
+            $("#" + id_engage_timeline_expand_btn_img).toggleClass(class_engage_timeline_expand_btn_rotate180);
+            if ($("#" + id_engage_timeline_expand_btn_img).hasClass(class_engage_timeline_expand_btn_rotate180)) {
+                EngageCore.trigger(timelineplugin_opened);
+            } else {
+                EngageCore.trigger(timelineplugin_closed);
+            }
+        });
+    }
 
     /*
      * logic to insert a plugin with name and type to the player in desktop mode

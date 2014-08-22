@@ -1,1 +1,9 @@
 /*theodul video videojs plugin, embed mode styles*/
+
+.vjs-openInPlayer {
+	float: right !important;
+}
+
+.vjs-openInPlayer:before {
+	content: "\e00e";
+}
