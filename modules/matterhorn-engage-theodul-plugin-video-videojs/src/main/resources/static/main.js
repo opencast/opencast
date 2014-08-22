@@ -372,6 +372,38 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
     }
 
+    /**
+     * Returns the formatted seconds
+     *
+     * @param seconds seconds to format
+     * @return formatted seconds
+     */
+    function formatSeconds(seconds) {
+        if (!seconds) {
+            seconds = 0;
+        }
+        seconds = (seconds < 0) ? 0 : seconds;
+        var result = "";
+        if (parseInt(seconds / 3600) < 10) {
+            result += "0";
+        }
+        result += parseInt(seconds / 3600);
+        result += ":";
+        if ((parseInt(seconds / 60) - parseInt(seconds / 3600) * 60) < 10) {
+            result += "0";
+        }
+        result += parseInt(seconds / 60) - parseInt(seconds / 3600) * 60;
+        result += ":";
+        if (seconds % 60 < 10) {
+            result += "0";
+        }
+        result += seconds % 60;
+        if (result.indexOf(".") != -1) {
+            result = result.substring(0, result.lastIndexOf(".")); // get rid of the .ms
+        }
+        return result;
+    }
+
     function registerEvents(videoDisplay, numberOfVideodisplays) {
         var theodulVideodisplayMaster = videojs(videoDisplay);
 
@@ -442,19 +474,33 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         });
         Engage.on(plugin.events.seek.getName(), function(time) {
             if (videosReady && pressedPlayOnce) {
-                theodulVideodisplayMaster.currentTime(time);
+                var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
+                if (duration && (time < duration)) {
+                    theodulVideodisplayMaster.currentTime(time);
+                } else {
+                    Engage.trigger(plugin.events.customError.getName(), "The given time (" + formatSeconds(time) + ") has to be smaller than the duration (" + formatSeconds(duration) + ").");
+                    Engage.trigger(plugin.events.timeupdate.getName(), theodulVideodisplayMaster.currentTime());
+                }
             } else {
-                Engage.trigger(plugin.events.customNotification.getName(), "Start playing the video before setting a time.");
+                if (!videosReady) {
+                    Engage.trigger(plugin.events.customNotification.getName(), "Please wait until the video has been loaded to set a time.");
+                } else { // pressedPlayOnce
+                    Engage.trigger(plugin.events.customNotification.getName(), "Please start playing the video once to set a time.");
+                }
                 Engage.trigger(plugin.events.timeupdate.getName(), 0);
             }
         });
         Engage.on(plugin.events.sliderStop.getName(), function(time) {
             if (videosReady && pressedPlayOnce) {
-                var duration = Engage.model.get("videoDataModel").get("duration");
+                var duration = parseInt(Engage.model.get("videoDataModel").get("duration"));
                 var normTime = (time / 1000) * (duration / 1000);
                 theodulVideodisplayMaster.currentTime(normTime);
             } else {
-                Engage.trigger(plugin.events.customNotification.getName(), "Start playing the video before seeking.");
+                if (!videosReady) {
+                    Engage.trigger(plugin.events.customNotification.getName(), "Please wait until the video has been loaded to seek.");
+                } else { // pressedPlayOnce
+                    Engage.trigger(plugin.events.customNotification.getName(), "Please start playing the video once to seek.");
+                }
                 Engage.trigger(plugin.events.timeupdate.getName(), 0);
             }
         });
