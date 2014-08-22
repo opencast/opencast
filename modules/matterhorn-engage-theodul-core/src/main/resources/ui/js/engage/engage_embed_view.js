@@ -27,7 +27,23 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
     /*
      * Init logic function
      */
-    var initEmbedView = function() {}
+    var initEmbedView = function() {
+        // load bootstrap css
+        var link = $("<link>");
+        link.attr({
+            type: 'text/css',
+            rel: 'stylesheet',
+            href: 'css/bootstrap/css/bootstrap.css'
+        });
+        $("head").append(link);
+        link = $("<link>");
+        link.attr({
+            type: 'text/css',
+            rel: 'stylesheet',
+            href: 'css/bootstrap/css/bootstrap-responsive.css'
+        });
+        $("head").append(link);
+	}
 
     /*
      * Logic to insert a plugin with name and type to the player in embed mode
@@ -36,20 +52,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
         plugin.inserted = false; // TODO
         switch (plugin.type) {
             case id_engage_controls:
-
+                $("#" + id_engage_controls).html(plugin.templateProcessed);
+                plugin.inserted = true;
+                plugin.container = "#" + id_engage_controls;
                 break;
             case id_engage_video:
-
+                $("#" + id_engage_video).html(plugin.templateProcessed);
+                plugin.inserted = true;
+                plugin.container = "#" + id_engage_video;
                 break;
             case id_engage_tab:
-
-                break;
             case id_engage_description:
-
-                break;
             case id_engage_timeline:
-
-                break;
             default:
                 plugin.inserted = false;
                 plugin.container = "";
