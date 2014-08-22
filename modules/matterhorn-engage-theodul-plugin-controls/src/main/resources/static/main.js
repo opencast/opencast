@@ -149,7 +149,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             this.render();
         },
         render: function() {
-            duration = this.model.get("duration");
+            duration = parseInt(this.model.get("duration"));
             segments = Engage.model.get("mediaPackage").get("segments");
 
             var tempVars = {
@@ -311,15 +311,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             if (e.keyCode == 13) {
                 $(this).blur();
                 try {
-                    var time = getTimeInMilliseconds($(this).val()) / 1000;
-                    var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
-                    if (duration && (time <= duration)) {
-                        Engage.trigger(plugin.events.seek.getName(), time);
-                    } else {
-                        Engage.trigger(plugin.events.customError.getName(), "The given time (" + formatSeconds(time) + ") has to be smaller than the duration (" + formatSeconds(duration) + ").");
+                    var time = getTimeInMilliseconds($(this).val());
+                    if (!isNaN(time)) {
+                        Engage.trigger(plugin.events.seek.getName(), time / 1000);
                     }
                 } catch (e) {
-                    $("#" + id_navigation_time_current).val(formatSeconds(0));
+                    Engage.trigger(plugin.events.seek.getName(), 0);
                 }
             }
         });
@@ -470,7 +467,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             Engage.on(plugin.events.timeupdate.getName(), function(currentTime) {
                 if (videosReady) {
                     // set slider
-                    var duration = Engage.model.get("videoDataModel").get("duration");
+                    var duration = parseInt(Engage.model.get("videoDataModel").get("duration"));
                     if (!isSliding && duration) {
                         var normTime = (currentTime / (duration / 1000)) * 1000;
                         $("#" + id_slider).slider("option", "value", normTime);
@@ -478,6 +475,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                             $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
                         }
                     }
+                } else {
+                    $("#" + id_slider).slider("option", "value", 0);
                 }
             });
             Engage.on(plugin.events.ended.getName(), function() {
