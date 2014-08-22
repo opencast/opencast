@@ -35,7 +35,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var plugin;
     var events = {
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
-        timeupdate: new Engage.Event("Video:timeupdate", "notices a timeupdate", "handler")
+        timeupdate: new Engage.Event("Video:timeupdate", "notices a timeupdate", "handler"),
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -89,6 +90,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var initCount = 3;
     var lastFootprint = undefined;
     var mediapackageID;
+    var mediapackageError = false;
 
     function initPlugin() {
         mediapackageID = Engage.model.get("urlParameters").id;
@@ -97,31 +99,37 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             return;
         }
 
+        Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
+            mediapackageError = true;
+        });
+
         Engage.on(plugin.events.timeupdate.getName(), function(currentTime) {
-            // add footprint each rounded timeupdate
-            var cTime = Math.round(currentTime);
-            if (lastFootprint != undefined) {
-                if (lastFootprint != cTime) {
+            if (!mediapackageError) {
+                // add footprint each rounded timeupdate
+                var cTime = Math.round(currentTime);
+                if (lastFootprint != undefined) {
+                    if (lastFootprint != cTime) {
+                        lastFootprint = cTime;
+                        Engage.log("Usertracking: Setting footprint at " + cTime);
+                        //put to mh endpoint
+                        $.ajax({
+                            type: 'PUT',
+                            url: USERTRACKING_ENDPOINT,
+                            data: {
+                                id: mediapackageID,
+                                in : cTime,
+                                out: cTime + 1,
+                                type: "FOOTPRINT"
+                            },
+                            success: function(result) {
+                                // update current footprint model
+                                Engage.model.get("footprints").update();
+                            }
+                        });
+                    }
+                } else {
                     lastFootprint = cTime;
-                    Engage.log("Usertracking: Setting footprint at " + cTime);
-                    //put to mh endpoint
-                    $.ajax({
-                        type: 'PUT',
-                        url: USERTRACKING_ENDPOINT,
-                        data: {
-                            id: mediapackageID,
-                            in : cTime,
-                            out: cTime + 1,
-                            type: "FOOTPRINT"
-                        },
-                        success: function(result) {
-                            // update current footprint model
-                            Engage.model.get("footprints").update();
-                        }
-                    });
                 }
-            } else {
-                lastFootprint = cTime;
             }
         });
     }

@@ -34,7 +34,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
 
     var plugin;
     var events = {
-        plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler")
+        plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -85,6 +86,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
     /* don't change these variables */
     var mediapackageChange = "change:mediaPackage";
     var initCount = 2;
+    var mediapackageError = false;
 
     var DescriptionTabView = Backbone.View.extend({
         initialize: function(mediaPackageModel, template) {
@@ -97,45 +99,47 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
             this.model.bind("change", this.render);
         },
         render: function() {
-            var tempVars = {
-                description: this.model.get("description"),
-                creator: this.model.get("creator"),
-                title: this.model.get("title"),
-                series: this.model.get("series"),
-                contributor: this.model.get("contributor"),
-                date: this.model.get("date")
-            };
-            // try to format the date
-            if (Moment(tempVars.date) != null) {
-                tempVars.date = Moment(tempVars.date).format("MMMM Do YYYY, h:mm:ss a");
-            }
-            if (!tempVars.creator) {
-                tempVars.creator = "";
-            }
-            if (!tempVars.description) {
-                tempVars.description = "";
-            }
-            if (!tempVars.title) {
-                tempVars.title = "";
-            }
-            if (!tempVars.series) {
-                tempVars.series = "";
-            }
-            if (!tempVars.contributor) {
-                tempVars.contributor = "";
-            }
-            if (!tempVars.date) {
-                tempVars.date = "";
-            }
-            // compile template and load into the html
-            this.$el.html(_.template(this.template, tempVars));
-            /*
+            if (!mediapackageError) {
+                var tempVars = {
+                    description: this.model.get("description"),
+                    creator: this.model.get("creator"),
+                    title: this.model.get("title"),
+                    series: this.model.get("series"),
+                    contributor: this.model.get("contributor"),
+                    date: this.model.get("date")
+                };
+                // try to format the date
+                if (Moment(tempVars.date) != null) {
+                    tempVars.date = Moment(tempVars.date).format("MMMM Do YYYY, h:mm:ss a");
+                }
+                if (!tempVars.creator) {
+                    tempVars.creator = "";
+                }
+                if (!tempVars.description) {
+                    tempVars.description = "";
+                }
+                if (!tempVars.title) {
+                    tempVars.title = "";
+                }
+                if (!tempVars.series) {
+                    tempVars.series = "";
+                }
+                if (!tempVars.contributor) {
+                    tempVars.contributor = "";
+                }
+                if (!tempVars.date) {
+                    tempVars.date = "";
+                }
+                // compile template and load into the html
+                this.$el.html(_.template(this.template, tempVars));
+                /*
 	      $(".description-item").mouseover(function() {
 	      $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
 	      }).mouseout(function() {
 	      $(this).removeClass("description-itemColor-hover").addClass("description-itemColor");
 	      });
 	    */
+            }
         }
     });
 
@@ -147,6 +151,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
             });
             // create a new view with the media package model and the template
             new DescriptionTabView(Engage.model.get("mediaPackage"), plugin.template);
+            Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
+                mediapackageError = true;
+            });
         }
     }
 
