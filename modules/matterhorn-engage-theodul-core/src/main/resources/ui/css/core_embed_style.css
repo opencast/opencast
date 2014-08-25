@@ -1,5 +1,10 @@
 /*Core embed css rules*/
 
+body {
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+}
+
 #engage_content {
     width: 100%;
 }
