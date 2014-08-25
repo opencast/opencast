@@ -82,8 +82,8 @@ public class UserActionImpl implements UserAction {
   private String mediapackageId;
 
   @ManyToOne(targetEntity = UserSessionImpl.class)
-  @JoinColumn(name = "session", nullable = false)
-  @XmlElement(name = "session")
+  @JoinColumn(name = "session_id", nullable = false)
+  @XmlElement(name = "sessionId")
   private UserSessionImpl session;
 
   @Column(name = "inpoint")

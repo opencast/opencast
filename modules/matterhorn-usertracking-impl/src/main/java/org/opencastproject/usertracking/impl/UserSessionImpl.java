@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
 public class UserSessionImpl implements UserSession {
 
   @Id
-  @Column(name = "sessionId", length = 50)
+  @Column(name = "session_id", length = 50)
   @XmlElement(name = "sessionId")
   private String sessionId;
 

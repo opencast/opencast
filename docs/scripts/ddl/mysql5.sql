@@ -243,28 +243,36 @@ CREATE TABLE mh_upload (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
+CREATE TABLE mh_user_session (
+  session_id VARCHAR(50) NOT NULL,
+  user_ip VARCHAR(255),
+  user_agent VARCHAR(255),
+  user_id VARCHAR(255),
+  PRIMARY KEY (session_id)
+) ENGINE=InnoDB;
+
 CREATE TABLE mh_user_action (
   id BIGINT NOT NULL,
-  user_ip VARCHAR(255),
   inpoint INTEGER,
   outpoint INTEGER,
   mediapackage VARCHAR(128),
-  session VARCHAR(128),
+  session_id VARCHAR(50) NOT NULL,
   created DATETIME,
-  user_id VARCHAR(255),
   length INTEGER,
   type VARCHAR(128),
   playing TINYINT(1) DEFAULT 0,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
+ALTER TABLE mh_user_action ADD CONSTRAINT FK_mh_user_action_session_id FOREIGN KEY (session_id) REFERENCES mh_user_session (session_id);
+
 CREATE INDEX IX_mh_user_action_created ON mh_user_action (created);
 CREATE INDEX IX_mh_user_action_inpoint ON mh_user_action (inpoint);
 CREATE INDEX IX_mh_user_action_outpoint ON mh_user_action (outpoint);
 CREATE INDEX IX_mh_user_action_mediapackage_id ON mh_user_action (mediapackage);
-CREATE INDEX IX_mh_user_action_user_id ON mh_user_action (user_id);
-CREATE INDEX IX_mh_user_action_session_id ON mh_user_action (session);
 CREATE INDEX IX_mh_user_action_type ON mh_user_action (type);
+
+CREATE INDEX IX_mh_user_session_user_id ON mh_user_session (user_id);
 
 CREATE TABLE mh_oaipmh_harvesting (
   url VARCHAR(255) NOT NULL,
