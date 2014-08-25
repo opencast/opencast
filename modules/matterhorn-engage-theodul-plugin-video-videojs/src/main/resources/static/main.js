@@ -53,6 +53,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "fullscreen change happened", "trigger"),
         usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "trigger"),
         numberOfVideodisplaysSet: new Engage.Event("Video:numberOfVideodisplaysSet", "the number of videodisplays has been set", "trigger"),
+        aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "go to fullscreen", "handler"),
         fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "cancel fullscreen", "handler"),
@@ -244,7 +245,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     if ((aspectRatio != null) && (videoDisplays.length > 0)) {
                         aspectRatio[1] = parseInt(aspectRatio[1]);
                         aspectRatio[2] = parseInt(aspectRatio[2]);
-                        Engage.log("Video: Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+                        Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+			Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100]);
                         $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
                         $("." + id_videoDisplayClass).each(function(index) {
                             if ((index % 2) == 1) {
@@ -349,7 +351,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     if ((aspectRatio != null) && (videoDisplays.length > 0)) {
                         aspectRatio[1] = parseInt(aspectRatio[1]);
                         aspectRatio[2] = parseInt(aspectRatio[2]);
-                        Engage.log("Video: Aspect ratio: " + aspectRatio[0] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+                        Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+			Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
                         $("." + id_videoDisplayClass).css("width", "100%");
                         for (i = 0; i < videoDisplays.length; ++i) {
                             $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");

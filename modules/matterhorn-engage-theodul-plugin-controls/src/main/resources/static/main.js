@@ -49,7 +49,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         volumeSet: new Engage.Event("Video:volumeSet", "", "trigger"),
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "trigger"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
-        customError: new Engage.Event("Notification:customError", "an error occured", "trigger"),
         customOKMessage: new Engage.Event("Notification:customOKMessage", "a custom message with an OK button", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "handler"),
@@ -57,7 +56,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         timeupdate: new Engage.Event("Video:timeupdate", "notices a timeupdate", "handler"),
         ended: new Engage.Event("Video:ended", "end of the video", "handler"),
         usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
+        aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "trigger"),
     };
 
     var isDesktopMode = false;
@@ -103,6 +103,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     /* change these variables */
+    var embedWidthOne = 800;
+    var embedWidthTwo = 640;
+    var embedWidthThree = 520;
+    var embedWidthFour = 380;
+    var embedWidthFive = 280;
     var logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
     var bootstrapPath = 'js/bootstrap/js/bootstrap';
     var jQueryUIPath = 'js/jqueryui/jquery-ui';
@@ -127,6 +132,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_unmute_button = "unmute_button";
     var id_mute_button = "mute_button";
     var id_segmentNo = "segment_";
+    var id_embed0 = "embed0";
+    var id_embed1 = "embed1";
+    var id_embed2 = "embed2";
+    var id_embed3 = "embed3";
+    var id_embed4 = "embed4";
     var class_dropdown = "dropdown-toggle";
 
     /* don't change these variables */
@@ -144,6 +154,40 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var usingFlash = false;
     var segments = {};
     var mediapackageError = false;
+    var aspectRatioWidth;
+    var aspectRatioHeight;
+    var aspectRatio;
+    var embedHeightOne;
+    var embedHeightTwo;
+    var embedHeightThree;
+    var embedHeightFour;
+    var embedHeightFive;
+    var entityMap = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': '&quot;',
+        "'": '&#39;',
+        "/": '&#x2F;'
+    };
+
+    function escapeHtml(string) {
+        return String(string).replace(/[&<>"'\/]/g, function(s) {
+            return entityMap[s];
+        });
+    }
+
+    function getAspectRatioWidth(originalWidth, originalHeight, height) {
+        // new width = new height * original width / original height
+        var width = Math.round(height * originalWidth / originalHeight);
+        return width;
+    }
+
+    function getAspectRatioHeight(originalWidth, originalHeight, width) {
+        // new height = original height / original width * new width
+        var height = Math.round(originalHeight / originalWidth * width);
+        return height;
+    }
 
     var ControlsView = Backbone.View.extend({
         el: $("#" + id_engage_controls), // every view has an element associated with it
@@ -315,6 +359,44 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
     }
 
+    function triggerEmbedMessage(ratioWidth, ratioHeight) {
+        var str = window.location.href;
+        if (str.indexOf("mode=desktop") == -1) {
+            str += "&mode=embed";
+        } else {
+            str = replaceAll(str, "mode=desktop", "mode=embed");
+        }
+        var code = "<iframe src=\"" + str + "\" style=\"border:0px #FFFFFF none;\" name=\"Opencast Matterhorn - Theodul Pass Player\" scrolling=\"no\" frameborder=\"0\" marginheight=\"0px\" marginwidth=\"0px\" width=\"" + ratioWidth + "\" height=\"" + ratioHeight + "\"></iframe>";
+        code = escapeHtml(code);
+        Engage.trigger(plugin.events.customOKMessage.getName(), "Copy the following code and paste it in the body of your html page: <div class=\"well well-sm well-alert\">" + code + "</div>");
+    }
+
+    function addEmbedRatioEvents() {
+        if (!mediapackageError) {
+            // setup listeners for the playback rate
+            $("#" + id_embed0).click(function(e) {
+                e.preventDefault();
+                triggerEmbedMessage(embedWidthOne, embedHeightOne);
+            });
+            $("#" + id_embed1).click(function(e) {
+                e.preventDefault();
+                triggerEmbedMessage(embedWidthTwo, embedHeightTwo);
+            });
+            $("#" + id_embed2).click(function(e) {
+                e.preventDefault();
+                triggerEmbedMessage(embedWidthThree, embedHeightThree);
+            });
+            $("#" + id_embed3).click(function(e) {
+                e.preventDefault();
+                triggerEmbedMessage(embedWidthFour, embedHeightFour);
+            });
+            $("#" + id_embed4).click(function(e) {
+                e.preventDefault();
+                triggerEmbedMessage(embedWidthFive, embedHeightFive);
+            });
+        }
+    }
+
     /**
      * getVolume
      */
@@ -387,17 +469,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 }
             });
 
-            $("#" + id_embed_button).click(function(e) {
-                e.preventDefault();
-                var str = window.location.href;
-                if (str.indexOf("mode=desktop") == -1) {
-                    str += "&mode=embed";
-                } else {
-                    str = replaceAll(str, "mode=desktop", "mode=embed");
-                }
-                Engage.trigger(plugin.events.customOKMessage.getName(), "To embed the player use the following link:<br /><a href=\"" + str + "\" target=\"_blank\">" + str + "</a>");
-            });
-
             // slider events
             $("#" + id_slider).on(event_slidestart, function(event, ui) {
                 isSliding = true;
@@ -445,6 +516,23 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
     }
 
+    function calculateEmbedAspectRatios() {
+        if ((aspectRatioWidth > 0) && (aspectRatioHeight > 0)) {
+            embedHeightOne = getAspectRatioHeight(aspectRatioWidth, aspectRatioHeight, embedWidthOne);
+            embedHeightTwo = getAspectRatioHeight(aspectRatioWidth, aspectRatioHeight, embedWidthTwo);
+            embedHeightThree = getAspectRatioHeight(aspectRatioWidth, aspectRatioHeight, embedWidthThree);
+            embedHeightFour = getAspectRatioHeight(aspectRatioWidth, aspectRatioHeight, embedWidthFour);
+            embedHeightFive = getAspectRatioHeight(aspectRatioWidth, aspectRatioHeight, embedWidthFive);
+
+            $("#embed0").html("Embed very big-sized video");// (" + embedWidthOne + "x" + embedHeightOne + ")");
+            $("#embed1").html("Embed big-sized video");// (" + embedWidthTwo + "x" + embedHeightTwo + ")");
+            $("#embed2").html("Embed middle-sized video");// (" + embedWidthThree + "x" + embedHeightThree + ")");
+            $("#embed3").html("Embed small-sized video");// (" + embedWidthFour + "x" + embedHeightFour + ")");
+            $("#embed4").html("Embed very small-sized video");// (" + embedWidthFive + "x" + embedHeightFive + ")");
+            $("#embed_button").removeClass("disabled");
+        }
+    }
+
     /**
      * Initializes the plugin
      */
@@ -453,6 +541,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         if (isDesktopMode && plugin.inserted) {
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
 
+            Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
+                aspectRatioWidth = as[0] || 0;
+                aspectRatioHeight = as[1] || 0;
+                aspectRatio = as[2] || 0;
+                calculateEmbedAspectRatios();
+                addEmbedRatioEvents();
+            });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
             });
