@@ -103,11 +103,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     /* change these variables */
-    var embedWidthOne = 800;
-    var embedWidthTwo = 640;
-    var embedWidthThree = 520;
-    var embedWidthFour = 380;
-    var embedWidthFive = 280;
+    var embedHeightOne = 280;
+    var embedHeightTwo = 315;
+    var embedHeightThree = 360;
+    var embedHeightFour = 480;
+    var embedHeightFive = 720;
     var logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
     var bootstrapPath = 'js/bootstrap/js/bootstrap';
     var jQueryUIPath = 'js/jqueryui/jquery-ui';
@@ -157,11 +157,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var aspectRatioWidth;
     var aspectRatioHeight;
     var aspectRatio;
-    var embedHeightOne;
-    var embedHeightTwo;
-    var embedHeightThree;
-    var embedHeightFour;
-    var embedHeightFive;
+    var embedWidthOne;
+    var embedWidthTwo;
+    var embedWidthThree;
+    var embedWidthFour;
+    var embedWidthFive;
     var entityMap = {
         "&": "&amp;",
         "<": "&lt;",
@@ -368,7 +368,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
         var code = "<iframe src=\"" + str + "\" style=\"border:0px #FFFFFF none;\" name=\"Opencast Matterhorn - Theodul Pass Player\" scrolling=\"no\" frameborder=\"0\" marginheight=\"0px\" marginwidth=\"0px\" width=\"" + ratioWidth + "\" height=\"" + ratioHeight + "\"></iframe>";
         code = escapeHtml(code);
-        Engage.trigger(plugin.events.customOKMessage.getName(), "Copy the following code and paste it in the body of your html page: <div class=\"well well-sm well-alert\">" + code + "</div>");
+        Engage.trigger(plugin.events.customOKMessage.getName(), "Copy the following code and paste it to the body of your html page: <div class=\"well well-sm well-alert\">" + code + "</div>");
     }
 
     function addEmbedRatioEvents() {
@@ -518,17 +518,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     function calculateEmbedAspectRatios() {
         if ((aspectRatioWidth > 0) && (aspectRatioHeight > 0)) {
-            embedHeightOne = getAspectRatioHeight(aspectRatioWidth, aspectRatioHeight, embedWidthOne);
-            embedHeightTwo = getAspectRatioHeight(aspectRatioWidth, aspectRatioHeight, embedWidthTwo);
-            embedHeightThree = getAspectRatioHeight(aspectRatioWidth, aspectRatioHeight, embedWidthThree);
-            embedHeightFour = getAspectRatioHeight(aspectRatioWidth, aspectRatioHeight, embedWidthFour);
-            embedHeightFive = getAspectRatioHeight(aspectRatioWidth, aspectRatioHeight, embedWidthFive);
+            embedWidthOne = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightOne);
+            embedWidthTwo = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightTwo);
+            embedWidthThree = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightThree);
+            embedWidthFour = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFour);
+            embedWidthFive = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFive);
 
-            $("#embed0").html("Embed very big-sized video");// (" + embedWidthOne + "x" + embedHeightOne + ")");
-            $("#embed1").html("Embed big-sized video");// (" + embedWidthTwo + "x" + embedHeightTwo + ")");
-            $("#embed2").html("Embed middle-sized video");// (" + embedWidthThree + "x" + embedHeightThree + ")");
-            $("#embed3").html("Embed small-sized video");// (" + embedWidthFour + "x" + embedHeightFour + ")");
-            $("#embed4").html("Embed very small-sized video");// (" + embedWidthFive + "x" + embedHeightFive + ")");
+            $("#embed0").html("Embed " + embedWidthOne + "x" + embedHeightOne);
+            $("#embed1").html("Embed " + embedWidthTwo + "x" + embedHeightTwo);
+            $("#embed2").html("Embed " + embedWidthThree + "x" + embedHeightThree);
+            $("#embed3").html("Embed " + embedWidthFour + "x" + embedHeightFour);
+            $("#embed4").html("Embed " + embedWidthFive + "x" + embedHeightFive);
             $("#embed_button").removeClass("disabled");
         }
     }
