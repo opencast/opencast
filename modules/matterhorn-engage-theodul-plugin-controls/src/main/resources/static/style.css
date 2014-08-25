@@ -14,6 +14,11 @@
     margin-top: 13px;
 }
 
+.well-alert {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
 .controlbutton {
     float: left;
     margin: 0px 3px;
