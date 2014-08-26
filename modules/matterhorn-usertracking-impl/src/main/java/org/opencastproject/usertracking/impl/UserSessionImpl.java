@@ -63,7 +63,7 @@ public class UserSessionImpl implements UserSession {
    * No Arg Constructor for JAXB
    */
   public UserSessionImpl() {
-    
+
   }
 
   public String getUserId() {

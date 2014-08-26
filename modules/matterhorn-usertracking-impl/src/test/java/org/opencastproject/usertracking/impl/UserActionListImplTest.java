@@ -36,7 +36,7 @@ public class UserActionListImplTest {
     us1.setSessionId("4");
     us1.setUserId("testing user");
     us1.setUserIp("127.0.0.1");
-    
+
     UserSession us2 = new UserSessionImpl();
     us2.setSessionId("6");
     us2.setUserId("testing user 2");
@@ -104,7 +104,7 @@ public class UserActionListImplTest {
     us1.setSessionId("4");
     us1.setUserId("testing user");
     us1.setUserIp("127.0.0.1");
-    
+
     UserSession us2 = new UserSessionImpl();
     us2.setSessionId("6");
     us2.setUserId("testing user 2");

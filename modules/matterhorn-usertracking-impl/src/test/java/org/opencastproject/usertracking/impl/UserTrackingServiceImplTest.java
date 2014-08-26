@@ -1315,7 +1315,7 @@ public class UserTrackingServiceImplTest {
     userSession.setUserIp(userIp);
     return userSession;
   }
-  
+
   /**
    * Creates a user action with an arbitrary date
    * @throws Exception
