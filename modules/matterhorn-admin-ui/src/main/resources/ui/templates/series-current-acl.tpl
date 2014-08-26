@@ -6,8 +6,8 @@
         <input type="checkbox" class="override" /> Override
     </span>
     <span>
-        <select class="acl" id="acl-<%! this.id %>">
-            <%! this.acl %>
+        <select class="acl" id="acl-<%= this.id %>">
+            <%= this.acl %>
         </select>
         <span class="aclLabel"></span>
     </span>
