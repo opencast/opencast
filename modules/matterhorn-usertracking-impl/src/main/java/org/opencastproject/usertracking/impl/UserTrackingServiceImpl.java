@@ -162,9 +162,9 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     a.setType(FOOTPRINT_KEY);
     EntityManager em = null;
     EntityTransaction tx = null;
-    if (!logIp) a.setUserIp("-omitted-");
-    if (!logUser) a.setUserId("-omitted-");
-    if (!logSession) a.setSessionId("-omitted-");
+    if (!logIp) session.setUserIp("-omitted-");
+    if (!logUser) session.setUserId("-omitted-");
+    if (!logSession) session.setSessionId("-omitted-");
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
@@ -209,9 +209,9 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   public UserAction addUserTrackingEvent(UserAction a, UserSession session) throws UserTrackingException {
     EntityManager em = null;
     EntityTransaction tx = null;
-    if (!logIp) a.setUserIp("-omitted-");
-    if (!logUser) a.setUserId("-omitted-");
-    if (!logSession) a.setSessionId("-omitted-");
+    if (!logIp) session.setUserIp("-omitted-");
+    if (!logUser) session.setUserId("-omitted-");
+    if (!logSession) session.setSessionId("-omitted-");
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
