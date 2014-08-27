@@ -1,9 +1,29 @@
 /*theodul video videojs plugin, embed mode styles*/
 
 .vjs-openInPlayer {
-	float: right !important;
+    float: right !important;
 }
 
 .vjs-openInPlayer:before {
-	content: "\e00e";
+    content: "\e00e";
+}
+
+.vjs-switchPlayer {
+    float: right !important;
+}
+
+.vjs-switchPlayer-value {
+    font-size: 1.5em;
+    line-height: 2;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.btn-video {
+    text-transform: none !important;
 }
