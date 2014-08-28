@@ -71,7 +71,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
     var mediapackageError = false;
 
     function browserSupported() {
-        return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari);
+        return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) /* || (Bowser.safari && Bowser.version >= browser_minVersion_safari) */ ;
     }
 
     // theodul core init
@@ -236,6 +236,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                                                 location.reload();
                                             });
                                             $("#" + id_engage_view).hide().detach();
+                                            $("body").css("min-width", "");
                                             $("#" + id_customError).show();
                                         } else {
                                             $("#" + id_customError).detach();
@@ -244,7 +245,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                                 }
                             } else {
                                 $("#" + id_engage_view + ", #" + id_customError).hide().detach();
-                                $("#" + browserWarning).show();
+                                $("body").css("min-width", "");
+                                $("#" + id_browserWarning).show();
                             }
                         }, loadingDelay2);
                     }, loadingDelay1);
