@@ -364,7 +364,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                             "<span class=\"" + class_vjs_control_text + "\">Switch player</span>" +
                             "</div>" +
                             "<div id=\"" + id_switchPlayer_value + "\" class=\"" + class_vjs_switchPlayer_value + "\">" +
-                            "V1" +
+                            "Vid. 1" +
                             "</div>" +
                             "<div class=\"" + class_vjs_menu + "\">" +
                             "<ul class=\"" + class_vjs_menu_content + "\">" +
