@@ -103,6 +103,7 @@
 }
 
 #browserWarning {
+    min-width: 200px;
     display: none;
     margin: 5%;
 }
