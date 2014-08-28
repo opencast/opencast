@@ -7,13 +7,13 @@
         <input type="checkbox" class="override" /> Override
     </span>
     <span>
-        <select class="acl" id="acl-<%! this.id %>">
-            <%! this.acl %>
+        <select class="acl" id="acl-<%= this.id %>">
+            <%= this.acl %>
         </select>
     </span>
     <span>
-        <select class="workflows" id="workflowDef-<%! this.id %>">
-            <%! this.workflows %>
+        <select class="workflows" id="workflowDef-<%= this.id %>">
+            <%= this.workflows %>
         </select>
     </span>
     <span>
