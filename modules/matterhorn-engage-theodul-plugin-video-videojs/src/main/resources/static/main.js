@@ -162,6 +162,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var event_sjs_buffering = "sjs:buffering";
     var event_sjs_bufferedAndAutoplaying = "sjs:bufferedAndAutoplaying";
     var event_sjs_bufferedButNotAutoplaying = "sjs:bufferedButNotAutoplaying";
+    var currentlySelectedVideodisplay = 0;
+    var globalVideoSource = new Array();
 
     function escapeRegExp(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -226,13 +228,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     // TODO: Same code as above...
                     else if (videoSources.presentation && videoSources.presentation[i] && videoSources.presentation[i].resolution) {
                         for (var j = 0; j < videoSources.presenter.length; ++j) {
-                            var aspectRatio_tmp = videoSources.presenter[j].resolution;
+                            var aspectRatio_tmp = videoSources.presentation[j].resolution;
                             var t_tmp = $.type(aspectRatio_tmp);
                             if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) {
                                 aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
                                 if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
                                     as1 = parseInt(aspectRatio_tmp[1]);
-                                    aspectRatio = videoSources.presenter[j].resolution;
+                                    aspectRatio = videoSources.presentation[j].resolution;
                                 }
                             }
                         }
@@ -341,14 +343,21 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     }
                 } else if (isEmbedMode) {
                     var nrOfVideoSources = 0;
+                    var init = false;
                     for (var v in videoSources) {
                         if (videoSources[v].length > 0) {
-                            initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
-                            break; // just init the first video
+                            if (!init) { // just init the first video
+                                init = true;
+                                initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
+                            }
+                            globalVideoSource.push({
+                                id: videoDisplays[i],
+                                src: videoSources[v]
+                            });
                         }
                     }
 
-                    if (videoDisplays.length > 1) {
+                    if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
                         $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_switchPlayer + "\" class=\"" + class_vjs_switchPlayer + " " + class_vjs_control + " " + class_vjs_menu_button + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"></div>");
                         $("#" + id_btn_switchPlayer).append(
                             "<div class=\"vjs-control-content\">" +
@@ -364,6 +373,20 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                             "</ul>" +
                             "</div>"
                         );
+                        $("#" + id_btn_video1).click(function(e) {
+                            $("#" + id_switchPlayer_value).html("Vid. 1");
+                            if (!currentlySelectedVideodisplay == 0) {
+                                currentlySelectedVideodisplay = 0;
+                                videojs(globalVideoSource[0].id).src(globalVideoSource[0].src);
+                            }
+                        });
+                        $("#" + id_btn_video2).click(function(e) {
+                            $("#" + id_switchPlayer_value).html("Vid. 2");
+                            if (!currentlySelectedVideodisplay == 1) {
+                                currentlySelectedVideodisplay = 1;
+                                videojs(globalVideoSource[1].id).src(globalVideoSource[1].src);
+                            }
+                        });
                     }
                     $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">Open in player</span></div></div>");
 
@@ -375,16 +398,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         } else {
                             str = replaceAll(str, "mode=embed", "mode=desktop");
                         }
+                        Engage.trigger(plugin.events.pause.getName(), false);
                         window.open(str, "_blank");
                     });
-		    $("#" + id_btn_video1).click(function(e) {
-			$("#" + id_switchPlayer_value).html("V1");
-			Engage.trigger(plugin.events.customError.getName(), "Switching the videodisplays is coming soon.");
-		    });
-		    $("#" + id_btn_video2).click(function(e) {
-			$("#" + id_switchPlayer_value).html("V2");
-			Engage.trigger(plugin.events.customError.getName(), "Switching the videodisplays is coming soon.");
-		    });
 
                     if ((aspectRatio != null) && (videoDisplays.length > 0)) {
                         aspectRatio[1] = parseInt(aspectRatio[1]);
@@ -418,6 +434,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             }
         }
     });
+
+    function switchToVideo() {
+
+    }
 
     var VideoDataModel = Backbone.Model.extend({
         initialize: function(ids, videoSources, duration) {
