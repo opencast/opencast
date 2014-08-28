@@ -113,6 +113,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var videojs_swf_path = "lib/videojs/video-js.swf";
     var videoDisplaySizeFactor = 1.1;
     var videoDisplaySizeTimesCheck = 100; // the smaller the factor, the higher the times check!
+    var checkVideoDisplaySizeTimeout = 1500;
 
     /* don't change these variables */
     var aspectRatio = "";
@@ -129,6 +130,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_btn_fullscreenCancel = "btn_fullscreenCancel";
     var id_generated_videojs_flash_component = "videojs_videodisplay_0_flash_api";
     var id_btn_openInPlayer = "btn_openInPlayer";
+    var id_btn_switchPlayer = "btn_switchPlayer";
+    var id_btn_video1 = "btn-video1";
+    var id_btn_video2 = "btn-video2";
+    var id_switchPlayer_value = "switchPlayer-value";
+    var class_vjs_switchPlayer = "vjs-switchPlayer";
+    var class_btn_video = "btn-video";
+    var class_vjs_menu_button = "vjs-menu-button";
+    var class_vjs_switchPlayer_value = "vjs-switchPlayer-value";
+    var class_vjs_menu = "vjs-menu";
+    var class_vjs_menu_content = "vjs-menu-content";
+    var class_vjs_menu_item = "vjs-menu-item";
     var class_vjsposter = "vjs-poster";
     var class_vjs_openInPlayer = "vjs-openInPlayer";
     var class_vjs_control = "vjs-control";
@@ -150,6 +162,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var event_sjs_buffering = "sjs:buffering";
     var event_sjs_bufferedAndAutoplaying = "sjs:bufferedAndAutoplaying";
     var event_sjs_bufferedButNotAutoplaying = "sjs:bufferedButNotAutoplaying";
+    var currentlySelectedVideodisplay = 0;
+    var globalVideoSource = new Array();
 
     function escapeRegExp(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -214,13 +228,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     // TODO: Same code as above...
                     else if (videoSources.presentation && videoSources.presentation[i] && videoSources.presentation[i].resolution) {
                         for (var j = 0; j < videoSources.presenter.length; ++j) {
-                            var aspectRatio_tmp = videoSources.presenter[j].resolution;
+                            var aspectRatio_tmp = videoSources.presentation[j].resolution;
                             var t_tmp = $.type(aspectRatio_tmp);
                             if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) {
                                 aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
                                 if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
                                     as1 = parseInt(aspectRatio_tmp[1]);
-                                    aspectRatio = videoSources.presenter[j].resolution;
+                                    aspectRatio = videoSources.presentation[j].resolution;
                                 }
                             }
                         }
@@ -246,7 +260,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         aspectRatio[1] = parseInt(aspectRatio[1]);
                         aspectRatio[2] = parseInt(aspectRatio[2]);
                         Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-			Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100]);
+                        Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100]);
                         $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
                         $("." + id_videoDisplayClass).each(function(index) {
                             if ((index % 2) == 1) {
@@ -328,13 +342,52 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         });
                     }
                 } else if (isEmbedMode) {
+                    var nrOfVideoSources = 0;
+                    var init = false;
                     for (var v in videoSources) {
                         if (videoSources[v].length > 0) {
-                            initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
-                            break; // just init the first video
+                            if (!init) { // just init the first video
+                                init = true;
+                                initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
+                            }
+                            globalVideoSource.push({
+                                id: videoDisplays[i],
+                                src: videoSources[v]
+                            });
                         }
                     }
 
+                    if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
+                        $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_switchPlayer + "\" class=\"" + class_vjs_switchPlayer + " " + class_vjs_control + " " + class_vjs_menu_button + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"></div>");
+                        $("#" + id_btn_switchPlayer).append(
+                            "<div class=\"vjs-control-content\">" +
+                            "<span class=\"" + class_vjs_control_text + "\">Switch player</span>" +
+                            "</div>" +
+                            "<div id=\"" + id_switchPlayer_value + "\" class=\"" + class_vjs_switchPlayer_value + "\">" +
+                            "Vid. 1" +
+                            "</div>" +
+                            "<div class=\"" + class_vjs_menu + "\">" +
+                            "<ul class=\"" + class_vjs_menu_content + "\">" +
+                            "<li id=\"" + id_btn_video1 + "\" aria-selected=\"true\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">Video 1</li>" +
+                            "<li id=\"" + id_btn_video2 + "\" aria-selected=\"false\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">Video 2</li>" +
+                            "</ul>" +
+                            "</div>"
+                        );
+                        $("#" + id_btn_video1).click(function(e) {
+                            $("#" + id_switchPlayer_value).html("Vid. 1");
+                            if (!currentlySelectedVideodisplay == 0) {
+                                currentlySelectedVideodisplay = 0;
+                                videojs(globalVideoSource[0].id).src(globalVideoSource[0].src);
+                            }
+                        });
+                        $("#" + id_btn_video2).click(function(e) {
+                            $("#" + id_switchPlayer_value).html("Vid. 2");
+                            if (!currentlySelectedVideodisplay == 1) {
+                                currentlySelectedVideodisplay = 1;
+                                videojs(globalVideoSource[1].id).src(globalVideoSource[1].src);
+                            }
+                        });
+                    }
                     $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">Open in player</span></div></div>");
 
                     $("#" + id_btn_openInPlayer).click(function(e) {
@@ -345,14 +398,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         } else {
                             str = replaceAll(str, "mode=embed", "mode=desktop");
                         }
-                        window.location = str;
+                        Engage.trigger(plugin.events.pause.getName(), false);
+                        window.open(str, "_blank");
                     });
 
                     if ((aspectRatio != null) && (videoDisplays.length > 0)) {
                         aspectRatio[1] = parseInt(aspectRatio[1]);
                         aspectRatio[2] = parseInt(aspectRatio[2]);
                         Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-			Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
+                        Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
                         $("." + id_videoDisplayClass).css("width", "100%");
                         for (i = 0; i < videoDisplays.length; ++i) {
                             $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
@@ -376,9 +430,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     }
                 }
                 checkVideoDisplaySize();
+                window.setTimeout(checkVideoDisplaySize, checkVideoDisplaySizeTimeout);
             }
         }
     });
+
+    function switchToVideo() {
+
+    }
 
     var VideoDataModel = Backbone.Model.extend({
         initialize: function(ids, videoSources, duration) {
