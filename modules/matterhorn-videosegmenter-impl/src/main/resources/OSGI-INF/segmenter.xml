@@ -13,8 +13,6 @@
       policy="static" bind="setWorkspace" />
     <reference name="Mpeg7Service" interface="org.opencastproject.metadata.mpeg7.Mpeg7CatalogService"
       cardinality="1..1" policy="static" bind="setMpeg7CatalogService" />
-    <reference name="ComposerService" interface="org.opencastproject.composer.api.ComposerService"
-      cardinality="1..1" policy="static" bind="setComposerService" />
     <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
       cardinality="1..1" policy="static" bind="setSecurityService" />
     <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"

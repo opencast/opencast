@@ -11,18 +11,13 @@
   </parent>
   <properties>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
+    <checkstyle.skip>true</checkstyle.skip>
   </properties>
   <dependencies>
     <!-- Matterhorn dependencies -->
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-videosegmenter-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-composer-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

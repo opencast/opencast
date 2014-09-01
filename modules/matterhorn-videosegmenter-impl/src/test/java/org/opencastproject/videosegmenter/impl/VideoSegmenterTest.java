@@ -75,7 +75,7 @@ public class VideoSegmenterTest {
   protected static final long mediaDuration = 20000L;
 
   /** Duration of the first segment */
-  protected static final long firstSegmentDuration = 11000L;
+  protected static final long firstSegmentDuration = 12000L;
 
   /** Duration of the seconds segment */
   protected static final long secondSegmentDuration = mediaDuration - firstSegmentDuration;
