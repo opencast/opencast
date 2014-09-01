@@ -55,11 +55,13 @@ import org.opencastproject.textextractor.api.TextLine;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -223,8 +225,14 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
       logger.info("Text extraction of {} finished, {} lines found", attachment.getURI(), videoTexts.length);
 
       URI uri;
+      InputStream in;
       try {
-        uri = workspace.putInCollection(COLLECTION_ID, job.getId() + ".xml", mpeg7CatalogService.serialize(mpeg7));
+        in = mpeg7CatalogService.serialize(mpeg7);
+      } catch (IOException e) {
+        throw new TextAnalyzerException("Error serializing mpeg7", e);
+      }
+      try {
+        uri = workspace.putInCollection(COLLECTION_ID, job.getId() + ".xml", in);
       } catch (IOException e) {
         throw new TextAnalyzerException("Unable to put mpeg7 into the workspace", e);
       }
@@ -343,8 +351,13 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
         logger.debug("No languages installed.  For better results, please install at least one language pack");
         text = new TextualImpl(line.getText());
       }
-      videoText.setText(text);
-      videoTexts.add(videoText);
+
+      if (StringUtils.isNotBlank(text.getText())) {
+        videoText.setText(text);
+        videoTexts.add(videoText);
+      } else {
+        logger.debug("No valid text found for line '{}'", line);
+      }
     }
     return videoTexts.toArray(new VideoText[videoTexts.size()]);
   }
