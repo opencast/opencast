@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.migration.IncidentMigrationService" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.migration.IncidentMigrationService" />
+  <property name="service.description" value="Incident Migration Service" />
+  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    cardinality="1..1" policy="static" bind="setServiceRegistry" />
+  <reference name="incidentService" interface="org.opencastproject.serviceregistry.api.IncidentService"
+    cardinality="1..1" policy="static" />
+</scr:component>

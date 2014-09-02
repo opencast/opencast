@@ -15,24 +15,32 @@
  */
 package org.opencastproject.util.data;
 
-import org.junit.Test;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.data.Arrays.array;
+import static org.opencastproject.util.data.Collections.iterator;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.repeat;
+import static org.opencastproject.util.data.Iterators.constant;
+import static org.opencastproject.util.data.Iterators.intRangeE;
+import static org.opencastproject.util.data.Monadics.IteratorMonadic;
+import static org.opencastproject.util.data.Monadics.mlazy;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.util.data.functions.Booleans;
 import org.opencastproject.util.data.functions.Functions;
+
+import org.junit.Test;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
-import static org.opencastproject.util.data.Arrays.array;
-import static org.opencastproject.util.data.Collections.*;
-import static org.opencastproject.util.data.Iterators.constant;
-import static org.opencastproject.util.data.Iterators.intRangeE;
-import static org.opencastproject.util.data.Monadics.*;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 public class MonadicsTest {
 
@@ -146,6 +154,14 @@ public class MonadicsTest {
     assertEquals(3, mlist(asList(1, 2, 3, 4, 5).iterator()).take(3).value().size());
     assertEquals(5, mlist(asList(1, 2, 3, 4, 5).iterator()).take(5).value().size());
     assertEquals(5, mlist(asList(1, 2, 3, 4, 5).iterator()).take(10).value().size());
+  }
+
+  @Test
+  public void testDropArray() {
+    assertTrue(mlist(array(1, 2, 3, 4, 5)).drop(10).value().isEmpty());
+    assertEquals(3, mlist(array(1, 2, 3, 4, 5)).drop(2).value().size());
+    assertEquals(1, mlist(array(1, 2, 3, 4, 5)).drop(4).value().size());
+    assertEquals(5, mlist(array(1, 2, 3, 4, 5)).drop(0).value().size());
   }
 
   @Test

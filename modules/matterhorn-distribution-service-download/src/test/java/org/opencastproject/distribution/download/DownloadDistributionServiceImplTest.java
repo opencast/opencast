@@ -33,6 +33,7 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.PathSupport;
@@ -42,7 +43,6 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.workspace.api.Workspace;
 
 import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -125,7 +125,7 @@ public class DownloadDistributionServiceImplTest {
     service.setSecurityService(securityService);
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     service.setServiceRegistry(serviceRegistry);
     service.setTrustedHttpClient(httpClient);
     service.distributionDirectory = distributionRoot;

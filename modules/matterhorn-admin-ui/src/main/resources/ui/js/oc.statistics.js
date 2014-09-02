@@ -48,6 +48,7 @@ ocStatistics = new (function() {
     "org_opencastproject_distribution_download"  : "Media distribution (local downloads)",
     "org_opencastproject_distribution_streaming" : "Media distribution (local streaming)",
     "org_opencastproject_distribution_itunesu"   : "Media distribution (iTunes)",
+    "org_opencastproject_nop"                    : "No Operation Service (Testing)",
     "org_opencastproject_publication_youtube"    : "Media publication (YouTube)",
     "org_opencastproject_smil"                   : "SMIL service",
     "org_opencastproject_videoeditor"            : "Video editor",

@@ -20,6 +20,16 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-json</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-workflow-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>jsr311-api</artifactId>
     </dependency>
@@ -38,11 +48,6 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-json</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -126,9 +131,15 @@
             <Service-Component>
               OSGI-INF/serviceregistry.xml,
               OSGI-INF/maintenance_shell.xml,
-              OSGI-INF/serviceregistry-endpoint.xml
+              OSGI-INF/serviceregistry-endpoint.xml,
+              OSGI-INF/incident-service.xml,
+              OSGI-INF/incident-service-endpoint.xml,
+              OSGI-INF/nop-service.xml
             </Service-Component>
-            <JPA-PersistenceUnits>org.opencastproject.serviceregistry</JPA-PersistenceUnits>
+            <JPA-PersistenceUnits>
+              org.opencastproject.serviceregistry,
+              org.opencastproject.incident
+            </JPA-PersistenceUnits>
           </instructions>
         </configuration>
       </plugin>

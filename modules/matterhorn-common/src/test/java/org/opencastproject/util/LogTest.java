@@ -30,7 +30,7 @@ public class LogTest {
     log.info("hello");
     log.endUnitOfWork();
     log.info("hello");
-    spawnThread(log.getUnitOfWork());
+    spawnThread(log.getContext());
     log.endUnitOfWork();
     log.endUnitOfWork();
     log.endUnitOfWork();
@@ -41,7 +41,7 @@ public class LogTest {
 
   private void spawnThread(List<String> unitOfWork) {
     final Log log = new Log(LoggerFactory.getLogger(LogTest.class));
-    log.continueUnitOfWork(unitOfWork);
+    log.continueContext(unitOfWork);
     log.info("new thread");
   }
 }
