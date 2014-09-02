@@ -116,10 +116,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_volume = "volume";
     var id_volumeIcon = "volumeIcon";
     var id_dropdownMenuPlaybackRate = "dropdownMenuPlaybackRate";
-    var id_playbackRate05 = "playback05";
-    var id_playbackRate10 = "playback10";
-    var id_playbackRate15 = "playback15";
-    var id_playbackRate20 = "playback20";
+    var id_playbackRate050 = "playback050";
+    var id_playbackRate075 = "playback075";
+    var id_playbackRate100 = "playback100";
+    var id_playbackRate125 = "playback125";
+    var id_playbackRate150 = "playback150";
     var id_playpause_controls = "playpause_controls";
     var id_fullscreen_button = "fullscreen_button";
     var id_embed_button = "embed_button";
@@ -137,6 +138,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_embed2 = "embed2";
     var id_embed3 = "embed3";
     var id_embed4 = "embed4";
+    var id_playbackRateIndicator = "playbackRateIndicator";
     var class_dropdown = "dropdown-toggle";
 
     /* don't change these variables */
@@ -340,21 +342,30 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     function addNonFlashEvents() {
         if (!mediapackageError && !usingFlash) {
             // setup listeners for the playback rate
-            $("#" + id_playbackRate05).click(function(e) {
+            $("#" + id_playbackRate050).click(function(e) {
                 e.preventDefault();
+                $("#" + id_playbackRateIndicator).html("0.5");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5);
             });
-            $("#" + id_playbackRate10).click(function(e) {
+            $("#" + id_playbackRate075).click(function(e) {
                 e.preventDefault();
+                $("#" + id_playbackRateIndicator).html("0.75");
+                Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75);
+            });
+            $("#" + id_playbackRate100).click(function(e) {
+                e.preventDefault();
+                $("#" + id_playbackRateIndicator).html("1.0");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0);
             });
-            $("#" + id_playbackRate15).click(function(e) {
+            $("#" + id_playbackRate125).click(function(e) {
                 e.preventDefault();
-                Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5);
+                $("#" + id_playbackRateIndicator).html("1.25");
+                Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25);
             });
-            $("#" + id_playbackRate20).click(function(e) {
+            $("#" + id_playbackRate150).click(function(e) {
                 e.preventDefault();
-                Engage.trigger(plugin.events.playbackRateChanged.getName(), 2.0);
+                $("#" + id_playbackRateIndicator).html("1.5");
+                Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5);
             });
         }
     }
@@ -373,7 +384,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     function addEmbedRatioEvents() {
         if (!mediapackageError) {
-            // setup listeners for the playback rate
+            // setup listeners for the embed
             $("#" + id_embed0).click(function(e) {
                 e.preventDefault();
                 triggerEmbedMessage(embedWidthOne, embedHeightOne);

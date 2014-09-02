@@ -37,34 +37,36 @@
     <!-- ##### Navigation ##### -->
     <div id="menu">
         <div class="btn-group">
-            <button id="fullscreen_button" type="button" class="btn btn-default disabled">
-            <span class="glyphicon glyphicon-fullscreen"></span>
-            </button>
             <div class="btn-group">
                 <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown">
                 <span class="glyphicon glyphicon-time"></span>
+                <span id="playbackRateIndicator">1.0</span>
                 <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
-                    <li role="presentation"><a id="playback05" role="menuitem" tabindex="-1" href="#">0.5</a></li>
-                    <li role="presentation"><a id="playback10" role="menuitem" tabindex="-1" href="#">1.0</a></li>
-                    <li role="presentation"><a id="playback15" role="menuitem" tabindex="-1" href="#">1.5</a></li>
-                    <li role="presentation"><a id="playback20" role="menuitem" tabindex="-1" href="#">2.0</a></li>
+                    <li role="presentation"><a id="playback050" role="menuitem" tabindex="-1" href="#">0.5</a></li>
+                    <li role="presentation"><a id="playback075" role="menuitem" tabindex="-1" href="#">0.75</a></li>
+                    <li role="presentation"><a id="playback100" role="menuitem" tabindex="-1" href="#">1.0</a></li>
+                    <li role="presentation"><a id="playback125" role="menuitem" tabindex="-1" href="#">1.25</a></li>
+                    <li role="presentation"><a id="playback150" role="menuitem" tabindex="-1" href="#">1.5</a></li>
                 </ul>
             </div>
-            <div class="btn-group">
-                <button id="embed_button" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown">
-                <span class="glyphicon glyphicon-share"></span>
-                <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu">
-                    <li role="presentation"><a id="embed0" role="menuitem" tabindex="-1" href="#"></a></li>
-                    <li role="presentation"><a id="embed1" role="menuitem" tabindex="-1" href="#"></a></li>
-                    <li role="presentation"><a id="embed2" role="menuitem" tabindex="-1" href="#"></a></li>
-                    <li role="presentation"><a id="embed3" role="menuitem" tabindex="-1" href="#"></a></li>
-                    <li role="presentation"><a id="embed4" role="menuitem" tabindex="-1" href="#"></a></li>
-                </ul>
-            </div>
+            <button id="fullscreen_button" type="button" class="btn btn-default disabled">
+            <span class="glyphicon glyphicon-fullscreen"></span>
+            </button>
+        </div>
+        <div class="btn-group">
+            <button id="embed_button" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-share"></span>
+            <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation"><a id="embed0" role="menuitem" tabindex="-1" href="#"></a></li>
+                <li role="presentation"><a id="embed1" role="menuitem" tabindex="-1" href="#"></a></li>
+                <li role="presentation"><a id="embed2" role="menuitem" tabindex="-1" href="#"></a></li>
+                <li role="presentation"><a id="embed3" role="menuitem" tabindex="-1" href="#"></a></li>
+                <li role="presentation"><a id="embed4" role="menuitem" tabindex="-1" href="#"></a></li>
+            </ul>
         </div>
     </div>
     <div class="clear"></div>

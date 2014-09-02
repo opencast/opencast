@@ -71,7 +71,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
     var mediapackageError = false;
 
     function browserSupported() {
-        return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) /* || (Bowser.safari && Bowser.version >= browser_minVersion_safari) */ ;
+        return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari);
     }
 
     // theodul core init

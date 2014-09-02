@@ -1,7 +1,7 @@
 /*Core desktop css rules*/
 
 body {
-    min-width: 800px;
+    min-width: 840px;
     font-family: Arial, sans-serif;
 }
 
@@ -20,7 +20,7 @@ h1, h2, h3 {
     padding: 5px 0px 10px 20px;
     margin-bottom: 20px;
     border: 1px solid #ddd;
-    min-width: 800px;
+    min-width: 840px;
 }
 
 #engage_content {
@@ -80,7 +80,7 @@ h1, h2, h3 {
 #engage_timeline_plugin {
     display: none;
     width: 100%;
-    min-width: 800px;
+    min-width: 840px;
     background: #f9f9f9;
     border-top: 1px solid #e3e3e3;
     border-bottom: 1px solid #e3e3e3;
