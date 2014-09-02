@@ -18,7 +18,6 @@ package org.opencastproject.smil.impl;
 import java.net.URI;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
@@ -243,9 +242,8 @@ public class SmilServiceImplTest {
     fail("SmilException schould be thrown if you try to add an invalid track.");
   }
 
-  @Ignore
-  @Test(expected = SmilException.class)
-  public void testAddClipWithInvalidTrackDuration() throws Exception {
+  @Test
+  public void testAddClipWithUnsetTrackDuration() throws Exception {
     TrackImpl videoTrack = new TrackImpl();
     videoTrack.setIdentifier("track-1");
     videoTrack.setFlavor(new MediaPackageElementFlavor("source", "presentation"));
@@ -255,7 +253,22 @@ public class SmilServiceImplTest {
 
     SmilResponse smilResponse = smilService.createNewSmil();
     smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 0, 10);
-    fail("SmilException schould be thrown if you try to add an invalid track.");
+    assertTrue("Smil service does not add new par element", smilResponse.getEntitiesCount() > 0);
+    assertNotNull(smilResponse.getEntities());
+  }
+
+  @Test(expected = SmilException.class)
+  public void testAddClipStartValueBiggerThanDuration() throws Exception {
+    TrackImpl videoTrack = new TrackImpl();
+    videoTrack.setIdentifier("track-1");
+    videoTrack.setFlavor(new MediaPackageElementFlavor("source", "presentation"));
+    videoTrack.setURI(new URI("http://hostname/video.mp4"));
+    videoTrack.addStream(new VideoStreamImpl());
+    videoTrack.setDuration(new Long(1000));
+
+    SmilResponse smilResponse = smilService.createNewSmil();
+    smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 1000, 10);
+    fail("Sequence start value is equal track duration but SmilService does not throw an SmilException.");
   }
 
   @Test(expected = SmilException.class)
