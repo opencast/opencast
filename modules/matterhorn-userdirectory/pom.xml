@@ -76,6 +76,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <version>1.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>c3p0</groupId>
       <artifactId>c3p0</artifactId>
       <scope>test</scope>
@@ -113,12 +119,15 @@
             </Export-Package>
             <Import-Package>
               org.opencastproject.kernel.security.persistence;version=${project.version},
+              org.json.simple,
+			  org.json.simple.parser,
               *;resolution:=optional
             </Import-Package>
             <Service-Component>
               OSGI-INF/userdirectory-service.xml,
               OSGI-INF/group-role-provider.xml,
-              OSGI-INF/user-reference-provider.xml
+              OSGI-INF/user-reference-provider.xml,
+              OSGI-INF/user_endpoint.xml
             </Service-Component>
             <JPA-PersistenceUnits>
               org.opencastproject.userdirectory

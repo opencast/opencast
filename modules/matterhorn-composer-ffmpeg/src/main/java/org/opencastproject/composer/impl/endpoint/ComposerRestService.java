@@ -436,15 +436,14 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "concat", description = "Starts a video concating process from multiple videos, based on the specified encoding profile ID and the source tracks", restParameters = {
           @RestParameter(description = "The source tracks to concat as XML", isRequired = true, name = "sourceTracks", type = Type.TEXT),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING),
-          @RestParameter(description = "The resolution dimension of the concat video as JSON", isRequired = true, name = "outputDimension", type = Type.STRING) }, reponses = {
+          @RestParameter(description = "The resolution dimension of the concat video as JSON", isRequired = false, name = "outputDimension", type = Type.STRING) }, reponses = {
           @RestResponse(description = "Results in an xml document containing the video track", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If required parameters aren't set or if sourceTracks aren't from the type Track or not at lest two tracks are present", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response concat(@FormParam("sourceTracks") String sourceTracksXml, @FormParam("profileId") String profileId,
           @FormParam("outputDimension") String outputDimension) throws Exception {
     // Ensure that the POST parameters are present
-    if (StringUtils.isBlank(sourceTracksXml) || StringUtils.isBlank(profileId) || StringUtils.isBlank(outputDimension))
-      return Response.status(Response.Status.BAD_REQUEST)
-              .entity("sourceTracks, outputDimension and profileId must not be null").build();
+    if (StringUtils.isBlank(sourceTracksXml) || StringUtils.isBlank(profileId))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceTracks and profileId must not be null").build();
 
     // Deserialize the source track
     List<? extends MediaPackageElement> tracks = MediaPackageElementParser.getArrayFromXml(sourceTracksXml);
@@ -458,8 +457,10 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
 
     try {
       // Asynchronously concat the specified tracks together
-      Job job = composerService.concat(profileId, Serializer.dimension(JsonObj.jsonObj(outputDimension)),
-              tracks.toArray(new Track[tracks.size()]));
+      Dimension dimension = null;
+      if (StringUtils.isNotBlank(outputDimension))
+        dimension = Serializer.dimension(JsonObj.jsonObj(outputDimension));
+      Job job = composerService.concat(profileId, dimension, tracks.toArray(new Track[tracks.size()]));
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to concat videos: " + e.getMessage());

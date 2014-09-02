@@ -133,9 +133,6 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
     // Replace the commandline parameters passed in at compile time
     commandline = processParameters(commandline);
 
-    // Remove unused commandline parts
-    commandline = commandline.replaceAll("#\\{.*?\\}", "");
-
     String[] args = commandline.split(" ");
     for (String a : args)
       if (!"".equals(a.trim()))

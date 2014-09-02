@@ -33,6 +33,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -49,7 +50,6 @@ import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration
 import org.opencastproject.workspace.api.Workspace;
 
 import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -145,7 +145,7 @@ public class WorkflowOperationSkippingTest {
     service.setOrganizationDirectoryService(organizationDirectoryService);
 
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
-            userDirectoryService, organizationDirectoryService);
+            userDirectoryService, organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
     dao = new WorkflowServiceSolrIndex();
     dao.solrRoot = sRoot + File.separator + "solr." + System.currentTimeMillis();

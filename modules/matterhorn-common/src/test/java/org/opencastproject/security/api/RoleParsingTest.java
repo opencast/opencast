@@ -16,10 +16,11 @@
 package org.opencastproject.security.api;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.io.IOUtils;
-import org.custommonkey.xmlunit.XMLUnit;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
+import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,7 +54,10 @@ public class RoleParsingTest {
 
     String expectedOutput = IOUtils.toString(getClass().getResourceAsStream(ROLE_XML_FILE), "UTF-8");
 
-    assertTrue("Role XML not formed as expected", XMLUnit.compareXML(expectedOutput, writer.toString()).identical());
+    Diff diff = new Diff(expectedOutput, writer.toString());
+    /* We don't care about ordering. */
+    diff.overrideElementQualifier(new ElementNameAndTextQualifier());
+    XMLAssert.assertXMLEqual(diff, true);
   }
 
   @Test

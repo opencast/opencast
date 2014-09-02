@@ -15,18 +15,15 @@
  */
 package org.opencastproject.serviceregistry.api;
 
-import static org.opencastproject.util.data.Option.some;
-
-import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +33,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.opencastproject.util.data.Option.some;
 
 /**
  * Base class serving as a convenience implementation for remote services.
@@ -107,7 +106,7 @@ public class RemoteBase {
    *          the http request. If the URI is specified, it should include only the path beyond the service endpoint.
    *          For example, a request intended for http://{host}/{service}/extra/path/info.xml should include the URI
    *          "/extra/path/info.xml".
-   * @return the response object
+   * @return the response object, or null if we can not connect to any services
    */
   protected HttpResponse getResponse(HttpRequestBase httpRequest) {
     return getResponse(httpRequest, HttpStatus.SC_OK);
