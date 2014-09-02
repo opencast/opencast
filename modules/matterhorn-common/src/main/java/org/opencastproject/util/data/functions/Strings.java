@@ -139,7 +139,7 @@ public final class Strings {
 
   /**
    * Convert a string into a boolean.
-   * 
+   *
    * @see Boolean#valueOf(String)
    */
   public static final Function<String, Boolean> toBool = new Function<String, Boolean>() {
@@ -151,7 +151,7 @@ public final class Strings {
 
   /**
    * Return a string formatting function.
-   * 
+   *
    * @see String#format(String, Object...)
    */
   public static <A> Function2<String, A[], String> format() {
@@ -175,7 +175,7 @@ public final class Strings {
   public static final Predicate<String> notBlank = new Predicate<String>() {
     @Override
     public Boolean apply(String a) {
-      return StringUtils.isBlank(a);
+      return StringUtils.isNotBlank(a);
     }
   };
 
@@ -203,7 +203,7 @@ public final class Strings {
   /**
    * Return a function that replaces all occurrences of <code>regex</code> in the argument with <code>replacement</code>
    * .
-   * 
+   *
    * @see String#replaceAll(String, String)
    */
   public static Function<String, String> replaceAll(final String regex, final String replacement) {
@@ -215,7 +215,7 @@ public final class Strings {
     };
   }
 
-  /** Create a split function from a regex pattern. */
+  /** Create a {@linkplain Pattern#split(CharSequence) split} function from a regex pattern. */
   public static Function<String, String[]> split(final Pattern splitter) {
     return new Function<String, String[]>() {
       @Override

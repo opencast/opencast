@@ -29,7 +29,7 @@ public class TesseractLine implements TextLine {
 
   /**
    * Creates a representation for a piece of text
-   * 
+   *
    * @param word
    *          the extracted text
    */
@@ -39,7 +39,7 @@ public class TesseractLine implements TextLine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.textextractor.api.TextLine#getText()
    */
   @Override
@@ -49,7 +49,7 @@ public class TesseractLine implements TextLine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.textextractor.api.TextLine#getBoundaries()
    */
   @Override
@@ -59,7 +59,7 @@ public class TesseractLine implements TextLine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

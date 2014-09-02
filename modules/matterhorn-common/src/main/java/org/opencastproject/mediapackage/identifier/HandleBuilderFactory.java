@@ -52,7 +52,7 @@ public final class HandleBuilderFactory {
 
   /**
    * Returns an instance of a HandleBuilderFactory.
-   * 
+   *
    * @return the handle builder factory
    * @throws ConfigurationException
    *           if the factory cannot be instantiated
@@ -70,7 +70,7 @@ public final class HandleBuilderFactory {
    * <li>Implementation specified using the <code>opencast.handlebuilder</code> system property</li>
    * <li>Platform default implementation</li>
    * </ul>
-   * 
+   *
    * @return the handle builder
    * @throws ConfigurationException
    *           If the builder cannot be instantiated

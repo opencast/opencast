@@ -22,21 +22,21 @@ public interface WorkingFileRepositoryMXBean {
 
   /**
    * Gets the free working file repository space in bytes
-   * 
+   *
    * @return free space in bytes
    */
   long getFreeSpace();
 
   /**
    * Gets the used working file repository space in bytes
-   * 
+   *
    * @return used space in bytes
    */
   long getUsedSpace();
 
   /**
    * Gets the total available working file repository space in bytes
-   * 
+   *
    * @return total available space in bytes
    */
   long getTotalSpace();

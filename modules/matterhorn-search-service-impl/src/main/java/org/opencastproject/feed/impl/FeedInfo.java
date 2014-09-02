@@ -42,7 +42,7 @@ public class FeedInfo {
 
   /**
    * Creates a new feed info.
-   * 
+   *
    * @param type
    *          the feed type
    * @param version
@@ -56,7 +56,7 @@ public class FeedInfo {
 
   /**
    * Creates a new feed info.
-   * 
+   *
    * @param type
    *          the feed type
    * @param version
@@ -81,7 +81,7 @@ public class FeedInfo {
 
   /**
    * Returns the feed type.
-   * 
+   *
    * @return the type
    */
   public Feed.Type getType() {
@@ -90,7 +90,7 @@ public class FeedInfo {
 
   /**
    * Returns the feed version.
-   * 
+   *
    * @return the version
    */
   public float getVersion() {
@@ -99,7 +99,7 @@ public class FeedInfo {
 
   /**
    * Sets the maximum number of entries that should be returned by this feed.
-   * 
+   *
    * @param size
    *          the maximum number of feed items
    */
@@ -109,7 +109,7 @@ public class FeedInfo {
 
   /**
    * Returns the maximum number of feed entries or <code>-1</code> if no maximum size was specified.
-   * 
+   *
    * @return the maximum number of entries in this feed
    */
   public int getSize() {
@@ -118,7 +118,7 @@ public class FeedInfo {
 
   /**
    * Returns the content query.
-   * 
+   *
    * @return the query
    */
   public String[] getQuery() {

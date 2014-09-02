@@ -41,7 +41,7 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
   /**
    * Creates a new package serializer that enables the resolution of relative urls from the manifest by taking
    * <code>packageRoot</code> as the root url.
-   * 
+   *
    * @param packageRoot
    *          the root url
    */
@@ -52,7 +52,7 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
   /**
    * Creates a new package serializer that enables the resolution of relative urls from the manifest by taking
    * <code>packageRoot</code> as the root directory.
-   * 
+   *
    * @param packageRoot
    *          the root url
    * @throws MalformedURLException
@@ -66,7 +66,7 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
   /**
    * Returns the package root that is used determine and resolve relative paths. Note that the package root may be
    * <code>null</code>.
-   * 
+   *
    * @return the packageRoot
    */
   public URL getPackageRoot() {
@@ -75,7 +75,7 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
 
   /**
    * Sets the package root.
-   * 
+   *
    * @param packageRoot
    *          the packageRoot to set
    * @see #getPackageRoot()
@@ -87,7 +87,7 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
   /**
    * This serializer implementation tries to cope with relative urls. Should the root url be set to any value other than
    * <code>null</code>, the serializer will try to convert element urls to relative paths if possible. .
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackageSerializer#encodeURI(URI)
    */
   public String encodeURI(URI uri) {
@@ -115,7 +115,7 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
    * constructor.
    * <p>
    * Note that for absolute paths without a protocol, the <code>file://</code> protocol is assumed.
-   * 
+   *
    * @see #DefaultMediaPackageSerializerImpl(URL)
    * @see org.opencastproject.mediapackage.MediaPackageSerializer#resolvePath(java.lang.String)
    */

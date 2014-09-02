@@ -89,10 +89,52 @@ public interface DublinCore {
   EName PROPERTY_ACCESS_RIGHTS = new EName(TERMS_NS_URI, "accessRights");
 
   /**
+   * Dublin Core Property <dfn>accrualMethod</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-accrualMethod">DCMI Terms Accrual Method</a>.
+   */
+  EName PROPERTY_ACCRUAL_METHOD = new EName(TERMS_NS_URI, "accrualMethod");
+
+  /**
+   * Dublin Core Property <dfn>accrualPeriodicity</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-accrualPeriodicity">DCMI Terms Accrual Periodicity</a>.
+   */
+  EName PROPERTY_ACCRUAL_PERIODICITY = new EName(TERMS_NS_URI, "accrualPeriodicity");
+
+  /**
+   * Dublin Core Property <dfn>accrualPolicy</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-accrualPolicy">DCMI Terms Accrual Policy</a>.
+   */
+  EName PROPERTY_ACCRUAL_POLICY = new EName(TERMS_NS_URI, "accrualPolicy");
+
+  /**
+   * Dublin Core Property <dfn>alternative</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-alternative">DCMI Terms Alternative</a>.
+   */
+  EName PROPERTY_ALTERNATIVE = new EName(TERMS_NS_URI, "alternative");
+
+  /**
+   * Dublin Core Property <dfn>audience</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-audience">DCMI Terms Audience</a>.
+   */
+  EName PROPERTY_AUDIENCE = new EName(TERMS_NS_URI, "audience");
+
+  /**
    * Dublin Core Property <dfn>available</dfn> in the /terms/ namespace. See <a
-   * href="http://dublincore.org/documents/dcmi-terms/#terms-available">DCMI Terms Date Available</a>.
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-available">DCMI Terms Available</a>.
    */
   EName PROPERTY_AVAILABLE = new EName(TERMS_NS_URI, "available");
+
+  /**
+   * Dublin Core Property <dfn>bibliographicCitation</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-bibliographicCitation">DCMI Terms Bibliographic Citation</a>.
+   */
+  EName PROPERTY_BIBLIOGRAPHIC_CITATION = new EName(TERMS_NS_URI, "bibliographicCitation");
+
+  /**
+   * Dublin Core Property <dfn>conformsTo</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-conformsTo">DCMI Terms Conforms To</a>.
+   */
+  EName PROPERTY_CONFORMS_TO = new EName(TERMS_NS_URI, "conformsTo");
 
   /**
    * Dublin Core Property <dfn>contributor</dfn> in the /terms/ namespace. See <a
@@ -108,7 +150,7 @@ public interface DublinCore {
 
   /**
    * Dublin Core Property <dfn>created</dfn> in the /terms/ namespace. See <a
-   * href="http://dublincore.org/documents/dcmi-terms/#terms-created">DCMI Terms Date Created</a>.
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-created">DCMI Terms Created</a>.
    */
   EName PROPERTY_CREATED = new EName(TERMS_NS_URI, "created");
 
@@ -125,10 +167,34 @@ public interface DublinCore {
   EName PROPERTY_DATE = new EName(TERMS_NS_URI, "date");
 
   /**
+   * Dublin Core Property <dfn>dateAccepted</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-dateAccepted">DCMI Terms Date Accepted</a>.
+   */
+  EName PROPERTY_DATE_ACCEPTED = new EName(TERMS_NS_URI, "dateAccepted");
+
+  /**
+   * Dublin Core Property <dfn>dateCopyrighted</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-dateCopyrighted">DCMI Terms Date Copyrighted</a>.
+   */
+  EName PROPERTY_DATE_COPYRIGHTED = new EName(TERMS_NS_URI, "dateCopyrighted");
+
+  /**
+   * Dublin Core Property <dfn>dateSubmitted</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-dateSubmitted">DCMI Terms Date Submitted</a>.
+   */
+  EName PROPERTY_DATE_SUBMITTED = new EName(TERMS_NS_URI, "dateSubmitted");
+
+  /**
    * Dublin Core Property <dfn>description</dfn> in the /terms/ namespace. See <a
    * href="http://dublincore.org/documents/dcmi-terms/#terms-description">DCMI Terms Description</a>.
    */
   EName PROPERTY_DESCRIPTION = new EName(TERMS_NS_URI, "description");
+
+  /**
+   * Dublin Core Property <dfn>educationLevel</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-educationLevel">DCMI Terms Education Level</a>.
+   */
+  EName PROPERTY_EDUCATION_LEVEL = new EName(TERMS_NS_URI, "educationLevel");
 
   /**
    * Dublin Core Property <dfn>extent</dfn> in the /terms/ namespace. See <a
@@ -143,10 +209,40 @@ public interface DublinCore {
   EName PROPERTY_FORMAT = new EName(TERMS_NS_URI, "format");
 
   /**
+   * Dublin Core Property <dfn>hasFormat</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-hasFormat">DCMI Terms Has Format</a>.
+   */
+  EName PROPERTY_HAS_FORMAT = new EName(TERMS_NS_URI, "hasFormat");
+
+  /**
+   * Dublin Core Property <dfn>hasPart</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-hasPart">DCMI Terms Has Part</a>.
+   */
+  EName PROPERTY_HAS_PART = new EName(TERMS_NS_URI, "hasPart");
+
+  /**
+   * Dublin Core Property <dfn>hasVersion</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-hasVersion">DCMI Terms Has Version</a>.
+   */
+  EName PROPERTY_HAS_VERSION = new EName(TERMS_NS_URI, "hasVersion");
+
+  /**
    * Dublin Core Property <dfn>identifier</dfn> in the /terms/ namespace. See <a
    * href="http://dublincore.org/documents/dcmi-terms/#terms-identifier">DCMI Terms Identifier</a>.
    */
   EName PROPERTY_IDENTIFIER = new EName(TERMS_NS_URI, "identifier");
+
+  /**
+   * Dublin Core Property <dfn>instructionalMethod</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-instructionalMethod">DCMI Terms Instructional Method</a>.
+   */
+  EName PROPERTY_INSTRUCTIONAL_METHOD = new EName(TERMS_NS_URI, "instructionalMethod");
+
+  /**
+   * Dublin Core Property <dfn>isFormatOf</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-isFormatOf">DCMI Terms Is Format Of</a>.
+   */
+  EName PROPERTY_IS_FORMAT_OF = new EName(TERMS_NS_URI, "isFormatOf");
 
   /**
    * Dublin Core Property <dfn>isPartOf</dfn> in the /terms/ namespace. See <a
@@ -156,7 +252,7 @@ public interface DublinCore {
 
   /**
    * Dublin Core Property <dfn>isReferencedBy</dfn> in the /terms/ namespace. See <a
-   * href="http://dublincore.org/documents/dcmi-terms/#terms-"isReferencedBy>DCMI Terms Is Referenced By</a>.
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-isReferencedBy">DCMI Terms Is Referenced By</a>.
    */
   EName PROPERTY_IS_REFERENCED_BY = new EName(TERMS_NS_URI, "isReferencedBy");
 
@@ -165,6 +261,24 @@ public interface DublinCore {
    * href="http://dublincore.org/documents/dcmi-terms/#terms-isReplacedBy">DCMI Terms Is Replaced By</a>.
    */
   EName PROPERTY_IS_REPLACED_BY = new EName(TERMS_NS_URI, "isReplacedBy");
+
+  /**
+   * Dublin Core Property <dfn>isRequiredBy</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-isRequiredBy">DCMI Terms Is Required By</a>.
+   */
+  EName PROPERTY_IS_REQUIRED_BY = new EName(TERMS_NS_URI, "isRequiredBy");
+
+  /**
+   * Dublin Core Property <dfn>issued</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-issued">DCMI Terms Issued</a>.
+   */
+  EName PROPERTY_ISSUED = new EName(TERMS_NS_URI, "issued");
+
+  /**
+   * Dublin Core Property <dfn>isVersionOf</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-isVersionOf">DCMI Terms Is Version Of</a>.
+   */
+  EName PROPERTY_IS_VERSION_OF = new EName(TERMS_NS_URI, "isVersionOf");
 
   /**
    * Dublin Core Property <dfn>language</dfn> in the /terms/ namespace. See <a
@@ -179,22 +293,58 @@ public interface DublinCore {
   EName PROPERTY_LICENSE = new EName(TERMS_NS_URI, "license");
 
   /**
+   * Dublin Core Property <dfn>mediator</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-mediator">DCMI Terms Mediator</a>.
+   */
+  EName PROPERTY_MEDIATOR = new EName(TERMS_NS_URI, "mediator");
+
+  /**
+   * Dublin Core Property <dfn>medium</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-medium">DCMI Terms Medium</a>.
+   */
+  EName PROPERTY_MEDIUM = new EName(TERMS_NS_URI, "medium");
+
+  /**
+   * Dublin Core Property <dfn>modified</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-modified">DCMI Terms Modified</a>.
+   */
+  EName PROPERTY_MODIFIED = new EName(TERMS_NS_URI, "modified");
+
+  /**
+   * Dublin Core Property <dfn>provenance</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-provenance">DCMI Terms Provenance</a>.
+   */
+  EName PROPERTY_PROVENANCE = new EName(TERMS_NS_URI, "provenance");
+
+  /**
    * Dublin Core Property <dfn>publisher</dfn> in the /terms/ namespace. See <a
    * href="http://dublincore.org/documents/dcmi-terms/#terms-publisher">DCMI Terms Publisher</a>.
    */
   EName PROPERTY_PUBLISHER = new EName(TERMS_NS_URI, "publisher");
 
   /**
-   * Dublin Core Property <dfn>realtion</dfn> in the /terms/ namespace. See <a
-   * href="http://dublincore.org/documents/dcmi-terms/#terms-replaces">DCMI Terms Replaces</a>.
+   * Dublin Core Property <dfn>references</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-references">DCMI Terms References</a>.
+   */
+  EName PROPERTY_REFERENCES = new EName(TERMS_NS_URI, "references");
+
+  /**
+   * Dublin Core Property <dfn>relation</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-relation">DCMI Terms Relation</a>.
    */
   EName PROPERTY_RELATION = new EName(TERMS_NS_URI, "relation");
 
   /**
    * Dublin Core Property <dfn>replaces</dfn> in the /terms/ namespace. See <a
-   * href="http://dublincore.org/documents/dcmi-terms/#terms-">DCMI Terms </a>.
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-replaces">DCMI Terms Replaces</a>.
    */
   EName PROPERTY_REPLACES = new EName(TERMS_NS_URI, "replaces");
+
+  /**
+   * Dublin Core Property <dfn>requires</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-requires">DCMI Terms Requires</a>.
+   */
+  EName PROPERTY_REQUIRES = new EName(TERMS_NS_URI, "requires");
 
   /**
    * Dublin Core Property <dfn>rights</dfn> in the /terms/ namespace. See <a
@@ -227,6 +377,12 @@ public interface DublinCore {
   EName PROPERTY_SUBJECT = new EName(TERMS_NS_URI, "subject");
 
   /**
+   * Dublin Core Property <dfn>tableOfContents</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-tableOfContents">DCMI Terms Table Of Contents</a>.
+   */
+  EName PROPERTY_TABLE_OF_CONTENTS = new EName(TERMS_NS_URI, "tableOfContents");
+
+  /**
    * Dublin Core Property <dfn>temporal</dfn> in the /terms/ namespace. See <a
    * href="http://dublincore.org/documents/dcmi-terms/#terms-temporal">DCMI Terms Temporal</a>.
    */
@@ -243,6 +399,12 @@ public interface DublinCore {
    * href="http://dublincore.org/documents/dcmi-terms/#terms-type">DCMI Terms Type</a>.
    */
   EName PROPERTY_TYPE = new EName(TERMS_NS_URI, "type");
+
+  /**
+   * Dublin Core Property <dfn>valid</dfn> in the /terms/ namespace. See <a
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-valid">DCMI Terms Valid</a>.
+   */
+  EName PROPERTY_VALID = new EName(TERMS_NS_URI, "valid");
 
   /**
    * Syntax encoding scheme <def>Box</def>. See <a
@@ -318,9 +480,7 @@ public interface DublinCore {
 
   /* Language constants */
 
-  /**
-   * Language code for properties without language information.
-   */
+  /** Language code for properties without language information. */
   String LANGUAGE_UNDEFINED = "__";
 
   /**
@@ -334,27 +494,25 @@ public interface DublinCore {
 
   /**
    * Get all values of a property, either in a certain language or in all contained languages.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @param language
-   *          a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
+   *         a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
    * @return a list of values which is empty if the property is not set
    */
   List<String> get(EName property, String language);
 
   /**
    * Get all values of a property no matter what language they have.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @return a list of values
    */
   List<DublinCoreValue> get(EName property);
 
-  /**
-   * Get all contained values grouped by property.
-   */
+  /** Get all contained values grouped by property. */
   Map<EName, List<DublinCoreValue>> getValues();
 
   /**
@@ -363,11 +521,11 @@ public interface DublinCore {
    * <p/>
    * Please note, that if you pass {@link #LANGUAGE_ANY}, values with an {@link #LANGUAGE_UNDEFINED undefined language}
    * are returned preferably.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @param language
-   *          a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
+   *         a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
    * @return the value or null
    */
   String getFirst(EName property, String language);
@@ -376,32 +534,44 @@ public interface DublinCore {
    * Get the first value of a property, no matter what language it is in. Like a call of
    * {@link #getFirst(EName, String)} with <code>language = {@link #LANGUAGE_ANY}</code>. Please not that values with an {@link #LANGUAGE_UNDEFINED undefined
    * language} are returned preferably.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @return the value or null
    * @see #getFirst(EName, String)
    */
   String getFirst(EName property);
 
   /**
-   * Return all values separated by a delimiter.
-   * 
+   * Get the first value of a property, no matter what language it is in. Like a call of
+   * {@link #getFirst(EName, String)} with <code>language = {@link #LANGUAGE_ANY}</code>. Please not that values with an {@link #LANGUAGE_UNDEFINED undefined
+   * language} are returned preferably.
+   *
    * @param property
-   *          the property qname
+   *         the property qname
+   * @return the value or null
+   * @see #getFirst(EName, String)
+   */
+  DublinCoreValue getFirstVal(EName property);
+
+  /**
+   * Return all values separated by a delimiter.
+   *
+   * @param property
+   *         the property qname
    * @param language
-   *          a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
+   *         a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
    * @param delimiter
-   *          a delimiter
+   *         a delimiter
    * @return the concatenated values or null
    */
   String getAsText(EName property, String language, String delimiter);
 
   /**
    * Return all languages this property has values in.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @return a set of languages which may be empty in case the property does not have any value. Note that the state of
    *         having no language defined ({@link #LANGUAGE_UNDEFINED}) is treated like a language.
    */
@@ -409,38 +579,38 @@ public interface DublinCore {
 
   /**
    * Check, if a property has multiple values assigned.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @param language
-   *          a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
+   *         a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
    */
   boolean hasMultipleValues(EName property, String language);
 
   /**
    * Check if a property has multiple values, ignoring any language information.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    */
   boolean hasMultipleValues(EName property);
 
   /**
    * Check if a property has at least one value assigned.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @param language
-   *          a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
+   *         a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
    */
   boolean hasValue(EName property, String language);
 
   /**
    * Check if a property has at least on value without language information assigned. Like a call of
    * {@link #hasValue(EName)} with <code>language = {@link #LANGUAGE_ANY}</code>
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    */
   boolean hasValue(EName property);
 
@@ -448,44 +618,44 @@ public interface DublinCore {
    * Set a property to the given value, overwriting an existing value in the given language.
    * <p/>
    * Please note that it is not allowed to pass {@link #LANGUAGE_ANY} as <code>language</code>.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @param value
-   *          the value or null to remove all values of the given language for this property
+   *         the value or null to remove all values of the given language for this property
    * @param language
-   *          a language code or {@link #LANGUAGE_UNDEFINED}
+   *         a language code or {@link #LANGUAGE_UNDEFINED}
    */
   void set(EName property, String value, String language);
 
   /**
    * Set a value without language information to a property, overwriting an existing value. This is like calling
    * {@link #set(EName, String, String)} with <code>language = {@link #LANGUAGE_UNDEFINED}</code>
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @param value
-   *          the value or null to remove all values of {@link #LANGUAGE_UNDEFINED} for this property
+   *         the value or null to remove all values of {@link #LANGUAGE_UNDEFINED} for this property
    */
   void set(EName property, String value);
 
   /**
    * Set a property to a value, overwriting an existing value.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @param value
-   *          the value or null to completely remove the property (all values in all languages)
+   *         the value or null to completely remove the property (all values in all languages)
    */
   void set(EName property, DublinCoreValue value);
 
   /**
    * Set a property to a list of values, overwriting any existing.
-   * 
+   *
    * @param property
-   *          the property name
+   *         the property name
    * @param values
-   *          the values or an empty list
+   *         the values or an empty list
    */
   void set(EName property, List<DublinCoreValue> values);
 
@@ -493,34 +663,34 @@ public interface DublinCore {
    * Add a value to a property.
    * <p/>
    * Please note that it is not allowed to pass {@link #LANGUAGE_ANY} as <code>language</code>.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @param value
-   *          the value
+   *         the value
    * @param language
-   *          a language code or {@link #LANGUAGE_UNDEFINED}
+   *         a language code or {@link #LANGUAGE_UNDEFINED}
    */
   void add(EName property, String value, String language);
 
   /**
    * Add a value without language information to a property. This is like calling {@link #add(EName, String, String)}
    * with <code>language = {@link #LANGUAGE_UNDEFINED}</code>
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @param value
-   *          the value
+   *         the value
    */
   void add(EName property, String value);
 
   /**
    * Add a value to a property.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @param value
-   *          the value
+   *         the value
    */
   void add(EName property, DublinCoreValue value);
 
@@ -531,30 +701,28 @@ public interface DublinCore {
    * <li> {@link #LANGUAGE_UNDEFINED}: remove only values with no language information
    * <li>language code: remove values of that language
    * </ul>
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    * @param language
-   *          a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
+   *         a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
    */
   void remove(EName property, String language);
 
   /**
    * Remove a complete property.
-   * 
+   *
    * @param property
-   *          the property qname
+   *         the property qname
    */
   void remove(EName property);
 
-  /**
-   * Clear the Dublin Core
-   */
+  /** Clear the Dublin Core */
   void clear();
 
   /**
    * Return all supported properties.
-   * 
+   *
    * @return a set of property names
    */
   Set<EName> getProperties();
@@ -563,11 +731,11 @@ public interface DublinCore {
    * Bind a prefix to a namespace name to support proprietary metadata properties. For further information about
    * namespaces and their binding, please see <a
    * href="http://www.w3.org/TR/xml-names">http://www.w3.org/TR/xml-names</a>
-   * 
+   *
    * @param prefix
-   *          the prefix
+   *         the prefix
    * @param namespaceName
-   *          the namespace name, usually a URI
+   *         the namespace name, usually a URI
    */
   void bindPrefix(String prefix, String namespaceName);
 }

@@ -63,7 +63,7 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
 
   /**
    * Construct an audio stream from another audio stream
-   * 
+   *
    * @param s
    */
   public AudioStreamImpl(AudioStreamImpl s) {
@@ -154,7 +154,7 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
 
   /**
    * Create an audio stream from the XML manifest.
-   * 
+   *
    * @param streamIdHint
    *          stream ID that has to be used if the manifest does not provide one. This is the case when reading an old
    *          manifest.

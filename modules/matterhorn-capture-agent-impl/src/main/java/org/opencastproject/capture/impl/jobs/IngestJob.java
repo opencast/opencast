@@ -55,7 +55,7 @@ public class IngestJob implements StatefulJob {
    * itself waiting for IngestJob to create a new IngestJobRetrier. In this way we can have a set number of times to try
    * an ingest with pauses between them, yet if it fails this number of times we can easily have it sleep for a set
    * amount of time before attempting to retry again. {@inheritDoc}
-   * 
+   *
    * @see org.quartz.Job#execute(JobExecutionContext)
    * @throws JobExecutionException
    */
@@ -153,7 +153,7 @@ public class IngestJob implements StatefulJob {
 
   /**
    * Removes a job from the schedule.
-   * 
+   *
    * @param ctx
    *          Used to remove the job from the correct scheduler
    * @param jobDetail

@@ -42,7 +42,7 @@ public class StartCaptureJob implements Job {
 
   /**
    * Starts the capture itself. Also schedules a StopCaptureJob. {@inheritDoc}
-   * 
+   *
    * @see org.quartz.Job#execute(JobExecutionContext)
    * @throws JobExecutionException
    */

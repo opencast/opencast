@@ -40,7 +40,7 @@ public class RecordingImpl implements Recording {
 
   /**
    * Builds a representation of the recording.
-   * 
+   *
    * @param recordingID
    *          The ID of the recording.
    * @param recordingState
@@ -53,7 +53,7 @@ public class RecordingImpl implements Recording {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Recording#getID()
    */
   public String getID() {
@@ -62,7 +62,7 @@ public class RecordingImpl implements Recording {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Recording#setState(java.lang.String)
    */
   public void setState(String newState) {
@@ -72,7 +72,7 @@ public class RecordingImpl implements Recording {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Recording#getState()
    */
   public String getState() {
@@ -81,7 +81,7 @@ public class RecordingImpl implements Recording {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Recording#getLastCheckinTime()
    */
   public Long getLastCheckinTime() {

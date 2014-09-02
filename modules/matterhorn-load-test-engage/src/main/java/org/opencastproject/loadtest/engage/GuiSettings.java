@@ -33,7 +33,7 @@ public class GuiSettings {
   private String usernameFieldName = DEFAULT_GUI_USERNAME_FIELD_NAME;
   /* The name of the password field to find it using selenium. */
   private String passwordFieldName = DEFAULT_GUI_PASSWORD_FIELD_NAME;
-  
+
   public String getUsername() {
     return username;
   }

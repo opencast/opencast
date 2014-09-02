@@ -65,7 +65,7 @@ import javax.servlet.http.HttpServletResponse;
  * Note that if you are running the workspace on the same machine as the singleton working file repository, you can save
  * a lot of space if you configure both root directories onto the same volume (that is, if your file system supports
  * hard links).
- * 
+ *
  * TODO Implement cache invalidation using the caching headers, if provided, from the remote server.
  */
 public class WorkspaceImpl implements Workspace {
@@ -108,7 +108,7 @@ public class WorkspaceImpl implements Workspace {
    * Note that if you are running the workspace on the same machine as the singleton working file repository, you can
    * save a lot of space if you configure both root directories onto the same volume (that is, if your file system
    * supports hard links).
-   * 
+   *
    * @param rootDirectory
    *          the repository root directory
    */
@@ -118,7 +118,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * OSGi service activation callback.
-   * 
+   *
    * @param cc
    *          the OSGi component context
    */
@@ -208,7 +208,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#get(java.net.URI)
    */
   public File get(final URI uri) throws NotFoundException, IOException {
@@ -325,7 +325,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * Returns the md5 of a file
-   * 
+   *
    * @param file
    *          the source file
    * @return the md5 hash
@@ -353,7 +353,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#delete(java.net.URI)
    */
   @Override
@@ -396,7 +396,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#delete(java.lang.String, java.lang.String)
    */
   public void delete(String mediaPackageID, String mediaPackageElementID) throws NotFoundException, IOException {
@@ -411,7 +411,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#put(java.lang.String, java.lang.String, java.lang.String,
    *      java.io.InputStream)
    */
@@ -455,7 +455,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#putInCollection(java.lang.String, java.lang.String,
    *      java.io.InputStream)
    */
@@ -513,7 +513,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#getURI(java.lang.String, java.lang.String)
    */
   public URI getURI(String mediaPackageID, String mediaPackageElementID) {
@@ -522,7 +522,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#getURI(java.lang.String, java.lang.String, java.lang.String)
    */
   public URI getURI(String mediaPackageID, String mediaPackageElementID, String filename) {
@@ -531,7 +531,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#getCollectionURI(java.lang.String, java.lang.String)
    */
   @Override
@@ -541,7 +541,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#copyTo(java.net.URI, java.lang.String, java.lang.String,
    *      java.lang.String)
    */
@@ -566,7 +566,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#moveTo(java.net.URI, java.lang.String, java.lang.String,
    *      java.lang.String)
    */
@@ -596,7 +596,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#getCollectionContents(java.lang.String)
    */
   @Override
@@ -606,7 +606,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#deleteFromCollection(java.lang.String, java.lang.String)
    */
   @Override
@@ -628,7 +628,7 @@ public class WorkspaceImpl implements Workspace {
    * Transforms a URI into a workspace File. If the file comes from the working file repository, the path in the
    * workspace mirrors that of the repository. If the file comes from another source, directories are created for each
    * segment of the URL. Sub-directories may be created as needed.
-   * 
+   *
    * @param uri
    *          the uri
    * @param createDirectories
@@ -656,11 +656,11 @@ public class WorkspaceImpl implements Workspace {
   /**
    * Returns the working file repository collection.
    * <p>
-   * 
+   *
    * <pre>
    * http://localhost:8080/files/collection/&lt;collection&gt;/ -> &lt;collection&gt;
    * </pre>
-   * 
+   *
    * @param uri
    *          the working file repository collection uri
    * @return the collection name
@@ -680,7 +680,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#getTotalSpace()
    */
   @Override
@@ -690,7 +690,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#getUsableSpace()
    */
   @Override
@@ -700,7 +700,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#getUsedSpace()
    */
   @Override
@@ -710,7 +710,7 @@ public class WorkspaceImpl implements Workspace {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workspace.api.Workspace#getBaseUri()
    */
   @Override

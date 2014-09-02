@@ -129,7 +129,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Creates a new dublin core metadata container.
-   * 
+   *
    * @param id
    *          the element identifier withing the package
    * @param uri
@@ -150,7 +150,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Creates a new dublin core metadata container, defaulting the flavor to {@link MediaPackageElements#EPISODE}.
-   * 
+   *
    * @param uri
    *          the document location
    * @param size
@@ -164,7 +164,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Creates a new dublin core metadata container.
-   * 
+   *
    * @param id
    *          the element identifier withing the package
    */
@@ -179,7 +179,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Creates a new dublin core metadata container.
-   * 
+   *
    * @return the new dublin core metadata container
    */
   public static DublinCoreCatalogImpl newInstance() {
@@ -188,7 +188,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Reads the metadata from the specified file and returns it encapsulated in a {@link DublinCoreCatalog} object.
-   * 
+   *
    * @param in
    *          the stream containing the dublin core metadata
    */
@@ -269,6 +269,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<DublinCoreValue> get(EName property) {
     if (property == null)
@@ -305,23 +306,33 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
                     });
   }
 
+  @Override
   public String getFirst(EName property, String language) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
     if (language == null)
       throw new IllegalArgumentException("Language code must not be null");
 
-    return getFirstValue(property, language);
+    final CatalogEntry f = getFirstCatalogEntry(property, language);
+    return f != null ? f.getValue() : null;
   }
 
+  @Override
   public String getFirst(EName property) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
 
-    return getFirstValue(property, LANGUAGE_ANY);
+    final CatalogEntry f = getFirstCatalogEntry(property, LANGUAGE_ANY);
+    return f != null ? f.getValue() : null;
   }
 
-  private String getFirstValue(EName property, String language) {
+  @Override
+  public DublinCoreValue getFirstVal(EName property) {
+    final CatalogEntry f = getFirstCatalogEntry(property, LANGUAGE_ANY);
+    return f != null ? toDublinCoreValue(f) : null;
+  }
+
+  private CatalogEntry getFirstCatalogEntry(EName property, String language) {
     CatalogEntry entry = null;
     if (LANGUAGE_UNDEFINED.equals(language)) {
       entry = getFirstLocalizedValue(property, null);
@@ -335,9 +346,10 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     } else {
       entry = getFirstLocalizedValue(property, language);
     }
-    return entry != null ? entry.getValue() : null;
+    return entry;
   }
 
+  @Override
   public String getAsText(EName property, String language, String delimiter) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -360,6 +372,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     }), delimiter) : null;
   }
 
+  @Override
   public Set<String> getLanguages(EName property) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -374,6 +387,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     return languages;
   }
 
+  @Override
   public boolean hasMultipleValues(EName property, String language) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -382,6 +396,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     return hasMultiplePropertyValues(property, language);
   }
 
+  @Override
   public boolean hasMultipleValues(EName property) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -403,6 +418,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     }
   }
 
+  @Override
   public boolean hasValue(EName property, String language) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -411,6 +427,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     return hasPropertyValue(property, language);
   }
 
+  @Override
   public boolean hasValue(EName property) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -429,6 +446,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     }
   }
 
+  @Override
   public void set(EName property, String value, String language) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -437,12 +455,14 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     setValue(property, value, language, null);
   }
 
+  @Override
   public void set(EName property, String value) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
     setValue(property, value, LANGUAGE_UNDEFINED, null);
   }
 
+  @Override
   public void set(EName property, DublinCoreValue value) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -453,6 +473,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     }
   }
 
+  @Override
   public void set(EName property, List<DublinCoreValue> values) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -474,6 +495,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     }
   }
 
+  @Override
   public void add(EName property, String value) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -483,6 +505,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     add(property, value, LANGUAGE_UNDEFINED, null);
   }
 
+  @Override
   public void add(EName property, String value, String language) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -494,6 +517,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     add(property, value, language, null);
   }
 
+  @Override
   public void add(EName property, DublinCoreValue value) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -520,6 +544,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     }
   }
 
+  @Override
   public void remove(EName property, String language) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -528,6 +553,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     removeValue(property, language);
   }
 
+  @Override
   public void remove(EName property) {
     if (property == null)
       throw new IllegalArgumentException("Property name must not be null");
@@ -544,6 +570,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     }
   }
 
+  @Override
   public void clear() {
     super.clear();
   }
@@ -564,6 +591,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
     return clone;
   }
 
+  @Override
   public Set<EName> getProperties() {
     return PROPERTIES;
   }
@@ -575,7 +603,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Saves the dublin core metadata container to a dom.
-   * 
+   *
    * @throws ParserConfigurationException
    *           if the xml parser environment is not correctly configured
    * @throws TransformerException
@@ -583,6 +611,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
    * @throws IOException
    *           if an error with catalog serialization occurs
    */
+  @Override
   public Document toXml() throws ParserConfigurationException, TransformerException, IOException {
     // Create the DOM document
     Document doc = newDocument();
@@ -600,9 +629,10 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.XMLCatalogImpl#toJson()
    */
+  @Override
   public String toJson() throws IOException {
     JSONObject json = toJsonObject();
     return json.toJSONString();
@@ -610,7 +640,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Reads values from a JSON object
-   * 
+   *
    * @param json
    *          the json object representing the dublin core catalog
    * @return the dublin core catalog
@@ -654,7 +684,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
   /**
    * Converts the catalog to JSON object.
-   * 
+   *
    * @return JSON object
    */
   @SuppressWarnings("unchecked")
@@ -711,7 +741,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
   /**
    * Adds the dublin core property identified by <code>name</code> to the root node if it's value is different from
    * <code>null</code>.
-   * 
+   *
    * @param document
    *          the document
    * @param root
@@ -760,7 +790,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Creates a new parser for dublin core documents. The parsed data will be added to <code>dcCatalog</code>.
-     * 
+     *
      * @param dcCatalog
      *          the catalog to populate
      */
@@ -770,7 +800,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Parses the catalog and returns an object representation for it.
-     * 
+     *
      * @param is
      *          the input stream containing the dublin core catalog
      * @return the catalog representation
@@ -808,7 +838,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Returns the element content.
-     * 
+     *
      * @return the element content
      */
     private String getContent() {
@@ -819,7 +849,7 @@ public class DublinCoreCatalogImpl extends XMLCatalogImpl implements DublinCoreC
 
     /**
      * Read <code>type</code> attribute from track or catalog element.
-     * 
+     *
      * @see org.xml.sax.helpers.DefaultHandler#startElement(String, String, String, org.xml.sax.Attributes)
      */
     @Override

@@ -33,9 +33,9 @@ import java.util.List;
 
 /**
  * Ingest REST resources
- * 
+ *
  * @author jamiehodge
- * 
+ *
  */
 
 public class IngestResources {
@@ -49,10 +49,10 @@ public class IngestResources {
   }
 
   /**
-   * 
+   *
    * @param type
    *          Type of media to add: Track, Catalog, Attachment
-   * 
+   *
    */
   public static HttpResponse add(TrustedHttpClient client, String type, String url, String flavor, String mediaPackage) throws Exception {
     HttpPost post = new HttpPost(getServiceUrl() + "add" + type);
@@ -65,10 +65,10 @@ public class IngestResources {
   }
 
   /**
-   * 
+   *
    * @param type
    *          Type of media to add: Track, Catalog, Attachment
-   * 
+   *
    */
   public static HttpResponse addTrack(TrustedHttpClient client, String type, InputStream media, String flavor, String mediaPackage)
           throws Exception {

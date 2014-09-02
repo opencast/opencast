@@ -38,6 +38,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
@@ -98,7 +99,7 @@ public class DistributeWorkflowOperationHandlerTest {
     EasyMock.replay(securityService);
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
     AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(
@@ -267,7 +268,7 @@ public class DistributeWorkflowOperationHandlerTest {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.opencastproject.job.api.JobProducer#isReadyToAcceptJobs(String)
      */
     @Override
@@ -277,7 +278,7 @@ public class DistributeWorkflowOperationHandlerTest {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.opencastproject.job.api.JobProducer#isReadyToAccept(org.opencastproject.job.api.Job)
      */
     @Override

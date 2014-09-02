@@ -23,21 +23,21 @@ import org.opencastproject.util.data.Option;
 public interface EpisodeACLTransition extends AclTransition {
   /**
    * Returns the episode identifier
-   * 
+   *
    * @return the episode identifier
    */
   String getEpisodeId();
 
   /**
    * Returns the managed access control list. If some, {@link #isDelete()} returns false.
-   * 
+   *
    * @return the managed access control list
    */
   Option<ManagedAcl> getAccessControlList();
 
   /**
    * Returns <code>true</code> if to just delete the ACL. In this case {@link #getAccessControlList()} returns none.
-   * 
+   *
    * @return <code>true</code> if to delete
    */
   boolean isDelete();

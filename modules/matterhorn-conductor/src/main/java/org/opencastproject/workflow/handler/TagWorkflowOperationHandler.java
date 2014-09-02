@@ -81,7 +81,7 @@ public class TagWorkflowOperationHandler extends ResumableWorkflowOperationHandl
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -91,7 +91,7 @@ public class TagWorkflowOperationHandler extends ResumableWorkflowOperationHandl
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */

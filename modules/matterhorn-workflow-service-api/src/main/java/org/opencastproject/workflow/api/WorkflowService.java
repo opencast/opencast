@@ -44,7 +44,7 @@ public interface WorkflowService {
 
   /**
    * Adds a workflow listener to be notified when workflows are updated.
-   * 
+   *
    * @param listener
    *          the workflow listener to add
    */
@@ -52,7 +52,7 @@ public interface WorkflowService {
 
   /**
    * Removes a workflow listener.
-   * 
+   *
    * @param listener
    *          the workflow listener to remove
    */
@@ -61,7 +61,7 @@ public interface WorkflowService {
   /**
    * Registers a new workflow definition. If a workflow definition with the same identifier is already registered, it
    * will be replaced.
-   * 
+   *
    * @param workflow
    *          the new workflow definition
    * @throws WorkflowDatabaseException
@@ -71,7 +71,7 @@ public interface WorkflowService {
 
   /**
    * Removes the workflow definition with this identifier.
-   * 
+   *
    * @throws NotFoundException
    *           if there is no workflow registered with this identifier
    * @throws WorkflowDatabaseException
@@ -82,7 +82,7 @@ public interface WorkflowService {
   /**
    * Returns the {@link WorkflowDefinition} identified by <code>name</code> or <code>null</code> if no such definition
    * was found.
-   * 
+   *
    * @param id
    *          the workflow definition id
    * @return the workflow
@@ -90,13 +90,13 @@ public interface WorkflowService {
    *           if there is a problem accessing the workflow definition
    * @throws NotFoundException
    *           if there is no registered workflow definition with this identifier
-   * 
+   *
    */
   WorkflowDefinition getWorkflowDefinitionById(String id) throws WorkflowDatabaseException, NotFoundException;
 
   /**
    * Gets a {@link WorkflowInstance} by its ID.
-   * 
+   *
    * @return the workflow instance
    * @throws WorkflowDatabaseException
    *           if there is a problem accessing the workflow instance from persistence
@@ -110,7 +110,7 @@ public interface WorkflowService {
 
   /**
    * Finds workflow instances based on the specified query.
-   * 
+   *
    * @param query
    *          The query parameters
    * @return The {@link WorkflowSet} containing the workflow instances matching the query parameters
@@ -121,7 +121,7 @@ public interface WorkflowService {
 
   /**
    * Finds workflow instances based on the specified query for administrative access.
-   * 
+   *
    * @param q
    *          The query parameters
    * @return The {@link WorkflowSet} containing the workflow instances matching the query parameters
@@ -135,7 +135,7 @@ public interface WorkflowService {
 
   /**
    * Creates a new workflow instance and starts the workflow.
-   * 
+   *
    * @param workflowDefinition
    *          the workflow definition
    * @param mediaPackage
@@ -153,7 +153,7 @@ public interface WorkflowService {
 
   /**
    * Creates a new workflow instance and starts the workflow.
-   * 
+   *
    * @param workflowDefinition
    *          the workflow definition
    * @param mediaPackage
@@ -175,7 +175,7 @@ public interface WorkflowService {
 
   /**
    * Creates a new workflow instance and starts the workflow.
-   * 
+   *
    * @param workflowDefinition
    *          the workflow definition
    * @param mediaPackage
@@ -191,7 +191,7 @@ public interface WorkflowService {
 
   /**
    * Gets the total number of workflows that have been created to date.
-   * 
+   *
    * @return The number of workflow instances, regardless of their state
    * @throws WorkflowDatabaseException
    *           if there is a problem accessing the workflow instances in persistence
@@ -201,7 +201,7 @@ public interface WorkflowService {
   /**
    * Gets the total number of workflows that have been created to date and that match all of the specified criterias
    * such as the workflow state or the current operation, both of which might be <code>null</code>.
-   * 
+   *
    * @param state
    *          the workflow state
    * @param operation
@@ -214,7 +214,7 @@ public interface WorkflowService {
 
   /**
    * Returns the statistics for the workflow service.
-   * 
+   *
    * @return workflow service statistics
    * @throws WorkflowDatabaseException
    *           if there is a problem accessing the workflow instances in persistence
@@ -223,7 +223,7 @@ public interface WorkflowService {
 
   /**
    * Stops a running workflow instance.
-   * 
+   *
    * @param workflowInstanceId
    *          the workflow instance identifier
    * @return the workflow instance
@@ -237,9 +237,10 @@ public interface WorkflowService {
   WorkflowInstance stop(long workflowInstanceId) throws WorkflowException, NotFoundException, UnauthorizedException;
 
   /**
-   * Permenantly removes a workflow instance.
-   * 
+   * Permanently removes a workflow instance.
+   *
    * @param workflowInstanceId
+   *          the workflow instance identifier
    * @throws WorkflowDatabaseException
    * @throws NotFoundException
    * @throws UnauthorizedException
@@ -249,7 +250,7 @@ public interface WorkflowService {
 
   /**
    * Temporarily suspends a started workflow instance.
-   * 
+   *
    * @param workflowInstanceId
    *          the workflow instance identifier
    * @return the workflow instance
@@ -264,7 +265,7 @@ public interface WorkflowService {
 
   /**
    * Resumes a suspended workflow instance.
-   * 
+   *
    * @param workflowInstanceId
    *          the workflow instance identifier
    * @return the workflow instance
@@ -279,7 +280,7 @@ public interface WorkflowService {
 
   /**
    * Resumes a suspended workflow instance, applying new properties to the workflow.
-   * 
+   *
    * @param workflowInstanceId
    *          the workflow to resume
    * @param properties
@@ -299,7 +300,7 @@ public interface WorkflowService {
 
   /**
    * Updates the given workflow instance with regard to the media package, the properties and the operations involved.
-   * 
+   *
    * @param workflowInstance
    *          the workflow instance
    * @throws WorkflowException
@@ -312,7 +313,7 @@ public interface WorkflowService {
   /**
    * Gets the list of available workflow definitions. In order to be "available", a workflow definition must be
    * registered and must have registered workflow operation handlers for each of the workflow definition's operations.
-   * 
+   *
    * @return The list of currently available workflow definitions, sorted by title
    * @throws WorkflowDatabaseException
    *           if there is a problem storing the registered workflow definitions

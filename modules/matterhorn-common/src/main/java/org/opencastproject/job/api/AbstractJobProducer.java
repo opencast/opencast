@@ -15,12 +15,14 @@
  */
 package org.opencastproject.job.api;
 
+import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
@@ -51,9 +53,9 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * Creates a new abstract job producer for jobs of the given type.
-   * 
+   *
    * @param jobType
-   *          the job type
+   *         the job type
    */
   public AbstractJobProducer(String jobType) {
     this.jobType = jobType;
@@ -61,7 +63,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#getJobType()
    */
   @Override
@@ -71,7 +73,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#countJobs(org.opencastproject.job.api.Job.Status)
    */
   @Override
@@ -83,7 +85,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#acceptJob(org.opencastproject.job.api.Job)
    */
   @Override
@@ -99,7 +101,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#isReadyToAcceptJobs(String)
    */
   @Override
@@ -109,7 +111,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#isReadyToAccept(org.opencastproject.job.api.Job)
    */
   @Override
@@ -117,30 +119,35 @@ public abstract class AbstractJobProducer implements JobProducer {
     return true;
   }
 
+  /** Shorthand for {@link #getServiceRegistry()}.incident() */
+  public Incidents incident() {
+    return getServiceRegistry().incident();
+  }
+
   /**
    * Returns a reference to the service registry.
-   * 
+   *
    * @return the service registry
    */
   protected abstract ServiceRegistry getServiceRegistry();
 
   /**
    * Returns a reference to the security service
-   * 
+   *
    * @return the security service
    */
   protected abstract SecurityService getSecurityService();
 
   /**
    * Returns a reference to the user directory service
-   * 
+   *
    * @return the user directory service
    */
   protected abstract UserDirectoryService getUserDirectoryService();
 
   /**
    * Returns a reference to the organization directory service.
-   * 
+   *
    * @return the organization directory service
    */
   protected abstract OrganizationDirectoryService getOrganizationDirectoryService();
@@ -148,18 +155,15 @@ public abstract class AbstractJobProducer implements JobProducer {
   /**
    * Asks the overriding class to process the arguments using the given operation. The result will be added to the
    * associated job as the payload.
-   * 
+   *
    * @param job
-   *          the job to process
-   * 
+   *         the job to process
    * @return the operation result
    * @throws Exception
    */
   protected abstract String process(Job job) throws Exception;
 
-  /**
-   * A utility class to run jobs
-   */
+  /** A utility class to run jobs */
   class JobRunner implements Callable<Void> {
 
     /** The job to dispatch */
@@ -170,11 +174,11 @@ public abstract class AbstractJobProducer implements JobProducer {
 
     /**
      * Constructs a new job runner
-     * 
+     *
      * @param job
-     *          the job to run
+     *         the job to run
      * @param currentJob
-     *          the current running job
+     *         the current running job
      */
     JobRunner(Job job, Job currentJob) {
       this.job = job;
@@ -183,7 +187,7 @@ public abstract class AbstractJobProducer implements JobProducer {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.util.concurrent.Callable#call()
      */
     @Override
@@ -206,6 +210,7 @@ public abstract class AbstractJobProducer implements JobProducer {
         logger.info(e.getMessage());
       } catch (Throwable e) {
         job.setStatus(Status.FAILED);
+        getServiceRegistry().incident().unhandledException(job, Severity.FAILURE, e);
         logger.error("Error handling operation '{}': {}", job.getOperation(), e);
         if (e instanceof ServiceRegistryException)
           throw (ServiceRegistryException) e;

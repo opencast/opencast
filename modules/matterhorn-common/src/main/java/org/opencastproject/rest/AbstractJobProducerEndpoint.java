@@ -91,15 +91,13 @@ public abstract class AbstractJobProducerEndpoint {
 
   /**
    * Returns the job producer that is backing this REST endpoint.
-   * 
+   *
    * @return the job producer
    */
   public abstract JobProducer getService();
 
   /**
-   * 
-   * 
-   * @return
+   * Return the service registry.
    */
   public abstract ServiceRegistry getServiceRegistry();
 

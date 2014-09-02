@@ -81,7 +81,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * Constructs a RecordingImpl object using the Properties and MediaPackage provided
-   * 
+   *
    * @param Xproperties
    *          The {@code XProperties} object associated to this recording
    * @param mp
@@ -153,7 +153,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
   /**
    * Determines the root URL and ID from the recording's properties //TODO: What if the properties object contains a
    * character in the recording id or root url fields that is invalid for the filesystem?
-   * 
+   *
    * @throws IOException
    */
   private void determineRootURLandID() throws IOException {
@@ -194,7 +194,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.AgentRecording#getProperties()
    */
   public XProperties getProperties() {
@@ -203,7 +203,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.AgentRecording#setProperties(java.util.Properties)
    */
   public void setProps(XProperties props) {
@@ -212,7 +212,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.AgentRecording#setProperties(java.util.Properties)
    */
   public void setProperties(Properties props) {
@@ -231,7 +231,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.AgentRecording#getMediaPackage()
    */
   public MediaPackage getMediaPackage() {
@@ -240,7 +240,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Recording#getID()
    */
   public String getID() {
@@ -249,7 +249,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.AgentRecording#getDir()
    */
   public File getBaseDir() {
@@ -258,7 +258,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.AgentRecording#getProperty(java.lang.String)
    */
   public String getProperty(String key) {
@@ -267,7 +267,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.api.AgentRecording#setProperty(java.lang.String, java.lang.String)
    */
   public String setProperty(String key, String value) {
@@ -276,7 +276,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Recording#setState(java.lang.String)
    */
   public void setState(String state) {
@@ -290,7 +290,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Recording#getState()
    */
   public String getState() {
@@ -299,7 +299,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.Recording#getLastCheckinTime()
    */
   public Long getLastCheckinTime() {
@@ -308,7 +308,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
 
   /**
    * Formats a Date object to UTC time and according to the dublin core rules for dcterms:created
-   * 
+   *
    * @param d
    *          The Date to format
    * @return The formatted Date
@@ -321,7 +321,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
   /**
    * Overrides the default serialization behaviour. This method writes the mediapackage to the mediapackage.xml file in
    * the base directory of this capture
-   * 
+   *
    * @param out
    *          The ObjectOutputStream for the serialization
    * @throws IOException
@@ -338,7 +338,7 @@ public class RecordingImpl implements AgentRecording, Serializable {
   /**
    * Overrides the default serialization behaviour. This method reads the mediapackage from the mediapackage.xml file in
    * the base directory of this capture
-   * 
+   *
    * @param in
    *          The ObjectInputStream for the serialization
    * @throws IOException

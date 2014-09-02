@@ -20,7 +20,7 @@ import java.util.Hashtable;
 
 /**
  * Adapter class for JaxB to represent a Hashtable
- * 
+ *
  */
 public class HashtableAdapter extends XmlAdapter<HashEntry[], Hashtable<String, String>> {
   public HashtableAdapter() {
@@ -28,7 +28,7 @@ public class HashtableAdapter extends XmlAdapter<HashEntry[], Hashtable<String, 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.xml.bind.annotation.adapters.XmlAdapter#marshal(java.lang.Object)
    */
   @Override
@@ -42,7 +42,7 @@ public class HashtableAdapter extends XmlAdapter<HashEntry[], Hashtable<String, 
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.xml.bind.annotation.adapters.XmlAdapter#unmarshal(java.lang.Object)
    */
   @Override

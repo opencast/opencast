@@ -35,7 +35,7 @@ public class TesseractTextFrame implements TextFrame {
 
   /**
    * Parses the tesseract output file and extracts the text information contained therein.
-   * 
+   *
    * @param is
    *          the input stream
    * @return the ocropus text information
@@ -56,7 +56,7 @@ public class TesseractTextFrame implements TextFrame {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.textextractor.api.TextFrame#hasText()
    */
   @Override
@@ -66,7 +66,7 @@ public class TesseractTextFrame implements TextFrame {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.textextractor.api.TextFrame#getLines()
    */
   @Override

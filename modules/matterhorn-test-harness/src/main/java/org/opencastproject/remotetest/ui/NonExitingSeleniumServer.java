@@ -39,7 +39,7 @@ public class NonExitingSeleniumServer extends SeleniumServer {
 
   /**
    * Constructs a non exiting selenium server.
-   * 
+   *
    * @param in
    *          the selenium test suite
    * @param the
@@ -65,7 +65,7 @@ public class NonExitingSeleniumServer extends SeleniumServer {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.openqa.selenium.server.SeleniumServer#runHtmlSuite()
    */
   @Override

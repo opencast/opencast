@@ -20,7 +20,7 @@ import static org.opencastproject.util.data.functions.Functions.chuck;
 
 /**
  * Run a side effect.
- * 
+ *
  * @see X
  */
 public abstract class Effect<A> extends Function<A, Void> {

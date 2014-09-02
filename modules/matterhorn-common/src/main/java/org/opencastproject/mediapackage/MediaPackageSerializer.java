@@ -24,7 +24,7 @@ public interface MediaPackageSerializer {
    * This method is called every time a url is being written to a media package manifest. By implementing this method,
    * serializers are able to store package elements in directories relative to some common root folder, thereby making
    * it movable.
-   * 
+   *
    * @param uri
    *          the url to encode
    * @return the encoded path
@@ -35,7 +35,7 @@ public interface MediaPackageSerializer {
    * This method is called every time a url is being read from a media package manifest. By implementing this method,
    * serializers are able to redirect urls to local caches which might make sense when it comes to dealing with huge
    * media files.
-   * 
+   *
    * @param path
    *          the original path from the manifest
    * @return the resolved url

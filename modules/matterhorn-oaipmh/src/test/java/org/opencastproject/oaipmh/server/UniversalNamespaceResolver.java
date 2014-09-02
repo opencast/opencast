@@ -30,9 +30,9 @@ public class UniversalNamespaceResolver implements NamespaceContext {
   private Document sourceDocument;
 
   /**
-   * 
+   *
    * Store the source document.
-   * 
+   *
    * @param document
    *          source document
    */
@@ -41,9 +41,9 @@ public class UniversalNamespaceResolver implements NamespaceContext {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see javax.xml.namespace.NamespaceContext#getNamespaceURI(String)
    */
   public String getNamespaceURI(String prefix) {
@@ -55,9 +55,9 @@ public class UniversalNamespaceResolver implements NamespaceContext {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see javax.xml.namespace.NamespaceContext#getPrefix(String)
    */
   public String getPrefix(String namespaceURI) {
@@ -65,9 +65,9 @@ public class UniversalNamespaceResolver implements NamespaceContext {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see javax.xml.namespace.NamespaceContext#getPrefixes(String)
    */
   @SuppressWarnings("unchecked")

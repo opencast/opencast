@@ -25,7 +25,7 @@ public class UserTrackingException extends Exception {
 
   /**
    * Constructs a UserTrackingException from the exception that caused the problem.
-   * 
+   *
    * @param cause
    *          the cause of the exception
    */

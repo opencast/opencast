@@ -52,7 +52,7 @@ public abstract class VideoProducer extends ProducerBin {
    * The main difference between this and a general Producer is that we will need a caps filter to support being able to
    * change the FPS of the output media and a videorate Element to fix the output media's timestamp in case of an fps
    * change.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           Thrown if any of the GStreamer Element's modules are not installed.
    **/
@@ -65,7 +65,7 @@ public abstract class VideoProducer extends ProducerBin {
 
   /**
    * Creates a videorate GST Element that adjusts the timestamps in case of a FPS change in the output file.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the module required for videorate Element is not installed.
    **/
@@ -76,7 +76,7 @@ public abstract class VideoProducer extends ProducerBin {
 
   /**
    * Creates a CAPs filter to change the FPS of the incoming media.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           Thrown if the capsfilter module is not installed.
    **/
@@ -87,7 +87,7 @@ public abstract class VideoProducer extends ProducerBin {
 
   /**
    * Set the FPS capsfilter properties.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           Thrown if the fpsfilter is null.
    **/
@@ -111,7 +111,7 @@ public abstract class VideoProducer extends ProducerBin {
 
   /**
    * Returns the frame per second filter.
-   * 
+   *
    * @return the fpsfilter
    */
   public Element getFpsfilter() {
@@ -120,7 +120,7 @@ public abstract class VideoProducer extends ProducerBin {
 
   /**
    * Returns the producer's video rate.
-   * 
+   *
    * @return the videorate
    */
   public Element getVideorate() {

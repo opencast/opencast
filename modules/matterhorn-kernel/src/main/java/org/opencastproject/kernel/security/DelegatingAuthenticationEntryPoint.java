@@ -40,7 +40,7 @@ public class DelegatingAuthenticationEntryPoint implements AuthenticationEntryPo
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.springframework.security.web.AuthenticationEntryPoint#commence(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse, org.springframework.security.core.AuthenticationException)
    */

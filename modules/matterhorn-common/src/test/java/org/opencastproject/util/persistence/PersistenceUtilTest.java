@@ -15,20 +15,21 @@
  */
 package org.opencastproject.util.persistence;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.persistence.PersistenceEnvs.testPersistenceEnv;
+
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
-import javax.persistence.EntityManager;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.persistence.PersistenceEnvs.testPersistenceEnv;
+import javax.persistence.EntityManager;
 
 public class PersistenceUtilTest {
   private PersistenceEnv penv;
@@ -44,13 +45,33 @@ public class PersistenceUtilTest {
   }
 
   @Test
-  public void testPersistenceUtil() {
+  public void testPersistAndFind() {
     final long id = penv.tx(Queries.persist(TestDto.create("key", "value"))).getId();
     assertEquals("value", penv.tx(Queries.find(TestDto.class, id)).get().getValue());
   }
 
   @Test
-  public void testPersistenceUtilCloseEntityManager() {
+  public void testPersistOrUpdateUpdate() {
+    assertTrue(penv.tx(TestDto.findAll).isEmpty());
+    final TestDto dto = penv.tx(Queries.persist(TestDto.create("key", "value")));
+    assertEquals("value", penv.tx(Queries.find(TestDto.class, dto.getId())).get().getValue());
+    dto.setValue("new-value");
+    penv.tx(Queries.persistOrUpdate(dto));
+    assertEquals("new-value", penv.tx(Queries.find(TestDto.class, dto.getId())).get().getValue());
+  }
+
+  @Test
+  public void testPersistOrUpdatePersist() {
+    assertTrue(penv.tx(TestDto.findAll).isEmpty());
+    final TestDto dto = penv.tx(Queries.persistOrUpdate(TestDto.create("key", "value")));
+    assertEquals("value", penv.tx(Queries.find(TestDto.class, dto.getId())).get().getValue());
+    dto.setValue("new-value");
+    penv.tx(Queries.persistOrUpdate(dto));
+    assertEquals("new-value", penv.tx(Queries.find(TestDto.class, dto.getId())).get().getValue());
+  }
+
+  @Test
+  public void testCloseEntityManager() {
     penv.tx(new Function<EntityManager, Object>() {
       @Override public Object apply(EntityManager entityManager) {
         // this should not throw an exception in penv.tx()
@@ -61,7 +82,7 @@ public class PersistenceUtilTest {
   }
 
   @Test(expected = RuntimeException.class)
-  public void testPersistenceUtilException() {
+  public void testException() {
     penv.tx(new Function<EntityManager, Object>() {
       @Override public Object apply(EntityManager entityManager) {
         throw new RuntimeException("error");
@@ -70,7 +91,7 @@ public class PersistenceUtilTest {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void testPersistenceUtilExceptionTransformation() {
+  public void testExceptionTransformation1() {
     penv.tx().rethrow(new Function<Exception, Exception>() {
       @Override public Exception apply(Exception e) {
         return new IllegalStateException(e);
@@ -83,7 +104,7 @@ public class PersistenceUtilTest {
   }
 
   @Test
-  public void testPersistenceUtilExceptionTransformation2() {
+  public void testExceptionTransformation2() {
     final boolean[] exception = {false};
     penv.<Void>tx().handle(new Effect<Exception>() {
       @Override public void run(Exception e) {
@@ -98,7 +119,7 @@ public class PersistenceUtilTest {
   }
 
   @Test
-  public void testPersistenceUtilExceptionTransformation3() {
+  public void testExceptionTransformation3() {
     final Option<String> r = penv.<Option<String>>tx().handle(new Function<Exception, Option<String>>() {
       @Override public Option<String> apply(Exception e) {
         return none();
@@ -112,7 +133,7 @@ public class PersistenceUtilTest {
   }
 
   @Test
-  public void testPersistenceUtilExceptionTransformation4() {
+  public void testExceptionTransformation4() {
     final Either<String, Integer> r = penv.<Integer>tx().either(new Function<Exception, String>() {
       @Override public String apply(Exception e) {
         return "error";

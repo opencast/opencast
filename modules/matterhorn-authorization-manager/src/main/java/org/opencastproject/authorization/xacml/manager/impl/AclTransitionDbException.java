@@ -35,7 +35,7 @@ public class AclTransitionDbException extends AclServiceException {
 
   /**
    * Create exception with a message.
-   * 
+   *
    * @param message
    */
   public AclTransitionDbException(String message) {
@@ -44,7 +44,7 @@ public class AclTransitionDbException extends AclServiceException {
 
   /**
    * Create exception with a cause.
-   * 
+   *
    * @param cause
    */
   public AclTransitionDbException(Throwable cause) {
@@ -53,7 +53,7 @@ public class AclTransitionDbException extends AclServiceException {
 
   /**
    * Create exception with a message and a cause.
-   * 
+   *
    * @param message
    * @param cause
    */

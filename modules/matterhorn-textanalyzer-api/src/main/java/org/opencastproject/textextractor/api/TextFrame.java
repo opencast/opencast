@@ -19,14 +19,14 @@ public interface TextFrame {
 
   /**
    * Returns <code>true</code> if text was found.
-   * 
+   *
    * @return <code>true</code> if there is text
    */
   boolean hasText();
 
   /**
    * Returns the lines found on the frame or an empty array if no lines have been found at all.
-   * 
+   *
    * @return the lines
    */
   TextLine[] getLines();

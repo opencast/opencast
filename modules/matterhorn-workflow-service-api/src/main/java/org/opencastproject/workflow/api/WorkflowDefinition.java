@@ -38,7 +38,7 @@ public interface WorkflowDefinition {
 
   /**
    * Sets the identifier
-   * 
+   *
    * @param id
    *          the workflow definition identifier
    */
@@ -51,7 +51,7 @@ public interface WorkflowDefinition {
 
   /**
    * Sets the title
-   * 
+   *
    * @param title
    *          the workflow definition title
    */
@@ -64,7 +64,7 @@ public interface WorkflowDefinition {
 
   /**
    * Sets the description
-   * 
+   *
    * @param description
    *          the workflow definition description
    */
@@ -82,14 +82,14 @@ public interface WorkflowDefinition {
 
   /**
    * Whether this definition is published. This information is useful for user interfaces.
-   * 
+   *
    * @return Whether this is a published workflow definition
    */
   boolean isPublished();
 
   /**
    * Tags the workflow definition with the given tag.
-   * 
+   *
    * @param tag
    *          the tag
    */
@@ -97,7 +97,7 @@ public interface WorkflowDefinition {
 
   /**
    * Removes the tag from the workflow definition.
-   * 
+   *
    * @param tag
    *          the tag
    */
@@ -105,7 +105,7 @@ public interface WorkflowDefinition {
 
   /**
    * Returns <code>true</code> if the workflow definition contains the given tag.
-   * 
+   *
    * @param tag
    *          the tag
    * @return <code>true</code> if the element is tagged
@@ -115,7 +115,7 @@ public interface WorkflowDefinition {
   /**
    * Returns <code>true</code> if the workflow definition contains at least one of the given tags. If there are no tags
    * contained in the set, then the definition is considered to match as well.
-   * 
+   *
    * @param tags
    *          the set of tag
    * @return <code>true</code> if the element is tagged accordingly
@@ -124,7 +124,7 @@ public interface WorkflowDefinition {
 
   /**
    * Returns the tags for this workflow definition or an empty array if there are no tags.
-   * 
+   *
    * @return the tags
    */
   String[] getTags();
@@ -136,7 +136,7 @@ public interface WorkflowDefinition {
 
   /**
    * Appends the operation to the workflow definition.
-   * 
+   *
    * @param operation
    *          the operation
    */
@@ -144,7 +144,7 @@ public interface WorkflowDefinition {
 
   /**
    * Inserts the operation at the given position into the workflow definition.
-   * 
+   *
    * @param operation
    *          the operation
    * @param position
@@ -156,7 +156,7 @@ public interface WorkflowDefinition {
 
   /**
    * Returns the operation at the given position.
-   * 
+   *
    * @param position
    *          the operation's position
    * @throws IndexOutOfBoundsException
@@ -166,7 +166,7 @@ public interface WorkflowDefinition {
 
   /**
    * Removes the workflow operation at the indicated position and returns it.
-   * 
+   *
    * @param position
    *          the operation's position
    * @return the removed workflow operation

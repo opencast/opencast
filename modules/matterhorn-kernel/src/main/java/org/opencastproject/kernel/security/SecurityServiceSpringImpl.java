@@ -45,7 +45,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.SecurityService#getOrganization()
    */
   @Override
@@ -55,7 +55,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.SecurityService#setOrganization(Organization)
    */
   @Override
@@ -65,7 +65,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.SecurityService#getUser()
    */
   @Override
@@ -106,7 +106,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.SecurityService#setUser(User)
    */
   @Override

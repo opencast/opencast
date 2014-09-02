@@ -42,6 +42,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.MimeTypes;
@@ -96,7 +97,7 @@ public class VideoSegmenterTest {
   /**
    * Copies test files to the local file system, since jmf is not able to access movies from the resource section of a
    * bundle.
-   * 
+   *
    * @throws Exception
    *           if setup fails
    */
@@ -113,7 +114,7 @@ public class VideoSegmenterTest {
 
   /**
    * Setup for the video segmenter service, including creation of a mock workspace.
-   * 
+   *
    * @throws Exception
    *           if setup fails
    */
@@ -153,7 +154,7 @@ public class VideoSegmenterTest {
 
     vsegmenter = new VideoSegmenterServiceImpl();
     serviceRegistry = new ServiceRegistryInMemoryImpl(vsegmenter, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     vsegmenter.setServiceRegistry(serviceRegistry);
     vsegmenter.setMpeg7CatalogService(mpeg7Service);
     vsegmenter.setWorkspace(workspace);

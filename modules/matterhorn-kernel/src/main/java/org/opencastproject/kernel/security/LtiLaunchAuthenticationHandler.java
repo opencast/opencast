@@ -76,6 +76,12 @@ public class LtiLaunchAuthenticationHandler implements
   /** The Matterhorn Role for OAUTH users **/
   private static final String ROLE_OAUTH_USER = "ROLE_OAUTH_USER";
 
+  /** The default context for LTI x **/
+  private static final String DEFAULT_CONTEXT = "LTI";
+
+  /** The default learner for LTI **/
+  private static final String DEFAULT_LEARNER = "USER";
+
   /** The user details service */
   protected UserDetailsService userDetailsService = null;
 
@@ -198,7 +204,22 @@ public class LtiLaunchAuthenticationHandler implements
       if (roles != null) {
         List<String> roleList = Arrays.asList(roles.split(","));
         for (int i = 0; i < roleList.size(); i++) {
-          String role = context + "_" + roleList.get(i);
+
+          /* Use a generic context and learner if none is given: */
+          context = StringUtils.isBlank(context) ? DEFAULT_CONTEXT : context;
+          String learner = StringUtils.isBlank(roleList.get(i))
+            ? DEFAULT_LEARNER : roleList.get(i);
+
+          /* Build the role */
+          String role = context + "_" + learner;
+
+          /* Make sure to not accept ROLE_… */
+          if (role.trim().toUpperCase().startsWith("ROLE_")) {
+            logger.warn("Discarding attempt to acquire role “{}”", role);
+            continue;
+          }
+
+          /* Add this role */
           logger.debug("adding role: {}", role);
           userAuthorities.add(new GrantedAuthorityImpl(role));
         }
