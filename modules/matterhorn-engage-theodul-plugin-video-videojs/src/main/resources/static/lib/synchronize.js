@@ -25,7 +25,7 @@
     var playWhenBuffered = false;
     var ignoreNextPause = false;
     var hitPauseWhileBuffering = false;
-    var bufferInterval = 1.5; // s
+    var bufferInterval = 10; // s
 
     var tryToPlayWhenBuffering = true; // flag for trying to play after N seconds of buffering
     var tryToPlayWhenBufferingTimer = null;
