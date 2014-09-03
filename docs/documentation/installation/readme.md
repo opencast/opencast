@@ -29,9 +29,9 @@ repository, providing a pre-configured Matterhorn installation neatly
 integrated into the operating system.
 
  - Officially Supported [^officialsupport]
-    - RedHat Enterprise Linux
-    - CentOS
-    - Scientific Linux
+    - [RedHat Enterprise Linux](rpm-rhel-sl-centos.md)
+    - [CentOS](rpm-rhel-sl-centos.md)
+    - [Scientific Linux](rpm-rhel-sl-centos.md)
  - Other Common Systems
     - Fedora
     - SLES
