@@ -24,7 +24,7 @@ Release Documentation
 The Matterhorn Release Documentation is the official Matterhorn documentation
 for each release. It contains:
 
- - Installation Guides
+ - [Installation Guides](installation)
  - Configuration Guides
     - Basic Configuration
     - Database Configuration
