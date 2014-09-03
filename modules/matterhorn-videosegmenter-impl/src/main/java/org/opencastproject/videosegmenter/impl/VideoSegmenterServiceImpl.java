@@ -88,10 +88,29 @@ VideoSegmenterService, ManagedService {
   public static final String FFMPEG_BINARY_CONFIG = "org.opencastproject.composer.ffmpeg.path";
   public static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
 
+  /** Name of the constant used to retreive the stability threshold */
+  public static final String OPT_STABILITY_THRESHOLD = "stabilitythreshold";
+
+  /** The number of seconds that need to resemble until a scene is considered "stable" */
+  public static final int DEFAULT_STABILITY_THRESHOLD = 5;
+
+  /** Name of the constant used to retreive the changes threshold */
+  public static final String OPT_CHANGES_THRESHOLD = "changesthreshold";
+
+  /** Default value for the number of pixels that may change between two frames without considering them different */
+  public static final float DEFAULT_CHANGES_THRESHOLD = 0.05f; // 5% change
+
+  
   /** The logging facility */
   protected static final Logger logger = LoggerFactory
     .getLogger(VideoSegmenterServiceImpl.class);
 
+  /** Number of pixels that may change between two frames without considering them different */
+  protected float changesThreshold = DEFAULT_CHANGES_THRESHOLD;
+
+  /** The number of seconds that need to resemble until a scene is considered "stable" */
+  protected int stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
+  
   /** Reference to the receipt service */
   protected ServiceRegistry serviceRegistry = null;
 
@@ -126,7 +145,29 @@ VideoSegmenterService, ManagedService {
   @SuppressWarnings("unchecked")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    logger.debug("Configuring the videosegmenter");
+	    logger.debug("Configuring the videosegmenter");
+
+	    // Stability threshold
+	    if (properties.get(OPT_STABILITY_THRESHOLD) != null) {
+	      String threshold = (String) properties.get(OPT_STABILITY_THRESHOLD);
+	      try {
+	        stabilityThreshold = Integer.parseInt(threshold);
+	        logger.info("Stability threshold set to {} consecutive frames", stabilityThreshold);
+	      } catch (Exception e) {
+	        logger.warn("Found illegal value '{}' for videosegmenter's stability threshold", threshold);
+	      }
+	    }
+
+	    // Changes threshold
+	    if (properties.get(OPT_CHANGES_THRESHOLD) != null) {
+	      String threshold = (String) properties.get(OPT_CHANGES_THRESHOLD);
+	      try {
+	        changesThreshold = Float.parseFloat(threshold);
+	        logger.info("Changes threshold set to {}", changesThreshold);
+	      } catch (Exception e) {
+	        logger.warn("Found illegal value '{}' for videosegmenter's changes threshold", threshold);
+	      }
+	    }
 
   }
 
@@ -199,7 +240,7 @@ VideoSegmenterService, ManagedService {
       logger.info("Starting video segmentation of {}", mediaUrl);
       String[] command = new String[] { binary, "-nostats", "-i",
         mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
-        "-filter:v", "select=gt(scene\\,0.04),showinfo",
+        "-filter:v", "select=gt(scene\\,"+changesThreshold+"),showinfo",
         "-f", "null", "-"
       };
       String commandline = StringUtils.join(command, " ");
