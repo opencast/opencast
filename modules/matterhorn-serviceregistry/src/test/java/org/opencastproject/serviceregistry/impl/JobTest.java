@@ -15,15 +15,15 @@
  */
 package org.opencastproject.serviceregistry.impl;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import org.apache.commons.lang.StringUtils;
-import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.data.Arrays.mkString;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.functions.Booleans.eq;
+import static org.opencastproject.util.persistence.PersistenceUtil.newPersistenceEnvironment;
+
 import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.Job.FailureReason;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
@@ -44,19 +44,23 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.persistence.PersistenceEnv;
 
-import javax.persistence.EntityManager;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
+import org.apache.commons.lang.StringUtils;
+import org.easymock.EasyMock;
+import org.eclipse.persistence.jpa.PersistenceProvider;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Arrays.mkString;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.functions.Booleans.eq;
-import static org.opencastproject.util.persistence.PersistenceUtil.newPersistenceEnvironment;
+import javax.persistence.EntityManager;
 
 public class JobTest {
 
@@ -358,7 +362,8 @@ public class JobTest {
       }
     });
     assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,RUNNING,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,RUNNING,2"))); // <-- 2 jobs, one of them is the dispatchable job
+    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,RUNNING,2"))); // <-- 2 jobs, one of them is the
+                                                                             // dispatchable job
     assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,FINISHED,1")));
     assertTrue(jpql.exists(eq("http://localhost:8080,testing2,FINISHED,1")));
     assertTrue(jpql.exists(eq("http://localhost:8080,testing1,FINISHED,1")));
@@ -600,4 +605,44 @@ public class JobTest {
     Assert.assertNull("Job should have no associated processor", serviceRegistry.getJob(job.getId())
             .getProcessingHost());
   }
+
+  @Test
+  public void testRemoveJobsWithoutParent() throws Exception {
+    Job jobRunning = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, null);
+    jobRunning.setStatus(Status.RUNNING);
+    serviceRegistry.updateJob(jobRunning);
+
+    Job jobFinished = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, null);
+    jobFinished.setStatus(Status.FINISHED);
+    serviceRegistry.updateJob(jobFinished);
+
+    Job jobFailed = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, null);
+    jobFailed.setStatus(Status.FAILED, FailureReason.NONE);
+    serviceRegistry.updateJob(jobFailed);
+
+    Job parent = serviceRegistry.createJob(JOB_TYPE_1, "START_OPERATION", null, null, false, null);
+    parent.setStatus(Status.FAILED);
+    serviceRegistry.updateJob(parent);
+
+    Job jobWithParent = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, parent);
+    jobWithParent.setStatus(Status.FAILED);
+    serviceRegistry.updateJob(jobWithParent);
+
+    List<Job> jobs = serviceRegistry.getJobs(null, null);
+    assertEquals(5, jobs.size());
+
+    serviceRegistry.removeParentlessJobs(0);
+
+    jobs = serviceRegistry.getJobs(null, null);
+    assertEquals(3, jobs.size());
+
+    jobRunning.setStatus(Status.FINISHED);
+    serviceRegistry.updateJob(jobRunning);
+
+    serviceRegistry.removeParentlessJobs(0);
+
+    jobs = serviceRegistry.getJobs(null, null);
+    assertEquals(2, jobs.size());
+  }
+
 }
