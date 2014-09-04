@@ -50,6 +50,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import org.opencastproject.mediapackage.track.TrackImpl;
 
 /**
  * Distributes media to the local media delivery directory.
@@ -223,6 +224,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
         throw new DistributionException("Distributed element produces an invalid URI", e);
       }
       distributedElement.setIdentifier(null);
+      ((TrackImpl)distributedElement).setTransport(TrackImpl.StreamingProtocol.RTMP);
 
       logger.info("Finished distribution of {}", element);
       return distributedElement;
