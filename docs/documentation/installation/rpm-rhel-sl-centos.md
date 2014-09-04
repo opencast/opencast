@@ -176,11 +176,17 @@ of the box and does not need much configuration.
 
 `opencast-matterhorn14-distribution-engage`
 
-This is the package for the Matterhorn Engage Modules which are the front-end to the viewer of your videos. It is always highly recommended to keep these separated from the rest of your system.
-opencast-matterhorn14-distribution-worker Worker Matterhorn distribution  This
-is the worker package that contains the modules that create the most CPU load
-(encoding, OCR, etc). So it is recommended to deploy this on a more powerful
-machine.
+This is the package for the Matterhorn Engage Modules which are the front-end
+to the viewer of your videos. It is always highly recommended to keep these
+separated from the rest of your system.
+
+### Worker Matterhorn distribution
+
+opencast-matterhorn14-distribution-worker
+
+This is the worker package that contains the modules that create the most CPU
+load (encoding, OCR, etc). So it is recommended to deploy this on a more
+powerful machine.
 
 
 Uninstall Matterhorn
