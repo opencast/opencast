@@ -139,6 +139,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_embed3 = "embed3";
     var id_embed4 = "embed4";
     var id_playbackRateIndicator = "playbackRateIndicator";
+    var id_playbackRemTime050 = "playbackRemTime050";
+    var id_playbackRemTime075 = "playbackRemTime075";
+    var id_playbackRemTime100 = "playbackRemTime100";
+    var id_playbackRemTime125 = "playbackRemTime125";
+    var id_playbackRemTime150 = "playbackRemTime150";
     var class_dropdown = "dropdown-toggle";
 
     /* don't change these variables */
@@ -564,9 +569,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             });
             Engage.on(plugin.events.usingFlash.getName(), function(flash) {
                 usingFlash = flash;
-                if (!usingFlash) {
-                    $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
-                }
                 addNonFlashEvents();
             });
             Engage.on(plugin.events.ready.getName(), function() {
@@ -582,6 +584,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                     $("#" + id_play_button).hide();
                     $("#" + id_pause_button).show();
                     isPlaying = true;
+                    if (!usingFlash) {
+                        $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
+                    }
                 }
             });
             Engage.on(plugin.events.pause.getName(), function() {
@@ -625,6 +630,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                                 $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
                             }
                         }
+                        var val = Math.round((duration / 1000) - currentTime);
+                        val = ((val >= 0) && (val <= (duration / 1000))) ? val : "-";
+                        $("#" + id_playbackRemTime050).html(formatSeconds(!isNaN(val) ? (1.5 * val) : val));
+                        $("#" + id_playbackRemTime075).html(formatSeconds(!isNaN(val) ? (1.25 * val) : val));
+                        $("#" + id_playbackRemTime100).html(formatSeconds(!isNaN(val) ? (1.0 * val) : val));
+                        $("#" + id_playbackRemTime125).html(formatSeconds(!isNaN(val) ? (0.75 * val) : val));
+                        $("#" + id_playbackRemTime150).html(formatSeconds(!isNaN(val) ? (0.5 * val) : val));
                     } else {
                         $("#" + id_slider).slider("option", "value", 0);
                     }
