@@ -32,6 +32,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.sox.api.SoxException;
@@ -134,12 +135,15 @@ public class SoxServiceTest {
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();
 
+    IncidentService incidentService = EasyMock.createNiceMock(IncidentService.class);
+
     // Finish setting up the mocks
-    EasyMock.replay(bc, cc, orgDirectory, userDirectory, securityService, workspace);
+    EasyMock.replay(bc, cc, orgDirectory, userDirectory, securityService, workspace, incidentService);
 
     // Create and populate the composer service
     soxService = new SoxServiceImpl();
-    serviceRegistry = new ServiceRegistryInMemoryImpl(soxService, securityService, userDirectory, orgDirectory);
+    serviceRegistry = new ServiceRegistryInMemoryImpl(soxService, securityService, userDirectory, orgDirectory,
+            incidentService);
     soxService.setOrganizationDirectoryService(orgDirectory);
     soxService.setSecurityService(securityService);
     soxService.setServiceRegistry(serviceRegistry);
