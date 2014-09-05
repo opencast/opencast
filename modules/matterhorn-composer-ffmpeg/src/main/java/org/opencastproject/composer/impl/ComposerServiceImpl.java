@@ -116,6 +116,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   private static final int CAPTION_NO_VIDEO = 20;
   private static final int CAPTION_NO_LANGUAGE = 21;
   private static final int WATERMARK_NOT_FOUND = 22;
+  private static final int NO_STREAMS = 23;
 
   /** The logging instance */
   private static final Logger logger = LoggerFactory.getLogger(ComposerServiceImpl.class);
@@ -275,7 +276,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         if (videoFile != null)
           params.put("video", videoTrack.getURI().toString());
         params.put("profile", profile.getIdentifier());
-        params.put("properties", properties.toString());
+        if (properties != null) {
+          params.put("properties", properties.toString());
+        } else {
+          params.put("properties", "null");
+        }
         incident().recordFailure(job, ENCODING_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
       }
@@ -679,6 +684,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       List<File> trackFiles = new ArrayList<File>();
       int i = 0;
       for (Track track : tracks) {
+        if (!track.hasAudio() && !track.hasVideo()) {
+          Map<String, String> params = new HashMap<String, String>();
+          params.put("track-id", track.getIdentifier());
+          params.put("track-url", track.getURI().toString());
+          incident().recordFailure(job, NO_STREAMS, params);
+          throw new EncoderException("Track has no audio or video stream available: " + track);
+        }
         try {
           trackFiles.add(i++, workspace.get(track.getURI()));
         } catch (NotFoundException e) {
@@ -1014,7 +1026,17 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         throw new EncoderException(e);
       }
     }
+  }
 
+  private void validateVideoStream(Job job, Track sourceTrack) throws EncoderException {
+    // make sure there is a video stream in the track
+    if (sourceTrack != null && !sourceTrack.hasVideo()) {
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("track-id", sourceTrack.getIdentifier());
+      params.put("track-url", sourceTrack.getURI().toString());
+      incident().recordFailure(job, IMAGE_EXTRACTION_NO_VIDEO, params);
+      throw new EncoderException("Cannot extract an image without a video stream");
+    }
   }
 
   /**
@@ -1618,13 +1640,20 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     boolean hasAudio = false;
     if (!onlyAudio) {
       // Add video scaling and check for audio
+      int characterCount = 0;
       for (int i = 0; i < files.size(); i++) {
+        if ((i % 25) == 0)
+          characterCount++;
         sb.append("[").append(i).append(":v]scale=iw*min(").append(dimension.getWidth()).append("/iw\\,")
                 .append(dimension.getHeight()).append("/ih):ih*min(").append(dimension.getWidth()).append("/iw\\,")
                 .append(dimension.getHeight()).append("/ih),pad=").append(dimension.getWidth()).append(":")
                 .append(dimension.getHeight()).append(":(ow-iw)/2:(oh-ih)/2").append(",setdar=")
-                .append((float) dimension.getWidth() / (float) dimension.getHeight()).append("[")
-                .append((char) ('a' + i + 1)).append("];");
+                .append((float) dimension.getWidth() / (float) dimension.getHeight()).append("[");
+        int character = ('a' + i + 1 - ((characterCount - 1) * 25));
+        for (int y = 0; y < characterCount; y++) {
+          sb.append((char) character);
+        }
+        sb.append("];");
         if (tracks.get(i).hasAudio())
           hasAudio = true;
       }
@@ -1639,9 +1668,19 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
 
     // Add concat segments
+    int characterCount = 0;
     for (int i = 0; i < files.size(); i++) {
-      if (!onlyAudio)
-        sb.append("[").append((char) ('a' + i + 1)).append("]");
+      if ((i % 25) == 0)
+        characterCount++;
+
+      int character = ('a' + i + 1 - ((characterCount - 1) * 25));
+      if (!onlyAudio) {
+        sb.append("[");
+        for (int y = 0; y < characterCount; y++) {
+          sb.append((char) character);
+        }
+        sb.append("]");
+      }
 
       if (tracks.get(i).hasAudio()) {
         sb.append("[").append(i).append(":a]");

@@ -414,7 +414,8 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("profileId", profileId));
-      params.add(new BasicNameValuePair("outputDimension", Serializer.json(outputDimension).toJson()));
+      if (outputDimension != null)
+        params.add(new BasicNameValuePair("outputDimension", Serializer.json(outputDimension).toJson()));
       params.add(new BasicNameValuePair("sourceTracks", MediaPackageElementParser.getArrayAsXml(Arrays.asList(tracks))));
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
