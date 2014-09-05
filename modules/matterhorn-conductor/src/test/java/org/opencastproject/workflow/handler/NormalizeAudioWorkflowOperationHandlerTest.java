@@ -32,6 +32,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.sox.api.SoxService;
@@ -96,8 +97,11 @@ public class NormalizeAudioWorkflowOperationHandlerTest {
     EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
     EasyMock.replay(securityService);
 
+    IncidentService incidentService = EasyMock.createNiceMock(IncidentService.class);
+    EasyMock.replay(incidentService);
+
     ServiceRegistry serviceRegistry = new ServiceRegistryInMemoryImpl(null, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, incidentService);
 
     Job analyzeJob = serviceRegistry.createJob(SoxService.JOB_TYPE, "Analyze", null, soxTrackXml, false);
     analyzeJob.setStatus(Status.FINISHED);
