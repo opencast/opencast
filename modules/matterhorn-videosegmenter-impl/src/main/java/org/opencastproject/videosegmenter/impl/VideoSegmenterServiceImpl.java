@@ -281,10 +281,7 @@ VideoSegmenterService, ManagedService {
         long endtime = 0;
         for (String seginfo : segmentsStrings) {
           Pattern pattern = Pattern.compile("pts_time\\:\\d+");
-          // in case you would like to ignore case sensitivity,
-          // you could use this statement:
           Matcher matcher = pattern.matcher(seginfo);
-          // check all occurance
           String time = "0";
           while (matcher.find()) {
             time = matcher.group().substring(9);
@@ -292,11 +289,14 @@ VideoSegmenterService, ManagedService {
           endtime = Long.parseLong(time) * 1000;
           Segment segement = videoContent.getTemporalDecomposition()
             .createSegment("segement-" + segmentcount);
-          segement.setMediaTime(new MediaRelTimeImpl(starttime,
-                endtime-starttime));
-          segments.add(segement);
-          segmentcount++;
-          starttime = endtime;
+          long segmentLength = endtime-starttime;
+          if(1000*stabilityThreshold < segmentLength){
+	          segement.setMediaTime(new MediaRelTimeImpl(starttime,
+	                endtime-starttime));
+	          segments.add(segement);
+	          segmentcount++;
+	          starttime = endtime;
+          }
         }
         // Add last segment
         Segment s = videoContent.getTemporalDecomposition()
