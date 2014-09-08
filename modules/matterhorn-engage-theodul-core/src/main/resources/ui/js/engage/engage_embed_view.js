@@ -43,7 +43,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
             href: 'css/bootstrap/css/bootstrap-responsive.css'
         });
         $("head").append(link);
-	}
+    }
 
     /*
      * Logic to insert a plugin with name and type to the player in embed mode

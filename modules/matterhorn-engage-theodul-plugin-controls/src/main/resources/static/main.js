@@ -14,25 +14,25 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
     "use strict";
-    var PLUGIN_NAME = "Engage Controls",
-        PLUGIN_TYPE = "engage_controls",
-        PLUGIN_VERSION = "0.1",
-        PLUGIN_TEMPLATE = "template.html",
-        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
-        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
-        PLUGIN_STYLES = [
-            "style.css",
-            "js/bootstrap/css/bootstrap.css",
-            "js/jqueryui/themes/base/jquery-ui.css"
-        ],
-        PLUGIN_STYLES_MOBILE = [
-            "style_mobile.css"
-        ],
-        PLUGIN_STYLES_EMBED = [
-            "style_embed.css"
-        ];
+    var PLUGIN_NAME = "Engage Controls";
+    var PLUGIN_TYPE = "engage_controls";
+    var PLUGIN_VERSION = "1.0";
+    var PLUGIN_TEMPLATE = "template.html";
+    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
+    var PLUGIN_STYLES = [
+        "style.css",
+        "js/bootstrap/css/bootstrap.css",
+        "js/jqueryui/themes/base/jquery-ui.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "style_mobile.css"
+    ];
+    var PLUGIN_STYLES_EMBED = [
+        "style_embed.css"
+    ];
 
     var plugin;
     var events = {
@@ -109,8 +109,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var embedHeightFour = 480;
     var embedHeightFive = 720;
     var logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
-    var bootstrapPath = 'js/bootstrap/js/bootstrap';
-    var jQueryUIPath = 'js/jqueryui/jquery-ui';
+    var bootstrapPath = "js/bootstrap/js/bootstrap";
+    var jQueryUIPath = "js/jqueryui/jquery-ui";
     var id_engage_controls = "engage_controls";
     var id_slider = "slider";
     var id_volume = "volume";
@@ -146,9 +146,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var id_playbackRemTime150 = "playbackRemTime150";
     var class_dropdown = "dropdown-toggle";
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var videosReady = false;
-    var videoDataModelChange = 'change:videoDataModel';
+    var videoDataModelChange = "change:videoDataModel";
     var mediapackageChange = "change:mediaPackage";
     var event_slidestart = "slidestart";
     var event_slidestop = "slidestop";
@@ -199,7 +199,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var ControlsView = Backbone.View.extend({
         el: $("#" + id_engage_controls), // every view has an element associated with it
         initialize: function(videoDataModel, template, plugin_path) {
-            this.setElement($(plugin.container)); // every plugin view has it's own container associated with it
+            this.setElement($(plugin.container)); // every plugin view has it"s own container associated with it
             this.model = videoDataModel;
             this.template = template;
             this.pluginPath = plugin_path;
@@ -241,7 +241,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     function replaceAll(string, find, replace) {
-        return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+        return string.replace(new RegExp(escapeRegExp(find), "g"), replace);
     }
 
     /**
@@ -251,8 +251,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      * @return time from the data in milliseconds
      */
     function getTimeInMilliseconds(data) {
-        if ((data != undefined) && (data != null) && (data != 0) && (data.length) && (data.indexOf(':') != -1)) {
-            var values = data.split(':');
+        if ((data != undefined) && (data != null) && (data != 0) && (data.length) && (data.indexOf(":") != -1)) {
+            var values = data.split(":");
             // when the format is correct
             if (values.length == 3) {
                 // try to convert to numbers
@@ -663,7 +663,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     if (isDesktopMode) {
         // init event
         Engage.log("Controls: Init");
-        var relative_plugin_path = Engage.getPluginPath('EngagePluginControls');
+        var relative_plugin_path = Engage.getPluginPath("EngagePluginControls");
 
         // load jquery-ui lib
         require([relative_plugin_path + jQueryUIPath], function() {
