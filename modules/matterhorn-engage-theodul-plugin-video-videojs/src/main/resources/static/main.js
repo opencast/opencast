@@ -434,13 +434,25 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                             checkVideoDisplaySize();
                         });
                     }
+
                 } else if (isMobileMode) {
-                    console.group("Ordering Modus: Mobile");
+                    for (var v in videoSources) {
+                        if (videoSources[v].length > 0) {
+                            initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
+                            ++i;
+                        }
+                    }
+
+                    if ((aspectRatio != null) && (videoDisplays.length > 0)) {
+                        aspectRatio[1] = parseInt(aspectRatio[1]);
+                        aspectRatio[2] = parseInt(aspectRatio[2]);
+                        Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+                        Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100]);
+                    }
+
                     if (Engage.model.get("orientation") == "portrait") {
-                        console.log("Portrait");
                         $("." + id_videoDisplayClass).css("width", "99.5%");
                     } else if (Engage.model.get("orientation") == "landscape") {
-                        console.log("landscape");
                         $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 2) + "%");
                     }
 
@@ -448,6 +460,30 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
                         ///$("#" + videoDisplays[i]).addClass("auto-height");
                     }
+
+                    Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
+
+                    if (videoDisplays.length > 0) {
+                        var nr = 0;
+                        
+                        for (var v in videoSources) {
+                            if (videoSources[v].length > 0) {
+                                ++nr;
+                            }
+                        }
+
+                        // first as masterdisplay
+                        registerEvents(videoDisplays[0], videoDisplays.length);
+                        
+                        if(nr >= 2) {
+                            // TODO Multi Video
+                        } else {
+                            videosReady = true;
+                            Engage.trigger(plugin.events.ready.getName());
+                        }
+
+                    }
+
                 }
                 checkVideoDisplaySize();
                 window.setTimeout(checkVideoDisplaySize, checkVideoDisplaySizeTimeout);
@@ -715,7 +751,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     function initPlugin() {
             // only init if plugin template was inserted into the DOM
-            if ((isDesktopMode || isEmbedMode) && plugin.inserted) {
+            if (plugin.inserted) {
                 // set path to swf player
                 var videojs_swf = plugin.pluginPath + videojs_swf_path;
 
