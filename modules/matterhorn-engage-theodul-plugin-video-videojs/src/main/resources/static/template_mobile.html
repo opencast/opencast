@@ -1,1 +1,12 @@
 <!-- theodul video videojs plugin mobile mode -->
+<div id="videojs_wrapper" class="mobile_wrapper" align="center">
+	<div class="mobile-video-content">
+    <% if(typeof ids !== "undefined" ){ var i = 1;%>
+        <% _.each(ids, function(id) { %>
+            <div id="videoDisplay<%= i%>" width="100%">
+                <video id="<%= id %>" class="video-js vjs-default-skin container" width="auto" height="auto" data-setup="{}"></video>
+            </div>
+        <% i++;}); %>
+    <% } %>
+	</div>
+</div>

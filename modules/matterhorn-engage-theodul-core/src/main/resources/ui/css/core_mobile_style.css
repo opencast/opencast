@@ -1,1 +1,8 @@
 /*Core mobile css rules*/
+  .panel-content {
+    padding: 1em;
+  }
+  #close-panel {
+  	position: absolute;
+  	bottom: 10px;
+  }

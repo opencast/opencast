@@ -1,1 +1,23 @@
 /*theodul video videojs plugin, mobile mode styles*/
+.videoDisplay {
+	padding-bottom: 2%;
+}
+
+.videojs_wrapper {
+	height: inherit;
+}
+
+#engage_content {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.videoDisplay:nth-child(even) {
+	float: right;
+}
+
+.videoDisplay:nth-child(odd) {
+	float: left;
+	padding-right: 2%;
+}
+

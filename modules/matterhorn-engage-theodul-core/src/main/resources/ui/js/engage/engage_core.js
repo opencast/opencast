@@ -167,7 +167,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                     $.get(core_template, function(template) {
                         // set template, render it and add it to DOM
                         engageCore.template = template;
-                        $(engageCore.el).html(_.template(template));
+                        $(engageCore.el).html(_.template(template)).trigger("create");
                         // run init function of the view
                         engageCore.pluginView.initView();
                         if (!(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {

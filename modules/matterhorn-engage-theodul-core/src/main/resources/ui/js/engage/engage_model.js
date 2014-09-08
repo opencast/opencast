@@ -65,7 +65,7 @@ define(['require', 'jquery', 'underscore', 'backbone'], function(require, $, _, 
             });
         }
     });
-
+    
     /*
      * Main Model Prototype
      */
@@ -84,6 +84,9 @@ define(['require', 'jquery', 'underscore', 'backbone'], function(require, $, _, 
             while (match = search.exec(query)) {
                 urlParams[decode(match[1])] = decode(match[2]);
             }
+            
+            this.set("orientation", "landscape");
+
             this.set("urlParameters", urlParams);
             // set players debug mode
             if (this.get("urlParameters").debug == "true") {
