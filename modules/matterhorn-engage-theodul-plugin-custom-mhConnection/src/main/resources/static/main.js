@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage Custom Matterhorn Endpoint Connection",
         PLUGIN_TYPE = "engage_custom",
@@ -86,7 +86,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var SEARCH_ENDPOINT = "/search/episode.json";
     var USERTRACKING_ENDPOINT = "/usertracking/footprint.json";
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var mediaPackageID = "";
     var initCount = 1;
     var mediaPackage; // mediaPackage data
@@ -106,8 +106,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 },
                 success: function(model) {
                     var mediaPackage; // Mediapackage data
-                    if (model.attributes && model.attributes['search-results'] && model.attributes['search-results'].result) {
-                        mediaPackage = model.attributes['search-results'].result;
+                    if (model.attributes && model.attributes["search-results"] && model.attributes["search-results"].result) {
+                        mediaPackage = model.attributes["search-results"].result;
                         if (mediaPackage) {
                             // format silent the model data, see dublin core for reference names
                             if (mediaPackage.mediapackage.media.track) {
@@ -218,8 +218,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             cache: false
         }).done(function(data) {
             // split search results
-            if (data && data['search-results'] && data['search-results'].result) {
-                mediaPackage = data['search-results'].result;
+            if (data && data["search-results"] && data["search-results"].result) {
+                mediaPackage = data["search-results"].result;
                 extractMediaInfo();
             } else {
                 Engage.trigger(plugin.events.mediaPackageModelError.getName(), "A requested search endpoint is currently not available.");
@@ -238,7 +238,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     // init event
     Engage.log("MhConnection: Init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomMhConnection');
+    var relative_plugin_path = Engage.getPluginPath("EngagePluginCustomMhConnection");
 
     // get ID
     mediaPackageID = Engage.model.get("urlParameters").id;

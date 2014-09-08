@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'engage/engage_model', 'engage/engage_tab_logic'], function(require, $, _, Backbone, Mousetrap, Bowser, EngageModel, EngageTabLogic) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, EngageModel, EngageTabLogic) {
     "use strict";
 
     var events = {
@@ -51,7 +51,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
     var id_customError_str = "customError_str";
     var class_loading = "loading";
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var plugins_loaded = {};
     var loadingDelay1 = 500;
     var loadingDelay2 = 1000;
@@ -128,8 +128,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                 // link tag for css file
                 var cssLinkTag = $("<link>");
                 var cssAttr = {
-                    type: 'text/css',
-                    rel: 'stylesheet'
+                    type: "text/css",
+                    rel: "stylesheet"
                 };
                 // template obj
                 var core_template = "none";
@@ -137,20 +137,20 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                 var view_logic_path = "";
                 switch (engageCore.model.get("mode")) {
                     case "mobile":
-                        cssAttr.href = 'css/core_mobile_style.css';
+                        cssAttr.href = "css/core_mobile_style.css";
                         core_template = "templates/core_mobile.html";
                         view_logic_path = "engage/engage_mobile_view";
                         engageCore.model.mobile = true;
                         break;
                     case "embed":
-                        cssAttr.href = 'css/core_embed_style.css';
+                        cssAttr.href = "css/core_embed_style.css";
                         core_template = "templates/core_embed.html";
                         view_logic_path = "engage/engage_embed_view";
                         engageCore.model.embed = true;
                         break;
                     case "desktop":
                     default:
-                        cssAttr.href = 'css/core_desktop_style.css';
+                        cssAttr.href = "css/core_desktop_style.css";
                         core_template = "templates/core_desktop.html";
                         view_logic_path = "engage/engage_desktop_view";
                         engageCore.model.desktop = true;
@@ -173,27 +173,27 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                         if (!(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                             // BEGIN LOAD PLUGINS
                             // fetch plugin information
-                            engageCore.model.get('pluginsInfo').fetch({
+                            engageCore.model.get("pluginsInfo").fetch({
                                 success: function(pluginInfos) {
                                     // load plugin as requirejs module
-                                    if (pluginInfos.get('pluginlist') && pluginInfos.get('pluginlist').plugins !== undefined) {
-                                        if ($.isArray(pluginInfos.get('pluginlist').plugins)) {
-                                            $.each(pluginInfos.get('pluginlist').plugins, function(index, value) {
-                                                var plugin_name = value['name'];
+                                    if (pluginInfos.get("pluginlist") && pluginInfos.get("pluginlist").plugins !== undefined) {
+                                        if ($.isArray(pluginInfos.get("pluginlist").plugins)) {
+                                            $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
+                                                var plugin_name = value["name"];
                                                 plugins_loaded[plugin_name] = false;
                                             });
-                                            $.each(pluginInfos.get('pluginlist').plugins, function(index, value) {
+                                            $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
                                                 // load plugin
-                                                var plugin_name = value['name'];
-                                                engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ('../../../plugin/' + value['static-path'] + '/') + "'...");
-                                                loadPlugin('../../../plugin/' + value['static-path'] + '/', plugin_name);
+                                                var plugin_name = value["name"];
+                                                engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + value["static-path"] + "/") + "'...");
+                                                loadPlugin("../../../plugin/" + value["static-path"] + "/", plugin_name);
                                             });
                                         } else {
                                             // load plugin
-                                            var plugin_name = value['name'];
+                                            var plugin_name = value["name"];
                                             plugins_loaded[plugin_name] = false;
-                                            engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ('../../../plugin/' + value['static-path'] + '/') + "'...");
-                                            loadPlugin('../../../plugin/' + pluginInfos.get('pluginlist').plugins['static-path'] + '/', plugin_name);
+                                            engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + value["static-path"] + "/") + "'...");
+                                            loadPlugin("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/", plugin_name);
                                         }
                                     }
                                 }
@@ -283,19 +283,19 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
             }
         },
         getPluginPath: function(pluginName) {
-            var evaluated_plugin_path = '';
-            var pluginsInfos = engageCore.model.get('pluginsInfo');
-            var pluginList = pluginsInfos.get('pluginlist');
+            var evaluated_plugin_path = "";
+            var pluginsInfos = engageCore.model.get("pluginsInfo");
+            var pluginList = pluginsInfos.get("pluginlist");
             if (pluginList && pluginList.plugins !== undefined) {
                 var plugins = pluginList.plugins;
                 if ($.isArray(plugins)) {
                     $.each(plugins, function(index, value) {
-                        if (value['name'] === pluginName) {
-                            evaluated_plugin_path = '../../../plugin/' + value['static-path'] + '/';
+                        if (value["name"] === pluginName) {
+                            evaluated_plugin_path = "../../../plugin/" + value["static-path"] + "/";
                         }
                     });
                 } else {
-                    evaluated_plugin_path = '../../../plugin/' + value['static-path'] + '/';
+                    evaluated_plugin_path = "../../../plugin/" + value["static-path"] + "/";
                 }
             }
             return evaluated_plugin_path;
@@ -397,16 +397,16 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
     }
 
     function loadPlugin(plugin_path, plugin_name) {
-            require([plugin_path + 'main'], function(plugin) {
+            require([plugin_path + "main"], function(plugin) {
                 // load styles in link tags via jquery
                 if ($.isArray(plugin.styles)) {
                     $.each(plugin.styles, function(style_index, style_path) {
                         if (style_path !== "") {
                             var link = $("<link>");
                             link.attr({
-                                type: 'text/css',
-                                rel: 'stylesheet',
-                                href: 'engage/theodul/' + plugin_path + style_path
+                                type: "text/css",
+                                rel: "stylesheet",
+                                href: "engage/theodul/" + plugin_path + style_path
                             });
                             $("head").append(link);
                         }
@@ -415,9 +415,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                     if (plugin.styles !== "") {
                         var link = $("<link>");
                         link.attr({
-                            type: 'text/css',
-                            rel: 'stylesheet',
-                            href: 'engage/theodul/' + plugin_path + plugin.styles
+                            type: "text/css",
+                            rel: "stylesheet",
+                            href: "engage/theodul/" + plugin_path + plugin.styles
                         });
                         $("head").append(link);
                     }
@@ -425,7 +425,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
 
                 if (plugin.template !== "none") {
                     // load template asynchronously
-                    $.get('engage/theodul/' + plugin_path + plugin.template, function(template) {
+                    $.get("engage/theodul/" + plugin_path + plugin.template, function(template) {
                         // empty data object
                         var template_data = {};
                         // add template if not undefined
@@ -433,11 +433,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'mousetrap', 'bowser', 'e
                             template_data = plugin.template_data;
                         }
                         // add full plugin path to the tmeplate data
-                        template_data.plugin_path = 'engage/theodul/' + plugin_path;
+                        template_data.plugin_path = "engage/theodul/" + plugin_path;
                         // process the template using underscore and set it in the plugin obj
                         plugin.templateProcessed = _.template(template, template_data);
                         plugin.template = template;
-                        plugin.pluginPath = 'engage/theodul/' + plugin_path;
+                        plugin.pluginPath = "engage/theodul/" + plugin_path;
                         // load the compiled HTML into the component
                         engageCore.pluginView.insertPlugin(plugin);
                         // plugin load done counter

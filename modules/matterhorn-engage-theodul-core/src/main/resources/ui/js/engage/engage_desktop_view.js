@@ -15,8 +15,8 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'engage/engage_model', 'engage/engage_tab_logic'], function(require, $, _, Backbone, EngageCore, EngageModel, EngageTabLogic) {
-    'use strict';
+define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, EngageCore, EngageModel, EngageTabLogic) {
+    "use strict";
 
     /* change these variables */
     var id_engage_timeline_expand_btn = "engage_timeline_expand_btn";
@@ -34,7 +34,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
     var class_engage_timeline_expand_btn_rotate180 = "engage_timeline_expand_btn_rotate180";
     var class_tab_pane = "tab-pane";
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var timelineplugin_opened = "Engage:timelineplugin_opened";
     var timelineplugin_closed = "Engage:timelineplugin_closed";
 
@@ -45,16 +45,16 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
         // load bootstrap css
         var link = $("<link>");
         link.attr({
-            type: 'text/css',
-            rel: 'stylesheet',
-            href: 'css/bootstrap/css/bootstrap.css'
+            type: "text/css",
+            rel: "stylesheet",
+            href: "css/bootstrap/css/bootstrap.css"
         });
         $("head").append(link);
         link = $("<link>");
         link.attr({
-            type: 'text/css',
-            rel: 'stylesheet',
-            href: 'css/bootstrap/css/bootstrap-responsive.css'
+            type: "text/css",
+            rel: "stylesheet",
+            href: "css/bootstrap/css/bootstrap-responsive.css"
         });
         $("head").append(link);
         // build timeline plugins
@@ -88,10 +88,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
             case id_engage_tab:
                 var tab_ref = plugin.name.replace(/ /g, "_");
                 // insert tab navigation line
-                var tabNavTag = '<li><a href="#' + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + '">' + plugin.name + '</a></li>';
+                var tabNavTag = "<li><a href=\"#" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + "\">" + plugin.name + "</a></li>";
                 $("#" + id_engage_tab_nav).prepend(tabNavTag);
                 // insert tab content
-                var tabTag = '<div class="' + class_tab_pane + '" id="' + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + '">' + plugin.templateProcessed + '</div>';
+                var tabTag = "<div class=\"" + class_tab_pane + "\" id=\"" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + "\">" + plugin.templateProcessed + "</div>";
                 $("#" + id_engage_tab_content).prepend(tabTag);
                 plugin.inserted = true;
                 plugin.container = "#" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2;
@@ -117,7 +117,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
      */
     var allPluginsLoadedEvent = function() {
         // add tab sorted tab logic to the view
-        EngageTabLogic('tabs', id_engage_tab_nav);
+        EngageTabLogic("tabs", id_engage_tab_nav);
     }
 
     // public functions for the module

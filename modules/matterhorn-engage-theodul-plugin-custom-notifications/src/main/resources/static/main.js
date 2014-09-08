@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'moment'], function(require, $, _, Backbone, Engage, Moment) {
+define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "moment"], function(require, $, _, Backbone, Engage, Moment) {
     "use strict";
     var PLUGIN_NAME = "Engage Custom Notifications",
         PLUGIN_TYPE = "engage_custom",
@@ -97,7 +97,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
     var alertifyDisplayDatetime = false;
     var alertifyPath = "lib/alertify/alertify";
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var alertify;
     var mediapackageError = false;
     var initCount = 2;
@@ -134,7 +134,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
      * Initialize the plugin
      */
     function initPlugin() {
-        Moment.locale('en', {
+        Moment.locale("en", {
             // customizations
         });
 
@@ -194,7 +194,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
 
     // init event
     Engage.log("Notifications: Init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomNotifications');
+    var relative_plugin_path = Engage.getPluginPath("EngagePluginCustomNotifications");
 
     // load alertify lib
     require([relative_plugin_path + alertifyPath], function(_alertify) {

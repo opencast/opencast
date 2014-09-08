@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage Plugin Custom Usertracking",
         PLUGIN_TYPE = "engage_custom",
@@ -82,11 +82,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     /* change these variables */
-    var USERTRACKING_ENDPOINT = '/usertracking';
-    var mediapackageChange = 'change:mediaPackage';
-    var footprintsChange = 'change:footprints';
+    var USERTRACKING_ENDPOINT = "/usertracking";
+    var mediapackageChange = "change:mediaPackage";
+    var footprintsChange = "change:footprints";
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var initCount = 3;
     var lastFootprint = undefined;
     var mediapackageID;
@@ -113,7 +113,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         Engage.log("Usertracking: Setting footprint at " + cTime);
                         //put to mh endpoint
                         $.ajax({
-                            type: 'PUT',
+                            type: "PUT",
                             url: USERTRACKING_ENDPOINT,
                             data: {
                                 id: mediapackageID,
@@ -136,7 +136,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     // init event
     Engage.log("Usertracking: Init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomUsertracking');
+    var relative_plugin_path = Engage.getPluginPath("EngagePluginCustomUsertracking");
 
     // mediapackage model created
     Engage.model.on(mediapackageChange, function() {

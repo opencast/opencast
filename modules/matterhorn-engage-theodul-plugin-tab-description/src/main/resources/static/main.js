@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'moment'], function(require, $, _, Backbone, Engage, Moment) {
+define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "moment"], function(require, $, _, Backbone, Engage, Moment) {
     "use strict";
     var PLUGIN_NAME = "Description";
     var PLUGIN_TYPE = "engage_tab";
@@ -83,14 +83,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
     /* change these variables */
     var class_tabGroupItem = "tab-group-item";
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var mediapackageChange = "change:mediaPackage";
     var initCount = 2;
     var mediapackageError = false;
 
     var DescriptionTabView = Backbone.View.extend({
         initialize: function(mediaPackageModel, template) {
-            this.setElement($(plugin.container)); // every plugin view has it's own container associated with it
+            this.setElement($(plugin.container)); // every plugin view has it"s own container associated with it
             this.model = mediaPackageModel;
             this.template = template;
             // bind the render function always to the view
@@ -146,7 +146,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
-            Moment.locale('en', {
+            Moment.locale("en", {
                 // customizations
             });
             // create a new view with the media package model and the template
@@ -160,7 +160,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
     if (isDesktopMode) {
         // init event
         Engage.log("Tab:Description: Init");
-        var relative_plugin_path = Engage.getPluginPath('EngagePluginTabDescription');
+        var relative_plugin_path = Engage.getPluginPath("EngagePluginTabDescription");
 
         // listen on a change/set of the mediaPackage model
         Engage.model.on(mediapackageChange, function() {
