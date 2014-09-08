@@ -16,24 +16,24 @@
 /*global define*/
 define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "moment"], function(require, $, _, Backbone, Engage, Moment) {
     "use strict";
-    var PLUGIN_NAME = "Engage Custom Notifications",
-        PLUGIN_TYPE = "engage_custom",
-        PLUGIN_VERSION = "0.1",
-        PLUGIN_TEMPLATE = "none",
-        PLUGIN_TEMPLATE_MOBILE = "none",
-        PLUGIN_TEMPLATE_EMBED = "none",
-        PLUGIN_STYLES = [
-            "lib/alertify/alertify.css",
-            "lib/alertify/alertify-bootstrap-3.css"
-        ],
-        PLUGIN_STYLES_MOBILE = [
-            "lib/alertify/alertify.css",
-            "lib/alertify/alertify-bootstrap-3.css"
-        ],
-        PLUGIN_STYLES_EMBED = [
-            "lib/alertify/alertify.css",
-            "lib/alertify/alertify-bootstrap-3.css"
-        ];
+    var PLUGIN_NAME = "Engage Custom Notifications";
+    var PLUGIN_TYPE = "engage_custom";
+    var PLUGIN_VERSION = "1.0";
+    var PLUGIN_TEMPLATE = "none";
+    var PLUGIN_TEMPLATE_MOBILE = "none";
+    var PLUGIN_TEMPLATE_EMBED = "none";
+    var PLUGIN_STYLES = [
+        "lib/alertify/alertify.css",
+        "lib/alertify/alertify-bootstrap-3.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "lib/alertify/alertify.css",
+        "lib/alertify/alertify-bootstrap-3.css"
+    ];
+    var PLUGIN_STYLES_EMBED = [
+        "lib/alertify/alertify.css",
+        "lib/alertify/alertify-bootstrap-3.css"
+    ];
 
     var plugin;
     var events = {

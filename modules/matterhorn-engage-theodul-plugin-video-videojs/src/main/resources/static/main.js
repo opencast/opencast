@@ -18,22 +18,22 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     "use strict";
     var PLUGIN_NAME = "Engage VideoJS Videodisplay";
     var PLUGIN_TYPE = "engage_video";
-    var PLUGIN_VERSION = "0.1",
-        PLUGIN_TEMPLATE = "template.html",
-        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
-        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
-        PLUGIN_STYLES = [
-            "style.css",
-            "lib/videojs/video-js.css"
-        ],
-        PLUGIN_STYLES_MOBILE = [
-            "style_mobile.css",
-            "lib/videojs/video-js.css"
-        ],
-        PLUGIN_STYLES_EMBED = [
-            "style_embed.css",
-            "lib/videojs/video-js.css"
-        ];
+    var PLUGIN_VERSION = "1.0";
+    var PLUGIN_TEMPLATE = "template.html";
+    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
+    var PLUGIN_STYLES = [
+        "style.css",
+        "lib/videojs/video-js.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "style_mobile.css",
+        "lib/videojs/video-js.css"
+    ];
+    var PLUGIN_STYLES_EMBED = [
+        "style_embed.css",
+        "lib/videojs/video-js.css"
+    ];
 
     var plugin;
     var events = {

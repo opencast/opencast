@@ -16,21 +16,21 @@
 /*global define*/
 define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
     "use strict";
-    var PLUGIN_NAME = "Engage Custom Matterhorn Endpoint Connection",
-        PLUGIN_TYPE = "engage_custom",
-        PLUGIN_VERSION = "0.1",
-        PLUGIN_TEMPLATE = "none",
-        PLUGIN_TEMPLATE_MOBILE = "none",
-        PLUGIN_TEMPLATE_EMBED = "none",
-        PLUGIN_STYLES = [
-            ""
-        ],
-        PLUGIN_STYLES_MOBILE = [
-            ""
-        ],
-        PLUGIN_STYLES_EMBED = [
-            ""
-        ];
+    var PLUGIN_NAME = "Engage Custom Matterhorn Endpoint Connection";
+    var PLUGIN_TYPE = "engage_custom";
+    var PLUGIN_VERSION = "1.0";
+    var PLUGIN_TEMPLATE = "none";
+    var PLUGIN_TEMPLATE_MOBILE = "none";
+    var PLUGIN_TEMPLATE_EMBED = "none";
+    var PLUGIN_STYLES = [
+        ""
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        ""
+    ];
+    var PLUGIN_STYLES_EMBED = [
+        ""
+    ];
 
     var plugin;
     var events = {

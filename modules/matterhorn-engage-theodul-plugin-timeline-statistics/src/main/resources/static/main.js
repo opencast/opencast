@@ -18,19 +18,19 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     "use strict";
     var PLUGIN_NAME = "Timeline Usertracking Statistics";
     var PLUGIN_TYPE = "engage_timeline";
-    var PLUGIN_VERSION = "0.1",
-        PLUGIN_TEMPLATE = "template.html",
-        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
-        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
-        PLUGIN_STYLES = [
-            "style.css"
-        ],
-        PLUGIN_STYLES_MOBILE = [
-            "style_mobile.css"
-        ],
-        PLUGIN_STYLES_EMBED = [
-            "style_embed.css"
-        ];
+    var PLUGIN_VERSION = "1.0";
+    var PLUGIN_TEMPLATE = "template.html";
+    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
+    var PLUGIN_STYLES = [
+        "style.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "style_mobile.css"
+    ];
+    var PLUGIN_STYLES_EMBED = [
+        "style_embed.css"
+    ];
 
     var plugin;
     var events = {
