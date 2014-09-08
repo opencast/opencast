@@ -33,3 +33,7 @@
     max-width: 100%;
     width: auto !important;
 }
+
+.vjs-fullscreen-control {
+    visibility: hidden;
+}

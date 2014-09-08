@@ -14,78 +14,86 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function (require, $, _, Backbone, Engage) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'moment'], function(require, $, _, Backbone, Engage, Moment) {
     "use strict";
     var PLUGIN_NAME = "Basic Engage Description";
     var PLUGIN_TYPE = "engage_description";
     var PLUGIN_VERSION = "0.1",
-		PLUGIN_TEMPLATE = "template.html",
+        PLUGIN_TEMPLATE = "template.html",
         PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
-        PLUGIN_TEMPLATE_EMBED = "template.html",
+        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
         PLUGIN_STYLES = [
             "style.css"
         ],
         PLUGIN_STYLES_MOBILE = [
-            "style.css"
+            "style_mobile.css"
         ],
         PLUGIN_STYLES_EMBED = [
-            "style.css"
+            "style_embed.css"
         ];
 
     var plugin;
     var events = {
-        plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler")
+        plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
+
+    var isDesktopMode = false;
+    var isEmbedMode = false;
+    var isMobileMode = false;
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
-    case "mobile":
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES_MOBILE,
-            template: PLUGIN_TEMPLATE_MOBILE,
-            events: events
-        };
-        break;
-    case "embed":
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES_EMBED,
-            template: PLUGIN_TEMPLATE_EMBED,
-            events: events
-        };
-        break;
-    // fallback to desktop/default mode
-    case "desktop":
-    default:
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES,
-            template: PLUGIN_TEMPLATE,
-            events: events
-        };
-        break;
+        case "mobile":
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_MOBILE,
+                template: PLUGIN_TEMPLATE_MOBILE,
+                events: events
+            };
+            isMobileMode = true;
+            break;
+        case "embed":
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_EMBED,
+                template: PLUGIN_TEMPLATE_EMBED,
+                events: events
+            };
+            isEmbedMode = true;
+            break;
+        case "desktop":
+        default:
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES,
+                template: PLUGIN_TEMPLATE,
+                events: events
+            };
+            isDesktopMode = true;
+            break;
     }
 
     /* change these variables */
-    var momentPath = 'lib/moment';
+    // nothing to see here...
 
     /* don't change these variables */
-    var initCount = 3;
+    var initCount = 2;
     var id_engage_description = "engage_description";
     var mediapackageChange = "change:mediaPackage";
+    var mediapackageError = false;
 
     // view //
 
     var DescriptionView = Backbone.View.extend({
         el: $("#" + id_engage_description), // every view has a element associated with it
-        initialize: function (mediaPackageModel, template) {
+        initialize: function(mediaPackageModel, template) {
             this.model = mediaPackageModel;
             this.template = template;
             // bind the render function always to the view
@@ -93,59 +101,58 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             // listen for changes of the model and bind the render function to this
             this.model.bind("change", this.render);
         },
-        render: function () {
-            // format values
-            var tempVars = {
-                title: this.model.get("title"),
-                creator: this.model.get("creator"),
-                date: this.model.get("date")
-            };
-            // try to format the date
-            if (moment(tempVars.date) !== null) {
-                tempVars.date = moment(this.model.get("date")).format("MMMM Do YYYY");
+        render: function() {
+            if (!mediapackageError) {
+                var tempVars = {
+                    title: this.model.get("title"),
+                    creator: this.model.get("creator"),
+                    date: this.model.get("date")
+                };
+                // try to format the date
+                if (Moment(tempVars.date) != null) {
+                    tempVars.date = Moment(tempVars.date).format("MMMM Do YYYY");
+                }
+                // compile template and load into the html
+                this.$el.html(_.template(this.template, tempVars));
             }
-            // compile template and load into the html
-            this.$el.html(_.template(this.template, tempVars));
         }
     });
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if (plugin.inserted === true) {
+        if (isDesktopMode && plugin.inserted) {
+            Moment.locale('en', {
+                // customizations
+            });
             // create a new view with the media package model and the template
             new DescriptionView(Engage.model.get("mediaPackage"), plugin.template);
+            Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
+                mediapackageError = true;
+            });
         }
     }
 
-    // init event
-    Engage.log("Description: Init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginDescription');
-    Engage.log('Description: Relative plugin path: "' + relative_plugin_path + '"');
+    if (isDesktopMode) {
+        // init event
+        Engage.log("Description: Init");
+        var relative_plugin_path = Engage.getPluginPath('EngagePluginDescription');
 
-    // listen on a change/set of the mediaPackage model
-    Engage.model.on(mediapackageChange, function () {
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
+        // listen on a change/set of the mediaPackage model
+        Engage.model.on(mediapackageChange, function() {
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
 
-    // load moment lib
-    require([relative_plugin_path + momentPath], function (momentjs) {
-        Engage.log("Description: Loaded moment lib");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
-
-    // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function () {
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
+        // all plugins loaded
+        Engage.on(plugin.events.plugin_load_done.getName(), function() {
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+    }
 
     return plugin;
 });

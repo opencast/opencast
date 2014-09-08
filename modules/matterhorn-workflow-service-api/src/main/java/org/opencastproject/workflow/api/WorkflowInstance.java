@@ -19,8 +19,9 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.List;
+
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * An single instance of a running, paused, or stopped workflow. WorkflowInstance objects are snapshots in time for a
@@ -114,7 +115,7 @@ public interface WorkflowInstance extends Configurable {
    * Set the state of the workflow.
    *
    * @param state
-   *            the new workflow state
+   *          the new workflow state
    */
   void setState(WorkflowState state);
 
@@ -129,8 +130,8 @@ public interface WorkflowInstance extends Configurable {
   WorkflowOperationInstance next();
 
   /**
-   * Return whether there is another operation after the current operation.
-   * If there is no next operation, this will return null.
+   * Return whether there is another operation after the current operation. If there is no next operation, this will
+   * return null.
    */
   boolean hasNext();
 
@@ -138,16 +139,6 @@ public interface WorkflowInstance extends Configurable {
    * Set the media package this workflow instance is processing.
    */
   void setMediaPackage(MediaPackage mp);
-
-  /**
-   * Gets the error messages describing what went wrong, if anything, with this media package during processing.
-   */
-  String[] getErrorMessages();
-
-  /**
-   * Add a localized error message.
-   */
-  void addErrorMessage(String localizedMessage);
 
   /**
    * Appends the operations found in the workflow definition to the end of this workflow instance.

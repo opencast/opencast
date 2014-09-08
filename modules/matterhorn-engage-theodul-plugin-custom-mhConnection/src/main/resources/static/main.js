@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function (require, $, _, Backbone, Engage) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage Custom Matterhorn Endpoint Connection",
         PLUGIN_TYPE = "engage_custom",
@@ -40,40 +40,46 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         getMediaPackage: new Engage.Event("MhConnection:getMediaPackage", "", "handler")
     };
 
+    var isDesktopMode = false;
+    var isEmbedMode = false;
+    var isMobileMode = false;
+
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
-    case "mobile":
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES_MOBILE,
-            template: PLUGIN_TEMPLATE_MOBILE,
-            events: events
-        };
-        break;
-    case "embed":
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES_EMBED,
-            template: PLUGIN_TEMPLATE_EMBED,
-            events: events
-        };
-        break;
-    // fallback to desktop/default mode
-    case "desktop":
-    default:
-        plugin = {
-            name: PLUGIN_NAME,
-            type: PLUGIN_TYPE,
-            version: PLUGIN_VERSION,
-            styles: PLUGIN_STYLES,
-            template: PLUGIN_TEMPLATE,
-            events: events
-        };
-        break;
+        case "mobile":
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_MOBILE,
+                template: PLUGIN_TEMPLATE_MOBILE,
+                events: events
+            };
+            isMobileMode = true;
+            break;
+        case "embed":
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_EMBED,
+                template: PLUGIN_TEMPLATE_EMBED,
+                events: events
+            };
+            break;
+            isEmbedMode = true;
+        case "desktop":
+        default:
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES,
+                template: PLUGIN_TEMPLATE,
+                events: events
+            };
+            isDesktopMode = true;
+            break;
     }
 
     /* change these variables */
@@ -88,44 +94,56 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     var MediaPackageModel = Backbone.Model.extend({
         urlRoot: SEARCH_ENDPOINT,
-        initialize: function () {
-            Engage.log("MhConnection: init MediaPackageModel");
+        initialize: function() {
+            Engage.log("MhConnection: Init MediaPackageModel");
             this.update();
         },
-        update: function () {
+        update: function() {
             // request model data
             this.fetch({
                 data: {
                     id: mediaPackageID
                 },
-                success: function (model) {
+                success: function(model) {
                     var mediaPackage; // Mediapackage data
                     if (model.attributes && model.attributes['search-results'] && model.attributes['search-results'].result) {
                         mediaPackage = model.attributes['search-results'].result;
                         if (mediaPackage) {
                             // format silent the model data, see dublin core for reference names
-                            if (mediaPackage.mediapackage.media.track)
+                            if (mediaPackage.mediapackage.media.track) {
                                 model.attributes.tracks = mediaPackage.mediapackage.media.track;
-                            if (mediaPackage.mediapackage.attachments.attachment)
+                            }
+                            if (mediaPackage.mediapackage.attachments.attachment) {
                                 model.attributes.attachments = mediaPackage.mediapackage.attachments.attachment;
-                            if (mediaPackage.dcTitle)
+                            }
+                            if (mediaPackage.dcTitle) {
                                 model.attributes.title = mediaPackage.dcTitle;
-                            if (mediaPackage.dcCreator)
+                            }
+                            if (mediaPackage.dcCreator) {
                                 model.attributes.creator = mediaPackage.dcCreator;
-                            if (mediaPackage.dcCreated)
+                            }
+                            if (mediaPackage.dcCreated) {
                                 model.attributes.date = mediaPackage.dcCreated;
-                            if (mediaPackage.dcDescription)
+                            }
+                            if (mediaPackage.dcDescription) {
                                 model.attributes.description = mediaPackage.dcDescription;
-                            if (mediaPackage.dcSubject)
+                            }
+                            if (mediaPackage.dcSubject) {
                                 model.attributes.subject = mediaPackage.dcSubject;
-                            if (mediaPackage.dcContributor)
+                            }
+                            if (mediaPackage.dcContributor) {
                                 model.attributes.contributor = mediaPackage.dcContributor;
-                            if (mediaPackage.mediapackage.seriestitle)
+                            }
+                            if (mediaPackage.mediapackage.seriestitle) {
                                 model.attributes.series = mediaPackage.mediapackage.seriestitle;
+                            }
+                            if (mediaPackage.segments && mediaPackage.segments.segment) {
+                                model.attributes.segments = mediaPackage.segments.segment;
+                            }
                         }
                         model.trigger("change");
                     } else {
-                		Engage.trigger(plugin.events.mediaPackageModelError.getName(), "Media information could not be loaded successfully.");
+                        Engage.trigger(plugin.events.mediaPackageModelError.getName(), "Media information could not be loaded successfully.");
                     }
                 }
             });
@@ -151,21 +169,21 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var FootprintCollection = Backbone.Collection.extend({
         model: FootprintModel,
         url: USERTRACKING_ENDPOINT,
-        initialize: function () {
+        initialize: function() {
             this.update();
         },
-        update: function () {
+        update: function() {
             // request collection data
             this.fetch({
                 data: {
                     id: mediaPackageID
                 },
-                success: function (collection) {
+                success: function(collection) {
                     collection.trigger("change");
                 }
             });
         },
-        parse: function (response) {
+        parse: function(response) {
             return response.footprints.footprint;
         }
     });
@@ -182,8 +200,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
             mediaInfo.creator = mediaPackage.dcCreator;
             mediaInfo.date = mediaPackage.dcCreated;
         } else {
-			Engage.trigger(plugin.events.mediaPackageModelError.getName(), "No media information are available.");
-		}
+            Engage.trigger(plugin.events.mediaPackageModelError.getName(), "No media information are available.");
+        }
     }
 
     /**
@@ -198,22 +216,29 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 id: mediaPackageID
             },
             cache: false
-        }).done(function (data) {
+        }).done(function(data) {
             // split search results
             if (data && data['search-results'] && data['search-results'].result) {
                 mediaPackage = data['search-results'].result;
                 extractMediaInfo();
             } else {
-				Engage.trigger(plugin.events.mediaPackageModelError.getName(), "A requested search endpoint is currently not available.");
+                Engage.trigger(plugin.events.mediaPackageModelError.getName(), "A requested search endpoint is currently not available.");
             }
             callback();
         });
     }
 
+    /**
+     * Initialize the plugin
+     */
+    function initPlugin() {
+        Engage.model.set("mediaPackage", new MediaPackageModel());
+        Engage.model.set("footprints", new FootprintCollection());
+    }
+
     // init event
     Engage.log("MhConnection: Init");
     var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomMhConnection');
-    Engage.log('MhConnection: Relative plugin path: "' + relative_plugin_path + '"');
 
     // get ID
     mediaPackageID = Engage.model.get("urlParameters").id;
@@ -221,11 +246,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         mediaPackageID = "";
     }
 
-    Engage.on(plugin.events.getMediaInfo.getName(), function (callback) {
+    Engage.on(plugin.events.getMediaInfo.getName(), function(callback) {
         // check if data is already loaded
         if (!mediaPackage && !mediaInfo) {
             // get info from search endpoint
-            callSearchEndpoint(function () {
+            callSearchEndpoint(function() {
                 // trigger callback
                 callback(mediaInfo);
             });
@@ -235,11 +260,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
     });
 
-    Engage.on(plugin.events.getMediaPackage.getName(), function (callback) {
+    Engage.on(plugin.events.getMediaPackage.getName(), function(callback) {
         // check if data is already loaded
         if (!mediaPackage) {
             // get info from search endpoint
-            callSearchEndpoint(function () {
+            callSearchEndpoint(function() {
                 // trigger callback
                 callback(mediaPackage);
             });
@@ -250,13 +275,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     });
 
     // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function () {
+    Engage.on(plugin.events.plugin_load_done.getName(), function() {
         Engage.log("MhConnection: Plugin load done");
-        Engage.model.set("mediaPackage", new MediaPackageModel());
-        Engage.model.set("footprints", new FootprintCollection());
         initCount -= 1;
         if (initCount <= 0) {
-            // do something
+            initPlugin();
         }
     });
 

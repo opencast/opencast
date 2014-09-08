@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<incidentTree xmlns="http://job.opencastproject.org">
+  <incident>
+    <id>1</id>
+    <jobId>2</jobId>
+    <serviceType>service</serviceType>
+    <processingHost>localhost</processingHost>
+    <timestamp>1970-01-01T00:00:00.001Z</timestamp>
+    <severity>FAILURE</severity>
+    <code>code</code>
+    <descriptionParameters>
+      <param name="key">value</param>
+    </descriptionParameters>
+    <details>
+      <detail title="title">content</detail>
+    </details>
+  </incident>
+  <incident>
+    <id>2</id>
+    <jobId>2</jobId>
+    <serviceType>service</serviceType>
+    <processingHost>localhost</processingHost>
+    <timestamp>1970-01-01T00:00:00.002Z</timestamp>
+    <severity>FAILURE</severity>
+    <code>code</code>
+    <descriptionParameters>
+      <param name="key">value</param>
+    </descriptionParameters>
+    <details>
+      <detail title="title">content</detail>
+    </details>
+  </incident>
+  <incidents>
+    <incident>
+      <id>3</id>
+      <jobId>2</jobId>
+      <serviceType>service</serviceType>
+      <processingHost>localhost</processingHost>
+      <timestamp>1970-01-01T00:00:00.003Z</timestamp>
+      <severity>FAILURE</severity>
+      <code>code</code>
+      <descriptionParameters>
+        <param name="key">value</param>
+      </descriptionParameters>
+      <details>
+        <detail title="title">content</detail>
+      </details>
+    </incident>
+    <incidents>
+      <incident>
+        <id>4</id>
+        <jobId>2</jobId>
+        <serviceType>service</serviceType>
+        <processingHost>localhost</processingHost>
+        <timestamp>1970-01-01T00:00:00.004Z</timestamp>
+        <severity>FAILURE</severity>
+        <code>code</code>
+        <descriptionParameters>
+          <param name="key">value</param>
+        </descriptionParameters>
+        <details>
+          <detail title="title">content</detail>
+        </details>
+      </incident>
+      <incident>
+        <id>5</id>
+        <jobId>2</jobId>
+        <serviceType>service</serviceType>
+        <processingHost>localhost</processingHost>
+        <timestamp>1970-01-01T00:00:00.005Z</timestamp>
+        <severity>FAILURE</severity>
+        <code>code</code>
+        <descriptionParameters>
+          <param name="key">value</param>
+        </descriptionParameters>
+        <details>
+          <detail title="title">content</detail>
+        </details>
+      </incident>
+    </incidents>
+  </incidents>
+</incidentTree>

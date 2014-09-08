@@ -1,15 +1,37 @@
-.engage_description_tab_entry {
-  
-}
-#engage_description_tab_content{
-	width: 60%;
+#engage_description_tab_content {
+    width: 100%;
+    padding-top: 15px;
+    padding-right: 20px;
 }
 
-#engage_description_tab_left {
-  float: left;
-  padding: 0px 0px 0px 10px;
+.description-item {
+    border-radius: 4px;
+    padding: 5px;
+/*
+  color: #000000;
+  background-color: #F1F1F1;
+  border-color: #969696;
+  */
 }
-#engage_description_tab_right {
-  float: right;
-  padding: 0px 0px 0px 10px;
+
+.description-item-header {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.description-item-body {
+    margin-left: 8px;
+}
+
+.descriptionTabLeft {
+    float: left;
+    width: 50%;
+}
+
+.descriptionTabRight {
+    float: left;
+}
+
+.clear {
+    clear: both;
 }

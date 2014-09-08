@@ -15,10 +15,12 @@
  */
 package org.opencastproject.util.data.functions;
 
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 
-import static org.opencastproject.util.data.Tuple.tuple;
+import java.util.List;
 
 /** Functions for tuples. */
 public final class Tuples {
@@ -37,6 +39,38 @@ public final class Tuples {
     return new Function<B, Tuple<A, B>>() {
       @Override public Tuple<A, B> apply(B b) {
         return tuple(a, b);
+      }
+    };
+  }
+
+  public static <A> Function<A[], Tuple<A, A>> fromArray() {
+    return new Function<A[], Tuple<A, A>>() {
+      @Override public Tuple<A, A> apply(A[] as) {
+        return tuple(as[0], as[1]);
+      }
+    };
+  }
+
+  public static <A> Function<List<A>, Tuple<A, A>> fromList() {
+    return new Function<List<A>, Tuple<A, A>>() {
+      @Override public Tuple<A, A> apply(List<A> as) {
+        return tuple(as.get(0), as.get(1));
+      }
+    };
+  }
+
+  public static <A> Function<A[], Boolean> arrayHasSize(final int size) {
+    return new Function<A[], Boolean>() {
+      @Override public Boolean apply(A[] as) {
+        return as.length == size;
+      }
+    };
+  }
+
+  public static <A> Function<List<A>, Boolean> listHasSize(final int size) {
+    return new Function<List<A>, Boolean>() {
+      @Override public Boolean apply(List<A> as) {
+        return as.size() == size;
       }
     };
   }

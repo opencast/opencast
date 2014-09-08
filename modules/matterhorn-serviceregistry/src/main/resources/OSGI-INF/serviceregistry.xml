@@ -19,4 +19,6 @@
     cardinality="1..1" policy="static" bind="setUserDirectoryService" />
   <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
     cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+  <reference name="incidentService" interface="org.opencastproject.serviceregistry.api.IncidentService"
+    cardinality="0..1" policy="dynamic" bind="setIncidentService" />
 </scr:component>
