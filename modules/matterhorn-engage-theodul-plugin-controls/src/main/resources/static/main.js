@@ -425,7 +425,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     }
 
     function loadStoredInitialValues() {
-        var vol = Basil.get(storagevolume);
+        var vol = Basil.get(storage_volume);
         if (vol) {
             $("#" + id_volume).slider("value", vol);
         }
