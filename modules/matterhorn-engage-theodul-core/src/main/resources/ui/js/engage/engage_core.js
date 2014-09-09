@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "basil", "mousetrap", "bowser", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Basil, Mousetrap, Bowser, EngageModel, EngageTabLogic) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, EngageModel, EngageTabLogic) {
     "use strict";
 
     var events = {
@@ -78,11 +78,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "mousetrap", "bo
     if (window.console) {
         console.log("Core: Init");
     }
-
-    var basilOptions = {
-        namespace: 'mhStorage'
-    };
-    Basil = new window.Basil(basilOptions);
 
     // event prototype
     function EngageEvent(name, description, type) {

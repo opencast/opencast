@@ -1,3 +1,8 @@
+/*!
+  * The missing Javascript smart persistence layer. Unified localstorage, cookie and session storage JavaScript API
+  * https://github.com/Wisembly/basil.js
+  * MIT License | (c) Wisembly and contributors 2014
+  */
 (function () {
 	// Basil
 	var Basil = function (options) {
