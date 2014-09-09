@@ -14,23 +14,23 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'moment'], function(require, $, _, Backbone, Engage, Moment) {
+define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "moment"], function(require, $, _, Backbone, Engage, Moment) {
     "use strict";
     var PLUGIN_NAME = "Basic Engage Description";
     var PLUGIN_TYPE = "engage_description";
-    var PLUGIN_VERSION = "0.1",
-        PLUGIN_TEMPLATE = "template.html",
-        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
-        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
-        PLUGIN_STYLES = [
-            "style.css"
-        ],
-        PLUGIN_STYLES_MOBILE = [
-            "style_mobile.css"
-        ],
-        PLUGIN_STYLES_EMBED = [
-            "style_embed.css"
-        ];
+    var PLUGIN_VERSION = "1.0";
+    var PLUGIN_TEMPLATE = "template.html";
+    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
+    var PLUGIN_STYLES = [
+        "style.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "style_mobile.css"
+    ];
+    var PLUGIN_STYLES_EMBED = [
+        "style_embed.css"
+    ];
 
     var plugin;
     var events = {
@@ -83,7 +83,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
     /* change these variables */
     // nothing to see here...
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var initCount = 2;
     var id_engage_description = "engage_description";
     var mediapackageChange = "change:mediaPackage";
@@ -121,7 +121,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
-            Moment.locale('en', {
+            Moment.locale("en", {
                 // customizations
             });
             // create a new view with the media package model and the template
@@ -135,7 +135,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
     if (isDesktopMode) {
         // init event
         Engage.log("Description: Init");
-        var relative_plugin_path = Engage.getPluginPath('EngagePluginDescription');
+        var relative_plugin_path = Engage.getPluginPath("EngagePluginDescription");
 
         // listen on a change/set of the mediaPackage model
         Engage.model.on(mediapackageChange, function() {

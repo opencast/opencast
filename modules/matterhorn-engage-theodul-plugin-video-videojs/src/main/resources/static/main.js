@@ -14,26 +14,26 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage VideoJS Videodisplay";
     var PLUGIN_TYPE = "engage_video";
-    var PLUGIN_VERSION = "0.1",
-        PLUGIN_TEMPLATE = "template.html",
-        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
-        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
-        PLUGIN_STYLES = [
-            "style.css",
-            "lib/videojs/video-js.css"
-        ],
-        PLUGIN_STYLES_MOBILE = [
-            "style_mobile.css",
-            "lib/videojs/video-js.css"
-        ],
-        PLUGIN_STYLES_EMBED = [
-            "style_embed.css",
-            "lib/videojs/video-js.css"
-        ];
+    var PLUGIN_VERSION = "1.0";
+    var PLUGIN_TEMPLATE = "template.html";
+    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
+    var PLUGIN_STYLES = [
+        "style.css",
+        "lib/videojs/video-js.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "style_mobile.css",
+        "lib/videojs/video-js.css"
+    ];
+    var PLUGIN_STYLES_EMBED = [
+        "style_embed.css",
+        "lib/videojs/video-js.css"
+    ];
 
     var plugin;
     var events = {
@@ -115,7 +115,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     var videoDisplaySizeTimesCheck = 100; // the smaller the factor, the higher the times check!
     var checkVideoDisplaySizeTimeout = 1500;
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var aspectRatio = "";
     var initCount = 4;
     var mediapackageError = false;
@@ -170,13 +170,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
     }
 
     function replaceAll(string, find, replace) {
-        return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+        return string.replace(new RegExp(escapeRegExp(find), "g"), replace);
     }
 
     var VideoDataView = Backbone.View.extend({
         el: $("#" + id_engage_video), // every view has an element associated with it
         initialize: function(videoDataModel, template, videojs_swf) {
-            this.setElement($(plugin.container)); // every plugin view has it's own container associated with it
+            this.setElement($(plugin.container)); // every plugin view has it"s own container associated with it
             this.model = videoDataModel;
             this.template = template;
             this.videojs_swf = videojs_swf;
@@ -209,7 +209,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         for (var j = 0; j < videoSources.presenter.length; ++j) {
                             var aspectRatio_tmp = videoSources.presenter[j].resolution;
                             var t_tmp = $.type(aspectRatio_tmp);
-                            if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) {
+                            if ((t_tmp === "string") && (/\d+x\d+/.test(aspectRatio_tmp))) {
                                 aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
                                 if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
                                     as1 = parseInt(aspectRatio_tmp[1]);
@@ -220,7 +220,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
                         var t = $.type(aspectRatio);
 
-                        if ((t === 'string') && (/\d+x\d+/.test(aspectRatio))) {
+                        if ((t === "string") && (/\d+x\d+/.test(aspectRatio))) {
                             aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
                             break;
                         }
@@ -230,7 +230,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                         for (var j = 0; j < videoSources.presenter.length; ++j) {
                             var aspectRatio_tmp = videoSources.presentation[j].resolution;
                             var t_tmp = $.type(aspectRatio_tmp);
-                            if ((t_tmp === 'string') && (/\d+x\d+/.test(aspectRatio_tmp))) {
+                            if ((t_tmp === "string") && (/\d+x\d+/.test(aspectRatio_tmp))) {
                                 aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
                                 if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
                                     as1 = parseInt(aspectRatio_tmp[1]);
@@ -241,7 +241,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
                         var t = $.type(aspectRatio);
 
-                        if ((t === 'string') && (/\d+x\d+/.test(aspectRatio))) {
+                        if ((t === "string") && (/\d+x\d+/.test(aspectRatio))) {
                             aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
                             break;
                         }
@@ -495,7 +495,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         initialize: function(ids, videoSources, duration) {
             Engage.log("Video: Init VideoDataModel");
             Engage.log(Engage.model.get("orientation"));
-            
+
             this.attributes.ids = ids;
             this.attributes.videoSources = videoSources;
             this.attributes.duration = duration;
@@ -662,7 +662,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
                 theodulVideodisplayMaster.requestFullscreen();
             } else {
                 $(window).scrollTop(0);
-                $('body').css('overflow', 'hidden');
+                $("body").css("overflow", "hidden");
                 $(window).scroll(function() {
                     $(this).scrollTop(0);
                 });
@@ -673,8 +673,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         Engage.on(plugin.events.fullscreenCancel.getName(), function() {
             $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
             if (numberOfVideodisplays > 1) {
-                $('body').css('overflow', 'auto');
-                $(window).unbind('scroll');
+                $("body").css("overflow", "auto");
+                $(window).unbind("scroll");
                 $("#" + id_page_cover).css("opacity", 0.9).fadeOut(300, function() {
                     $("#" + id_engage_video).css("z-index", 0).css("position", "");
                 });
@@ -831,7 +831,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         }
         // init Event
     Engage.log("Video: Init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginVideoVideoJS');
+    var relative_plugin_path = Engage.getPluginPath("EngagePluginVideoVideoJS");
 
     // load video.js lib
     require([relative_plugin_path + videoPath], function(videojs) {

@@ -1,40 +1,43 @@
 /*global requirejs*/
 requirejs.config({
-    baseUrl: 'js/lib',
+    baseUrl: "js/lib",
     paths: {
-        engage: '../engage',
-        plugins: '/engage/plugin/*/static'
+        engage: "../engage",
+        plugins: "/engage/plugin/*/static"
     },
     shim: {
-        'bootstrap': {
+        "bootstrap": {
             //script dependencies
-            deps: ['jquery'],
+            deps: ["jquery"],
             //global variable
-            exports: 'Bootstrap'
+            exports: "Bootstrap"
         },
-        'backbone': {
+        "backbone": {
             //script dependencies
-            deps: ['underscore', 'jquery'],
+            deps: ["underscore", "jquery"],
             //global variable
-            exports: 'Backbone'
+            exports: "Backbone"
         },
-        'underscore': {
+        "underscore": {
             //global variable
-            exports: '_'
+            exports: "_"
         },
-        'jquery.mobile': {
+        "jquery.mobile": {
             //script dependencies
-            deps: ['jquery'],
+            deps: ["jquery"],
         },
-        'mousetrap': {
-            exports: 'Mousetrap'
+        "mousetrap": {
+            exports: "Mousetrap"
         },
-        'moment': {
-            exports: 'Moment'
+        "moment": {
+            exports: "Moment"
+        },
+        "basil": {
+            exports: "Basil"
         }
     }
 });
-var PLUGIN_MANAGER_PATH = '/engage/theodul/manager/list.json';
-var PLUGIN_PATH = '/engage/theodul/plugin/';
+var PLUGIN_MANAGER_PATH = "/engage/theodul/manager/list.json";
+var PLUGIN_PATH = "/engage/theodul/plugin/";
 //start core logic
 require(["engage/engage_core"]);

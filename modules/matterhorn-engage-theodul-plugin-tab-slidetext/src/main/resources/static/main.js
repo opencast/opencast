@@ -14,23 +14,23 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Slide text";
     var PLUGIN_TYPE = "engage_tab";
-    var PLUGIN_VERSION = "0.1",
-        PLUGIN_TEMPLATE = "template.html",
-        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
-        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
-        PLUGIN_STYLES = [
-            "style.css"
-        ],
-        PLUGIN_STYLES_MOBILE = [
-            "style_mobile.css"
-        ],
-        PLUGIN_STYLES_EMBED = [
-            "style_embed.css"
-        ];
+    var PLUGIN_VERSION = "1.0";
+    var PLUGIN_TEMPLATE = "template.html";
+    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
+    var PLUGIN_STYLES = [
+        "style.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "style_mobile.css"
+    ];
+    var PLUGIN_STYLES_EMBED = [
+        "style_embed.css"
+    ];
 
     var plugin;
     var events = {
@@ -88,7 +88,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     /* change these variables */
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var TEMPLATE_TAB_CONTENT_ID = "engage_slidetext_tab_content";
     var html_snippet_id = "engage_slidetext_tab_content";
     var id_segmentNo = "tab_slidetext_segment_";
@@ -115,8 +115,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
      * @return time from the data in milliseconds
      */
     function getTimeInMilliseconds(data) {
-        if ((data !== undefined) && (data !== null) && (data != 0) && (data.length) && (data.indexOf(':') != -1)) {
-            var values = data.split(':');
+        if ((data !== undefined) && (data !== null) && (data != 0) && (data.length) && (data.indexOf(":") != -1)) {
+            var values = data.split(":");
             // when the format is correct
             if (values.length == 3) {
                 // try to convert to numbers
@@ -148,7 +148,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     var SlidetextTabView = Backbone.View.extend({
         initialize: function(mediaPackageModel, template) {
-            this.setElement($(plugin.container)); // every plugin view has it's own container associated with it
+            this.setElement($(plugin.container)); // every plugin view has it"s own container associated with it
             this.model = mediaPackageModel;
             this.template = template;
             // bind the render function always to the view
@@ -236,7 +236,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     // init event
     Engage.log("Tab:Slidetext: Init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginTabSlidetext');
+    var relative_plugin_path = Engage.getPluginPath("EngagePluginTabSlidetext");
 
     // listen on a change/set of the mediaPackage model
     Engage.model.on(mediapackageChange, function() {

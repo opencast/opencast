@@ -14,23 +14,23 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $, _, Backbone, Engage) {
+define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Timeline Usertracking Statistics";
     var PLUGIN_TYPE = "engage_timeline";
-    var PLUGIN_VERSION = "0.1",
-        PLUGIN_TEMPLATE = "template.html",
-        PLUGIN_TEMPLATE_MOBILE = "template_mobile.html",
-        PLUGIN_TEMPLATE_EMBED = "template_embed.html",
-        PLUGIN_STYLES = [
-            "style.css"
-        ],
-        PLUGIN_STYLES_MOBILE = [
-            "style_mobile.css"
-        ],
-        PLUGIN_STYLES_EMBED = [
-            "style_embed.css"
-        ];
+    var PLUGIN_VERSION = "1.0";
+    var PLUGIN_TEMPLATE = "template.html";
+    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
+    var PLUGIN_STYLES = [
+        "style.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "style_mobile.css"
+    ];
+    var PLUGIN_STYLES_EMBED = [
+        "style_embed.css"
+    ];
 
     var plugin;
     var events = {
@@ -194,7 +194,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
         datasetFill: true,
     }
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var mediapackageChange = "change:mediaPackage";
     var footprintChange = "change:footprints";
     var videoDataModelChange = "change:videoDataModel";
@@ -264,7 +264,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     var StatisticsTimelineView = Backbone.View.extend({
         initialize: function() {
-            this.setElement($(plugin.container)); // every plugin view has it's own container associated with it
+            this.setElement($(plugin.container)); // every plugin view has it"s own container associated with it
             this.videoData = Engage.model.get("videoDataModel");
             this.footprints = Engage.model.get("footprints");
             this.template = plugin.template;
@@ -312,7 +312,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], fu
 
     // init event
     Engage.log("Timeline:Statistics: Init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginTimelineStatistics');
+    var relative_plugin_path = Engage.getPluginPath("EngagePluginTimelineStatistics");
 
     if (isDesktopMode) {
         Engage.model.on(footprintChange, function() {

@@ -14,26 +14,26 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'moment'], function(require, $, _, Backbone, Engage, Moment) {
+define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "moment"], function(require, $, _, Backbone, Engage, Moment) {
     "use strict";
-    var PLUGIN_NAME = "Engage Custom Notifications",
-        PLUGIN_TYPE = "engage_custom",
-        PLUGIN_VERSION = "0.1",
-        PLUGIN_TEMPLATE = "none",
-        PLUGIN_TEMPLATE_MOBILE = "none",
-        PLUGIN_TEMPLATE_EMBED = "none",
-        PLUGIN_STYLES = [
-            "lib/alertify/alertify.css",
-            "lib/alertify/alertify-bootstrap-3.css"
-        ],
-        PLUGIN_STYLES_MOBILE = [
-            "lib/alertify/alertify.css",
-            "lib/alertify/alertify-bootstrap-3.css"
-        ],
-        PLUGIN_STYLES_EMBED = [
-            "lib/alertify/alertify.css",
-            "lib/alertify/alertify-bootstrap-3.css"
-        ];
+    var PLUGIN_NAME = "Engage Custom Notifications";
+    var PLUGIN_TYPE = "engage_custom";
+    var PLUGIN_VERSION = "1.0";
+    var PLUGIN_TEMPLATE = "none";
+    var PLUGIN_TEMPLATE_MOBILE = "none";
+    var PLUGIN_TEMPLATE_EMBED = "none";
+    var PLUGIN_STYLES = [
+        "lib/alertify/alertify.css",
+        "lib/alertify/alertify-bootstrap-3.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "lib/alertify/alertify.css",
+        "lib/alertify/alertify-bootstrap-3.css"
+    ];
+    var PLUGIN_STYLES_EMBED = [
+        "lib/alertify/alertify.css",
+        "lib/alertify/alertify-bootstrap-3.css"
+    ];
 
     var plugin;
     var events = {
@@ -97,7 +97,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
     var alertifyDisplayDatetime = false;
     var alertifyPath = "lib/alertify/alertify";
 
-    /* don't change these variables */
+    /* don"t change these variables */
     var alertify;
     var mediapackageError = false;
     var initCount = 2;
@@ -134,7 +134,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
      * Initialize the plugin
      */
     function initPlugin() {
-        Moment.locale('en', {
+        Moment.locale("en", {
             // customizations
         });
 
@@ -194,7 +194,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'mo
 
     // init event
     Engage.log("Notifications: Init");
-    var relative_plugin_path = Engage.getPluginPath('EngagePluginCustomNotifications');
+    var relative_plugin_path = Engage.getPluginPath("EngagePluginCustomNotifications");
 
     // load alertify lib
     require([relative_plugin_path + alertifyPath], function(_alertify) {
