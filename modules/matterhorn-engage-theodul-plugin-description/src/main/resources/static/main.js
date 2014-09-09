@@ -18,7 +18,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     "use strict";
     var PLUGIN_NAME = "Basic Engage Description";
     var PLUGIN_TYPE = "engage_description";
-    var PLUGIN_VERSION = "1.0",
+    var PLUGIN_VERSION = "1.0";
     var PLUGIN_TEMPLATE = "template.html";
     var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
     var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
