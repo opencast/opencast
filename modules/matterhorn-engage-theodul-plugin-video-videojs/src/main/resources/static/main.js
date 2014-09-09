@@ -205,7 +205,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 aspectRatio = null;
                 var as1 = 0;
                 for (var i = 0; i < videoDisplays.length; ++i) {
-                    if (videoSources.presenter && videoSources.presenter[i] && videoSources.presenter[i].resolution) {
+                    if (videoSources.presenter && (videoSources.presenter.length > 0) && videoSources.presenter[i] && videoSources.presenter[i].resolution) {
                         for (var j = 0; j < videoSources.presenter.length; ++j) {
                             var aspectRatio_tmp = videoSources.presenter[j].resolution;
                             var t_tmp = $.type(aspectRatio_tmp);
@@ -226,8 +226,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                         }
                     }
                     // TODO: Same code as above...
-                    else if (videoSources.presentation && videoSources.presentation[i] && videoSources.presentation[i].resolution) {
-                        for (var j = 0; j < videoSources.presenter.length; ++j) {
+                    else if (videoSources.presentation && (videoSources.presentation.length > 0) && videoSources.presentation[i] && videoSources.presentation[i].resolution) {
+                        for (var j = 0; j < videoSources.presentation.length; ++j) {
                             var aspectRatio_tmp = videoSources.presentation[j].resolution;
                             var t_tmp = $.type(aspectRatio_tmp);
                             if ((t_tmp === "string") && (/\d+x\d+/.test(aspectRatio_tmp))) {
@@ -255,8 +255,9 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
 
                 if (isDesktopMode) {
+                    var i = 0;
                     for (var v in videoSources) {
-                        if (videoSources[v].length > 0) {
+                        if ((videoSources[v].length > 0) && (videoDisplays.length > i)) {
                             initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
                             ++i;
                         }
@@ -273,7 +274,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                                 $(this).css("float", "right");
                             }
                         });
-                        for (i = 0; i < videoDisplays.length; ++i) {
+                        for (var i = 0; i < videoDisplays.length; ++i) {
                             $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
                         }
                     }
@@ -414,7 +415,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                         Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
                         Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
                         $("." + id_videoDisplayClass).css("width", "100%");
-                        for (i = 0; i < videoDisplays.length; ++i) {
+                        for (var i = 0; i < videoDisplays.length; ++i) {
                             $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
                         }
                     }
@@ -435,18 +436,18 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                         });
                     }
                 } else if (isMobileMode) {
-                    console.group("Ordering Modus: Mobile");
+                    // console.group("Ordering Modus: Mobile");
                     if (Engage.model.get("orientation") == "portrait") {
-                        console.log("Portrait");
+                        Engage.log("Portrait");
                         $("." + id_videoDisplayClass).css("width", "99.5%");
                     } else if (Engage.model.get("orientation") == "landscape") {
-                        console.log("landscape");
+                        Engage.log("landscape");
                         $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 2) + "%");
                     }
 
-                    for (i = 0; i < videoDisplays.length; ++i) {
+                    for (var i = 0; i < videoDisplays.length; ++i) {
                         $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
-                        ///$("#" + videoDisplays[i]).addClass("auto-height");
+                        // $("#" + videoDisplays[i]).addClass("auto-height");
                     }
                 }
                 checkVideoDisplaySize();
@@ -474,7 +475,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     });
 
     function initVideojsVideo(id, videoSource, videojs_swf) {
-        Engage.log("Video: Initializing video.js-display: '" + id + "'");
+        Engage.log("Video: Initializing video.js-display '" + id + "'");
 
         if (id) {
             if (videoSource) {
