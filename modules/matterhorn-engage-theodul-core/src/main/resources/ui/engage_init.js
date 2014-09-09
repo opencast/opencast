@@ -31,6 +31,9 @@ requirejs.config({
         },
         "moment": {
             exports: "Moment"
+        },
+        "basil": {
+            exports: "Basil"
         }
     }
 });

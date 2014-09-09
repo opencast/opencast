@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
+define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_core"], function(require, $, _, Backbone, Basil, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage Controls";
     var PLUGIN_TYPE = "engage_controls";
@@ -33,6 +33,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var PLUGIN_STYLES_EMBED = [
         "style_embed.css"
     ];
+
+    var basilOptions = {
+        namespace: 'mhStorage'
+    };
+    Basil = new window.Basil(basilOptions);
 
     var plugin;
     var events = {
@@ -109,6 +114,9 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var embedHeightFour = 480;
     var embedHeightFive = 720;
     var logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
+    var storage_playbackRate = "playbackRate";
+    var storage_volume = "volume";
+    var storage_muted = "muted";
     var bootstrapPath = "js/bootstrap/js/bootstrap";
     var jQueryUIPath = "js/jqueryui/jquery-ui";
     var id_engage_controls = "engage_controls";
@@ -185,13 +193,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     }
 
     function getAspectRatioWidth(originalWidth, originalHeight, height) {
-        // new width = new height * original width / original height
         var width = Math.round(height * originalWidth / originalHeight);
         return width;
     }
 
     function getAspectRatioHeight(originalWidth, originalHeight, width) {
-        // new height = original height / original width * new width
         var height = Math.round(originalHeight / originalWidth * width);
         return height;
     }
@@ -351,26 +357,31 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html("0.5");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5);
+                Basil.set(storage_playbackRate, "0.5");
             });
             $("#" + id_playbackRate075).click(function(e) {
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html("0.75");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75);
+                Basil.set(storage_playbackRate, "0.75");
             });
             $("#" + id_playbackRate100).click(function(e) {
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html("1.0");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0);
+                Basil.set(storage_playbackRate, "1.0");
             });
             $("#" + id_playbackRate125).click(function(e) {
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html("1.25");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25);
+                Basil.set(storage_playbackRate, "1.25");
             });
             $("#" + id_playbackRate150).click(function(e) {
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html("1.5");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5);
+                Basil.set(storage_playbackRate, "1.5");
             });
         }
     }
@@ -410,6 +421,25 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 e.preventDefault();
                 triggerEmbedMessage(embedWidthFive, embedHeightFive);
             });
+        }
+    }
+
+    function loadStoredInitialValues() {
+        var vol = Basil.get(storagevolume);
+        if (vol) {
+            $("#" + id_volume).slider("value", vol);
+        }
+
+        var pbr = Basil.get(storage_playbackRate);
+        if (pbr) {
+            $("#" + id_playbackRateIndicator).html(pbr);
+        }
+
+        var muted = Basil.get(storage_muted);
+        if (muted == "true") {
+            Engage.trigger(plugin.events.mute.getName());
+        } else {
+            Engage.trigger(plugin.events.unmute.getName());
         }
     }
 
@@ -456,14 +486,17 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 value: 100,
                 change: function(event, ui) {
                     Engage.trigger(plugin.events.volumeSet.getName(), (ui.value) / 100);
+                    Basil.set(storage_volume, ui.value);
                 }
             });
 
             $("#" + id_volumeIcon).click(function() {
                 if (isMute) {
                     Engage.trigger(plugin.events.unmute.getName());
+                    Basil.set(storage_muted, "false");
                 } else {
                     Engage.trigger(plugin.events.mute.getName());
+                    Basil.set(storage_muted, "true");
                 }
             });
 
@@ -586,6 +619,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                     isPlaying = true;
                     if (!usingFlash) {
                         $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
+                        var pbr = Basil.get(storage_playbackRate);
+                        if (pbr) {
+                            $("#" + id_playbackRateIndicator).html(pbr);
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), parseInt(pbr));
+                        }
                     }
                 }
             });
@@ -657,6 +695,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                     $("#" + id_segmentNo + no).removeClass("segmentHover");
                 }
             });
+            loadStoredInitialValues();
         }
     }
 
