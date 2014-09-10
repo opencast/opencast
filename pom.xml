@@ -128,6 +128,7 @@
         </property>
       </activation>
       <modules>
+        <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
