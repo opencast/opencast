@@ -1,20 +1,26 @@
 <!-- theodul video videojs plugin desktop mode -->
-<div class="videojs_wrapper clearfix">
-    <% if(typeof ids !== "undefined") { var i = 1;%>
-      <% _.each(ids, function(id) { %>
-        <div class="videoDisplay">
-          <div id="videoDisplay<%= i%>_wrapper" class="videoFrame">
-	    <% if(typeof type !== "undefined") { %>
-	      <% if(type == "audio") { %>
-                <audio id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin vjs-audio container" data-setup="{}"></audio>
-	      <% } else { %>
-                <video id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin container" data-setup="{}"></video>
-	      <% } %>
-	    <% } else { %>
-              <video id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin container" data-setup="{}"></video>
-	    <% } %>
-          </div>
-        </div>
-      <% i++;}); %>
-    <% } %>
-</div>
+<% if((typeof type !== "undefined") && (type == "audio")) { %>
+	<div class="audio_wrapper">
+		<!-- TODO: Support more than one audio tag -->
+		<% if((typeof src !== "undefined") && (typeof mimetype !== "undefined")) { %>
+			<div class="audioDisplay">
+				<audio id="audioDisplay">
+					<source src="<%= src %>" type="<%= mimetype %>" />
+					Your browser does not support the audio element.
+				</audio>
+			</div>
+		<% } %>
+	</div>
+<% } else { %>
+	<div class="videojs_wrapper clearfix">
+		<% if(typeof ids !== "undefined") { var i = 1; %>
+			<% _.each(ids, function(id) { %>
+				<div class="videoDisplay">
+					<div id="videoDisplay<%= i %>_wrapper" class="videoFrame">
+						<video id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin container" data-setup="{}"></video>
+					</div>
+				</div>
+			<% i++;}); %>
+		<% } %>
+	</div>
+<% } %>
