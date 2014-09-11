@@ -62,7 +62,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         ended: new Engage.Event("Video:ended", "end of the video", "handler"),
         usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
-        aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "trigger"),
+        aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "handler"),
+        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler")
     };
 
     var isDesktopMode = false;
@@ -167,6 +168,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var isMute = false;
     var duration;
     var usingFlash = false;
+    var isAudioOnly = false;
     var segments = {};
     var mediapackageError = false;
     var aspectRatioWidth;
@@ -351,7 +353,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     }
 
     function addNonFlashEvents() {
-        if (!mediapackageError && !usingFlash) {
+        if (!mediapackageError && !usingFlash && !isAudioOnly) {
             // setup listeners for the playback rate
             $("#" + id_playbackRate050).click(function(e) {
                 e.preventDefault();
@@ -578,8 +580,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             $("#embed2").html("Embed " + embedWidthThree + "x" + embedHeightThree);
             $("#embed3").html("Embed " + embedWidthFour + "x" + embedHeightFour);
             $("#embed4").html("Embed " + embedWidthFive + "x" + embedHeightFive);
-            $("#embed_button").removeClass("disabled");
+        } else {
+            embedWidthOne = 310;
+            embedHeightOne = 70;
+
+            $("#embed0").html("Embed " + embedWidthOne + "x" + embedHeightOne);
+            $("#embed1, #embed2, #embed3, embed4").hide();
         }
+
+        $("#embed_button").removeClass("disabled");
     }
 
     /**
@@ -604,12 +613,17 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                 usingFlash = flash;
                 addNonFlashEvents();
             });
+            Engage.on(plugin.events.isAudioOnly.getName(), function(audio) {
+                isAudioOnly = audio;
+            });
             Engage.on(plugin.events.ready.getName(), function() {
                 if (!mediapackageError) {
                     greyIn(id_play_button);
                     enable(id_play_button);
                     videosReady = true;
-                    $("#" + id_fullscreen_button).removeClass("disabled");
+                    if (!isAudioOnly) {
+                        $("#" + id_fullscreen_button).removeClass("disabled");
+                    }
                 }
             });
             Engage.on(plugin.events.play.getName(), function() {
@@ -617,7 +631,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                     $("#" + id_play_button).hide();
                     $("#" + id_pause_button).show();
                     isPlaying = true;
-                    if (!usingFlash) {
+                    if (!usingFlash && !isAudioOnly) {
                         $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
                         var pbr = Basil.get(storage_playbackRate);
                         if (pbr) {
