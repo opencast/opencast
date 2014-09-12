@@ -15,22 +15,23 @@
  */
 package org.opencastproject.util;
 
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /** Only one function application can be threaded through the needle eye at a time. */
 public final class NeedleEye {
   private final AtomicBoolean running = new AtomicBoolean(false);
 
   /**
-   * Apply function <code>f</code> only if no other thread currently applies a function using this needle eye.
-   * Please note that <code>f</code> must <em>not</em> return null, so please do not use {@link org.opencastproject.util.data.Effect0}.
-   *
+   * Apply function <code>f</code> only if no other thread currently applies a function using this needle eye. Please
+   * note that <code>f</code> must <em>not</em> return null, so please do not use
+   * {@link org.opencastproject.util.data.Effect0}.
+   * 
    * @return the result of <code>f</code> or none if another function is currently being applied.
    */
   public <A> Option<A> apply(Function0<A> f) {

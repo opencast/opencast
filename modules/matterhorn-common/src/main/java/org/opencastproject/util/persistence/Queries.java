@@ -15,11 +15,20 @@
  */
 package org.opencastproject.util.persistence;
 
-import org.joda.time.base.AbstractInstant;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
+
+import org.joda.time.base.AbstractInstant;
+
+import java.util.Date;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -27,13 +36,6 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
-import java.util.Date;
-import java.util.List;
-
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
 
 /** JPA query constructors. */
 // CHECKSTYLE:OFF
@@ -69,11 +71,37 @@ public final class Queries {
     };
   }
 
+  /** {@link javax.persistence.EntityManager#remove(Object)} as a function. */
   public static <A> Function<EntityManager, A> remove(final A a) {
     return new Function<EntityManager, A>() {
       @Override public A apply(EntityManager em) {
         em.remove(a);
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
+      }
+    };
+  }
+
+  public static <A> A persistOrUpdate(final EntityManager em, final A a) {
+    final Object id = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(a);
+    if (id == null) {
+      em.persist(a);
+      return a;
+    } else {
+      @SuppressWarnings("unchecked")
+      final A dto = (A) em.find(a.getClass(), id);
+      if (dto == null) {
+        em.persist(a);
+        return a;
+      } else {
+        return em.merge(a);
+      }
+    }
+  }
+
+  public static <A> Function<EntityManager, A> persistOrUpdate(final A a) {
+    return new Function<EntityManager, A>() {
+      @Override public A apply(EntityManager em) {
+        return persistOrUpdate(em, a);
       }
     };
   }

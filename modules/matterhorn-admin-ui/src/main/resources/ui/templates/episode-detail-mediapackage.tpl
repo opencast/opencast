@@ -5,13 +5,13 @@
       <% if (opencast.episode.Utils.isStringOrNumber(value)) { %>
         <tr>
           <td class="td-key">
-            <%= key %>
+            <%! key %>
           </td>
           <td class="td-value">
             <% if (key == 'url') { %>
-              <a href="<%= value %>"><%= value %></a>
+              <a href="<%= value %>"><%! value %></a>
             <% } else { %>
-              <%= value %>
+              <%! value %>
             <% } %>
           </td>
         </tr>
@@ -26,23 +26,23 @@
       <% _.each(tracks, function(track) { %>
         <tr class="unfoldable-tr">
         <td class="td-key">
-          <%= track.type %>
+          <%! track.type %>
         </td>
         <td class="td-value">
-          <%= track.mimetype %>
+          <%! track.mimetype %>
           <div class="unfoldable-content">
             <table class="subtable">
               <% _.each(track, function(value, key) { %>
                 <% if (opencast.episode.Utils.isStringOrNumber(value)) { %>
                   <tr>
                     <td class="td-key">
-                      <%= key %>
+                      <%! key %>
                     </td>
                     <td class="td-value">
                         <% if (key == 'url') { %>
-                      <a href="<%= value %>"><%= value %></a>
+                      <a href="<%= value %>"><%! value %></a>
                       <% } else { %>
-                        <%= value %>
+                        <%! value %>
                       <% } %>
                     </td>
                   </tr>
@@ -59,13 +59,13 @@
                         <% if (opencast.episode.Utils.isStringOrNumber(value)) { %>
                           <tr>
                             <td class="td-key">
-                              <%= key %>
+                              <%! key %>
                             </td>
                             <td class="td-value">
                               <% if (key == 'url') { %>
-                                <a href="<%= value %>"><%= value %></a>
+                                <a href="<%= value %>"><%! value %></a>
                               <% } else { %>
-                                <%= value %>
+                                <%! value %>
                               <% } %>
                             </td>
                           </tr>
@@ -82,13 +82,13 @@
                         <% if (opencast.episode.Utils.isStringOrNumber(value)) { %>
                           <tr>
                             <td class="td-key">
-                              <%= key %>
+                              <%! key %>
                             </td>
                             <td class="td-value">
                               <% if (key == 'url') { %>
-                                <a href="<%= value %>"><%= value %></a>
+                                <a href="<%= value %>"><%! value %></a>
                               <% } else { %>
-                                <%= value %>
+                                <%! value %>
                               <% } %>
                             </td>
                           </tr>
@@ -112,23 +112,23 @@
       <% _.each(catalogs, function(catalog) { %>
         <tr class="unfoldable-tr">
         <td class="td-key">
-          <%= catalog.type %>
+          <%! catalog.type %>
         </td>
         <td class="td-value">
-          <%= catalog.id %>
+          <%! catalog.id %>
           <div class="unfoldable-content">
             <table class="subtable">
               <% _.each(catalog, function(value, key) { %>
                 <% if (opencast.episode.Utils.isStringOrNumber(value)) { %>
                   <tr>
                     <td class="td-key">
-                      <%= key %>
+                      <%! key %>
                     </td>
                     <td class="td-value">
                       <% if (key == 'url') { %>
-                        <a href="<%= value %>"><%= value %></a>
+                        <a href="<%= value %>"><%! value %></a>
                       <% } else { %>
-                        <%= value %>
+                        <%! value %>
                       <% } %>
                     </td>
                   </tr>
@@ -150,23 +150,23 @@
       <% _.each(attachments, function(item) { %>
         <tr class="unfoldable-tr">
         <td class="td-key">
-          <%= item.type %>
+          <%! item.type %>
         </td>
         <td class="td-value">
-          <%= item.id %>
+          <%! item.id %>
           <div class="unfoldable-content">
             <table class="subtable">
               <% _.each(item, function(value, key) { %>
                 <% if (opencast.episode.Utils.isStringOrNumber(value)) { %>
                   <tr>
                     <td class="td-key">
-                      <%= key %>
+                      <%! key %>
                     </td>
                     <td class="td-value">
                       <% if (key == 'url') { %>
-                        <a href="<%= value %>"><%= value %></a>
+                        <a href="<%= value %>"><%! value %></a>
                       <% } else { %>
-                        <%= value %>
+                        <%! value %>
                       <% } %>
                     </td>
                   </tr>
@@ -187,23 +187,23 @@
       <% _.each(publication, function(item) { %>
         <tr class="unfoldable-tr">
         <td class="td-key">
-          <%= item.channel %>
+          <%! item.channel %>
         </td>
         <td class="td-value">
-          <%= item.id %>
+          <%! item.id %>
           <div class="unfoldable-content">
             <table class="subtable">
               <% _.each(item, function(value, key) { %>
                 <% if (opencast.episode.Utils.isStringOrNumber(value)) { %>
                   <tr>
                     <td class="td-key">
-                      <%= key %>
+                      <%! key %>
                     </td>
                     <td class="td-value">
                       <% if (key == 'url') { %>
-                        <a href="<%= value %>"><%= value %></a>
+                        <a href="<%= value %>"><%! value %></a>
                       <% } else { %>
-                        <%= value %>
+                        <%! value %>
                       <% } %>
                     </td>
                   </tr>

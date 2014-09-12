@@ -175,7 +175,7 @@ public final class Strings {
   public static final Predicate<String> notBlank = new Predicate<String>() {
     @Override
     public Boolean apply(String a) {
-      return StringUtils.isBlank(a);
+      return StringUtils.isNotBlank(a);
     }
   };
 
@@ -215,7 +215,7 @@ public final class Strings {
     };
   }
 
-  /** Create a split function from a regex pattern. */
+  /** Create a {@linkplain Pattern#split(CharSequence) split} function from a regex pattern. */
   public static Function<String, String[]> split(final Pattern splitter) {
     return new Function<String, String[]>() {
       @Override

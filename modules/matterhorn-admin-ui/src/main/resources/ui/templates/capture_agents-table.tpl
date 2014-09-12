@@ -15,8 +15,8 @@
       <% $.each(data[j].agents, function(key, agent) { %>
         <tr>
           <td class="ui-state-active">
-            <div style="margin-left:10px;"><a title="<%= agent.name %>"
-              href="<%= agent.url %>"><%= agent.name %></a></div>
+            <div style="margin-left:10px;"><a title="<%! agent.name %>"
+              href="<%= agent.url %>"><%! agent.name %></a></div>
           </td>
           <td class="ui-state-active" align="center">
             <% if (agent.devices) { %>
@@ -24,11 +24,11 @@
               <% $.each(agent.devices, function(key, capability) { %>
               <li>
                 <span class="subnav"></span>
-                <span class="device"><%= capability.device %></span>
+                <span class="device"><%! capability.device %></span>
                 <% if (capability.properties) { %>
                 <ul class="itemnav">
                   <% $.each(capability.properties, function(t, property) { %>
-                  <li><span class="dev-prop"><%= property.key %> :</span><span class="dev-prop-val"><%= property.value %></span>
+                  <li><span class="dev-prop"><%! property.key %> :</span><span class="dev-prop-val"><%! property.value %></span>
                   </li>
                   <% }); %>
                 </ul>
@@ -58,7 +58,7 @@
       <% }); %>
     <% } else { %>
         <tr>
-          <td class="ui-state-active" colspan="3" align="center">
+          <td class="ui-state-active" colspan="4" align="center">
             No Capture Agents found
           </td>
         </tr>

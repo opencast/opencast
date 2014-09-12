@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.opencastproject.workflow.impl.OsgiWorkflowCleanupScheduler"
+  activate="activate"
+  deactivate="deactivate"
+  immediate="true">
+  
+  <implementation class="org.opencastproject.workflow.impl.OsgiWorkflowCleanupScheduler" />
+  <property name="service.description" value="Workflow Cleanup Scheduler Service" />
+  
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService" />
+  </service>
+  
+  <reference cardinality="1..1" interface="org.opencastproject.workflow.api.WorkflowService" name="WorkflowService" policy="static" bind="bindWorkflowService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" name="ServiceRegistry" policy="static" bind="bindServiceRegistry"/>
+  <reference cardinality="1..1" interface="org.opencastproject.security.api.OrganizationDirectoryService" name="OrganizationDirectoryService" policy="static" bind="bindOrganizationDirectoryService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.security.api.SecurityService" name="SecurityService" policy="static" bind="bindSecurityService"/>
+ 
+</scr:component>

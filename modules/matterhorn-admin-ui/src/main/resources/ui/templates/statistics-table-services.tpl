@@ -1,6 +1,6 @@
 <div>
   <% $.each(data[j].servicesView, function(key, service) { %>
-  <h2><%= ocStatistics.labelName(service.id) %></h2>
+  <h2><%! ocStatistics.labelName(service.id) %></h2>
   <table id="statsTable" class="ui-widget" cellspacing="0" width="100%">
     <thead>
       <tr>
@@ -19,34 +19,34 @@
             <img style="vertical-align:middle; margin-right:5px;" src=<% if (server.online) { %><% if(server.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %> "/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/>
 		  	<% if (server.state != "NORMAL") { %>
 		  	<img style="vertical-align:middle; margin-right:5px;" src=<% if (server.state == "WARNING") { %>"/admin/img/icons/lightbulb.png" title="Warning State" <% } else { %> "/admin/img/icons/exclamation.png" title="Error State" <% } %>/>
-		  	<a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-right:5px;" href="host=<%= server.host %>&serviceType=<%= server.type %>">Sanitize</a>
+		  	<a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-right:5px;" href="host=<%! server.host %>&serviceType=<%! server.type %>">Sanitize</a>
 		  	<% } %>
-			<span style="vertical-align:middle;"><%= server.host %></span>
+			<span style="vertical-align:middle;"><%! server.host %></span>
         </td>
         <td class="ui-state-active center">
-          <%= server.finished %>
+          <%! server.finished %>
         </td>
         <td class="ui-state-active center">
-          <%= server.running %>
+          <%! server.running %>
         </td>
         <td class="ui-state-active center">
-          <%= server.queued %>
+          <%! server.queued %>
         </td>
         <td class="ui-state-active center">
-          <%= server.meanRunTime %>
+          <%! server.meanRunTime %>
         </td>
         <td class="ui-state-active center">
-          <%= server.meanQueueTime %>
+          <%! server.meanQueueTime %>
         </td>
       </tr>
       <% }); %>
       <tr>
         <td style="text-align:right; padding-right:10px; font-weight:bold;">Total</td>
-        <td class="ui-state-active center" style="font-weight:bold;"> <%= service.finishedTotal %></td>
-        <td class="ui-state-active center" style="font-weight:bold;"> <%= service.runningTotal %></td>
-        <td class="ui-state-active center" style="font-weight:bold;"> <%= service.queuedTotal %></td>
-        <td class="ui-state-active center" style="font-weight:bold;"> <%= service.meanRunTimeTotal %></td>
-        <td class="ui-state-active center" style="font-weight:bold;"> <%= service.meanQueueTimeTotal %></td>
+        <td class="ui-state-active center" style="font-weight:bold;"> <%! service.finishedTotal %></td>
+        <td class="ui-state-active center" style="font-weight:bold;"> <%! service.runningTotal %></td>
+        <td class="ui-state-active center" style="font-weight:bold;"> <%! service.queuedTotal %></td>
+        <td class="ui-state-active center" style="font-weight:bold;"> <%! service.meanRunTimeTotal %></td>
+        <td class="ui-state-active center" style="font-weight:bold;"> <%! service.meanQueueTimeTotal %></td>
       </tr>
     </tbody>
   </table>

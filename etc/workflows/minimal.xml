@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>minimal</id>
+  <title>Minimal Testing Workflow</title>
+  <tags>
+    <tag>upload</tag>
+    <tag>schedule</tag>
+    <tag>archive</tag>
+  </tags>
+  <description>
+    A minimal workflow that transcodes the media into distribution formats, then
+    sends the resulting distribution files, along with their associated metadata,
+    to the distribution channels.
+  </description>
+
+  <configuration_panel>
+  <![CDATA[
+    <fieldset>
+      <legend>Archive</legend>
+      <ul class="oc-ui-checkbox-list-upload">
+    <li class="ui-helper-clearfix">
+      <span id="archiveconfig">
+        <input id="archiveOp" name="archiveOp" type="checkbox" checked="checked" class="configField holdCheckbox" value="true"/>
+        <span id="i18n_activate_archive">&nbsp;Archive the media package</span>
+      </span>
+    </li>
+      </ul>
+    </fieldset>
+    <fieldset>
+      <legend>Distribution</legend>
+      <ul class="oc-ui-form-list">
+        <!-- field: License -->
+        <li class="ui-helper-clearfix">
+          <label class="scheduler-label"><span class="color-red">* </span><span id="i18n_dist_label">Distribution Channel(s)</span>:</label>
+          <span id="dist">
+            <input id="distribution" name="distribution" type="checkbox" checked="checked" disabled="disabled" class="configField" value="Matterhorn Media Module" />
+            <span id="i18n_dist_mmm">&nbsp;Matterhorn Media Module</span>
+          </span>
+        </li>
+      </ul>
+    </fieldset>
+    <script type="text/javascript">
+      var ocWorkflowPanel = ocWorkflowPanel || {};
+
+      ocWorkflowPanel.registerComponents = function(components){
+        /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
+         * into the workflow. The component's nodeKey must match the components array key.
+         *
+         * Example:'org.opencastproject.workflow.config.myProperty' will be availible at ${my.property}
+         */
+
+        components['org.opencastproject.workflow.config.archiveOp'] = new ocAdmin.Component(
+          ['archiveOp'],
+          {key: 'org.opencastproject.workflow.config.archiveOp'},
+          {getValue: function(){ return this.fields.archiveOp.is(":checked");}
+          });
+
+        ocScheduler.dublinCore.components['license'] = new ocAdmin.Component(
+          ['license'],
+          {label: 'licenseLabel', key: 'license'}
+          );
+
+          //etc...
+      }
+      ocWorkflowPanel.setComponentValues = function(values, components){
+        components['org.opencastproject.workflow.config.archiveOp'].setValue(values['org.opencastproject.workflow.config.archiveOp']);
+        components['license'].setValue(values['license']);
+      }
+    </script>
+  ]]>
+  </configuration_panel>
+
+  <operations>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Ingest and prepare                                                -->
+    <!--                                                                   -->
+    <!-- Download from external ingest nodes, tag, inspect and and prepare -->
+    <!-- source recording and metadata catalogs.                           -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Ingest elements from external working file repositories and file servers -->
+
+    <operation
+      id="ingest-download"
+      description="Ingesting external elements">
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Inspect the media -->
+
+    <operation
+      id="inspect"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Inspecting audio and video streams">
+      <configurations>
+        <configuration key="overwrite">false</configuration>
+        <configuration key="accept-no-media">false</configuration>
+      </configurations>
+    </operation>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Encode for publication to Engage                                  -->
+    <!--                                                                   -->
+    <!-- Encode audio and video formats to the distribution formats that   -->
+    <!-- are required by the Engage publication channel.                   -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- encode to engage search result thumbnails -->
+
+    <operation
+      id="image"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Creating Engage search result thumbnails">
+      <configurations>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="source-tags"></configuration>
+        <configuration key="target-flavor">*/search+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">search-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode to engage player preview images -->
+
+    <operation
+      id="image"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Creating Engage player preview image">
+      <configurations>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="source-tags"></configuration>
+        <configuration key="target-flavor">*/player+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-preview.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode for engage player and feeds -->
+
+    <operation
+      id="compose"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Encoding for engage player and feeds">
+      <configurations>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,rss,atom</configuration>
+        <configuration key="encoding-profile">fast.http</configuration>
+      </configurations>
+    </operation>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Publish to publication channels                                   -->
+    <!--                                                                   -->
+    <!-- Send the encoded material along with the metadata to the          -->
+    <!-- publication channels.                                             -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Publish to engage player -->
+
+    <operation
+      id="publish-engage"
+      max-attempts="2"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Publishing to Engage">
+      <configurations>
+        <configuration key="download-source-flavors">dublincore/*</configuration>
+        <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
+        <configuration key="streaming-source-tags">engage-streaming</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Archive                                                           -->
+    <!--                                                                   -->
+    <!-- Store everything that has been tagged accordingly in the archive. -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+      if="${archiveOp}"
+      id="archive"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Archiving">
+      <configurations>
+        <configuration key="source-flavors">*/source,dublincore/*</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Cleanup                                                           -->
+    <!--                                                                   -->
+    <!-- Remove the recording's artefacts from the workspace and the       -->
+    <!-- working file repository.                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Cleanup the working file repository -->
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+      <configurations>
+        <configuration key="preserve-flavors"></configuration>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

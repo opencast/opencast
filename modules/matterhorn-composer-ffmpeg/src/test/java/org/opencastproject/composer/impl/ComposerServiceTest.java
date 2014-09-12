@@ -44,6 +44,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.IoSupport;
@@ -138,31 +139,35 @@ public class ComposerServiceTest {
     }
   }
 
+  private static File getFile(String path) throws Exception {
+    return new File(ComposerServiceTest.class.getResource(path).toURI());
+  }
+
   @Before
   public void setUp() throws Exception {
     if (!ffmpegInstalled)
       return;
 
     // Copy an existing media file to a temp file
-    File f = new File("src/test/resources/slidechanges.mov");
+    File f = getFile("/slidechanges.mov");
     source = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mov", testDir);
     FileUtils.copyFile(f, source);
     f = null;
 
     // Create another video only file
-    f = new File("src/test/resources/video.mp4");
+    f = getFile("/video.mp4");
     sourceVideoOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp4", testDir);
     FileUtils.copyFile(f, sourceVideoOnly);
     f = null;
 
     // Create another audio only file
-    f = new File("src/test/resources/audio.mp3");
+    f = getFile("/audio.mp3");
     sourceAudioOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp3", testDir);
     FileUtils.copyFile(f, sourceAudioOnly);
     f = null;
 
     // Create an image file
-    f = new File("src/test/resources/image.jpg");
+    f = getFile("/image.jpg");
     sourceImage = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".jpg", testDir);
     FileUtils.copyFile(f, sourceImage);
     f = null;
@@ -177,7 +182,7 @@ public class ComposerServiceTest {
     JaxbOrganization org = new DefaultOrganization();
     HashSet<JaxbRole> roles = new HashSet<JaxbRole>();
     roles.add(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, org, ""));
-    User user = new JaxbUser("admin", org, roles);
+    User user = new JaxbUser("admin", "test", org, roles);
     OrganizationDirectoryService orgDirectory = EasyMock.createNiceMock(OrganizationDirectoryService.class);
     EasyMock.expect(orgDirectory.getOrganization((String) EasyMock.anyObject())).andReturn(org).anyTimes();
 
@@ -192,7 +197,7 @@ public class ComposerServiceTest {
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(source).anyTimes();
 
     profileScanner = new EncodingProfileScanner();
-    File encodingProfile = new File("src/test/resources/encodingprofiles.properties");
+    File encodingProfile = getFile("/encodingprofiles.properties");
     assertNotNull("Encoding profile must exist", encodingProfile);
     profileScanner.install(encodingProfile);
 
@@ -211,7 +216,7 @@ public class ComposerServiceTest {
     // Create and populate the composer service
     composerService = new ComposerServiceImpl() {
       @Override
-      protected Job inspect(URI workspaceURI) throws MediaInspectionException, EncoderException {
+      protected Job inspect(Job job, URI workspaceURI) throws EncoderException {
         Job inspectionJob = EasyMock.createNiceMock(Job.class);
         try {
           EasyMock.expect(inspectionJob.getPayload()).andReturn(MediaPackageElementParser.getAsXml(inspectedTrack));
@@ -222,7 +227,8 @@ public class ComposerServiceTest {
         return inspectionJob;
       }
     };
-    serviceRegistry = new ServiceRegistryInMemoryImpl(composerService, securityService, userDirectory, orgDirectory);
+    serviceRegistry = new ServiceRegistryInMemoryImpl(composerService, securityService, userDirectory, orgDirectory,
+            EasyMock.createNiceMock(IncidentService.class));
     composerService.setEncoderEngineFactory(encoderEngineFactory);
     composerService.setOrganizationDirectoryService(orgDirectory);
     composerService.setSecurityService(securityService);
@@ -235,6 +241,9 @@ public class ComposerServiceTest {
   @After
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(source);
+    FileUtils.deleteQuietly(sourceVideoOnly);
+    FileUtils.deleteQuietly(sourceAudioOnly);
+    FileUtils.deleteQuietly(sourceImage);
   }
 
   @Test
@@ -326,7 +335,7 @@ public class ComposerServiceTest {
 
     try {
       composerService.encode(null, sourceTrackVideo, sourceTrackAudio, "av.work", null);
-    } catch (EncoderException e) {
+    } catch (IllegalArgumentException e) {
       assertTrue("The Job parameter must not be null".equals(e.getMessage()));
     }
   }
@@ -401,7 +410,10 @@ public class ComposerServiceTest {
 
     String sourceTrack2Xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
             + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
-            + "       <mimetype>video/mpeg</mimetype>" + "       <url>slidechanges.mov</url>" + "       </track>";
+            + "       <mimetype>video/mpeg</mimetype>" + "       <url>slidechanges.mov</url>"
+            + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
+            + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"
+            + "<scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track>";
     Track sourceTrack2 = (Track) MediaPackageElementParser.getFromXml(sourceTrack2Xml);
 
     Dimension outputDimension = new Dimension(500, 500);
@@ -458,5 +470,4 @@ public class ComposerServiceTest {
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
     Assert.assertEquals(inspectedTrack, imageToVideoTrack);
   }
-
 }

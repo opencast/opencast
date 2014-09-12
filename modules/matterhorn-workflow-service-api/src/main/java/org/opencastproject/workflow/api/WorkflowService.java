@@ -237,15 +237,22 @@ public interface WorkflowService {
   WorkflowInstance stop(long workflowInstanceId) throws WorkflowException, NotFoundException, UnauthorizedException;
 
   /**
-   * Permenantly removes a workflow instance.
+   * Permanently removes a workflow instance. Only workflow instances with state {@link WorkflowState#SUCCEEDED},
+   * {@link WorkflowState#STOPPED} or {@link WorkflowState#FAILED} may be removed.
    *
    * @param workflowInstanceId
+   *          the workflow instance identifier
    * @throws WorkflowDatabaseException
+   *           if there is a problem writing to the database
    * @throws NotFoundException
+   *           if no workflow instance with the given identifier could be found
    * @throws UnauthorizedException
+   *           if the current user does not have {@link #WRITE_PERMISSION} on the workflow instance
+   * @throws WorkflowStateException
+   *           if the workflow instance is in a disallowed state
    */
   void remove(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException,
-          UnauthorizedException;
+          UnauthorizedException, WorkflowStateException;
 
   /**
    * Temporarily suspends a started workflow instance.
@@ -318,4 +325,15 @@ public interface WorkflowService {
    *           if there is a problem storing the registered workflow definitions
    */
   List<WorkflowDefinition> listAvailableWorkflowDefinitions() throws WorkflowDatabaseException;
+
+  /**
+   * Starts a cleanup of workflow instances with a given lifetime and a specific state
+   *
+   * @param lifetime
+   *          minimum lifetime of the workflow instances
+   * @param state
+   *          state of the workflow instances
+   */
+  void cleanupWorkflowInstances(int lifetime, WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException,
+          UnauthorizedException;
 }

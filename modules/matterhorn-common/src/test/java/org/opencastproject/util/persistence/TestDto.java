@@ -15,16 +15,24 @@
  */
 package org.opencastproject.util.persistence;
 
+import org.opencastproject.util.data.Function;
+
 import org.junit.Ignore;
+
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity(name = "Test")
 @Table(name = "test")
+@NamedQueries(@NamedQuery(name = "Test.findAll", query = "select a from Test a"))
 @Ignore
 public class TestDto {
   @Id
@@ -59,4 +67,6 @@ public class TestDto {
   public void setValue(String value) {
     this.value = value;
   }
+
+  public static final Function<EntityManager, List<TestDto>> findAll = Queries.named.findAll("Test.findAll");
 }
