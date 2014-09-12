@@ -3,8 +3,8 @@
 #
 text/html		html htm HTML HTM
 text/plain		txt text TXT TEXT
-text/css    css CSS
-text/xml    xml xsl
+text/css                css CSS
+text/xml                xml xsl
 image/gif		gif GIF
 image/ief		ief
 image/jpeg		jpeg jpg jpe JPG
@@ -23,8 +23,9 @@ audio/x-aifc		aifc
 audio/x-aiff            aif aiff
 audio/x-mpeg		mpeg mpg
 audio/x-wav             wav
-auido/mpeg    mp3
+auido/mpeg              mp3
 video/mpeg		mpeg mpg mpe
 video/quicktime		qt mov
 video/x-msvideo		avi
-video/mp4   mp4
+video/mp4               mp4
+audio/x-aac             m4a aac
