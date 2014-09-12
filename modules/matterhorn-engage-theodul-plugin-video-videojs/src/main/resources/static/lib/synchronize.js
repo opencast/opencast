@@ -14,7 +14,17 @@
 
     var lastSynch = 0;
     var synchInterval = 2000; // ms
+    
+    // Delay that a slave video can lag before even starting to synchronize.
+    // if a slave video is ahead it will always be synchronized.
     var synchGap = 1.0; // s
+    
+    // Maximum gap that is accepted before seeking (higher playback rate to fill gap)
+    var maxGap = 5.0; //s
+    
+    // Seek ahead for synchronized displays, as the master continues to play 
+    // while the slave is seeking
+    var seekAhead = 0.5; // in seconds. 
 
     var startClicked = false;
 
@@ -25,7 +35,7 @@
     var playWhenBuffered = false;
     var ignoreNextPause = false;
     var hitPauseWhileBuffering = false;
-    var bufferInterval = 10; // s
+    var bufferInterval = 2; // s
 
     var tryToPlayWhenBuffering = true; // flag for trying to play after N seconds of buffering
     var tryToPlayWhenBufferingTimer = null;
@@ -34,6 +44,8 @@
     var receivedEventLoadeddata = false;
     var receivedEventLoadeddata_interval = null;
     var receivedEventLoadeddata_waitTimeout = 5000; // ms
+    
+    var videojsFlash = false;
 
     /**
      * Checks whether a number is in an interval [lower, upper]
@@ -210,7 +222,7 @@
         } else {
             return -1;
         }
-    }
+    }   
 
     /**
      * Sets the current time in the video
@@ -233,6 +245,44 @@
             return false;
         }
     }
+    
+   /**
+     * Returns the current playback rate of the video
+     *
+     * @param id video id
+     * @return current time if id is not undefined
+     */
+    function getPlaybackRate(id) {
+        if (id) {
+            if (!useVideoJs()) {
+                return getVideo(id).playbackRate;
+            } else {
+                return getVideo(id).playbackRate();
+            }
+        } else {
+            return 1.0;
+        }
+    }   
+    
+    /**
+     * Sets the playback rate for the video
+     *
+     * @param id video id
+     * @param rate the speed at which the video plays 
+     * @return true if rate has been set if id is not undefined
+     */
+    function setPlaybackRate(id, rate) {
+        if (id) {
+            if (!useVideoJs()) {
+                getVideo(id).playbackRate = rate;
+            } else {
+                getVideo(id).playbackRate(rate);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }    
 
     /**
      * Returns the buffer timerange
@@ -252,26 +302,71 @@
         }
     }
 
+    function isSynchronized(videoId) {
+        var ctMaster = getCurrentTime(masterVideoId); // currentTime in seconds!
+        var ct = getCurrentTime(videoId); // currentTime in seconds!
+        if ((ctMaster != -1) && (ct != -1) && !isInInterval(ct, ctMaster - synchGap, ctMaster)) {
+            return ct - ctMaster; //return the difference to work with this value later on
+        } 
+        return 0.0; // return 0 if delay is acceptable
+    }
+
     /**
      * Synchronizes all slaves with the master
      */
     function synchronize() {
-        var ct1 = getCurrentTime(masterVideoId);
-        var ct2;
         for (var i = 0; i < videoIds.length; ++i) {
             if (videoIds[i] != masterVideoId) {
-                ct2 = getCurrentTime(videoIds[i]);
-                // currentTime in seconds!
-                if ((ct1 != -1) && (ct2 != -1) && !isInInterval(ct2, ct1 - synchGap, ct1)) {
-                    $(document).trigger("sjs:synchronizing", [ct1, videoIds[i]]);
-                    if (!setCurrentTime(videoIds[i], ct1)) {
+                var syncDelay = isSynchronized(videoIds[i]);
+                if (Math.abs(syncDelay) > 0.0) {
+                    $(document).trigger("sjs:synchronizing", [getCurrentTime(masterVideoId), videoIds[i]]);
+                    console.log("Synchronizing. Delay: " + syncDelay);
+                    if (syncDelay > 0.0) {
+                        if (getPlaybackRate(masterVideoId) != getPlaybackRate(videoIds[i])) {
+                            setPlaybackRate(videoIds[i], getPlaybackRate(masterVideoId));
+                        }
+                        if (syncDelay < maxGap) {
+                            syncPause(videoIds[i], syncDelay);
+                        } else {
+                            if (!setCurrentTime(videoIds[i], getCurrentTime(masterVideoId) + seekAhead)) {
                         // pause(videoIds[i]);
-                    } else {
-                        play(videoIds[i]);
+                            } else {
+                                console.log("Synchronizing. Seeking: " + (getCurrentTime(masterVideoId) + seekAhead));
+                                play(videoIds[i]); 
+                            }
+                        }
+                    } else if (syncDelay < 0.0) {
+                        if (!videojsFlash && Math.abs(syncDelay) < maxGap) {
+                            setPlaybackRate(videoIds[i], (getPlaybackRate(masterVideoId) + 0.5)); // Play slave video faster to catchup.
+                            console.log("Synchronizing. Increased playback speed to: " + (getPlaybackRate(videoIds[i])));
+                        } else {
+                            if (!setCurrentTime(videoIds[i], getCurrentTime(masterVideoId) + seekAhead)) {
+                        // pause(videoIds[i]);
+                            } else {
+                                console.log("Synchronizing. Seeking: " + (getCurrentTime(masterVideoId) + seekAhead));
+                                play(videoIds[i]);
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+    
+    /**
+     * Pause a video stream for a certain delay
+     * @param {type} videoId Id of the video that should be pause
+     * @param {type} delay Delay 
+     * @returns {undefined}
+     */
+    
+    function syncPause (videoId, delay) {
+        console.log("Synchronizing. Pauseing for " + delay + "s.");
+        pause(videoId);
+        setTimeout(function () {
+            play(videoId);
+            console.log("Synchronizing. Continue to play after " + delay + "s.");
+        }, (delay * 1000));
     }
 
     /**
@@ -310,6 +405,15 @@
                 }
             });
 
+            masterPlayer.on("playbackRateChanged", function () {
+                $(document).trigger("sjs:masterPlaybackRateChanged", [getPlaybackRate(masterVideoId)]);
+                for (var i = 0; i < videoIds.length; ++i) {
+                    if (videoIds[i] != masterVideoId) {
+                        setPlaybackRate(videoIds[i], getPlaybackRate(masterVideoId));
+                    }
+                }
+            });            
+
             masterPlayer.on("ended", function () {
                 $(document).trigger("sjs:masterEnded", [getDuration(masterVideoId)]);
                 hitPauseWhileBuffering = true;
@@ -320,6 +424,10 @@
                     }
                 }
             });
+            
+            masterPlayer.on("usingFlash", function () {
+                videojsFlash = true;
+            });            
 
             masterPlayer.on("timeupdate", function () {
                 $(document).trigger("sjs:masterTimeupdate", [getCurrentTime(masterVideoId)]);

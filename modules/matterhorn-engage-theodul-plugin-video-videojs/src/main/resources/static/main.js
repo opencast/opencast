@@ -487,7 +487,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                     "loop": false,
                     "width": "100%",
                     "height": "100%" // ,
-                        // "playbackRates": [0.5, 1, 1.5, 2]
+                        // "playbackRates": [0.5, 0.75, 1, 1.25, 1.5]
                 };
                 if (isEmbedMode) {
                     videoOptions.controls = true;
