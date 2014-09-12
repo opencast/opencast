@@ -191,14 +191,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             this.render();
         },
         render: function() {
-            var src = (this.model.get("videoSources")["audio"] && this.model.get("videoSources")["audio"][0] && this.model.get("videoSources")["audio"][0].src) ? this.model.get("videoSources")["audio"][0].src : "";
-            // (this.model.get("videoSources")["audio"] && this.model.get("videoSources")["audio"][0] && this.model.get("videoSources")["audio"][0].type) ? this.model.get("videoSources")["audio"][0].type : "";
-            var mimetype = "audio/mp3"; // TODO: bad audio mimetype hack
+            var src = (this.model.get("videoSources") && this.model.get("videoSources")["audio"]) ? this.model.get("videoSources")["audio"] : [];
             var tempVars = {
                 ids: this.model.get("ids"),
                 type: this.model.get("type"),
-                src: src,
-                mimetype: mimetype
+                sources: src
             };
             if (isEmbedMode && !isAudioOnly) {
                 tempVars.id = this.model.get("ids")[0];
@@ -355,7 +352,9 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                             }
                         } else {
                             videosReady = true;
-                            Engage.trigger(plugin.events.ready.getName());
+                            if (!isAudioOnly) {
+                                Engage.trigger(plugin.events.ready.getName());
+                            }
                         }
 
                         if (this.model.get("type") != "audio") {
@@ -611,6 +610,9 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         if (isAudioOnly) {
             var audioPlayer_id = $("#" + videoDisplay);
             var audioPlayer = audioPlayer_id[0];
+            audioPlayer_id.on("canplay", function() {
+                Engage.trigger(plugin.events.ready.getName());
+            });
             audioPlayer_id.on("play", function() {
                 Engage.trigger(plugin.events.play.getName(), true);
                 pressedPlayOnce = true;
@@ -867,16 +869,22 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                                     if (track.duration > duration) {
                                         duration = track.duration;
                                     }
-                                    if ((track.mimetype == "audio/m4a") ||
-                                        (track.mimetype == "audio/mp4") ||
-                                        (track.mimetype == "audio/webm") ||
-                                        (track.mimetype == "audio/ogg")) {
-                                        videoSources.audio.push({
-                                            src: track.url,
-                                            type: track.mimetype,
-                                            typemh: track.type
-                                        });
-                                    }
+                                    /*
+				      if((track.mimetype == "audio/aac") ||
+				      (track.mimetype == "audio/mp4") ||
+				      (track.mimetype == "audio/mpeg") ||
+				      (track.mimetype == "audio/ogg") ||
+				      (track.mimetype == "audio/wav") ||
+				      (track.mimetype == "audio/webm")) {
+				    */
+                                    videoSources.audio.push({
+                                        src: track.url,
+                                        type: track.mimetype,
+                                        typemh: track.type
+                                    });
+                                    /*
+				      }
+				    */
                                 }
                             }
                         });

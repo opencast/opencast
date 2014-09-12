@@ -1,12 +1,15 @@
 <!-- theodul video videojs plugin desktop mode -->
 <% if((typeof type !== "undefined") && (type == "audio")) { %>
 	<div class="audio_wrapper">
-		<!-- TODO: Support more than one audio tag -->
-		<% if((typeof src !== "undefined") && (typeof mimetype !== "undefined")) { %>
+		<% if(typeof sources !== "undefined") { %>
 			<div class="audioDisplay">
 				<audio id="audioDisplay">
-					<source src="<%= src %>" type="<%= mimetype %>" />
-					Your browser does not support the audio element.
+				  <% _.each(sources, function(src) { %>
+				    <% if((src.src != "") && (src.type != "")) { %>
+				      <source src="<%= src.src %>" type="<%= src.type %>" />
+				    <% } %>
+				  <% }); %>
+				  Your browser does not support the audio element.
 				</audio>
 			</div>
 		<% } %>
