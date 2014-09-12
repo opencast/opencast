@@ -46,7 +46,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         customOKMessage: new Engage.Event("Notification:customOKMessage", "a custom message with an OK button", "handler"),
         bufferedAndAutoplaying: new Engage.Event("Video:bufferedAndAutoplaying", "buffering successful, was playing, autoplaying now", "handler"),
         bufferedButNotAutoplaying: new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
+        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler")
     };
 
     var isDesktopMode = false;
@@ -98,6 +99,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var alertifyPath = "lib/alertify/alertify";
 
     /* don"t change these variables */
+    var isAudioOnly = false;
     var alertify;
     var mediapackageError = false;
     var initCount = 2;
@@ -146,13 +148,24 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         window.setTimeout(function() {
             if (!videoLoaded && !mediapackageError) {
                 videoLoadMsgDisplayed = true;
-                alertify.error(getAlertifyMessage("The video is loading. Please wait a moment."));
+                if (!isAudioOnly) {
+                    alertify.error(getAlertifyMessage("The video is loading. Please wait a moment."));
+                } else {
+                    alertify.error(getAlertifyMessage("The audio is loading. Please wait a moment."));
+                }
             }
         }, alertifyVideoLoadMessageThreshold);
 
+        Engage.on(plugin.events.isAudioOnly.getName(), function(audio) {
+            isAudioOnly = audio;
+        });
         Engage.on(plugin.events.ready.getName(), function() {
             if (!videoLoaded && videoLoadMsgDisplayed && !mediapackageError) {
-                alertify.success(getAlertifyMessage("The video has been loaded successfully."));
+                if (!isAudioOnly) {
+                    alertify.success(getAlertifyMessage("The video has been loaded successfully."));
+                } else {
+                    alertify.success(getAlertifyMessage("The audio has been loaded successfully."));
+                }
             }
             videoLoaded = true;
         });
@@ -217,3 +230,4 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
 
     return plugin;
 });
+
