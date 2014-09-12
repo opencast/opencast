@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>theodul</id>
-  <title>Theodul Player HTML5 Videos</title>
+  <id>theodulmp4</id>
+  <title>Theodul Player: MP4 only</title>
   <tags>
     <tag>upload</tag>
     <tag>schedule</tag>
@@ -344,22 +344,6 @@
         <configuration key="encoding-profile">mp4.http</configuration>
       </configurations>
     </operation>
-
-    <!-- encode to Engage player WebMformat -->
-
-    <operation
-      id="compose"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Encoding WebM video">
-      <configurations>
-        <configuration key="source-flavor">*/trimmed</configuration>
-        <configuration key="target-flavor">*/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">webm.http</configuration>
-      </configurations>
-    </operation>
-
 
     <!-- encode to Engage player audio only format -->
 
