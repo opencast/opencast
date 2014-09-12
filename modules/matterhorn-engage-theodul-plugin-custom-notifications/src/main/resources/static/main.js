@@ -157,7 +157,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         }, alertifyVideoLoadMessageThreshold);
 
         Engage.on(plugin.events.isAudioOnly.getName(), function(audio) {
-            isAudioOnly = true;
+            isAudioOnly = audio;
         });
         Engage.on(plugin.events.ready.getName(), function() {
             if (!videoLoaded && videoLoadMsgDisplayed && !mediapackageError) {
