@@ -163,9 +163,8 @@ ocCaptureAgent = new (function ()
   })();
 
 function unregisterCaptureAgent(name) {
-  if (confirm('Are you sure you want to remove all records of the capture '
-        + 'agtent “' + name + '”? This might cause any upcomming '
-        + 'recordings for this to fail.')) {
+  if (confirm('This may cause upcoming recordings for capture agent “'
+        + name + '” to fail, are you sure?')) {
     $.ajax({
       type : 'delete',
       url : '/capture-admin/agents/' + name,
