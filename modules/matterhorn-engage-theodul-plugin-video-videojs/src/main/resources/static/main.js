@@ -55,6 +55,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         numberOfVideodisplaysSet: new Engage.Event("Video:numberOfVideodisplaysSet", "the number of videodisplays has been set", "trigger"),
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "trigger"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "trigger"),
+        audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "go to fullscreen", "handler"),
         fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "cancel fullscreen", "handler"),
@@ -115,6 +116,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var videoDisplaySizeFactor = 1.1;
     var videoDisplaySizeTimesCheck = 100; // the smaller the factor, the higher the times check!
     var checkVideoDisplaySizeTimeout = 1500;
+    var audioLoadTimeoutCheckDelay = 5000;
 
     /* don't change these variables */
     var isAudioOnly = false;
@@ -150,6 +152,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var class_vjs_control_text = "vjs-control-text";
     var class_vjs_mute_control = "vjs-mute-control";
     var class_audio_wrapper = "audio_wrapper";
+    var class_audioDisplay = "audioDisplay";
+    var class_audioDisplayError = "audioDisplayError";
     var videosReady = false;
     var pressedPlayOnce = false;
     var mediapackageChange = "change:mediaPackage";
@@ -610,8 +614,14 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         if (isAudioOnly) {
             var audioPlayer_id = $("#" + videoDisplay);
             var audioPlayer = audioPlayer_id[0];
+            var audioLoadTimeout = window.setTimeout(function() {
+                Engage.trigger(plugin.events.audioCodecNotSupported.getName());
+                $("." + class_audioDisplay).hide();
+                $("." + class_audioDisplayError).show();
+            }, audioLoadTimeoutCheckDelay);
             audioPlayer_id.on("canplay", function() {
                 Engage.trigger(plugin.events.ready.getName());
+                window.clearTimeout(audioLoadTimeout);
             });
             audioPlayer_id.on("play", function() {
                 Engage.trigger(plugin.events.play.getName(), true);
@@ -822,7 +832,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 mediaInfo.tracks = this.get("tracks");
                 mediaInfo.attachments = this.get("attachments");
 
-                if (mediaInfo.tracks.length > 0) {
+                if (mediaInfo.tracks && (mediaInfo.tracks.length > 0)) {
                     var videoDisplays = [];
                     var videoSources = [];
                     videoSources.presenter = [];
@@ -869,22 +879,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                                     if (track.duration > duration) {
                                         duration = track.duration;
                                     }
-                                    /*
-				      if((track.mimetype == "audio/aac") ||
-				      (track.mimetype == "audio/mp4") ||
-				      (track.mimetype == "audio/mpeg") ||
-				      (track.mimetype == "audio/ogg") ||
-				      (track.mimetype == "audio/wav") ||
-				      (track.mimetype == "audio/webm")) {
-				    */
                                     videoSources.audio.push({
                                         src: track.url,
                                         type: track.mimetype,
                                         typemh: track.type
                                     });
-                                    /*
-				      }
-				    */
                                 }
                             }
                         });
@@ -898,7 +897,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                             delete videoSources.audio;
                         }
                     }
-                    if (mediaInfo.attachments) {
+                    if (mediaInfo.attachments && (mediaInfo.attachments.length > 0)) {
                         $(mediaInfo.attachments).each(function(i, attachment) {
                             if (attachment.mimetype && attachment.type && attachment.mimetype.match(/image/g) && attachment.type.match(/player/g)) {
                                 // filter for different video sources

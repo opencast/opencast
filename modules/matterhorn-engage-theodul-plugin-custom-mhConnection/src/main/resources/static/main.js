@@ -110,11 +110,26 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                         mediaPackage = model.attributes["search-results"].result;
                         if (mediaPackage) {
                             // format silent the model data, see dublin core for reference names
-                            if (mediaPackage.mediapackage.media.track) {
-                                model.attributes.tracks = mediaPackage.mediapackage.media.track;
-                            }
-                            if (mediaPackage.mediapackage.attachments.attachment) {
-                                model.attributes.attachments = mediaPackage.mediapackage.attachments.attachment;
+                            if (mediaPackage.mediapackage) {
+                                if (mediaPackage.mediapackage.media && mediaPackage.mediapackage.media.track) {
+                                    if (!mediaPackage.mediapackage.media.track.length) {
+                                        model.attributes.tracks = new Array();
+                                        model.attributes.tracks.push(mediaPackage.mediapackage.media.track);
+                                    } else {
+                                        model.attributes.tracks = mediaPackage.mediapackage.media.track;
+                                    }
+                                }
+                                if (mediaPackage.mediapackage.attachments.attachment) {
+                                    if (!mediaPackage.mediapackage.attachments.attachment.length) {
+                                        model.attributes.attachments = new Array();
+                                        model.attributes.attachments.push(mediaPackage.mediapackage.attachments.attachment);
+                                    } else {
+                                        model.attributes.attachments = mediaPackage.mediapackage.attachments.attachment;
+                                    }
+                                }
+                                if (mediaPackage.mediapackage.seriestitle) {
+                                    model.attributes.series = mediaPackage.mediapackage.seriestitle;
+                                }
                             }
                             if (mediaPackage.dcTitle) {
                                 model.attributes.title = mediaPackage.dcTitle;
@@ -133,9 +148,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                             }
                             if (mediaPackage.dcContributor) {
                                 model.attributes.contributor = mediaPackage.dcContributor;
-                            }
-                            if (mediaPackage.mediapackage.seriestitle) {
-                                model.attributes.series = mediaPackage.mediapackage.seriestitle;
                             }
                             if (mediaPackage.segments && mediaPackage.segments.segment) {
                                 model.attributes.segments = mediaPackage.segments.segment;
