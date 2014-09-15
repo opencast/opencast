@@ -2,6 +2,11 @@
 <% if((typeof type !== "undefined") && (type == "audio")) { %>
 	<div class="audio_wrapper">
 		<% if(typeof sources !== "undefined") { %>
+			<div class="audioDisplayError">
+			  <div class="alert alert-danger" role="alert">
+			    Error: The audio codec is not supported by this browser
+			  </div>
+			</div>
 			<div class="audioDisplay">
 				<audio id="audioDisplay">
 				  <% _.each(sources, function(src) { %>

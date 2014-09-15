@@ -47,7 +47,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         bufferedAndAutoplaying: new Engage.Event("Video:bufferedAndAutoplaying", "buffering successful, was playing, autoplaying now", "handler"),
         bufferedButNotAutoplaying: new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
-        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler")
+        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler"),
+        audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "handler")
     };
 
     var isDesktopMode = false;
@@ -102,6 +103,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var isAudioOnly = false;
     var alertify;
     var mediapackageError = false;
+    var codecError = false;
     var initCount = 2;
     var videoLoaded = false;
     var videoLoadMsgDisplayed = false;
@@ -146,7 +148,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         });
 
         window.setTimeout(function() {
-            if (!videoLoaded && !mediapackageError) {
+            if (!videoLoaded && !mediapackageError && !codecError) {
                 videoLoadMsgDisplayed = true;
                 if (!isAudioOnly) {
                     alertify.error(getAlertifyMessage("The video is loading. Please wait a moment."));
@@ -160,7 +162,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
             isAudioOnly = audio;
         });
         Engage.on(plugin.events.ready.getName(), function() {
-            if (!videoLoaded && videoLoadMsgDisplayed && !mediapackageError) {
+            if (!videoLoaded && videoLoadMsgDisplayed && !mediapackageError && !codecError) {
                 if (!isAudioOnly) {
                     alertify.success(getAlertifyMessage("The video has been loaded successfully."));
                 } else {
@@ -170,19 +172,19 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
             videoLoaded = true;
         });
         Engage.on(plugin.events.buffering.getName(), function() {
-            if (!videoBuffering && !mediapackageError) {
+            if (!videoBuffering && !mediapackageError && !codecError) {
                 videoBuffering = true;
                 alertify.success(getAlertifyMessage("The video is currently buffering. Please wait a moment."));
             }
         });
         Engage.on(plugin.events.bufferedAndAutoplaying.getName(), function() {
-            if (videoBuffering && !mediapackageError) {
+            if (videoBuffering && !mediapackageError && !codecError) {
                 videoBuffering = false;
                 alertify.success(getAlertifyMessage("The video has been buffered successfully and is now autoplaying."));
             }
         });
         Engage.on(plugin.events.bufferedButNotAutoplaying.getName(), function() {
-            if (videoBuffering && !mediapackageError) {
+            if (videoBuffering && !mediapackageError && !codecError) {
                 videoBuffering = false;
                 alertify.success(getAlertifyMessage("The video has been buffered successfully."));
             }
@@ -202,6 +204,10 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
             mediapackageError = true;
             alertify.error(getAlertifyMessage("Error: " + msg));
+        });
+        Engage.on(plugin.events.audioCodecNotSupported.getName(), function() {
+            codecError = true;
+            alertify.error(getAlertifyMessage("Error: The audio codec is not supported by this browser"));
         });
     }
 
@@ -230,4 +236,3 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
 
     return plugin;
 });
-
