@@ -616,7 +616,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             var audioPlayer = audioPlayer_id[0];
             var audioLoadTimeout = window.setTimeout(function() {
                 Engage.trigger(plugin.events.audioCodecNotSupported.getName());
-                // TODO
                 $("." + class_audioDisplay).hide();
                 $("." + class_audioDisplayError).show();
             }, audioLoadTimeoutCheckDelay);
