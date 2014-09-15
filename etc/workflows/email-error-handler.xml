@@ -13,6 +13,7 @@
       <configurations>
 		<configuration key="to">root@localhost</configuration>
 		<configuration key="subject">Failure processing a mediapackage</configuration>
+        <configuration key="body-template-file">sample</configuration>
       </configurations>
     </operation>
 

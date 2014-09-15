@@ -1,0 +1,10 @@
+Event Details
+
+<#if catalogs['series']?has_content>
+Series Title: ${catalogs['series']['title']}
+Instructor: ${catalogs['series']['contributor']}
+</#if>
+Media Package Id: ${mediaPackage.identifier}
+Title: ${mediaPackage.title}
+Workflow Id: ${workflow.id}
+Event Date: ${mediaPackage.date?datetime?iso_local}
