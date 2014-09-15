@@ -559,10 +559,12 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
         Engage.on(plugin.events.play.getName(), function() {
             if (videosReady) {
+                console.log("Master video is playing")
                 theodulVideodisplay.play();
             }
         });
         Engage.on(plugin.events.pause.getName(), function() {
+            console.log("Master video is pausing");
             theodulVideodisplay.pause();
         });
     }
@@ -604,10 +606,12 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
         if (numberOfVideodisplays == 1) {
             theodulVideodisplayMaster.on("play", function() {
+                console.log("Playing master video");
                 Engage.trigger(plugin.events.play.getName(), true);
                 pressedPlayOnce = true;
             });
             theodulVideodisplayMaster.on("pause", function() {
+                console.log("Playing master video");
                 Engage.trigger(plugin.events.pause.getName(), true);
             });
             theodulVideodisplayMaster.on("ended", function() {
@@ -652,12 +656,14 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         });
         Engage.on(plugin.events.play.getName(), function(triggeredByMaster) {
             if (!triggeredByMaster && videosReady) {
+                console.log("Play master video");
                 theodulVideodisplayMaster.play();
                 pressedPlayOnce = true;
             }
         });
         Engage.on(plugin.events.pause.getName(), function(triggeredByMaster) {
             if (!triggeredByMaster && pressedPlayOnce) {
+                console.log("Pause master video");
                 theodulVideodisplayMaster.pause();
             }
         });
@@ -701,6 +707,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         });
         Engage.on(plugin.events.ended.getName(), function(time) {
             if (videosReady) {
+                console.log("Videos ready");
                 theodulVideodisplayMaster.pause();
                 Engage.trigger(plugin.events.pause.getName());
                 theodulVideodisplayMaster.currentTime(theodulVideodisplayMaster.duration());

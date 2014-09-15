@@ -130,7 +130,8 @@
      * @return true if id is not undefined and video plays
      */
     function play(id) {
-        if (id) {
+        if (id && id !== masterVideoId) {
+            console.log("Playing on " + id);
             getVideo(id).play();
             return true;
         } else {
@@ -163,7 +164,8 @@
      * @return true if id is not undefined
      */
     function pause(id) {
-        if (id) {
+        if (id && id !== masterVideoId) {
+            console.log("Pausing on " + id);
             return getVideo(id).pause();
         } else {
             return false;
@@ -344,7 +346,12 @@
                         // pause(videoIds[i]);
                             } else {
                                 console.log("Synchronizing. Seeking: " + (getCurrentTime(masterVideoId) + seekAhead));
-                                play(videoIds[i]);
+                                if (! isPaused(masterVideoId)) {
+                                    play(videoIds[i]);
+                                    console.log ("Playing video " + videoIds[i]  + " after seeking.");
+                                } else {
+                                    console.log ("Pausing video " + videoIds[i]  + " after seeking, as master video is paused too.");
+                                }
                             }
                         }
                     }
@@ -364,8 +371,12 @@
         console.log("Synchronizing. Pauseing for " + delay + "s.");
         pause(videoId);
         setTimeout(function () {
-            play(videoId);
-            console.log("Synchronizing. Continue to play after " + delay + "s.");
+            if (!isPaused(masterVideoId)) {
+                play(videoId);
+                console.log("Synchronizing. Continue to play after " + delay + "s.");
+            } else {
+                console.log("Still pausing after " + delay + "s, as master video is pausing");
+            }
         }, (delay * 1000));
     }
 
