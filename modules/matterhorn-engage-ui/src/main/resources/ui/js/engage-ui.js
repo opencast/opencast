@@ -41,7 +41,7 @@ $(document).ready(function() {
         var dest = stack[choose];
 
         if (dest == undefined) {
-            return
+            return;
         };
 
         page = dest.page;
@@ -81,16 +81,20 @@ $(document).ready(function() {
             success: function(data) {
                 $.log("Info loaded");
 
-                var logo = data.org.properties.logo_large;
-                var player = data.org.properties.player;
+                if (data && data.org && data.org.properties) {
+                    var logo = data.org.properties.logo_large ? data.org.properties.logo_large : "";
+                    var player = data.org.properties.player ? data.org.properties.player : "";
 
-                $('.page-header h1').before("<img src='" + logo + "' class='img-responsive'>");
+                    $('.page-header h1').before("<img src='" + logo + "' class='img-responsive'>");
 
-                /* choose player */
-                if (player == "theodul") {
-                    playerEndpoint = playerEndpoint + "theodul/ui/core.html?id=";
+                    if (player == "theodul") {
+                        playerEndpoint = playerEndpoint + "theodul/ui/core.html?id=";
+                    } else {
+                        playerEndpoint = playerEndpoint + "ui/watch.html?id=";
+                    }
                 } else {
-                    playerEndpoint = playerEndpoint + "ui/watch.html?id=";
+                    // TODO
+                    $.log("Error: No info data received.");
                 }
                 $.log("Chosen player: " + player);
             }
@@ -120,12 +124,12 @@ $(document).ready(function() {
                     loadSeries();
                     break;
                 default:
+                    break;
             }
         });
 
         /* pagination */
         $('.next').on("click", function() {
-
             if ($(this).hasClass('disabled')) {
                 return;
             };
@@ -197,199 +201,225 @@ $(document).ready(function() {
                 // clear main grid
                 $('#main-container').empty();
 
-                // number of total search results
-                var total = data["search-results"]["total"];
-                if (data["search-results"] == undefined || total == undefined) {
-                    $.log("Error: Searchr esults (total) undefined");
-                    $('#main-container').append("<h2> Something went wrong. Try again! </h2>");
-                    return;
-                };
+                if (data && data["search-results"] && data["search-results"]["total"]) {
+                    // number of total search results
+                    var total = data["search-results"]["total"];
+                    if (data["search-results"] == undefined || total == undefined) {
+                        $.log("Error: Search results (total) undefined");
+                        $('#main-container').append("<h2> Something went wrong. Try again! </h2>");
+                        return;
+                    };
 
-                if (total == 0) {
-                    $('#main-container').append("<h2> No Episodes </h2>");
-                    return;
-                };
+                    if (total == 0) {
+                        $('#main-container').append("<h2> No Episodes </h2>");
+                        return;
+                    };
 
-                var result = data["search-results"]["result"];
+                    var result = data["search-results"]["result"];
 
-                if (page == 1) {
-                    $('.previous').addClass('disabled');
-                };
+                    if (page == 1) {
+                        $('.previous').addClass('disabled');
+                    };
 
-                if (result.length < 6 || total < 6) {
-                    $('.next').addClass('disabled');
+                    if (result.length < 6 || total < 6) {
+                        $('.next').addClass('disabled');
+                    } else {
+                        $('.next').removeClass('disabled');
+                    }
+
+                    if (total == 1) {
+                        buildGrid(result);
+                        return;
+                    };
+
+                    $.each(result, function(index, val) {
+                        buildGrid(val);
+                    });
                 } else {
-                    $('.next').removeClass('disabled');
+                    // TODO
+                    $.log("Error: No episode data received.");
                 }
-
-                if (total == 1) {
-                    buildGrid(result);
-                    return;
-                };
-
-                $.each(result, function(index, val) {
-                    buildGrid(val);
-                });
             }
         });
     }
 
     function buildGrid(data) {
-        var serID = data["id"];
+        if (data) {
+            var serID = data["id"];
 
-        if (data["id"] == undefined) {
-            $.log("Error: Episode with no ID.")
-            serID = "0";
-        };
-
-        var tile = mediaContainer + '<div class="tile" id="' + serID + '">';
-
-        tile = tile + '<h4 class="title">' + data.dcTitle + "</h4>";
-
-        // append thumbnail 
-        var thumb = "";
-        var time = 0;
-        var color = "A6A6A6";
-        var creator = "<br>";
-        var seriestitle = "<br>";
-        var date = "<br>";
-
-
-        if (data.mediapackage.attachments.attachment[1].url) {
-            thumb = data.mediapackage.attachments.attachment[1].url;
-            tile = tile + "<div><img class='img-responsive img-rounded' src='" + thumb + "'></div>";
-        };
-
-        tile = tile + "<div class='infos'>";
-
-        if (data["dcCreator"]) {
-            creator = data["dcCreator"];
-        };
-        tile = tile + "<div class='creator'>" + creator + "</div>";
-
-        if (data.mediapackage.seriestitle) {
-            seriestitle = data.mediapackage.seriestitle;
-        };
-        tile = tile + "<div class='seriestitle'>" + seriestitle + "</div>";
-
-        if (data.mediapackage["start"]) {
-            date = new Date(data.mediapackage["start"]);
-        };
-        tile = tile + "<div class='date'>" + date.toLocaleDateString() + "</div>";
-
-        if (data["mediapackage"]["duration"]) {
-            time = data["mediapackage"]["duration"];
-            var seconds = Math.floor((time / 1000) % 60);
-            var minutes = Math.floor((time / (1000 * 60) % 60));
-            var hours = Math.floor((time / (1000 * 60 * 60) % 60));
-
-            if (seconds < 10) {
-                seconds = "0" + seconds
-            };
-            if (minutes < 10) {
-                minutes = "0" + minutes
-            };
-            if (hours < 10) {
-                hours = "0" + hours
+            if (data["id"] == undefined) {
+                $.log("Error: Episode with no ID.")
+                serID = "0";
             };
 
-            tile = tile + "<div class='duration'>" + hours + ":" + minutes + ":" + seconds + "</div>";
-        };
+            var tile = mediaContainer + '<div class="tile" id="' + serID + '">';
 
-        tile = tile + "</div>";
+            tile = tile + '<h4 class="title">' + data.dcTitle + "</h4>";
 
-        if (data.mediapackage.series) {
-            Math.seedrandom(data.mediapackage.series);
-            color = Math.ceil(Math.random() * 1000000);
-        };
+            // append thumbnail 
+            var thumb = "";
+            var time = 0;
+            var color = "A6A6A6";
+            var creator = "<br>";
+            var seriestitle = "<br>";
+            var date = "<br>";
 
+            if (data.mediapackage) {
+                if (data.mediapackage.attachments && data.mediapackage.attachments.attachment[1].url) {
+                    thumb = data.mediapackage.attachments.attachment[1].url;
+                    tile = tile + "<div><img class='img-responsive img-rounded' src='" + thumb + "'></div>";
+                };
 
-        tile = tile + '</div></div>';
+                tile = tile + "<div class='infos'>";
 
-        $('#main-container').append(tile);
+                if (data.dcCreator) {
+                    creator = data.dcCreator;
+                };
+                tile = tile + "<div class='creator'>" + creator + "</div>";
 
-        $('#' + data["id"]).css("background", "linear-gradient(to bottom, #" + color + " 10%,#FFFFFF 10%,#FFFFFF 50%,#FFFFFF 100%)");
+                if (data.mediapackage.seriestitle) {
+                    seriestitle = data.mediapackage.seriestitle;
+                };
+                tile = tile + "<div class='seriestitle'>" + seriestitle + "</div>";
 
-        $('#' + data["id"]).on('click', function() {
-            $(location).attr('href', playerEndpoint + data["id"]);
-        });
+                if (data.mediapackage.start) {
+                    date = new Date(data.mediapackage.start);
+                };
+                tile = tile + "<div class='date'>" + date.toLocaleDateString() + "</div>";
 
-        $('#' + data["id"]).on('mouseenter', function() {
-            $(this).css("background", "linear-gradient(to top, #FBB900 90%, #FFFFFF 90%, #FFFFFF 10%,#" + color + " 10%)");
-        });
-        $('#' + data["id"]).on('mouseleave', function() {
-            $(this).css("background", "linear-gradient(to bottom, #" + color + " 10%,#FFFFFF 10%, #FFFFFF 50%,#FFFFFF 100%)");
-        });
+                if (data.mediapackage.duration) {
+                    time = data.mediapackage.duration;
+                    var seconds = Math.floor((time / 1000) % 60);
+                    var minutes = Math.floor((time / (1000 * 60) % 60));
+                    var hours = Math.floor((time / (1000 * 60 * 60) % 60));
+
+                    if (seconds < 10) {
+                        seconds = "0" + seconds
+                    };
+                    if (minutes < 10) {
+                        minutes = "0" + minutes
+                    };
+                    if (hours < 10) {
+                        hours = "0" + hours
+                    };
+
+                    tile = tile + "<div class='duration'>" + hours + ":" + minutes + ":" + seconds + "</div>";
+                };
+
+                tile = tile + "</div>";
+
+                if (data.mediapackage.series) {
+                    Math.seedrandom(data.mediapackage.series);
+                    color = Math.ceil(Math.random() * 1000000);
+                };
+
+                tile = tile + '</div></div>';
+
+                $('#main-container').append(tile);
+
+                $('#' + data["id"]).css("background", "linear-gradient(to bottom, #" + color + " 10%,#FFFFFF 10%,#FFFFFF 50%,#FFFFFF 100%)");
+
+                $('#' + data["id"]).on('click', function() {
+                    $(location).attr('href', playerEndpoint + data["id"]);
+                });
+
+                $('#' + data["id"]).on('mouseenter', function() {
+                    $(this).css("background", "linear-gradient(to top, #FBB900 90%, #FFFFFF 90%, #FFFFFF 10%,#" + color + " 10%)");
+                });
+                $('#' + data["id"]).on('mouseleave', function() {
+                    $(this).css("background", "linear-gradient(to bottom, #" + color + " 10%,#FFFFFF 10%, #FFFFFF 50%,#FFFFFF 100%)");
+                });
+            } else {
+                // TODO
+                $.log("Error: Mediapackage is empty.");
+            }
+        } else {
+            // TODO
+            $.log("Error: Data for building grid is empty.");
+        }
 
         /* TODO: Swipe events etc. for mobile devices */
         //registerMobileEvents();
     }
 
     function createSeriesGrid(data) {
-        var tile = mediaContainer + '<div class="tile" id="' + data["id"] + '">';
+        if (data && data.id) {
+            var tile = mediaContainer + '<div class="tile" id="' + data.id + '">';
 
-        tile = tile + '<h4 class="title">' + data.dcTitle + "</h4>";
+            tile = tile + '<h4 class="title">' + (data.dcTitle ? data.dcTitle : "Unknown title") + "</h4>";
 
-        tile = tile + '</div></div>';
+            tile = tile + '</div></div>';
 
-        // Set Color. TODO: Better generator, use series color for ep.
-        Math.seedrandom(data["id"]);
-        var color = Math.ceil(Math.random() * 1000000);
+            // Set Color. TODO: Better generator, use series color for ep.
+            Math.seedrandom(data.id);
+            var color = Math.ceil(Math.random() * 1000000);
 
-        $('#main-container').append(tile);
-        $('#' + data["id"]).css("background", "linear-gradient(to bottom, #" + color + " 10%,#FFFFFF 10%,#FFFFFF 50%,#FFFFFF 100%)");
+            $('#main-container').append(tile);
+            $('#' + data.id).css("background", "linear-gradient(to bottom, #" + color + " 10%,#FFFFFF 10%,#FFFFFF 50%,#FFFFFF 100%)");
 
-        $('#' + data["id"]).on('click', function() {
-            restData = "sid=" + data["id"];
-            page = 1;
-            active = "episodes";
-            $('#navbarEpisodes').addClass('active');
-            $('#navbarSeries').removeClass('active');
-            pushHistory(1, "episodes", restData);
-            loadEpisodes();
-        });
+            $('#' + data.id).on('click', function() {
+                restData = "sid=" + data.id;
+                page = 1;
+                active = "episodes";
+                $('#navbarEpisodes').addClass('active');
+                $('#navbarSeries').removeClass('active');
+                pushHistory(1, "episodes", restData);
+                loadEpisodes();
+            });
+        } else {
+            $.log("Error: Data for creating series grid is empty.");
+        }
     }
 
     function loadSeries(data) {
-        var requestUrl = restEndpoint + "/series.json?limit=6&offset=" + (page - 1) * 6 + "&" + restData;
-        $.ajax({
-            url: requestUrl,
-            dataType: "json",
-            success: function(data) {
-                $('#main-container').empty();
+        if (data) {
+            var requestUrl = restEndpoint + "/series.json?limit=6&offset=" + (page - 1) * 6 + "&" + restData;
+            $.ajax({
+                url: requestUrl,
+                dataType: "json",
+                success: function(data2) {
+                    if (data2 && data2["search-results"] && data2["search-results"]["total"]) {
+                        $('#main-container').empty();
 
-                var total = data["search-results"]["total"];
+                        var total = data2["search-results"]["total"];
 
-                if (total == 0) {
-                    $('#main-container').append("<h2> No Series </h2>");
-                    return;
-                };
+                        if (total == 0) {
+                            $('#main-container').append("<h2> No Series </h2>");
+                            return;
+                        };
 
-                var result = data["search-results"]["result"];
+                        var result = data2["search-results"]["result"];
 
-                if (page == 1) {
-                    $('.previous').addClass('disabled');
-                };
+                        if (page == 1) {
+                            $('.previous').addClass('disabled');
+                        };
 
-                if (result.length < 6 || total < 6) {
-                    $('.next').addClass('disabled');
-                } else {
-                    $('.next').removeClass('disabled');
+                        if (result.length < 6 || total < 6) {
+                            $('.next').addClass('disabled');
+                        } else {
+                            $('.next').removeClass('disabled');
+                        }
+
+                        if (total == 1) {
+                            createSeriesGrid(result);
+                            return;
+                        };
+
+                        $.each(result, function(index, val) {
+                            createSeriesGrid(val);
+                        });
+                    } else {
+                        // TODO
+                        $.log("Error: No series data received.");
+                    }
                 }
-
-                if (total == 1) {
-                    createSeriesGrid(result);
-                    return;
-                };
-
-                $.each(result, function(index, val) {
-                    createSeriesGrid(val);
-                });
-            }
-        });
+            });
+        } else {
+            $.log("Error: Data for series data is empty.");
+        }
     }
 
     function registerMobileEvents() {
-        /* TODO */
+        // TODO
     }
 });

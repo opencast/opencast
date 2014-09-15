@@ -1,12 +1,34 @@
 <!-- theodul video videojs plugin desktop mode -->
-<div class="videojs_wrapper clearfix">
-    <% if(typeof ids !== "undefined" ){ var i = 1;%>
-    <% _.each(ids, function(id) { %>
-    <div class="videoDisplay">
-        <div id="videoDisplay<%= i%>_wrapper" class="videoFrame">
-            <video id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin container" data-setup="{}"></video>
-        </div>
-    </div>
-    <% i++;}); %>
-    <% } %>
-</div>
+<% if((typeof type !== "undefined") && (type == "audio")) { %>
+	<div class="audio_wrapper">
+		<% if(typeof sources !== "undefined") { %>
+			<div class="audioDisplayError">
+			  <div class="alert alert-danger" role="alert">
+			    Error: The audio codec is not supported by this browser
+			  </div>
+			</div>
+			<div class="audioDisplay">
+				<audio id="audioDisplay">
+				  <% _.each(sources, function(src) { %>
+				    <% if((src.src != "") && (src.type != "")) { %>
+				      <source src="<%= src.src %>" type="<%= src.type %>" />
+				    <% } %>
+				  <% }); %>
+				  Your browser does not support the audio element.
+				</audio>
+			</div>
+		<% } %>
+	</div>
+<% } else { %>
+	<div class="videojs_wrapper clearfix">
+		<% if(typeof ids !== "undefined") { var i = 1; %>
+			<% _.each(ids, function(id) { %>
+				<div class="videoDisplay">
+					<div id="videoDisplay<%= i %>_wrapper" class="videoFrame">
+						<video id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin container" data-setup="{}"></video>
+					</div>
+				</div>
+			<% i++;}); %>
+		<% } %>
+	</div>
+<% } %>
