@@ -44,6 +44,8 @@
     var receivedEventLoadeddata = false;
     var receivedEventLoadeddata_interval = null;
     var receivedEventLoadeddata_waitTimeout = 5000; // ms
+    
+    var waitingForSync = [];
 
     var flashPlayer = false;
     var id_generated_videojs_flash_component = "videojs_videodisplay_0_flash_api";
@@ -327,6 +329,10 @@
                     if (syncDelay > 0.0) {
                         if (getPlaybackRate(masterVideoId) != getPlaybackRate(videoIds[i])) {
                             setPlaybackRate(videoIds[i], getPlaybackRate(masterVideoId));
+                            if (! isPaused(masterVideoId) && ! waitingForSync[videoIds[i]]) {                 
+                               play(videoIds[i]);
+                               console.log("Restarting to play " + videoIds[i] + " as ist is pausing unexpectedly.") 
+                            } 
                         }
                         if (syncDelay < maxGap) {
                             syncPause(videoIds[i], syncDelay);
@@ -369,16 +375,18 @@
      */
     
     function syncPause (videoId, delay) {
-        console.log("Synchronizing. Pauseing for " + delay + "s.");
+        console.log("Synchronizing. Pauseing for " + (delay / getPlaybackRate(masterVideoId)) + "s.");
+        waitingForSync[videoId] = true;
         pause(videoId);
         setTimeout(function () {
+            waitingForSync[videoId] = false;
             if (!isPaused(masterVideoId)) {
                 play(videoId);
                 console.log("Synchronizing. Continue to play after " + delay + "s.");
             } else {
                 console.log("Still pausing after " + delay + "s, as master video is pausing");
             }
-        }, (delay * 1000));
+        }, ((delay / getPlaybackRate(masterVideoId)) * 1000));
     }
 
     /**
