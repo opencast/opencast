@@ -769,6 +769,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 }
             });
             Engage.on(plugin.events.playbackRateChanged.getName(), function(rate) {
+                console.log("Received event " + plugin.events.playbackRateChanged.getName() + " , Rate " + rate);
                 if (pressedPlayOnce) {
                     theodulVideodisplayMaster.playbackRate(rate);
                 }
@@ -776,12 +777,14 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             Engage.on(plugin.events.play.getName(), function(triggeredByMaster) {
                 if (!triggeredByMaster && videosReady) {
                     theodulVideodisplayMaster.play();
+                    console.log("Playing master video");
                     pressedPlayOnce = true;
                 }
             });
             Engage.on(plugin.events.pause.getName(), function(triggeredByMaster) {
                 if (!triggeredByMaster && pressedPlayOnce) {
                     theodulVideodisplayMaster.pause();
+                    console.log("Playing master video");
                 }
             });
             Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {

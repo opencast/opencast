@@ -13,7 +13,7 @@
     var nrOfPlayersReady = 0;
 
     var lastSynch = 0;
-    var synchInterval = 2000; // ms
+    var synchInterval = 1500; // ms
     
     // Delay that a slave video can lag before even starting to synchronize.
     // if a slave video is ahead it will always be synchronized.
@@ -44,8 +44,9 @@
     var receivedEventLoadeddata = false;
     var receivedEventLoadeddata_interval = null;
     var receivedEventLoadeddata_waitTimeout = 5000; // ms
-    
-    var videojsFlash = false;
+
+    var flashPlayer = false;
+    var id_generated_videojs_flash_component = "videojs_videodisplay_0_flash_api";
 
     /**
      * Checks whether a number is in an interval [lower, upper]
@@ -338,7 +339,7 @@
                             }
                         }
                     } else if (syncDelay < 0.0) {
-                        if (!videojsFlash && Math.abs(syncDelay) < maxGap) {
+                        if (!flashPlayer && Math.abs(syncDelay) < maxGap) {
                             setPlaybackRate(videoIds[i], (getPlaybackRate(masterVideoId) + 0.5)); // Play slave video faster to catchup.
                             console.log("Synchronizing. Increased playback speed to: " + (getPlaybackRate(videoIds[i])));
                         } else {
@@ -388,6 +389,7 @@
             var masterPlayer = getVideoObj(masterVideoId);
 
             masterPlayer.on("play", function () {
+                console.log("sjs: received play event");
                 $(document).trigger("sjs:masterPlay", [getCurrentTime(masterVideoId)]);
                 hitPauseWhileBuffering = false;
                 if (!bufferCheckerSet && checkBuffer) {
@@ -405,6 +407,7 @@
             });
 
             masterPlayer.on("pause", function () {
+                console.log("sjs: received pause event");
                 $(document).trigger("sjs:masterPause", [getCurrentTime(masterVideoId)]);
                 hitPauseWhileBuffering = !ignoreNextPause && playWhenBuffered;
                 ignoreNextPause = ignoreNextPause ? !ignoreNextPause : ignoreNextPause;
@@ -416,7 +419,8 @@
                 }
             });
 
-            masterPlayer.on("playbackRateChanged", function () {
+            masterPlayer.on("ratechange", function () {
+                console.log("sjs: received playbackRateChanged event");
                 $(document).trigger("sjs:masterPlaybackRateChanged", [getPlaybackRate(masterVideoId)]);
                 for (var i = 0; i < videoIds.length; ++i) {
                     if (videoIds[i] != masterVideoId) {
@@ -426,6 +430,7 @@
             });            
 
             masterPlayer.on("ended", function () {
+                console.log("sjs: received ended event");
                 $(document).trigger("sjs:masterEnded", [getDuration(masterVideoId)]);
                 hitPauseWhileBuffering = true;
                 for (var i = 0; i < videoIds.length; ++i) {
@@ -434,13 +439,9 @@
                         pause(videoIds[i]);
                     }
                 }
-            });
-            
-            masterPlayer.on("usingFlash", function () {
-                videojsFlash = true;
-            });            
+            });         
 
-            masterPlayer.on("timeupdate", function () {
+            masterPlayer.on("timeupdate", function () {                
                 $(document).trigger("sjs:masterTimeupdate", [getCurrentTime(masterVideoId)]);
                 hitPauseWhileBuffering = true;
                 var now = Date.now();
@@ -453,9 +454,9 @@
                             mute(videoIds[i]);
                             paused = isPaused(videoIds[i]);
                             synchronize();
-                            if (paused || isPaused(masterVideoId)) {
-                                pause(videoIds[i]);
-                            }
+                  //          if (paused || isPaused(masterVideoId)) {
+                  //              pause(videoIds[i]);
+                  //          }
                         }
                     }
                 }
@@ -606,6 +607,12 @@
             tryToPlayWhenBufferingTimer = null;
         }
     }
+    
+    function isUsingFlash() {
+        flashPlayer = $("#" + id_generated_videojs_flash_component).length > 0;
+        console.log("Flash: " + flashPlayer);
+        return flashPlayer;
+    }
 
     /**
      * @param masterVidNumber [0, n-1]
@@ -615,7 +622,9 @@
      */
     $.synchronizeVideos = function (playerMasterVidNumber, videoId1OrMediagroup, videoId2) {
         var validIds = true;
-
+        
+        isUsingFlash(); //check if a Flash-Player has been activated
+        
         // check for mediagroups
         if ((arguments.length == 2)) {
             var videosInMediagroup = $("video[mediagroup=\"" + videoId1OrMediagroup + "\"]");
