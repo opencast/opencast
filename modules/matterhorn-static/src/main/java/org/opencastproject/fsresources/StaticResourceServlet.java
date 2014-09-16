@@ -391,7 +391,9 @@ public class StaticResourceServlet extends HttpServlet {
     while ((bytesToRead > 0) && (len >= buffer.length)) {
       try {
         len = istream.read(buffer);
-        if (bytesToRead >= len) {
+        if (len < 1) {
+          break;
+        } else if (bytesToRead >= len) {
           ostream.write(buffer, 0, len);
           bytesToRead -= len;
         } else {
