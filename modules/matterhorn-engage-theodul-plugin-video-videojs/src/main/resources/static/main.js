@@ -506,6 +506,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
         if (id) {
             if (videoSource) {
+
                 if (isAudioOnly) {} else {
                     var videoOptions = {
                         "controls": false,
@@ -578,6 +579,25 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         }
     }
 
+    function registerEvents(videoDisplay) {
+        var theodulVideodisplay = videojs(videoDisplay);
+
+        $(window).resize(function() {
+            checkVideoDisplaySize();
+        });
+
+        Engage.on(plugin.events.play.getName(), function() {
+            if (videosReady) {
+                console.log("Master video is playing")
+                theodulVideodisplay.play();
+            }
+        });
+        Engage.on(plugin.events.pause.getName(), function() {
+            console.log("Master video is pausing");
+            theodulVideodisplay.pause();
+        });
+    }
+
     /**
      * Returns the formatted seconds
      *
@@ -611,6 +631,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     }
 
     function registerEvents(videoDisplay, numberOfVideodisplays) {
+
         if (isAudioOnly) {
             var audioPlayer_id = $("#" + videoDisplay);
             var audioPlayer = audioPlayer_id[0];
@@ -706,8 +727,10 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 theodulVideodisplayMaster.on("play", function() {
                     Engage.trigger(plugin.events.play.getName(), true);
                     pressedPlayOnce = true;
+                    console.log("Playing master video");
                 });
                 theodulVideodisplayMaster.on("pause", function() {
+                    console.log("Pausing master video");
                     Engage.trigger(plugin.events.pause.getName(), true);
                 });
                 theodulVideodisplayMaster.on("ended", function() {
@@ -746,6 +769,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 }
             });
             Engage.on(plugin.events.playbackRateChanged.getName(), function(rate) {
+                console.log("Received event " + plugin.events.playbackRateChanged.getName() + " , Rate " + rate);
                 if (pressedPlayOnce) {
                     theodulVideodisplayMaster.playbackRate(rate);
                 }
@@ -753,12 +777,14 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             Engage.on(plugin.events.play.getName(), function(triggeredByMaster) {
                 if (!triggeredByMaster && videosReady) {
                     theodulVideodisplayMaster.play();
+                    console.log("Playing master video");
                     pressedPlayOnce = true;
                 }
             });
             Engage.on(plugin.events.pause.getName(), function(triggeredByMaster) {
                 if (!triggeredByMaster && pressedPlayOnce) {
                     theodulVideodisplayMaster.pause();
+                    console.log("Playing master video");
                 }
             });
             Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {
