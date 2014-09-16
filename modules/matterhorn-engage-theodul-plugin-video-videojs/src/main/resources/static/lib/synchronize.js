@@ -1,6 +1,6 @@
 /**
  * Synchronize.js
- * Version 1.1.2
+ * Version 1.1.4
  *
  * Copyright 2013-2014 Denis Meyer
  */
@@ -16,16 +16,18 @@
     var lastSynch = 0;
     var synchInterval = 1500; // ms
 
-    // Delay that a slave video can lag before even starting to synchronize.
-    // if a slave video is ahead it will always be synchronized.
+    // prevent that a slave video lags before even starting to synchronize
+    // if a slave video is ahead it will always be synchronized
     var synchGap = 1.0; // s
 
-    // Maximum gap that is accepted before seeking (higher playback rate to fill gap)
-    var maxGap = 5.0; //s
+    // maximum gap that is accepted before seeking (higher playback rate to fill the gap)
+    var maxGap = 5.0; // s
 
-    // Seek ahead for synchronized displays, as the master continues to play 
+    // seek ahead for synchronized displays, as the master continues to play
     // while the slave is seeking
-    var seekAhead = 0.5; // in seconds. 
+    var seekAhead = 0.5; // s
+
+    var synchDelayThreshold = 0.0;
 
     var startClicked = false;
 
@@ -38,7 +40,7 @@
     var hitPauseWhileBuffering = false;
     var bufferInterval = 2; // s
 
-    var tryToPlayWhenBuffering = true; // flag for trying to play after N seconds of buffering
+    var tryToPlayWhenBuffering = true; // flag for trying to play after n seconds of buffering
     var tryToPlayWhenBufferingTimer = null;
     var tryToPlayWhenBufferingMS = 10000;
 
@@ -337,11 +339,11 @@
      * @param id video id
      * @return 0 if video element is in synch with the master, a time else
      */
-    function isSynchronized(videoId) {
-        var ctMaster = getCurrentTime(masterVideoId); // currentTime in seconds!
-        var ct = getCurrentTime(videoId); // currentTime in seconds!
+    function getSynchDelay(videoId) {
+        var ctMaster = getCurrentTime(masterVideoId); // current time in seconds
+        var ct = getCurrentTime(videoId); // current time in seconds
         if ((ctMaster != -1) && (ct != -1) && !isInInterval(ct, ctMaster - synchGap, ctMaster)) {
-            return ct - ctMaster; //return the difference to work with this value later on
+            return ct - ctMaster; // return the difference
         }
         return 0.0; // return 0 if delay is acceptable
     }
@@ -352,13 +354,13 @@
     function synchronize() {
         for (var i = 0; i < videoIds.length; ++i) {
             if (videoIds[i] != masterVideoId) {
-                var syncDelay = isSynchronized(videoIds[i]);
-                if (Math.abs(syncDelay) > 0.0) {
+                var syncDelay = getSynchDelay(videoIds[i]);
+                if (Math.abs(syncDelay) > synchDelayThreshold) {
                     $(document).trigger("sjs:synchronizing", [getCurrentTime(masterVideoId), videoIds[i]]);
                     var doSeek = false;
                     if (!usingFlash) {
                         log("SJS: [synchronize] Synchronizing video element id '" + videoIds[i] + "', delay = " + syncDelay);
-                        if (syncDelay > 0.0) {
+                        if (syncDelay > synchDelayThreshold) {
                             if (getPlaybackRate(masterVideoId) != getPlaybackRate(videoIds[i])) {
                                 setPlaybackRate(videoIds[i], getPlaybackRate(masterVideoId));
                                 if (!isPaused(masterVideoId) && !waitingForSync[videoIds[i]]) {
@@ -371,7 +373,7 @@
                             } else {
                                 doSeek = true;
                             }
-                        } else if (syncDelay < 0.0) {
+                        } else if (syncDelay < synchDelayThreshold) {
                             if (Math.abs(syncDelay) < maxGap) {
                                 log("SJS: [synchronize] Synchronizing. Increased playback speed of video element id '" + videoIds[i] + "' to " + (getPlaybackRate(videoIds[i])));
                                 setPlaybackRate(videoIds[i], (getPlaybackRate(masterVideoId) + 0.5)); // play slave video faster to catch up to the master
@@ -529,7 +531,7 @@
                     var duration = getDuration(videoIds[i]);
                     var currTimePlusBuffer = getCurrentTime(videoIds[i]) + bufferInterval;
                     var buffered = false;
-                    for (j = 0;
+                    for (var j = 0;
                         (j < bufferedTimeRange.length) && !buffered; ++j) {
                         currTimePlusBuffer = (currTimePlusBuffer >= duration) ? duration : currTimePlusBuffer;
                         if (isInInterval(currTimePlusBuffer, bufferedTimeRange.start(j), bufferedTimeRange.end(j))) {
@@ -628,6 +630,9 @@
         }
     }
 
+    /**
+     * Initial play
+     */
     function initialPlay() {
         var myPlayer = this;
         for (var i = 0; i < videoIds.length; ++i) {
@@ -636,15 +641,20 @@
         startClicked = true;
     }
 
+    /**
+     * Initial pause
+     */
     function initialPause() {
         var myPlayer = this;
-        // pause(getVideoId(this));
         for (var i = 0; i < videoIds.length; ++i) {
             pause(videoIds[i]);
         }
         startClicked = false;
     }
 
+    /**
+     * Stop try to play when buffering timer
+     */
     function stopTryToPlayWhenBufferingTimer() {
         if (tryToPlayWhenBufferingTimer != null) {
             window.clearInterval(tryToPlayWhenBufferingTimer);
@@ -653,6 +663,8 @@
     }
 
     /**
+     * Main
+     *
      * @param masterVidNumber [0, n-1]
      * @param videoId1OrMediagroup
      * @param videoId2
