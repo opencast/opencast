@@ -848,7 +848,7 @@ var ocScheduler = (function() {
           series = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + ocUtils.escapeXML(this.fields.seriesSelect.val()) + '</dcterms:title></dublincore>'
           seriesComponent = this;
           
-          var anonymous_role = 'anonymous';
+          var anonymous_role = 'ROLE_ANONYMOUS';
           $.ajax({
               url: ANOYMOUS_URL,
               type: 'GET',

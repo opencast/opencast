@@ -56,6 +56,7 @@ import org.opencastproject.util.jmx.JmxUtil;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -96,16 +97,20 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
+import javax.persistence.TypedQuery;
 import javax.persistence.spi.PersistenceProvider;
 
 /** JPA implementation of the {@link ServiceRegistry} */
 public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
-  /** Id of the workflow operation start operation, need to match the corresponding enum value in WorkflowServiceImpl */
+  /** Id of the workflow's start operation operation, need to match the corresponding enum value in WorkflowServiceImpl */
   public static final String START_OPERATION = "START_OPERATION";
 
-  /** Id of the workflow start operation, need to match the corresponding enum value in WorkflowServiceImpl */
+  /** Id of the workflow's start workflow operation, need to match the corresponding enum value in WorkflowServiceImpl */
   public static final String START_WORKFLOW = "START_WORKFLOW";
+
+  /** Id of the workflow's resume operation, need to match the corresponding enum value in WorkflowServiceImpl */
+  public static final String RESUME = "RESUME";
 
   /** Identifier for the workflow service */
   public static final String TYPE_WORKFLOW = "org.opencastproject.workflow";
@@ -139,7 +144,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the maximum load */
   protected static final String OPT_MAXLOAD = "org.opencastproject.server.maxload";
 
-  /** Configuration key for the dispatch interval in miliseconds */
+  /** Configuration key for the dispatch interval in milliseconds */
   protected static final String OPT_DISPATCHINTERVAL = "dispatchinterval";
 
   /** Configuration key for the interval to check whether the hosts in the service registry are still alive [sec] * */
@@ -476,6 +481,126 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (em != null)
         em.close();
     }
+  }
+
+  @Override
+  public void removeJob(long jobId) throws NotFoundException, ServiceRegistryException {
+    if (jobId < 1)
+      throw new NotFoundException("Job ID must be greater than zero (0)");
+
+    logger.debug("Start deleting job with ID '{}'", jobId);
+
+    EntityManager em = null;
+    EntityTransaction tx = null;
+
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+
+      Job job = em.find(JobJpaImpl.class, jobId);
+      if (job == null)
+        throw new NotFoundException("Job with ID '" + jobId + "' not found");
+
+      deleteChildJobs(jobId);
+
+      tx.begin();
+      em.remove(job);
+      tx.commit();
+      logger.debug("Job with ID '{}' deleted", jobId);
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Unable to remove job {}: {}", jobId, e);
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw new ServiceRegistryException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  private void deleteChildJobs(long jobId) throws ServiceRegistryException {
+    List<Job> childJobs = getChildJobs(jobId);
+    if (childJobs.isEmpty()) {
+      logger.debug("No child jobs of job '{}' found to delete.", jobId);
+      return;
+    }
+
+    logger.debug("Start deleting child jobs of job '{}'", jobId);
+
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      for (int i = childJobs.size() - 1; i >= 0; i--) {
+        Job job = childJobs.get(i);
+        Job jobToDelete = em.find(JobJpaImpl.class, job.getId());
+        tx.begin();
+        em.remove(jobToDelete);
+        tx.commit();
+        logger.debug("Job '{}' deleted", jobToDelete.getId());
+      }
+      logger.debug("Deleted all child jobs of job '{}'", jobId);
+    } catch (Exception e) {
+      logger.error("Unable to remove child jobs from {}: {}", jobId, e);
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw new ServiceRegistryException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public void removeParentlessJobs(int lifetime) throws ServiceRegistryException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+
+    Date d = DateUtils.addDays(new Date(), -lifetime);
+    int count = 0;
+
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      TypedQuery<JobJpaImpl> query = em.createNamedQuery("Job.withoutParent", JobJpaImpl.class);
+      List<JobJpaImpl> jobs = query.getResultList();
+
+      tx.begin();
+      for (JobJpaImpl job : jobs) {
+        if (job.getDateCreated().after(d))
+          continue;
+
+        // DO NOT DELETE workflow instances and operations!
+        if (START_OPERATION.equals(job.getOperation()) || START_WORKFLOW.equals(job.getOperation())
+                || RESUME.equals(job.getOperation()))
+          continue;
+
+        if (job.getStatus().isTerminated()) {
+          try {
+            removeJob(job.getId());
+            logger.debug("Parentless job '{}' removed", job.getId());
+            count++;
+          } catch (NotFoundException e) {
+            logger.debug("Parentless job '{} ' not found in database: {}", job.getId(), e);
+          }
+        }
+
+      }
+      tx.commit();
+      if (count > 0)
+        logger.info("Successfully removed {} parentless jobs", count);
+      else
+        logger.info("No parentless jobs found to remove", count);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+    return;
   }
 
   /**

@@ -1,7 +1,7 @@
 <div>
   <% $.each(data[j].serversView, function(key, server) { %>
-  <h2><img src=<% if (server.online) { %><% if (server.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %>"/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/> <%= server.host %></h2>
-  <input class="server-maintenance" value="<%= server.online %>" name="<%= server.host %>" type="checkbox" <% if (server.maintenance) { %> checked="checked" <% } %>> Maintenance</input>
+  <h2><img src=<% if (server.online) { %><% if (server.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %>"/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/> <%! server.host %></h2>
+  <input class="server-maintenance" value="<%! server.online %>" name="<%! server.host %>" type="checkbox" <% if (server.maintenance) { %> checked="checked" <% } %>> Maintenance</input>
   <table id="statsTable" class="ui-widget" cellspacing="0" width="100%">
     <thead>
       <tr>
@@ -20,34 +20,34 @@
           <img style="vertical-align:middle; margin-right:5px;" src=<% if (service.online) { %><% if (service.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %> "/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/>
           <% if (service.state != "NORMAL") { %>
 		  <img style="vertical-align:middle; margin-right:5px;" src=<% if (service.state == "WARNING") { %>"/admin/img/icons/lightbulb.png" title="Warning State" <% } else { %> "/admin/img/icons/exclamation.png" title="Error State" <% } %>/>
-		  <a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-right: 5px;" href="host=<%= server.host %>&serviceType=<%= service.type %>">Sanitize</a>
+		  <a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-right: 5px;" href="host=<%! server.host %>&serviceType=<%! service.type %>">Sanitize</a>
 		  <% } %>
-          <span style="vertical-align:middle;"><%= ocStatistics.labelName(service.id) %></span>
+          <span style="vertical-align:middle;"><%! ocStatistics.labelName(service.id) %></span>
         </td>
         <td class="ui-state-active center">
-          <%= service.finished %>
+          <%! service.finished %>
         </td>
         <td class="ui-state-active center">
-          <%= service.running %>
+          <%! service.running %>
         </td>
         <td class="ui-state-active  center">
-          <%= service.queued %>
+          <%! service.queued %>
         </td>
         <td class="ui-state-active  center">
-          <%= service.meanRunTime %>
+          <%! service.meanRunTime %>
         </td>
         <td class="ui-state-active  center">
-          <%= service.meanQueueTime %>
+          <%! service.meanQueueTime %>
         </td>
       </tr>
       <% }); %>
       <tr>
         <td style=" text-align:right; padding-right:10px; font-weight:bold;">Total</td>
-        <td class="ui-state-active center" style="font-weight:bold;"> <%= server.finishedTotal %></td>
-        <td class="ui-state-active center" style="font-weight:bold;"> <%= server.runningTotal %></td>
-        <td class="ui-state-active center" style="font-weight:bold;"> <%= server.queuedTotal %></td>
-        <td class="ui-state-active center" style="font-weight:bold;"> <%= server.meanRunTimeTotal %></td>
-        <td class="ui-state-active center" style="font-weight:bold;"> <%= server.meanQueueTimeTotal %></td>
+        <td class="ui-state-active center" style="font-weight:bold;"> <%! server.finishedTotal %></td>
+        <td class="ui-state-active center" style="font-weight:bold;"> <%! server.runningTotal %></td>
+        <td class="ui-state-active center" style="font-weight:bold;"> <%! server.queuedTotal %></td>
+        <td class="ui-state-active center" style="font-weight:bold;"> <%! server.meanRunTimeTotal %></td>
+        <td class="ui-state-active center" style="font-weight:bold;"> <%! server.meanQueueTimeTotal %></td>
       </tr>
     </tbody>
   </table>

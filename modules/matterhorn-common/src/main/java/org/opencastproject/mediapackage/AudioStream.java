@@ -35,6 +35,12 @@ public interface AudioStream extends Stream {
 
   Float getBitRate();
 
+  Float getPkLevDb();
+
+  Float getRmsLevDb();
+
+  Float getRmsPkDb();
+
   String getCaptureDevice();
 
   String getCaptureDeviceVersion();

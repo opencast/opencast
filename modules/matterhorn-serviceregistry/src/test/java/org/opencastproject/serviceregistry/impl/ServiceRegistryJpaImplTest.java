@@ -17,6 +17,7 @@ package org.opencastproject.serviceregistry.impl;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
 
 import org.easymock.EasyMock;
@@ -139,6 +140,11 @@ public class ServiceRegistryJpaImplTest {
   @Test
   public void nullContextActivatesOkay() throws ServiceRegistryException {
     serviceRegistryJpaImpl.activate(null);
+  }
+
+  @Test(expected = NotFoundException.class)
+  public void testDeleteJobInvalidJobId() throws Exception {
+    serviceRegistryJpaImpl.removeJob(-1L);
   }
 
 }

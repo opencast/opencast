@@ -132,7 +132,11 @@ public class TextualImpl implements Textual {
    */
   @Override
   public void setText(String text) {
-    this.text = text;
+    if (StringUtils.trimToNull(text) == null) {
+      throw new IllegalArgumentException("The text cannot be empty");
+    } else {
+      this.text = text;
+    }
   }
 
   /**
