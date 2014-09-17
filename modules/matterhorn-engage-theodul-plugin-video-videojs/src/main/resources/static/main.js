@@ -120,6 +120,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
     /* don't change these variables */
     var isAudioOnly = false;
+    var isUsingFlash = false;
     var aspectRatio = "";
     var initCount = 4;
     var mediapackageError = false;
@@ -170,6 +171,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var event_sjs_buffering = "sjs:buffering";
     var event_sjs_bufferedAndAutoplaying = "sjs:bufferedAndAutoplaying";
     var event_sjs_bufferedButNotAutoplaying = "sjs:bufferedButNotAutoplaying";
+    var event_sjs_isUsingFlash = "sjs:isUsingFlash";
+    var event_sjs_debug = "sjs:debug";
     var currentlySelectedVideodisplay = 0;
     var globalVideoSource = new Array();
 
@@ -350,9 +353,13 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                                 if (i > 0) {
                                     // sync every other videodisplay with the master
                                     $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
-                                    Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay " + 0);
+                                    Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay");
                                 }
                                 ++i;
+                            }
+                            if (isUsingFlash) {
+                                $(document).trigger(event_sjs_isUsingFlash, []);
+                                $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
                             }
                         } else {
                             videosReady = true;
@@ -507,7 +514,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         if (id) {
             if (videoSource) {
 
-                if (isAudioOnly) {} else {
+                if (!isAudioOnly) {
                     var videoOptions = {
                         "controls": false,
                         "autoplay": false,
@@ -534,8 +541,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                     } else {
                         Engage.log("Video: No flash component loaded");
                     }
-                    var flashComponentUsed = $("#" + id_generated_videojs_flash_component).length > 0;
-                    Engage.trigger(plugin.events.usingFlash.getName(), flashComponentUsed);
+                    isUsingFlash = $("#" + id_generated_videojs_flash_component).length > 0;
+                    Engage.trigger(plugin.events.usingFlash.getName(), isUsingFlash);
                 }
             } else {
                 Engage.log("Video: Error: No video source available");
@@ -588,12 +595,10 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
         Engage.on(plugin.events.play.getName(), function() {
             if (videosReady) {
-                console.log("Master video is playing")
                 theodulVideodisplay.play();
             }
         });
         Engage.on(plugin.events.pause.getName(), function() {
-            console.log("Master video is pausing");
             theodulVideodisplay.pause();
         });
     }
@@ -672,6 +677,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 }
             });
             Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {
+                Engage.log("Video: Volume set to " + percentAsDecimal);
                 if ((percentAsDecimal / 100) > 0.09) {
                     audioPlayer.volume = percentAsDecimal / 100;
                 } else {
@@ -682,6 +688,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 callback(audioPlayer.volume);
             });
             Engage.on(plugin.events.seek.getName(), function(time) {
+                Engage.log("Video: Seek to " + time);
                 if (videosReady && pressedPlayOnce) {
                     var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
                     if (duration && (time < duration)) {
@@ -700,6 +707,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 }
             });
             Engage.on(plugin.events.sliderStop.getName(), function(time) {
+                Engage.log("Video: Slider stopped at " + time);
                 if (videosReady && pressedPlayOnce) {
                     var duration = parseInt(Engage.model.get("videoDataModel").get("duration"));
                     var normTime = (time / 1000) * (duration / 1000);
@@ -715,6 +723,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             });
             Engage.on(plugin.events.ended.getName(), function(time) {
                 if (videosReady) {
+                    Engage.log("Video: Ended at " + time);
                     audioPlayer.pause();
                     Engage.trigger(plugin.events.pause.getName());
                     audioPlayer.currentTime = audioPlayer.duration;
@@ -727,10 +736,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 theodulVideodisplayMaster.on("play", function() {
                     Engage.trigger(plugin.events.play.getName(), true);
                     pressedPlayOnce = true;
-                    console.log("Playing master video");
                 });
                 theodulVideodisplayMaster.on("pause", function() {
-                    console.log("Pausing master video");
                     Engage.trigger(plugin.events.pause.getName(), true);
                 });
                 theodulVideodisplayMaster.on("ended", function() {
@@ -769,25 +776,24 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 }
             });
             Engage.on(plugin.events.playbackRateChanged.getName(), function(rate) {
-                console.log("Received event " + plugin.events.playbackRateChanged.getName() + " , Rate " + rate);
                 if (pressedPlayOnce) {
+                    Engage.log("Video: Playback rate changed to rate " + rate);
                     theodulVideodisplayMaster.playbackRate(rate);
                 }
             });
             Engage.on(plugin.events.play.getName(), function(triggeredByMaster) {
                 if (!triggeredByMaster && videosReady) {
                     theodulVideodisplayMaster.play();
-                    console.log("Playing master video");
                     pressedPlayOnce = true;
                 }
             });
             Engage.on(plugin.events.pause.getName(), function(triggeredByMaster) {
                 if (!triggeredByMaster && pressedPlayOnce) {
                     theodulVideodisplayMaster.pause();
-                    console.log("Playing master video");
                 }
             });
             Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {
+                Engage.log("Video: Volume changed to " + percentAsDecimal);
                 theodulVideodisplayMaster.volume(percentAsDecimal);
             });
             Engage.on(plugin.events.volumeGet.getName(), function(callback) {
