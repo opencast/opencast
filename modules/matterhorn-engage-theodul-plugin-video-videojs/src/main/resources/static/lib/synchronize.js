@@ -5,7 +5,7 @@
  * Copyright 2013-2014 Denis Meyer
  */
 (function($) {
-    var debug = false; // set to true to get debug output
+    var debug = false;
 
     var videoIds = [];
     var videoIdsReady = {};
@@ -813,6 +813,10 @@
             if (allVideoIdsInitialized()) {
                 setCurrentTime(masterVideoId, time);
             }
+        });
+        $(document).on("sjs:debug", function(e, _debug) {
+            log("SJS: Received 'sjs:debug' event");
+            debug = _debug;
         });
         $(document).on("sjs:synchronize", function(e) {
             log("SJS: Received 'sjs:synchronize' event");

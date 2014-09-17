@@ -172,6 +172,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var event_sjs_bufferedAndAutoplaying = "sjs:bufferedAndAutoplaying";
     var event_sjs_bufferedButNotAutoplaying = "sjs:bufferedButNotAutoplaying";
     var event_sjs_isUsingFlash = "sjs:isUsingFlash";
+    var event_sjs_debug = "sjs:debug";
     var currentlySelectedVideodisplay = 0;
     var globalVideoSource = new Array();
 
@@ -358,6 +359,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                             }
                             if (isUsingFlash) {
                                 $(document).trigger(event_sjs_isUsingFlash, []);
+                                $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
                             }
                         } else {
                             videosReady = true;
