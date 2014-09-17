@@ -120,6 +120,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
     /* don't change these variables */
     var isAudioOnly = false;
+    var isUsingFlash = false;
     var aspectRatio = "";
     var initCount = 4;
     var mediapackageError = false;
@@ -170,6 +171,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var event_sjs_buffering = "sjs:buffering";
     var event_sjs_bufferedAndAutoplaying = "sjs:bufferedAndAutoplaying";
     var event_sjs_bufferedButNotAutoplaying = "sjs:bufferedButNotAutoplaying";
+    var event_sjs_isUsingFlash = "sjs:isUsingFlash";
     var currentlySelectedVideodisplay = 0;
     var globalVideoSource = new Array();
 
@@ -350,9 +352,12 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                                 if (i > 0) {
                                     // sync every other videodisplay with the master
                                     $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
-                                    Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay " + 0);
+                                    Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay");
                                 }
                                 ++i;
+                            }
+                            if (isUsingFlash) {
+                                $(document).trigger(event_sjs_isUsingFlash, []);
                             }
                         } else {
                             videosReady = true;
@@ -534,11 +539,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                     } else {
                         Engage.log("Video: No flash component loaded");
                     }
-                    var flashComponentUsed = $("#" + id_generated_videojs_flash_component).length > 0;
-                    Engage.trigger(plugin.events.usingFlash.getName(), flashComponentUsed);
-                    if (flashComponentUsed) {
-                        $(document).trigger("sjs:isUsingFlash", []);
-                    }
+                    isUsingFlash = $("#" + id_generated_videojs_flash_component).length > 0;
+                    Engage.trigger(plugin.events.usingFlash.getName(), isUsingFlash);
                 }
             } else {
                 Engage.log("Video: Error: No video source available");

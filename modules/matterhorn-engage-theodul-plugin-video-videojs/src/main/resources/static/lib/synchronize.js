@@ -5,13 +5,14 @@
  * Copyright 2013-2014 Denis Meyer
  */
 (function($) {
+    var debug = false; // set to true to get debug output
+
     var videoIds = [];
     var videoIdsReady = {};
     var videoIdsInit = {};
     var masterVidNumber = 0;
     var masterVideoId;
     var nrOfPlayersReady = 0;
-    var debug = true;
 
     var lastSynch = 0;
     var synchInterval = 1500; // ms
@@ -441,10 +442,8 @@
                 }
                 for (var i = 0; i < videoIds.length; ++i) {
                     if (videoIds[i] != masterVideoId) {
-                        getVideoObj(videoIds[i]).on("play", function() {
-                            mute(videoIds[i]);
-                        });
                         play(videoIds[i]);
+                        mute(videoIds[i]);
                     }
                 }
             });
