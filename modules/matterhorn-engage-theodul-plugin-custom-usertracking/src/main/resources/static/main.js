@@ -83,6 +83,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
     /* change these variables */
     var USERTRACKING_ENDPOINT = "/usertracking";
+    var USERTRACKING_ENDPOINT_GETSTATS = "/stats.json";
     var mediapackageChange = "change:mediaPackage";
     var footprintsChange = "change:footprints";
 
@@ -99,6 +100,31 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             return;
         }
 
+        $.ajax({
+            type: "PUT",
+            url: USERTRACKING_ENDPOINT,
+            data: {
+                id: mediapackageID,
+                    in : 0,
+                out: 0,
+                type: "VIEWS"
+            },
+            success: function(result) {
+		$.ajax({
+		    type: "GET",
+		    url: USERTRACKING_ENDPOINT + USERTRACKING_ENDPOINT_GETSTATS,
+		    data: {
+			id: mediapackageID
+		    },
+		    success: function(result) {
+			if(result && result.stats) {
+			    Engage.log("Views: " + result.stats.views);
+			}
+		    }
+		});
+            }
+        });
+
         Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
             mediapackageError = true;
         });
@@ -111,7 +137,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                     if (lastFootprint != cTime) {
                         lastFootprint = cTime;
                         Engage.log("Usertracking: Setting footprint at " + cTime);
-                        //put to mh endpoint
+                        // put to mh endpoint
                         $.ajax({
                             type: "PUT",
                             url: USERTRACKING_ENDPOINT,
