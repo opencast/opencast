@@ -84,8 +84,9 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var class_tabGroupItem = "tab-group-item";
 
     /* don"t change these variables */
+    var viewsModelChange = "change:views";
     var mediapackageChange = "change:mediaPackage";
-    var initCount = 2;
+    var initCount = 3;
     var mediapackageError = false;
 
     var DescriptionTabView = Backbone.View.extend({
@@ -106,7 +107,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                     title: this.model.get("title"),
                     series: this.model.get("series"),
                     contributor: this.model.get("contributor"),
-                    date: this.model.get("date")
+                    date: this.model.get("date"),
+                    views: Engage.model.get("views").get("stats").views
                 };
                 // try to format the date
                 if (Moment(tempVars.date) != null) {
@@ -130,9 +132,12 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                 if (!tempVars.date) {
                     tempVars.date = "";
                 }
+                if (!tempVars.views) {
+                    tempVars.views = "-";
+                }
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
-                /*
+         /*
 	      $(".description-item").mouseover(function() {
 	      $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
 	      }).mouseout(function() {
@@ -149,10 +154,14 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
             Moment.locale("en", {
                 // customizations
             });
+
             // create a new view with the media package model and the template
-            new DescriptionTabView(Engage.model.get("mediaPackage"), plugin.template);
+            var descriptionTabView = new DescriptionTabView(Engage.model.get("mediaPackage"), plugin.template);
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
+            });
+            Engage.model.get("views").on("change", function() {
+                descriptionTabView.render();
             });
         }
     }
@@ -161,6 +170,13 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         // init event
         Engage.log("Tab:Description: Init");
         var relative_plugin_path = Engage.getPluginPath("EngagePluginTabDescription");
+
+        Engage.model.on(viewsModelChange, function() {
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
 
         // listen on a change/set of the mediaPackage model
         Engage.model.on(mediapackageChange, function() {

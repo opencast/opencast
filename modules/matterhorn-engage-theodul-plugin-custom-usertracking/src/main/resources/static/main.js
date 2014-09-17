@@ -111,7 +111,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                     if (lastFootprint != cTime) {
                         lastFootprint = cTime;
                         Engage.log("Usertracking: Setting footprint at " + cTime);
-                        //put to mh endpoint
+                        // put to mh endpoint
                         $.ajax({
                             type: "PUT",
                             url: USERTRACKING_ENDPOINT,

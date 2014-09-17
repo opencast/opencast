@@ -158,7 +158,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var videosReady = false;
     var pressedPlayOnce = false;
     var mediapackageChange = "change:mediaPackage";
-    var engageModelChange = "change:videoDataModel";
+    var videoDataModelChange = "change:videoDataModel";
     var event_html5player_volumechange = "volumechange";
     var event_html5player_fullscreenchange = "fullscreenchange";
     var event_sjs_allPlayersReady = "sjs:allPlayersReady";
@@ -853,7 +853,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             // set path to swf player
             var videojs_swf = plugin.pluginPath + videojs_swf_path;
 
-            Engage.model.on(engageModelChange, function() {
+            Engage.model.on(videoDataModelChange, function() {
                 new VideoDataView(this.get("videoDataModel"), plugin.template, videojs_swf);
             });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
