@@ -598,7 +598,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
-
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
                 aspectRatioWidth = as[0] || 0;
                 aspectRatioHeight = as[1] || 0;
