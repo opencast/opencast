@@ -117,10 +117,25 @@
 				</executions>
 			</plugin>
       <plugin>
+        <groupId>com.github.klieber</groupId>
+        <artifactId>phantomjs-maven-plugin</artifactId>
+        <version>0.4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <version>1.9.7</version>
+        </configuration>
+      </plugin>
+      <plugin>
         <!-- Further plugin parameter information http://searls.github.io/jasmine-maven-plugin/bdd-mojo.html -->
         <groupId>com.github.searls</groupId>
         <artifactId>jasmine-maven-plugin</artifactId>
-        <version>1.3.1.2</version>
+        <version>1.3.1.5</version>
         <executions>
           <execution>
             <goals>
@@ -144,6 +159,13 @@
             <include>**/*.coffee</include>
           </specIncludes>
           <specRunnerTemplate>REQUIRE_JS</specRunnerTemplate>
+          <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
+          <webDriverCapabilities>
+            <capability>
+              <name>phantomjs.binary.path</name>
+              <value>${phantomjs.binary}</value>
+            </capability>
+          </webDriverCapabilities>
           <format>progress</format>
         </configuration>
       </plugin>
