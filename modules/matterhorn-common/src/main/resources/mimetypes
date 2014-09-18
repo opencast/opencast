@@ -21,6 +21,7 @@ audio/basic		au
 audio/midi		midi mid
 audio/x-aifc		aifc
 audio/x-aiff            aif aiff
+audio/x-flac	flac
 audio/x-mpeg		mpeg mpg
 audio/x-wav             wav
 auido/mpeg              mp3
