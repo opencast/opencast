@@ -70,14 +70,14 @@ ocRecordings = new (function() {
 
     // default configuration
     this.state = 'all';
-    this.pageSize = 10;
-    this.page = 0;
-    this.refresh = 5;
-    this.doRefresh = 'true';
-    this.sortField = 'Date';
-    this.sortOrder = 'DESC';
-    this.filterField = null;
-    this.filterText = '';
+    this.pageSize = $.cookie('pageSize') || 10;
+    this.page = $.cookie('page') || 0;
+    this.refresh = $.cookie('refresh') || 5;
+    this.doRefresh = $.cookie('doRefresh') || 'true';
+    this.sortField = $.cookie('sortField') || 'Date';
+    this.sortOrder = $.cookie('sortOrder') || 'DESC';
+    this.filterField = $.cookie('filterField') || null;
+    this.filterText = $.cookie('filterText') ||'';
     
     this.lastState = 'all';
     this.lastPageSize = 10;
@@ -670,6 +670,8 @@ ocRecordings = new (function() {
     .click( function() {
       var sortDesc = $(this).find('.sort-icon').hasClass('ui-icon-circle-triangle-s');
       var sortField = ($(this).attr('id')).substr(4);
+      $.cookie('sortField', sortField);
+      $.cookie('sortOrder', sortDesc);
       $( '#ocRecordingsTable th .sort-icon' )
       .removeClass('ui-icon-circle-triangle-s')
       .removeClass('ui-icon-circle-triangle-n')
@@ -915,6 +917,8 @@ ocRecordings = new (function() {
 
   this.updateRefreshInterval = function(enable, delay) {
     delay = delay < 5 ? 5 : delay;
+    $.cookie('doRefresh', enable);
+    $.cookie('refresh', delay);
     ocRecordings.Configuration.refresh = delay;
     ocUtils.log('Setting Refresh to ' + enable + " - " + delay + " sec");
     ocRecordings.Configuration.doRefresh = enable;
@@ -967,6 +971,8 @@ ocRecordings = new (function() {
         if ($.trim(text) != '') {
           ocRecordings.Configuration.filterField = field;
           ocRecordings.Configuration.filterText = text;
+          $.cookie("filterField", field);
+          $.cookie("filterText", text);
           ocRecordings.Configuration.page = 0;
         }
         refresh();
@@ -999,7 +1005,7 @@ ocRecordings = new (function() {
     		ocRecordings.Configuration.todate = ocUtils.toISODate(to);
     		ocRecordings.Configuration.dateFilter="range"
     	}
-    	$.cookie( 'dateFilter', ocRecordings.Configuration.dateFilter );
+    	$.cookie('dateFilter', ocRecordings.Configuration.dateFilter );
     	$.cookie('fromDate', ocRecordings.Configuration.fromdate);
     	$.cookie('toDate', ocRecordings.Configuration.todate);
     	refresh();
@@ -1121,6 +1127,7 @@ ocRecordings = new (function() {
     
     $('#pageSize').change(function(){
       ocRecordings.Configuration.pageSize = $(this).val();
+      $.cookie('pageSize', ocRecordings.Configuration.pageSize);
       ocRecordings.Configuration.page = 0;
       ocRecordings.reload();
     });
@@ -1281,6 +1288,7 @@ ocRecordings = new (function() {
         page = 0;
       }
       ocRecordings.Configuration.page = page;
+      $.cookie('page', ocRecordings.Configuration.page);
       ocRecordings.reload();
     }
   }

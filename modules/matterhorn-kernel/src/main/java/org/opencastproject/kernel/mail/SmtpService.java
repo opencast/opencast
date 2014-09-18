@@ -15,10 +15,6 @@
  */
 package org.opencastproject.kernel.mail;
 
-import org.opencastproject.util.doc.DocUtil;
-import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workspace.api.Workspace;
-
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -27,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
@@ -100,12 +95,6 @@ public class SmtpService implements ManagedService {
 
   /** The current mail transport protocol */
   private String mailTransport = null;
-
-  /** The workspace (needed to read the catalogs when processing templates) **/
-  private Workspace workspace;
-
-  /** Email template scanner is optional and has dynamic policy */
-  private AtomicReference<EmailTemplateScanner> templateScannerRef = new AtomicReference<EmailTemplateScanner>();
 
   /**
    * Callback from the OSGi <code>ConfigurationAdmin</code> on configuration changes.
@@ -286,66 +275,6 @@ public class SmtpService implements ManagedService {
     message.setText("Hello world");
     message.saveChanges();
     send(message);
-  }
-
-  /**
-   * Apply the freemarker template specified.
-   * 
-   * @param templateName
-   *          the name of the template (specified when configuring the send-email operation)
-   * @param templateContent
-   *          [OPTIONAL] the template content (if specified in the send-email operation configuration). If not informed,
-   *          template will be obtained from the set of templates loaded from MH_HOME/etc/email.
-   * @param workflowInstance
-   *          the workflow instance
-   * 
-   * @return the content after the template was applied to it
-   * @throws IllegalArgumentException
-   *           if template passed it not found
-   */
-  public String applyTemplate(String templateName, String templateContent, WorkflowInstance workflowInstance)
-          throws IllegalArgumentException {
-    if (templateContent == null && templateScannerRef.get() != null) {
-      templateContent = templateScannerRef.get().getTemplate(templateName);
-    }
-
-    if (templateContent == null) {
-      logger.warn("E-mail template not found: {}", templateName);
-      throw new IllegalArgumentException("Email template not found: " + templateName);
-    }
-
-    // Apply the template
-    return DocUtil.generate(new EmailData(templateName, workflowInstance, workspace), templateContent);
-  }
-
-  /**
-   * Callback for OSGi to set the {@link Workspace}.
-   * 
-   * @param ws
-   *          the workspace
-   */
-  void setWorkspace(Workspace ws) {
-    this.workspace = ws;
-  }
-
-  /**
-   * Callback for OSGi to set the {@link EmailTemplateScanner}.
-   * 
-   * @param templateScanner
-   *          the template scanner service
-   */
-  void bindEmailTemplateScanner(EmailTemplateScanner templateScanner) {
-    this.templateScannerRef.compareAndSet(null, templateScanner);
-  }
-
-  /**
-   * Callback for OSGi to unset the {@link EmailTemplateScanner}.
-   * 
-   * @param templateScanner
-   *          the template scanner service
-   */
-  void unbindEmailTemplateScanner(EmailTemplateScanner templateScanner) {
-    this.templateScannerRef.compareAndSet(templateScanner, null);
   }
 
 }
