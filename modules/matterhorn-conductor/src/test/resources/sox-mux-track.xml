@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:track type="presentation/video-audio" id="123958c3-923f-4b08-9caa-c5713d62a489">
+	<ns2:mimetype>video/x-flv</ns2:mimetype>
+	<ns2:tags />
+	<ns2:url>fooVideo.flv</ns2:url>
+	<ns2:checksum type="md5">46cb2e9df2e73756b0d96c33b1aaf055</ns2:checksum>
+	<ns2:duration>65680</ns2:duration>
+	<ns2:audio id="audio-1">
+		<ns2:device />
+		<ns2:encoder type="ADPCM" />
+		<ns2:bitdepth>16</ns2:bitdepth>
+		<ns2:channels>2</ns2:channels>
+		<ns2:bitrate>62500.0</ns2:bitrate>
+	</ns2:audio>
+	<ns2:video id="video-1">
+		<ns2:device />
+		<ns2:encoder type="H.263" />
+		<ns2:bitrate>781250.0</ns2:bitrate>
+		<ns2:framerate>25.0</ns2:framerate>
+		<ns2:resolution>624x352</ns2:resolution>
+	</ns2:video>
+</ns2:track>

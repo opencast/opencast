@@ -78,6 +78,7 @@
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-solr</module>
+        <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videoeditor-api</module>
@@ -131,6 +132,7 @@
         </property>
       </activation>
       <modules>
+        <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
@@ -385,10 +387,7 @@
         <module>modules/matterhorn-dictionary-textcorpora</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-service-impl</module>
-        <!--
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        -->
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -401,6 +400,8 @@
         <module>modules/matterhorn-silencedetection-impl</module>
         <module>modules/matterhorn-smil-api</module>
         <module>modules/matterhorn-smil-impl</module>
+        <module>modules/matterhorn-sox-api</module>
+        <module>modules/matterhorn-sox-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
@@ -435,10 +436,7 @@
         <module>modules/matterhorn-dictionary-textcorpora</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-service-impl</module>
-        <!--
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        -->
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -451,6 +449,8 @@
         <module>modules/matterhorn-silencedetection-impl</module>
         <module>modules/matterhorn-smil-api</module>
         <module>modules/matterhorn-smil-impl</module>
+        <module>modules/matterhorn-sox-api</module>
+        <module>modules/matterhorn-sox-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
@@ -492,6 +492,8 @@
         <module>modules/matterhorn-silencedetection-remote</module>
         <module>modules/matterhorn-smil-api</module>
         <module>modules/matterhorn-smil-impl</module>
+        <module>modules/matterhorn-sox-api</module>
+        <module>modules/matterhorn-sox-remote</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-remote</module>
@@ -719,7 +721,7 @@
         </property>
       </activation>
       <modules>
-        <module>modules/matterhorn-inspection-service-ffmpeg</module>
+        <module>modules/matterhorn-inspection-service-impl</module>
         <module>modules/matterhorn-dictionary-none</module>
       </modules>
     </profile>

@@ -53,6 +53,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -489,6 +491,34 @@ public class ServiceRegistryEndpoint {
     try {
       Integer count = serviceRegistry.getMaxConcurrentJobs();
       return Response.ok(count).build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @DELETE
+  @Path("job/{id}")
+  @RestQuery(name = "deletejob", description = "Deletes a job from the service registry", returnDescription = "No data is returned, just the HTTP status code", pathParameters = { @RestParameter(isRequired = true, name = "id", type = Type.INTEGER, description = "ID of the job to delete") }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Job successfully deleted"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Job with given id could not be found") })
+  public Response deleteJob(@PathParam("id") long id) throws NotFoundException {
+    try {
+      serviceRegistry.removeJob(id);
+      return Response.noContent().build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @POST
+  @Path("removeparentlessjobs")
+  @RestQuery(name = "removeparentlessjobs", description = "Removes all jobs without a parent job which have passed their lifetime", returnDescription = "No data is returned, just the HTTP status code", restParameters = { @RestParameter(name = "lifetime", isRequired = true, type = Type.INTEGER, description = "Lifetime of parentless jobs") }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Parentless jobs successfully removed"),
+          @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "Error while removing parentless jobs") })
+  public Response removeParentlessJobs(@FormParam("lifetime") int lifetime) {
+    try {
+      serviceRegistry.removeParentlessJobs(lifetime);
+      return Response.noContent().build();
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }
