@@ -84,7 +84,9 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
     /* change these variables */
     var SEARCH_ENDPOINT = "/search/episode.json";
-    var USERTRACKING_ENDPOINT = "/usertracking/footprint.json";
+    var USERTRACKING_ENDPOINT = "/usertracking";
+    var USERTRACKING_ENDPOINT_FOOTPRINTS = "/footprint.json";
+    var USERTRACKING_ENDPOINT_STATS = "/stats.json";
 
     /* don"t change these variables */
     var mediaPackageID = "";
@@ -171,6 +173,46 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         }
     });
 
+    var ViewsModel = Backbone.Model.extend({
+        urlRoot: USERTRACKING_ENDPOINT + USERTRACKING_ENDPOINT_STATS,
+        initialize: function() {
+            Engage.log("MhConnection: Init ViewsModel");
+
+            Engage.log("MhConnection: Adding user to viewers");
+            var thisModel = this;
+            $.ajax({
+                type: "PUT",
+                url: USERTRACKING_ENDPOINT,
+                data: {
+                    id: mediaPackageID,
+                    in : 0,
+                    out: 0,
+                    type: "VIEWS"
+                },
+                success: function(result) {
+                    thisModel.update();
+                }
+            });
+        },
+        update: function() {
+            // request model data
+            Engage.log("MhConnection: Updating views model");
+            this.fetch({
+                data: {
+                    id: mediaPackageID
+                },
+                success: function(model) {
+                    model.trigger("change");
+                }
+            });
+        },
+        defaults: {
+            "stats": {
+                "views": 0
+            }
+        }
+    });
+
     var FootprintModel = Backbone.Model.extend({
         defaults: {
             "position": 0,
@@ -180,7 +222,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
     var FootprintCollection = Backbone.Collection.extend({
         model: FootprintModel,
-        url: USERTRACKING_ENDPOINT,
+        url: USERTRACKING_ENDPOINT + USERTRACKING_ENDPOINT_FOOTPRINTS,
         initialize: function() {
             this.update();
         },
@@ -245,6 +287,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
      */
     function initPlugin() {
         Engage.model.set("mediaPackage", new MediaPackageModel());
+        Engage.model.set("views", new ViewsModel());
         Engage.model.set("footprints", new FootprintCollection());
     }
 

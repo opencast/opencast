@@ -32,7 +32,7 @@ define(['require', 'jquery', 'underscore', 'backbone'], function(require, $, _, 
     var PluginModelCollection = Backbone.Collection.extend({});
 
     /*
-     * Model with informations about the current user and the current MH configuration
+     * Model with information about the current user and the current MH configuration
      */
     var MeInfoModel = Backbone.Model.extend({
         urlRoot: "../../../info/me.json",
