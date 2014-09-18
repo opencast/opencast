@@ -175,7 +175,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
           @RestParameter(name = "seriesId", type = RestParameter.Type.STRING, description = "The id of a series to apply this workflow to. Either this or the series title is required.", isRequired = false),
           @RestParameter(name = "seriesTitle", type = RestParameter.Type.STRING, description = "The title of a series to apply this workflow to. Either this or the series id is required.", isRequired = false) }, reponses = {
           @RestResponse(description = "The workflows have been started.", responseCode = HttpServletResponse.SC_NO_CONTENT),
-          @RestResponse(description = "Both the series id and series title is not provided so we can't search for episodes within a series to apply this workflow to.", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "No content is returned.")
+          @RestResponse(description = "Returned if both the series id and series title are not provided. The reason being that we can't search for episodes within a series without at least one of them.", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "No content is returned.")
   public Response applyWorkflowToSeries(@PathParam("wfDefId") final String wfId,
           @FormParam("seriesId") final String seriesId, @FormParam("seriesTitle") final String seriesTitle,
           @Context final HttpServletRequest req) {
