@@ -45,12 +45,6 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>matterhorn-smil-api</artifactId>
-      <version>${project.version}</version>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>matterhorn-silencedetection-api</artifactId>
       <version>${project.version}</version>
     </dependency>
