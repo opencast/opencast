@@ -177,7 +177,9 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         urlRoot: USERTRACKING_ENDPOINT + USERTRACKING_ENDPOINT_STATS,
         initialize: function() {
             Engage.log("MhConnection: Init ViewsModel");
-
+            this.put();
+        },
+        put: function() {
             Engage.log("MhConnection: Adding user to viewers");
             var thisModel = this;
             $.ajax({
@@ -225,6 +227,25 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         url: USERTRACKING_ENDPOINT + USERTRACKING_ENDPOINT_FOOTPRINTS,
         initialize: function() {
             this.update();
+        },
+        put: function(from, to) {
+            Engage.log("MhConnection: Setting footprint at " + from);
+            var thisModel = this;
+            // put to mh endpoint
+            $.ajax({
+                type: "PUT",
+                url: USERTRACKING_ENDPOINT,
+                data: {
+                    id: mediaPackageID,
+                    in : from,
+                    out: to,
+                    type: "FOOTPRINT"
+                },
+                success: function(result) {
+                    // update current footprint model
+                    thisModel.update();
+                }
+            });
         },
         update: function() {
             // request collection data
