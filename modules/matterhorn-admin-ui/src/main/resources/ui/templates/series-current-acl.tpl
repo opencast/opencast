@@ -1,4 +1,4 @@
-<div class="series-schedule current" id="<%= this.id %>">
+<div class="series-schedule current" id="<%! this.id %>">
     <span>
         Active ACL
     </span>

@@ -24,7 +24,7 @@ requirejs.config({
         },
         "jquery.mobile": {
             //script dependencies
-            deps: ["jquery"],
+            deps: ["jquery"]
         },
         "mousetrap": {
             exports: "Mousetrap"

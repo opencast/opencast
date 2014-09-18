@@ -110,22 +110,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 if (lastFootprint != undefined) {
                     if (lastFootprint != cTime) {
                         lastFootprint = cTime;
-                        Engage.log("Usertracking: Setting footprint at " + cTime);
-                        //put to mh endpoint
-                        $.ajax({
-                            type: "PUT",
-                            url: USERTRACKING_ENDPOINT,
-                            data: {
-                                id: mediapackageID,
-                                in : cTime,
-                                out: cTime + 1,
-                                type: "FOOTPRINT"
-                            },
-                            success: function(result) {
-                                // update current footprint model
-                                Engage.model.get("footprints").update();
-                            }
-                        });
+                        Engage.model.get("footprints").put(cTime, cTime + 1);
                     }
                 } else {
                     lastFootprint = cTime;

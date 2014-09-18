@@ -12,9 +12,9 @@
   	<% var self = this; %>
     <% _.each(ocUtils.ensureArray(this.groups.group), function(group) { %>
       <tr valign="top">
-        <td class="ui-state-active"><%= group.name %></td>
-        <td class="ui-state-active"><%= group.description %></td>
-        <td class="ui-state-active"><%= group.role %></td>
+        <td class="ui-state-active"><%! group.name %></td>
+        <td class="ui-state-active"><%! group.description %></td>
+        <td class="ui-state-active"><%! group.role %></td>
         <td class="ui-state-active" style="text-align: center">
 	      <a href="/groups/<%= group.id %>">Delete</a>
         </td>
@@ -32,15 +32,15 @@
 						<ul class="oc-ui-form-list">
 							<li>
 								<label id="idLabel" for="id" class="groups-label"><span id="i18n_id_label">Id</span>:</label>
-								<input type="text" disabled="disabled" value="<%= group.id %>" maxlength="255" class="oc-ui-form-field" name="id" id="id">
+								<input type="text" disabled="disabled" value="<%! group.id %>" maxlength="255" class="oc-ui-form-field" name="id" id="id">
 							</li>
 							<li>
 								<label id="nameLabel" for="name" class="groups-label"><span id="i18n_name_label">Name</span><span class="scheduler-required-text"> *</span>:</label>
-								<input type="text" maxlength="255" value="<%= group.name %>" class="oc-ui-form-field" name="name" id="name">
+								<input type="text" maxlength="255" value="<%! group.name %>" class="oc-ui-form-field" name="name" id="name">
 							</li>
 							<li>
 								<label id="descriptionLabel" for="description" class="groups-label"><span id="i18n_description_label">Description</span>:</label>
-								<input type="text" maxlength="255" value="<%= group.description %>" id="description" name="description" class="oc-ui-form-field">
+								<input type="text" maxlength="255" value="<%! group.description %>" id="description" name="description" class="oc-ui-form-field">
 							</li>
 							<li>
 								<label id="rolesLabel" for="roles" class="groups-label"><span id="i18n_roles_label">Roles</span>:</label>
@@ -49,7 +49,7 @@
 							<li>
 							    <select id="rolesSelect" name="top5" size="5" multiple>
 							      <% _.each(ocUtils.ensureArray(group.roles.role), function(role) { %>
-							      <option value=<%= role.name %>><%= role.name %></option>
+							      <option value=<%! role.name %>><%! role.name %></option>
 							      <% }); %>
 							    </select>
 								<button id="removeRole" type="button">Remove Role</button>
@@ -63,9 +63,9 @@
 							    <select id="usersSelect" name="top5" size="5" multiple>
 							      <% _.each(ocUtils.ensureArray(group.members.member), function(member) { %>
 							      	<% if(_.contains(self.users, member)) { %>
-							      		<option value=<%= member %>><%= member %></option>
+							      		<option value=<%! member %>><%! member %></option>
 	        	  					<% } else { %>
-							      		<option style="background-color: Yellow;" value=<%= member %>><%= member %></option>
+							      		<option style="background-color: Yellow;" value=<%! member %>><%! member %></option>
 	        	  					<% } %>
 							      <% }); %>
 							    </select>

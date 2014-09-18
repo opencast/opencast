@@ -70,6 +70,14 @@ case `os` in
     [ $? -ne 0 ] && exit 1
     sudox apt-get -y install gstreamer0.10-plugins-ugly
     [ $? -ne 0 ] && exit 1
+    case `os_ver` in
+      14.* )
+        sudox add-apt-repository -y ppa:mc3man/trusty-media
+        [ $? -ne 0 ] && exit 1
+        sudox apt-get update
+        [ $? -ne 0 ] && exit 1
+        ;;
+    esac
     sudox apt-get -y install gstreamer0.10-ffmpeg
     [ $? -ne 0 ] && exit 1
     ;;

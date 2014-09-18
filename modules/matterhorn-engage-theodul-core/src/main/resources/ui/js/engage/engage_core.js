@@ -40,6 +40,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
     var browser_minVersion_chrome = 30;
     var browser_minVersion_opera = 20;
     var browser_minVersion_safari = 7;
+    var browser_minVersion_msie = 9;    
     var id_engage_view = "engage_view";
     var id_loading1 = "loading1";
     var id_loading2 = "loading2";
@@ -71,7 +72,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
     var mediapackageError = false;
 
     function browserSupported() {
-        return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari);
+        return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari) || (Bowser.msie && Bowser.version >= browser_minVersion_msie);
     }
 
     // theodul core init

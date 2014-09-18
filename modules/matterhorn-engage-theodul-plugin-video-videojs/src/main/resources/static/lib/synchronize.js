@@ -1,10 +1,12 @@
 /**
  * Synchronize.js
- * Version 1.1.2
+ * Version 1.1.4
  *
  * Copyright 2013-2014 Denis Meyer
  */
-(function ($) {
+(function($) {
+    var debug = false;
+
     var videoIds = [];
     var videoIdsReady = {};
     var videoIdsInit = {};
@@ -13,8 +15,20 @@
     var nrOfPlayersReady = 0;
 
     var lastSynch = 0;
-    var synchInterval = 2000; // ms
+    var synchInterval = 1500; // ms
+
+    // prevent that a slave video lags before even starting to synchronize
+    // if a slave video is ahead it will always be synchronized
     var synchGap = 1.0; // s
+
+    // maximum gap that is accepted before seeking (higher playback rate to fill the gap)
+    var maxGap = 5.0; // s
+
+    // seek ahead for synchronized displays, as the master continues to play
+    // while the slave is seeking
+    var seekAhead = 0.5; // s
+
+    var synchDelayThreshold = 0.0;
 
     var startClicked = false;
 
@@ -25,15 +39,25 @@
     var playWhenBuffered = false;
     var ignoreNextPause = false;
     var hitPauseWhileBuffering = false;
-    var bufferInterval = 10; // s
+    var bufferInterval = 2; // s
 
-    var tryToPlayWhenBuffering = true; // flag for trying to play after N seconds of buffering
+    var tryToPlayWhenBuffering = true; // flag for trying to play after n seconds of buffering
     var tryToPlayWhenBufferingTimer = null;
     var tryToPlayWhenBufferingMS = 10000;
 
     var receivedEventLoadeddata = false;
     var receivedEventLoadeddata_interval = null;
     var receivedEventLoadeddata_waitTimeout = 5000; // ms
+
+    var waitingForSync = [];
+
+    var usingFlash = false;
+
+    function log(vals) {
+        if (debug && window.console) {
+            console.log(vals);
+        }
+    }
 
     /**
      * Checks whether a number is in an interval [lower, upper]
@@ -65,6 +89,7 @@
                 return videojs(id);
             }
         } else {
+            log("SJS: [getVideoObj] Undefined video element id '" + id + "'");
             return undefined;
         }
     }
@@ -83,6 +108,7 @@
                 return videojs(id);
             }
         } else {
+            log("SJS: [getVideo] Undefined video element id '" + id + "'");
             return undefined;
         }
     }
@@ -104,7 +130,7 @@
      */
     function getVideoId(videojsVideo) {
         if (useVideoJs() && videojsVideo) {
-	    var id = videojsVideo.Q ? videojsVideo.Q : videojsVideo.U;
+            var id = videojsVideo.Q ? videojsVideo.Q : videojsVideo.U;
             return id;
         } else {
             return videojsVideo;
@@ -118,10 +144,12 @@
      * @return true if id is not undefined and video plays
      */
     function play(id) {
-        if (id) {
+        if (id && id !== masterVideoId) {
+            log("SJS: [play] Playing video element id '" + id + "'");
             getVideo(id).play();
             return true;
         } else {
+            log("SJS: [play] Undefined video element id '" + id + "'");
             return false;
         }
     }
@@ -134,12 +162,14 @@
      */
     function mute(id) {
         if (id) {
+            log("SJS: [mute] Muting video element id '" + id + "'");
             if (!useVideoJs()) {
                 getVideo(id).muted = true;
             } else {
                 getVideo(id).volume(0);
             }
         } else {
+            log("SJS: [mute] Undefined video element id '" + id + "'");
             return undefined;
         }
     }
@@ -151,9 +181,11 @@
      * @return true if id is not undefined
      */
     function pause(id) {
-        if (id) {
+        if (id && id !== masterVideoId) {
+            log("SJS: [pause] Pausing video element id '" + id + "'");
             return getVideo(id).pause();
         } else {
+            log("SJS: [pause] Undefined video element id '" + id + "'");
             return false;
         }
     }
@@ -172,6 +204,7 @@
                 return getVideo(id).paused();
             }
         } else {
+            log("SJS: [isPaused] Undefined video element id '" + id + "'");
             return false;
         }
     }
@@ -190,6 +223,7 @@
                 return getVideo(id).duration();
             }
         } else {
+            log("SJS: [getDuration] Undefined video element id '" + id + "'");
             return -1;
         }
     }
@@ -208,6 +242,7 @@
                 return getVideo(id).currentTime();
             }
         } else {
+            log("SJS: [getCurrentTime] Undefined video element id '" + id + "'");
             return -1;
         }
     }
@@ -220,16 +255,62 @@
      * @return true if time has been set if id is not undefined
      */
     function setCurrentTime(id, time) {
-        var duration = getDuration(id);
-        if (id && (duration != -1) && !isNaN(time) && (time >= 0) && (time <= duration)) {
-            if (!useVideoJs()) {
-                getVideo(id).currentTime = time;
+        if (id) {
+            var duration = getDuration(id);
+            if ((duration != -1) && !isNaN(time) && (time >= 0) && (time <= duration)) {
+                if (!useVideoJs()) {
+                    getVideo(id).currentTime = time;
+                } else {
+                    getVideo(id).currentTime(time);
+                }
+                return true;
             } else {
-                getVideo(id).currentTime(time);
+                log("SJS: [setCurrentTime] Could not set time for video element id '" + id + "'");
+                setCurrentTime(id, duration);
+                return false;
+            }
+        } else {
+            log("SJS: [setCurrentTime] Undefined video element id '" + id + "'");
+            return false;
+        }
+    }
+
+    /**
+     * Returns the current playback rate of the video
+     *
+     * @param id video id
+     * @return current time if id is not undefined
+     */
+    function getPlaybackRate(id) {
+        if (id) {
+            if (!useVideoJs()) {
+                return getVideo(id).playbackRate;
+            } else {
+                return getVideo(id).playbackRate();
+            }
+        } else {
+            log("SJS: [getPlaybackRate] Undefined video element id '" + id + "'");
+            return 1.0;
+        }
+    }
+
+    /**
+     * Sets the playback rate for the video
+     *
+     * @param id video id
+     * @param rate the speed at which the video plays
+     * @return true if rate has been set if id is not undefined
+     */
+    function setPlaybackRate(id, rate) {
+        if (id) {
+            if (!useVideoJs()) {
+                getVideo(id).playbackRate = rate;
+            } else {
+                getVideo(id).playbackRate(rate);
             }
             return true;
         } else {
-            setCurrentTime(id, duration);
+            log("SJS: [setPlaybackRate] Undefined video element id '" + id + "'");
             return false;
         }
     }
@@ -248,30 +329,100 @@
                 return getVideo(id).buffered();
             }
         } else {
+            log("SJS: [getBufferTimeRange] Undefined video element id '" + id + "'");
             return undefined;
         }
+    }
+
+    /**
+     * Check whether a video element is in synch with the master
+     *
+     * @param id video id
+     * @return 0 if video element is in synch with the master, a time else
+     */
+    function getSynchDelay(videoId) {
+        var ctMaster = getCurrentTime(masterVideoId); // current time in seconds
+        var ct = getCurrentTime(videoId); // current time in seconds
+        if ((ctMaster != -1) && (ct != -1) && !isInInterval(ct, ctMaster - synchGap, ctMaster)) {
+            return ct - ctMaster; // return the difference
+        }
+        return 0.0; // return 0 if delay is acceptable
     }
 
     /**
      * Synchronizes all slaves with the master
      */
     function synchronize() {
-        var ct1 = getCurrentTime(masterVideoId);
-        var ct2;
         for (var i = 0; i < videoIds.length; ++i) {
             if (videoIds[i] != masterVideoId) {
-                ct2 = getCurrentTime(videoIds[i]);
-                // currentTime in seconds!
-                if ((ct1 != -1) && (ct2 != -1) && !isInInterval(ct2, ct1 - synchGap, ct1)) {
-                    $(document).trigger("sjs:synchronizing", [ct1, videoIds[i]]);
-                    if (!setCurrentTime(videoIds[i], ct1)) {
-                        // pause(videoIds[i]);
+                var syncDelay = getSynchDelay(videoIds[i]);
+                if (Math.abs(syncDelay) > synchDelayThreshold) {
+                    $(document).trigger("sjs:synchronizing", [getCurrentTime(masterVideoId), videoIds[i]]);
+                    var doSeek = false;
+                    if (!usingFlash) {
+                        log("SJS: [synchronize] Synchronizing video element id '" + videoIds[i] + "', delay = " + syncDelay);
+                        if (syncDelay > synchDelayThreshold) {
+                            if (getPlaybackRate(masterVideoId) != getPlaybackRate(videoIds[i])) {
+                                setPlaybackRate(videoIds[i], getPlaybackRate(masterVideoId));
+                                if (!isPaused(masterVideoId) && !waitingForSync[videoIds[i]]) {
+                                    play(videoIds[i]);
+                                    log("SJS: [synchronize] Restarting video element id '" + videoIds[i] + "' as it paused unexpectedly");
+                                }
+                            }
+                            if (syncDelay < maxGap) {
+                                syncPause(videoIds[i], syncDelay);
+                            } else {
+                                doSeek = true;
+                            }
+                        } else if (syncDelay < synchDelayThreshold) {
+                            if (Math.abs(syncDelay) < maxGap) {
+                                log("SJS: [synchronize] Synchronizing. Increased playback speed of video element id '" + videoIds[i] + "' to " + (getPlaybackRate(videoIds[i])));
+                                setPlaybackRate(videoIds[i], (getPlaybackRate(masterVideoId) + 0.5)); // play slave video faster to catch up to the master
+                            } else {
+                                doSeek = true;
+                            }
+                        }
                     } else {
-                        play(videoIds[i]);
+                        doSeek = true;
+                    }
+                    if (doSeek) {
+                        log("SJS: Synchronizing. Seeking: " + (getCurrentTime(masterVideoId) + seekAhead));
+                        if (!setCurrentTime(videoIds[i], getCurrentTime(masterVideoId) + seekAhead)) {
+                            // pause(videoIds[i]);
+                        } else {
+                            if (!isPaused(masterVideoId)) {
+                                log("SJS: [synchronize] Playing video element id '" + videoIds[i] + "' after seeking");
+                                play(videoIds[i]);
+                            } else {
+                                log("SJS: [synchronize] Pausing video element id '" + videoIds[i] + "' after seeking, as the master video is paused, too");
+                                pause(videoIds[i]);
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Pause a video stream for a certain delay
+     *
+     * @param videoId ID of the video id to synch
+     * @param delay delay
+     */
+    function syncPause(videoId, delay) {
+        log("SJS: [syncPause] Synchronizing. Pausing video id '" + videoId + "' for " + (delay / getPlaybackRate(masterVideoId)) + "s");
+        waitingForSync[videoId] = true;
+        pause(videoId);
+        setTimeout(function() {
+            waitingForSync[videoId] = false;
+            if (!isPaused(masterVideoId)) {
+                play(videoId);
+                log("SJS: [syncPause] Synchronizing. Continuing to play video id '" + videoId + "' after " + delay + "s");
+            } else {
+                log("SJS: [syncPause] Still pausing video id '" + videoId + "' after " + delay + "s, as the master video is paused, too");
+            }
+        }, ((delay / getPlaybackRate(masterVideoId)) * 1000));
     }
 
     /**
@@ -281,7 +432,8 @@
         if (allVideoIdsInitialized()) {
             var masterPlayer = getVideoObj(masterVideoId);
 
-            masterPlayer.on("play", function () {
+            masterPlayer.on("play", function() {
+                log("SJS: Master received 'play' event");
                 $(document).trigger("sjs:masterPlay", [getCurrentTime(masterVideoId)]);
                 hitPauseWhileBuffering = false;
                 if (!bufferCheckerSet && checkBuffer) {
@@ -290,15 +442,14 @@
                 }
                 for (var i = 0; i < videoIds.length; ++i) {
                     if (videoIds[i] != masterVideoId) {
-                        getVideoObj(videoIds[i]).on("play", function () {
-                            mute(videoIds[i]);
-                        });
                         play(videoIds[i]);
+                        mute(videoIds[i]);
                     }
                 }
             });
 
-            masterPlayer.on("pause", function () {
+            masterPlayer.on("pause", function() {
+                log("SJS: Master received 'pause' event");
                 $(document).trigger("sjs:masterPause", [getCurrentTime(masterVideoId)]);
                 hitPauseWhileBuffering = !ignoreNextPause && playWhenBuffered;
                 ignoreNextPause = ignoreNextPause ? !ignoreNextPause : ignoreNextPause;
@@ -310,7 +461,18 @@
                 }
             });
 
-            masterPlayer.on("ended", function () {
+            masterPlayer.on("ratechange", function() {
+                log("SJS: Master received 'ratechange' event");
+                $(document).trigger("sjs:masterPlaybackRateChanged", [getPlaybackRate(masterVideoId)]);
+                for (var i = 0; i < videoIds.length; ++i) {
+                    if (videoIds[i] != masterVideoId) {
+                        setPlaybackRate(videoIds[i], getPlaybackRate(masterVideoId));
+                    }
+                }
+            });
+
+            masterPlayer.on("ended", function() {
+                log("SJS: Master received 'ended' event");
                 $(document).trigger("sjs:masterEnded", [getDuration(masterVideoId)]);
                 hitPauseWhileBuffering = true;
                 for (var i = 0; i < videoIds.length; ++i) {
@@ -321,7 +483,7 @@
                 }
             });
 
-            masterPlayer.on("timeupdate", function () {
+            masterPlayer.on("timeupdate", function() {
                 $(document).trigger("sjs:masterTimeupdate", [getCurrentTime(masterVideoId)]);
                 hitPauseWhileBuffering = true;
                 var now = Date.now();
@@ -334,9 +496,11 @@
                             mute(videoIds[i]);
                             paused = isPaused(videoIds[i]);
                             synchronize();
-                            if (paused || isPaused(masterVideoId)) {
-                                pause(videoIds[i]);
+                            /*
+							if (paused || isPaused(masterVideoId)) {
+                            pause(videoIds[i]);
                             }
+							*/
                         }
                     }
                 }
@@ -355,7 +519,7 @@
      *   - starts automatically playing when enough has been buffered
      */
     function setBufferChecker() {
-        bufferChecker = window.setInterval(function () {
+        bufferChecker = window.setInterval(function() {
             var allBuffered = true;
 
             var currTime = getCurrentTime(masterVideoId);
@@ -366,7 +530,7 @@
                     var duration = getDuration(videoIds[i]);
                     var currTimePlusBuffer = getCurrentTime(videoIds[i]) + bufferInterval;
                     var buffered = false;
-                    for (j = 0;
+                    for (var j = 0;
                         (j < bufferedTimeRange.length) && !buffered; ++j) {
                         currTimePlusBuffer = (currTimePlusBuffer >= duration) ? duration : currTimePlusBuffer;
                         if (isInInterval(currTimePlusBuffer, bufferedTimeRange.start(j), bufferedTimeRange.end(j))) {
@@ -418,12 +582,14 @@
      */
     function doWhenDataLoaded(id, func) {
         if (id != "") {
-            getVideoObj(id).on("loadeddata", function () {
-		receivedEventLoadeddata = true;
-		if(func) {
+            getVideoObj(id).on("loadeddata", function() {
+                receivedEventLoadeddata = true;
+                if (func) {
                     func();
-		}
+                }
             });
+        } else {
+            log("SJS: [doWhenDataLoaded] Undefined video element id '" + id + "'");
         }
     }
 
@@ -463,24 +629,31 @@
         }
     }
 
+    /**
+     * Initial play
+     */
     function initialPlay() {
         var myPlayer = this;
-        // pause(getVideoId(this));
         for (var i = 0; i < videoIds.length; ++i) {
             pause(videoIds[i]);
         }
         startClicked = true;
     }
 
+    /**
+     * Initial pause
+     */
     function initialPause() {
         var myPlayer = this;
-        // pause(getVideoId(this));
         for (var i = 0; i < videoIds.length; ++i) {
             pause(videoIds[i]);
         }
         startClicked = false;
     }
 
+    /**
+     * Stop try to play when buffering timer
+     */
     function stopTryToPlayWhenBufferingTimer() {
         if (tryToPlayWhenBufferingTimer != null) {
             window.clearInterval(tryToPlayWhenBufferingTimer);
@@ -489,12 +662,14 @@
     }
 
     /**
+     * Main
+     *
      * @param masterVidNumber [0, n-1]
      * @param videoId1OrMediagroup
      * @param videoId2
      * @param videoId3 - videoIdN [optional]
      */
-    $.synchronizeVideos = function (playerMasterVidNumber, videoId1OrMediagroup, videoId2) {
+    $.synchronizeVideos = function(playerMasterVidNumber, videoId1OrMediagroup, videoId2) {
         var validIds = true;
 
         // check for mediagroups
@@ -533,7 +708,7 @@
                     getVideoObj(videoIds[i]).on("play", initialPlay);
                     getVideoObj(videoIds[i]).on("pause", initialPause);
 
-                    getVideoObj(videoIds[i]).ready(function () {
+                    getVideoObj(videoIds[i]).ready(function() {
                         ++nrOfPlayersReady;
 
                         if (allVideoIdsInitialized()) {
@@ -557,11 +732,11 @@
 
                     getVideoObj(videoIds[i]).on("play", initialPlay);
                     getVideoObj(videoIds[i]).on("pause", initialPause);
-                    getVideoObj(videoIds[i]).ready(function () {
+                    getVideoObj(videoIds[i]).ready(function() {
                         var playerName = getVideoId(this);
 
                         videoIdsReady[playerName] = true;
-                        doWhenDataLoaded(playerName, function () {
+                        doWhenDataLoaded(playerName, function() {
                             videoIdsInit[playerName] = true;
 
                             $(document).trigger("sjs:playerLoaded", [playerName]);
@@ -579,68 +754,86 @@
                                 $(document).trigger("sjs:allPlayersReady", []);
                             }
                         });
-			
-			receivedEventLoadeddata_interval = window.setInterval(function(){
-			    if(!receivedEventLoadeddata) {
-				for (var i = 0; i < videoIds.length; ++i) {
-				    getVideoObj(videoIds[i]).trigger("loadeddata");
-				}
-			    } else {
-				window.clearInterval(receivedEventLoadeddata_interval);
-				receivedEventLoadeddata_interval = null;
-			    }
-			}, receivedEventLoadeddata_waitTimeout);
+
+                        receivedEventLoadeddata_interval = window.setInterval(function() {
+                            if (!receivedEventLoadeddata) {
+                                for (var i = 0; i < videoIds.length; ++i) {
+                                    getVideoObj(videoIds[i]).trigger("loadeddata");
+                                }
+                            } else {
+                                window.clearInterval(receivedEventLoadeddata_interval);
+                                receivedEventLoadeddata_interval = null;
+                            }
+                        }, receivedEventLoadeddata_waitTimeout);
                     });
                 }
             }
         } else {
+            log("SJS: Not enough videos");
             $(document).trigger("sjs:notEnoughVideos", []);
         }
 
         if (tryToPlayWhenBuffering) {
-            $(document).on("sjs:buffering", function (e) {
-                tryToPlayWhenBufferingTimer = setInterval(function () {
+            $(document).on("sjs:buffering", function(e) {
+                log("SJS: Received 'sjs:buffering' event");
+                tryToPlayWhenBufferingTimer = setInterval(function() {
                     if (allVideoIdsInitialized() && !hitPauseWhileBuffering) {
                         play(masterVideoId);
                     }
                 }, tryToPlayWhenBufferingMS);
             });
-            $(document).on("sjs:bufferedAndAutoplaying", function (e) {
+            $(document).on("sjs:bufferedAndAutoplaying", function(e) {
+                log("SJS: Received 'sjs:bufferedAndAutoplaying' event");
                 stopTryToPlayWhenBufferingTimer();
             });
-            $(document).on("sjs:bufferedButNotAutoplaying", function (e) {
+            $(document).on("sjs:bufferedButNotAutoplaying", function(e) {
+                log("SJS: Received 'sjs:bufferedButNotAutoplaying' event");
                 stopTryToPlayWhenBufferingTimer();
             });
         }
 
-        $(document).on("sjs:play", function (e) {
+        $(document).on("sjs:isUsingFlash", function(e) {
+            log("SJS: Received 'sjs:isUsingFlash' event");
+            isUsingFlash = true;
+        });
+        $(document).on("sjs:play", function(e) {
+            log("SJS: Received 'sjs:play' event");
             if (allVideoIdsInitialized()) {
                 play(masterVideoId);
             }
         });
-        $(document).on("sjs:pause", function (e) {
+        $(document).on("sjs:pause", function(e) {
+            log("SJS: Received 'sjs:pause' event");
             if (allVideoIdsInitialized()) {
                 pause(masterVideoId);
             }
         });
-        $(document).on("sjs:setCurrentTime", function (e, time) {
+        $(document).on("sjs:setCurrentTime", function(e, time) {
+            log("SJS: Received 'sjs:setCurrentTime' event");
             if (allVideoIdsInitialized()) {
                 setCurrentTime(masterVideoId, time);
             }
         });
-        $(document).on("sjs:synchronize", function (e) {
+        $(document).on("sjs:debug", function(e, _debug) {
+            log("SJS: Received 'sjs:debug' event");
+            debug = _debug;
+        });
+        $(document).on("sjs:synchronize", function(e) {
+            log("SJS: Received 'sjs:synchronize' event");
             if (allVideoIdsInitialized()) {
                 synchronize();
             }
         });
-        $(document).on("sjs:startBufferChecker", function (e) {
+        $(document).on("sjs:startBufferChecker", function(e) {
+            log("SJS: Received 'sjs:startBufferChecker' event");
             if (!bufferCheckerSet) {
                 window.clearInterval(bufferChecker);
                 bufferCheckerSet = true;
                 setBufferChecker();
             }
         });
-        $(document).on("sjs:stopBufferChecker", function (e) {
+        $(document).on("sjs:stopBufferChecker", function(e) {
+            log("SJS: Received 'sjs:stopBufferChecker' event");
             window.clearInterval(bufferChecker);
             bufferCheckerSet = false;
         });

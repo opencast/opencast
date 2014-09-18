@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:track type="presentation/audio" id="999958c3-972b-4b08-9caa-c5714742a489">
+	<ns2:mimetype>video/x-flac</ns2:mimetype>
+	<ns2:tags />
+	<ns2:url>normalizedfooVideo.flac</ns2:url>
+	<ns2:checksum type="md5">46cb2e9df2e73756b0d96c33b1aaf055</ns2:checksum>
+	<ns2:duration>65680</ns2:duration>
+	<ns2:audio id="audio-1">
+		<ns2:device />
+		<ns2:encoder type="ADPCM" />
+		<ns2:bitdepth>16</ns2:bitdepth>
+		<ns2:channels>2</ns2:channels>
+		<ns2:bitrate>62500.0</ns2:bitrate>
+		<ns2:peakleveldb>-40</ns2:peakleveldb>
+		<ns2:rmsleveldb>-30</ns2:rmsleveldb>
+		<ns2:rmspeakdb>-20</ns2:rmspeakdb>
+	</ns2:audio>
+</ns2:track>
