@@ -534,7 +534,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
-            String value = Streams.asString(item.openStream());
+            String value = Streams.asString(item.openStream(), "UTF-8");
             /* Ignore empty fields */
             if ("".equals(value)) {
               continue;
@@ -804,6 +804,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         } else {
           mp = factory.newMediaPackageBuilder().loadFromXml(formData.getFirst(key));
         }
+      }
+      if (mp == null) {
+        logger.warn("Rejected ingest without mediapackage.");
+        return Response.status(Response.Status.BAD_REQUEST).build();
       }
       return ingest(mp, wfConfig);
     } catch (Exception e) {
