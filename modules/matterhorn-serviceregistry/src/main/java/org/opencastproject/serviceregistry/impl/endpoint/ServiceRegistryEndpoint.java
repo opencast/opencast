@@ -36,8 +36,6 @@ import org.opencastproject.serviceregistry.api.JaxbServiceStatisticsList;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.serviceregistry.api.ServiceState;
-import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl;
 import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
@@ -124,15 +122,8 @@ public class ServiceRegistryEndpoint {
   @GET
   @Path("servicewarnings")
   @RestQuery(name = "servicewarnings", description = "Get the number of services currently in a non-NORMAL state", returnDescription = "The count of abnormal services.", reponses = { @RestResponse(responseCode = SC_OK, description = "A plain text representation of the number of abnormal services") })
-  public Response serviceWarnings() throws ServiceRegistryException {
-    List<ServiceStatistics> services = serviceRegistry.getServiceStatistics();
-    Integer count = 0;
-    for (ServiceStatistics service : services) {
-      if (service.getServiceRegistration().getServiceState() != ServiceState.NORMAL) {
-        count++;
-      }
-    }
-    return Response.ok(count).build();
+  public long serviceWarnings() throws ServiceRegistryException {
+    return serviceRegistry.getCountOfAbnormalServices();
   }
 
   @POST
