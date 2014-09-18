@@ -71,7 +71,6 @@ import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -198,10 +197,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
       mpIds.add(searchResult.getId());
     }
 
-    List<String> ignoredKeys = new ArrayList<String>();
-    ignoredKeys.add("seriesId");
-    ignoredKeys.add("seriesTitle");
-    return applyWorkflowToMediapackageIds(wfId, mpIds, req, ignoredKeys);
+    return applyWorkflowToMediapackageIds(wfId, mpIds, req);
   }
 
 //  @POST
@@ -246,9 +242,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
   public Response applyWorkflow(@PathParam("wfDefId") final String wfId,
                                 @FormParam("mediaPackageIds") final List<String> mpIds,
                                 @Context final HttpServletRequest req) {
-    List<String> ignoredKeys = new ArrayList<String>();
-    ignoredKeys.add("mediaPackageIds");
-    return applyWorkflowToMediapackageIds(wfId, mpIds, req, ignoredKeys);
+    return applyWorkflowToMediapackageIds(wfId, mpIds, req);
   }
 
   /**
@@ -259,23 +253,13 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
    * @return A no content response if the request was sucessful
    */
   private Response applyWorkflowToMediapackageIds(final String workflowId, final List<String> mediaPackageIds,
-          final HttpServletRequest request, final List<String> keysToIgnore) {
+          final HttpServletRequest request) {
     return handleException(new Function0.X<Response>() {
       @Override
       public Response xapply() throws Exception {
         Map<String, String[]> params = request.getParameterMap();
-        Map<String, String[]> usefulParams = new HashMap<String, String[]>(params);
-
-        try {
-          for (String key : keysToIgnore) {
-            usefulParams.remove(key);
-          }
-        } catch (Exception e) {
-          logger.error("Trying to remove ignored keys ", e);
-        }
-
         // filter and reduce String[] to String
-        final Map<String, String> wfp = mlist(usefulParams.entrySet().iterator()).foldl(Collections.<String, String> map(),
+        final Map<String, String> wfp = mlist(params.entrySet().iterator()).foldl(Collections.<String, String> map(),
                 new Function2<Map<String, String>, Map.Entry<String, String[]>, Map<String, String>>() {
                   @Override
                   public Map<String, String> apply(Map<String, String> wfConf, Map.Entry<String, String[]> param) {
