@@ -30,18 +30,16 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.silencedetection.api.SilenceDetectionFailedException;
-import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.silencedetection.api.SilenceDetectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Silence dedection service proxy for use as a JVM local service.
  */
 public class SilenceDetectionServiceRemote extends RemoteBase implements SilenceDetectionService {
 
   private static final Logger logger = LoggerFactory.getLogger(SilenceDetectionServiceRemote.class);
-  private SmilService smilService = null;
 
   public SilenceDetectionServiceRemote() {
     super(JOB_TYPE);
@@ -62,7 +60,7 @@ public class SilenceDetectionServiceRemote extends RemoteBase implements Silence
         String referencedTracksXml = MediaPackageElementParser.getArrayAsXml(Arrays.asList(referencedTracks));
         params.add(new BasicNameValuePair("referenceTracks", referencedTracksXml));
       }
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new SilenceDetectionFailedException(
               "Unable to assemble a remote silence detection request for track " + sourceTrack.getIdentifier());
@@ -89,9 +87,5 @@ public class SilenceDetectionServiceRemote extends RemoteBase implements Silence
     }
     throw new SilenceDetectionFailedException("Unable to run silence detection for track "
             + sourceTrack.getIdentifier() + " on remote silence detection service");
-  }
-
-  public void setSmilService(SmilService smilService) {
-    this.smilService = smilService;
   }
 }

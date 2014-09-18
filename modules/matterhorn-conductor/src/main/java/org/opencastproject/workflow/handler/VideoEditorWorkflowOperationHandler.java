@@ -81,7 +81,8 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
   /**
    * Name of the configuration option that provides the smil flavor as input.
    */
-  private static final String SMIL_FLAVORS_PROPERTY = "smil-flavors";/**
+  private static final String SMIL_FLAVORS_PROPERTY = "smil-flavors";
+  /**
    * Name of the configuration option that provides the smil flavor as input.
    */
   private static final String TARGET_SMIL_FLAVOR_PROPERTY = "target-smil-flavor";

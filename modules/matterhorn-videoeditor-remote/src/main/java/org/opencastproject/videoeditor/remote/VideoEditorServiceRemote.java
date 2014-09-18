@@ -35,6 +35,9 @@ import org.opencastproject.videoeditor.api.VideoEditorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Video editor service proxy for use as a JVM local service.
+ */
 public class VideoEditorServiceRemote extends RemoteBase implements VideoEditorService {
 
   private static final Logger logger = LoggerFactory.getLogger(VideoEditorServiceRemote.class);
@@ -50,7 +53,7 @@ public class VideoEditorServiceRemote extends RemoteBase implements VideoEditorS
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     try {
       params.add(new BasicNameValuePair("smil", smil.toXML()));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new ProcessFailedException(
               "Unable to assemble a remote videoeditor request for smil " + smil.getId());
