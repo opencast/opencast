@@ -87,99 +87,101 @@
     left: 50%;  
 }
 .page-header img {
-  float: right;
-  height: 60px;
+    float: right;
+    height: 60px;
 }
 .page-header h1 {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 body {
-  font-family: "Open Sans", "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.5em; 
-  font-weight: 400;
+    font-family: "Open Sans", "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5em; 
+    font-weight: 400;
 }
 
 p, span, a, ul, li, button {
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
 }
 
 strong {
-  font-weight: 600;
+    font-weight: 600;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Open Sans", "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
-  line-height: 1.5em;
-  font-weight: 300;
+    font-family: "Open Sans", "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5em;
+    font-weight: 300;
 }
 
 strong {
-  font-weight: 400;
+    font-weight: 400;
 }
 
 .tile {
-  width: 100%;
-  display: inline-block;
-  box-sizing: border-box;
-  padding: 20px;
-  margin-bottom: 30px;
-  border: 1px solid gray;
+    width: 100%;
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid gray;
+    background: linear-gradient(to bottom, #A6A6A6 10%,#FFFFFF 10%,#FFFFFF 50%,#FFFFFF 100%);
 }
 .tile:hover {
-  background: #FBB900;
-  cursor: pointer;
+    background: #FBB900;
+    cursor: pointer;
+    background: linear-gradient(to top, #FBB900 90%, #FFFFFF 90%, #FFFFFF 10%,#A6A6A6 10%);
 } 
 
 .tile img {
-  width: 50%;
-  float: left;
-  margin-right: 2%;
-  max-height: 163px; 
+    width: 50%;
+    float: left;
+    margin-right: 2%;
+    max-height: 163px; 
 }
 
 @media (min-width: 768px) {
-  .tile img {
-    max-height: 77px;
-  }
+    .tile img {
+	max-height: 77px;
+    }
 }
 @media (min-width: 992px) {
     .tile img {
-      max-height: 65px;
-  }
+	max-height: 65px;
+    }
 }
 @media (min-width: 1200px) {
     .tile img {
-      max-height: 84px;
-  }
+	max-height: 84px;
+    }
 }
 
 .tile .title {
-  margin-top: 0px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    margin-top: 0px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .tile .infos {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .pager li>a:hover, .pager li>a:focus {
-  text-decoration: none;
-  background-color: #FBB900;
-  cursor: pointer;
+    text-decoration: none;
+    background-color: #FBB900;
+    cursor: pointer;
 }
 .oc-search-btn {
-  border-color: #FBB900;
+    border-color: #FBB900;
 }
 .oc-search-btn:hover {
-  background: #FBB900;
-  border-color: #FBB900;
+    background: #FBB900;
+    border-color: #FBB900;
 }

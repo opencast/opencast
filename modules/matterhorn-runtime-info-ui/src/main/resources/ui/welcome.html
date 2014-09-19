@@ -10,16 +10,11 @@
     $(document).ready(function() {
       $.getJSON("/info/components.json", function(data) {
         var contentDiv = $("#content");
-        var capt = false,
-        confMon = false;
+        var capt = false;
+        var confMon = false;
         $.each(data, function(section) {
             if("rest" == section) {
                $.each(data.rest, function(i) {
-                  /*if(i < Math.floor(data.rest.length / 2)){
-                     col = $('#docs1');
-                  }else{
-                     col = $('#docs2');
-                  }*/
                   var col = $('#docs1');
                   var pathToDocs = data.rest[i].docs.replace(/^.*\/\/[^\/]+/, '');
                   col.append("<li>" + data.rest[i].description + " <a href='" + pathToDocs + "'>Docs</a></li>");
@@ -43,7 +38,7 @@
 		      if(!confMon) {
 		        $('#col4m').hide();
 		      }
-		      if(!analytics) {
+		      if(typeof analytics == "undefined") {
 		        $('#col5m').hide();
 		      }
         });
