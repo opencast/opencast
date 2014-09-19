@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+  <scr:component name="org.opencastproject.sox.impl.SoxServiceImpl" immediate="true" activate="activate">
+    <implementation class="org.opencastproject.sox.impl.SoxServiceImpl" />
+    <property name="service.description" value="Sox audio processing service" />
+    <service>
+      <provide interface="org.opencastproject.sox.api.SoxService" />
+    </service>
+    <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" 
+      cardinality="1..1" policy="static" bind="setWorkspace" />
+    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+    <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+      cardinality="1..1" policy="static" bind="setSecurityService" />
+    <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
+      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+    <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+  </scr:component>
+
+  <scr:component name="org.opencastproject.sox.impl.endpoint.SoxRestService" immediate="true">
+    <implementation class="org.opencastproject.sox.impl.endpoint.SoxRestService" />
+    <property name="service.description" value="SoX REST Endpoint" />
+    <property name="opencast.service.type" value="org.opencastproject.sox" />
+    <property name="opencast.service.path" value="/sox" />
+    <property name="opencast.service.jobproducer" value="true" />
+    <service>
+      <provide interface="org.opencastproject.sox.impl.endpoint.SoxRestService" />
+    </service>
+    <reference name="composerService" interface="org.opencastproject.sox.api.SoxService"
+      cardinality="1..1" policy="static" bind="setSoxService" />
+    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+  </scr:component>
+</scr:components>

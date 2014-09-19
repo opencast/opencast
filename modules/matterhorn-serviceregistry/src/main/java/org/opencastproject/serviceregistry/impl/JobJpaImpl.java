@@ -20,8 +20,15 @@ import org.opencastproject.job.api.JaxbJobContext;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -55,11 +62,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A long running, asynchronously executed job. This concrete implementations adds JPA annotations to {@link JaxbJob}.
@@ -87,6 +89,7 @@ import java.util.Map;
                 + "j.processorServiceRegistration.hostRegistration.baseUrl = :host order by j.dateCreated"),
         @NamedQuery(name = "Job.root.children", query = "SELECT j FROM Job j WHERE j.rootJob.id = :id ORDER BY j.dateCreated"),
         @NamedQuery(name = "Job.children", query = "SELECT j FROM Job j WHERE j.parentJob.id = :id ORDER BY j.dateCreated"),
+        @NamedQuery(name = "Job.withoutParent", query = "SELECT j FROM Job j WHERE j.parentJob IS NULL"),
         @NamedQuery(name = "Job.avgOperation", query = "SELECT j.operation, AVG(j.runTime), AVG(j.queueTime) FROM Job j GROUP BY j.operation"),
 
         // Job count queries
@@ -128,6 +131,8 @@ public class JobJpaImpl extends JaxbJob {
 
   /** The service that is processing, or processed, this job */
   protected ServiceRegistrationJpaImpl processorServiceRegistration;
+
+  protected long processorServiceRegistrationId;
 
   protected List<JobPropertyJpaImpl> properties;
 
@@ -187,7 +192,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getId()
    */
   @Id
@@ -234,7 +239,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JaxbJob#getVersion()
    */
   @Column(name = "instance_version")
@@ -247,7 +252,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getStatus()
    */
   @Column(name = "status")
@@ -266,7 +271,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getType()
    */
   @Transient
@@ -278,7 +283,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JaxbJob#getOperation()
    */
   @Lob
@@ -291,7 +296,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JaxbJob#getArguments()
    */
   @Lob
@@ -308,7 +313,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getProcessingHost()
    */
   @Transient
@@ -320,7 +325,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JaxbJob#getCreatedHost()
    */
   @Transient
@@ -332,7 +337,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getDateCompleted()
    */
   @Column(name = "date_completed")
@@ -345,7 +350,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getDateCreated()
    */
   @Column(name = "date_created")
@@ -358,7 +363,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.Job#getDateStarted()
    */
   @Column(name = "date_started")
@@ -391,7 +396,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JaxbJob#getPayload()
    */
   @Lob
@@ -404,7 +409,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JaxbJob#setPayload(java.lang.String)
    */
   @Override
@@ -468,6 +473,26 @@ public class JobJpaImpl extends JaxbJob {
     }
   }
 
+  /**
+   * Returns the identifier of the processor service
+   * <p>
+   * Use this method instead of {@link #getProcessorServiceRegistration()} when you only need/want the identifier of the
+   * service and not the service registration object.
+   *
+   * @return the processor service identifier
+   */
+  @Column(name = "processor_service", insertable = false, updatable = false)
+  public long getProcessorServiceRegistrationId() {
+    return processorServiceRegistrationId;
+  }
+
+  /**
+   * This method MUST NOT be used - it's for JPA only!
+   */
+  protected void setProcessorServiceRegistrationId(long id) {
+    this.processorServiceRegistrationId = id;
+  }
+
   @PreUpdate
   public void preUpdate() {
     if (properties != null)
@@ -509,7 +534,7 @@ public class JobJpaImpl extends JaxbJob {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JaxbJob#getContext()
    */
   @Transient

@@ -63,7 +63,7 @@ public class Ingestor {
 
   /**
    * Create new ingestor.
-   * 
+   *
    * @param ingestService
    *          media packages are passed to the ingest service
    * @param workingFileRepository
@@ -154,7 +154,7 @@ public class Ingestor {
 
   /**
    * Create a function that logs a warning.
-   * 
+   *
    * @param msg
    *          a message string to be used with {@link org.slf4j.Logger}
    * @param args

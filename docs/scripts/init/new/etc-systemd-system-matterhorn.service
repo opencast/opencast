@@ -1,0 +1,16 @@
+[Unit]
+Description=Opencast Matterhorn Server
+After=network.target
+After=local-fs.target
+After=nfs.target
+After=remote-fs.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/matterhorn.pid
+ExecStart=/usr/sbin/matterhorn --daemon
+ExecStop=/usr/sbin/matterhorn --quit
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

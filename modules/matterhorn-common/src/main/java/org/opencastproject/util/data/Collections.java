@@ -15,6 +15,8 @@
  */
 package org.opencastproject.util.data;
 
+import static org.opencastproject.util.data.Option.some;
+
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 
@@ -34,8 +36,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import static org.opencastproject.util.data.Option.some;
 
 /**
  * This class provides functions to ease and secure the handling of collections by supporting a type safe -- at least to
@@ -58,7 +58,7 @@ public final class Collections {
 
   /**
    * Get a value from a map, creating and adding a new one, if the value is missing, i.e. it is null.
-   * 
+   *
    * @param c
    *          creates the missing value
    */
@@ -88,7 +88,7 @@ public final class Collections {
    * <code>bs</code>.
    * <p/>
    * An (empty) instance of the target collection has to be provided explicitly.
-   * 
+   *
    * @param as
    *          the source collection
    * @param bs
@@ -108,7 +108,7 @@ public final class Collections {
    * Apply a binary function (operator) to a start value and all elements of the list in turn.
    * <p/>
    * Example: (+) 0 [1, 2, 3] -> (((0 + 1) + 2) + 3)
-   * 
+   *
    * @deprecated use {@link Monadics}
    */
   public static <A, B> B foldl(Collection<A> as, B start, Function2<B, A, B> f) {
@@ -127,7 +127,7 @@ public final class Collections {
    * <p/>
    * Please note that since java does not support higher-order polymorphism -- which is needed to capture the type of
    * the collection -- some casting on the client side may still be necessary.
-   * 
+   *
    * @throws RuntimeException
    *           if the target collection cannot be created
    * @deprecated use {@link Monadics}
@@ -148,7 +148,7 @@ public final class Collections {
    * <p/>
    * Please note that since java does not support higher-order polymorphism -- which is needed to capture the type of
    * the collection -- some casting on the client side may still be necessary.
-   * 
+   *
    * @throws RuntimeException
    *           if the result collection cannot be created
    * @deprecated use {@link Monadics}
@@ -164,7 +164,7 @@ public final class Collections {
   /**
    * Exactly like {@link #flatMap(java.util.Collection, Function)} but you have to provide the target collection
    * yourself.
-   * 
+   *
    * @deprecated use {@link Monadics}
    */
   public static <A, B, M extends Collection<B>> M flatMap(Collection<A> as, M bs, Function<A, Collection<B>> f) {
@@ -176,7 +176,7 @@ public final class Collections {
 
   /**
    * Returns the first element in <code>as</code> that satisfies a predicate <code>p</code>.
-   * 
+   *
    * @deprecated use {@link Monadics}
    */
   public static <A> Option<A> find(Collection<A> as, Predicate<A> p) {
@@ -189,7 +189,7 @@ public final class Collections {
 
   /**
    * Tests if at least one element in <code>as</code> satisfies predicate <code>p</code>.
-   * 
+   *
    * @deprecated use {@link Monadics}
    */
   public static <A> boolean exists(Collection<A> as, Predicate<A> p) {
@@ -204,7 +204,7 @@ public final class Collections {
    * Return a new collection containing only the elements that satisfy predicate <code>p</code>.
    * <p/>
    * The type of collection <code>as</code> needs a parameterless constructor.
-   * 
+   *
    * @deprecated use {@link Monadics}
    */
   public static <A, M extends Collection<A>> M filter(M as, Predicate<A> p) {
@@ -347,8 +347,16 @@ public final class Collections {
     return a != null ? list(a) : Collections.<A> nil();
   }
 
-  /** Return the list as is or nil, if <code>as</code> is null. */
+  /**
+   * Return the list as is or nil, if <code>as</code> is null.
+   * @deprecated use {@link #nullToNil(java.util.List)}
+   */
   public static <A> List<A> mkList(List<A> as) {
+    return as != null ? as : Collections.<A> nil();
+  }
+
+  /** Return the list as is or nil, if <code>as</code> is null. */
+  public static <A> List<A> nullToNil(List<A> as) {
     return as != null ? as : Collections.<A> nil();
   }
 
@@ -517,7 +525,7 @@ public final class Collections {
    * unique per list element because each key holds only one value. Later values overwrite newer ones.
    * <p/>
    * The resulting map is an immutable {@link java.util.HashMap}.
-   * 
+   *
    * @see #asMap(java.util.Map, java.util.List, Function)
    */
   public static <K, V> Map<K, V> asMap(List<V> values, Function<V, K> keyGen) {
@@ -528,7 +536,7 @@ public final class Collections {
    * Partition a list after some predicate <code>keyGen</code> into <code>map</code>. The partition function has to make
    * sure that keys are unique per list element because each key holds only one value. Later values overwrite newer
    * ones.
-   * 
+   *
    * @see #asMap(java.util.List, Function)
    */
   public static <K, V> Map<K, V> asMap(Map<K, V> map, List<V> values, Function<V, K> keyGen) {
@@ -616,7 +624,7 @@ public final class Collections {
 
   /**
    * Make an Iterator usable in a for comprehension like this:
-   * 
+   *
    * <pre>
    *   Iterator&lt;A&gt; as = ...
    *   for (A a : forc(as)) {

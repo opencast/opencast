@@ -41,6 +41,7 @@ import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -75,7 +76,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowDefinitionById(java.lang.String)
    */
   @Override
@@ -102,7 +103,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowById(long)
    */
   @Override
@@ -129,7 +130,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService
    *      #getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
    */
@@ -224,7 +225,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
@@ -235,7 +236,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getStatistics()
    */
   @Override
@@ -255,7 +256,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#start(org.opencastproject.workflow.api.WorkflowDefinition,
    *      org.opencastproject.mediapackage.MediaPackage, java.util.Map)
    */
@@ -272,7 +273,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   /**
    * Converts a Map<String, String> to s key=value\n string, suitable for the properties form parameter expected by the
    * workflow rest endpoint.
-   * 
+   *
    * @param props
    *          The map of strings
    * @return the string representation
@@ -290,7 +291,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#start(org.opencastproject.workflow.api.WorkflowDefinition,
    *      org.opencastproject.mediapackage.MediaPackage, Long, java.util.Map)
    */
@@ -332,7 +333,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#start(org.opencastproject.workflow.api.WorkflowDefinition,
    *      org.opencastproject.mediapackage.MediaPackage)
    */
@@ -348,7 +349,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances()
    */
   @Override
@@ -358,7 +359,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState,
    *      java.lang.String)
    */
@@ -401,7 +402,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#stop(long)
    */
   @Override
@@ -436,7 +437,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#suspend(long)
    */
   @Override
@@ -471,7 +472,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#resume(long)
    */
   @Override
@@ -481,7 +482,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#resume(long, java.util.Map)
    */
   @Override
@@ -519,7 +520,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#update(org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
@@ -549,7 +550,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#remove(long)
    */
   @Override
@@ -574,7 +575,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#listAvailableWorkflowDefinitions()
    */
   @Override
@@ -595,7 +596,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#registerWorkflowDefinition(org.opencastproject.workflow.api.WorkflowDefinition)
    */
   @Override
@@ -630,7 +631,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#unregisterWorkflowDefinition(java.lang.String)
    */
   @Override
@@ -655,7 +656,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#addWorkflowListener(org.opencastproject.workflow.api.WorkflowListener)
    */
   @Override
@@ -665,7 +666,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#removeWorkflowListener(org.opencastproject.workflow.api.WorkflowListener)
    */
   @Override
@@ -674,4 +675,33 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
             "Removing workflow listeners from a remote workflow service is not supported");
   }
 
+  @Override
+  public void cleanupWorkflowInstances(int lifetime, WorkflowState state) throws WorkflowDatabaseException,
+          UnauthorizedException {
+    HttpPost post = new HttpPost("/cleanup");
+
+    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+    params.add(new BasicNameValuePair("lifetime", String.valueOf(lifetime)));
+    params.add(new BasicNameValuePair("state", state.toString()));
+    try {
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (UnsupportedEncodingException e) {
+      throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
+    }
+
+    HttpResponse response = getResponse(post, SC_OK, HttpStatus.SC_UNAUTHORIZED);
+    try {
+      if (response != null) {
+        if (HttpStatus.SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+          throw new UnauthorizedException("You do not have permission to cleanup");
+        } else {
+          logger.info("Successful request to workflow cleanup endpoint");
+          return;
+        }
+      }
+    } finally {
+      closeConnection(response);
+    }
+    throw new WorkflowDatabaseException("Unable to successfully request the workflow cleanup endpoint");
+  }
 }

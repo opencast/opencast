@@ -57,7 +57,7 @@ public class FrameGrabber implements DataSink, BufferTransferHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.media.MediaHandler#setSource(javax.media.protocol.DataSource)
    */
   public void setSource(DataSource source) throws IncompatibleSourceException {
@@ -81,7 +81,7 @@ public class FrameGrabber implements DataSink, BufferTransferHandler {
 
   /**
    * Returns the output locator, which will always be <code>null</code>.
-   * 
+   *
    * @see javax.media.DataSink#getOutputLocator()
    */
   public MediaLocator getOutputLocator() {
@@ -103,7 +103,7 @@ public class FrameGrabber implements DataSink, BufferTransferHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.media.DataSink#start()
    */
   public void start() {
@@ -116,7 +116,7 @@ public class FrameGrabber implements DataSink, BufferTransferHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.media.DataSink#stop()
    */
   public void stop() {
@@ -129,7 +129,7 @@ public class FrameGrabber implements DataSink, BufferTransferHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.media.DataSink#close()
    */
   public void close() {
@@ -138,7 +138,7 @@ public class FrameGrabber implements DataSink, BufferTransferHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.media.DataSink#addDataSinkListener(javax.media.datasink.DataSinkListener)
    */
   public void addDataSinkListener(DataSinkListener dsl) {
@@ -149,7 +149,7 @@ public class FrameGrabber implements DataSink, BufferTransferHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.media.DataSink#removeDataSinkListener(javax.media.datasink.DataSinkListener)
    */
   public void removeDataSinkListener(DataSinkListener dsl) {
@@ -158,7 +158,7 @@ public class FrameGrabber implements DataSink, BufferTransferHandler {
   }
 
   /**
-   * 
+   *
    * @param event
    */
   protected void sendEvent(DataSinkEvent event) {
@@ -213,7 +213,7 @@ public class FrameGrabber implements DataSink, BufferTransferHandler {
 
   /**
    * Returns the current buffer.
-   * 
+   *
    * @return the buffer the buffer
    * @throws IOException
    */
@@ -242,7 +242,7 @@ public class FrameGrabber implements DataSink, BufferTransferHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.media.Controls#getControls()
    */
   public Object[] getControls() {
@@ -251,7 +251,7 @@ public class FrameGrabber implements DataSink, BufferTransferHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.media.Controls#getControl(java.lang.String)
    */
   public Object getControl(String name) {

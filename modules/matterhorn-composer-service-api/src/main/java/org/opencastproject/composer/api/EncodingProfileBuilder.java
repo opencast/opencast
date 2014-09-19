@@ -45,7 +45,7 @@ public final class EncodingProfileBuilder {
 
   /**
    * Returns an instance of the {@link EncodingProfileBuilder}.
-   * 
+   *
    * @return a factory
    */
   public static EncodingProfileBuilder getInstance() {
@@ -61,7 +61,7 @@ public final class EncodingProfileBuilder {
 
   /**
    * Loads an encoding profile from the given input stream.
-   * 
+   *
    * @param in
    *          the input stream
    * @return the encoding profile
@@ -79,7 +79,7 @@ public final class EncodingProfileBuilder {
 
   /**
    * Loads an encoding profile from the xml fragement.
-   * 
+   *
    * @param in
    *          xml stream of the profile
    * @return the profile
@@ -98,7 +98,7 @@ public final class EncodingProfileBuilder {
 
   /**
    * Loads an encoding profile list from the given input stream.
-   * 
+   *
    * @param in
    *          the input stream
    * @return the encoding profile list
@@ -116,7 +116,7 @@ public final class EncodingProfileBuilder {
 
   /**
    * Loads an encoding profile from the xml stream.
-   * 
+   *
    * @param in
    *          xml stream of the profile list
    * @return the profile list
@@ -135,7 +135,7 @@ public final class EncodingProfileBuilder {
 
   /**
    * Serializes a profile to xml.
-   * 
+   *
    * @param profile
    *          the profile to serialize
    * @return the xml fragment
@@ -150,7 +150,7 @@ public final class EncodingProfileBuilder {
 
   /**
    * Serializes a profile list to xml.
-   * 
+   *
    * @param profileList
    *          the profile list to serialize
    * @return the xml fragment

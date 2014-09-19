@@ -68,7 +68,7 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
 
   /**
    * OSGi activation callback
-   * 
+   *
    * @param cc
    *          this component's context
    */
@@ -77,7 +77,7 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -141,7 +141,7 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -154,7 +154,7 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

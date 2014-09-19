@@ -70,7 +70,7 @@ public class DFXPCaptionConverter implements CaptionConverter {
    * {@inheritDoc} Parser used for parsing XML document is DOM parser. Language parameter will determine which language
    * is searched for and parsed. If there is no matching language, empty collection is returned. If language parameter
    * is <code>null</code> first language found is parsed.
-   * 
+   *
    * @see org.opencastproject.caption.api.CaptionConverter#importCaption(java.io.InputStream, java.lang.String)
    */
   @Override
@@ -151,7 +151,7 @@ public class DFXPCaptionConverter implements CaptionConverter {
 
   /**
    * Parse &lt;p&gt; element which contains one caption.
-   * 
+   *
    * @param p
    *          &lt;p&gt; element to be parsed
    * @return new {@link Caption} object
@@ -171,7 +171,7 @@ public class DFXPCaptionConverter implements CaptionConverter {
 
   /**
    * Returns caption text stripped of all tags.
-   * 
+   *
    * @param p
    *          &lt;p&gt; element to be parsed
    * @return Caption text with \n as new line character
@@ -265,7 +265,7 @@ public class DFXPCaptionConverter implements CaptionConverter {
 
   /**
    * {@inheritDoc} Uses SAX parser to quickly read the document and retrieve available languages.
-   * 
+   *
    * @see org.opencastproject.caption.api.CaptionConverter#getLanguageList(java.io.InputStream)
    */
   @Override
@@ -313,7 +313,7 @@ public class DFXPCaptionConverter implements CaptionConverter {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.caption.api.CaptionConverter#getExtension()
    */
   @Override

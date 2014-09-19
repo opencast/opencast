@@ -53,6 +53,15 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
   @XmlElement(name = "bitrate")
   protected Float bitrate;
 
+  @XmlElement(name = "peakleveldb")
+  protected Float pkLevDb;
+
+  @XmlElement(name = "rmsleveldb")
+  protected Float rmsLevDb;
+
+  @XmlElement(name = "rmspeakdb")
+  protected Float rmsPkDb;
+
   public AudioStreamImpl() {
     this(UUID.randomUUID().toString());
   }
@@ -63,7 +72,7 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
 
   /**
    * Construct an audio stream from another audio stream
-   * 
+   *
    * @param s
    */
   public AudioStreamImpl(AudioStreamImpl s) {
@@ -74,6 +83,9 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     this.encoder = s.encoder;
     this.identifier = s.identifier;
     this.samplingrate = s.samplingrate;
+    this.pkLevDb = s.pkLevDb;
+    this.rmsLevDb = s.rmsLevDb;
+    this.rmsPkDb = s.rmsPkDb;
   }
 
   /**
@@ -149,12 +161,30 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
       node.appendChild(samplingrateNode);
     }
 
+    // Pk lev dB
+    if (pkLevDb != null) {
+      Element peakleveldbNode = document.createElement("peakleveldb");
+      peakleveldbNode.appendChild(document.createTextNode(pkLevDb.toString()));
+      node.appendChild(peakleveldbNode);
+    }
+    // RMS lev dB
+    if (rmsLevDb != null) {
+      Element rmsleveldbNode = document.createElement("rmsleveldb");
+      rmsleveldbNode.appendChild(document.createTextNode(rmsLevDb.toString()));
+      node.appendChild(rmsleveldbNode);
+    }
+    // RMS Pk dB
+    if (rmsPkDb != null) {
+      Element rmspeakdbNode = document.createElement("rmspeakdb");
+      rmspeakdbNode.appendChild(document.createTextNode(rmsPkDb.toString()));
+      node.appendChild(rmspeakdbNode);
+    }
     return node;
   }
 
   /**
    * Create an audio stream from the XML manifest.
-   * 
+   *
    * @param streamIdHint
    *          stream ID that has to be used if the manifest does not provide one. This is the case when reading an old
    *          manifest.
@@ -203,6 +233,33 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
       throw new IllegalStateException("Bit rate was malformatted: " + e.getMessage());
     }
 
+    // Pk lev dB
+    try {
+      String pkLev = (String) xpath.evaluate("peakleveldb/text()", node, XPathConstants.STRING);
+      if (!StringUtils.isBlank(pkLev))
+        as.pkLevDb = new Float(pkLev.trim());
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("Pk lev dB was malformatted: " + e.getMessage());
+    }
+
+    // RMS lev dB
+    try {
+      String rmsLev = (String) xpath.evaluate("rmsleveldb/text()", node, XPathConstants.STRING);
+      if (!StringUtils.isBlank(rmsLev))
+        as.rmsLevDb = new Float(rmsLev.trim());
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("RMS lev dB was malformatted: " + e.getMessage());
+    }
+
+    // RMS Pk dB
+    try {
+      String rmsPk = (String) xpath.evaluate("rmspeakdb/text()", node, XPathConstants.STRING);
+      if (!StringUtils.isBlank(rmsPk))
+        as.rmsPkDb = new Float(rmsPk.trim());
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("RMS Pk dB was malformatted: " + e.getMessage());
+    }
+
     // device
     String captureDevice = (String) xpath.evaluate("device/@type", node, XPathConstants.STRING);
     if (!StringUtils.isBlank(captureDevice))
@@ -244,6 +301,18 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     return bitrate;
   }
 
+  public Float getPkLevDb() {
+    return pkLevDb;
+  }
+
+  public Float getRmsLevDb() {
+    return rmsLevDb;
+  }
+
+  public Float getRmsPkDb() {
+    return rmsPkDb;
+  }
+
   // Setter
 
   public void setBitDepth(Integer bitdepth) {
@@ -260,6 +329,18 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
 
   public void setBitRate(Float bitRate) {
     this.bitrate = bitRate;
+  }
+
+  public void setPkLevDb(Float pkLevDb) {
+    this.pkLevDb = pkLevDb;
+  }
+
+  public void setRmsLevDb(Float rmsLevDb) {
+    this.rmsLevDb = rmsLevDb;
+  }
+
+  public void setRmsPkDb(Float rmsPkDb) {
+    this.rmsPkDb = rmsPkDb;
   }
 
   public void setCaptureDevice(String captureDevice) {

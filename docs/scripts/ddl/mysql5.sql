@@ -164,6 +164,7 @@ CREATE INDEX IX_mh_job_date_created ON mh_job (date_created);
 CREATE INDEX IX_mh_job_date_completed ON mh_job (date_completed);
 CREATE INDEX IX_mh_job_dispatchable ON mh_job (dispatchable);
 CREATE INDEX IX_mh_job_operation ON mh_job (operation);
+CREATE INDEX IX_mh_job_statistics ON mh_job (processor_service, status, queue_time, run_time);
 
 CREATE TABLE mh_job_argument (
   id BIGINT NOT NULL,
@@ -184,6 +185,36 @@ CREATE TABLE mh_job_context (
 
 CREATE INDEX IX_mh_job_context_id ON mh_job_context (id);
 
+CREATE TABLE mh_job_mh_service_registration (
+  Job_id BIGINT NOT NULL,
+  servicesRegistration_id BIGINT NOT NULL,
+  PRIMARY KEY (Job_id, servicesRegistration_id),
+  KEY mhjobmhservice_registrationservicesRegistration_id (servicesRegistration_id),
+  CONSTRAINT FK_mh_job_mh_service_registration_Job_id FOREIGN KEY (Job_id) REFERENCES mh_job (id) ON DELETE CASCADE,
+  CONSTRAINT mhjobmhservice_registrationservicesRegistration_id FOREIGN KEY (servicesRegistration_id) REFERENCES mh_service_registration (id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE mh_incident (
+  id BIGINT NOT NULL,
+  jobid BIGINT,
+  timestamp DATETIME,
+  code VARCHAR(255),
+  severity INTEGER,
+  parameters TEXT(65535),
+  details TEXT(65535),
+  PRIMARY KEY (id),
+  CONSTRAINT FK_job_incident_jobid FOREIGN KEY (jobid) REFERENCES mh_job (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_incident_jobid ON mh_incident (jobid);
+CREATE INDEX IX_mh_incident_severity ON mh_incident (severity);
+
+CREATE TABLE mh_incident_text (
+  id VARCHAR(255) NOT NULL,
+  text VARCHAR(2038) NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE mh_scheduled_event (
   id BIGINT NOT NULL,
   capture_agent_metadata TEXT(65535),
@@ -196,7 +227,7 @@ CREATE TABLE mh_search (
   organization VARCHAR(128),
   deletion_date DATETIME,
   access_control TEXT(65535),
-  mediapackage_xml TEXT(65535),
+  mediapackage_xml MEDIUMTEXT,
   modification_date DATETIME,
   PRIMARY KEY (id),
   CONSTRAINT FK_mh_search_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
@@ -256,7 +287,7 @@ CREATE TABLE mh_episode_episode (
   organization VARCHAR(128),
   deletion_date DATETIME,
   access_control TEXT(65535),
-  mediapackage_xml TEXT(65535),
+  mediapackage_xml MEDIUMTEXT,
   modification_date DATETIME,
   PRIMARY KEY (id, version, organization),
   CONSTRAINT FK_mh_episode_episode_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE

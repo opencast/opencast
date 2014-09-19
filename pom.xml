@@ -75,6 +75,7 @@
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-solr</module>
+        <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videosegmenter-api</module>
@@ -83,82 +84,6 @@
         <module>modules/matterhorn-workflow-service-impl</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>analytics</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-analytics-impl</module>
-        <module>modules/matterhorn-analytics-ui</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-search-service-api</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-usertracking-api</module>
-        <module>modules/matterhorn-usertracking-impl</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>export-admin</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-export-impl</module>
-        <module>modules/matterhorn-gstreamer-service-api</module>
-        <module>modules/matterhorn-gstreamer-service-remote</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-serviceregistry</module>
-        <module>modules/matterhorn-static</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>export-worker</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-gstreamer-service-api</module>
-        <module>modules/matterhorn-gstreamer-service-impl</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>export-all-in-one</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-export-impl</module>
-        <module>modules/matterhorn-gstreamer-service-api</module>
-        <module>modules/matterhorn-gstreamer-service-impl</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-serviceregistry</module>
-        <module>modules/matterhorn-static</module>
       </modules>
     </profile>
 
@@ -203,6 +128,7 @@
         </property>
       </activation>
       <modules>
+        <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
@@ -457,10 +383,7 @@
         <module>modules/matterhorn-dictionary-textcorpora</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-service-impl</module>
-        <!--
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        -->
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -469,6 +392,8 @@
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
+        <module>modules/matterhorn-sox-api</module>
+        <module>modules/matterhorn-sox-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
@@ -501,10 +426,7 @@
         <module>modules/matterhorn-dictionary-textcorpora</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-service-impl</module>
-        <!--
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        -->
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -513,6 +435,8 @@
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
+        <module>modules/matterhorn-sox-api</module>
+        <module>modules/matterhorn-sox-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
@@ -548,6 +472,8 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-series-service-api</module>
+        <module>modules/matterhorn-sox-api</module>
+        <module>modules/matterhorn-sox-remote</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-remote</module>
@@ -773,8 +699,21 @@
         </property>
       </activation>
       <modules>
-        <module>modules/matterhorn-inspection-service-ffmpeg</module>
+        <module>modules/matterhorn-inspection-service-impl</module>
         <module>modules/matterhorn-dictionary-none</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>migration</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>all</name>
+        </property>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-migration</module>
       </modules>
     </profile>
 
@@ -804,7 +743,7 @@
                 </goals>
                 <configuration>
                   <target if="harness">
-                    <java classname="org.opencastproject.remotetest.Main" fork="true">
+                    <java classname="org.opencastproject.remotetest.Main" fork="true" failOnError="true">
                       <classpath>
                         <pathelement path="modules/matterhorn-test-harness/target/matterhorn-test-harness-${project.version}-jar-with-dependencies.jar"/>
                       </classpath>
@@ -999,6 +938,7 @@
             <java.awt.headless>true</java.awt.headless>
             <eclipselink.logging.level>SEVERE</eclipselink.logging.level>
             <java.util.logging.config.file>${basedir}/conf/services/java.util.logging.properties</java.util.logging.config.file>
+            <logj4.configuration>${basedir}/docs/log4j/log4j.properties</logj4.configuration>
           </systemPropertyVariables>
         </configuration>
       </plugin>

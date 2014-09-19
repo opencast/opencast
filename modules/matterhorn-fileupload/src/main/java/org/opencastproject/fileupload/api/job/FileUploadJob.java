@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * A Class representing the information about an upload job.
- * 
+ *
  */
 @XmlType(name = "uploadjob", namespace = "http://fileupload.opencastproject.org")
 @XmlRootElement(name = "uploadjob", namespace = "http://fileupload.opencastproject.org")
@@ -94,11 +94,11 @@ public class FileUploadJob {
     setLastModified(System.currentTimeMillis());
     this.state = state;
   }
-  
+
   public void setLastModified(long time) {
     this.modified = time;
   }
-  
+
   public long lastModified() {
     return this.modified;
   }

@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * A class representing the information about the payload of an upload job.
- * 
+ *
  */
 @XmlType(name = "payload", namespace = "http://fileupload.opencastproject.org")
 @XmlRootElement(name = "payload", namespace = "http://fileupload.opencastproject.org")

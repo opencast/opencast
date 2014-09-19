@@ -16,30 +16,13 @@
 
 package org.opencastproject.util.persistence;
 
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Tuple.tuple;
-
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.opencastproject.fn.juc.Immutables;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
-
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import org.osgi.service.component.ComponentContext;
-
-import java.beans.PropertyVetoException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -49,6 +32,20 @@ import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.spi.PersistenceProvider;
 import javax.sql.DataSource;
+import java.beans.PropertyVetoException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Tuple.tuple;
 /** Functions supporting persistence. */
 
 /**
@@ -68,7 +65,7 @@ public final class PersistenceUtil {
    * <code>persistenceProps</code>. See
    * {@link javax.persistence.spi.PersistenceProvider#createEntityManagerFactory(String, java.util.Map)} for more
    * information about config maps.
-   * 
+   *
    * @param emName
    *          name of the persistence unit
    */
@@ -85,7 +82,7 @@ public final class PersistenceUtil {
    * {@link javax.persistence.spi.PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi
    * service. See {@link javax.persistence.spi.PersistenceProvider#createEntityManagerFactory(String, java.util.Map)}
    * for more information about config maps.
-   * 
+   *
    * @param emName
    *          name of the persistence unit
    * @param persistenceProps
@@ -104,7 +101,7 @@ public final class PersistenceUtil {
 
   /**
    * Shortcut for <code>newPersistenceEnvironment(newEntityManagerFactory(cc, emName, persistenceProps))</code>.
-   * 
+   *
    * @see #newEntityManagerFactory(org.osgi.service.component.ComponentContext, String, java.util.Map)
    */
   public static PersistenceEnv newPersistenceEnvironment(ComponentContext cc, String emName, Map persistenceProps) {
@@ -113,7 +110,7 @@ public final class PersistenceUtil {
 
   /**
    * Shortcut for <code>newPersistenceEnvironment(newEntityManagerFactory(cc, emName))</code>.
-   * 
+   *
    * @see #newEntityManagerFactory(org.osgi.service.component.ComponentContext, String)
    */
   public static PersistenceEnv newPersistenceEnvironment(ComponentContext cc, String emName) {
@@ -132,7 +129,7 @@ public final class PersistenceUtil {
 
   /**
    * Equip a persistence environment with an exception handler.
-   * 
+   *
    * @see #newPersistenceEnvironment(javax.persistence.EntityManagerFactory, org.opencastproject.util.data.Function)
    */
   public static <F> PersistenceEnv2<F> equip2(final PersistenceEnv penv, final Function<Exception, F> exHandler) {
@@ -157,7 +154,7 @@ public final class PersistenceUtil {
    * Create a new, concurrently usable persistence environment which uses JPA local transactions.
    * <p/>
    * Transaction propagation is supported on a per thread basis.
-   * 
+   *
    * @deprecated use {@link PersistenceEnvs#persistenceEnvironment(EntityManagerFactory)}
    */
   public static PersistenceEnv newPersistenceEnvironment(final EntityManagerFactory emf) {
@@ -175,7 +172,7 @@ public final class PersistenceUtil {
 
   /**
    * Test if a connection to the given data source can be established.
-   * 
+   *
    * @return none, if the connection could be established
    */
   public static Option<SQLException> testConnection(DataSource ds) {
@@ -193,7 +190,7 @@ public final class PersistenceUtil {
   /**
    * Create a named query with a list of parameters. Values of type {@link Date} are recognized and set as a timestamp (
    * {@link TemporalType#TIMESTAMP}.
-   * 
+   *
    * @deprecated use {@link Queries#named#query(EntityManager, String, Class, Object[])}
    */
   public static Query createNamedQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -211,7 +208,7 @@ public final class PersistenceUtil {
 
   /**
    * Run an update (UPDATE or DELETE) query and ensure that at least one row got affected.
-   * 
+   *
    * @deprecated use {@link Queries#named#update(EntityManager, String, Object[])}
    */
   public static boolean runUpdate(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -220,7 +217,7 @@ public final class PersistenceUtil {
 
   /**
    * Run a query (SELECT) that should return a single result.
-   * 
+   *
    * @deprecated use {@link Queries#named#findSingle(EntityManager, String, Object[])}
    */
   public static <A> Option<A> runSingleResultQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -235,7 +232,7 @@ public final class PersistenceUtil {
 
   /**
    * Run a query that should return the first result of it.
-   * 
+   *
    * @deprecated use {@link Queries#named#findFirst(EntityManager, String, Object[])}
    */
   public static <A> Option<A> runFirstResultQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -250,7 +247,7 @@ public final class PersistenceUtil {
 
   /**
    * Execute a <code>COUNT(x)</code> query.
-   * 
+   *
    * @deprecated use {@link Queries#named#count(EntityManager, String, Object[])}
    */
   public static long runCountQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -269,7 +266,7 @@ public final class PersistenceUtil {
 
   /**
    * Find a single object.
-   * 
+   *
    * @param params
    *          the query parameters
    * @param toA
@@ -283,7 +280,7 @@ public final class PersistenceUtil {
 
   /**
    * Find multiple objects.
-   * 
+   *
    * @deprecated use {@link Queries#named#findAll(EntityManager, String, Object[])}
    */
   public static <A> List<A> findAll(EntityManager em, final String queryName, final Tuple<String, ?>... params) {
@@ -292,7 +289,7 @@ public final class PersistenceUtil {
 
   /**
    * Find multiple objects with optional pagination.
-   * 
+   *
    * @deprecated use {@link Queries#named#findAll(EntityManager, String, Option, Option, Object[])}
    */
   public static <A> List<A> findAll(EntityManager em, final String queryName, Option<Integer> offset,
@@ -307,7 +304,7 @@ public final class PersistenceUtil {
 
   /**
    * Find multiple objects.
-   * 
+   *
    * @param params
    *          the query parameters
    * @param toA
@@ -321,7 +318,7 @@ public final class PersistenceUtil {
 
   /**
    * Find multiple objects with optional pagination.
-   * 
+   *
    * @param params
    *          the query parameters
    * @param toA
@@ -340,7 +337,7 @@ public final class PersistenceUtil {
 
   /**
    * Create function to persist object <code>a</code> using {@link EntityManager#persist(Object)}.
-   * 
+   *
    * @deprecated use {@link Queries#persist(A)}
    */
   public static <A> Function<EntityManager, A> persist(final A a) {
@@ -355,7 +352,7 @@ public final class PersistenceUtil {
 
   /**
    * Create function to merge an object <code>a</code> with the persisten context of the given entity manage.
-   * 
+   *
    * @deprecated use {@link Queries#merge(A)}
    */
   public static <A> Function<EntityManager, A> merge(final A a) {
@@ -382,9 +379,10 @@ public final class PersistenceUtil {
     pooledDataSource.setPassword(pwd);
 
     // Set up the persistence properties
-    final Map<String, Object> props = new HashMap<String, Object>(persistenceProps);
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.target-database", vendor);
+    final Map<String, Object> props = Immutables.<String, Object>map(
+            persistenceProps,
+            tuple("javax.persistence.nonJtaDataSource", pooledDataSource),
+            tuple("eclipselink.target-database", vendor));
 
     final EntityManagerFactory emf = pp.createEntityManagerFactory(emName, props);
     if (emf == null) {
@@ -396,7 +394,7 @@ public final class PersistenceUtil {
 
   /**
    * Create a new entity manager factory backed by an in-memory H2 database for testing purposes.
-   * 
+   *
    * @param emName
    *          name of the persistence unit (see META-INF/persistence.xml)
    */
@@ -408,17 +406,23 @@ public final class PersistenceUtil {
             "jdbc:h2:./target/db" + System.currentTimeMillis(),
             "sa",
             "sa",
-            map(tuple("eclipselink.ddl-generation", "create-tables"),
-                    tuple("eclipselink.ddl-generation.output-mode", "database")),
-            new org.eclipse.persistence.jpa.PersistenceProvider());
+            Immutables.map(tuple("eclipselink.ddl-generation", "create-tables"),
+                           tuple("eclipselink.ddl-generation.output-mode", "database")),
+            testPersistenceProvider());
+  }
+
+  /** Create a new persistence provider for unit tests. */
+  public static PersistenceProvider testPersistenceProvider() {
+    return new org.eclipse.persistence.jpa.PersistenceProvider();
   }
 
   /**
    * Create a new persistence environment based on an entity manager factory backed by an in-memory H2 database for
    * testing purposes.
-   * 
+   *
    * @param emName
    *          name of the persistence unit (see META-INF/persistence.xml)
+   * @deprecated use {@link PersistenceEnvs#testPersistenceEnv(String)}
    */
   public static PersistenceEnv newTestPersistenceEnv(String emName) {
     return newPersistenceEnvironment(newTestEntityManagerFactory(emName));

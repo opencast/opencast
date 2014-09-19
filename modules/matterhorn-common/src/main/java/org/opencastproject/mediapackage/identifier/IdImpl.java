@@ -40,7 +40,7 @@ public class IdImpl implements Id {
 
   /**
    * Creates a new serial identifier as created by {@link SerialIdBuilder}.
-   * 
+   *
    * @param id
    *          the identifier
    */
@@ -50,7 +50,7 @@ public class IdImpl implements Id {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.identifier.Id#compact()
    */
   public String compact() {
@@ -64,7 +64,7 @@ public class IdImpl implements Id {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -78,7 +78,7 @@ public class IdImpl implements Id {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override

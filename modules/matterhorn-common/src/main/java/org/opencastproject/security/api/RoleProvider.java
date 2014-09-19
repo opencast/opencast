@@ -25,14 +25,14 @@ public interface RoleProvider {
 
   /**
    * Gets all known roles.
-   * 
+   *
    * @return the roles
    */
   Iterator<Role> getRoles();
 
   /**
    * Returns the roles for this user or an empty array if no roles are applicable.
-   * 
+   *
    * @param userName
    *          the user id
    * @return the set of roles
@@ -41,14 +41,14 @@ public interface RoleProvider {
 
   /**
    * Returns the identifier for the organization that is defining this set of roles.
-   * 
+   *
    * @return the defining organization
    */
   String getOrganization();
 
   /**
    * Return the found role's as an iterator.
-   * 
+   *
    * @param query
    *          the query. Use the wildcards "_" to match any single character and "%" to match an arbitrary number of
    *          characters (including zero characters).

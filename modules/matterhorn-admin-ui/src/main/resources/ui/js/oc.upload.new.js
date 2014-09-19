@@ -307,11 +307,18 @@ ocUpload.UI = (function() {
       draggable: false,
       disabled: true
     });
+    window.onbeforeunload = function(e) {
+      var confirmationMessage = "The file has not completed uploading.";
+
+      (e || window.event).returnValue = confirmationMessage;     //Gecko + IE
+      return confirmationMessage;                                //Webkit, Safari, Chrome etc.
+    };
   }
 
   this.hideProgressDialog = function() {
     $('#progressStage').dialog( "destroy" );
     $('#grayOut').css('display','block');
+    window.onbeforeunload = null;
   }
 
   this.setProgress = function(message) {
@@ -735,7 +742,7 @@ ocUpload.Ingest = (function() {
 
   function createSeries(name) {
     var id = false;
-    var seriesXml = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + name + '</dcterms:title></dublincore>';
+    var seriesXml = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + ocUtils.escapeXML(name) + '</dcterms:title></dublincore>';
     var anonymous_role = 'anonymous';
 
     ocUpload.UI.setProgress("Creating Series " + name);
@@ -767,8 +774,7 @@ ocUpload.Ingest = (function() {
       },
       success: function(data){
         window.debug = data;
-        //id = $('identifier', data).text();
-        id = $(ocUtils.xmlToString(data)).children().first().text()
+        id = $(data).find('[nodeName="dcterms:identifier"]').text();
       }
     });
     return id;
@@ -820,11 +826,13 @@ ocUpload.Listener = (function() {
     inProgress : false
   }
 
+
   this.uploadComplete = function(jobId, trackUrl) {
     destroyUpdateInterval();
     ocUtils.log("Upload complete " + jobId);
     ocUpload.UI.setProgress('Upload successful');
     ocUpload.Ingest.trackDone(jobId, trackUrl);
+    window.onbeforeunload = null;
   }
 
   this.uploadFailed = function(jobId) {

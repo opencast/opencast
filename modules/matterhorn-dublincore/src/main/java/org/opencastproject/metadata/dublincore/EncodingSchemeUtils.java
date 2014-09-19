@@ -16,11 +16,14 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import static org.opencastproject.util.data.Option.option;
+
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
 import org.joda.time.Duration;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,8 +32,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.opencastproject.util.data.Option.option;
 
 /**
  * Utility class to facilitate the work with DCMI encoding schemes.
@@ -62,7 +63,7 @@ public final class EncodingSchemeUtils {
    * <p/>
    * See <a href="http://www.w3.org/TR/NOTE-datetime">http://www.w3.org/TR/NOTE-datetime</a> for more information about
    * W3C-DTF.
-   * 
+   *
    * @param date
    *          the date to encode
    * @param precision
@@ -77,7 +78,7 @@ public final class EncodingSchemeUtils {
     return new DublinCoreValue(formatDate(date, precision), DublinCore.LANGUAGE_UNDEFINED, DublinCore.ENC_SCHEME_W3CDTF);
   }
 
-  private static String formatDate(Date date, Precision precision) {
+  public static String formatDate(Date date, Precision precision) {
     SimpleDateFormat f = new SimpleDateFormat(formats.get(precision));
     if (precision == Precision.Minute || precision == Precision.Second || precision == Precision.Fraction)
       f.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -94,7 +95,7 @@ public final class EncodingSchemeUtils {
    * <p/>
    * See <a href="http://dublincore.org/documents/dcmi-period/">http://dublincore.org/documents/dcmi-period/</a> for
    * more information about DCMI Period.
-   * 
+   *
    * @param period
    *          the period
    * @param precision
@@ -129,7 +130,7 @@ public final class EncodingSchemeUtils {
    * The language of the returned value is {@link DublinCore#LANGUAGE_UNDEFINED}.
    * <p/>
    * See <a href="http://en.wikipedia.org/wiki/ISO_8601#Durations"> ISO8601 Durations</a> for details.
-   * 
+   *
    * @param duration
    *          the duration in milliseconds
    */
@@ -144,7 +145,7 @@ public final class EncodingSchemeUtils {
    * Also supports the REPLAY legacy format <code>hh:mm:ss</code>.
    * <p/>
    * See <a href="http://en.wikipedia.org/wiki/ISO_8601#Durations"> ISO8601 Durations</a> for details.
-   * 
+   *
    * @param value
    *          the ISO encoded string
    * @return the duration in milliseconds or null, if the value cannot be parsed
@@ -171,7 +172,7 @@ public final class EncodingSchemeUtils {
 
   /**
    * Decode a string encoded in the ISO8601 encoding scheme.
-   * 
+   *
    * @param value
    *          the Dublin Core value
    * @return the duration in milliseconds or null, if the value cannot be parsed or is in a different encoding scheme
@@ -199,7 +200,7 @@ public final class EncodingSchemeUtils {
 
   /**
    * Tries to decode the given value as a W3C-DTF encoded date. If decoding fails, null is returned.
-   * 
+   *
    * @return the date or null if decoding fails
    */
   public static Date decodeDate(DublinCoreValue value) {
@@ -221,7 +222,7 @@ public final class EncodingSchemeUtils {
 
   /**
    * Tries to decode the given value as a W3C-DTF encoded date. If decoding fails, null is returned.
-   * 
+   *
    * @return the date or null if decoding fails
    */
   public static Date decodeDate(String value) {
@@ -241,7 +242,7 @@ public final class EncodingSchemeUtils {
 
   /**
    * Like {@link #decodeDate(String)}, but throws an {@link IllegalArgumentException} if the value cannot be decoded.
-   * 
+   *
    * @param value
    *          the value
    * @return the date
@@ -257,7 +258,7 @@ public final class EncodingSchemeUtils {
 
   /**
    * Like {@link #decodeDate(String)}, but throws an {@link IllegalArgumentException} if the value cannot be decoded.
-   * 
+   *
    * @return the date
    * @throws IllegalArgumentException
    *           if the value cannot be decoded
@@ -275,7 +276,7 @@ public final class EncodingSchemeUtils {
   /**
    * Tries to decode a string in the DCMI period format, using W3C-DTF for the encoding of the individual dates. If
    * parsing fails at any point, null will be returned.
-   * 
+   *
    * @return the period or null if decoding fails
    */
   public static DCMIPeriod decodePeriod(DublinCoreValue value) {
@@ -285,7 +286,7 @@ public final class EncodingSchemeUtils {
   /**
    * Tries to decode a string in the DCMI period format, using W3C-DTF for the encoding of the individual dates. If
    * parsing fails at any point, null will be returned.
-   * 
+   *
    * @return the period or null if decoding fails
    */
   public static DCMIPeriod decodePeriod(String value) {
@@ -335,7 +336,7 @@ public final class EncodingSchemeUtils {
 
   /**
    * Like {@link #decodePeriod(String)}, but throws an {@link IllegalArgumentException} if the value cannot be decoded.
-   * 
+   *
    * @return the period
    * @throws IllegalArgumentException
    *           if the value cannot be decoded
@@ -347,7 +348,7 @@ public final class EncodingSchemeUtils {
   /**
    * Like {@link #decodePeriod(DublinCoreValue)}, but throws an {@link IllegalArgumentException} if the value cannot be
    * decoded.
-   * 
+   *
    * @return the period
    * @throws IllegalArgumentException
    *           if the value cannot be decoded
@@ -363,7 +364,7 @@ public final class EncodingSchemeUtils {
   /**
    * Tries to decode the value to a temporal object. For now, supported types are {@link java.util.Date},
    * {@link DCMIPeriod} and Long for a duration.
-   * 
+   *
    * @param value
    *          the value to decode
    * @return a temporal object of the said types or null if decoding fails
@@ -385,7 +386,7 @@ public final class EncodingSchemeUtils {
   /**
    * Like {@link #decodeTemporal(DublinCoreValue)}, but throws an {@link IllegalArgumentException} if the value cannot
    * be decoded.
-   * 
+   *
    * @return the temporal object of type {@link java.util.Date} or {@link DCMIPeriod}
    * @throws IllegalArgumentException
    *           if the value cannot be decoded

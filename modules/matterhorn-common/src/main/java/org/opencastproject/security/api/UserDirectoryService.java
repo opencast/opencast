@@ -24,14 +24,14 @@ public interface UserDirectoryService {
 
   /**
    * Gets all known users.
-   * 
+   *
    * @return the users
    */
   Iterator<User> getUsers();
 
   /**
    * Loads a user by username, or returns null if this user is not known to the thread's current organization.
-   * 
+   *
    * @param userName
    *          the username
    * @return the user
@@ -42,7 +42,7 @@ public interface UserDirectoryService {
 
   /**
    * Return the found user's as an iterator.
-   * 
+   *
    * @param query
    *          the query. Use the wildcards "_" to match any single character and "%" to match an arbitrary number of
    *          characters (including zero characters).

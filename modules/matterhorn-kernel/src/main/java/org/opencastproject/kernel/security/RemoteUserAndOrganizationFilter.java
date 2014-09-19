@@ -165,7 +165,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
   /**
    * Sets the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -175,7 +175,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -185,7 +185,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
   /**
    * Sets a reference to the user directory service.
-   * 
+   *
    * @param userDirectory
    *          the user directory
    */

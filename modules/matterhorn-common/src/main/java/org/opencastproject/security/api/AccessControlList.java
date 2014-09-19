@@ -61,7 +61,7 @@ public final class AccessControlList {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

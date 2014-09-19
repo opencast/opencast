@@ -50,7 +50,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext
    * )
@@ -64,7 +64,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
@@ -106,7 +106,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /**
    * Callback for OSGi to set the {@link SmtpService}.
-   * 
+   *
    * @param smtpService
    *          the smtp service
    */

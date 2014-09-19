@@ -15,19 +15,6 @@
  */
 package org.opencastproject.util;
 
-import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Either.left;
-import static org.opencastproject.util.data.Either.right;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Prelude.sleep;
-import static org.opencastproject.util.data.functions.Misc.chuck;
-
-import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Tuple;
-
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -37,11 +24,24 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.util.data.Collections;
+import org.opencastproject.util.data.Either;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Tuple;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.List;
+
+import static org.opencastproject.util.EqualsUtil.eq;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Either.left;
+import static org.opencastproject.util.data.Either.right;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Prelude.sleep;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /** Functions to support Apache httpcomponents and HTTP related operations in general. */
 
@@ -59,6 +59,12 @@ public final class HttpUtil {
   public static HttpPost post(String uri, NameValuePair... formParams) {
     final HttpPost post = new HttpPost(uri);
     setFormParams(post, formParams);
+    return post;
+  }
+
+  public static HttpPost post(String uri, List<NameValuePair> formParams) {
+    final HttpPost post = new HttpPost(uri);
+    setFormParams(post, Collections.toArray(NameValuePair.class, formParams));
     return post;
   }
 
@@ -93,6 +99,16 @@ public final class HttpUtil {
     return new BasicNameValuePair(name, value);
   }
 
+  public static NameValuePair param(Tuple<String, String> p) {
+    return new BasicNameValuePair(p.getA(), p.getB());
+  }
+
+  public static final Function<Tuple<String, String>, NameValuePair> param_ = new Function<Tuple<String, String>, NameValuePair>() {
+    @Override public NameValuePair apply(Tuple<String, String> p) {
+      return param(p);
+    }
+  };
+
   public static final Function<HttpResponse, Integer> getStatusCode = new Function<HttpResponse, Integer>() {
     @Override
     public Integer apply(HttpResponse response) {
@@ -106,7 +122,7 @@ public final class HttpUtil {
 
   /**
    * Wait for a certain status of a resource.
-   * 
+   *
    * @return either an exception or the status code of the last http response
    */
   public static Either<Exception, Integer> waitForResource(final TrustedHttpClient http, final URI resourceUri,

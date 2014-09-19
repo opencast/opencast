@@ -39,7 +39,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Persist a set of roles
-   * 
+   *
    * @param roles
    *          the roles to persist
    * @param emf
@@ -80,7 +80,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Persist an organization
-   * 
+   *
    * @param organization
    *          the organization to persist
    * @param emf
@@ -112,8 +112,43 @@ public final class UserDirectoryPersistenceUtil {
   }
 
   /**
-   * Returns all groups from the persistence unit as a list
+   * Persist an user
    * 
+   * @param user
+   *          the user to persist
+   * @param emf
+   *          the entity manager factory
+   * @return the persisted organization
+   */
+  public static JpaUser saveUser(JpaUser user, EntityManagerFactory emf) {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      JpaUser u = findUser(user.getUsername(), user.getOrganization().getId(), emf);
+      if (u == null) {
+        em.persist(user);
+      } else {
+        u.password = user.getPassword();
+        u.roles = user.roles;
+        user = em.merge(u);
+      }
+      tx.commit();
+      return user;
+    } finally {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * Returns all groups from the persistence unit as a list
+   *
    * @param organization
    *          the organization
    * @param limit
@@ -140,7 +175,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns all roles from the persistence unit as a list
-   * 
+   *
    * @param organization
    *          the organization
    * @param limit
@@ -167,7 +202,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns a list of roles by a search query if set or all roles if search query is <code>null</code>
-   * 
+   *
    * @param orgId
    *          the organization identifier
    * @param query
@@ -198,7 +233,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns all user groups from the persistence unit as a list
-   * 
+   *
    * @param userName
    *          the user name
    * @param emf
@@ -222,7 +257,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns the persisted organization by the given organization
-   * 
+   *
    * @param organization
    *          the organization
    * @param emf
@@ -246,7 +281,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns the persisted user by the user name and organization id
-   * 
+   *
    * @param userName
    *          the user name
    * @param organizationId
@@ -273,7 +308,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns a list of users by a search query if set or all users if search query is <code>null</code>
-   * 
+   *
    * @param orgId
    *          the organization identifier
    * @param query
@@ -304,7 +339,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns a list of users by a search query if set or all users if search query is <code>null</code>
-   * 
+   *
    * @param query
    *          the query to search
    * @param limit
@@ -331,7 +366,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns the persisted role by the name and organization id
-   * 
+   *
    * @param name
    *          the role name
    * @param organization
@@ -358,7 +393,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Returns the persisted group by the group id and organization id
-   * 
+   *
    * @param groupId
    *          the group id
    * @param orgId
@@ -396,6 +431,44 @@ public final class UserDirectoryPersistenceUtil {
         throw new NotFoundException("Group with ID " + groupId + " does not exist");
       }
       em.remove(em.merge(group));
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw e;
+    } finally {
+      em.close();
+    }
+  }
+
+  /**
+   * Delete the user with given name in the given organization
+   * 
+   * @param username
+   *          the name of the user to delete
+   * @param orgId
+   *          the organization id
+   * @param emf
+   *          the entity manager factory
+   * @throws NotFoundException
+   * @throws Exception
+   */
+  public static void deleteUser(String username, String orgId, EntityManagerFactory emf) throws NotFoundException,
+          Exception {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      JpaUser user = findUser(username, orgId, emf);
+      if (user == null) {
+        throw new NotFoundException("User with name " + username + " does not exist");
+      }
+      em.remove(em.merge(user));
       tx.commit();
     } catch (NotFoundException e) {
       throw e;

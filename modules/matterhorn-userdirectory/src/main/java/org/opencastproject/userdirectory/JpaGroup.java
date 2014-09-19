@@ -91,7 +91,7 @@ public final class JpaGroup implements Group {
 
   /**
    * Constructs a group with the specified groupId, name, description and group role.
-   * 
+   *
    * @param groupId
    *          the group id
    * @param organization
@@ -120,7 +120,7 @@ public final class JpaGroup implements Group {
 
   /**
    * Constructs a group with the specified groupId, name, description, group role and roles.
-   * 
+   *
    * @param groupId
    *          the group id
    * @param organization
@@ -142,7 +142,7 @@ public final class JpaGroup implements Group {
 
   /**
    * Constructs a group with the specified groupId, name, description, group role and roles.
-   * 
+   *
    * @param groupId
    *          the group id
    * @param organization
@@ -182,7 +182,7 @@ public final class JpaGroup implements Group {
 
   /**
    * Sets the group name
-   * 
+   *
    * @param name
    *          the name
    */
@@ -208,7 +208,7 @@ public final class JpaGroup implements Group {
 
   /**
    * Sets the description
-   * 
+   *
    * @param description
    *          the description
    */
@@ -234,7 +234,7 @@ public final class JpaGroup implements Group {
 
   /**
    * Sets the members
-   * 
+   *
    * @param members
    *          the members
    */
@@ -252,7 +252,7 @@ public final class JpaGroup implements Group {
 
   /**
    * Sets the roles
-   * 
+   *
    * @param roles
    *          the roles
    */
@@ -262,7 +262,7 @@ public final class JpaGroup implements Group {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -272,7 +272,7 @@ public final class JpaGroup implements Group {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -285,7 +285,7 @@ public final class JpaGroup implements Group {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

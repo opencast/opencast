@@ -1,4 +1,4 @@
-<div class="series-schedule" id="<%= this.id %>">
+<div class="series-schedule" id="<%! this.id %>">
     <span>
         <span class="currentText">Active</span>
         <input type="text" class="from" />

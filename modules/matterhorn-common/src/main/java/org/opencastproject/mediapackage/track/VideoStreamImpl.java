@@ -92,7 +92,7 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
 
   /**
    * Create a video stream from the XML manifest.
-   * 
+   *
    * @param streamIdHint
    *          stream ID that has to be used if the manifest does not provide one. This is the case when reading an old
    *          manifest.

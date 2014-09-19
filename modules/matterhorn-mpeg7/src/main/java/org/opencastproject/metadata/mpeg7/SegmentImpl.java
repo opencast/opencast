@@ -49,7 +49,7 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
 
   /**
    * Creates a new content segment.
-   * 
+   *
    * @param type
    *          the segment type
    * @param id
@@ -179,7 +179,7 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.VideoSegment#createSpatioTemporalDecomposition(boolean, boolean)
    */
   @Override
@@ -193,7 +193,7 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.AudioVisualSegment#getSpatioTemporalDecomposition()
    */
   @Override
@@ -203,7 +203,7 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.AudioVisualSegment#hasSpatioTemporalDecomposition()
    */
   @Override

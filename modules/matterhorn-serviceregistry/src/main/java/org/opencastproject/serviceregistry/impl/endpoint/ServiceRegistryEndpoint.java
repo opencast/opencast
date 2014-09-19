@@ -53,6 +53,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -90,7 +92,7 @@ public class ServiceRegistryEndpoint {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -431,20 +433,16 @@ public class ServiceRegistryEndpoint {
   @GET
   @Path("job/{id}/children.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "childrenjobsasxml", description = "Returns all children from a job as XML.", returnDescription = "A list of children jobs as XML", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Jobs found."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No children jobs found.") })
-  public JaxbJobList getChildrenJobsAsXml(@PathParam("id") long id) throws NotFoundException {
+  @RestQuery(name = "childrenjobsasxml", description = "Returns all children from a job as XML.", returnDescription = "A list of children jobs as XML", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = { @RestResponse(responseCode = SC_OK, description = "Jobs found.") })
+  public JaxbJobList getChildrenJobsAsXml(@PathParam("id") long id) {
     return getChildrenJobsAsJson(id);
   }
 
   @GET
   @Path("job/{id}/children.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "childrenjobsasjson", description = "Returns all children from a job as JSON.", returnDescription = "A list of children jobs as JSON", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Jobs found."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No children jobs found.") })
-  public JaxbJobList getChildrenJobsAsJson(@PathParam("id") long id) throws NotFoundException {
+  @RestQuery(name = "childrenjobsasjson", description = "Returns all children from a job as JSON.", returnDescription = "A list of children jobs as JSON", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = { @RestResponse(responseCode = SC_OK, description = "Jobs found.") })
+  public JaxbJobList getChildrenJobsAsJson(@PathParam("id") long id) {
     try {
       return new JaxbJobList(serviceRegistry.getChildJobs(id));
     } catch (ServiceRegistryException e) {
@@ -500,6 +498,34 @@ public class ServiceRegistryEndpoint {
     try {
       Integer count = serviceRegistry.getMaxConcurrentJobs();
       return Response.ok(count).build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @DELETE
+  @Path("job/{id}")
+  @RestQuery(name = "deletejob", description = "Deletes a job from the service registry", returnDescription = "No data is returned, just the HTTP status code", pathParameters = { @RestParameter(isRequired = true, name = "id", type = Type.INTEGER, description = "ID of the job to delete") }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Job successfully deleted"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Job with given id could not be found") })
+  public Response deleteJob(@PathParam("id") long id) throws NotFoundException {
+    try {
+      serviceRegistry.removeJob(id);
+      return Response.noContent().build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @POST
+  @Path("removeparentlessjobs")
+  @RestQuery(name = "removeparentlessjobs", description = "Removes all jobs without a parent job which have passed their lifetime", returnDescription = "No data is returned, just the HTTP status code", restParameters = { @RestParameter(name = "lifetime", isRequired = true, type = Type.INTEGER, description = "Lifetime of parentless jobs") }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Parentless jobs successfully removed"),
+          @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "Error while removing parentless jobs") })
+  public Response removeParentlessJobs(@FormParam("lifetime") int lifetime) {
+    try {
+      serviceRegistry.removeParentlessJobs(lifetime);
+      return Response.noContent().build();
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }

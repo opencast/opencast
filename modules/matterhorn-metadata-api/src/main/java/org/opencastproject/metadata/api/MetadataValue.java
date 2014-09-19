@@ -20,7 +20,7 @@ import static org.opencastproject.util.RequireUtil.notNull;
 
 /**
  * A metadata value.
- * 
+ *
  * @param <A>
  *          type of the encapsulated data
  */

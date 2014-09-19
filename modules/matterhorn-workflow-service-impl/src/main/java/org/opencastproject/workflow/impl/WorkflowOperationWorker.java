@@ -19,6 +19,7 @@ import static org.opencastproject.workflow.impl.WorkflowServiceImpl.NO;
 import static org.opencastproject.workflow.impl.WorkflowServiceImpl.PROPERTY_PATTERN;
 import static org.opencastproject.workflow.impl.WorkflowServiceImpl.YES;
 
+import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
@@ -53,7 +54,7 @@ final class WorkflowOperationWorker {
    * Creates a worker that will execute the given handler and thereby the current operation of the workflow instance.
    * When the worker is finished, a callback will be made to the workflow service reporting either success or failure of
    * the current workflow operation.
-   * 
+   *
    * @param handler
    *          the workflow operation handler
    * @param workflow
@@ -72,7 +73,7 @@ final class WorkflowOperationWorker {
    * Creates a worker that will execute the given handler and thereby the current operation of the workflow instance.
    * When the worker is finished, a callback will be made to the workflow service reporting either success or failure of
    * the current workflow operation.
-   * 
+   *
    * @param handler
    *          the workflow operation handler
    * @param workflow
@@ -91,7 +92,7 @@ final class WorkflowOperationWorker {
   /**
    * Creates a worker that still needs an operation handler to be set. When the worker is finished, a callback will be
    * made to the workflow service reporting either success or failure of the current workflow operation.
-   * 
+   *
    * @param workflow
    *          the workflow instance
    * @param properties
@@ -107,7 +108,7 @@ final class WorkflowOperationWorker {
   /**
    * Creates a worker that still needs an operation handler to be set. When the worker is finished, a callback will be
    * made to the workflow service reporting either success or failure of the current workflow operation.
-   * 
+   *
    * @param workflow
    *          the workflow instance
    * @param service
@@ -119,7 +120,7 @@ final class WorkflowOperationWorker {
 
   /**
    * Sets the workflow operation handler to use.
-   * 
+   *
    * @param operationHandler
    *          the handler
    */
@@ -161,8 +162,10 @@ final class WorkflowOperationWorker {
       } else {
         logger.error("Workflow operation '" + operation + "' failed", e);
       }
+      // the associated job shares operation's id
+      service.getServiceRegistry().incident().unhandledException(operation.getId(), Severity.FAILURE, e);
       try {
-        workflow = service.handleOperationException(workflow, new WorkflowOperationException(e, operation));
+        workflow = service.handleOperationException(workflow, operation);
       } catch (Exception e2) {
         logger.error("Error handling workflow operation '{}' failure: {}", new Object[] { operation, e2.getMessage(),
                 e2 });
@@ -173,7 +176,7 @@ final class WorkflowOperationWorker {
 
   /**
    * Starts executing the workflow operation.
-   * 
+   *
    * @return the workflow operation result
    * @throws WorkflowOperationException
    *           if executing the workflow operation handler fails
@@ -227,7 +230,7 @@ final class WorkflowOperationWorker {
   /**
    * Resumes a previously suspended workflow operation. Note that only workflow operation handlers that implement
    * {@link ResumableWorkflowOperationHandler} can be resumed.
-   * 
+   *
    * @return the workflow operation result
    * @throws WorkflowOperationException
    *           if executing the workflow operation handler fails

@@ -74,7 +74,7 @@ public class RoleEndpoint {
 
   /**
    * Sets the role directory service
-   * 
+   *
    * @param roleDirectoryService
    *          the roleDirectoryService to set
    */

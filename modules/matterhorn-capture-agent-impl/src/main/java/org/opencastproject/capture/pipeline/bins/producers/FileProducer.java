@@ -40,7 +40,7 @@ public class FileProducer extends VideoProducer {
    * FileProducer handles file sources (both hardware like Hauppauges or regular source files) where we don't know what
    * kind of codec or container we are getting in. To handle this we use a decodebin to do our decoding and pass it off
    * to the sinks.
-   * 
+   *
    * @throws CaptureDeviceNullPointerException
    *           If the mandatory captureDevice parameter is null we throw this Exception.
    * @throws UnableToCreateElementException
@@ -68,7 +68,7 @@ public class FileProducer extends VideoProducer {
   /**
    * Sets the file location and creates the listener for the decodebin's src pad because it is only present when it has
    * something connected to it's sink.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If filesrc or decodebin is null then this Exception is thrown.
    **/
@@ -81,7 +81,7 @@ public class FileProducer extends VideoProducer {
 
   /**
    * Sets the location to read the file from.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           Thrown if filesrc is null
    * @throws IllegalArgumentException
@@ -100,7 +100,7 @@ public class FileProducer extends VideoProducer {
 
   /**
    * Add a listener to decodebin to connect it to the videorate Element once its src pad becomes available.
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If decodebin is null this exception is thrown
    * **/
@@ -140,7 +140,7 @@ public class FileProducer extends VideoProducer {
 
   /**
    * Links all of the FileProducer's Elements together.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           Thrown if any Element will not link to another.
    */

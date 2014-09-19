@@ -79,12 +79,14 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
+import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
@@ -98,6 +100,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -236,7 +239,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Activate this service implementation via the OSGI service component runtime.
-   * 
+   *
    * @param componentContext
    *          the component context
    */
@@ -261,7 +264,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#addWorkflowListener(org.opencastproject.workflow.api.WorkflowListener)
    */
   @Override
@@ -271,7 +274,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#removeWorkflowListener(org.opencastproject.workflow.api.WorkflowListener)
    */
   @Override
@@ -331,7 +334,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#listAvailableWorkflowDefinitions()
    */
   @Override
@@ -367,7 +370,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Tests the workflow definition for its runnability. This method is a helper for
    * {@link #isRunnable(WorkflowDefinition)} that is suited for recursive calling.
-   * 
+   *
    * @param workflowDefinition
    *          the definition to test
    * @param availableOperations
@@ -414,7 +417,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Gets the currently registered workflow operation handlers.
-   * 
+   *
    * @return All currently registered handlers
    */
   public Set<HandlerRegistration> getRegisteredHandlers() {
@@ -448,7 +451,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Lists the names of each workflow operation. Operation names are availalbe for use if there is a registered
    * {@link WorkflowOperationHandler} with an equal {@link WorkflowServiceImpl#WORKFLOW_OPERATION_PROPERTY} property.
-   * 
+   *
    * @return The {@link List} of available workflow operation names
    */
   protected List<String> listAvailableOperationNames() {
@@ -461,7 +464,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#registerWorkflowDefinition(org.opencastproject.workflow.api.WorkflowDefinition)
    */
   @Override
@@ -478,7 +481,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#unregisterWorkflowDefinition(java.lang.String)
    */
   @Override
@@ -491,7 +494,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowById(long)
    */
   @Override
@@ -520,7 +523,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#start(org.opencastproject.workflow.api.WorkflowDefinition,
    *      org.opencastproject.mediapackage.MediaPackage)
    */
@@ -532,7 +535,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#start(org.opencastproject.workflow.api.WorkflowDefinition,
    *      org.opencastproject.mediapackage.MediaPackage)
    */
@@ -549,7 +552,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#start(org.opencastproject.workflow.api.WorkflowDefinition,
    *      org.opencastproject.mediapackage.MediaPackage, Long, java.util.Map)
    */
@@ -559,7 +562,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           WorkflowParsingException, NotFoundException {
 
     try {
-      logger.endUnitOfWork();
+      logger.startUnitOfWork();
       if (workflowDefinition == null)
         throw new IllegalArgumentException("workflow definition must not be null");
       if (sourceMediaPackage == null)
@@ -650,7 +653,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Replaces all occurrences of <code>${.*+}</code> with the property in the provided map, or if not available in the
    * map, from the bundle context properties, if available.
-   * 
+   *
    * @param source
    *          The source string
    * @param properties
@@ -691,7 +694,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Does a lookup of available operation handlers for the given workflow operation.
-   * 
+   *
    * @param operation
    *          the operation definition
    * @return the handler or <code>null</code>
@@ -715,7 +718,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Executes the workflow.
-   * 
+   *
    * @param workflow
    *          the workflow instance
    * @throws WorkflowException
@@ -762,7 +765,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Executes the workflow's current operation.
-   * 
+   *
    * @param workflow
    *          the workflow
    * @param properties
@@ -892,7 +895,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Returns the workflow identified by <code>id</code> or <code>null</code> if no such definition was found.
-   * 
+   *
    * @param id
    *          the workflow definition id
    * @return the workflow
@@ -907,7 +910,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#stop(long)
    */
   @Override
@@ -919,40 +922,96 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     // Update the workflow instance
     update(instance);
 
-    // Remove
-    logger.info("Removing temporary files for stopped workflow %s", workflowInstanceId);
-    for (MediaPackageElement elem : instance.getMediaPackage().getElements()) {
+    removeTempFiles(instance);
+
+    return instance;
+  }
+
+  private void removeTempFiles(WorkflowInstance workflowInstance) throws WorkflowDatabaseException,
+          UnauthorizedException, NotFoundException {
+    logger.info("Removing temporary files for workflow {}", workflowInstance);
+    for (MediaPackageElement elem : workflowInstance.getMediaPackage().getElements()) {
       try {
-        logger.debug("Removing temporary file %s for stopped workflow %d", elem.getURI(), workflowInstanceId);
+        logger.debug("Removing temporary file {} for workflow {}", elem.getURI(), workflowInstance);
         workspace.delete(elem.getURI());
       } catch (IOException e) {
-        logger.warn("Unable to delete mediapackage element %s", e.getMessage());
+        logger.warn("Unable to delete mediapackage element {}", e.getMessage());
+      } catch (NotFoundException e) {
+        // File was probably already deleted before...
       }
     }
-    return instance;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#remove(long)
    */
   @Override
   public void remove(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException,
-          UnauthorizedException, WorkflowParsingException {
+          UnauthorizedException, WorkflowParsingException, WorkflowStateException {
     WorkflowQuery query = new WorkflowQuery();
     query.withId(Long.toString(workflowInstanceId));
     WorkflowSet workflows = index.getWorkflowInstances(query, READ_PERMISSION, false);
     if (workflows.size() == 1) {
-      WorkflowInstance[] w = workflows.getItems();
+      WorkflowInstance instance = workflows.getItems()[0];
+
+      WorkflowInstance.WorkflowState state = instance.getState();
+      if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED && state != WorkflowState.STOPPED)
+        throw new WorkflowStateException("Workflow instance with state '" + state
+                + "' cannot be removed. Only states SUCCEEDED, FAILED & STOPPED are allowed");
+
       try {
-        assertPermission(w[0], WRITE_PERMISSION);
+        assertPermission(instance, WRITE_PERMISSION);
       } catch (MediaPackageException e) {
         throw new WorkflowParsingException(e);
       }
-      index.remove(workflowInstanceId);
+
+      // First, remove temporary files DO THIS BEFORE REMOVING FROM INDEX
+      try {
+        removeTempFiles(instance);
+      } catch (NotFoundException e) {
+        // If the files aren't their anymore, we don't have to cleanup up them :-)
+        logger.debug("Temporary files of workflow instance {} seem to be gone already...", workflowInstanceId);
+      }
+
+      // Second, remove jobs related to a operation which belongs to the workflow instance
+      List<WorkflowOperationInstance> operations = instance.getOperations();
+      for (WorkflowOperationInstance op : operations) {
+        if (op.getId() != null) {
+          long workflowOpId = op.getId();
+          if (workflowOpId != workflowInstanceId) {
+            try {
+              serviceRegistry.removeJob(workflowOpId);
+            } catch (ServiceRegistryException e) {
+              logger.warn("Problems while removing jobs related to workflow operation '{}': {}", workflowOpId,
+                      e.getMessage());
+            } catch (NotFoundException e) {
+              logger.debug("No jobs related to the workflow operation '{}' found in the service registry", workflowOpId);
+            }
+          }
+        }
+      }
+
+      // Third, remove workflow instance job itself
+      try {
+        serviceRegistry.removeJob(workflowInstanceId);
+      } catch (ServiceRegistryException e) {
+        logger.warn("Problems while removing workflow instance job '{}': {}", workflowInstanceId, e.getMessage());
+      } catch (NotFoundException e) {
+        logger.info("No workflow instance job '{}' found in the service registry", workflowInstanceId);
+      }
+
+      // At last, remove workflow instance from the index
+      try {
+        index.remove(workflowInstanceId);
+      } catch (NotFoundException e) {
+        // This should never happen, because we got workflow instance by querying the index...
+        logger.warn("Workflow instance could not be removed from index: {}", e);
+      }
     } else if (workflows.size() == 0) {
-      throw new NotFoundException();
+      throw new NotFoundException("Workflow instance with id '" + Long.toString(workflowInstanceId)
+              + "' could not be found");
     } else {
       throw new WorkflowDatabaseException("More than one workflow found with id: " + Long.toString(workflowInstanceId));
     }
@@ -960,7 +1019,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#suspend(long)
    */
   @Override
@@ -974,7 +1033,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#resume(long)
    */
   @Override
@@ -984,7 +1043,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#resume(long, Map)
    */
   @Override
@@ -1061,7 +1120,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Asserts that the current user has permission to take the provided action on a workflow instance.
-   * 
+   *
    * @param workflow
    *          the workflow instance
    * @param action
@@ -1094,7 +1153,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#update(org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
@@ -1214,7 +1273,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Updates the search index entries for this workflow instance.
-   * 
+   *
    * @param workflowInstance
    *          the workflow
    * @throws WorkflowDatabaseException
@@ -1227,7 +1286,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances()
    */
   @Override
@@ -1237,7 +1296,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState,
    *      java.lang.String)
    */
@@ -1248,7 +1307,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getStatistics()
    */
   @Override
@@ -1258,7 +1317,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
@@ -1268,7 +1327,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
@@ -1284,20 +1343,17 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Callback for workflow operations that were throwing an exception. This implementation assumes that the operation
    * worker has already adjusted the current operation's state appropriately.
-   * 
+   *
    * @param workflow
    *          the workflow instance
-   * @param e
-   *          the exception
+   * @param operation
+   *          the current workflow operation
    * @return the workflow instance
    * @throws WorkflowParsingException
    */
-  protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationException e)
+  protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationInstance operation)
           throws WorkflowDatabaseException, WorkflowParsingException, UnauthorizedException {
-    // Add the exception's localized message to the workflow instance
-    workflow.addErrorMessage(e.getLocalizedMessage());
-
-    WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) e.getOperation();
+    WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) operation;
     int failedAttempt = currentOperation.getFailedAttempts() + 1;
     currentOperation.setFailedAttempts(failedAttempt);
     currentOperation.addToExecutionHistory(currentOperation.getId());
@@ -1332,7 +1388,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Handles the workflow for a failing operation.
-   * 
+   *
    * @param workflow
    *          the workflow
    * @param currentOperation
@@ -1382,7 +1438,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Callback for workflow operation handlers that executed and finished without exception. This implementation assumes
    * that the operation worker has already adjusted the current operation's state appropriately.
-   * 
+   *
    * @param workflow
    *          the workflow instance
    * @param result
@@ -1483,7 +1539,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Reads the available metadata from the dublin core catalog (if there is one) and updates the mediapackage.
-   * 
+   *
    * @param mp
    *          the media package
    */
@@ -1568,9 +1624,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * If we are already running the maximum number of workflows, don't accept another START_WORKFLOW job.
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#isReadyToAcceptJobs(String)
    */
   @Override
@@ -1604,9 +1660,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * If we are already running the maximum number of workflows, don't accept another START_WORKFLOW job
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#isReadyToAccept(org.opencastproject.job.api.Job)
    */
   @Override
@@ -1682,7 +1738,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#acceptJob(org.opencastproject.job.api.Job)
    */
   @Override
@@ -1716,7 +1772,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Processes the workflow job.
-   * 
+   *
    * @param job
    *          the job
    * @return the job payload
@@ -1803,7 +1859,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Synchronizes the workflow operation's job with the operation status if the operation has a job associated with it,
    * which is determined by looking at the operation's job id.
-   * 
+   *
    * @param state
    *          the operation state
    * @param jobId
@@ -1839,7 +1895,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#countJobs(org.opencastproject.job.api.Job.Status)
    */
   @Override
@@ -1893,7 +1949,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     try {
       for (Organization org : organizationDirectoryService.getOrganizations()) {
         securityService.setOrganization(org);
-        WorkflowQuery workflowQuery = new WorkflowQuery().withState(WorkflowInstance.WorkflowState.PAUSED);
+        WorkflowQuery workflowQuery = new WorkflowQuery().withState(WorkflowInstance.WorkflowState.PAUSED).withCount(
+                Integer.MAX_VALUE);
         WorkflowSet workflowSet = getWorkflowInstances(workflowQuery);
         workflows.addAll(Arrays.asList(workflowSet.getItems()));
       }
@@ -1906,7 +1963,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
   /**
    * Converts a Map<String, String> to s key=value\n string, suitable for the properties form parameter expected by the
    * workflow rest endpoint.
-   * 
+   *
    * @param props
    *          The map of strings
    * @return the string representation
@@ -1926,7 +1983,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback for the OSGi environment to register with the <code>Workspace</code>.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -1936,7 +1993,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback for the OSGi environment to register with the <code>ServiceRegistry</code>.
-   * 
+   *
    * @param registry
    *          the service registry
    */
@@ -1944,9 +2001,13 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     this.serviceRegistry = registry;
   }
 
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
+
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -1956,7 +2017,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback for setting the authorization service.
-   * 
+   *
    * @param authorizationService
    *          the authorizationService to set
    */
@@ -1966,7 +2027,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback for setting the user directory service
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -1976,7 +2037,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -1986,7 +2047,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Sets the search indexer to use in this service.
-   * 
+   *
    * @param index
    *          The search index
    */
@@ -1996,7 +2057,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Sets the series service
-   * 
+   *
    * @param seriesService
    *          the seriesService to set
    */
@@ -2006,7 +2067,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback to set the metadata service
-   * 
+   *
    * @param service
    *          the metadata service
    */
@@ -2016,7 +2077,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback to remove a mediapackage metadata service.
-   * 
+   *
    * @param service
    *          the mediapackage metadata service to remove
    */
@@ -2026,7 +2087,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * Callback to set the workflow definition scanner
-   * 
+   *
    * @param scanner
    *          the workflow definition scanner
    */
@@ -2036,7 +2097,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.JobProducer#getJobType()
    */
   @Override
@@ -2046,7 +2107,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @Override
@@ -2087,7 +2148,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -2101,7 +2162,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -2134,7 +2195,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
     /**
      * Constructs a new job runner
-     * 
+     *
      * @param job
      *          the job to run
      * @param currentJob
@@ -2147,7 +2208,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.util.concurrent.Callable#call()
      */
     @Override
@@ -2168,4 +2229,46 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     }
   }
 
+  @Override
+  public void cleanupWorkflowInstances(int lifetime, WorkflowState state) throws UnauthorizedException,
+          WorkflowDatabaseException {
+    logger.info("Start cleaning up workflow instances older than {} days with status '{}'", lifetime, state);
+
+    int instancesCleaned = 0;
+    int cleaningFailed = 0;
+
+    WorkflowQuery query = new WorkflowQuery().withState(state).withDateBefore(DateUtils.addDays(new Date(), -lifetime))
+            .withCount(Integer.MAX_VALUE);
+    for (WorkflowInstance workflowInstance : getWorkflowInstances(query).getItems()) {
+      try {
+        remove(workflowInstance.getId());
+        instancesCleaned++;
+      } catch (WorkflowDatabaseException e) {
+        throw e;
+      } catch (UnauthorizedException e) {
+        throw e;
+      } catch (NotFoundException e) {
+        // Since we are in a cleanup operation, we don't have to care about NotFoundExceptions
+        logger.debug("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), e);
+      } catch (WorkflowParsingException e) {
+        logger.warn("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), e);
+        cleaningFailed++;
+      } catch (WorkflowStateException e) {
+        logger.warn("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), e);
+        cleaningFailed++;
+      }
+    }
+
+    if (instancesCleaned == 0 && cleaningFailed == 0) {
+      logger.info("No workflow instances found to clean up");
+      return;
+    }
+
+    if (instancesCleaned > 0)
+      logger.info("Cleaned up {} workflow instances", instancesCleaned);
+    if (cleaningFailed > 0) {
+      logger.warn("Cleaning failed for {} workflow instances", cleaningFailed);
+      throw new WorkflowDatabaseException("Unable to clean all workflow instances, see logs!");
+    }
+  }
 }

@@ -42,7 +42,7 @@ public class StopCaptureJob implements Job {
 
   /**
    * Stops the capture. Also schedules a SerializeJob. {@inheritDoc}
-   * 
+   *
    * @see org.quartz.Job#execute(JobExecutionContext)
    * @throws JobExecutionException
    */

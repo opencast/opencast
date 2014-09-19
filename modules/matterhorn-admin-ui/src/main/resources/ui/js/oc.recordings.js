@@ -4,9 +4,11 @@ ocRecordings = new (function() {
   var WORKFLOW_LIST_URL = '../workflow/instances.json';          // URL of workflow instances list endpoint
   var WORKFLOW_INSTANCE_URL = '../workflow/instance/';           // URL of workflow instance endpoint
   var WORKFLOW_STATISTICS_URL = '../workflow/statistics.json';   // URL of workflow instances statistics endpoint
+  var JOB_INCIDENTS_URL = '../incidents/job/';                   // URL of job incidents endpoint
   var SERIES_URL = '/series';
   var SEARCH_URL = '../search';
   var ENGAGE_URL = '';
+  var ANOYMOUS_URL = '/info/me.json';
 
   var UPCOMMING_EVENTS_GRACE_PERIOD = 30 * 1000;
   var END_OF_CAPTURE_GRACE_PERIOD = 3600 * 1000;
@@ -23,7 +25,7 @@ ocRecordings = new (function() {
     q : 'Any fields',
     title : 'Title',
     creator : 'Presenter',
-    seriestitle : 'Course/Series',
+    seriesTitle : 'Course/Series',
   },
   {
     contributor : 'Contributor',
@@ -65,14 +67,14 @@ ocRecordings = new (function() {
 
     // default configuration
     this.state = 'all';
-    this.pageSize = 10;
-    this.page = 0;
-    this.refresh = 5;
-    this.doRefresh = 'true';
-    this.sortField = 'Date';
-    this.sortOrder = 'DESC';
-    this.filterField = null;
-    this.filterText = '';
+    this.pageSize = $.cookie('pageSize') || 10;
+    this.page = $.cookie('page') || 0;
+    this.refresh = $.cookie('refresh') || 5;
+    this.doRefresh = $.cookie('doRefresh') || 'true';
+    this.sortField = $.cookie('sortField') || 'Date';
+    this.sortOrder = $.cookie('sortOrder') || 'DESC';
+    this.filterField = $.cookie('filterField') || null;
+    this.filterText = $.cookie('filterText') ||'';
     
     this.lastState = 'all';
     this.lastPageSize = 10;
@@ -387,6 +389,7 @@ ocRecordings = new (function() {
       stats.processing += parseInt(definition.running);
       stats.finished += parseInt(definition.finished);
       stats.ignored += parseInt(definition.stopped);
+      stats.hold += parseInt(definition.paused);
       stats.failed += parseInt(definition.failed) + parseInt(definition.failing);
     }
   }
@@ -425,6 +428,7 @@ ocRecordings = new (function() {
     this.actions=[];
     this.holdAction=false;
     this.error = false;
+    this.incident = true;
     this.captureAgent = '';
 
     var self = this;    // ie for $.each
@@ -472,20 +476,8 @@ ocRecordings = new (function() {
       var finishedOp = ocRecordings.findLastOperation(wf, 'SUCCEEDED');
       this.end = ocUtils.fromTimestampToFormattedTime(finishedOp.completed);
     } else if (wf.state == 'FAILING' || wf.state == 'FAILED') {
-    	this.state = 'Failed';
-    	var wf = ocRecordings.getWorkflow(wf.id);
-    	var failedOp = ocRecordings.findFirstOperation(wf, 'FAILED');
-	this.state = 'Failed' + failedOp.description;
-	this.end = ocUtils.fromTimestampToFormattedTime(failedOp.completed);
-	if (wf.errors === '') {
-		if (op) {
-			this.error = 'Failed in operation ' + op.description;
-		} else {
-			this.error = 'No error message available';
-		}
-	} else {
-		this.error = ocUtils.ensureArray(wf.errors.error).join(', ');
-	}
+      this.state = 'Failed';
+      this.error = true;
     } else if (wf.state == 'PAUSED') {
     	var pausedOp = ocRecordings.findFirstOperation(wf, 'PAUSED');
       if (pausedOp) {
@@ -538,6 +530,7 @@ ocRecordings = new (function() {
           var start = elm['$'];
           var now = new Date().getTime() - UPCOMMING_EVENTS_GRACE_PERIOD;
           if (parseInt(start) < now) {
+        	self.incident = false;
             self.error = 'It seems the core system did not receive proper status updates from the Capture Agent that should have conducted this recording.';
             self.state = 'WARNING : Recording may have failed to start or ingest!';
             recordingActions.push('ignore');
@@ -550,6 +543,7 @@ ocRecordings = new (function() {
           var stop = elm['$'];
           var now = new Date().getTime() - END_OF_CAPTURE_GRACE_PERIOD;
           if (parseInt(stop) < now) {
+        	self.incident = false;
             self.error = 'It seems the core system did not receive proper status updates from the Capture Agent that should have conducted this recording.';
             self.state = 'WARNING : Recording failed to ingest!';
             recordingActions.push('ignore');
@@ -673,6 +667,8 @@ ocRecordings = new (function() {
     .click( function() {
       var sortDesc = $(this).find('.sort-icon').hasClass('ui-icon-circle-triangle-s');
       var sortField = ($(this).attr('id')).substr(4);
+      $.cookie('sortField', sortField);
+      $.cookie('sortOrder', sortDesc);
       $( '#ocRecordingsTable th .sort-icon' )
       .removeClass('ui-icon-circle-triangle-s')
       .removeClass('ui-icon-circle-triangle-n')
@@ -701,6 +697,7 @@ ocRecordings = new (function() {
     }
     // care for items in the table that can be unfolded
     //$('#recordingsTable .foldable').
+    var self = this;
     $('#recordingsTable .foldable').each( function() {
       $('<span></span>').addClass('fold-icon ui-icon ui-icon-triangle-1-e').css('float','left').prependTo($(this).find('.fold-header'));
       $(this).click( function() {
@@ -711,11 +708,59 @@ ocRecordings = new (function() {
           if($(this).css('display') === 'none') {
             ocRecordings.updateRefreshInterval(true, ocRecordings.Configuration.refresh);
           } else {
+        	var foldBody = $(this);
+        	if(foldBody.hasClass('empty')) {
+              $.ajax({
+            	url: JOB_INCIDENTS_URL + foldBody.attr('id').replace('workflowId-','') + '.json?cascade=true&format=digest',
+            	type: 'GET',
+            	error: function(XHR,status,e){
+            	  alert('Could not get error failure reason.');
+            	},
+            	success: function(data){
+                  foldBody.removeClass('empty');
+            	  var causeIncident = self.getLastIncident(data.incidentFullTree);
+            	  if(!causeIncident) {
+            		foldBody.html("No error failure reason available!");
+            	  } else {
+                    foldBody.html("<b>ErrorCode:</b> " + causeIncident.code + "<br />" +
+                    		  "<b>Title:</b> " + causeIncident.title + "<br />" +
+                    		  "<b>Description:</b> " + causeIncident.description + "<br />" +
+                    		  "<b>Severity:</b> " + causeIncident.severity + "<br />");
+            	  }
+            	}
+              });
+        	}
             ocRecordings.disableRefresh();
           }
         });
       });
     });
+  }
+  
+  this.getLastIncident = function(incidents) {
+	var self = this;
+	var rootIncident;
+	
+    $.each(ocUtils.ensureArray(incidents.incident), function(index, incident) {
+      if (!$.isEmptyObject(incident) && incident.severity == "FAILURE") {
+    	  rootIncident = incident;
+      }
+    });
+    var childIncident;
+    if($.isArray(incidents.incidents)) {
+        $.each(incidents.incidents, function(index, incident) {
+        	childIncident = self.getLastIncident(incident);
+        });
+    }
+    else if (!$.isEmptyObject(incidents.incidents)) {
+    	childIncident = self.getLastIncident(incidents.incidents);
+    }
+    
+	if(childIncident) {
+	  return childIncident;
+	} else {
+	  return rootIncident;
+	}
   }
 
   this.buildURLparams = function() {
@@ -755,22 +800,30 @@ ocRecordings = new (function() {
 
   this.findFirstOperation = function(workflow, state) {
     var out = false;
-    for (var i in ocUtils.ensureArray(workflow.operations.operation)) {
-      if (workflow.operations.operation[i].state == state) {
-        out = workflow.operations.operation[i];
-        break;
-      }
+    if (workflow.operations == undefined || workflow.operations.operation == undefined) {
+      ocUtils.log('Warning: no operations found for workflow id = ' + workflow.id );
+    } else {
+      $.each(ocUtils.ensureArray(workflow.operations.operation), function(index, operation) {
+        if (operation.state == state) {
+          out = operation;
+          return false; //only want first
+        }
+      });
     }
     return out;
   }
 
   this.findLastOperation = function(workflow, state) {
     var out = false;
-    $.each(ocUtils.ensureArray(workflow.operations.operation), function(index, operation) {
-      if (operation.state == state) {
-        out = operation;
-      }
-    });
+    if (workflow.operations == undefined || workflow.operations.operation == undefined) {
+      ocUtils.log('Warning: no operations found for workflow id = ' + workflow.id );
+    } else {
+      $.each(ocUtils.ensureArray(workflow.operations.operation), function(index, operation) {
+        if (operation.state == state) {
+          out = operation;
+        }
+      });
+    }
     return out;
   }
 
@@ -861,6 +914,8 @@ ocRecordings = new (function() {
 
   this.updateRefreshInterval = function(enable, delay) {
     delay = delay < 5 ? 5 : delay;
+    $.cookie('doRefresh', enable);
+    $.cookie('refresh', delay);
     ocRecordings.Configuration.refresh = delay;
     ocUtils.log('Setting Refresh to ' + enable + " - " + delay + " sec");
     ocRecordings.Configuration.doRefresh = enable;
@@ -915,6 +970,8 @@ ocRecordings = new (function() {
         if ($.trim(text) != '') {
           ocRecordings.Configuration.filterField = field;
           ocRecordings.Configuration.filterText = text;
+          $.cookie("filterField", field);
+          $.cookie("filterText", text);
           ocRecordings.Configuration.page = 0;
         }
         refresh();
@@ -947,7 +1004,7 @@ ocRecordings = new (function() {
     		ocRecordings.Configuration.todate = ocUtils.toISODate(to);
     		ocRecordings.Configuration.dateFilter="range"
     	}
-    	$.cookie( 'dateFilter', ocRecordings.Configuration.dateFilter );
+    	$.cookie('dateFilter', ocRecordings.Configuration.dateFilter );
     	$.cookie('fromDate', ocRecordings.Configuration.fromdate);
     	$.cookie('toDate', ocRecordings.Configuration.todate);
     	refresh();
@@ -1069,6 +1126,7 @@ ocRecordings = new (function() {
     
     $('#pageSize').change(function(){
       ocRecordings.Configuration.pageSize = $(this).val();
+      $.cookie('pageSize', ocRecordings.Configuration.pageSize);
       ocRecordings.Configuration.page = 0;
       ocRecordings.reload();
     });
@@ -1125,14 +1183,14 @@ ocRecordings = new (function() {
     callback(source);
   }
   
-  this.removeRecording = function(id, title) {
-    if(confirm('Are you sure you wish to delete ' + title + '?')){
+  this.removeRecording = function(id) {
+    if(confirm('Are you sure you wish to delete this recording?')){
       $.ajax({
         url: '/recordings/' + id,
         type: 'DELETE',
         dataType: 'text',
         error: function(XHR,status,e){
-          alert('Could not remove Recording ' + title);
+          alert('Could not remove recording');
         },
         success: function(){
           ocRecordings.reload();
@@ -1229,6 +1287,7 @@ ocRecordings = new (function() {
         page = 0;
       }
       ocRecordings.Configuration.page = page;
+      $.cookie('page', ocRecordings.Configuration.page);
       ocRecordings.reload();
     }
   }
@@ -1497,13 +1556,26 @@ ocRecordings = new (function() {
         if(this.fields.seriesSelect !== ''){
           series = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + this.fields.seriesSelect.val() + '</dcterms:title></dublincore>'
           seriesComponent = this;
+          var anonymous_role = 'ROLE_ANONYMOUS';
+          $.ajax({
+              url: ANOYMOUS_URL,
+              type: 'GET',
+              dataType: 'json',
+              async: false,
+              error: function () {
+                  ocUtils.log("Could not retrieve anonymous role " + ANOYMOUS_URL);
+              },
+              success: function(data) {
+                  anonymous_role = data.org.anonymousRole;
+              }
+          });
           $.ajax({
             async: false,
             type: 'POST',
             url: SERIES_URL + '/',
             data: { 
               series: series,
-              acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="org.opencastproject.security"><ace><role>anonymous</role><action>read</action><allow>true</allow></ace></acl>'
+              acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="org.opencastproject.security"><ace><role>' + anonymous_role + '</role><action>read</action><allow>true</allow></ace></acl>'
             },
             dataType: 'xml',
             success: function(data){
@@ -1570,11 +1642,11 @@ ocRecordings = new (function() {
         }
 
       } else if (action == 'delete') {
-        links.push('<a href="javascript:ocRecordings.removeRecording(\'' + id + '\',\'' + recording.title + '\')">Delete</a>');
-        
+        links.push('<a href="javascript:ocRecordings.removeRecording(\'' + id + '\')">Delete</a>');
+
       } else if (action == 'unpublish') {
         links.push('<a href="javascript:ocRecordings.unpublishRecording(\'' + id + '\')">Unpublish</a>');
-      
+
       } else if (action == 'ignore') {
         links.push('<a title="Remove this Recording from UI only" href="javascript:ocRecordings.stopWorkflow(\'' + id + '\')">Ignore</a>');
 

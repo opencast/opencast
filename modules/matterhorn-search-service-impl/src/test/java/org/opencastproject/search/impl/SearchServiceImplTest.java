@@ -54,6 +54,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.PathSupport;
@@ -89,7 +90,7 @@ import java.util.Map;
 
 /**
  * Tests the functionality of the search service.
- * 
+ *
  * todo setup scenario where gathering metadata from both the media package and the dublin core is required
  * (StaticMetadataServiceMediaPackageImpl, StaticMetadataServiceDublinCoreImpl)
  */
@@ -217,7 +218,7 @@ public class SearchServiceImplTest {
     service = new SearchServiceImpl();
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
     StaticMetadataService mdService = newStaticMetadataService(workspace);
 
@@ -526,7 +527,7 @@ public class SearchServiceImplTest {
 
   /**
    * Ads a media package with one dublin core for the episode and one for the series.
-   * 
+   *
    * todo media package needs to return a series id for this test to work
    */
   @Test

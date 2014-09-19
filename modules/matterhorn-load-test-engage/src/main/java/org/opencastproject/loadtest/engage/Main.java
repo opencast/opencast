@@ -69,7 +69,7 @@ public class Main {
   /* The logger */
   private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-  
+
   /* The number browsers that will be spawned to load test the server. */
   public static int numberOfBrowsers = 1;
   /* The amount of time to watch a given video before moving onto the next one. */
@@ -83,7 +83,7 @@ public class Main {
 
   /* The collection of all browsers that the user can choose from. */
   public enum BrowserToUse {
-    Chrome, Firefox, IE, Safari 
+    Chrome, Firefox, IE, Safari
   };
 
   /** Create a new trusted client to make rest endpoint requests. **/
@@ -261,7 +261,7 @@ public class Main {
 
   /**
    * Parse the episode xml to retrieve all of the episode ids.
-   * 
+   *
    * @param is
    *          This is the input stream representation of the xml.
    * @return A linked list of ids for the episodes on the engage server as Strings.

@@ -51,7 +51,7 @@ public final class JaxbRole implements Role {
 
   /**
    * Constructs a role with the specified name and organization.
-   * 
+   *
    * @param name
    *          the name
    * @param organization
@@ -65,7 +65,7 @@ public final class JaxbRole implements Role {
 
   /**
    * Constructs a role with the specified name, organization and description.
-   * 
+   *
    * @param name
    *          the name
    * @param organization
@@ -87,7 +87,7 @@ public final class JaxbRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.Role#getName()
    */
   @Override
@@ -97,7 +97,7 @@ public final class JaxbRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.Role#getDescription()
    */
   @Override
@@ -107,7 +107,7 @@ public final class JaxbRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.Role#getOrganization()
    */
   public Organization getOrganization() {
@@ -116,7 +116,7 @@ public final class JaxbRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -126,7 +126,7 @@ public final class JaxbRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -139,7 +139,7 @@ public final class JaxbRole implements Role {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

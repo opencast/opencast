@@ -55,7 +55,7 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /**
    * Creates a new service registration. The service is initially online and not in maintenance mode.
-   * 
+   *
    * @param type
    *          the service type
    * @param host
@@ -74,7 +74,7 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /**
    * Creates a new service registration. The service is initially online and not in maintenance mode.
-   * 
+   *
    * @param service
    *          the local service instance
    */
@@ -86,7 +86,7 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getServiceType()
    */
   @Override
@@ -96,7 +96,7 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getHost()
    */
   @Override
@@ -106,7 +106,7 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getPath()
    */
   @Override
@@ -116,7 +116,7 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isJobProducer()
    */
   @Override
@@ -126,7 +126,7 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isActive()
    */
   @Override
@@ -136,7 +136,7 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isOnline()
    */
   @Override
@@ -146,7 +146,7 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#isInMaintenanceMode()
    */
   @Override
@@ -156,7 +156,7 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /**
    * Sets the service's maintenance mode.
-   * 
+   *
    * @param maintenance
    *          <code>true</code> if the service is in maintenance mode
    */
@@ -166,7 +166,7 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
 
   /**
    * Returns the actual service instance.
-   * 
+   *
    * @return the service
    */
   public JobProducer getService() {
@@ -174,9 +174,9 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistration#getOnlineFrom()
    */
   @Override

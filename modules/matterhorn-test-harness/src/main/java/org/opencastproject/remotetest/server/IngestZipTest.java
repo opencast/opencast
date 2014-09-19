@@ -62,6 +62,6 @@ public class IngestZipTest {
     HttpPost post = new HttpPost(BASE_URL + "/ingest/addZippedMediaPackage");
     post.setEntity(new ByteArrayEntity(bytesToPost));
     HttpResponse response = client.execute(post);
-    Assert.assertEquals(200, response.getStatusLine().getStatusCode());    
+    Assert.assertEquals(200, response.getStatusLine().getStatusCode());
   }
 }

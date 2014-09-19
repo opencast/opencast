@@ -725,9 +725,6 @@ var ocScheduler = (function() {
         data.end = sched.components.recurrenceEnd.getValue();
         data.duration = sched.components.recurrenceDuration.getValue();
         data.rrule = sched.dublinCore.components.recurrence.getValue();
-        if(sched.timezone == ''){
-          return false;
-        }
         data.timezone = sched.timezone;
       } else {
         return false;
@@ -783,7 +780,7 @@ var ocScheduler = (function() {
       required: false,
       key: 'isPartOf',
       errors: {
-        missingRequired: new ocAdmin.Error('missingSeries', 'seriesLabel'),
+        missingRequired: new ocAdmin.Error('missingSeries', 'seriesSelectLabel'),
         seriesError: new ocAdmin.Error('errorSeries')
       },
       fields: {
@@ -819,7 +816,7 @@ var ocScheduler = (function() {
             error.push(this.errors.seriesError); //failed to create series for some reason.
           }
         }
-        if(this.fields.series.val() === '' && !window.checkForErrors && this.required) {
+        if(this.fields.seriesSelect.val() === '' && window.checkForErrors && this.required) {
           error.push(this.errors.missingRequired);
         }
         return error;
@@ -848,10 +845,10 @@ var ocScheduler = (function() {
         var creationSucceeded = false;
         if (window.checkForErrors) return true;
         if(this.fields.seriesSelect !== ''){
-          series = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + this.fields.seriesSelect.val() + '</dcterms:title></dublincore>'
+          series = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + ocUtils.escapeXML(this.fields.seriesSelect.val()) + '</dcterms:title></dublincore>'
           seriesComponent = this;
           
-          var anonymous_role = 'anonymous';
+          var anonymous_role = 'ROLE_ANONYMOUS';
           $.ajax({
               url: ANOYMOUS_URL,
               type: 'GET',
@@ -1411,6 +1408,7 @@ var ocScheduler = (function() {
           var end = this.fields.recurEnd.datepicker('getDate') / 1000;
           end += this.fields.recurStartTimeHour.val() * 3600; // start hour
           end += this.fields.recurStartTimeMin.val() * 60; //start min, then add duration
+          end -= sched.tzDiff * 60; //Agent TZ offset
           end += this.fields.recurDurationHour.val() * 3600; // seconds per hour
           end += this.fields.recurDurationMin.val() * 60; // milliseconds per min
           end = end * 1000;

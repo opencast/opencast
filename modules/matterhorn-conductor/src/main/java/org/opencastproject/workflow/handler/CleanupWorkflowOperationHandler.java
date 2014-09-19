@@ -86,7 +86,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * Sets the workspace to use.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -96,7 +96,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * Sets the trusted http client
-   * 
+   *
    * @param client
    *          the trusted http client
    */
@@ -106,7 +106,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -227,7 +227,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override

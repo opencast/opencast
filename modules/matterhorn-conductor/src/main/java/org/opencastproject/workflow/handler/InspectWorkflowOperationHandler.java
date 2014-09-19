@@ -94,7 +94,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -104,7 +104,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param inspectionService
    *          the inspection service
    */
@@ -115,7 +115,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -125,7 +125,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -202,7 +202,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * Updates those dublin core fields that can be gathered from the technical metadata.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    */
@@ -238,7 +238,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * Loads a dublin core catalog from a mediapackage's catalog reference
-   * 
+   *
    * @param catalog
    *          the mediapackage's reference to this catalog
    * @return the dublin core

@@ -30,7 +30,7 @@ public interface CaptionService {
   /**
    * Converts captions from one format to another. Language parameter is used for those formats that store information
    * about language.
-   * 
+   *
    * @param input
    *          Catalog containing captions
    * @param inputFormat
@@ -50,7 +50,7 @@ public interface CaptionService {
   /**
    * Converts captions from one format to another. Language parameter is used for those formats that store information
    * about language.
-   * 
+   *
    * @param input
    *          Catalog containing captions
    * @param inputFormat
@@ -71,7 +71,7 @@ public interface CaptionService {
 
   /**
    * Returns list of languages available in captions (if such information is stored).
-   * 
+   *
    * @param input
    *          Catalog containing captions
    * @param format

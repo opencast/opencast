@@ -171,6 +171,7 @@ public class RestPublisher implements RestConstants {
     ServiceRegistration reg = null;
     String serviceType = (String) ref.getProperty(SERVICE_TYPE_PROPERTY);
     String servicePath = (String) ref.getProperty(SERVICE_PATH_PROPERTY);
+    boolean servicePublishFlag = ref.getProperty(SERVICE_PUBLISH_PROPERTY) == null || Boolean.parseBoolean((String)ref.getProperty(SERVICE_PUBLISH_PROPERTY));
     boolean jobProducer = Boolean.parseBoolean((String) ref.getProperty(SERVICE_JOBPRODUCER_PROPERTY));
     try {
       Dictionary<String, Object> props = new Hashtable<String, Object>();
@@ -178,6 +179,7 @@ public class RestPublisher implements RestConstants {
       props.put("alias", servicePath);
       props.put(SERVICE_TYPE_PROPERTY, serviceType);
       props.put(SERVICE_PATH_PROPERTY, servicePath);
+      props.put(SERVICE_PUBLISH_PROPERTY, servicePublishFlag);
       props.put(SERVICE_JOBPRODUCER_PROPERTY, jobProducer);
       reg = componentContext.getBundleContext().registerService(Servlet.class.getName(), cxf, props);
     } catch (Exception e) {

@@ -36,7 +36,7 @@ public final class GStreamerElementFactory {
 
   /**
    * Creates a GStreamer Element
-   * 
+   *
    * @param captureDeviceName
    *          Used to create a useful error message for the Exception.
    * @param elementType

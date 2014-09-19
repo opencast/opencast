@@ -174,9 +174,29 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.xmlmatchers</groupId>
+      <artifactId>xml-matchers</artifactId>
+      <version>1.0-RC1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>Saxon-HE</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- for xml matchers equivalence tests -->
+    <dependency>
       <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
       <version>1.5</version>
+      <scope>test</scope>
+  	</dependency>
+    <!-- for xml matchers (org.w3c.dom.ElementTraversal) -->
+    <dependency>
+      <groupId>org.apache.servicemix.specs</groupId>
+      <artifactId>org.apache.servicemix.specs.jaxp-api-1.4</artifactId>
+      <version>2.4.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -212,7 +232,12 @@
           <!-- disabled checking PersistenceUtil/PersistenceEnvs because of this strange error:
                /modules/matterhorn-common/src/main/java/org/opencastproject/util/persistence/PersistenceUtil.java
                200:9   expecting EOF, found 'try' -->
-          <excludes>**/package-info.java,**/PersistenceUtil.java,**/PersistenceEnvs.java</excludes>
+          <excludes>
+            **/package-info.java,
+            **/PersistenceUtil.java,
+            **/PersistenceEnvs.java,
+            **/JaxbIncident*.java
+          </excludes>
           <failOnViolation>true</failOnViolation>
           <failsOnError>true</failsOnError>
         </configuration>

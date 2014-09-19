@@ -54,7 +54,7 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param publicationService
    *          the publication service
    */
@@ -73,7 +73,7 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -83,7 +83,7 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */

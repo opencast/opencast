@@ -17,7 +17,7 @@ package org.opencastproject.series.impl;
 
 /**
  * Presents exception that occurs while storing/retrieving series from permanent storage or from index.
- * 
+ *
  */
 public class SeriesServiceDatabaseException extends Exception {
 
@@ -34,7 +34,7 @@ public class SeriesServiceDatabaseException extends Exception {
 
   /**
    * Create exception with a message.
-   * 
+   *
    * @param message
    */
   public SeriesServiceDatabaseException(String message) {
@@ -43,7 +43,7 @@ public class SeriesServiceDatabaseException extends Exception {
 
   /**
    * Create exception with a cause.
-   * 
+   *
    * @param cause
    */
   public SeriesServiceDatabaseException(Throwable cause) {
@@ -52,7 +52,7 @@ public class SeriesServiceDatabaseException extends Exception {
 
   /**
    * Create exception with a message and a cause.
-   * 
+   *
    * @param message
    * @param cause
    */

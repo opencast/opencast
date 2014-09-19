@@ -25,7 +25,7 @@ public class SchedulerException extends Exception {
 
   /**
    * Build a new scheduler exception with a message and an original cause.
-   * 
+   *
    * @param message
    *          the error message
    * @param cause
@@ -37,7 +37,7 @@ public class SchedulerException extends Exception {
 
   /**
    * Build a new scheduler exception from the original cause.
-   * 
+   *
    * @param cause
    *          the original exception causing this scheduler exception to be thrown
    */
@@ -47,7 +47,7 @@ public class SchedulerException extends Exception {
 
   /**
    * Build a new scheduler exception with a message
-   * 
+   *
    * @param message
    *          the error message
    */

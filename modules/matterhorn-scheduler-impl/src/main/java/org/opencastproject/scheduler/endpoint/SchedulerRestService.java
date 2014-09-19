@@ -100,7 +100,7 @@ public class SchedulerRestService {
 
   /**
    * Method to set the service this REST endpoint uses
-   * 
+   *
    * @param service
    */
   public void setService(SchedulerService service) {
@@ -109,7 +109,7 @@ public class SchedulerRestService {
 
   /**
    * Method to unset the service this REST endpoint uses
-   * 
+   *
    * @param service
    */
   public void unsetService(SchedulerService service) {
@@ -122,7 +122,7 @@ public class SchedulerRestService {
 
   /**
    * The method that will be called, if the service will be activated
-   * 
+   *
    * @param cc
    *          The ComponentContext of this service
    */
@@ -144,7 +144,7 @@ public class SchedulerRestService {
 
   /**
    * Gets a XML with the Dublin Core metadata for the specified event.
-   * 
+   *
    * @param eventId
    *          The unique ID of the event.
    * @return Dublin Core XML for the event
@@ -171,7 +171,7 @@ public class SchedulerRestService {
 
   /**
    * Gets a Dublin Core metadata for the specified event as JSON.
-   * 
+   *
    * @param eventId
    *          The unique ID of the event.
    * @return Dublin Core JSON for the event
@@ -197,7 +197,7 @@ public class SchedulerRestService {
 
   /**
    * Gets java Properties file with technical metadata for the specified event.
-   * 
+   *
    * @param eventId
    *          The unique ID of the event.
    * @return Java Properties File with the metadata for the event
@@ -341,9 +341,9 @@ public class SchedulerRestService {
   }
 
   /**
-   * 
+   *
    * Removes the specified event from the database. Returns true if the event was found and could be removed.
-   * 
+   *
    * @param eventId
    *          The unique ID of the event.
    * @return true if the event was found and could be deleted.
@@ -370,10 +370,10 @@ public class SchedulerRestService {
   /**
    * Updates an existing event in the database. The event-id has to be stored in the database already. Will return OK,
    * if the event was found and could be updated.
-   * 
+   *
    * @param eventID
    *          id of event to be updated
-   * 
+   *
    * @param catalogs
    *          serialized DC representing event
    * @return
@@ -459,7 +459,7 @@ public class SchedulerRestService {
 
   /**
    * Returns Dublin Core list as XML based on search parameters.
-   * 
+   *
    * @param text
    *          full test search
    * @param eventId
@@ -554,7 +554,7 @@ public class SchedulerRestService {
 
   /**
    * Returns Dublin Core list as JSON based on search parameters.
-   * 
+   *
    * @param text
    *          full test search
    * @param eventId
@@ -649,7 +649,7 @@ public class SchedulerRestService {
 
   /**
    * Returns Dublin Core list based on search parameters.
-   * 
+   *
    * @param text
    *          full test search
    * @param eventId
@@ -752,7 +752,7 @@ public class SchedulerRestService {
 
   /**
    * Looks for events that are conflicting with the given event, because they use the same recorder at the same time.
-   * 
+   *
    * @param device
    *          device that will be checked for conflicts
    * @param startDate
@@ -787,7 +787,7 @@ public class SchedulerRestService {
 
   /**
    * Looks for events that are conflicting with the given event, because they use the same recorder at the same time.
-   * 
+   *
    * @param device
    *          device that will be checked for conflicts
    * @param startDate
@@ -876,12 +876,12 @@ public class SchedulerRestService {
 
   /**
    * Gets the iCalendar with all (even old) events for the specified filter.
-   * 
+   *
    * @param captureAgentID
    *          The ID that specifies the capture agent.
    * @param seriesId
    *          The ID that specifies series.
-   * 
+   *
    * @return an iCalendar
    */
   @GET
@@ -932,7 +932,7 @@ public class SchedulerRestService {
 
   /**
    * Generates event Dublin Core without identifier set.
-   * 
+   *
    * @return
    */
   public String getSampleDublinCore() {
@@ -941,7 +941,7 @@ public class SchedulerRestService {
 
   /**
    * Generates event capture agent properties.
-   * 
+   *
    * @return
    */
   public String getSampleCAProperties() {
@@ -951,12 +951,12 @@ public class SchedulerRestService {
 
   /**
    * Serializes Dublin core and returns serialized string.
-   * 
+   *
    * @param dc
    *          {@link DublinCoreCatalog} to be serialized
-   * 
+   *
    * @return String representation of serialized Dublin core
-   * 
+   *
    * @throws IOException
    *           if serialization fails
    */
@@ -971,7 +971,7 @@ public class SchedulerRestService {
 
   /**
    * Parses Dublin core stored as string.
-   * 
+   *
    * @param dcXML
    *          string representation of Dublin core
    * @return parsed {@link DublinCoreCatalog}
@@ -993,7 +993,7 @@ public class SchedulerRestService {
 
   /**
    * Serializes Properties to String.
-   * 
+   *
    * @param caProperties
    *          Properties to be serialized
    * @return serialized properties
@@ -1008,7 +1008,7 @@ public class SchedulerRestService {
 
   /**
    * Parses Properties represented as String.
-   * 
+   *
    * @param serializedProperties
    *          properties to be parsed.
    * @return parsed properties

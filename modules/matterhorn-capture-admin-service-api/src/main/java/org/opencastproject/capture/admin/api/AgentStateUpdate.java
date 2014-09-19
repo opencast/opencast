@@ -43,7 +43,7 @@ public class AgentStateUpdate {
   /**
    * The state of the agent. This should be defined from the constants in
    * {@link org.opencastproject.capture.admin.api.AgentState}.
-   * 
+   *
    * @see AgentState
    */
   @XmlElement(name = "state")
@@ -73,7 +73,7 @@ public class AgentStateUpdate {
 
   /**
    * Builds an AgentStateUpdate object about the Agent a. This calculates the time delta for you.
-   * 
+   *
    * @param a
    *          The agent you wish to know more information about.
    */
@@ -87,7 +87,7 @@ public class AgentStateUpdate {
 
   /**
    * Returns the agent name.
-   * 
+   *
    * @return the name
    */
   public String getName() {
@@ -96,7 +96,7 @@ public class AgentStateUpdate {
 
   /**
    * Returns the agent url.
-   * 
+   *
    * @return the url
    */
   public String getUrl() {
@@ -105,7 +105,7 @@ public class AgentStateUpdate {
 
   /**
    * Returns the agent state.
-   * 
+   *
    * @return the state
    */
   public String getState() {
@@ -114,7 +114,7 @@ public class AgentStateUpdate {
 
   /**
    * Returns the agent capabilities.
-   * 
+   *
    * @return the capabilities
    */
   public Properties getCapabilities() {
@@ -123,7 +123,7 @@ public class AgentStateUpdate {
 
   /**
    * Returns the time when the agent was last seen online.
-   * 
+   *
    * @return the time of the last update
    */
   public Long getTimeSinceLastUpdate() {

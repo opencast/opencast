@@ -38,7 +38,7 @@ public interface MediaPackageElementBuilderPlugin {
    * This method is called once in a plugin's life cycle. When this method is called, the plugin can make sure that
    * everything is in place for it to work properly. If this isn't the case, it should throw an exception so it will no
    * longer be bothered by the element builder.
-   * 
+   *
    * @throws Exception
    *           if some unrecoverable state is reached
    */
@@ -57,7 +57,7 @@ public interface MediaPackageElementBuilderPlugin {
    * given element type. If this is the case for a plugin, it will then be asked to create such an element by a call to
    * {@link #newElement(org.opencastproject.mediapackage.MediaPackageElement.Type ,MediaPackageElementFlavor)}.
    * </p>
-   * 
+   *
    * @param type
    *          the type
    * @param flavor
@@ -77,7 +77,7 @@ public interface MediaPackageElementBuilderPlugin {
    * Implementers schould return the correct mime type for the given file if they are absolutely sure about the file.
    * Otherwise, <code>null</code> should be returned.
    * </p>
-   * 
+   *
    * @param uri
    *          the element location
    * @param type
@@ -98,7 +98,7 @@ public interface MediaPackageElementBuilderPlugin {
    * The element must then be constructed and returned in the call to
    * {@link #elementFromManifest(Node, MediaPackageSerializer)}.
    * </p>
-   * 
+   *
    * @param elementNode
    *          the node
    * @return <code>true</code> if the plugin is able to create such an element
@@ -107,7 +107,7 @@ public interface MediaPackageElementBuilderPlugin {
 
   /**
    * Creates a media package element from the given url that was previously accepted.
-   * 
+   *
    * @param uri
    *          the element location
    * @return the new media package element
@@ -118,7 +118,7 @@ public interface MediaPackageElementBuilderPlugin {
 
   /**
    * Creates a media package element from the DOM element.
-   * 
+   *
    * @param elementNode
    *          the DOM node
    * @param serializer
@@ -131,7 +131,7 @@ public interface MediaPackageElementBuilderPlugin {
 
   /**
    * Creates a new media package element of the specified type.
-   * 
+   *
    * @param type
    *          the element type
    * @param flavor

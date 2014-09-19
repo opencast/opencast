@@ -30,7 +30,7 @@ public class ElementStoreException extends RuntimeException {
 
   /**
    * Create exception with a message.
-   * 
+   *
    * @param message
    */
   public ElementStoreException(String message) {
@@ -39,7 +39,7 @@ public class ElementStoreException extends RuntimeException {
 
   /**
    * Create exception with a cause.
-   * 
+   *
    * @param cause
    */
   public ElementStoreException(Throwable cause) {
@@ -48,7 +48,7 @@ public class ElementStoreException extends RuntimeException {
 
   /**
    * Create exception with a message and a cause.
-   * 
+   *
    * @param message
    * @param cause
    */

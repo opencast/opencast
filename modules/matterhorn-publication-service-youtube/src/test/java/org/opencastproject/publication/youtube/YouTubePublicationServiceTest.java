@@ -15,11 +15,6 @@
  */
 package org.opencastproject.publication.youtube;
 
-import junit.framework.Assert;
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.opencastproject.deliver.youtube.YouTubeConfiguration;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -34,9 +29,17 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.workspace.api.Workspace;
+
+import junit.framework.Assert;
+
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.net.URI;
@@ -76,7 +79,7 @@ public class YouTubePublicationServiceTest {
     service.setSecurityService(securityService);
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     service.setServiceRegistry(serviceRegistry);
 
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
@@ -93,8 +96,10 @@ public class YouTubePublicationServiceTest {
             .setUploadUrl("http://uploads.gdata.youtube.com/feeds/api/users/default/uploads");
     YouTubePublicationServiceImpl.config.setVideoPrivate(false);
 
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(new File(getClass().getResource("/dublincore.xml").toURI()));
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(new File(getClass().getResource("/media.mov").toURI()));
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(
+            new File(getClass().getResource("/dublincore.xml").toURI()));
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(
+            new File(getClass().getResource("/media.mov").toURI()));
     EasyMock.replay(workspace);
   }
 

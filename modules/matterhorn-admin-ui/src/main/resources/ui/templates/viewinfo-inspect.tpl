@@ -327,7 +327,7 @@
       </tr>
       <% }); %>
     </table>
-  </div>     
+  </div>
 
 <!--  <div id="performance">
     <div id="graph" style="width: 760px; height: 400px"></div>  </div> -->
