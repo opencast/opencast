@@ -214,7 +214,34 @@
         <configuration key="rewrite">false</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
-    </operation>
+    </operation> 
+
+    <operation
+      id="prepare-av"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Preparing audience audio and video work version">
+      <configurations>
+        <configuration key="source-flavor">audience/source</configuration>
+        <configuration key="target-flavor">audience/work</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="promiscuous-audio-muxing">true</configuration>
+      </configurations>
+    </operation> 
+
+    <operation
+      id="prepare-av"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Preparing date audio and video work version">
+      <configurations>
+        <configuration key="source-flavor">data/source</configuration>
+        <configuration key="target-flavor">data/work</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="promiscuous-audio-muxing">true</configuration>
+      </configurations>
+    </operation> 
+
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Preview, trimming and captions                                    -->

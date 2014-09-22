@@ -192,7 +192,7 @@ $(document).ready(function() {
         $.log("Handler registered");
     }
 
-    function loadEpisodes(data) {
+    function loadEpisodes() {
         var requestUrl = restEndpoint + "episode.json?limit=6&offset=" + ((page - 1)) * 6 + "&" + restData;
         $.ajax({
             url: requestUrl,
@@ -317,17 +317,8 @@ $(document).ready(function() {
 
                 $('#main-container').append(tile);
 
-                $('#' + data["id"]).css("background", "linear-gradient(to bottom, #" + color + " 10%,#FFFFFF 10%,#FFFFFF 50%,#FFFFFF 100%)");
-
                 $('#' + data["id"]).on('click', function() {
                     $(location).attr('href', playerEndpoint + data["id"]);
-                });
-
-                $('#' + data["id"]).on('mouseenter', function() {
-                    $(this).css("background", "linear-gradient(to top, #FBB900 90%, #FFFFFF 90%, #FFFFFF 10%,#" + color + " 10%)");
-                });
-                $('#' + data["id"]).on('mouseleave', function() {
-                    $(this).css("background", "linear-gradient(to bottom, #" + color + " 10%,#FFFFFF 10%, #FFFFFF 50%,#FFFFFF 100%)");
                 });
             } else {
                 // TODO
@@ -355,7 +346,6 @@ $(document).ready(function() {
             var color = Math.ceil(Math.random() * 1000000);
 
             $('#main-container').append(tile);
-            $('#' + data.id).css("background", "linear-gradient(to bottom, #" + color + " 10%,#FFFFFF 10%,#FFFFFF 50%,#FFFFFF 100%)");
 
             $('#' + data.id).on('click', function() {
                 restData = "sid=" + data.id;
@@ -371,52 +361,48 @@ $(document).ready(function() {
         }
     }
 
-    function loadSeries(data) {
-        if (data) {
-            var requestUrl = restEndpoint + "/series.json?limit=6&offset=" + (page - 1) * 6 + "&" + restData;
-            $.ajax({
-                url: requestUrl,
-                dataType: "json",
-                success: function(data2) {
-                    if (data2 && data2["search-results"] && data2["search-results"]["total"]) {
-                        $('#main-container').empty();
+    function loadSeries() {
+        var requestUrl = restEndpoint + "/series.json?limit=6&offset=" + (page - 1) * 6 + "&" + restData;
+        $.ajax({
+            url: requestUrl,
+            dataType: "json",
+            success: function(data2) {
+                if (data2 && data2["search-results"] && data2["search-results"]["total"]) {
+                    $('#main-container').empty();
 
-                        var total = data2["search-results"]["total"];
+                    var total = data2["search-results"]["total"];
 
-                        if (total == 0) {
-                            $('#main-container').append("<h2> No Series </h2>");
-                            return;
-                        };
+                    if (total == 0) {
+                        $('#main-container').append("<h2> No Series </h2>");
+                        return;
+                    };
 
-                        var result = data2["search-results"]["result"];
+                    var result = data2["search-results"]["result"];
 
-                        if (page == 1) {
-                            $('.previous').addClass('disabled');
-                        };
+                    if (page == 1) {
+                        $('.previous').addClass('disabled');
+                    };
 
-                        if (result.length < 6 || total < 6) {
-                            $('.next').addClass('disabled');
-                        } else {
-                            $('.next').removeClass('disabled');
-                        }
-
-                        if (total == 1) {
-                            createSeriesGrid(result);
-                            return;
-                        };
-
-                        $.each(result, function(index, val) {
-                            createSeriesGrid(val);
-                        });
+                    if (result.length < 6 || total < 6) {
+                        $('.next').addClass('disabled');
                     } else {
-                        // TODO
-                        $.log("Error: No series data received.");
+                        $('.next').removeClass('disabled');
                     }
+
+                    if (total == 1) {
+                        createSeriesGrid(result);
+                        return;
+                    };
+
+                    $.each(result, function(index, val) {
+                        createSeriesGrid(val);
+                    });
+                } else {
+                    // TODO
+                    $.log("Error: No series data received.");
                 }
-            });
-        } else {
-            $.log("Error: Data for series data is empty.");
-        }
+            }
+        });
     }
 
     function registerMobileEvents() {
