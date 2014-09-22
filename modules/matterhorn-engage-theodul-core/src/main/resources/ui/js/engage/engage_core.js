@@ -171,7 +171,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
                         $(engageCore.el).html(_.template(template)).trigger("create");
                         // run init function of the view
                         engageCore.pluginView.initView();
-                        if (!(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
+                        if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                             // BEGIN LOAD PLUGINS
                             // fetch plugin information
                             engageCore.model.get("pluginsInfo").fetch({
@@ -226,10 +226,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
                         $("#" + id_loadingProgressbar2).css("width", "100%");
                         window.setTimeout(function() {
                             $("." + class_loading).hide().detach();
-                            if (!(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
+                            if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                                 $("#" + id_browserWarning).hide().detach();
                                 $("#" + id_engage_view).show();
-                                if (engageCore.model.desktop) {
+                                if (engageCore.model.desktop || engageCore.model.mobile) {
                                     window.setTimeout(function() {
                                         if ($("#" + id_volume).html() == "") {
                                             $("#" + id_btn_reloadPage).click(function(e) {
