@@ -466,18 +466,53 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                             });
                         }
                     }
-                } else if (isMobileMode) {
-                    if (Engage.model.get("orientation") == "portrait") {
-                        Engage.log("Portrait");
-                        $("." + id_videoDisplayClass).css("width", "99.5%");
-                    } else if (Engage.model.get("orientation") == "landscape") {
-                        Engage.log("landscape");
-                        $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 2) + "%");
-                    }
 
-                    for (var i = 0; i < videoDisplays.length; ++i) {
-                        $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
-                        // $("#" + videoDisplays[i]).addClass("auto-height");
+                } else if (isMobileMode) {
+
+                    for (var v in videoSources) {
+                        if (videoSources[v].length > 0) {
+                            console.log("Init Video Display: " + v);
+                            initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
+                            ++i;
+                        }
+                    }
+                    Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
+
+                    if ((aspectRatio != null) && (videoDisplays.length > 0)) {
+                        aspectRatio[1] = parseInt(aspectRatio[1]);
+                        aspectRatio[2] = parseInt(aspectRatio[2]);
+                        Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+                        Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
+                        $("." + id_videoDisplayClass).css("width", "100%");
+                        for (var i = 0; i < videoDisplays.length; ++i) {
+                            $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+                        }
+                    } else {
+                        Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
+                    }
+                    
+                    if (videoDisplays.length > 0) {
+                        var nr = 0;
+                        
+                        for (var v in videoSources) {
+                            if (videoSources[v].length > 0) {
+                                console.log("Count Sources: " + v);
+                                ++nr;
+                            }
+                        }
+
+                        // first as masterdisplay
+                        registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
+                        
+                        if(nr >= 2) {
+                            // TODO Multi Video
+                        } else {
+                            videosReady = true;
+                            if (!isAudioOnly) {
+                                Engage.trigger(plugin.events.ready.getName());
+                            }
+                        }
+
                     }
                 }
                 if (this.model.get("type") != "audio") {
@@ -848,10 +883,10 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     }
 
     function initPlugin() {
-        // only init if plugin template was inserted into the DOM
-        if ((isDesktopMode || isEmbedMode) && plugin.inserted) {
-            // set path to swf player
-            var videojs_swf = plugin.pluginPath + videojs_swf_path;
+            // only init if plugin template was inserted into the DOM
+            if (plugin.inserted) {
+                // set path to swf player
+                var videojs_swf = plugin.pluginPath + videojs_swf_path;
 
             Engage.model.on(videoDataModelChange, function() {
                 new VideoDataView(this.get("videoDataModel"), plugin.template, videojs_swf);

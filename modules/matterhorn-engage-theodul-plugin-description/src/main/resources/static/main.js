@@ -120,7 +120,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if (isDesktopMode && plugin.inserted) {
+        if ((isDesktopMode || isMobileMode) && plugin.inserted) {
             Moment.locale("en", {
                 // customizations
             });
@@ -132,9 +132,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         }
     }
 
-    if (isDesktopMode) {
+    if (isDesktopMode || isMobileMode) {
         // init event
-        Engage.log("Description: Init");
         var relative_plugin_path = Engage.getPluginPath("EngagePluginDescription");
 
         // listen on a change/set of the mediaPackage model

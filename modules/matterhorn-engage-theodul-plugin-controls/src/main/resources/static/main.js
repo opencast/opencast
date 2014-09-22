@@ -233,8 +233,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
-
-                if (isDesktopMode) {
+                if (isDesktopMode || isMobileMode) {
                     initControlsEvents();
 
                     // init dropdown menus
@@ -596,7 +595,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
      */
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if (isDesktopMode && plugin.inserted) {
+        if ((isDesktopMode || isMobileMode) && plugin.inserted) {
             new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
                 aspectRatioWidth = as[0] || 0;
@@ -712,7 +711,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         }
     }
 
-    if (isDesktopMode) {
+    if (isDesktopMode || isMobileMode) {
         // init event
         Engage.log("Controls: Init");
         var relative_plugin_path = Engage.getPluginPath("EngagePluginControls");
