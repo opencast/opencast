@@ -35,32 +35,35 @@ public class SilenceDetectorTest extends GstreamerAbstractTest {
 
   private static final Logger logger = LoggerFactory.getLogger(SilenceDetectorTest.class);
 
-  private static boolean gstreamerInstalled = true;
+  private static boolean gstreamerInstalled = false;
 
   @BeforeClass
   public static void setUpClass() throws Exception {
     try {
       GstreamerAbstractTest.setUpClass();
-    } catch (Error e) {
+      gstreamerInstalled = true;
+    } catch (Throwable e) {
       gstreamerInstalled = false;
-      logger.info("Unable to initialize gstreamer: {}", e.getMessage());
+      logger.warn("Skipping silence detection tests due to unsatisifed gstreamer installation: {}",
+              e.getMessage());
+      return;
     }
 
     /* gstreamer-core */
-    if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.FILESRC)) {
+    if (!testGstreamerElementInstalled(GstreamerElements.FILESRC)) {
       gstreamerInstalled = false;
 
       logger.info("Skip tests because gstreamer-base is not installed!");
       return;
     }
     /* gstreamer-plugins-base*/
-    if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.DECODEBIN)) {
+    if (!testGstreamerElementInstalled(GstreamerElements.DECODEBIN)) {
       gstreamerInstalled = false;
       logger.info("Skip tests because gstreamer-plugins-base is not installed!");
       return;
     }
     /* gstreamer-plugins-good */
-    if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.CUTTER)) {
+    if (!testGstreamerElementInstalled(GstreamerElements.CUTTER)) {
       gstreamerInstalled = false;
 
       logger.info("Skip tests because gstreamer-plugins-good is not installed!");
@@ -140,7 +143,9 @@ public class SilenceDetectorTest extends GstreamerAbstractTest {
 
   @Test(expected = SilenceDetectionFailedException.class)
   public void detectorFailTest() throws SilenceDetectionFailedException {
-    if (!gstreamerInstalled) return;
+    if (!gstreamerInstalled)
+      throw new SilenceDetectionFailedException("Gstreamer is not installed.");
+
     String videoFilePath = "foo.bar";
     logger.info("segmenting video only file '{}' should fail...", videoFilePath);
     try {
