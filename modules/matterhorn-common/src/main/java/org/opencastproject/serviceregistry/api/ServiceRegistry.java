@@ -414,6 +414,14 @@ public interface ServiceRegistry {
   List<ServiceStatistics> getServiceStatistics() throws ServiceRegistryException;
 
   /**
+   * Gets the count of the number of abnormal services across the whole system.
+   *
+   * @return the count of abnormal services
+   * @throws ServiceRegistryException
+   */
+  long countOfAbnormalServices() throws ServiceRegistryException;
+
+  /**
    * Count the number of jobs of this type in this {@link Status} across all hosts.
    *
    * @param serviceType
