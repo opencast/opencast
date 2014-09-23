@@ -419,7 +419,7 @@ public interface ServiceRegistry {
    * @return the count of abnormal services
    * @throws ServiceRegistryException
    */
-  long getCountOfAbnormalServices() throws ServiceRegistryException;
+  long countOfAbnormalServices() throws ServiceRegistryException;
 
   /**
    * Count the number of jobs of this type in this {@link Status} across all hosts.

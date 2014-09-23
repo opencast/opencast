@@ -125,7 +125,7 @@ public class ServiceRegistryEndpoint {
   @Path("servicewarnings")
   @RestQuery(name = "servicewarnings", description = "Get the number of services currently in a non-NORMAL state", returnDescription = "The count of abnormal services.", reponses = { @RestResponse(responseCode = SC_OK, description = "A plain text representation of the number of abnormal services") })
   public long serviceWarnings() throws ServiceRegistryException {
-    return serviceRegistry.getCountOfAbnormalServices();
+    return serviceRegistry.countOfAbnormalServices();
   }
 
   @POST

@@ -1677,13 +1677,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  public long getCountOfAbnormalServices() throws ServiceRegistryException {
+  public long countOfAbnormalServices() throws ServiceRegistryException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
       Query query = em.createNamedQuery("ServiceRegistration.countNotNormal");
-      long count = (Long) query.getSingleResult();
-      return count;
+      Number count = (Number) query.getSingleResult();
+      return count.longValue();
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
