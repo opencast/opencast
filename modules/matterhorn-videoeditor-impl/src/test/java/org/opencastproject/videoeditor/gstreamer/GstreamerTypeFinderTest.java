@@ -33,26 +33,29 @@ public class GstreamerTypeFinderTest extends GstreamerAbstractTest {
    */
   private static final Logger logger = LoggerFactory.getLogger(GstreamerTypeFinderTest.class);
 
-  private static boolean gstreamerInstalled = true;
+  private static boolean gstreamerInstalled = false;
 
   @BeforeClass
   public static void setUpClass() throws Exception {
     try {
       GstreamerAbstractTest.setUpClass();
-    } catch (Error e) {
+      gstreamerInstalled = true;
+    } catch (Throwable e) {
       gstreamerInstalled = false;
-      logger.info("Unable to initialize gstreamer: {}", e.getMessage());
+      logger.warn("Skipping video editor type finder tests due to unsatisifed gstreamer installation: {}",
+              e.getMessage());
+      return;
     }
 
     /* gstreamer-core */
-    if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.FILESRC)) {
+    if (!testGstreamerElementInstalled(GstreamerElements.FILESRC)) {
       gstreamerInstalled = false;
 
       logger.info("Skip tests because gstreamer-base is not installed!");
       return;
     }
     /* gstreamer-plugins-base */
-    if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.DECODEBIN2)) {
+    if (!testGstreamerElementInstalled(GstreamerElements.DECODEBIN2)) {
       gstreamerInstalled = false;
 
       logger.info("Skip tests because gstreamer-plugins-base is not installed!");

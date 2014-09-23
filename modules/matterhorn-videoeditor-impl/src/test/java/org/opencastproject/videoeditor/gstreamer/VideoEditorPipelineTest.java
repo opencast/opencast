@@ -34,53 +34,56 @@ public class VideoEditorPipelineTest extends GstreamerAbstractTest {
   /** The logging instance */
   private static final Logger logger = LoggerFactory.getLogger(VideoEditorPipelineTest.class);
 
-  private static boolean gstreamerInstalled = true;
+  private static boolean gstreamerInstalled = false;
 
   @BeforeClass
   public static void setUpClass() throws Exception {
     try {
       GstreamerAbstractTest.setUpClass();
-    } catch (Error e) {
+      gstreamerInstalled = true;
+    } catch (Throwable e) {
       gstreamerInstalled = false;
-      logger.info("Unable to initialize gstreamer: {}", e.getMessage());
+      logger.warn("Skipping video editor tests due to unsatisifed gstreamer installation: {}",
+              e.getMessage());
+      return;
     }
 
     /* gstreamer-core */
-    if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.FILESRC)) {
+    if (!testGstreamerElementInstalled(GstreamerElements.FILESRC)) {
       gstreamerInstalled = false;
 
       logger.info("Skip tests because gstreamer-base is not installed!");
       return;
     }
     /* gstreamer-plugins-base*/
-    if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.DECODEBIN)) {
+    if (!testGstreamerElementInstalled(GstreamerElements.DECODEBIN)) {
       gstreamerInstalled = false;
       logger.info("Skip tests because gstreamer-plugins-base is not installed!");
       return;
     }
     /* gstreamer-plugins-good */
-    if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.CUTTER)) {
+    if (!testGstreamerElementInstalled(GstreamerElements.CUTTER)) {
       gstreamerInstalled = false;
 
       logger.info("Skip tests because gstreamer-plugins-good is not installed!");
       return;
     }
     /* gstreamer-plugins-bad */
-    if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.FAAC)) {
+    if (!testGstreamerElementInstalled(GstreamerElements.FAAC)) {
       gstreamerInstalled = false;
 
       logger.info("Skip tests because gstreamer-plugins-bad is not installed!");
       return;
     }
     /* gstreamer-plugins-ugly */
-    if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.X264ENC)) {
+    if (!testGstreamerElementInstalled(GstreamerElements.X264ENC)) {
       gstreamerInstalled = false;
 
       logger.info("Skip tests because gstreamer-plugins-ugly is not installed!");
       return;
     }
     /* gstreamer-gnonlin */
-    if (gstreamerInstalled  && !testGstreamerElementInstalled(GstreamerElements.GNL_COMPOSITION)) {
+    if (!testGstreamerElementInstalled(GstreamerElements.GNL_COMPOSITION)) {
       gstreamerInstalled = false;
 
       logger.info("Skip tests because gstreamer-gnonlin is not installed!");

@@ -46,13 +46,13 @@ public abstract class GstreamerAbstractTest {
   }
 
   @BeforeClass
-  public static void setUpClass() throws Exception {
+  public static void setUpClass() throws Throwable {
     Gst.setUseDefaultContext(true);
     Gst.init();
   }
 
   @Before
-  public void bla() throws FileNotFoundException {
+  public void setUp() throws FileNotFoundException {
     if (!new File(audioFilePath).exists())
       throw new FileNotFoundException("Audio test file does not exist");
   }
@@ -65,7 +65,7 @@ public abstract class GstreamerAbstractTest {
   public static boolean testGstreamerElementInstalled(String factoryName) {
     try {
       return null != ElementFactory.make(factoryName, null);
-    } catch (Exception e) {
+    } catch (Throwable e) {
       return false;
     }
   }
