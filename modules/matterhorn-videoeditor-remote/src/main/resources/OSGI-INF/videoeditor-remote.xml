@@ -12,6 +12,4 @@
     cardinality="1..1" policy="static" bind="setTrustedHttpClient" />
   <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
     cardinality="1..1" policy="static" bind="setRemoteServiceManager" />
-  <reference name="smilService" interface="org.opencastproject.smil.api.SmilService"
-    cardinality="1..1" policy="static" bind="setSmilService" />
 </scr:component>

@@ -28,7 +28,6 @@ import org.apache.http.util.EntityUtils;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
-import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 import org.opencastproject.videoeditor.api.VideoEditorService;
@@ -41,7 +40,6 @@ import org.slf4j.LoggerFactory;
 public class VideoEditorServiceRemote extends RemoteBase implements VideoEditorService {
 
   private static final Logger logger = LoggerFactory.getLogger(VideoEditorServiceRemote.class);
-  private SmilService smilService;
 
   public VideoEditorServiceRemote() {
     super(JOB_TYPE);
@@ -82,10 +80,6 @@ public class VideoEditorServiceRemote extends RemoteBase implements VideoEditorS
     }
     throw new ProcessFailedException("Unable to proccess smil "
             + smil.getId() + " using a remote videoeditor service.");
-  }
-
-  public void setSmilService(SmilService smilService) {
-    this.smilService = smilService;
   }
 }
 
