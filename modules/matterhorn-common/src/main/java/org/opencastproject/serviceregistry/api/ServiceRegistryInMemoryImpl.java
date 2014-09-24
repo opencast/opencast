@@ -583,7 +583,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCountOfAbnormalServices()
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countOfAbnormalServices()
    */
   @Override
   public long countOfAbnormalServices() throws ServiceRegistryException {
