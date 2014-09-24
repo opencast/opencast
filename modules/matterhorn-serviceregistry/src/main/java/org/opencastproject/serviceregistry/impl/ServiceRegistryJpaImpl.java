@@ -2126,6 +2126,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           updateJob(jpaJob);
           logger.debug("Service {} refused to accept {}", registration, job);
           throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
+        } else if (responseStatusCode == HttpStatus.SC_METHOD_NOT_ALLOWED) {
+          logger.debug("Service {} is not yet reachable", registration);
+          continue;
         } else {
           logger.warn("Service {} failed ({}) accepting {}", new Object[] { registration, responseStatusCode, job });
           continue;
