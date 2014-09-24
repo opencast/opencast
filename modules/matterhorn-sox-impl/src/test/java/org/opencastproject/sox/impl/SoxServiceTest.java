@@ -109,8 +109,8 @@ public class SoxServiceTest {
       return;
 
     // Copy an existing media file to a temp file
-    File f = new File("src/test/resources/audio-test.mp3");
-    source = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp3");
+    File f = new File("src/test/resources/audio-test.flac");
+    source = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".flac");
     FileUtils.copyFile(f, source);
     f = null;
 
@@ -163,7 +163,7 @@ public class SoxServiceTest {
       return;
 
     assertTrue(source.isFile());
-    String sourceTrackXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>audio/mp3</mimetype>"
+    String sourceTrackXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>audio/flac</mimetype>"
             + "<url>http://localhost:8080/workflow/samples/camera.mpg</url>"
             + "<checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum><duration>14546</duration>"
             + "<audio><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
@@ -181,9 +181,9 @@ public class SoxServiceTest {
       Job job = serviceRegistry.getJob(j.getId());
       TrackImpl track = (TrackImpl) MediaPackageElementParser.getFromXml(job.getPayload());
       AudioStream audioStream = track.getAudio().get(0);
-      assertEquals(-0.34f, audioStream.getPkLevDb().floatValue(), 0.0002);
-      assertEquals(-24.78f, audioStream.getRmsLevDb().floatValue(), 0.0002);
-      assertEquals(-15.00f, audioStream.getRmsPkDb().floatValue(), 0.0002);
+      assertEquals(-8.55f, audioStream.getPkLevDb().floatValue(), 0.0002);
+      assertEquals(-27.78f, audioStream.getRmsLevDb().floatValue(), 0.0002);
+      assertEquals(-20.12f, audioStream.getRmsPkDb().floatValue(), 0.0002);
       assertEquals(Job.Status.FINISHED, job.getStatus());
     }
   }
@@ -194,16 +194,16 @@ public class SoxServiceTest {
       return;
 
     assertTrue(source.isFile());
-    String sourceTrackXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>audio/mp3</mimetype>"
+    String sourceTrackXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>audio/flac</mimetype>"
             + "<url>http://localhost:8080/workflow/samples/camera.mpg</url>"
             + "<checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum><duration>14546</duration>"
             + "<audio><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
             + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><channels>2</channels>"
-            + "<bitdepth>16</bitdepth><rmsleveldb>-24.78</rmsleveldb><samplingrate>44100</samplingrate></audio></track>";
+            + "<bitdepth>16</bitdepth><rmsleveldb>-27.78</rmsleveldb><samplingrate>44100</samplingrate></audio></track>";
     Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
     List<Job> jobs = new ArrayList<Job>();
     for (int i = 0; i < 10; i++) {
-      jobs.add(soxService.normalize(sourceTrack, -20f));
+      jobs.add(soxService.normalize(sourceTrack, -25f));
     }
     boolean success = new JobBarrier(serviceRegistry, jobs.toArray(new Job[jobs.size()])).waitForJobs().isSuccess();
     assertTrue(success);
@@ -212,7 +212,7 @@ public class SoxServiceTest {
       Job job = serviceRegistry.getJob(j.getId());
       TrackImpl track = (TrackImpl) MediaPackageElementParser.getFromXml(job.getPayload());
       AudioStream audioStream = track.getAudio().get(0);
-      assertEquals(-20f, audioStream.getRmsLevDb().floatValue(), 0.9);
+      assertEquals(-25f, audioStream.getRmsLevDb().floatValue(), 0.9);
       assertEquals(Job.Status.FINISHED, job.getStatus());
     }
   }
@@ -223,12 +223,12 @@ public class SoxServiceTest {
       return;
 
     assertTrue(source.isFile());
-    String sourceTrackXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>audio/mp3</mimetype>"
+    String sourceTrackXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>audio/flac</mimetype>"
             + "<url>http://localhost:8080/workflow/samples/camera.mpg</url>"
             + "<checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum><duration>14546</duration>"
             + "<audio><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
             + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><channels>2</channels>"
-            + "<bitdepth>16</bitdepth><rmsleveldb>-24.78</rmsleveldb><samplingrate>44100</samplingrate></audio></track>";
+            + "<bitdepth>16</bitdepth><rmsleveldb>-27.78</rmsleveldb><samplingrate>44100</samplingrate></audio></track>";
     Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
     List<Job> jobs = new ArrayList<Job>();
     for (int i = 0; i < 10; i++) {
