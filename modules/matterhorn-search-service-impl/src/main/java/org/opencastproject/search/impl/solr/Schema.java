@@ -69,6 +69,15 @@ public final class Schema {
   public static final String DC_ACCESS_RIGHTS_PREFIX = "dc_access_rights_";
   public static final String DC_LICENSE_PREFIX = "dc_license_";
 
+  // Sorting fields
+  public static final String DC_TITLE_SORT = "dc_title-sort";
+  public static final String DC_SUBJECT_SORT = "dc_subject-sort";
+  public static final String DC_CREATOR_SORT = "dc_creator-sort";
+  public static final String DC_PUBLISHER_SORT = "dc_publisher-sort";
+  public static final String DC_CONTRIBUTOR_SORT = "dc_contributor-sort";
+  public static final String DC_DESCRIPTION_SORT = "dc_description-sort";
+  public static final String DC_LICENSE_SORT = "dc_license-sort";
+
   // Filters for audio and video files
   public static final String HAS_AUDIO = "has_audio_file";
   public static final String HAS_VIDEO = "has_video_file";
