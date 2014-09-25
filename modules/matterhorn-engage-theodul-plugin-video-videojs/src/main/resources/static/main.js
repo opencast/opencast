@@ -70,6 +70,9 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var isDesktopMode = false;
     var isEmbedMode = false;
     var isMobileMode = false;
+    
+    var flavors = "";
+    var mimetypes = "";
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
@@ -112,6 +115,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     /* change these variables */
     var videoPath = "lib/videojs/video";
     var synchronizePath = "lib/synchronize";
+    var mediaSourcesPath = "lib/videojs/videojs-media-sources";
+    var hlsPath = "lib/videojs/videojs.hls.min";
     var videojs_swf_path = "lib/videojs/video-js.swf";
     var videoDisplaySizeFactor = 1.1;
     var videoDisplaySizeTimesCheck = 100; // the smaller the factor, the higher the times check!
@@ -122,7 +127,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var isAudioOnly = false;
     var isUsingFlash = false;
     var aspectRatio = "";
-    var initCount = 4;
+    var initCount = 6;
     var mediapackageError = false;
     var videoDisplayNamePrefix = "videojs_videodisplay_";
     var id_engage_video = "engage_video";
@@ -218,48 +223,27 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 // get aspect ratio
                 aspectRatio = null;
                 var as1 = 0;
-                for (var i = 0; i < videoDisplays.length; ++i) {
-                    if (videoSources.presenter && (videoSources.presenter.length > 0) && videoSources.presenter[i] && videoSources.presenter[i].resolution) {
-                        for (var j = 0; j < videoSources.presenter.length; ++j) {
-                            var aspectRatio_tmp = videoSources.presenter[j].resolution;
-                            var t_tmp = $.type(aspectRatio_tmp);
-                            if ((t_tmp === "string") && (/\d+x\d+/.test(aspectRatio_tmp))) {
-                                aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
-                                if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
-                                    as1 = parseInt(aspectRatio_tmp[1]);
-                                    aspectRatio = videoSources.presenter[j].resolution;
-                                }
+                var videoDisplayNumber = 0;
+                for (var v in videoSources) {
+                    for (var j = 0; j < videoSources[v].length; ++j) {
+                        var aspectRatio_tmp = videoSources[v][j].resolution;
+                        var t_tmp = $.type(aspectRatio_tmp);
+                        if ((t_tmp === "string") && (/\d+x\d+/.test(aspectRatio_tmp))) {
+                            aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
+                            if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
+                                as1 = parseInt(aspectRatio_tmp[1]);
+                                aspectRatio = videoSources.presenter[j].resolution;
                             }
                         }
-
-                        var t = $.type(aspectRatio);
-
-                        if ((t === "string") && (/\d+x\d+/.test(aspectRatio))) {
-                            aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
-                            break;
-                        }
                     }
-                    // TODO: Same code as above...
-                    else if (videoSources.presentation && (videoSources.presentation.length > 0) && videoSources.presentation[i] && videoSources.presentation[i].resolution) {
-                        for (var j = 0; j < videoSources.presentation.length; ++j) {
-                            var aspectRatio_tmp = videoSources.presentation[j].resolution;
-                            var t_tmp = $.type(aspectRatio_tmp);
-                            if ((t_tmp === "string") && (/\d+x\d+/.test(aspectRatio_tmp))) {
-                                aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
-                                if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
-                                    as1 = parseInt(aspectRatio_tmp[1]);
-                                    aspectRatio = videoSources.presentation[j].resolution;
-                                }
-                            }
-                        }
+                    
+                    var t = $.type(aspectRatio);
 
-                        var t = $.type(aspectRatio);
-
-                        if ((t === "string") && (/\d+x\d+/.test(aspectRatio))) {
-                            aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
-                            break;
-                        }
+                    if ((t === "string") && (/\d+x\d+/.test(aspectRatio))) {
+                        aspectRatio = aspectRatio.match(/(\d+)x(\d+)/);
+                        break;
                     }
+                    videoDisplayNumber++;
                 }
 
                 $(window).on("orientationchange", function(event) {
@@ -881,6 +865,14 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             });
         }
     }
+    
+    function extractFlavorMainType(flavor) {
+        var types = flavor.split("/");
+        if (types.length > 0) {
+            return types[0];
+        }
+        return "presenter" //fallback value, should never be returned, but does no harm 
+    }
 
     function initPlugin() {
             // only init if plugin template was inserted into the DOM
@@ -900,14 +892,32 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 mediaInfo.attachments = this.get("attachments");
 
                 if (mediaInfo.tracks && (mediaInfo.tracks.length > 0)) {
+                    
+                    for (i = 0; i < mediaInfo.tracks.length; i++) {
+                        if (flavors.indexOf(mediaInfo.tracks[i].type) < 0) {
+                            flavors += mediaInfo.tracks[i].type + ",";
+                        }
+                        if (mimetypes.indexOf(mediaInfo.tracks[i].mimetype) < 0) {
+                            mimetypes += mediaInfo.tracks[i].mimetype + ",";
+                        }
+                    }
+                    flavors = flavors.substring(0, flavors.length - 1);
+                    mimetypes = mimetypes.substring(0, mimetypes.length - 1);
+                    console.log("Flavors = " + flavors + ", mimetypes = " + mimetypes);
+                        
+                    var flavorsArray = flavors.split(",");
+                        
                     var videoDisplays = [];
                     var videoSources = [];
-                    videoSources.presenter = [];
-                    videoSources.presentation = [];
                     videoSources.audio = [];
-
-                    var hasPresenter = false;
-                    var hasPresentation = false;
+                    
+                    for (i = 0; i < flavorsArray.length; i++) {
+                        videoSources[extractFlavorMainType(flavorsArray[i])] = [];
+                    }
+                    
+                    //var hasPresenter = false;
+                    //var hasPresentation = false;
+                    var hasVideo = false
                     var hasAudio = false;
 
                     // look for video source
@@ -915,32 +925,16 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                     if (mediaInfo.tracks) {
                         $(mediaInfo.tracks).each(function(i, track) {
                             if (track.mimetype && track.type) {
-                                if (track.mimetype.match(/video/g)) {
+                                if (track.mimetype.match(/video/g) || track.mimetype.match(/application/g)) {
+                                    hasVideo = true;
                                     var resolution = (track.video && track.video.resolution) ? track.video.resolution : "";
                                     // filter for different video sources
-                                    if (track.type.match(/presenter/g)) {
-                                        hasPresenter = true;
-                                        if (track.duration > duration) {
-                                            duration = track.duration;
-                                        }
-                                        videoSources.presenter.push({
+                                    videoSources[extractFlavorMainType(track.type)].push({
                                             src: track.url,
                                             type: track.mimetype,
                                             typemh: track.type,
                                             resolution: resolution
                                         });
-                                    } else if (track.type.match(/presentation/g)) {
-                                        hasPresentation = true;
-                                        if (track.duration > duration) {
-                                            duration = track.duration;
-                                        }
-                                        videoSources.presentation.push({
-                                            src: track.url,
-                                            type: track.mimetype,
-                                            typemh: track.type,
-                                            resolution: resolution
-                                        });
-                                    }
                                 } else if (track.mimetype.match(/audio/g)) {
                                     hasAudio = true;
                                     if (track.duration > duration) {
@@ -954,30 +948,29 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                                 }
                             }
                         });
-                        if (!hasPresenter) {
-                            delete videoSources.presenter;
+                        
+                        if (!hasVideo) {
+                            for (i = 0; i < videoSources.length; i++) {
+                                if (videoSources[i] !== videoSources.audio) {
+                                    delete videoSources.flavor;
+                                }
+                            }
                         }
-                        if (!hasPresentation) {
-                            delete videoSources.presentation;
-                        }
-                        if (hasPresenter || hasPresentation || !hasAudio) {
+                        
+                        if (hasVideo || !hasAudio) {
                             delete videoSources.audio;
-                        }
+                        }               
                     }
                     if (mediaInfo.attachments && (mediaInfo.attachments.length > 0)) {
                         $(mediaInfo.attachments).each(function(i, attachment) {
                             if (attachment.mimetype && attachment.type && attachment.mimetype.match(/image/g) && attachment.type.match(/player/g)) {
                                 // filter for different video sources
-                                if (attachment.type.match(/presenter/g)) {
-                                    videoSources.presenter.poster = attachment.url;
-                                } else if (attachment.type.match(/presentation/g)) {
-                                    videoSources.presentation.poster = attachment.url;
-                                }
+                                videoSources[extractFlavorMainType(attachment.type)]["poster"] = attachment.url;
                             }
                         });
                     }
                     var i = 0;
-                    for (var v in videoSources) {
+                    for (var v in videoSources) {                        
                         if (videoSources[v].length > 0) {
                             var name = videoDisplayNamePrefix.concat(i);
                             videoDisplays.push(name);
@@ -1008,6 +1001,24 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         Engage.log("Video: Lib synchronize loaded");
         initCount -= 1;
         if (initCount == 0) {
+            initPlugin();
+        }
+    });
+    
+    // load videojs-media-sources lib
+    require([relative_plugin_path + mediaSourcesPath], function(videojs) {
+        Engage.log("Video: Lib videojs media sources loaded");
+        initCount -= 1;
+        if (initCount == 0) {
+            initPlugin();
+        }
+    });   
+    
+    // load videojs.hls.min lib
+    require([relative_plugin_path + hlsPath], function(videojs) {
+        Engage.log("Video: Lib videojs HLS playback loaded");
+        initCount -= 1;
+        if (initCount == 1) {
             initPlugin();
         }
     });
