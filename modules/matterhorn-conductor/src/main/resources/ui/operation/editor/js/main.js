@@ -201,15 +201,13 @@ $(document)
             });
 
             // create player
-            $('#videoPlayer').prepend(
-                '<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>')
+            $('#videoPlayer').prepend('<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>');
             player = $('#videoPlayer').mhPlayer({
-                fps: previewTracks[0].video.framerate,
+                fps: ((previewTracks[0] && previewTracks[0].video && previewTracks[0].video.framerate) ? previewTracks[0].video.framerate : 0),
                 duration: previewTracks[0].duration / 1000
             });
 
             if (previewTracks.length == 2) {
-
                 var videoSlave = '<video id="videoPlayerSlave"> Your browser does not support HTML5 video.</video>';
                 videoSlave = $(videoSlave).prepend(
                     '<source src="' + previewTracks[1].url + '" type="' + previewTracks[1].mimetype + '"/>')

@@ -2146,12 +2146,11 @@ function prepareUI() {
         } else {
             ocUtils.log("Did not find waveform");
             $('#waveformImage').hide();
-            $('#slider-waveform-zoom').hide();
+            $('#waveformImage, #slider-waveform-zoom, #segmentsWaveform').hide();
         }
     } else {
         ocUtils.log("Did not find waveform");
-        $('#waveformImage').hide();
-        $('#slider-waveform-zoom').hide();
+        $('#waveformImage, #slider-waveform-zoom, #segmentsWaveform').hide();
     }
 
     // adjust size of the holdState UI
@@ -2191,8 +2190,8 @@ function parseInitialSMIL() {
             var lastEnd = 0;
             $.each(editor.parsedSmil.par, function (key, value) {
                 value.video = ocUtils.ensureArray(value.video);
-                var clipBegin = parseFloat(value.video[0].clipBegin) / 1000;
-                var clipEnd = parseFloat(value.video[0].clipEnd) / 1000;
+                var clipBegin = (value && value.video[0] && value.video[0].clipBegin) ? (parseFloat(value.video[0].clipBegin) / 1000) : 0;
+                var clipEnd = (value && value.video[0] && value.video[0].clipEnd) ? (parseFloat(value.video[0].clipEnd) / 1000) : getDuration();
                 if ((key > 0) && (lastEnd != clipBegin)) {
                     ocUtils.log("Inserting a split element (1): (" + lastEnd + " - " + clipBegin + ")");
                     editor.splitData.splits.push({
