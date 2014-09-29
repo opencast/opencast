@@ -194,7 +194,7 @@
       <configurations>
         <configuration key="source-flavor">presenter/source</configuration>
         <configuration key="target-flavor">presenter/work</configuration>
-        <configuration key="rewrite">true</configuration>
+        <configuration key="rewrite">false</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
     </operation>
@@ -209,22 +209,22 @@
       <configurations>
         <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-flavor">presentation/work</configuration>
-        <configuration key="rewrite">true</configuration>
+        <configuration key="rewrite">false</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
     </operation>
 
-    <!-- encode trim preview as webm video -->
+    <!-- encode preview and editor base file as H.264 -->
     <operation
       id="compose"
       if="${trimHold}"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Encoding presenter (camera) video for videoeditor preview">
+      description="Encoding videos for videoeditor preview">
       <configurations>
         <configuration key="source-flavor">*/work</configuration>
         <configuration key="target-flavor">*/preview</configuration>
-        <configuration key="encoding-profile">webm-preview.http</configuration>
+        <configuration key="encoding-profile">editor.work</configuration>
       </configurations>
     </operation>
 
@@ -276,7 +276,7 @@
       exception-handler-workflow="error"
       description="Waiting for user to review / video edit recording">
       <configurations>
-        <configuration key="source-flavors">*/work</configuration>
+        <configuration key="source-flavors">*/preview</configuration>
         <configuration key="preview-flavors">*/preview</configuration>
         <configuration key="smil-flavors">*/smil</configuration>
         <configuration key="target-smil-flavor">episode/smil</configuration>
