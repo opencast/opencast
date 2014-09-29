@@ -132,6 +132,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'bowser', 'basil'], funct
                Basil.set("overrideBrowser", false);
             } 
             
+            // Check for prefered playback format
+            if (this.get("urlParameters").format != null) {
+               if (this.get("urlParameters").format == "default") {
+                  Basil.set("preferedFormat", null); 
+               }
+               Basil.set("preferedFormat", this.get("urlParameters").format);
+            } 
+            
             if (window.console) {
                 console.log("EngageModel: Player mode: " + this.get("mode"));
             }
