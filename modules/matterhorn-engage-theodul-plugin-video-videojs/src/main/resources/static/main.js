@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
+define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_core"], function(require, $, _, Backbone, Basil, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage VideoJS Videodisplay";
     var PLUGIN_TYPE = "engage_video";
@@ -73,6 +73,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     
     var flavors = "";
     var mimetypes = "";
+
+    var basilOptions = {
+        namespace: 'mhStorage'
+    };
+    Basil = new window.Basil(basilOptions);
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
@@ -187,6 +192,32 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
     function replaceAll(string, find, replace) {
         return string.replace(new RegExp(escapeRegExp(find), "g"), replace);
+    }
+    
+    function preferedFormat() {
+        if (Basil.get("preferedFormat") == null) {
+            return null;
+        }
+        switch (Basil.get("preferedFormat")) {
+            case "hls" : return "application/x-mpegURL" ;
+            case "dash" : return "application/dash+xml" ;    
+            case "rtmp" : return "rtmp/mp4";
+            case "mp4" : return "video/mp4";
+            case "webm" : return "video/webm";
+            case "audio" : return "audio/";
+            default : return null;
+        }
+    }
+    
+    function acceptFormat(track) {
+        if (preferedFormat() == 0 || mimetypes.indexOf(preferedFormat()) == -1) {
+            return true; //prefered format is not available, accept all
+        }
+        if (track.mimetype == preferedFormat()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     var VideoDataView = Backbone.View.extend({
@@ -897,6 +928,16 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                         if (flavors.indexOf(mediaInfo.tracks[i].type) < 0) {
                             flavors += mediaInfo.tracks[i].type + ",";
                         }
+                        
+                        //rtmp is treated different for video.js. Mimetype and 
+                        //url have to be changed                      
+                        if (mediaInfo.tracks[i].mimetype == "video/mp4" &&
+                             (mediaInfo.tracks[i].url.indexOf("rtmp://") > -1 || 
+                             mediaInfo.tracks[i].url.indexOf("RTMP://") > -1)) {                         
+                            mediaInfo.tracks[i].mimetype = "rtmp/mp4";
+                            mediaInfo.tracks[i].url = replaceAll(mediaInfo.tracks[i].url, "mp4:", "&mp4:");
+                        }
+                        
                         if (mimetypes.indexOf(mediaInfo.tracks[i].mimetype) < 0) {
                             mimetypes += mediaInfo.tracks[i].mimetype + ",";
                         }
@@ -923,10 +964,13 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                     // look for video source
                     var duration = 0;
                     if (mediaInfo.tracks) {
-                        $(mediaInfo.tracks).each(function(i, track) {
-                            if (track.mimetype && track.type) {
-                                if (track.mimetype.match(/video/g) || track.mimetype.match(/application/g)) {
+                        $(mediaInfo.tracks).each(function(i, track) {                       
+                            if (track.mimetype && track.type && acceptFormat(track)) {
+                                if (track.mimetype.match(/video/g) || track.mimetype.match(/application/g) || track.mimetype.match(/rtmp/g)) {
                                     hasVideo = true;
+                                    if (track.duration > duration) {
+                                        duration = track.duration;
+                                    }                                    
                                     var resolution = (track.video && track.video.resolution) ? track.video.resolution : "";
                                     // filter for different video sources
                                     videoSources[extractFlavorMainType(track.type)].push({
