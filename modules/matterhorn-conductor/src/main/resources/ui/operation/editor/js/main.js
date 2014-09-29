@@ -66,8 +66,7 @@ function changedCategory() {
 }
 
 function changedSubCategory() {
-    var subject = $('#category option:selected').index() == 0 ? $('#categorySelector option:selected').text() : $(
-        '#category option:selected').text();
+    var subject = $('#category option:selected').index() == 0 ? $('#categorySelector option:selected').text() : $('#category option:selected').text();
     $("#meta-subject").val(subject);
 }
 
@@ -90,305 +89,287 @@ function zeroFill(number, width) {
     return number + ""; // always return a string
 }
 
-$(document).ready(function () {
+$(document).ready(function() {
     addSelectValues('startTimeHour', 0, 23);
     addSelectValues('startTimeMin', 0, 59);
-})
 
-$(document)
-    .ready(
-        function () {
-            var id = postData.id;
-            initCategories();
-            $('#categorySelector').change(function () {
-                changedCategory();
-            });
-            $('#category').change(function () {
-                changedSubCategory();
-            });
-            if (id == "") {
-                return;
+    $("#seriesLabel, #series").hide(); // TODO: Correct series code and comment in
+
+    var id = postData.id;
+    initCategories();
+    $('#categorySelector').change(function() {
+        changedCategory();
+    });
+    $('#category').change(function() {
+        changedSubCategory();
+    });
+    if (id == "") {
+        return;
+    }
+    var recordDate = null;
+    $('#recordDate').datepicker({
+        showOn: 'both',
+        buttonImage: '/admin/img/icons/calendar.gif',
+        buttonImageOnly: true,
+        dateFormat: 'yy-mm-dd'
+    });
+
+    $('.oc-ui-form-field').change(function() {
+        metadataChanged = true;
+    });
+
+    // load tracks
+    var tracks = {};
+    tracks.tracks = [];
+
+    $.ajax({
+        url: WORKFLOW_RESTSERVICE + id + ".json",
+        async: false,
+        success: function(data) {
+            // extract tracks
+            workflowInstance = data.workflow;
+            data = data.workflow.mediapackage.media.track;
+            var singleFile = true;
+            for (i = 0; i < data.length; i++) {
+                if (data[i].type.indexOf("work") != -1) {
+                    tracks.tracks.push(data[i]);
+                } else if (data[i].type.indexOf("preview") != -1) {
+                    previewTracks.push(data[i]);
+                }
             }
-            var recordDate = null;
-            $('#recordDate').datepicker({
-                showOn: 'both',
-                buttonImage: '/admin/img/icons/calendar.gif',
-                buttonImageOnly: true,
-                dateFormat: 'yy-mm-dd'
+
+            // populate series field if information
+            var seriesid = workflowInstance.mediapackage.series;
+            if (seriesid) {
+                $('#ispartof').val(seriesid);
+                $('#series').val(workflowInstance.mediapackage.seriestitle);
+                $('#info-series')[0].innerHTML = workflowInstance.mediapackage.seriestitle;
+            }
+
+            // load metadata from DC xml for editing
+            $.each(ocUtils.ensureArray(workflowInstance.mediapackage.metadata.catalog), function(key, value) {
+                if (value.type == "dublincore/episode") {
+                    catalogUrl = value.url;
+                }
             });
-
-            $('.oc-ui-form-field').change(function () {
-                metadataChanged = true;
-            });
-
-            // load tracks
-            var tracks = {};
-            tracks.tracks = [];
-
             $.ajax({
-                url: WORKFLOW_RESTSERVICE + id + ".json",
-                async: false,
-                success: function (data) {
-
-                    // extract tracks
-                    workflowInstance = data.workflow;
-                    data = data.workflow.mediapackage.media.track;
-                    var singleFile = true;
-                    for (i = 0; i < data.length; i++) {
-                        if (data[i].type.indexOf("work") != -1) {
-                            tracks.tracks.push(data[i]);
-                        } else if (data[i].type.indexOf("preview") != -1) {
-                            previewTracks.push(data[i]);
-                        }
-                    }
-
-                    // populate series field if information
-                    var seriesid = workflowInstance.mediapackage.series;
-                    if (seriesid) {
-                        $('#ispartof').val(seriesid);
-                        $('#series').val(workflowInstance.mediapackage.seriestitle);
-                        $('#info-series')[0].innerHTML = workflowInstance.mediapackage.seriestitle;
-                    }
-
-                    // load metadata from DC xml for editing
-                    $.each(ocUtils.ensureArray(workflowInstance.mediapackage.metadata.catalog), function (key, value) {
-                        if (value.type == "dublincore/episode") {
-                            catalogUrl = value.url;
+                url: catalogUrl,
+                dataType: 'xml',
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    $('div#errorMessage').html('error: ' + textStatus);
+                },
+                success: function(data) {
+                    DCmetadata = data;
+                    $(data.documentElement).children().each(function(index, elm) {
+                        var tagName = elm.tagName.split(/:/)[1];
+                        if ($(elm).text() != '') {
+                            $('#meta-' + tagName).val($(elm).text());
+                            if ($('#info-' + tagName).length > 0)
+                                $('#info-' + tagName)[0].innerHTML = $(elm).text();
+                            if (tagName === "category") {
+                                value = $(elm).text();
+                                $('#categorySelector').val(value.substr(0, 3));
+                                changedCategory();
+                                if (value.length > 3) {
+                                    $('#category').val(value);
+                                    changedSubCategory();
+                                }
+                            }
+                            if (tagName === "created") {
+                                $('#recordDate').datepicker('setDate', new Date($(elm).text()));
+                                $('#startTimeHour').val((new Date($(elm).text())).getHours());
+                                $('#startTimeMin').val((new Date($(elm).text())).getMinutes());
+                            }
                         }
                     });
-                    $.ajax({
-                        url: catalogUrl,
-                        dataType: 'xml',
-                        error: function (XMLHttpRequest, textStatus, errorThrown) {
-                            $('div#errorMessage').html('error: ' + textStatus);
-                        },
-                        success: function (data) {
-                            DCmetadata = data;
-                            $(data.documentElement).children().each(function (index, elm) {
-                                var tagName = elm.tagName.split(/:/)[1];
-                                if ($(elm).text() != '') {
-                                    $('#meta-' + tagName).val($(elm).text());
-                                    if ($('#info-' + tagName).length > 0)
-                                        $('#info-' + tagName)[0].innerHTML = $(elm).text();
-                                    if (tagName === "category") {
-                                        value = $(elm).text();
-                                        $('#categorySelector').val(value.substr(0, 3));
-                                        changedCategory();
-                                        if (value.length > 3) {
-                                            $('#category').val(value);
-                                            changedSubCategory();
-                                        }
-                                    }
-                                    if (tagName === "created") {
-                                        $('#recordDate').datepicker('setDate', new Date($(elm).text()));
-                                        $('#startTimeHour').val((new Date($(elm).text())).getHours());
-                                        $('#startTimeMin').val((new Date($(elm).text())).getMinutes());
-                                    }
+
+                    // save information that
+                    // some metadata changed
+                    $('.dcMetaField').change(function() {
+                        metadataChanged = true;
+                    });
+                    $('.ocMetaField').change(function() {
+                        metadataChanged = true;
+                    });
+                }
+            });
+        }
+    });
+
+    // create player
+    $('#videoPlayer').prepend('<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>');
+    player = $('#videoPlayer').mhPlayer({
+        fps: ((previewTracks[0] && previewTracks[0].video && previewTracks[0].video.framerate) ? previewTracks[0].video.framerate : 0),
+        duration: previewTracks[0].duration / 1000
+    });
+
+    if (previewTracks.length == 2) {
+        var videoSlave = '<video id="videoPlayerSlave"> Your browser does not support HTML5 video.</video>';
+        videoSlave = $(videoSlave).prepend(
+            '<source src="' + previewTracks[1].url + '" type="' + previewTracks[1].mimetype + '"/>')
+        $('#videoPlayer').after(videoSlave);
+        $('#videoPlayer').after('<div id="video_overlay_msg"></div>');
+
+        $('#videoPlayerSlave').show();
+
+        $("#video_overlay_msg").html("Loading videos...").show();
+        $.synchronizeVideos(0, "videoPlayer", "videoPlayerSlave");
+        $(document).on("sjs:buffering", function(event) {
+            // $("#video_overlay_msg").html("The videos are currently buffering...").show(); // TODO: Comment in
+        });
+        $(document).on("sjs:allPlayersReady", function(event) {
+            $("#video_overlay_msg").html("").hide();
+        });
+        $(document).on("sjs:bufferedAndAutoplaying", function(event) {
+            $("#video_overlay_msg").html("").hide();
+        });
+        $(document).on("sjs:bufferedButNotAutoplaying", function(event) {
+            $("#video_overlay_msg").html("").hide();
+        });
+    } else {
+        $('#videoPlayer').css("width", "100%");
+    }
+
+    $('#trackForm').append($('#template').jqote(tracks));
+
+    $('input[id^="chk"]').click(function(event) {
+        if ($("input:checked").length == 0) {
+            $('#trackError').show();
+            $(event.currentTarget).prop("checked", true);
+        } else {
+            $('#trackError').hide();
+        }
+    });
+
+    // create Buttons
+    $('.ui-button').button();
+    // disable continue
+    // $('#continueBtn').button('disable');
+
+    // hide some stuff we don't want to see
+    window.parent.$('#uploadContainer').hide(0);
+    $('#trimming-hint').toggle();
+
+    window.parent.$('#controlsTop').hide(0);
+    window.parent.$('#searchBox').hide(0);
+    window.parent.$('#tableContainer').hide(0);
+    window.parent.ocRecordings.disableRefresh();
+    window.parent.ocRecordings.stopStatisticsUpdate();
+    window.parent.$('#controlsFoot').hide(0);
+
+    $.ajax({
+        url: '/workflow/instance/' + id + '.xml',
+        dataType: 'xml',
+        success: function(data) {
+            // clone mediapackage for editing
+            mediapackage = ocUtils.createDoc('mediapackage', '');
+
+            $.xmlns["mp"] = "http://mediapackage.opencastproject.org";
+
+            $(data).find('mediapackage').clone();
+
+            var clone = $(data).find('mediapackage').clone();
+
+            $(clone).children().appendTo($(mediapackage.documentElement));
+            $(mediapackage.documentElement).attr('id', $(clone).attr('id'));
+            $(mediapackage.documentElement).attr('start', $(clone).attr('start'));
+            $(mediapackage.documentElement).attr('duration', $(clone).attr('duration'));
+        }
+    })
+
+    // save information that some metadata changed
+    $('.dcMetaField').change(function() {
+        metadataChanged = true;
+    });
+    $('.ocMetaField').change(function() {
+        metadataChanged = true;
+    });
+
+    // Event: collapsable title clicked, de-/collapse collapsables
+    $('.collapse-control2').click(function() {
+        $('#ui-icon').toggleClass('ui-icon-triangle-1-e');
+        $('#ui-icon').toggleClass('ui-icon-triangle-1-s');
+        $(this).next('.collapsable').toggle();
+        parent.ocRecordings.adjustHoldActionPanelHeight();
+    });
+
+    // TODO: use JSONP here so we can call services provided by other hosts in a distributed deployment
+    var thisHost = window.location.protocol + '//' + window.location.host;
+    $.ajax({
+        type: 'GET',
+        url: '/services/services.json',
+        data: {
+            serviceType: 'org.opencastproject.series',
+            host: thisHost
+        },
+        dataType: 'json',
+        success: function(data) {
+            if (data.services.service !== undefined) {
+                seriesServiceURL = data.services.service.host + data.services.service.path;
+                $('#series').removeAttr('disabled');
+                ocUtils.log('Initializing autocomplete for series field')
+                $('#series')
+                    .autocomplete({
+                        source: function(request, response) {
+                            $.ajax({
+                                url: seriesServiceURL + '/series.json?q=' + request.term,
+                                dataType: 'json',
+                                type: 'GET',
+                                success: function(data) {
+                                    var series_list = [];
+                                    $.each(data.catalogs, function() {
+                                        series_list.push({
+                                            value: this[DUBLIN_CORE_NS_URI]['title'][0].value,
+                                            id: this[DUBLIN_CORE_NS_URI]['identifier'][0].value
+                                        });
+                                    });
+                                    response(series_list);
+                                },
+                                error: function() {
+                                    ocUtils.log('could not retrieve series_data');
                                 }
                             });
+                        },
+                        select: function(event, ui) {
+                            $('#ispartof').val(ui.item.id);
+                        },
+                        change: function(event, ui) {
+                            if ($('#ispartof').val() === '' && $('#series').val() !== '') {
+                                ocUtils.log("Searching for series in series endpoint");
+                                $
+                                    .ajax({
+                                        url: seriesServiceURL + '/series.json?seriesTitle=' + $('#series').val(),
+                                        type: 'get',
+                                        dataType: 'json',
+                                        success: function(data) {
+                                            var series_input = $('#series').val(),
+                                                series_list = data["catalogs"],
+                                                series_title, series_id;
 
-                            // save information that
-                            // some metadata changed
-                            $('.dcMetaField').change(function () {
-                                metadataChanged = true;
-                            });
-                            $('.ocMetaField').change(function () {
-                                metadataChanged = true;
-                            });
+                                            if (series_list.length !== 0) {
+                                                series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
+                                                series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
+                                                $('#ispartof').val(series_id);
+                                            }
+                                        }
+                                    });
+                            } else if ($('#ispartof').val() === '' && $('#series').val() === '') {
+                                $('#ispartof').val('');
+                            }
+                        },
+                        search: function() {
+                            $('#ispartof').val('');
                         }
                     });
-                }
-            });
-
-            // create player
-            $('#videoPlayer').prepend(
-                '<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>')
-            player = $('#videoPlayer').mhPlayer({
-                fps: previewTracks[0].video.framerate,
-                duration: previewTracks[0].duration / 1000
-            });
-
-            if (previewTracks.length == 2) {
-
-                var videoSlave = '<video id="videoPlayerSlave"> Your browser does not support HTML5 video.</video>';
-                videoSlave = $(videoSlave).prepend(
-                    '<source src="' + previewTracks[1].url + '" type="' + previewTracks[1].mimetype + '"/>')
-                $('#videoPlayer').after(videoSlave);
-                $('#videoPlayer').after('<div id="video_overlay_msg"></div>');
-
-                $('#videoPlayerSlave').show();
-
-                $("#video_overlay_msg").html("Loading videos...").show();
-                $.synchronizeVideos(0, "videoPlayer", "videoPlayerSlave");
-                $(document).on("sjs:buffering", function (event) {
-                    // $("#video_overlay_msg").html("The videos are currently buffering...").show(); // TODO: Comment in
+                $('#series').change(function() {
+                    seriesChanged = true;
                 });
-                $(document).on("sjs:allPlayersReady", function (event) {
-                    $("#video_overlay_msg").html("").hide();
-                });
-                $(document).on("sjs:bufferedAndAutoplaying", function (event) {
-                    $("#video_overlay_msg").html("").hide();
-                });
-                $(document).on("sjs:bufferedButNotAutoplaying", function (event) {
-                    $("#video_overlay_msg").html("").hide();
-                });
-            } else {
-                $('#videoPlayer').css("width", "100%");
             }
+        }
+    });
 
-            $('#trackForm').append($('#template').jqote(tracks));
-
-            $('input[id^="chk"]').click(function (event) {
-                if ($("input:checked").length == 0) {
-                    $('#trackError').show();
-                    $(event.currentTarget).prop("checked", true);
-                } else {
-                    $('#trackError').hide();
-                }
-            });
-
-            // loading tracks ready
-
-            // create Buttons
-            $('.ui-button').button();
-            // disable continue
-            // $('#continueBtn').button('disable');
-
-            // hide some stuff we don't want to see
-            window.parent.$('#uploadContainer').hide(0);
-            $('#trimming-hint').toggle();
-
-            window.parent.$('#controlsTop').hide(0);
-            window.parent.$('#searchBox').hide(0);
-            window.parent.$('#tableContainer').hide(0);
-            window.parent.ocRecordings.disableRefresh();
-            window.parent.ocRecordings.stopStatisticsUpdate();
-            window.parent.$('#controlsFoot').hide(0);
-
-            $.ajax({
-                url: '/workflow/instance/' + id + '.xml',
-                dataType: 'xml',
-                success: function (data) {
-                    // clone mediapackage for editing
-                    mediapackage = ocUtils.createDoc('mediapackage', '');
-
-                    $.xmlns["mp"] = "http://mediapackage.opencastproject.org";
-
-                    $(data).find('mediapackage').clone()
-
-                    var clone = $(data).find('mediapackage').clone();
-
-                    $(clone).children().appendTo($(mediapackage.documentElement));
-                    $(mediapackage.documentElement).attr('id', $(clone).attr('id'));
-                    $(mediapackage.documentElement).attr('start', $(clone).attr('start'));
-                    $(mediapackage.documentElement).attr('duration', $(clone).attr('duration'));
-                }
-            })
-
-            // save information that
-            // some metadata changed
-            $('.dcMetaField').change(function () {
-                metadataChanged = true;
-            });
-            $('.ocMetaField').change(function () {
-                metadataChanged = true;
-            });
-
-            // Event: collapsable title clicked, de-/collapse
-            // collapsables
-            $('.collapse-control2').click(function () {
-                $('#ui-icon').toggleClass('ui-icon-triangle-1-e');
-                $('#ui-icon').toggleClass('ui-icon-triangle-1-s');
-                $(this).next('.collapsable').toggle();
-                parent.ocRecordings.adjustHoldActionPanelHeight();
-            });
-
-            // try to obtain URL of series service endpoint from service
-            // registry
-            // on success enable series input field / init autocomplete
-            // on it
-            // TODO: use JSONP here so we can call services provieded by
-            // other hosts in a distributed deployment
-            var thisHost = window.location.protocol + '//' + window.location.host;
-            $
-                .ajax({
-                    type: 'GET',
-                    url: '/services/services.json',
-                    data: {
-                        serviceType: 'org.opencastproject.series',
-                        host: thisHost
-                    },
-                    dataType: 'json',
-                    success: function (data) { // we are asking for
-                        // a series service
-                        // on the host this
-                        // site comes from
-                        if (data.services.service !== undefined) { // so
-                            seriesServiceURL = data.services.service.host + data.services.service.path;
-                            $('#series').removeAttr('disabled');
-                            ocUtils.log('Initializing autocomplete for series field')
-                            $('#series')
-                                .autocomplete({
-                                    source: function (request, response) {
-                                        $.ajax({
-                                            url: seriesServiceURL + '/series.json?q=' + request.term,
-                                            dataType: 'json',
-                                            type: 'GET',
-                                            success: function (data) {
-                                                var series_list = [];
-                                                $.each(data.catalogs, function () {
-                                                    series_list.push({
-                                                        value: this[DUBLIN_CORE_NS_URI]['title'][0].value,
-                                                        id: this[DUBLIN_CORE_NS_URI]['identifier'][0].value
-                                                    });
-                                                });
-                                                response(series_list);
-                                            },
-                                            error: function () {
-                                                ocUtils.log('could not retrieve series_data');
-                                            }
-                                        });
-                                    },
-                                    select: function (event, ui) {
-                                        $('#ispartof').val(ui.item.id);
-                                    },
-                                    change: function (event, ui) {
-                                        if ($('#ispartof').val() === '' && $('#series').val() !== '') {
-                                            ocUtils.log("Searching for series in series endpoint");
-                                            $
-                                                .ajax({
-                                                    url: seriesServiceURL + '/series.json?seriesTitle=' + $('#series').val(),
-                                                    type: 'get',
-                                                    dataType: 'json',
-                                                    success: function (data) {
-                                                        var series_input = $('#series').val(),
-                                                            series_list = data["catalogs"],
-                                                            series_title, series_id;
-
-                                                        if (series_list.length !== 0) {
-                                                            series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
-                                                            series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
-                                                            $('#ispartof').val(series_id);
-                                                        }
-                                                    }
-                                                });
-                                        } else if ($('#ispartof').val() === '' && $('#series').val() === '') {
-                                            $('#ispartof').val('');
-                                        }
-                                    },
-                                    search: function () {
-                                        $('#ispartof').val('');
-                                    }
-                                });
-                            $('#series').change(function () {
-                                seriesChanged = true;
-                            });
-                        }
-                    }
-                });
-
-            parent.ocRecordings.adjustHoldActionPanelHeight();
-        });
+    parent.ocRecordings.adjustHoldActionPanelHeight();
+});
 
 /**
  * Returns the Input Time in Milliseconds
@@ -497,8 +478,7 @@ function in_de_creaseObject(obj, val) {
 }
 
 /**
- * calculates the new length of the media and shows the result in the according
- * field
+ * calculates the new length of the media and shows the result in the according field
  */
 function calculateNewLength() {
     inPoint = getTimeInMilliseconds($('#inPoint').val());
@@ -561,11 +541,11 @@ function continueWorkflowHelper() {
                 $.ajax({
                     url: seriesCatalogUrl,
                     type: 'delete',
-                    error: function () {
-                        ocUtils.log('Failed to removed Series DC XML');
+                    error: function() {
+                        ocUtils.log('Failed to removed series');
                     },
-                    success: function () {
-                        ocUtils.log('Removed Series DC XML');
+                    success: function() {
+                        ocUtils.log('Removed series');
                     }
                 });
                 $seriesCatalogRef.remove();
@@ -575,7 +555,7 @@ function continueWorkflowHelper() {
             var seriesDcXml = '';
             if ($('#ispartof').val() == '') {
                 // create series
-                ocUtils.log('Creating Series ' + $('#series').val());
+                ocUtils.log('Creating series ' + $('#series').val());
                 seriesXml = '<series><additionalMetadata><metadata><key>title</key><value>' + $('#series').val() + '</value></metadata></additionalMetadata></series>';
                 $.ajax({
                     async: false,
@@ -585,7 +565,7 @@ function continueWorkflowHelper() {
                         series: seriesXml
                     },
                     dataType: 'json',
-                    success: function (data) {
+                    success: function(data) {
                         $('#ispartof').val(data.series.id);
                     }
                 });
@@ -593,51 +573,52 @@ function continueWorkflowHelper() {
             // get seriesDcXml
             ocUtils.log('Getting DC catalog for series ' + $('#ispartof').val());
             $.ajax({
-                url: seriesServiceURL + '/' + $('#ispartof').val() + '.xml',
-                type: 'get',
                 async: false,
+                url: seriesServiceURL + '/' + $('#ispartof').val() + '.xml',
+                type: 'GET',
                 dataType: 'xml',
-                error: function () {
+                error: function() {
                     ocUtils.log('Could not retrieve series DC catalog for series ' + $('#ispartof').val());
                 },
-                success: function (data) {
+                success: function(data) {
                     seriesDcXml = ocUtils.xmlToString(data);
-                }
-            });
 
-            // find series dc ref in mediapackage
-            var seriesDcElm = $(mediapackage.documentElement).find("metadata > catalog[type='dublincore/series']");
-            var seriesDcFileId = ''; // MediaPackageElementId of series DC catalog
-            if (seriesDcElm.length == 0) {
-                var seriesDcElm = $('<catalog></catalog>', mediapackage.documentElement).attr('id', DEFAULT_SERIES_CATALOG_ID)
-                    .attr('type', 'dublincore/series');
-                $('<mimetype></mimetype>', mediapackage.documentElement).text('text/xml').appendTo(seriesDcElm);
-                $('<url></url>', mediapackage.documentElement).appendTo(seriesDcElm);
-                $(mediapackage.documentElement).find('metadata').append(seriesDcElm);
-            }
-            // upload series dc xml
-            seriesDcFileId = seriesDcElm.attr('id');
-            var mediapackageId = $(mediapackage.documentElement).attr('id');
-            var url = '/files/mediapackage/' + mediapackageId + '/' + seriesDcFileId + '/dublincore.xml';
-            ocUtils.log('Saving Series DC Catalog to ' + url);
-            $.ajax({
-                url: url,
-                type: 'post',
-                async: false,
-                data: {
-                    content: seriesDcXml
-                },
-                error: function () {
-                    ocUtils.log('Failed to save DC metadata to ' + url);
-                },
-                success: function (data) {
-                    ocUtils.log('Save DC metadata to ' + url);
-                    seriesDcElm.find('url').text(data);
+                    // find series dc ref in mediapackage
+                    var seriesDcElm = $(mediapackage.documentElement).find("metadata > catalog[type='dublincore/series']");
+                    var seriesDcFileId = ''; // MediaPackageElementId of series DC catalog
+                    if (seriesDcElm.length == 0) {
+                        var seriesDcElm = $('<catalog></catalog>', mediapackage.documentElement).attr('id', DEFAULT_SERIES_CATALOG_ID).attr('type', 'dublincore/series');
+                        $('<mimetype></mimetype>', mediapackage.documentElement).text('text/xml').appendTo(seriesDcElm);
+                        $('<url></url>', mediapackage.documentElement).appendTo(seriesDcElm);
+                        $(mediapackage.documentElement).find('metadata').append(seriesDcElm);
+                    }
+                    // upload series dc xml
+                    seriesDcFileId = seriesDcElm.attr('id');
+                    var mediapackageId = $(mediapackage.documentElement).attr('id');
+                    var url = '/files/mediapackage/' + mediapackageId + '/' + seriesDcFileId + '/dublincore.xml';
+                    ocUtils.log('Saving Series DC Catalog to ' + url);
+                    $.ajax({
+                        async: false,
+                        url: "/ingest/addCatalog",
+                        type: "POST",
+                        data: {
+                            url: seriesServiceURL + '/' + $('#ispartof').val() + '.xml',
+                            flavor: "dublincore/series",
+                            mediaPackage: seriesDcXml
+                        },
+                        error: function() {
+                            ocUtils.log('Failed to save DC metadata to ' + url);
+                        },
+                        success: function(data) {
+                            ocUtils.log('Save DC metadata to ' + url);
+                            seriesDcElm.find('url').text(data);
+                            // finally update series in mediapackage instance
+                            updateMPElement('seriestitle', $('#series').val());
+                            updateMPElement('series', $('#ispartof').val());
+                        }
+                    });
                 }
             });
-            // finally update series in mediapackage instance
-            updateMPElement('seriestitle', $('#series').val());
-            updateMPElement('series', $('#ispartof').val());
         }
     }
 
@@ -645,7 +626,7 @@ function continueWorkflowHelper() {
     if (metadataChanged || seriesChanged || trackChanged) {
         var mp = ocUtils.xmlToString(mediapackage);
         mp = mp.replace(/ xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/g, ''); // no luck with $(element).removeAttr('xmlns');
-        $.each($('input:checkbox:not(:checked)'), function (key, value) {
+        $.each($('input:checkbox:not(:checked)'), function(key, value) {
             var trackId = $(value).prop("id");
             trackId = trackId.split('/')[1];
             mp = ocMediapackage.removeTrack(mp, trackId);
@@ -671,7 +652,7 @@ function updateDCMetadata() {
     ocUtils.log("Updating DC metadata");
 
     $('.dcMetaField').each(
-        function () {
+        function() {
             var $field = $(this);
             var fieldname = $field.attr('name');
             if (fieldname === 'created') {
@@ -685,7 +666,7 @@ function updateDCMetadata() {
             }
             if ($field.val() != '') {
                 var $dcelm = false; // $(DCmetadata.documentElement).find('dcterms\\:' + $field.attr('name'));
-                $(DCmetadata.documentElement).children().each(function (index, elm) {
+                $(DCmetadata.documentElement).children().each(function(index, elm) {
                     if (elm.tagName == 'dcterms:' + fieldname) {
                         $dcelm = $(elm);
                     }
@@ -739,7 +720,7 @@ function createSeriesFromText() {
             series: dcDoc,
             acl: acl
         },
-        success: function (data) {
+        success: function(data) {
             id = data.getElementsByTagName('dcterms:identifier')[0].textContent;
             $('#ispartof').val(id);
         }
@@ -776,7 +757,7 @@ function updateMetadataGroupField(DCname, MPgroupname, MPname) {
             $parent = $('<' + MPgroupname + '/>');
             $(mediapackage.documentElement).append($parent);
         }
-        $dcelms.each(function () {
+        $dcelms.each(function() {
             $('<' + MPname + '/>').text($(this).text()).appendTo($parent);
         });
     }
@@ -790,10 +771,10 @@ function saveDCMetadata() {
         data: {
             content: ocUtils.xmlToString(DCmetadata)
         },
-        error: function () {
+        error: function() {
             ocUtils.log('Failed to save DC metadata to ' + catalogUrl);
         },
-        success: function () {
+        success: function() {
             ocUtils.log('Save DC metadata to ' + catalogUrl);
         }
     });

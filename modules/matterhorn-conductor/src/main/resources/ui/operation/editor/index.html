@@ -207,13 +207,13 @@
     </div>
     <div class="clear"></div>
     <div id="editorMetaData">
-      <div class="form-box layout-centered ui-widget oc-ui-collapsible-widget" style="width: 680px;">
+      <div id="editorMetaData_editMetadata" class="form-box layout-centered ui-widget oc-ui-collapsible-widget" style="width: 680px;">
 	<div class="form-box-head ui-widget-header ui-corner-top oc-ui-cursor collapse-control2">
           <div id="additional_icon" class="ui-icon ui-icon-triangle-1-e"></div>
           <div id="i18n_additional">Edit Metadata of this Recording</div>
           <div class="clear"></div>
       </div>
-	<div class="form-box-content ui-widget-content ui-corner-bottom collapsable">
+	<div id="editorMetaData_selectTracks" class="form-box-content ui-widget-content ui-corner-bottom collapsable">
           <form action="">
             <ul class="oc-ui-form-list">
               <li><label class="scheduler-label" for="title" id="titleLabel" style="width: 15%;">
@@ -260,13 +260,17 @@
 						style="width: 15%;">
                   <span id="i18n_sub_category">Category</span>:
 		</label> <input type="text" class="oc-ui-form-field dcMetaField" name="subject" id="meta-subject" maxlength="255" /></li>
-              <li class="additionMeta"><label class="scheduler-label" for="categorySelector"
-					      id="categorySelectorLabel" style="width: 15%;">
+              <li class="additionalMeta">
+		<label class="scheduler-label" for="categorySelector" id="categorySelectorLabel" style="width: 15%;">
                   <span id="i18n_sub_label">Subject</span>:
-		</label> <select name="categorySelector" id="categorySelector" class="oc-ui-form-field"></select> <label
-														     class="scheduler-label" for="category" id="categoryLabel" style="width: 15%;">
+		</label> <select name="categorySelector" id="categorySelector" class="oc-ui-form-field"></select>
+	      </li>
+              <li class="additionalMeta">
+		<label class="scheduler-label" for="category" id="categoryLabel" style="width: 15%;">
                   <span id="i18n_cat_label"></span>
-		</label> <select name="category" id="category" class="oc-ui-form-field ocMetaField"></select></li>
+		</label>
+		<select name="category" id="category" class="oc-ui-form-field ocMetaField"></select>
+	      </li>
               <li class="additionalMeta"><label class="scheduler-label" for="language" id="languageLabel"
 						style="width: 15%;">
                   <span id="i18n_lang_label">Language</span>:
