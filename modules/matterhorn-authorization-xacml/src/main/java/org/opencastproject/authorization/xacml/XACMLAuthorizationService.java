@@ -54,6 +54,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
@@ -447,7 +448,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /** Load an ACL from the given URI. */
   private Option<AccessControlList> loadAcl(final URI uri) {
-    File file = fromWorkspace(uri);
+    final File file = fromWorkspace(uri);
     if (file == null)
       return none();
 
@@ -457,7 +458,8 @@ public class XACMLAuthorizationService implements AuthorizationService {
         try {
           return XACMLUtils.parseXacml(in);
         } catch (JAXBException e) {
-          throw new Error("Unable to unmarshall XACML document: " + e);
+          FileUtils.deleteQuietly(file);
+          throw new Error("Unable to unmarshall XACML document from " + file + ":" + e);
         }
       }
     });
