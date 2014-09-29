@@ -135,7 +135,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
     }
     Collection<Track> sourceTracks = trackSelector.select(mediaPackage, false);
     if (sourceTracks.isEmpty()) {
-      logger.warn("No tracks found in mediapackage {} with specified {} {}", new String[] {
+      logger.info("No tracks found in mediapackage {} with specified {} {}", new String[] {
               mediaPackage.getIdentifier().compact(),
               SOURCE_FLAVOR_PROPERTY,
               sourceFlavorProperty});
