@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="SilenceDetectionWorkflowOperationHandler" immediate="true"
+ name="org.opencastproject.workflow.handler.SilenceDetectionWorkflowOperationHandler" immediate="true"
   activate="activate" deactivate="deactivate">
   <implementation class="org.opencastproject.workflow.handler.SilenceDetectionWorkflowOperationHandler" />
   <property name="service.description" value="Silence Detection Workflow Operation Handler" />
