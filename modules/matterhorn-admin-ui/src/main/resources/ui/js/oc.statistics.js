@@ -34,6 +34,7 @@ ocStatistics = new (function() {
     	self.refreshInterval = window.setInterval(refresh, delay * 1000);
     }
   }
+  
 
   /**
    * The labels for the UI.  TODO: i18n
@@ -50,6 +51,9 @@ ocStatistics = new (function() {
     "org_opencastproject_sox"                    : "SoX (sound processing)",
     "org_opencastproject_nop"                    : "No Operation Service (Testing)",
     "org_opencastproject_publication_youtube"    : "Media publication (YouTube)",
+    "org_opencastproject_smil"                   : "SMIL service",
+    "org_opencastproject_videoeditor"            : "Video editor",
+    "org_opencastproject_silencedetection"       : "Silence detection",
     "org_opencastproject_gstreamer"              : "GStreamer Launch Service",
     "org_opencastproject_inspection"             : "Media inspection",
     "org_opencastproject_workflow"               : "Workflow",
