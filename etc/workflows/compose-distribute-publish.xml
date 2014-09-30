@@ -217,7 +217,7 @@
     <!-- encode preview and editor base file as H.264 -->
     <operation
       id="compose"
-      if="${trimHold}"
+<!--      if="${trimHold}" -->
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Encoding videos for videoeditor preview">
