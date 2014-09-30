@@ -148,7 +148,8 @@ public class DictionaryServiceImpl implements DictionaryService {
     bufr.close();
 
     if (p.waitFor() != 0) {
-      throw new IllegalStateException();
+      logger.error("Hunspell reported an error (Missing dictionaries?)");
+      throw new IllegalStateException("Hunspell returned error code");
     }
 
     return words;
