@@ -8,14 +8,14 @@ FUNCTIONS="functions.sh"
 
 #The version the POMs are in the release branch.
 #E.g. BRANCH_VER=1.3-SNAPSHOT
-BRANCH_VER=1.6.0-SNAPSHOT
+BRANCH_VER=
 
 #The new version of our release as it will show up in the tags
 #E.g. RELEASE_VER=1.3-rc5
-RELEASE_VER=1.3.0-beta1
+RELEASE_VER=
 
 #The jira ticket this work is being done under (must be open)
-JIRA_TICKET=MH-10473
+JIRA_TICKET=
 
 #=======You should not need to modify anything below this line=================
 
