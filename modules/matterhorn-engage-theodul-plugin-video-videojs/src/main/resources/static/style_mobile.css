@@ -1,23 +1,36 @@
 /*theodul video videojs plugin, mobile mode styles*/
-.videoDisplay {
-	padding-bottom: 2%;
+#content-box {
+	padding-top: 2%
 }
-
-.videojs_wrapper {
-	height: inherit;
-}
-
 #engage_content {
 	margin-left: auto;
 	margin-right: auto;
 }
-
+#engage_video {
+	height: inherit;
+}
+.mobile_wrapper {
+	height: inherit;
+}
+.videoDisplay {
+	padding-bottom: 2%;
+	width: 100%;
+	height: 100%;
+}
 .videoDisplay:nth-child(even) {
 	float: right;
 }
-
 .videoDisplay:nth-child(odd) {
 	float: left;
 	padding-right: 2%;
+}
+.mobile_video_display {
+	height: 100%;
+}
+
+/* Styles for Sidebar */
+#video-displays {
+	height: inherit;
+	width: inherit;
 }
 
