@@ -134,7 +134,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     /* Get output of hunspell */
     String line;
-    bufr = new BufferedReader(new InputStreamReader(stdout));
+    bufr = new BufferedReader(new InputStreamReader(stdout, "UTF-8"));
     while ((line = bufr.readLine()) != null) {
       words.add(line);
     }
