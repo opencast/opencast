@@ -98,7 +98,7 @@ public class DictionaryServiceImplTest {
   public void testSpecialCharacters() throws Exception {
     if (hunspellDeuDictAvailable) {
       DictionaryServiceImpl service = new DictionaryServiceImpl();
-      service.setCommand("-d de_DE -G");
+      service.setCommand("-i utf-8 -d de_DE -G");
       String in  = "Ich hab' hier bloß ein Amt und keine Meinung.";
       String out = "Ich hab hier bloß ein Amt und keine Meinung.";
       Assert.assertEquals(out, service.cleanUpText(in).getText());
