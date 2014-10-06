@@ -42,8 +42,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @Entity(name = "UserSummary")
 @Table(name = "mh_user_action")
-@NamedQueries({ 
- @NamedQuery(name = "userSummaryByMediapackageByType", query = "SELECT a.userId, COUNT(distinct a.sessionId), COUNT(distinct a.mediapackageId), SUM(a.length), MAX(a.created) FROM UserAction a WHERE a.type = :type AND a.mediapackageId = :mediapackageId GROUP BY a.userId") })
+@NamedQueries({ @NamedQuery(name = "userSummaryByMediapackageByType", query = "SELECT a.userId, COUNT(distinct a.sessionId), COUNT(distinct a.mediapackageId), SUM(a.length), MAX(a.created) FROM UserAction a WHERE a.type = :type AND a.mediapackageId = :mediapackageId GROUP BY a.userId") })
 @XmlType(name = "summary", namespace = "http://usertracking.opencastproject.org")
 @XmlRootElement(name = "summary", namespace = "http://usertracking.opencastproject.org")
 @XmlAccessorType(XmlAccessType.NONE)
@@ -52,31 +51,31 @@ public class UserSummaryImpl implements UserSummary {
   @Column(name = "user_id", length = 65535)
   @XmlElement(name = "userId")
   private String userId = "Empty UserId";
-  
+
   @Column(name = "session")
   @XmlElement(name = "sessionCount")
   private long sessionCount = 0;
-  
+
   @Column(name = "mediapackage", length = 128)
   @XmlElement(name = "uniqueMediapackages")
   private long uniqueMediapackages = 0;
-  
+
   @Column(name = "length")
   @XmlElement(name = "length")
   private long length = 0;
-  
+
   @Basic(optional = false)
   @Column(name = "created")
   @Temporal(TemporalType.TIMESTAMP)
   @XmlElement(name = "last")
   private Date last = new Date();
 
-//The logger
- private Logger logger = LoggerFactory.getLogger(UserSummaryImpl.class);
-  
+  // The logger
+  private Logger logger = LoggerFactory.getLogger(UserSummaryImpl.class);
+
   public UserSummaryImpl() {
   }
-  
+
   public String getUserId() {
     return userId;
   }
@@ -125,7 +124,7 @@ public class UserSummaryImpl implements UserSummary {
       this.setLast(other.getLast());
     }
   }
-  
+
   public void ingest(Object[] properties) {
     if (properties.length != 5) {
       return;

@@ -83,10 +83,10 @@ public class UserTrackingServiceImplTest {
 
     service.updated(null);
     Assert.assertFalse(service.getUserTrackingEnabled());
-    
+
     service.updated(props);
     Assert.assertFalse(service.getUserTrackingEnabled());
-    
+
     props.setProperty("org.opencastproject.usertracking.detailedtrack", "true");
     service.updated(props);
     Assert.assertTrue(service.getUserTrackingEnabled());
@@ -106,7 +106,7 @@ public class UserTrackingServiceImplTest {
     verifyFootprintViewsAndPositions(list, 0, 0, 0);
     list = getFootprintList("mp", "me", 1);
     verifyFootprintViewsAndPositions(list, 0, 0, 0);
-    
+
     //Create the initial viewer/user event
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 10, 20);
 
@@ -151,7 +151,7 @@ public class UserTrackingServiceImplTest {
 
     //Update the first viewer/user event
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 20, 30);
-    
+
     //Sanity checks
     Assert.assertEquals(2, service.getViews("mp"));
     Assert.assertEquals(0, service.getViews("other"));
@@ -752,7 +752,7 @@ public class UserTrackingServiceImplTest {
   private void testUserActionsByDayWithFormat(Date yesterdayD, Date todayD, Date tomorrowD, String format) throws Exception {
     DateFormat df = new SimpleDateFormat(format);
     String today = df.format(todayD);
-    
+
     //Create an event that happens tomorrow, and check to make sure it does not appear in the stats for today
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 0, 10, tomorrowD);
     Assert.assertEquals(1, service.getViews("mp"));
@@ -1328,7 +1328,7 @@ public class UserTrackingServiceImplTest {
       userAction = service.addUserTrackingEvent(userAction);
     }
     Long id = userAction.getId();
-    
+
     // Ensure that, once persisted, the user action has an ID
     Assert.assertNotNull(id);
 

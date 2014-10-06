@@ -56,7 +56,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * Sets the JPA persistence provider
-   * 
+   *
    * @param persistenceProvider
    *          the JPA PersistenceProvider
    */
@@ -66,7 +66,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * Sets the persistence properties used to customize the entity manager factory
-   * 
+   *
    * @param persistenceProperties
    *          the persistenceProperties to set
    */
@@ -86,7 +86,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * Gets a word in a particular language, or null if it doesn't exist in that language.
-   * 
+   *
    * @param text
    *          The text of the word
    * @param language
@@ -115,7 +115,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#addWord(java.lang.String, java.lang.String)
    */
   @Override
@@ -145,7 +145,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#addWord(java.lang.String, java.lang.String,
    *      java.lang.Integer)
    */
@@ -180,7 +180,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#addWord(java.lang.String, java.lang.String,
    *      java.lang.Integer, java.lang.Double)
    */
@@ -217,7 +217,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#cleanText(java.lang.String[], java.lang.String)
    */
   @Override
@@ -238,7 +238,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#clear(java.lang.String)
    */
   @Override
@@ -265,7 +265,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * Gets words for a particular string.
-   * 
+   *
    * @param text
    *          The text of the word
    * @return The words from all languages
@@ -287,7 +287,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#detectLanguage(java.lang.String[])
    */
   @Override
@@ -344,7 +344,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#getLanguages()
    */
   @SuppressWarnings("unchecked")
@@ -363,7 +363,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#getLanguages(java.lang.String)
    */
   @SuppressWarnings("unchecked")
@@ -384,7 +384,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#getWordCount(java.lang.String, java.lang.String)
    */
   @Override
@@ -399,7 +399,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#getWordWeight(java.lang.String, java.lang.String)
    */
   @Override
@@ -414,7 +414,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#isStopWord(java.lang.String)
    */
   @Override
@@ -429,7 +429,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#isStopWord(java.lang.String, java.lang.String)
    */
   @Override
@@ -444,7 +444,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#isWord(java.lang.String)
    */
   @Override
@@ -454,7 +454,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#isWord(java.lang.String, java.lang.String)
    */
   @Override
@@ -464,7 +464,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#markStopWord(java.lang.String, java.lang.String)
    */
   @Override
@@ -495,7 +495,7 @@ public class DictionaryServiceJpaImpl implements DictionaryService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.dictionary.api.DictionaryService#parseStopWords(java.lang.Double, java.lang.String)
    */
   @Override

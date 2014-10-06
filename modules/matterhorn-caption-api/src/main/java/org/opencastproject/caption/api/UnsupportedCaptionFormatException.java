@@ -19,7 +19,7 @@ package org.opencastproject.caption.api;
  * Indicates that a caption format is not supported.
  */
 public class UnsupportedCaptionFormatException extends Exception {
-  
+
   private static final long serialVersionUID = -5523486854693037639L;
 
   public UnsupportedCaptionFormatException(String format) {

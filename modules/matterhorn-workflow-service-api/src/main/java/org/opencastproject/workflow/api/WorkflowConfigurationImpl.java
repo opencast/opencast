@@ -61,7 +61,7 @@ public class WorkflowConfigurationImpl implements WorkflowConfiguration, Compara
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -74,7 +74,7 @@ public class WorkflowConfigurationImpl implements WorkflowConfiguration, Compara
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -96,7 +96,7 @@ public class WorkflowConfigurationImpl implements WorkflowConfiguration, Compara
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -106,7 +106,7 @@ public class WorkflowConfigurationImpl implements WorkflowConfiguration, Compara
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   @Override

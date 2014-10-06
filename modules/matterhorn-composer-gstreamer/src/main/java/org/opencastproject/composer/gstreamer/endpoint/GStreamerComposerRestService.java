@@ -72,7 +72,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * A REST endpoint delegating functionality to the {@link ComposerService}
  */
 @Path("/")
-@RestService(name = "gstreamercomposer", title = "GStreamer Composer", 
+@RestService(name = "gstreamercomposer", title = "GStreamer Composer",
   abstractText = "This service creates and augments Matterhorn media packages that include media tracks, metadata "
                + "catalogs and attachments.",
   notes = {
@@ -101,7 +101,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -111,7 +111,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the composer service
-   * 
+   *
    * @param composerService
    *          the composer service
    */
@@ -121,7 +121,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
@@ -135,7 +135,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Encodes a track.
-   * 
+   *
    * @param sourceTrack
    *          The source track
    * @param profileId
@@ -171,7 +171,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Trims a track to a new length.
-   * 
+   *
    * @param sourceTrack
    *          The source track
    * @param profileId
@@ -226,7 +226,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Encodes a track.
-   * 
+   *
    * @param audioSourceTrack
    *          The audio source track
    * @param videoSourceTrack
@@ -273,7 +273,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Encodes a track in a media package.
-   * 
+   *
    * @param sourceTrackXml
    *          The source track
    * @param profileId
@@ -323,7 +323,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Embeds captions in media file.
-   * 
+   *
    * @param sourceTrackXml
    *          media file to which captions will be embedded
    * @param captionsXml
@@ -395,11 +395,11 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
     return Response.ok(profile).build();
   }
 
- 
+
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -412,7 +412,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Converts string representation of the one or more catalogs to object array
-   * 
+   *
    * @param elementsAsXml
    *          the serialized elements array representation
    * @return
@@ -444,7 +444,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Parses string containing times in seconds separated by comma.
-   * 
+   *
    * @param times
    *          string to be parsed
    * @return array of times in seconds
@@ -505,7 +505,7 @@ public class GStreamerComposerRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

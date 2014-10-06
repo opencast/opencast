@@ -38,8 +38,8 @@ public class ComposerResources {
   public static HttpResponse profiles(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "profiles"));
   }
-  
-  public static HttpResponse encode(TrustedHttpClient client, String mediapackage, 
+
+  public static HttpResponse encode(TrustedHttpClient client, String mediapackage,
       String audioSourceTrackId, String videoSourceTrackId, String profileId) throws Exception {
     HttpPost post = new HttpPost(getServiceUrl() + "encode");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -50,12 +50,12 @@ public class ComposerResources {
     post.setEntity(new UrlEncodedFormEntity(params));
     return client.execute(post);
   }
-  
+
   public static HttpResponse receipt(TrustedHttpClient client, String id) {
     return client.execute(new HttpGet(getServiceUrl() + "receipt" + id));
   }
-  
-  public static HttpResponse image(TrustedHttpClient client, String mediapackage, 
+
+  public static HttpResponse image(TrustedHttpClient client, String mediapackage,
       String time, String sourceTrackId, String profileId) throws Exception {
     HttpPost post = new HttpPost(getServiceUrl() + "encode");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();

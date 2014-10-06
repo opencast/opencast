@@ -52,7 +52,7 @@ public final class IdBuilderFactory {
 
   /**
    * Returns an instance of a HandleBuilderFactory.
-   * 
+   *
    * @return the id builder factory
    * @throws ConfigurationException
    *           if the factory cannot be instantiated
@@ -70,7 +70,7 @@ public final class IdBuilderFactory {
    * <li>Implementation specified using the <code>opencast.idbuilder</code> system property</li>
    * <li>Platform default implementation</li>
    * </ul>
-   * 
+   *
    * @return the id builder
    * @throws ConfigurationException
    *           If the builder cannot be instantiated

@@ -31,7 +31,7 @@ public interface EncoderEngine {
 
   /**
    * Removes an encoder listener from this engine.
-   * 
+   *
    * @param listener
    *          the encoder listener
    */
@@ -39,7 +39,7 @@ public interface EncoderEngine {
 
   /**
    * Adds an encoder listener to this engine.
-   * 
+   *
    * @param listener
    *          the encoder listener
    */
@@ -47,13 +47,13 @@ public interface EncoderEngine {
 
   /**
    * Encodes a file into the specified format.
-   * 
+   *
    * @param mediaSource
    *          the media file to use in encoding
    * @param format
    *          the media format definition
-   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass
-   *   encodings where the first run does not actually create a media file
+   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass encodings
+   *         where the first run does not actually create a media file
    *
    * @throws EncoderException
    *           if an error occurs during encoding
@@ -62,7 +62,7 @@ public interface EncoderEngine {
 
   /**
    * Encodes a file into the specified format.
-   * 
+   *
    * @param audioSource
    *          the audio file to use in encoding
    * @param videoSource
@@ -71,9 +71,9 @@ public interface EncoderEngine {
    *          the media format definition
    * @param properties
    *          the encoder properties
-   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass
-   *   encodings where the first run does not actually create a media file
-   * 
+   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass encodings
+   *         where the first run does not actually create a media file
+   *
    * @throws EncoderException
    *           if an error occurs during encoding
    */
@@ -82,7 +82,7 @@ public interface EncoderEngine {
 
   /**
    * Encodes a file into the specified format.
-   * 
+   *
    * @param mediaSource
    *          the media file to use in encoding
    * @param format
@@ -91,9 +91,9 @@ public interface EncoderEngine {
    *          the new start time in miliseconds
    * @param duration
    *          the new duration in miliseconds
-   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass
-   *   encodings where the first run does not actually create a media file
-   * 
+   * @return the encoded file or none if there is no resulting file. This may be the case when doing two pass encodings
+   *         where the first run does not actually create a media file
+   *
    * @throws EncoderException
    *           if an error occurs during encoding
    */
@@ -102,7 +102,7 @@ public interface EncoderEngine {
 
   /**
    * Extracts one or more image from video stream.
-   * 
+   *
    * @param mediaSource
    *          video stream used for extraction
    * @param format
@@ -113,7 +113,7 @@ public interface EncoderEngine {
    * @throws EncoderException
    *           if extraction fails
    */
-  List<File> extract(File mediaSource, EncodingProfile format, Map<String, String> properties, long... times)
+  List<File> extract(File mediaSource, EncodingProfile format, Map<String, String> properties, double... times)
           throws EncoderException;
 
   /**
@@ -122,7 +122,7 @@ public interface EncoderEngine {
    * If this is the case, the local node will suspend the current job once the work has been submitted to the engine and
    * thereby allow other jobs to submit work as well.
    * </p>
-   * 
+   *
    * @return <code>true</code> if the engine supports multiple jobs at once
    */
   boolean supportsMultithreading();
@@ -130,12 +130,12 @@ public interface EncoderEngine {
   /**
    * Returns <code>true</code> if the encoder engine supports encoding a track of the given type to the specified
    * profile.
-   * 
+   *
    * @param profile
    *          name of the encoding profile, e. g. <code>flash.http</code>
    * @param type
    *          track type
-   * 
+   *
    * @return <code>true</code> if the engine supports the profile for the given track
    */
   boolean supportsProfile(String profile, MediaType type);
@@ -145,7 +145,7 @@ public interface EncoderEngine {
    * <p>
    * Some encoders, such as the Telestream Episode Engine, will not work reliably off a network volume, so although some
    * time will be lost with copying, it is better to do the encoding off a local hard disk.
-   * 
+   *
    * @return <code>true</code> if the encoder needs a local copy
    */
   boolean needsLocalWorkCopy();

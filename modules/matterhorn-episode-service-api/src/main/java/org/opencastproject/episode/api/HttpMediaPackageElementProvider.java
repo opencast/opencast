@@ -18,7 +18,7 @@ package org.opencastproject.episode.api;
 /**
  * A HttpMediaPackageElementProvider is an instance that is able to deliver archived media package elements via HTTP and
  * therefore provides a means to rewrite element URIs to point to itself.
- * 
+ *
  * @see EpisodeService#applyWorkflow(org.opencastproject.workflow.api.ConfiguredWorkflow, UriRewriter, EpisodeQuery)
  * @see EpisodeService#applyWorkflow(org.opencastproject.workflow.api.ConfiguredWorkflow, UriRewriter, java.util.List)
  */

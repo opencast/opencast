@@ -40,7 +40,7 @@ public class V4L2Producer extends VideoProducer {
 
   /**
    * V4L2Producer captures from a generic V4L2 src such as a webcam.
-   * 
+   *
    * @param captureDevice
    *          The details of the capture device such as location, bitrate, container etc.
    * @param propeties
@@ -65,7 +65,7 @@ public class V4L2Producer extends VideoProducer {
 
   /**
    * Creates the v4l2src.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           Thrown if the necessary module for v4l2src is not installed or the platform doesn't support v4l2.
    **/
@@ -78,7 +78,7 @@ public class V4L2Producer extends VideoProducer {
 
   /**
    * Set the device location of the v4l2src
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If the v4l2src is null then this Exception is thrown
    * @throws IllegalArgumentException

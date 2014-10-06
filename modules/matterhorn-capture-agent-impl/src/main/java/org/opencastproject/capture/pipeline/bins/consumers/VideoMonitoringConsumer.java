@@ -44,7 +44,7 @@ public class VideoMonitoringConsumer extends ConsumerBin {
   private Element capsfilter;
   private Element jpegenc;
   private Element multifilesink;
-  
+
   private File location;
 
   /**
@@ -194,14 +194,14 @@ public class VideoMonitoringConsumer extends ConsumerBin {
       throw new UnableToLinkGStreamerElementsException(captureDevice, jpegenc, multifilesink);
     }
   }
-  
+
   /**
    * Set monitoring video location on MonitoringListener.
    * @param monitoringListener monitoring listener
    */
   public void registerVideoLocation(MonitoringListener monitoringListener) {
     if (monitoringListener != null)
-      monitoringListener.setMonitoringVideoLocation(captureDevice.getFriendlyName(), 
+      monitoringListener.setMonitoringVideoLocation(captureDevice.getFriendlyName(),
             location.getAbsolutePath());
   }
 }

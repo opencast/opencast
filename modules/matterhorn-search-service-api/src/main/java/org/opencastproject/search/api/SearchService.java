@@ -53,7 +53,7 @@ public interface SearchService {
 
   /**
    * Adds the media package to the search index.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @throws SearchException
@@ -70,7 +70,7 @@ public interface SearchService {
 
   /**
    * Removes the media package identified by <code>mediaPackageId</code> from the search index.
-   * 
+   *
    * @param mediaPackageId
    *          id of the media package to remove
    * @return <code>true</code> if the episode was found and deleted
@@ -83,7 +83,7 @@ public interface SearchService {
 
   /**
    * Find search results based on the specified query object
-   * 
+   *
    * @param q
    *          The {@link SearchQuery} containing the details of the desired results
    * @return The search result
@@ -95,7 +95,7 @@ public interface SearchService {
   /**
    * Finds search results across any organization, protected by any access control. This should be used for
    * administrative purposes, such as bulk edits based on metadata updates.
-   * 
+   *
    * @param q
    *          The {@link SearchQuery} containing the details of the desired results
    * @return The search result
@@ -109,7 +109,7 @@ public interface SearchService {
   /**
    * Sends a query to the search service. Depending on the service implementation, the query might be an sql statement a
    * solr query or something similar. In the future, a higher level query language might be a better solution.
-   * 
+   *
    * @param query
    *          the search query
    * @param offset

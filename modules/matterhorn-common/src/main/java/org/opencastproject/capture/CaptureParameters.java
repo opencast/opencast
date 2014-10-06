@@ -178,7 +178,7 @@ public interface CaptureParameters {
 
   /** Property specifying the GStreamer like syntax for a Custom Consumer **/
   String CAPTURE_DEVICE_CUSTOM_CONSUMER = ".customConsumer";
-  
+
   /** Property specifying the name of the file to output */
   String CAPTURE_DEVICE_DEST = ".outputfile";
 
@@ -264,7 +264,7 @@ public interface CaptureParameters {
    * tries to start a second capture while the first is still in progress.
    */
   String CAPTURE_SCHEDULE_INTEREVENT_BUFFERTIME = "capture.schedule.event.buffertime";
-     
+
   /**
    * Host, where to send the RTP stream (default: 127.0.0.1).
    */
@@ -274,7 +274,7 @@ public interface CaptureParameters {
    */
   String CAPTURE_RTP_AUDIO_CONSUMER_RTP_PORT = ".rtpConsumer.audio.rtpPort";
   /**
-   * Encoder property can be used to choose a different audio encoder (default: faac) 
+   * Encoder property can be used to choose a different audio encoder (default: faac)
    * or set encoder-properties (by adding .propertyName=value).
    */
   String CAPTURE_RTP_AUDIO_CONSUMER_ENCODER = ".rtpConsumer.audio.encoder";
@@ -288,7 +288,7 @@ public interface CaptureParameters {
    */
   String CAPTURE_RTP_VIDEO_CONSUMER_RTP_PORT = ".rtpConsumer.video.rtpPort";
   /**
-   * Encoder property can be used to choose a different video encoder (default: x264enc) 
+   * Encoder property can be used to choose a different video encoder (default: x264enc)
    * or set encoder-properties (by adding .propertyName=value).
    */
   String CAPTURE_RTP_VIDEO_CONSUMER_ENCODER = ".rtpConsumer.video.encoder";

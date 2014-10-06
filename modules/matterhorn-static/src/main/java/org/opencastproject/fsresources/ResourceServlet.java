@@ -15,6 +15,7 @@
  */
 package org.opencastproject.fsresources;
 
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.XProperties;
 
@@ -135,7 +136,7 @@ public class ResourceServlet extends HttpServlet {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */
@@ -250,8 +251,8 @@ public class ResourceServlet extends HttpServlet {
     NodeList roles = (NodeList) xPath.evaluate("//*[local-name() = 'role']", aclDoc, XPathConstants.NODESET);
     for (int i = 0; i < roles.getLength(); i++) {
       Node role = roles.item(i);
-      for (String userRole : securityService.getUser().getRoles()) {
-        if (userRole.equals(role.getTextContent())) {
+      for (Role userRole : securityService.getUser().getRoles()) {
+        if (userRole.getName().equals(role.getTextContent())) {
           return true;
         }
       }

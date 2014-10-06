@@ -80,7 +80,7 @@ public class DistributionDownloadRestEndpointTest {
   public void testDistribute() throws Exception {
     String mediapackage = getSampleMediaPackage();
     String trackId = "track-1";
-    
+
     HttpPost post = new HttpPost(BASE_URL + "/distribution/download");
     List<NameValuePair> formParams = new ArrayList<NameValuePair>();
     formParams.add(new BasicNameValuePair("channelId", "engage-player"));
@@ -91,7 +91,7 @@ public class DistributionDownloadRestEndpointTest {
     // Ensure we get a 200 OK (we don't really care about the body of the result)
     HttpResponse response = client.execute(post);
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-    
+
     // Ideally, we would check to see that the files have been copied to the right location, too, but we can't assume
     // that the server is local.  So we'll just have to trust that our unit tests cover that.
   }

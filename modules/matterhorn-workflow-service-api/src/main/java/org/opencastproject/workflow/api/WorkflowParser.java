@@ -56,7 +56,7 @@ public final class WorkflowParser {
 
   /**
    * Loads workflow definitions from the given input stream.
-   * 
+   *
    * @param in
    * @return the list of workflow definitions
    */
@@ -79,7 +79,7 @@ public final class WorkflowParser {
 
   /**
    * Loads a workflow definition from the given input stream.
-   * 
+   *
    * @param in
    *          the input stream
    * @return the workflow definition
@@ -99,7 +99,7 @@ public final class WorkflowParser {
 
   /**
    * Loads a workflow definition from the xml stream.
-   * 
+   *
    * @param in
    *          xml stream of the workflow definition
    * @return the workflow definition
@@ -116,7 +116,7 @@ public final class WorkflowParser {
 
   /**
    * Loads a workflow instance from the given input stream.
-   * 
+   *
    * @param in
    *          the input stream
    * @return the workflow instance
@@ -139,7 +139,7 @@ public final class WorkflowParser {
 
   /**
    * Loads a workflow instance from the xml stream.
-   * 
+   *
    * @param in
    *          xml stream of the workflow instance
    * @return the workflow instance
@@ -156,7 +156,7 @@ public final class WorkflowParser {
 
   /**
    * Loads workflow statistics from the given input stream.
-   * 
+   *
    * @param in
    *          the input stream
    * @return the workflow statistics
@@ -176,7 +176,7 @@ public final class WorkflowParser {
 
   /**
    * Loads workflow statistics from the given xml string.
-   * 
+   *
    * @param xml
    *          the xml serialized representation of the workflow statistics
    * @return the workflow statistics
@@ -193,7 +193,7 @@ public final class WorkflowParser {
 
   /**
    * Loads a set of workflow instances from the given input stream.
-   * 
+   *
    * @param in
    *          the input stream
    * @return the set of workflow instances
@@ -213,7 +213,7 @@ public final class WorkflowParser {
 
   /**
    * Loads a set of workflow instances from the xml string.
-   * 
+   *
    * @param in
    *          xml string of the workflow instance set
    * @return the workflow set

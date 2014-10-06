@@ -33,6 +33,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.serviceregistry.api.SystemLoad;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.QueryStringBuilder;
 import org.opencastproject.util.UrlSupport;
@@ -92,35 +93,37 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * Callback for the OSGi environment that is called upon service activation.
-   * 
+   *
    * @param context
    *          the component context
    */
   protected void activate(ComponentContext cc) {
-    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty("org.opencastproject.server.url"))) {
+    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY))) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      serverUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
+      serverUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
     }
 
     if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL))) {
       try {
         serviceURL = new URL(serverUrl + "/services").toExternalForm();
       } catch (MalformedURLException e) {
-        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is missing, and fallback localhost url is malformed: " + serverUrl + "/services");
+        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is missing, and fallback localhost url is malformed: "
+                + serverUrl + "/services");
       }
     } else {
       try {
         serviceURL = new URL(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL)).toExternalForm();
       } catch (MalformedURLException e) {
-        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is malformed: " + StringUtils.trimToNull(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL)));
+        throw new ServiceException(OPT_SERVICE_REGISTRY_URL + " is malformed: "
+                + StringUtils.trimToNull(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL)));
       }
     }
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerService(java.lang.String, java.lang.String,
    *      java.lang.String)
    */
@@ -132,7 +135,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#enableHost(String)
    */
   @Override
@@ -168,7 +171,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#disableHost(String)
    */
   @Override
@@ -204,7 +207,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(java.lang.String, int)
    */
   @Override
@@ -237,7 +240,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#unregisterHost(java.lang.String)
    */
   @Override
@@ -269,7 +272,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerService(java.lang.String, java.lang.String,
    *      java.lang.String, boolean)
    */
@@ -308,7 +311,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#unRegisterService(java.lang.String, java.lang.String)
    */
   @Override
@@ -343,7 +346,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#setMaintenanceStatus(java.lang.String, boolean)
    */
   @Override
@@ -381,7 +384,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String)
    */
   @Override
@@ -391,7 +394,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List)
    */
@@ -402,7 +405,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List, java.lang.String)
    */
@@ -414,7 +417,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List, String, boolean)
    */
@@ -426,7 +429,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(String, String, List, String, boolean, Job)
    */
   @Override
@@ -470,7 +473,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#updateJob(org.opencastproject.job.api.Job)
    */
   @Override
@@ -508,7 +511,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getJob(long)
    */
   @Override
@@ -535,7 +538,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getChildJobs(long)
    */
   @Override
@@ -563,7 +566,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getJobs(java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -581,11 +584,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
       responseStatusCode = response.getStatusLine().getStatusCode();
       if (responseStatusCode == HttpStatus.SC_OK) {
         JaxbJobList jaxbJobList = JobParser.parseJobList(response.getEntity().getContent());
-        List<Job> jobs = new ArrayList<Job>(jaxbJobList.getJobs().size());
-        for (Job job : jaxbJobList.getJobs()) {
-          jobs.add(job);
-        }
-        return jobs;
+        return new ArrayList<Job>(jaxbJobList.getJobs());
       }
     } catch (IOException e) {
       throw new ServiceRegistryException("Unable to get jobs", e);
@@ -597,7 +596,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrationsByLoad(java.lang.String)
    */
   @Override
@@ -624,7 +623,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrationsByHost(java.lang.String)
    */
   @Override
@@ -651,7 +650,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrationsByType(java.lang.String)
    */
   @Override
@@ -678,7 +677,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistration(java.lang.String,
    *      java.lang.String)
    */
@@ -710,7 +709,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceRegistrations()
    */
   @Override
@@ -736,7 +735,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getHostRegistrations()
    */
   @Override
@@ -762,7 +761,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceStatistics()
    */
   @Override
@@ -788,7 +787,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -799,7 +798,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countByHost(java.lang.String, java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -810,7 +809,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countByOperation(java.lang.String, java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
@@ -821,7 +820,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String, java.lang.String,
    *      java.lang.String, org.opencastproject.job.api.Job.Status)
    */
@@ -859,7 +858,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getLoad()
    */
   @Override
@@ -869,7 +868,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * Sets the trusted http client.
-   * 
+   *
    * @param client
    *          the trusted http client
    */
@@ -879,7 +878,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getMaxConcurrentJobs()
    */
   @Override
@@ -933,7 +932,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCurrentJob()
    */
   @Override
@@ -943,7 +942,7 @@ public class ServiceRegistryRemoteImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#setCurrentJob(Job)
    */
   @Override

@@ -58,7 +58,7 @@ public class SeriesFeedTest {
   public void setUp() throws Exception {
 
     client = Main.getClient();
-    
+
   }
 
   @After
@@ -69,7 +69,7 @@ public class SeriesFeedTest {
 
   // Assert MH-9569 is fixed
   @Test
-  public void testEmptySeriesFeed() throws Exception {  
+  public void testEmptySeriesFeed() throws Exception {
     // Add a series
     HttpPost postSeries = new HttpPost(BASE_URL + "/series/");
     List<NameValuePair> seriesParams = new ArrayList<NameValuePair>();
@@ -79,14 +79,14 @@ public class SeriesFeedTest {
     HttpResponse response = client.execute(postSeries);
     response.getEntity().consumeContent();
     Assert.assertEquals(201, response.getStatusLine().getStatusCode());
-    
+
     HttpGet get = new HttpGet(BASE_URL + "/feeds/rss/2.0/series/10.245/5819");
     response = client.execute(get);
     HttpEntity entity = response.getEntity();
     String feed = EntityUtils.toString(entity);
     // Though empty should generate a valid feed for a valid series
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-    
+
     // Remove series
     HttpDelete del = new HttpDelete(BASE_URL + "/series/10.245/5819");
     response = client.execute(del);
@@ -101,12 +101,12 @@ public class SeriesFeedTest {
     String feed = EntityUtils.toString(entity);
     Assert.assertEquals(404, response.getStatusLine().getStatusCode());
   }
-  
+
   protected String getSampleSeries() throws Exception {
     return IOUtils.toString(getClass().getClassLoader().getResourceAsStream("authorization/sample-series-1.xml"),
             "UTF-8");
   }
-  
+
   protected String getSampleAcl() throws Exception {
     return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><acl xmlns=\"org.opencastproject.security\"><ace><role>admin</role><action>delete</action><allow>true</allow></ace></acl>";
 

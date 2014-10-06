@@ -71,7 +71,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
 
   /**
    * Creates a new mime type with the given type and subtype.
-   * 
+   *
    * @param type
    *          the major type
    * @param subtype
@@ -110,7 +110,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    * <p>
    * For example, if the mimetype is ISO Motion JPEG 2000 which is represented as <code>video/mj2</code>, this method
    * will return <code>video</code>.
-   * 
+   *
    * @return the type
    */
   public String getType() {
@@ -122,7 +122,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    * <p>
    * For example, if the mimetype is ISO Motion JPEG 2000 which is represented as <code>video/mj2</code>, this method
    * will return <code>mj2</code>.
-   * 
+   *
    * @return the subtype
    */
   public String getSubtype() {
@@ -133,7 +133,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    * Returns the main suffix for this mime type, that identifies files containing data of this flavor.
    * <p>
    * For example, files with the suffix <code>mj2</code> will contain data of type <code>video/mj2</code>.
-   * 
+   *
    * @return the file suffix
    */
   public Option<String> getSuffix() {
@@ -145,7 +145,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    * the list includes the main suffix returned by <code>getSuffix()</code>.
    * <p>
    * For example, files containing ISO Motion JPEG 2000 may have file suffixes <code>mj2</code> and <code>mjp2</code>.
-   * 
+   *
    * @return the registered file suffixes
    */
   public String[] getSuffixes() {
@@ -154,7 +154,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
 
   /**
    * Returns <code>true</code> if the mimetype supports the specified suffix.
-   * 
+   *
    * @return <code>true</code> if the suffix is supported
    */
   public boolean supportsSuffix(String suffix) {
@@ -163,7 +163,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
 
   /**
    * Returns the mime type description.
-   * 
+   *
    * @return the description
    */
   public Option<String> getDescription() {
@@ -176,7 +176,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    * A flavor is a hint on a specialized variant of a general mime type. For example, a dublin core file will have a
    * mime type of <code>text/xml</code>. Adding a flavor of <code>mpeg-7</code> gives an additional hint on the file
    * contents.
-   * 
+   *
    * @return the file's flavor
    */
   public Option<String> getFlavor() {
@@ -185,7 +185,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
 
   /**
    * Returns the flavor description.
-   * 
+   *
    * @return the flavor description
    */
   public Option<String> getFlavorDescription() {
@@ -194,7 +194,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
 
   /**
    * Returns <code>true</code> if the file has the given flavor associated.
-   * 
+   *
    * @return <code>true</code> if the file has that flavor
    */
   public boolean hasFlavor(String flavor) {
@@ -235,7 +235,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    * <p>
    * For example, a gzipped file may have both of these mime types defined, <code>application/x-compressed</code> or
    * <code>application/x-gzip</code>.
-   * 
+   *
    * @return <code>true</code> if this mime type is equal
    */
   public boolean isEquivalentTo(String type, String subtype) {

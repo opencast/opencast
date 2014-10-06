@@ -27,10 +27,10 @@ import org.opencastproject.workflow.api.WorkflowStatistics;
  * Provides persistence services to the workflow service implementation.
  */
 public interface WorkflowServiceIndex {
-  
+
   /**
    * Update the workflow instance, or add it to persistence if it is not already stored.
-   * 
+   *
    * @param instance
    *          The workflow instance to store
    * @throws WorkflowDatabaseException
@@ -40,7 +40,7 @@ public interface WorkflowServiceIndex {
 
   /**
    * Remove the workflow instance with this id.
-   * 
+   *
    * @param id
    *          The workflow instance id
    *          @return the job that was set to deleted
@@ -53,7 +53,7 @@ public interface WorkflowServiceIndex {
 
   /**
    * Gets the total number of workflows that have been created to date.
-   * 
+   *
    * @param state
    *          the workflow state
    * @param operation
@@ -66,12 +66,12 @@ public interface WorkflowServiceIndex {
 
   /**
    * Gets a set of workflow instances using a custom query
-   * 
+   *
    * @param query
    *          the query to use in the search for workflow instances
    * @param action TODO
    * @param applyPermissions TODO
-   * 
+   *
    * @return the set of matching workflow instances
    * @throws WorkflowDatabaseException
    *           if there is a problem retrieving the workflow instances from persistence
@@ -80,7 +80,7 @@ public interface WorkflowServiceIndex {
 
   /**
    * Returns the workflow statistics.
-   * 
+   *
    * @return workflow statistics
    * @throws WorkflowDatabaseException
    *           if there is a problem accessing the workflow instances in persistence

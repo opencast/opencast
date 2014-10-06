@@ -37,7 +37,7 @@ public class AudioTestSrcProducer extends AudioProducer {
   /**
    * Used to create an audiotestsrc GStreamer Element Producer great for testing the capture agent without needing any
    * devices installed but still gives that authentic capturing experience.
-   * 
+   *
    * @param captureDevice
    *          The details for this capture device.
    * @param properties
@@ -62,7 +62,7 @@ public class AudioTestSrcProducer extends AudioProducer {
 
   /**
    * Create an audiotestsrc Element (see gst-inspect for details)
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the current system cannot create an audiotestsrc Element this Exception is thrown.
    **/

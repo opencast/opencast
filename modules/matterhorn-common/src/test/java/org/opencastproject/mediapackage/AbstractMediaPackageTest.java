@@ -16,12 +16,13 @@
 
 package org.opencastproject.mediapackage;
 
-import org.junit.After;
-import org.junit.Before;
 import org.opencastproject.mediapackage.identifier.Handle;
 import org.opencastproject.mediapackage.identifier.HandleBuilder;
 import org.opencastproject.mediapackage.identifier.HandleBuilderFactory;
 import org.opencastproject.util.FileSupport;
+
+import org.junit.After;
+import org.junit.Before;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -90,7 +91,7 @@ public abstract class AbstractMediaPackageTest {
 
   /**
    * Creates everything that is needed to test a media package.
-   * 
+   *
    * @throws java.lang.Exception
    */
   @Before
@@ -147,7 +148,7 @@ public abstract class AbstractMediaPackageTest {
 
   /**
    * Cleans up after every test method.
-   * 
+   *
    * @throws Exception
    */
   @After

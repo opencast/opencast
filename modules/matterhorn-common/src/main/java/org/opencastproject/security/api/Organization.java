@@ -26,14 +26,14 @@ public interface Organization {
 
   /**
    * Returns the name for the local anonymous role.
-   * 
+   *
    * @return the anonymous role name
    */
   String getAnonymousRole();
 
   /**
    * Returns the name for the local admin role.
-   * 
+   *
    * @return the admin role name
    */
   String getAdminRole();
@@ -45,14 +45,14 @@ public interface Organization {
 
   /**
    * Returns the organizational properties
-   * 
+   *
    * @return the properties
    */
   Map<String, String> getProperties();
 
   /**
    * Returns the server names and the corresponding ports that have been registered with this organization.
-   * 
+   *
    * @return the servers
    */
   Map<String, Integer> getServers();

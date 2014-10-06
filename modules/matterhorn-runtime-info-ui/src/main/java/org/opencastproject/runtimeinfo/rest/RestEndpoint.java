@@ -25,7 +25,7 @@ import java.util.Vector;
 
 @Deprecated
 public class RestEndpoint {
-  
+
   public static enum Type {
     WRITE, READ
   };
@@ -54,7 +54,7 @@ public class RestEndpoint {
   /**
    * Create a new basic endpoint, you should use the add methods to fill in the rest of the information about the
    * endpoint data
-   * 
+   *
    * @param name
    *          the endpoint name (this should be unique for this set of endpoints)
    * @param method
@@ -91,7 +91,7 @@ public class RestEndpoint {
    * the type of this parameter should only be FILE or TEXT but nothing stops you from using the other types<br/>
    * This is always a required parameter as you should never design an endpoint that takes a file sometimes but not
    * always
-   * 
+   *
    * @param isBinary
    *          if true then this should use an uploader to send, otherwise the data can be placed in a text area
    * @param defaultValue
@@ -114,7 +114,7 @@ public class RestEndpoint {
   /**
    * Adds a path parameter for this endpoint, this would be a parameter which is passed as part of the path (e.g.
    * /my/path/{param}) and thus must use a name which is safe to place in a URL and does not contain a slash (/)
-   * 
+   *
    * @param param
    *          the path param to add
    * @throws IllegalArgumentException
@@ -140,7 +140,7 @@ public class RestEndpoint {
    * request body (commonly referred to as a post or form parameter) <br/>
    * WARNING: This should generally be reserved for endpoints which are used for processing, it is better to use path
    * params unless the required parameter is not part of an identifier for the resource
-   * 
+   *
    * @param param
    *          the required param to add
    * @throws IllegalArgumentException
@@ -164,7 +164,7 @@ public class RestEndpoint {
   /**
    * Adds an optional parameter for this endpoint, this would be a parameter which is passed in the query string (for
    * GET) or encoded as part of the body otherwise (often referred to as a post or form parameter)
-   * 
+   *
    * @param param
    *          the optional param to add
    * @throws IllegalArgumentException
@@ -184,7 +184,7 @@ public class RestEndpoint {
 
   /**
    * Adds a format for the return data for this endpoint
-   * 
+   *
    * @param format
    *          a format object
    * @throws IllegalArgumentException
@@ -202,7 +202,7 @@ public class RestEndpoint {
 
   /**
    * Adds a response status for this endpoint
-   * 
+   *
    * @param status
    *          a response status object
    * @throws IllegalArgumentException
@@ -220,7 +220,7 @@ public class RestEndpoint {
 
   /**
    * Adds a note for this endpoint
-   * 
+   *
    * @param note
    *          a note object
    * @throws IllegalArgumentException
@@ -238,7 +238,7 @@ public class RestEndpoint {
 
   /**
    * Sets the test form for this endpoint, if this is null then no test form is rendered for this endpoint
-   * 
+   *
    * @param form
    *          the test form object (null to clear the form)
    * @throws IllegalArgumentException
@@ -248,27 +248,28 @@ public class RestEndpoint {
     this.form = form;
   }
 
-  
   /**
-   * @param pathFormat the pathFormat to set
+   * @param pathFormat
+   *          the pathFormat to set
    */
   public void setPathFormat(String pathFormat) {
     this.pathFormat = pathFormat;
   }
-  
+
   /**
-   * @param pathFormatHtml the pathFormatHtml to set
+   * @param pathFormatHtml
+   *          the pathFormatHtml to set
    */
   public void setPathFormatHtml(String pathFormatHtml) {
     this.pathFormatHtml = pathFormatHtml;
   }
-  
+
   /**
    * Setting this to true will cause the path to be filled in with format extensions which will work with the {FORMAT}
    * convention (which is automatically filled in with the selected or default format key - e.g. json) <br/>
    * This will generate a path like /your/path.{FORMAT} and will show the following on screen GET /your/path.{xml|json}
    * if you have 2 formats in this endpoint
-   * 
+   *
    * @param autoPathFormat
    *          true to enable, false to disable
    */

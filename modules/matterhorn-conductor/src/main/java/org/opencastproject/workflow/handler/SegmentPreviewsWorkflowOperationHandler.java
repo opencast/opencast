@@ -101,7 +101,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -111,7 +111,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param composerService
    *          the composer service
    */
@@ -121,7 +121,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param catalogService
    *          the catalog service
    */
@@ -132,7 +132,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -142,10 +142,12 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
   /**
    * {@inheritDoc}
-   * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   *
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
-  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     logger.debug("Running segments preview workflow operation on {}", workflowInstance);
 
     // Check if there is an mpeg-7 catalog containing video segments
@@ -167,7 +169,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
   /**
    * Encode tracks from MediaPackage using profiles stored in properties and updates current MediaPackage.
-   * 
+   *
    * @param mediaPackage
    * @param properties
    * @return the operation result containing the updated mediapackage
@@ -266,7 +268,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
           }
 
           // convert to time array
-          long[] timeArray = new long[timePointList.size()];
+          double[] timeArray = new double[timePointList.size()];
           for (int i = 0; i < timePointList.size(); i++)
             timeArray[i] = timePointList.get(i).getTimeInMilliseconds() / 1000;
 
@@ -331,7 +333,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
   /**
    * Returns the track that is used as the reference for the segment previews. It is either identified by flavor and tag
    * set and being derived from <code>t</code> or <code>t</code> itself.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param t
@@ -374,7 +376,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
   /**
    * Loads an mpeg7 catalog from a mediapackage's catalog reference
-   * 
+   *
    * @param catalog
    *          the mediapackage's reference to this catalog
    * @return the mpeg7

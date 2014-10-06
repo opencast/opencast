@@ -15,6 +15,9 @@
  */
 package org.opencastproject.fileupload.service;
 
+import static java.lang.String.format;
+import static org.opencastproject.util.data.Prelude.unexhaustiveMatch;
+
 import org.opencastproject.fileupload.api.FileUploadService;
 import org.opencastproject.fileupload.api.exception.FileUploadException;
 import org.opencastproject.fileupload.api.job.Chunk;
@@ -32,6 +35,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,16 +61,12 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 
-/**
- * A service for big file uploads via HTTP.
- *
- */
+/** A service for big file uploads via HTTP. */
 public class FileUploadServiceImpl implements FileUploadService, ManagedService {
 
-  final String PROPKEY_STORAGE_DIR    = "org.opencastproject.storage.dir";
+  private static final Logger logger = LoggerFactory.getLogger(FileUploadServiceImpl.class);
+  final String PROPKEY_STORAGE_DIR = "org.opencastproject.storage.dir";
   final String PROPKEY_CLEANER_MAXTTL = "org.opencastproject.upload.cleaner.maxttl";
   final String PROPKEY_UPLOAD_WORKDIR = "org.opencastproject.upload.workdir";
   final String DEFAULT_UPLOAD_WORKDIR = "fileupload-tmp"; /* The default location is the storage dir */
@@ -90,11 +91,11 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   protected synchronized void activate(ComponentContext cc) throws Exception {
     /* Ensure a working directory is set */
     if (workRoot == null) {
-   /* Use the default location: STORAGE_DIR / DEFAULT_UPLOAD_WORKDIR */
+      /* Use the default location: STORAGE_DIR / DEFAULT_UPLOAD_WORKDIR */
       String dir = cc.getBundleContext().getProperty(PROPKEY_STORAGE_DIR);
       if (dir == null) {
-        throw new RuntimeException("Storage directory not defined. "
-            + "Use " + PROPKEY_STORAGE_DIR + " to set the property.");
+        throw new RuntimeException("Storage directory not defined. " + "Use " + PROPKEY_STORAGE_DIR
+                + " to set the property.");
       }
       dir += File.separator + DEFAULT_UPLOAD_WORKDIR;
       workRoot = new File(dir);
@@ -119,6 +120,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   }
 
   @Override
+  @SuppressWarnings("rawtypes")
   public synchronized void updated(Dictionary properties) throws ConfigurationException {
     // try to get time-to-live threshold for jobs, use default if not configured
     String dir = (String) properties.get(PROPKEY_UPLOAD_WORKDIR);
@@ -127,7 +129,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
       log.info("Configuration updated. Upload working directory set to {}.", dir);
     }
     try {
-      jobMaxTTL = Integer.parseInt(((String)properties.get(PROPKEY_CLEANER_MAXTTL)).trim());
+      jobMaxTTL = Integer.parseInt(((String) properties.get(PROPKEY_CLEANER_MAXTTL)).trim());
     } catch (Exception e) {
       jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
       log.warn("Unable to update configuration. {}", e.getMessage());
@@ -148,7 +150,8 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.fileupload.api.FileUploadService#createJob(String filename, long filesize, int chunksize)
+   * @see org.opencastproject.fileupload.api.FileUploadService#createJob(String, long, int,
+   *      org.opencastproject.mediapackage.MediaPackage, org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
   @Override
   public FileUploadJob createJob(String filename, long filesize, int chunksize, MediaPackage mp,
@@ -157,24 +160,17 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     log.info("Creating new upload job: {}", job);
 
     try {
-      File jobDir = getJobDir(job.getId());      // create working dir
+      File jobDir = getJobDir(job.getId()); // create working dir
       FileUtils.forceMkdir(jobDir);
       ensureExists(getPayloadFile(job.getId())); // create empty payload file
-      storeJob(job);                             // create job file
-
+      storeJob(job); // create job file
     } catch (FileUploadException e) {
       deleteJob(job.getId());
-      String message = new StringBuilder("Could not create job file in ").append(workRoot.getAbsolutePath())
-              .append(": ").append(e.getMessage()).toString();
-      log.error(message, e);
-      throw new FileUploadException(message, e);
-
+      throw fileUploadException(Severity.error, "Could not create job file in " + workRoot.getAbsolutePath(), e);
     } catch (IOException e) {
       deleteJob(job.getId());
-      String message = new StringBuilder("Could not create upload job directory in ")
-              .append(workRoot.getAbsolutePath()).append(": ").append(e.getMessage()).toString();
-      log.error(message, e);
-      throw new FileUploadException(message, e);
+      throw fileUploadException(Severity.error,
+              "Could not create upload job directory in " + workRoot.getAbsolutePath(), e);
     }
     return job;
   }
@@ -206,19 +202,18 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    */
   @Override
   public FileUploadJob getJob(String id) throws FileUploadException {
-    if (jobCache.containsKey(id)) {          // job already cached?
+    if (jobCache.containsKey(id)) { // job already cached?
       return jobCache.get(id);
-    } else {                                 // job not in cache?
-      try {                                  // try to load job from filesystem
+    } else { // job not in cache?
+      try { // try to load job from filesystem
         synchronized (this) {
           File jobFile = getJobFile(id);
           FileUploadJob job = (FileUploadJob) jobUnmarshaller.unmarshal(jobFile);
-          job.setLastModified(jobFile.lastModified());  // get last modified time from job file
+          job.setLastModified(jobFile.lastModified()); // get last modified time from job file
           return job;
-        }                                    // if loading from fs also fails
-      } catch (Exception e) {                // we could not find the job and throw an Exception
-        log.warn("Failed to load job " + id + " from file.");
-        throw new FileUploadException("Error retrieving job " + id, e);
+        } // if loading from fs also fails
+      } catch (Exception e) { // we could not find the job and throw an Exception
+        throw fileUploadException(Severity.warn, "Failed to load job " + id + " from file.", e);
       }
     }
   }
@@ -230,11 +225,16 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    */
   @Override
   public void cleanOutdatedJobs() throws IOException {
+    File[] workRootFiles = workRoot.listFiles();
+    if (workRootFiles == null) {
+      logger.trace("No outdated files found in {}", workRoot.getAbsolutePath());
+      return;
+    }
     for (File dir : workRoot.listFiles()) {
       if (dir.getParentFile().equals(workRoot) && dir.isDirectory()) {
         try {
-          String id = dir.getName();    // assuming that the dir name is the ID of a job..
-          if (!isLocked(id)) {          // ..true if not in cache or job is in cache and not locked
+          String id = dir.getName(); // assuming that the dir name is the ID of a job..
+          if (!isLocked(id)) { // ..true if not in cache or job is in cache and not locked
             FileUploadJob job = getJob(id);
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.HOUR, -jobMaxTTL);
@@ -244,8 +244,8 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
               log.info("Deleted outdated job {}", id);
             }
           }
-        } catch (Exception e) {        // something went wrong, so we assume the dir is corrupted
-          FileUtils.forceDelete(dir);  // ..and delete it right away
+        } catch (Exception e) { // something went wrong, so we assume the dir is corrupted
+          FileUtils.forceDelete(dir); // ..and delete it right away
           log.info("Deleted corrupted job {}", dir.getName());
         }
       }
@@ -265,8 +265,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
       File jobFile = ensureExists(getJobFile(job.getId()));
       jobMarshaller.marshal(job, jobFile);
     } catch (Exception e) {
-      log.warn("Error while storing upload job: " + e.getMessage());
-      throw new FileUploadException("Failed to write job file.");
+      throw fileUploadException(Severity.error, "Failed to write job file.", e);
     }
   }
 
@@ -285,8 +284,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
       File jobDir = getJobDir(id);
       FileUtils.forceDelete(jobDir);
     } catch (Exception e) {
-      log.warn("Error while deleting upload job: " + e.getMessage());
-      throw new FileUploadException("Error deleting job", e);
+      throw fileUploadException(Severity.error, "Error deleting job", e);
     }
   }
 
@@ -301,12 +299,13 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     // job already completed?
     if (job.getState().equals(FileUploadJob.JobState.COMPLETE)) {
       removeFromCache(job);
-      throw new FileUploadException("Job is already complete!");
+      throw fileUploadException(Severity.warn, "Job is already complete.");
     }
 
     // job ready to recieve data?
     if (isLocked(job.getId())) {
-      throw new FileUploadException("Job is locked. Seems like a concurrent upload to this job is in progress.");
+      throw fileUploadException(Severity.error,
+              "Job is locked. Seems like a concurrent upload to this job is in progress.");
     } else {
       lock(job);
     }
@@ -314,23 +313,27 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     // right chunk offered?
     int supposedChunk = job.getCurrentChunk().getNumber() + 1;
     if (chunkNumber != supposedChunk) {
-      StringBuilder sb = new StringBuilder().append("Wrong chunk number! Awaiting #").append(supposedChunk)
-              .append(" but #").append(Long.toString(chunkNumber)).append(" was offered.");
       removeFromCache(job);
-      throw new FileUploadException(sb.toString());
+      throw fileUploadException(Severity.error,
+              format("Wrong chunk number. Awaiting #%d but #%d was offered.", supposedChunk, chunkNumber));
     }
-    log.debug("Recieving chunk #" + chunkNumber + " of job {}", job);
+    log.debug("Receiving chunk #" + chunkNumber + " of job {}", job);
 
     // write chunk to temp file
     job.getCurrentChunk().incrementNumber();
-    File chunkFile = ensureExists(getChunkFile(job.getId()));
+    File chunkFile = null;
+    try {
+      chunkFile = ensureExists(getChunkFile(job.getId()));
+    } catch (IOException e) {
+      throw fileUploadException(Severity.error, "Cannot create chunk file", e);
+    }
     OutputStream out = null;
     try {
       out = new FileOutputStream(chunkFile, false);
       int bytesRead = 0;
       long bytesReadTotal = 0l;
       Chunk currentChunk = job.getCurrentChunk(); // copy manually (instead of using IOUtils.copy()) so we can count the
-                                                  // number of bytes
+      // number of bytes
       do {
         bytesRead = content.read(readBuffer);
         if (bytesRead > 0) {
@@ -340,12 +343,12 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
         }
       } while (bytesRead != -1);
       if (job.getPayload().getTotalSize() == -1 && job.getChunksTotal() == 1) { // set totalSize in case of ordinary
-                                                                                // from submit
+        // from submit
         job.getPayload().setTotalSize(bytesReadTotal);
       }
     } catch (Exception e) {
       removeFromCache(job);
-      throw new FileUploadException("Failed to store chunk data!", e);
+      throw fileUploadException(Severity.error, "Failed to store chunk data", e);
     } finally {
       IOUtils.closeQuietly(content);
       IOUtils.closeQuietly(out);
@@ -357,8 +360,8 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     if (chunkNumber == job.getChunksTotal() - 1) {
       supposedSize = job.getPayload().getTotalSize() % job.getChunksize();
       supposedSize = supposedSize == 0 ? job.getChunksize() : supposedSize; // a not so nice workaround for the rare
-                                                                            // case that file size is a multiple of the
-                                                                            // chunk size
+      // case that file size is a multiple of the
+      // chunk size
     } else {
       supposedSize = job.getChunksize();
     }
@@ -375,9 +378,8 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
         payload.setCurrentSize(payload.getCurrentSize() + actualSize);
 
       } catch (IOException e) {
-        log.error("Failed to append chunk data.", e);
         removeFromCache(job);
-        throw new FileUploadException("Could not append chunk data", e);
+        throw fileUploadException(Severity.error, "Failed to append chunk data", e);
 
       } finally {
         IOUtils.closeQuietly(in);
@@ -386,10 +388,9 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
       }
 
     } else {
-      StringBuilder sb = new StringBuilder().append("Chunk has wrong size. Awaited: ").append(supposedSize)
-              .append(" bytes, recieved: ").append(actualSize).append(" bytes.");
       removeFromCache(job);
-      throw new FileUploadException(sb.toString());
+      throw fileUploadException(Severity.warn,
+              format("Chunk has wrong size. Awaited: %d bytes, received: %d bytes.", supposedSize, actualSize));
     }
 
     // update job
@@ -413,7 +414,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   public InputStream getPayload(FileUploadJob job) throws FileUploadException {
     // job not locked?
     if (isLocked(job.getId())) {
-      throw new FileUploadException(
+      throw fileUploadException(Severity.warn,
               "Job is locked. Download is only permitted while no upload to this job is in progress.");
     }
 
@@ -421,7 +422,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
       FileInputStream payload = new FileInputStream(getPayloadFile(job.getId()));
       return payload;
     } catch (FileNotFoundException e) {
-      throw new FileUploadException("Failed to retrieve file from job " + job.getId());
+      throw fileUploadException(Severity.error, "Failed to retrieve file from job " + job.getId(), e);
     }
   }
 
@@ -458,9 +459,8 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    *
    * @param job
    *          job to remove from cache
-   * @throws FileUploadException
    */
-  private void removeFromCache(FileUploadJob job) throws FileUploadException {
+  private void removeFromCache(FileUploadJob job) {
     jobCache.remove(job.getId());
   }
 
@@ -484,19 +484,16 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     job.setState(FileUploadJob.JobState.COMPLETE);
   }
 
-  /**
-   * Function that writes the given file to the uploaded collection.
-   *
-   */
+  /** Function that writes the given file to the uploaded collection. */
   private Function2<InputStream, File, Option<URI>> putInCollection = new Function2<InputStream, File, Option<URI>>() {
 
     @Override
     public Option<URI> apply(InputStream is, File f) {
       try {
         URI uri = workspace.putInCollection(UPLOAD_COLLECTION, f.getName(), is); // storing file with jod id as name
-                                                                                 // instead of original filename to
-                                                                                 // avoid collisions (original filename
-                                                                                 // can be obtained from upload job)
+        // instead of original filename to
+        // avoid collisions (original filename
+        // can be obtained from upload job)
         return Option.some(uri);
       } catch (IOException e) {
         log.error("Could not add file to collection.", e);
@@ -520,10 +517,10 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
       try {
         return result.get().toURL();
       } catch (MalformedURLException e) {
-        throw new FileUploadException("Unable to return URL of payloads final destination.", e);
+        throw fileUploadException(Severity.error, "Unable to return URL of payloads final destination.", e);
       }
     } else {
-      throw new FileUploadException("Failed to put payload in collection.");
+      throw fileUploadException(Severity.error, "Failed to put payload in collection.");
     }
   }
 
@@ -553,7 +550,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
       return tracks.get(0).getURI().toURL();
     } catch (Exception e) {
-      throw new FileUploadException("Failed to add payload to MediaPackage.", e);
+      throw fileUploadException(Severity.error, "Failed to add payload to MediaPackage.", e);
     } finally {
       IOUtils.closeQuietly(fileInputStream);
     }
@@ -566,13 +563,9 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    *          ID of the job of which the chunk file should be deleted
    */
   private void deleteChunkFile(String id) {
-    File chunkFile = getChunkFile(id);
-    try {
-      log.debug("Attempting to delete chunk file of job " + id);
-      if (!chunkFile.delete()) {
-        throw new RuntimeException("Could not delete chunk file");
-      }
-    } catch (Exception e) {
+    final File chunkFile = getChunkFile(id);
+    log.debug("Attempting to delete chunk file of job " + id);
+    if (!chunkFile.delete()) {
       log.warn("Could not delete chunk file " + chunkFile.getAbsolutePath());
     }
   }
@@ -584,32 +577,16 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    *          ID of the job of which the chunk file should be deleted
    */
   private void deletePayloadFile(String id) {
-    File payloadFile = getPayloadFile(id);
-    try {
-      log.debug("Attempting to delete payload file of job " + id);
-      if (!payloadFile.delete()) {
-        throw new RuntimeException("Could not delete chunk file");
-      }
-    } catch (Exception e) {
-      log.warn("Could not delete chunk file " + payloadFile.getAbsolutePath());
+    final File payloadFile = getPayloadFile(id);
+    log.debug("Attempting to delete payload file of job " + id);
+    if (!payloadFile.delete()) {
+      log.warn("Could not delete payload file " + payloadFile.getAbsolutePath());
     }
   }
 
-  /**
-   * Ensures the existence of a given file.
-   *
-   * @param file
-   * @return File existing file
-   * @throws IllegalStateException
-   */
-  private File ensureExists(File file) throws IllegalStateException {
-    if (!file.exists()) {
-      try {
-        file.createNewFile();
-      } catch (IOException e) {
-        throw new IllegalStateException("Failed to create chunk file!");
-      }
-    }
+  /** Ensures the existence of a given file. */
+  private File ensureExists(File file) throws IOException {
+    file.createNewFile();
     return file;
   }
 
@@ -621,7 +598,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    * @return File job directory
    */
   private File getJobDir(String id) {
-    StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id);
+    final StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id);
     return new File(sb.toString());
   }
 
@@ -633,7 +610,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    * @return File job file
    */
   private File getJobFile(String id) {
-    StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id)
+    final StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id)
             .append(File.separator).append(FILENAME_JOBFILE);
     return new File(sb.toString());
   }
@@ -646,7 +623,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    * @return File chunk file
    */
   private File getChunkFile(String id) {
-    StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id)
+    final StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id)
             .append(File.separator).append(FILENAME_CHUNKFILE);
     return new File(sb.toString());
   }
@@ -659,9 +636,41 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    * @return File job file
    */
   private File getPayloadFile(String id) {
-    StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id)
+    final StringBuilder sb = new StringBuilder().append(workRoot.getAbsolutePath()).append(File.separator).append(id)
             .append(File.separator).append(id).append(FILEEXT_DATAFILE);
     return new File(sb.toString());
   }
 
+  private enum Severity {
+    warn, error
+  }
+
+  private FileUploadException fileUploadException(Severity severity, String msg) throws FileUploadException {
+    switch (severity) {
+      case warn:
+        log.warn(msg);
+        break;
+      case error:
+        log.error(msg);
+        break;
+      default:
+        unexhaustiveMatch();
+    }
+    throw new FileUploadException(msg);
+  }
+
+  private FileUploadException fileUploadException(Severity severity, String msg, Exception cause)
+          throws FileUploadException {
+    switch (severity) {
+      case warn:
+        log.warn(msg, cause);
+        break;
+      case error:
+        log.error(msg, cause);
+        break;
+      default:
+        unexhaustiveMatch();
+    }
+    throw new FileUploadException(msg, cause);
+  }
 }

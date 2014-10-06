@@ -30,6 +30,7 @@ import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesException;
@@ -65,6 +66,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -130,7 +132,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * OSGi callback for setting Dublin core service.
-   * 
+   *
    * @param dcService
    *          {@link DublinCoreCatalogService} object
    */
@@ -140,7 +142,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * OSGi callback for setting Dublin core service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -150,7 +152,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Callback from the OSGi environment on component registration. Retrieves location of the solr index.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -191,7 +193,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * OSGi callback for deactivation.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -225,7 +227,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Prepares the embedded solr environment.
-   * 
+   *
    * @param solrRoot
    *          the solr root directory
    */
@@ -290,7 +292,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.series.impl.SeriesServiceIndex#index(org.opencastproject.metadata.dublincore.DublinCoreCatalog)
    */
@@ -327,7 +329,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceIndex#index(java.lang.String,
    * org.opencastproject.security.api.AccessControlList)
    */
@@ -353,6 +355,9 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
     final SolrInputDocument inputDoc = ClientUtils.toSolrInputDocument(seriesDoc);
     inputDoc.setField(SolrFields.ACCESS_CONTROL_KEY, serializedAC);
+    inputDoc.removeField(SolrFields.ACCESS_CONTROL_CONTRIBUTE);
+    inputDoc.removeField(SolrFields.ACCESS_CONTROL_EDIT);
+    inputDoc.removeField(SolrFields.ACCESS_CONTROL_READ);
     for (AccessControlEntry ace : accessControl.getEntries()) {
       if (SeriesService.CONTRIBUTE_CONTENT_PERMISSION.equals(ace.getAction()) && ace.isAllow()) {
         inputDoc.addField(SolrFields.ACCESS_CONTROL_CONTRIBUTE, ace.getRole());
@@ -392,7 +397,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Creates solr document for inserting into solr index.
-   * 
+   *
    * @param dc
    *          {@link DublinCoreCatalog} to be stored in index
    * @return {@link SolrInputDocument} created out of Dublin core
@@ -484,7 +489,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Builds a composite key for use in solr.
-   * 
+   *
    * @param dublinCoreId
    *          the DC identifier, which must be unique for an organization
    * @param orgId
@@ -503,7 +508,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
   /**
    * Add field to solr document that can contain multiple values. For sorting field, those values are concatenated and
    * multivalued field delimiter is used.
-   * 
+   *
    * @param doc
    *          {@link SolrInputDocument} for fields to be added to
    * @param solrField
@@ -529,7 +534,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceIndex#count()
    */
   @Override
@@ -544,7 +549,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Appends query parameters to a solr query
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -568,7 +573,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Appends a multivalued query parameter to a solr query
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -583,7 +588,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Appends a multivalued query parameter to a solr query
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -618,7 +623,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
   /**
    * Appends query parameters to a solr query in a way that they are found even though they are not treated as a full
    * word in solr.
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -644,7 +649,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Appends query parameters to a solr query
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -670,7 +675,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Builds a solr search query from a {@link SeriesQuery}.
-   * 
+   *
    * @param query
    *          the series query
    * @param forEdit
@@ -703,26 +708,30 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Appends the authorization information to the solr query string
-   * 
+   *
    * @param sb
    *          the {@link StringBuilder} containing the query
    * @param forEdit
    *          if this query should return only series available to the current user for editing
-   * 
+   *
    * @return the appended {@link StringBuilder}
    */
   protected StringBuilder appendAuthorization(StringBuilder sb, boolean forEdit) {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
     if (!currentUser.hasRole(currentOrg.getAdminRole()) && !currentUser.hasRole(GLOBAL_ADMIN_ROLE)) {
-      final String[] roles = currentUser.getRoles();
+      List<String> roleList = new ArrayList<String>();
+      for (Role role : currentUser.getRoles()) {
+        roleList.add(role.getName());
+      }
+      String[] roles = roleList.toArray(new String[roleList.size()]);
       if (forEdit) {
         appendAnd(sb, SolrFields.ACCESS_CONTROL_EDIT, roles);
       } else if (roles.length > 0) {
         sb.append(" AND (");
-        append(sb, "", SolrFields.ACCESS_CONTROL_CONTRIBUTE, currentUser.getRoles());
+        append(sb, "", SolrFields.ACCESS_CONTROL_CONTRIBUTE, roles);
         sb.append(" OR ");
-        append(sb, "", SolrFields.ACCESS_CONTROL_READ, currentUser.getRoles());
+        append(sb, "", SolrFields.ACCESS_CONTROL_READ, roles);
         sb.append(")");
       }
     }
@@ -731,7 +740,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Returns the search index' field name that corresponds to the sort field.
-   * 
+   *
    * @param sort
    *          the sort field
    * @return the field name in the search index
@@ -859,7 +868,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceIndex#get(java.lang.String)
    */
   @Override
@@ -883,7 +892,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceIndex#getAccessControl(java.lang.String)
    */
   @Override
@@ -910,7 +919,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Returns SolrDocument corresponding to given ID or null if such document does not exist.
-   * 
+   *
    * @param id
    *          SolrDocument ID
    * @return corresponding document
@@ -953,7 +962,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Serializes Dublin core and returns serialized string.
-   * 
+   *
    * @param dc
    *          {@link DublinCoreCatalog} to be serialized
    * @return String representation of serialized Dublin core
@@ -971,7 +980,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /**
    * Parses Dublin core stored as string.
-   * 
+   *
    * @param dcXML
    *          string representation of Dublin core
    * @return parsed {@link DublinCoreCatalog}

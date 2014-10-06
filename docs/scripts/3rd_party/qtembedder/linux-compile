@@ -26,8 +26,9 @@ cp ../qt_sbtl_embedder.cc src
 cp ../qt_sbtl_embedder.h src
 [ $? -ne 0 ] && exit 1
 #
-./configure \
-LDFLAGS="-Wl,-rpath,${LOCAL_PREFIX}/lib"
+./configure --prefix=$LOCAL_PREFIX \
+CPPFLAGS=-I${LOCAL_PREFIX}/include \
+LDFLAGS="-L${LOCAL_PREFIX}/lib -Wl,-rpath,${LOCAL_PREFIX}/lib"
 #CC=g++
 [ $? -ne 0 ] && exit 1
 make

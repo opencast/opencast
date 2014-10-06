@@ -43,10 +43,15 @@ cp ../configure.ac .
 #
 ./autogen.sh
 [ $? -ne 0 ] && exit 1
-./configure \
-LDFLAGS='-L${LOCAL_PREFIX}/lib -Wl,-rpath,${LOCAL_PREFIX}/lib' \
+./configure --prefix=$LOCAL_PREFIX \
+LDFLAGS="-L${LOCAL_PREFIX}/lib -Wl,-rpath,${LOCAL_PREFIX}/lib" \
+LIBLEPT_HEADERSDIR="${LOCAL_PREFIX}/include /usr/include" \
 LIBS=-lgif
 [ $? -ne 0 ] && exit 1
+#
+patch -p 1 < ../tesseract-3.01-missing_header.patch
+[ $? -ne 0 ] && exit 1
+#
 make
 [ $? -ne 0 ] && exit 1
 #

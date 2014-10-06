@@ -40,7 +40,7 @@ public class DublinCoreValue implements Serializable {
 
   /**
    * Creates a new Dublin Core value.
-   * 
+   *
    * @param value
    *          the value
    * @param language
@@ -61,7 +61,7 @@ public class DublinCoreValue implements Serializable {
 
   /**
    * Creates a new Dublin Core value without an encoding scheme.
-   * 
+   *
    * @param value
    *          the value
    * @param language
@@ -73,7 +73,7 @@ public class DublinCoreValue implements Serializable {
 
   /**
    * Creates a new Dublin Core value with the language set to undefined and no particular encoding scheme.
-   * 
+   *
    * @param value
    *          the value
    * @see org.opencastproject.metadata.dublincore.DublinCore#LANGUAGE_UNDEFINED

@@ -16,38 +16,43 @@
 
 package org.opencastproject.util.data;
 
+import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.opencastproject.util.data.functions.Misc.chuck;
-
 /**
- * The option type encapsulates on optional value. It contains either some value or is empty.
- * Please make sure to NEVER wrap null into a some. Instead use none.
+ * The option type encapsulates on optional value. It contains either some value or is empty. Please make sure to NEVER
+ * wrap null into a some. Instead use none.
  */
 // todo clean up the mix of abstract methods and concrete implementations based on the isSome() decision
 public abstract class Option<A> implements Iterable<A> {
-
   private Option() {
   }
 
   /** Safe decomposition of the option type. */
   public abstract <B> B fold(Match<A, B> visitor);
 
-  public abstract Option<A> foreach(Function<A, Void> f);
+  /** Safe decomposition of the option type using functions. */
+  public <B> B fold(Function<A, B> some, Function0<B> none) {
+    return isSome() ? some.apply(get()) : none.apply();
+  }
 
-  public abstract <B> Option<B> fmap(Function<A, B> f);
+  public abstract Option<A> foreach(Function<? super A, Void> f);
 
-  public <B> Option<B> map(Function<A, B> f) {
+  public abstract <B> Option<B> fmap(Function<? super A, ? extends B> f);
+
+  public <B> Option<B> map(Function<? super A, ? extends B> f) {
     return fmap(f);
   }
 
   /** Monadic bind operation <code>m a -> (a -> m b) -> m b</code>. */
   public abstract <B> Option<B> bind(Function<A, Option<B>> f);
 
-  /** @see org.opencastproject.util.data.functions.Functions#bind(Function */
+  /** @see org.opencastproject.util.data.functions.Functions#bind(Function) */
   public <B> Option<B> flatMap(Function<A, Option<B>> f) {
     return bind(f);
   }
@@ -58,27 +63,27 @@ public abstract class Option<A> implements Iterable<A> {
     return !isSome();
   }
 
-  /** If this is none return <code>some</code>. Like {@link #bind(Function)} but ignores the option's content. */
+  /** If this is some return <code>some</code>. Like {@link #bind(Function)} but ignores the option's content. */
   public <B> Option<B> andThen(Option<B> some) {
-    return isSome() ? some : Option.<B>none();
+    return isSome() ? some : Option.<B> none();
   }
 
-  /** If this is none return <code>some</code>. Like {@link #map(Function)} but ignores the option's content. */
+  /** If this is some return <code>some</code>. Like {@link #map(Function)} but ignores the option's content. */
   public <B> Option<B> andThenV(B some) {
-    return isSome() ? some(some) : Option.<B>none();
+    return isSome() ? some(some) : Option.<B> none();
   }
 
   /** Lazy version of {@link #andThen(Option)}. */
   public <B> Option<B> andThen(Function0<Option<B>> some) {
-    return isSome() ? some.apply() : Option.<B>none();
+    return isSome() ? some.apply() : Option.<B> none();
   }
 
   /** Lazy version of {@link #andThenV(Object)}. */
   public <B> Option<B> andThenV(Function0<B> some) {
-    return isSome() ? some(some.apply()) : Option.<B>none();
+    return isSome() ? some(some.apply()) : Option.<B> none();
   }
 
-  /** If this is none return <code>node</code> else this. */
+  /** If this is none return <code>none</code> else this. */
   public Option<A> orElse(Option<A> none) {
     return isSome() ? this : none;
   }
@@ -90,13 +95,16 @@ public abstract class Option<A> implements Iterable<A> {
 
   /** Throw <code>none</code> if none. */
   public <T extends Throwable> Option<A> orError(T none) throws T {
-    if (isSome()) return this;
-    else throw none;
+    if (isSome())
+      return this;
+    else
+      throw none;
   }
 
   /** Throw <code>none</code> if none. */
   public <T extends Throwable> Option<A> orError(Class<T> none) throws T {
-    if (isSome()) return this;
+    if (isSome())
+      return this;
     else {
       T t;
       try {
@@ -112,8 +120,18 @@ public abstract class Option<A> implements Iterable<A> {
 
   /** Throw exception returned by <code>none</code> if none. */
   public <T extends Throwable> Option<A> orError(Function0<T> none) throws T {
-    if (isSome()) return this;
-    else throw none.apply();
+    if (isSome())
+      return this;
+    else
+      throw none.apply();
+  }
+
+  public <B> Option<Tuple<A, B>> and(Option<B> b) {
+    if (isSome() && b.isSome()) {
+      return some(tuple(get(), b.get()));
+    } else {
+      return none();
+    }
   }
 
   /** Get the contained value or throw an exception. */
@@ -135,16 +153,29 @@ public abstract class Option<A> implements Iterable<A> {
   public abstract List<A> list();
 
   /**
-   * Left projection of this option. If the option is <code>some</code> return the
-   * value in an {@link Either#left(Object)} else return <code>right</code> in an {@link Either#right(Object)}.
+   * Left projection of this option. If the option is <code>some</code> return the value in an
+   * {@link Either#left(Object)} else return <code>right</code> in an {@link Either#right(Object)}.
    */
   public abstract <B> Either<A, B> left(B right);
 
   /**
-   * Right projection of this optio. If the option is <code>some</code> return the
-   * value in an {@link Either#left(Object)} else return <code>right</code> in an {@link Either#right(Object)}.
+   * Right projection of this optio. If the option is <code>some</code> return the value in an
+   * {@link Either#left(Object)} else return <code>right</code> in an {@link Either#right(Object)}.
    */
   public abstract <B> Either<B, A> right(B left);
+
+  /** Inversion. If some return none. If none return some(zero). */
+  public Option<A> inv(A zero) {
+    return isSome() ? Option.<A> none() : some(zero);
+  }
+
+  @Override
+  public abstract int hashCode();
+
+  @Override
+  public abstract boolean equals(Object o);
+
+  // -- constructor functions
 
   /** Create a new some. */
   public static <A> Option<A> some(final A a) {
@@ -157,14 +188,15 @@ public abstract class Option<A> implements Iterable<A> {
       }
 
       @Override
-      public Option<A> foreach(Function<A, Void> f) {
+      public Option<A> foreach(Function<? super A, Void> f) {
         f.apply(a);
         return this;
       }
 
       @Override
-      public <B> Option<B> fmap(Function<A, B> f) {
-        return some(f.apply(a));
+      public <B> Option<B> fmap(Function<? super A, ? extends B> f) {
+        B b = f.apply(a);
+        return some(b);
       }
 
       @Override
@@ -192,7 +224,8 @@ public abstract class Option<A> implements Iterable<A> {
         return a;
       }
 
-      @Override public A getOrElseNull() {
+      @Override
+      public A getOrElseNull() {
         return a;
       }
 
@@ -254,12 +287,12 @@ public abstract class Option<A> implements Iterable<A> {
       }
 
       @Override
-      public Option<A> foreach(Function<A, Void> f) {
+      public Option<A> foreach(Function<? super A, Void> f) {
         return this;
       }
 
       @Override
-      public <B> Option<B> fmap(Function<A, B> f) {
+      public <B> Option<B> fmap(Function<? super A, ? extends B> f) {
         return none();
       }
 
@@ -288,7 +321,8 @@ public abstract class Option<A> implements Iterable<A> {
         return none.apply();
       }
 
-      @Override public A getOrElseNull() {
+      @Override
+      public A getOrElseNull() {
         return null;
       }
 
@@ -299,7 +333,7 @@ public abstract class Option<A> implements Iterable<A> {
 
       @Override
       public Monadics.ListMonadic<A> mlist() {
-        return Monadics.<A>mlist(list());
+        return Monadics.<A> mlist(list());
       }
 
       @Override
@@ -335,8 +369,8 @@ public abstract class Option<A> implements Iterable<A> {
   }
 
   /**
-   * Create a none with the type of <code>example</code>.
-   * This saves some nasty typing, e.g. <code>Option.&lt;String&gt;none()</code> vs. <code>none("")</code>.
+   * Create a none with the type of <code>example</code>. This saves some nasty typing, e.g.
+   * <code>Option.&lt;String&gt;none()</code> vs. <code>none("")</code>.
    * <p/>
    * Please note that this constructor is only due to Java's insufficient type inference.
    */
@@ -357,12 +391,21 @@ public abstract class Option<A> implements Iterable<A> {
       return none();
   }
 
+  /** {@link #option(Object)} as a function. */
+  public static <A> Function<A, Option<A>> option() {
+    return new Function<A, Option<A>>() {
+      @Override
+      public Option<A> apply(A a) {
+        return option(a);
+      }
+    };
+  }
+
   /**
    * Use this function in <code>getOrElse</code> if it is an error being none.
    *
-   * @deprecated use {@link #orError(Throwable)} or {@link #orElse(Function0)} instead since it saves the need
-   *             for creating new objects just for the sake of type soundness. Java unfortunately lacks a
-   *             bottom type.
+   * @deprecated use {@link #orError(Throwable)} or {@link #orElse(Function0)} instead since it saves the need for
+   *             creating new objects just for the sake of type soundness. Java unfortunately lacks a bottom type.
    */
   public static <A> Function0<A> error(final String message) {
     return new Function0<A>() {
@@ -375,6 +418,7 @@ public abstract class Option<A> implements Iterable<A> {
 
   /**
    * Create an equals function.
+   *
    * <pre>
    *   some("abc").map(eq("bcd")).getOrElse(false) // false
    *   some("abc").map(eq("abc")).getOrElse(false) // true

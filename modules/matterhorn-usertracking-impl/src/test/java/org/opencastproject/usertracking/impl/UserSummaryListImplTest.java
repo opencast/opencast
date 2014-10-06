@@ -76,7 +76,7 @@ public class UserSummaryListImplTest {
     c2.add(Calendar.HOUR, 1);
     Calendar c3 = (Calendar) c2.clone();
     c3.add(Calendar.HOUR, 1);
-    
+
     l1.add(userSummary1);
     Assert.assertEquals(1, l1.getTotal());
     Assert.assertEquals(1, l1.getUserSummaries().size());
@@ -101,7 +101,7 @@ public class UserSummaryListImplTest {
     Assert.assertEquals(2, l1.getUserSummaries().get(1).getSessionCount());
     Assert.assertEquals(2, l1.getUserSummaries().get(1).getUniqueMediapackages());
     Assert.assertEquals("test2", l1.getUserSummaries().get(1).getUserId());
-    
+
     l1.add(userSummary3);
     Assert.assertEquals(2, l1.getTotal());
     Assert.assertEquals(2, l1.getUserSummaries().size());

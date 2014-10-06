@@ -64,7 +64,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /**
    * Creates {@link EntityManagerFactory} using persistence provider and properties passed via OSGi.
-   * 
+   *
    * @param cc
    */
   public void activate(ComponentContext cc) {
@@ -75,7 +75,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /**
    * Closes entity manager factory.
-   * 
+   *
    * @param cc
    */
   public void deactivate(ComponentContext cc) {
@@ -84,7 +84,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /**
    * OSGi callback to set persistence properties.
-   * 
+   *
    * @param persistenceProperties
    *          persistence properties
    */
@@ -94,7 +94,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /**
    * OSGi callback to set persistence provider.
-   * 
+   *
    * @param persistenceProvider
    *          {@link PersistenceProvider} object
    */
@@ -104,7 +104,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /**
    * OSGi callback to set dublin core catalog service.
-   * 
+   *
    * @param dcService
    *          {@link DublinCoreCatalogService} object
    */
@@ -114,7 +114,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /**
    * Serializes Dublin core catalog and returns it as String.
-   * 
+   *
    * @param dc
    *          {@link DublinCoreCatalog} to be serialized
    * @return String presenting serialized dublin core
@@ -132,7 +132,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /**
    * Serializes Properties and returns them as string.
-   * 
+   *
    * @param caProperties
    *          Properties to be serialized
    * @return String representation of properties
@@ -147,7 +147,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /**
    * Parses Dublin core stored as string.
-   * 
+   *
    * @param dcXML
    *          string representation of Dublin core
    * @return parsed {@link DublinCoreCatalog}
@@ -161,7 +161,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /**
    * Parses Properties represented as String.
-   * 
+   *
    * @param serializedProperties
    * @return parsed Properties
    * @throws IOException
@@ -175,7 +175,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceDatabase#deleteEvent(java.lang.String)
    */
   @Override
@@ -209,7 +209,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceDatabase#getAllEvents()
    */
   @SuppressWarnings("unchecked")
@@ -244,7 +244,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceDatabase#getEventMetadata(long)
    */
   @Override
@@ -274,7 +274,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.scheduler.impl.SchedulerServiceDatabase#updateEvent(org.opencastproject.metadata.dublincore
    * .DublinCoreCatalog)
@@ -322,7 +322,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceDatabase#storeEvents(java.util.List)
    */
   @Override
@@ -364,7 +364,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.impl.SchedulerServiceDatabase#updateEventWithMetadata(java.lang.String,
    * java.util.Properties)
    */

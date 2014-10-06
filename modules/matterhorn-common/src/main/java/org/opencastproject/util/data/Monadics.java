@@ -13,7 +13,6 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.util.data;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -30,6 +29,7 @@ import static java.util.Arrays.asList;
 import static org.opencastproject.util.data.Collections.appendTo;
 import static org.opencastproject.util.data.Collections.appendToA;
 import static org.opencastproject.util.data.Collections.appendToM;
+import static org.opencastproject.util.data.Collections.forc;
 import static org.opencastproject.util.data.Collections.iterator;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.toList;
@@ -48,13 +48,13 @@ public final class Monadics {
   // abstract over the container type like this
   //
   // interface Functor<F<_>> {
-  //   <A, B> F<B> fmap(F<A> a, Function<A, B> f);
+  // <A, B> F<B> fmap(F<A> a, Function<A, B> f);
   // }
   //
   // or
   //
   // interface Functor<A, F<A>> {
-  //   <B> F<B> fmap(Function<A, B> f);
+  // <B> F<B> fmap(Function<A, B> f);
   // }
 
   /** The list monad. */
@@ -64,7 +64,7 @@ public final class Monadics {
     }
 
     /** Alias for {@link #fmap(Function) fmap}. */
-    public final <B> ListMonadic<B> map(Function<A, B> f) {
+    public final <B> ListMonadic<B> map(Function<? super A, ? extends B> f) {
       return fmap(f);
     }
 
@@ -73,24 +73,24 @@ public final class Monadics {
      *
      * @see #map(Function)
      */
-    public abstract <B> ListMonadic<B> fmap(Function<A, B> f);
+    public abstract <B> ListMonadic<B> fmap(Function<? super A, ? extends B> f);
 
     /** Alias for {@link #bind(Function)}. */
-    public final <B, M extends Iterable<B>> ListMonadic<B> flatMap(Function<A, M> f) {
+    public final <B> ListMonadic<B> flatMap(Function<? super A, ? extends Iterable<B>> f) {
       return bind(f);
     }
 
     /**
-     * Monadic bind <code>m a -&gt; (a -&gt; m b) -&gt m b</code>.
-     * Apply <code>f</code> to each elements concatenating the results into a new list.
+     * Monadic bind <code>m a -&gt; (a -&gt; m b) -&gt m b</code>. Apply <code>f</code> to each elements concatenating
+     * the results into a new list.
      */
-    public abstract <B, M extends Iterable<B>> ListMonadic<B> bind(Function<A, M> f);
+    public abstract <B> ListMonadic<B> bind(Function<? super A, ? extends Iterable<B>> f);
 
     /** Fold the list from left to right applying binary operator <code>f</code> starting with <code>zero</code>. */
-    public abstract <B> B foldl(B zero, Function2<B, A, B> f);
+    public abstract <B> B foldl(B zero, Function2<? super B, ? super A, ? extends B> f);
 
     /** Reduce the list from left to right applying binary operator <code>f</code>. The list must not be empty. */
-    public abstract A reducel(Function2<A, A, A> f);
+    public abstract A reducel(Function2<? super A, ? super A, ? extends A> f);
 
     /** Append <code>a</code> to the list. */
     public abstract <M extends Iterable<A>> ListMonadic<A> concat(M m);
@@ -99,19 +99,19 @@ public final class Monadics {
     public abstract <X extends A> ListMonadic<A> cons(X a);
 
     /** Retain all elements satisfying predicate <code>p</code>. */
-    public abstract ListMonadic<A> filter(Function<A, Boolean> p);
+    public abstract ListMonadic<A> filter(Function<? super A, Boolean> p);
 
     /** Return the first element satisfying predicate <code>p</code>. */
-    public abstract Option<A> find(Function<A, Boolean> p);
+    public abstract Option<A> find(Function<? super A, Boolean> p);
 
     /** Check if at least one element satisfies predicate <code>p</code>. */
-    public abstract boolean exists(Function<A, Boolean> p);
+    public abstract boolean exists(Function<? super A, Boolean> p);
 
     /** Apply side effect <code>e</code> to each element. */
-    public abstract ListMonadic<A> each(Function<A, Void> e);
+    public abstract ListMonadic<A> each(Function<? super A, Void> e);
 
     /** Apply side effect <code>e</code> to each element. Indexed version. */
-    public abstract ListMonadic<A> eachIndex(Function2<A, Integer, Void> e);
+    public abstract ListMonadic<A> eachIndex(Function2<? super A, ? super Integer, Void> e);
 
     public abstract <B, M extends Iterable<B>> ListMonadic<Tuple<A, B>> zip(M bs);
 
@@ -120,6 +120,8 @@ public final class Monadics {
     public abstract <B> ListMonadic<Tuple<A, B>> zip(Iterator<B> bs);
 
     public abstract ListMonadic<A> sort(Comparator<A> c);
+
+    public abstract ListMonadic<A> reverse();
 
     /** Return the head of the list. */
     public abstract Option<A> headOpt();
@@ -142,8 +144,11 @@ public final class Monadics {
     /** Limit the list to the first <code>n</code> elements. */
     public abstract ListMonadic<A> take(int n);
 
+    /** Drop the first <code>n</code> elements of the list. */
+    public abstract ListMonadic<A> drop(int n);
+
     /** Process the wrapped list en bloc. */
-    public abstract <B> ListMonadic<B> inspect(Function<List<A>, List<B>> f);
+    public abstract <B> ListMonadic<B> inspect(Function<? super List<A>, ? extends List<B>> f);
 
     /** Pattern matching on the wrapped list. */
     public final <B> B match(Matcher<A, B>... ms) {
@@ -159,6 +164,8 @@ public final class Monadics {
       }
       return unexhaustiveMatch();
     }
+
+    public abstract String mkString(String sep);
 
     /** Return the wrapped, unmodifiable list. */
     public abstract List<A> value();
@@ -189,10 +196,10 @@ public final class Monadics {
     /** Monadic bind. Apply <code>f</code> to each elements concatenating the results. */
     public abstract <B> IteratorMonadic<B> bind(Function<A, Iterator<B>> f);
 
-//    /**
-//     * Apply <code>f</code> to each elements concatenating the results into a new list.
-//     */
-//    <B, BB extends Collection<B>> IteratorMonadic<B> flatMap(Function<A, BB> f);
+    // /**
+    // * Apply <code>f</code> to each elements concatenating the results into a new list.
+    // */
+    // <B, BB extends Collection<B>> IteratorMonadic<B> flatMap(Function<A, BB> f);
 
     /** Fold the elements applying binary operator <code>f</code> starting with <code>zero</code>. */
     public abstract <B> B fold(B zero, Function2<B, A, B> f);
@@ -200,13 +207,16 @@ public final class Monadics {
     /** Reduce the elements applying binary operator <code>f</code>. The iterator must not be empty. */
     public abstract A reduce(Function2<A, A, A> f);
 
-//    /**
-//     * Append <code>a</code> to the list.
-//     */
-//    <M extends Collection<A>> ListMonadic<A> concat(M a);
+    // /**
+    // * Append <code>a</code> to the list.
+    // */
+    // <M extends Collection<A>> ListMonadic<A> concat(M a);
 
     /** Retain all elements satisfying predicate <code>p</code>. */
     public abstract IteratorMonadic<A> filter(Function<A, Boolean> p);
+
+    /** Check if at least one element satisfies predicate <code>p</code>. */
+    public abstract boolean exists(Function<A, Boolean> p);
 
     /** Limit iteration to the first <code>n</code> elements. */
     public abstract IteratorMonadic<A> take(int n);
@@ -218,9 +228,8 @@ public final class Monadics {
     public abstract IteratorMonadic<A> eachIndex(Function2<A, Integer, Void> e);
 
     /**
-     * Return the head of the iterator.
-     * <em>ATTENTION:</em> This method is not pure since it has the
-     * side effect of taking and wrapping the next element of the wrapped iterator.
+     * Return the head of the iterator. <em>ATTENTION:</em> This method is not pure since it has the side effect of
+     * taking and wrapping the next element of the wrapped iterator.
      */
     public abstract Option<A> next();
 
@@ -239,10 +248,15 @@ public final class Monadics {
     return new ArrayList<A>(size);
   }
 
+  private static <A> List<A> newListBuilder(Collection<A> as) {
+    return new ArrayList<A>(as);
+  }
+
   // -- matchers and constructors
 
   public static interface Matcher<A, B> {
     boolean matches(ListMonadic<A> m);
+
     B apply(ListMonadic<A> m);
   }
 
@@ -300,6 +314,10 @@ public final class Monadics {
 
   // -- constructors
 
+  public static <A> ListMonadic<A> mlist(final Iterable<A> as) {
+    return mlist(as.iterator());
+  }
+
   /** Constructor for collections. */
   public static <A> ListMonadic<A> mlist(final Collection<A> as) {
     return mlist(new ArrayList<A>(as));
@@ -309,21 +327,22 @@ public final class Monadics {
   public static <A> ListMonadic<A> mlist(final List<A> as) {
     return new ListMonadic<A>() {
       @Override
-      public <B> ListMonadic<B> fmap(Function<A, B> f) {
+      public <B> ListMonadic<B> fmap(Function<? super A, ? extends B> f) {
         final List<B> target = newListBuilder(as.size());
         for (A a : as) target.add(f.apply(a));
         return mlist(target);
       }
 
       @Override
-      public <B, M extends Iterable<B>> ListMonadic<B> bind(Function<A, M> f) {
+      public <B> ListMonadic<B> bind(Function<? super A, ? extends Iterable<B>> f) {
         final List<B> target = newListBuilder();
-        for (A a : as) appendTo(target, f.apply(a));
+        for (A a : as)
+          appendTo(target, f.apply(a));
         return mlist(target);
       }
 
       @Override
-      public ListMonadic<A> filter(Function<A, Boolean> p) {
+      public ListMonadic<A> filter(Function<? super A, Boolean> p) {
         final List<A> target = newListBuilder(as.size());
         for (A a : as) {
           if (p.apply(a)) {
@@ -334,7 +353,7 @@ public final class Monadics {
       }
 
       @Override
-      public Option<A> find(Function<A, Boolean> p) {
+      public Option<A> find(Function<? super A, Boolean> p) {
         for (A a : as) {
           if (p.apply(a))
             return some(a);
@@ -343,7 +362,7 @@ public final class Monadics {
       }
 
       @Override
-      public boolean exists(Function<A, Boolean> p) {
+      public boolean exists(Function<? super A, Boolean> p) {
         for (A a : as) {
           if (p.apply(a))
             return true;
@@ -352,7 +371,7 @@ public final class Monadics {
       }
 
       @Override
-      public <B> B foldl(B zero, Function2<B, A, B> f) {
+      public <B> B foldl(B zero, Function2<? super B, ? super A, ? extends B> f) {
         B fold = zero;
         for (A a : as) {
           fold = f.apply(fold, a);
@@ -361,7 +380,7 @@ public final class Monadics {
       }
 
       @Override
-      public A reducel(Function2<A, A, A> f) {
+      public A reducel(Function2<? super A, ? super A, ? extends A> f) {
         if (as.size() == 0) {
           throw new RuntimeException("Cannot reduce an empty list");
         } else {
@@ -375,26 +394,31 @@ public final class Monadics {
 
       @Override
       public Option<A> headOpt() {
-        return !as.isEmpty() ? some(head()) : Option.<A>none();
+        return !as.isEmpty() ? some(head()) : Option.<A> none();
       }
 
-      @Override public A head() {
+      @Override
+      public A head() {
         return as.get(0);
       }
 
-      @Override public A last() {
+      @Override
+      public A last() {
         return as.get(as.size() - 1);
       }
 
-      @Override public Option<A> lastOpt() {
-        return !as.isEmpty() ? some(last()) : Option.<A>none();
+      @Override
+      public Option<A> lastOpt() {
+        return !as.isEmpty() ? some(last()) : Option.<A> none();
       }
 
-      @Override public Option<A> option() {
-        return as.size() == 1 ? some(as.get(0)) : Option.<A>none();
+      @Override
+      public Option<A> option() {
+        return as.size() == 1 ? some(as.get(0)) : Option.<A> none();
       }
 
-      @Override public ListMonadic<A> tail() {
+      @Override
+      public ListMonadic<A> tail() {
         if (as.size() <= 1)
           return mlist();
         return mlist(as.subList(1, as.size()));
@@ -406,30 +430,37 @@ public final class Monadics {
       }
 
       @Override
+      public ListMonadic<A> drop(int n) {
+        return mlist(as.subList(min(as.size(), n), as.size()));
+      }
+
+      @Override
       public <M extends Iterable<A>> ListMonadic<A> concat(M bs) {
-        return mlist(appendToM(Monadics.<A>newListBuilder(), as, bs));
+        return mlist(appendToM(Monadics.<A> newListBuilder(), as, bs));
       }
 
       @Override
       public <X extends A> ListMonadic<A> cons(X a) {
-        return mlist(Collections.<A>cons(a, as));
+        return mlist(Collections.<A> cons(a, as));
       }
 
       @Override
-      public <B> ListMonadic<B> inspect(Function<List<A>, List<B>> f) {
+      public <B> ListMonadic<B> inspect(Function<? super List<A>, ? extends List<B>> f) {
         return mlist(f.apply(as));
       }
 
       @Override
-      public ListMonadic<A> each(Function<A, Void> e) {
-        for (A a : as) e.apply(a);
+      public ListMonadic<A> each(Function<? super A, Void> e) {
+        for (A a : as)
+          e.apply(a);
         return this;
       }
 
       @Override
-      public ListMonadic<A> eachIndex(Function2<A, Integer, Void> e) {
+      public ListMonadic<A> eachIndex(Function2<? super A, ? super Integer, Void> e) {
         int i = 0;
-        for (A a : as) e.apply(a, i++);
+        for (A a : as)
+          e.apply(a, i++);
         return this;
       }
 
@@ -465,11 +496,24 @@ public final class Monadics {
         return mlist(target);
       }
 
-      @Override public ListMonadic<A> sort(Comparator<A> c) {
+      @Override
+      public ListMonadic<A> sort(Comparator<A> c) {
         final List<A> target = newListBuilder(as.size());
         target.addAll(as);
         java.util.Collections.sort(target, c);
         return mlist(target);
+      }
+
+      @Override
+      public ListMonadic<A> reverse() {
+        final List<A> target = newListBuilder(as);
+        java.util.Collections.reverse(target);
+        return mlist(target);
+      }
+
+      @Override
+      public String mkString(String sep) {
+        return Collections.mkString(as, sep);
       }
 
       @Override
@@ -488,21 +532,23 @@ public final class Monadics {
   public static <A> ListMonadic<A> mlist(final A... as) {
     return new ListMonadic<A>() {
       @Override
-      public <B> ListMonadic<B> fmap(Function<A, B> f) {
+      public <B> ListMonadic<B> fmap(Function<? super A, ? extends B> f) {
         final List<B> target = newListBuilder(as.length);
-        for (A a : as) target.add(f.apply(a));
+        for (A a : as)
+          target.add(f.apply(a));
         return mlist(target);
       }
 
       @Override
-      public <B, M extends Iterable<B>> ListMonadic<B> bind(Function<A, M> f) {
+      public <B> ListMonadic<B> bind(Function<? super A, ? extends Iterable<B>> f) {
         final List<B> target = newListBuilder();
-        for (A a : as) appendTo(target, f.apply(a));
+        for (A a : as)
+          appendTo(target, f.apply(a));
         return mlist(target);
       }
 
       @Override
-      public ListMonadic<A> filter(Function<A, Boolean> p) {
+      public ListMonadic<A> filter(Function<? super A, Boolean> p) {
         List<A> target = newListBuilder(as.length);
         for (A a : as) {
           if (p.apply(a)) {
@@ -513,7 +559,7 @@ public final class Monadics {
       }
 
       @Override
-      public Option<A> find(Function<A, Boolean> p) {
+      public Option<A> find(Function<? super A, Boolean> p) {
         for (A a : as) {
           if (p.apply(a))
             return some(a);
@@ -522,7 +568,7 @@ public final class Monadics {
       }
 
       @Override
-      public boolean exists(Function<A, Boolean> p) {
+      public boolean exists(Function<? super A, Boolean> p) {
         for (A a : as) {
           if (p.apply(a))
             return true;
@@ -531,7 +577,7 @@ public final class Monadics {
       }
 
       @Override
-      public <B> B foldl(B zero, Function2<B, A, B> f) {
+      public <B> B foldl(B zero, Function2<? super B, ? super A, ? extends B> f) {
         B fold = zero;
         for (A a : as) {
           fold = f.apply(fold, a);
@@ -540,7 +586,7 @@ public final class Monadics {
       }
 
       @Override
-      public A reducel(Function2<A, A, A> f) {
+      public A reducel(Function2<? super A, ? super A, ? extends A> f) {
         if (as.length == 0) {
           throw new RuntimeException("Cannot reduce an empty list");
         } else {
@@ -554,7 +600,7 @@ public final class Monadics {
 
       @Override
       public Option<A> headOpt() {
-        return as.length != 0 ? some(as[0]) : Option.<A>none();
+        return as.length != 0 ? some(as[0]) : Option.<A> none();
       }
 
       @Override
@@ -562,17 +608,19 @@ public final class Monadics {
         return as[0];
       }
 
-      @Override public A last() {
+      @Override
+      public A last() {
         return as[as.length - 1];
       }
 
-      @Override public Option<A> lastOpt() {
-        return as.length > 0 ? some(last()) : Option.<A>none();
+      @Override
+      public Option<A> lastOpt() {
+        return as.length > 0 ? some(last()) : Option.<A> none();
       }
 
       @Override
       public Option<A> option() {
-        return as.length == 1 ? some(as[0]) : Option.<A>none();
+        return as.length == 1 ? some(as[0]) : Option.<A> none();
       }
 
       @Override
@@ -588,6 +636,11 @@ public final class Monadics {
       }
 
       @Override
+      public ListMonadic<A> drop(int n) {
+        return (ListMonadic<A>) mlist(ArrayUtils.subarray(as, n, as.length));
+      }
+
+      @Override
       public <M extends Iterable<A>> ListMonadic<A> concat(M bs) {
         final List<A> t = newListBuilder(as.length);
         return mlist(appendTo(appendToA(t, as), bs));
@@ -595,16 +648,16 @@ public final class Monadics {
 
       @Override
       public <X extends A> ListMonadic<A> cons(X a) {
-        return mlist(Collections.<A, List>concat(Collections.<A>list(a), Collections.<A>list(as)));
+        return mlist(Collections.<A, List> concat(Collections.<A> list(a), Collections.<A> list(as)));
       }
 
       @Override
-      public <B> ListMonadic<B> inspect(Function<List<A>, List<B>> f) {
+      public <B> ListMonadic<B> inspect(Function<? super List<A>, ? extends List<B>> f) {
         return mlist(f.apply(value()));
       }
 
       @Override
-      public ListMonadic<A> each(Function<A, Void> e) {
+      public ListMonadic<A> each(Function<? super A, Void> e) {
         for (A a : as) {
           e.apply(a);
         }
@@ -612,7 +665,7 @@ public final class Monadics {
       }
 
       @Override
-      public ListMonadic<A> eachIndex(Function2<A, Integer, Void> e) {
+      public ListMonadic<A> eachIndex(Function2<? super A, ? super Integer, Void> e) {
         int i = 0;
         for (A a : as) {
           e.apply(a, i++);
@@ -652,10 +705,23 @@ public final class Monadics {
         return mlist(target);
       }
 
-      @Override public ListMonadic<A> sort(Comparator<A> c) {
+      @Override
+      public ListMonadic<A> sort(Comparator<A> c) {
         final List<A> target = list(as);
         java.util.Collections.sort(target, c);
         return mlist(target);
+      }
+
+      @Override
+      public ListMonadic<A> reverse() {
+        final List<A> target = list(as);
+        java.util.Collections.reverse(target);
+        return mlist(target);
+      }
+
+      @Override
+      public String mkString(String sep) {
+        return Arrays.mkString(as, sep);
       }
 
       @Override
@@ -674,7 +740,7 @@ public final class Monadics {
   public static <A> ListMonadic<A> mlist(final Iterator<A> as) {
     return new ListMonadic<A>() {
       @Override
-      public <B> ListMonadic<B> fmap(Function<A, B> f) {
+      public <B> ListMonadic<B> fmap(Function<? super A, ? extends B> f) {
         final List<B> target = newListBuilder();
         while (as.hasNext()) {
           target.add(f.apply(as.next()));
@@ -683,14 +749,15 @@ public final class Monadics {
       }
 
       @Override
-      public <B, M extends Iterable<B>> ListMonadic<B> bind(Function<A, M> f) {
+      public <B> ListMonadic<B> bind(Function<? super A, ? extends Iterable<B>> f) {
         final List<B> target = newListBuilder();
-        while (as.hasNext()) appendTo(target, f.apply(as.next()));
+        while (as.hasNext())
+          appendTo(target, f.apply(as.next()));
         return mlist(target);
       }
 
       @Override
-      public ListMonadic<A> filter(Function<A, Boolean> p) {
+      public ListMonadic<A> filter(Function<? super A, Boolean> p) {
         final List<A> target = newListBuilder();
         while (as.hasNext()) {
           A a = as.next();
@@ -702,8 +769,8 @@ public final class Monadics {
       }
 
       @Override
-      public Option<A> find(Function<A, Boolean> p) {
-        for (A a : Collections.forc(as)) {
+      public Option<A> find(Function<? super A, Boolean> p) {
+        for (A a : forc(as)) {
           if (p.apply(a))
             return some(a);
         }
@@ -711,8 +778,8 @@ public final class Monadics {
       }
 
       @Override
-      public boolean exists(Function<A, Boolean> p) {
-        for (A a : Collections.forc(as)) {
+      public boolean exists(Function<? super A, Boolean> p) {
+        for (A a : forc(as)) {
           if (p.apply(a))
             return true;
         }
@@ -720,7 +787,7 @@ public final class Monadics {
       }
 
       @Override
-      public <B> B foldl(B zero, Function2<B, A, B> f) {
+      public <B> B foldl(B zero, Function2<? super B, ? super A, ? extends B> f) {
         B fold = zero;
         while (as.hasNext()) {
           fold = f.apply(fold, as.next());
@@ -729,7 +796,7 @@ public final class Monadics {
       }
 
       @Override
-      public A reducel(Function2<A, A, A> f) {
+      public A reducel(Function2<? super A, ? super A, ? extends A> f) {
         if (!as.hasNext()) {
           throw new RuntimeException("Cannot reduce an empty iterator");
         } else {
@@ -746,23 +813,28 @@ public final class Monadics {
         throw new UnsupportedOperationException();
       }
 
-      @Override public A head() {
+      @Override
+      public A head() {
         throw new UnsupportedOperationException();
       }
 
-      @Override public A last() {
+      @Override
+      public A last() {
         throw new UnsupportedOperationException();
       }
 
-      @Override public Option<A> lastOpt() {
+      @Override
+      public Option<A> lastOpt() {
         throw new UnsupportedOperationException();
       }
 
-      @Override public Option<A> option() {
+      @Override
+      public Option<A> option() {
         throw new UnsupportedOperationException();
       }
 
-      @Override public ListMonadic<A> tail() {
+      @Override
+      public ListMonadic<A> tail() {
         throw new UnsupportedOperationException();
       }
 
@@ -789,30 +861,41 @@ public final class Monadics {
       }
 
       @Override
+      public ListMonadic<A> drop(int n) {
+        int count = n;
+        while (as.hasNext() && count > 0) {
+          as.next();
+          count--;
+        }
+        return mlist(as);
+      }
+
+      @Override
       public <M extends Iterable<A>> ListMonadic<A> concat(M bs) {
         throw new UnsupportedOperationException();
       }
 
       @Override
       public <X extends A> ListMonadic<A> cons(X a) {
-        return null;  //todo
+        return null; // todo
       }
 
       @Override
-      public <B> ListMonadic<B> inspect(Function<List<A>, List<B>> f) {
+      public <B> ListMonadic<B> inspect(Function<? super List<A>, ? extends List<B>> f) {
         throw new UnsupportedOperationException();
       }
 
       @Override
-      public ListMonadic<A> each(Function<A, Void> e) {
+      public ListMonadic<A> each(Function<? super A, Void> e) {
         while (as.hasNext()) e.apply(as.next());
         return this;
       }
 
       @Override
-      public ListMonadic<A> eachIndex(Function2<A, Integer, Void> e) {
+      public ListMonadic<A> eachIndex(Function2<? super A, ? super Integer, Void> e) {
         int i = 0;
-        while (as.hasNext()) e.apply(as.next(), i++);
+        while (as.hasNext())
+          e.apply(as.next(), i++);
         return this;
       }
 
@@ -845,12 +928,24 @@ public final class Monadics {
         return mlist(target);
       }
 
-      @Override public Iterator<A> iterator() {
+      @Override
+      public Iterator<A> iterator() {
         return as;
       }
 
-      @Override public ListMonadic<A> sort(Comparator<A> c) {
+      @Override
+      public ListMonadic<A> sort(Comparator<A> c) {
         throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public ListMonadic<A> reverse() {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public String mkString(String sep) {
+        return Collections.mkString(toList(as), sep);
       }
 
       @Override
@@ -925,17 +1020,56 @@ public final class Monadics {
       }
 
       @Override
+      public boolean exists(Function<A, Boolean> p) {
+        for (A a : forc(as)) {
+          if (p.apply(a))
+            return true;
+        }
+        return false;
+      }
+
+      @Override
+      public IteratorMonadic<A> filter(final Function<A, Boolean> p) {
+        return mlazy(new Iter<A>() {
+          private A next = null;
+
+          @Override
+          public boolean hasNext() {
+            if (next != null) {
+              return true;
+            } else {
+              for (A a : forc(as)) {
+                if (p.apply(a)) {
+                  next = a;
+                  return true;
+                }
+              }
+              return false;
+            }
+          }
+
+          @Override
+          public A next() {
+            try {
+              if (next != null || hasNext()) {
+                return next;
+              } else {
+                throw new NoSuchElementException();
+              }
+            } finally {
+              next = null;
+            }
+          }
+        });
+      }
+
+      @Override
       public <B> B fold(B zero, Function2<B, A, B> f) {
         throw new UnsupportedOperationException();
       }
 
       @Override
       public A reduce(Function2<A, A, A> f) {
-        throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public IteratorMonadic<A> filter(Function<A, Boolean> p) {
         throw new UnsupportedOperationException();
       }
 
@@ -1021,6 +1155,11 @@ public final class Monadics {
 
   /** Constructor function optimized for lists. */
   public static <A> IteratorMonadic<A> mlazy(final List<A> as) {
+    return mlazy(as.iterator());
+  }
+
+  /** Constructor function. */
+  public static <A> IteratorMonadic<A> mlazy(final Iterable<A> as) {
     return mlazy(as.iterator());
   }
 

@@ -30,7 +30,7 @@ public class FreeTextAnnotationImpl implements FreeTextAnnotation {
 
   /**
    * Creates a new free text annotation.
-   * 
+   *
    * @param text
    *          the annotation
    */

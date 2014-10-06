@@ -19,13 +19,12 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.List;
 
 /**
  * An single instance of a running, paused, or stopped workflow. WorkflowInstance objects are snapshots in time for a
- * particular workflow. They are not threadsafe, and will not be updated by other threads.
+ * particular workflow. They are not thread-safe, and will not be updated by other threads.
  */
 @XmlJavaTypeAdapter(WorkflowInstanceImpl.Adapter.class)
 public interface WorkflowInstance extends Configurable {
@@ -34,48 +33,48 @@ public interface WorkflowInstance extends Configurable {
   }
 
   /**
-   * The unique ID of this {@link WorkflowInstance}
+   * The unique ID of this {@link WorkflowInstance}.
    */
   long getId();
 
   /**
    * Sets the workflow identifier.
-   * 
+   *
    * @param id
    *          the identifier
    */
   void setId(long id);
 
   /**
-   * The short title of the workflow definition used to create this workflow instance
+   * The short title of the workflow definition used to create this workflow instance.
    */
   String getTitle();
 
   /**
-   * The identifier of the workflow definition used to create this workflow instance
+   * The identifier of the workflow definition used to create this workflow instance.
    */
   String getTemplate();
 
   /**
-   * The longer description of the workflow definition used to create this workflow instance
+   * The longer description of the workflow definition used to create this workflow instance.
    */
   String getDescription();
 
   /**
-   * The parent workflow instance ID, if any
+   * The parent workflow instance ID, if any.
    */
   Long getParentId();
 
   /**
    * Returns the user that created this workflow.
-   * 
+   *
    * @return the workflow's creator
    */
   User getCreator();
 
   /**
    * Returns the organization that this workflow belongs to.
-   * 
+   *
    * @return the organization
    */
   Organization getOrganization();
@@ -83,14 +82,14 @@ public interface WorkflowInstance extends Configurable {
   /**
    * Returns a copy of the {@link WorkflowOperationInstance}s that make up this workflow. In order to modify the
    * operations, call setOperations.
-   * 
+   *
    * @return the workflow operations
    */
   List<WorkflowOperationInstance> getOperations();
 
   /**
-   * Sets the list of workflow operations
-   * 
+   * Sets the list of workflow operations.
+   *
    * @param operations
    *          the new list of operations
    */
@@ -99,20 +98,23 @@ public interface WorkflowInstance extends Configurable {
   /**
    * Returns the {@link WorkflowOperationInstance} that is currently either in {@link WorkflowState#RUNNING} or
    * {@link WorkflowState#PAUSED}.
-   * 
+   *
    * @return the current operation
+   * @throws IllegalStateException
+   *           if the workflow instance has no operations
    */
-  WorkflowOperationInstance getCurrentOperation();
+  WorkflowOperationInstance getCurrentOperation() throws IllegalStateException;
 
   /**
-   * The current {@link WorkflowState} of this {@link WorkflowInstance}
+   * The current {@link WorkflowState} of this {@link WorkflowInstance}.
    */
   WorkflowState getState();
 
   /**
-   * Set the state of the workflow
-   * 
+   * Set the state of the workflow.
+   *
    * @param state
+   *            the new workflow state
    */
   void setState(WorkflowState state);
 
@@ -123,43 +125,35 @@ public interface WorkflowInstance extends Configurable {
 
   /**
    * Returns the next operation, and marks it as current. If there is no next operation, this method will return null.
-   * 
-   * @return The next operation
    */
   WorkflowOperationInstance next();
 
   /**
-   * Whether there is another operation after the current operation. If there is no next operation, this will return
-   * null.
-   * 
-   * @return Whether there is a next operation.
+   * Return whether there is another operation after the current operation.
+   * If there is no next operation, this will return null.
    */
   boolean hasNext();
 
   /**
-   * @param mp
-   *          the mediapackage
+   * Set the media package this workflow instance is processing.
    */
   void setMediaPackage(MediaPackage mp);
 
   /**
-   * Gets the error messages describing what went wrong, if anything, with this mediapackage
-   * 
-   * @return the error messages that occured during processing
+   * Gets the error messages describing what went wrong, if anything, with this media package during processing.
    */
   String[] getErrorMessages();
 
   /**
-   * @param localizedMessage
+   * Add a localized error message.
    */
   void addErrorMessage(String localizedMessage);
 
   /**
-   * Appends the operations found in the workflow defintion to the end of this workflow instance.
-   * 
-   * @param workflow
-   *          the workflow defintion
+   * Appends the operations found in the workflow definition to the end of this workflow instance.
+   *
+   * @param workflowDefinition
+   *          the workflow definition
    */
   void extend(WorkflowDefinition workflowDefinition);
-
 }

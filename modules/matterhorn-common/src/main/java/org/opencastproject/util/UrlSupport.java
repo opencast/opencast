@@ -16,16 +16,18 @@
 
 package org.opencastproject.util;
 
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+import static org.opencastproject.util.data.functions.Strings.asStringNull;
+
 import org.opencastproject.util.data.Function2;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
-
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.functions.Strings.asStringNull;
 
 /**
  * <code>UrlSupport</code> is a helper class to deal with urls.
@@ -39,9 +41,49 @@ public final class UrlSupport {
   private UrlSupport() {
   }
 
+  /** URI constructor function without checked exceptions. */
+  public static URI uri(String uri) {
+    try {
+      return new URI(uri);
+    } catch (Exception e) {
+      return chuck(e);
+    }
+  }
+
+  /** URL constructor function without checked exceptions. */
+  public static URL url(String url) {
+    try {
+      return new URL(url);
+    } catch (Exception e) {
+      return chuck(e);
+    }
+  }
+
+  /** URL constructor function without checked exceptions. */
+  public static URL url(String protocol, String host, int port) {
+    try {
+      return new URL(protocol, host, port, "/");
+    } catch (Exception e) {
+      return chuck(e);
+    }
+  }
+
+  /**
+   * URL constructor function without checked exceptions.
+   *
+   * @see URL
+   */
+  public static URL url(URL context, String spec) {
+    try {
+      return new URL(context, spec);
+    } catch (Exception e) {
+      return chuck(e);
+    }
+  }
+
   /**
    * Sorts the given urls by path.
-   * 
+   *
    * @param urls
    *          the urls to sort
    * @return the sorted urls
@@ -64,7 +106,7 @@ public final class UrlSupport {
    * <p>
    * Note that returned path will only end with a slash if <code>suffix</code> does. If you need a trailing slash, see
    * {@link #concat(String, String, boolean)}.
-   * 
+   *
    * @return the concatenated url of the two arguments
    */
   public static String concat(String prefix, String suffix) {
@@ -74,7 +116,7 @@ public final class UrlSupport {
   /**
    * Concatenates the two urls with respect to leading and trailing slashes. The path will always end with a trailing
    * slash.
-   * 
+   *
    * @return the concatenated url of the two arguments
    */
   public static String concat(String prefix, String suffix, boolean close) {
@@ -104,7 +146,7 @@ public final class UrlSupport {
 
   /**
    * Concatenates the urls with respect to leading and trailing slashes.
-   * 
+   *
    * @param parts
    *          the parts to concat
    * @return the concatenated url
@@ -136,7 +178,8 @@ public final class UrlSupport {
     if (parts.size() == 0)
       throw new IllegalArgumentException("Array parts is empty");
     return mlist(parts).reducel(new Function2<String, String, String>() {
-      @Override public String apply(String s, String s1) {
+      @Override
+      public String apply(String s, String s1) {
         return concat(s, s1);
       }
     });
@@ -150,7 +193,7 @@ public final class UrlSupport {
   /**
    * Returns the trimmed url. Trimmed means that the url is free from leading or trailing whitespace characters, and
    * that a directory url like <code>/news/</code> is closed by a slash (<code>/</code>).
-   * 
+   *
    * @param url
    *          the url to trim
    * @return the trimmed url
@@ -183,13 +226,15 @@ public final class UrlSupport {
   }
 
   /**
-   * Removes any occurence of double separators ("//") and replaces it with "/".
-   * 
+   * Removes any occurrence of double separators ("//") and replaces it with "/".
+   * Any double separators right after the protocol part are left untouched so that, e.g. http://localhost
+   * stays http://localhost
+   *
    * @param path
    *          the path to check
    * @return the corrected path
    */
-  private static String removeDoubleSeparator(String path) {
+  public static String removeDoubleSeparator(String path) {
     String protocol = "";
     int index = path.indexOf("://");
 
@@ -214,7 +259,7 @@ public final class UrlSupport {
    * <p>
    * Note that <code>a</code> is also an extended prefix of <code>b</code> if <code>a</code> and <code>b</code> are
    * equal.
-   * 
+   *
    * @param a
    *          the first url
    * @param b
@@ -241,7 +286,7 @@ public final class UrlSupport {
    * <p>
    * Note that <code>a</code> is also an extended prefix of <code>b</code> if <code>a</code> and <code>b</code> are
    * equal.
-   * 
+   *
    * @param a
    *          the first url
    * @param b
@@ -264,7 +309,7 @@ public final class UrlSupport {
    * <p>
    * If <code>prefix</code> is not a prefix of <code>url</code>, this method returns <code>null</code>, if
    * <code>url</code> and <code>prefix</code> match, the empty string is returned.
-   * 
+   *
    * @param prefix
    *          the url prefix
    * @param url
@@ -293,7 +338,7 @@ public final class UrlSupport {
    * <li>/**</li>
    * <li><code>null</code></li>
    * </ul>
-   * 
+   *
    * @param url
    *          the url with extension
    * @return the url extension or <code>null</code> if no extension can be found
@@ -309,7 +354,7 @@ public final class UrlSupport {
 
   /**
    * Strips off the extension and returns the pure url.
-   * 
+   *
    * @param url
    *          the url with extension
    * @return the url
@@ -324,7 +369,7 @@ public final class UrlSupport {
 
   /**
    * Returns <code>true</code> if the url is valid, that is, if it contains only allowed characters.
-   * 
+   *
    * @return <code>true</code> or the invalid character
    */
   public static boolean isValid(String url) {
@@ -334,7 +379,7 @@ public final class UrlSupport {
   /**
    * Returns <code>null</code> if the url is valid, that is, if it contains only allowed characters. Otherwhise, the
    * invalid character is returned.
-   * 
+   *
    * @return <code>null</code> or the invalid character
    */
   public static Character getInvalidCharacter(String url) {
@@ -345,7 +390,7 @@ public final class UrlSupport {
   /**
    * Returns <code>null</code> if the url is valid, that is, if it contains only allowed characters. Otherwhise, the
    * invalid character is returned.
-   * 
+   *
    * @return <code>null</code> or the invalid character
    */
   private static Character checkUrl(String url) {

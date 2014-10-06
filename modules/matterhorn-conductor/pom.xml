@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4.4</version>
+    <version>1.5.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -201,9 +201,12 @@
               OSGI-INF/operations/cli.xml,
               OSGI-INF/operations/cleanup.xml,
               OSGI-INF/operations/compose.xml,
+              OSGI-INF/operations/composite.xml,
+              OSGI-INF/operations/concat.xml,
               OSGI-INF/operations/coverart.xml,
               OSGI-INF/operations/delete-archive.xml,
               OSGI-INF/operations/distribute-acl.xml,
+              OSGI-INF/operations/distribute-mediapackagepost.xml,
               OSGI-INF/operations/download-dvd.xml,
               OSGI-INF/operations/email.xml,
               OSGI-INF/operations/embed.xml,
@@ -213,6 +216,7 @@
               OSGI-INF/operations/error-resolution.xml,
               OSGI-INF/operations/failing.xml,
               OSGI-INF/operations/image.xml,
+              OSGI-INF/operations/image-to-video.xml,
               OSGI-INF/operations/ingest.xml,
               OSGI-INF/operations/ingest-download.xml,
               OSGI-INF/operations/inspect.xml,

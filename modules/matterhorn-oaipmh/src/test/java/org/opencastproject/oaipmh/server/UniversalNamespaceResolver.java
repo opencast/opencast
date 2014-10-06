@@ -18,9 +18,10 @@ package org.opencastproject.oaipmh.server;
 
 import org.w3c.dom.Document;
 
+import java.util.Iterator;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
-import java.util.Iterator;
 
 /**
  * Copied from the test harness module.
@@ -29,9 +30,9 @@ public class UniversalNamespaceResolver implements NamespaceContext {
   private Document sourceDocument;
 
   /**
-   * 
+   *
    * Store the source document.
-   * 
+   *
    * @param document
    *          source document
    */
@@ -40,9 +41,9 @@ public class UniversalNamespaceResolver implements NamespaceContext {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see javax.xml.namespace.NamespaceContext#getNamespaceURI(String)
    */
   public String getNamespaceURI(String prefix) {
@@ -54,9 +55,9 @@ public class UniversalNamespaceResolver implements NamespaceContext {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see javax.xml.namespace.NamespaceContext#getPrefix(String)
    */
   public String getPrefix(String namespaceURI) {
@@ -64,9 +65,9 @@ public class UniversalNamespaceResolver implements NamespaceContext {
   }
 
   /**
-   * 
+   *
    * {@inheritDoc}
-   * 
+   *
    * @see javax.xml.namespace.NamespaceContext#getPrefixes(String)
    */
   @SuppressWarnings("unchecked")

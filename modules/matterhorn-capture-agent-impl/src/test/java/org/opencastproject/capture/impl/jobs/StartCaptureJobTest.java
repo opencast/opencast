@@ -45,7 +45,7 @@ public class StartCaptureJobTest {
   private Scheduler scheduler = null;
   private JobExecutionContext ctx = null;
   private JobDataMap jobDataMap = null;
-  
+
   @Before
   public void init() {
     initNeededVariables();
@@ -66,18 +66,18 @@ public class StartCaptureJobTest {
     ctx = EasyMock.createMock(JobExecutionContext.class);
     jobDataMap = new JobDataMap();
   }
-  
+
   public void addNeededVariablesToJobDataMap() {
     jobDataMap.put(JobParameters.CAPTURE_AGENT, captureAgentImpl);
     jobDataMap.put(JobParameters.MEDIA_PACKAGE, mediaPackage);
     jobDataMap.put(JobParameters.CAPTURE_PROPS, properties);
     jobDataMap.put(JobParameters.SCHEDULER, scheduler);
   }
-  
+
   public void addNeededProperties() {
     properties.put(JobParameters.JOB_POSTFIX, "StartCaptureJob Test Job");
   }
-  
+
   @Test
   public void startCaptureFailsToStartIfEndIsRightNow() {
     try {
@@ -85,28 +85,7 @@ public class StartCaptureJobTest {
     } catch (ParseException e) {
       Assert.fail("Could not create a cronjob " + e.getMessage());
     }
-    
-    StartCaptureJob job = new StartCaptureJob();
-    EasyMock.expect(ctx.getMergedJobDataMap()).andReturn(jobDataMap).anyTimes();
-    EasyMock.replay(ctx);
-    // Expect captureAgentImpl won't fire startCapture. 
-    EasyMock.replay(captureAgentImpl);
-    try {
-      job.execute(ctx);
-    } catch (JobExecutionException e) {
-      Assert.fail(e.getMessage());
-    }
-  }
-  
-  @Test
-  public void startCaptureFailsToStartIfAfterEnd() {
-    try {
-      Date end = new Date(System.currentTimeMillis() - 1000000);
-      properties.put(CaptureParameters.RECORDING_END, SchedulerImpl.getCronString(end).toString());
-    } catch (ParseException e) {
-      Assert.fail("Could not create a cronjob " + e.getMessage());
-    }
-    
+
     StartCaptureJob job = new StartCaptureJob();
     EasyMock.expect(ctx.getMergedJobDataMap()).andReturn(jobDataMap).anyTimes();
     EasyMock.replay(ctx);
@@ -118,7 +97,28 @@ public class StartCaptureJobTest {
       Assert.fail(e.getMessage());
     }
   }
-  
+
+  @Test
+  public void startCaptureFailsToStartIfAfterEnd() {
+    try {
+      Date end = new Date(System.currentTimeMillis() - 1000000);
+      properties.put(CaptureParameters.RECORDING_END, SchedulerImpl.getCronString(end).toString());
+    } catch (ParseException e) {
+      Assert.fail("Could not create a cronjob " + e.getMessage());
+    }
+
+    StartCaptureJob job = new StartCaptureJob();
+    EasyMock.expect(ctx.getMergedJobDataMap()).andReturn(jobDataMap).anyTimes();
+    EasyMock.replay(ctx);
+    // Expect captureAgentImpl won't fire startCapture.
+    EasyMock.replay(captureAgentImpl);
+    try {
+      job.execute(ctx);
+    } catch (JobExecutionException e) {
+      Assert.fail(e.getMessage());
+    }
+  }
+
   @Test
   public void startCaptureFiresIfEndIsAfterNow() throws SchedulerException {
     try {
@@ -127,21 +127,21 @@ public class StartCaptureJobTest {
     } catch (ParseException e) {
       Assert.fail("Could not create a cronjob " + e.getMessage());
     }
-    
+
     StartCaptureJob job = new StartCaptureJob();
     EasyMock.expect(ctx.getMergedJobDataMap()).andReturn(jobDataMap).anyTimes();
     EasyMock.expect(ctx.getJobDetail()).andReturn(new JobDetail());
     EasyMock.expect(ctx.getScheduler()).andReturn(scheduler).anyTimes();
     EasyMock.replay(ctx);
-    
+
     //EasyMock.expect(scheduler.isShutdown()).andReturn(true);
-   
+
     // Expect captureAgentImpl will fire startCapture.
     EasyMock.expect(captureAgentImpl.startCapture(mediaPackage, properties)).andReturn("This would be an id");
     EasyMock.replay(captureAgentImpl);
     try {
       job.execute(ctx);
-      
+
     } catch (JobExecutionException e) {
       Assert.fail(e.getMessage());
     }

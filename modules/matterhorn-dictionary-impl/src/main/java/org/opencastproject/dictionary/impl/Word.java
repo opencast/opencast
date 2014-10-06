@@ -170,7 +170,7 @@ public class Word {
   /**
    * Sets the case for a string using a consistent locale. This method must be called to fix the case of strings when a
    * dictionary is created, and when the dictionary is queried.
-   * 
+   *
    * @param str
    *          The raw string
    * @return The case-fixed string

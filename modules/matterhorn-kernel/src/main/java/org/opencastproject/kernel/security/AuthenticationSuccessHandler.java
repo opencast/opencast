@@ -17,6 +17,7 @@ package org.opencastproject.kernel.security;
 
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.INITIAL_REQUEST_PATH;
 
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 
@@ -50,7 +51,7 @@ public class AuthenticationSuccessHandler implements
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.springframework.security.web.authentication.AuthenticationSuccessHandler#onAuthenticationSuccess(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse, org.springframework.security.core.Authentication)
    */
@@ -76,9 +77,9 @@ public class AuthenticationSuccessHandler implements
 
     // Look for a welcome page for one of this user's roles
     User currentUser = securityService.getUser();
-    for (String role : currentUser.getRoles()) {
-      if (welcomePages.containsKey(role)) {
-        response.sendRedirect(welcomePages.get(role));
+    for (Role role : currentUser.getRoles()) {
+      if (welcomePages.containsKey(role.getName())) {
+        response.sendRedirect(welcomePages.get(role.getName()));
         return;
       }
     }
@@ -93,7 +94,7 @@ public class AuthenticationSuccessHandler implements
 
   /**
    * Sets the security service
-   * 
+   *
    * @param securityService
    *          the security service
    */
@@ -103,7 +104,7 @@ public class AuthenticationSuccessHandler implements
 
   /**
    * Sets the welcome pages mapping.
-   * 
+   *
    * @param welcomePages
    *          the welcomePages to set
    */

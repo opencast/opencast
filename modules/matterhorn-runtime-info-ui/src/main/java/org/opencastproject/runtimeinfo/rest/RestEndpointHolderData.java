@@ -15,7 +15,6 @@
  */
 package org.opencastproject.runtimeinfo.rest;
 
-
 import org.opencastproject.util.doc.DocData;
 
 import java.util.Collections;
@@ -63,7 +62,7 @@ public class RestEndpointHolderData {
 
   /**
    * Add an endpoint to this holder and make sure the endpoints are sorted by their names.
-   * 
+   *
    * @param endpoint
    *          an endpoint to be added to this holder
    */
@@ -79,7 +78,7 @@ public class RestEndpointHolderData {
 
   /**
    * Return a string representation of this RestEndpointHolderData object.
-   * 
+   *
    * @return a string representation of this RestEndpointHolderData object
    */
   @Override
@@ -89,7 +88,7 @@ public class RestEndpointHolderData {
 
   /**
    * Returns a copy of this RestEndpointHolderData object.
-   * 
+   *
    * @return a copy of this RestEndpointHolderData object
    */
   public RestEndpointHolderData duplicate() {
@@ -98,9 +97,9 @@ public class RestEndpointHolderData {
 
   /**
    * Returns a copy of this RestEndpointHolderData object.
-   * 
+   *
    * @return a copy of this RestEndpointHolderData object
-   * 
+   *
    * @throws CloneNotSupportedException
    */
   @Override
@@ -110,7 +109,7 @@ public class RestEndpointHolderData {
 
   /**
    * Gets the name of this endpoint holder.
-   * 
+   *
    * @return the name of this endpoint holder
    */
   public String getName() {
@@ -119,7 +118,7 @@ public class RestEndpointHolderData {
 
   /**
    * Gets the title of this endpoint holder.
-   * 
+   *
    * @return the title of this endpoint holder
    */
   public String getTitle() {
@@ -128,7 +127,7 @@ public class RestEndpointHolderData {
 
   /**
    * Gets the list of endpoints in this endpoint holder.
-   * 
+   *
    * @return the list of endpoints in this endpoint holder
    */
   public List<RestEndpointData> getEndpoints() {

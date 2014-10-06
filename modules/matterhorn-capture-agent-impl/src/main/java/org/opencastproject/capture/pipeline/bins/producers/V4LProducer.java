@@ -32,7 +32,7 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This V4LProducer supports capturing from a v4l device. 
+ * This V4LProducer supports capturing from a v4l device.
  */
 public class V4LProducer extends VideoProducer {
 
@@ -40,7 +40,7 @@ public class V4LProducer extends VideoProducer {
 
   /**
    * V4LProducer captures from a generic V4L src.
-   * 
+   *
    * @param captureDevice
    *          The details of the capture device such as location, bitrate, container etc.
    * @param propeties
@@ -64,7 +64,7 @@ public class V4LProducer extends VideoProducer {
 
   /**
    * Create the v4lsrc.
-   * 
+   *
    * @throws UnableToCreateElementException
    *           Thrown if the module for v4l is not installed or the current machine doens't support v4l.
    **/
@@ -77,7 +77,7 @@ public class V4LProducer extends VideoProducer {
 
   /**
    * Set the device location of the v4lsrc
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If the v4l2src is null then this Exception is thrown
    * @throws IllegalArgumentException
@@ -103,7 +103,7 @@ public class V4LProducer extends VideoProducer {
 
   /**
    * Link all of the GStreamer Elements together.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           If any of the Elements cannot be linked together this Exception is thrown.
    **/

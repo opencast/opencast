@@ -34,6 +34,7 @@ import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
@@ -131,7 +132,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -141,7 +142,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the workflow service
-   * 
+   *
    * @param service
    *          the workflow service instance
    */
@@ -151,7 +152,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the workspace.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -161,7 +162,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGI callback for component activation
-   * 
+   *
    * @param cc
    *          the OSGI declarative services component context
    */
@@ -170,7 +171,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     if (cc == null) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
       logger.info("configured server url is {}", ccServerUrl);
       if (ccServerUrl == null) {
         serverUrl = UrlSupport.DEFAULT_BASE_URL;
@@ -314,7 +315,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Returns the workflow configuration panel HTML snippet for the workflow definition specified by
-   * 
+   *
    * @param definitionId
    * @return config panel HTML snippet
    */
@@ -781,7 +782,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       service.unregisterWorkflowDefinition(workflowDefinitionId);
       return Response.status(Status.NO_CONTENT).build();
     } catch (NotFoundException e) {
-      return Response.status(Status.NOT_FOUND).build();  
+      return Response.status(Status.NOT_FOUND).build();
     } catch (WorkflowDatabaseException e) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
@@ -817,7 +818,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -831,7 +832,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

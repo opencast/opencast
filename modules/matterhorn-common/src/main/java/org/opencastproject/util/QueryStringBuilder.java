@@ -29,7 +29,7 @@ public class QueryStringBuilder {
 
   /**
    * Constructs a querystring builder starting with the base path
-   * 
+   *
    * @param baseServicePath
    *          the base path
    */
@@ -41,7 +41,7 @@ public class QueryStringBuilder {
   /**
    * Add a key/value pair to the querystring. This method may be called multiple times for a given key, and each\ value
    * will be added to the querystring.
-   * 
+   *
    * @param key
    *          the parameter key
    * @param value

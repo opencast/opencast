@@ -50,44 +50,50 @@ import javax.servlet.http.HttpServletRequest;
 public class LtiLaunchAuthenticationHandler implements
         org.springframework.security.oauth.provider.OAuthAuthenticationHandler {
 
-  
+
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LtiLaunchAuthenticationHandler.class);
-  
+
   /** The Http request parameter, sent by the LTI consumer, containing the user ID. */
   public static final String LTI_USER_ID_PARAM = "user_id";
-  
+
   /** The http request paramater containing the Consumer GUI **/
   public static final String LTI_CONSUMER_GUID = "tool_consumer_instance_guid";
-  
+
   /** LTI field containing a comma delimeted list of roles */
   public static final String ROLES = "roles";
-  
+
   /** The LTI field containing the context_id */
   public static final String CONTEXT_ID = "context_id";
-  
+
   /** The prefix for LTI user ids   */
   public static final String LTI_USER_ID_PREFIX = "lti";
-  
+
   /** The delimiter to use in generated OAUTH id's **/
   public static final String LTI_ID_DELIMITER = ":";
 
   /** The Matterhorn Role for OAUTH users **/
   private static final String ROLE_OAUTH_USER = "ROLE_OAUTH_USER";
-  
+
+  /** The default context for LTI x **/
+  private static final String DEFAULT_CONTEXT = "LTI";
+
+  /** The default learner for LTI **/
+  private static final String DEFAULT_LEARNER = "USER";
+
   /** The user details service */
   protected UserDetailsService userDetailsService = null;
-  
+
   /** the Security Service **/
   protected SecurityService securityService;
-  
-  /** list of keys that will be highly */ 
+
+  /** list of keys that will be highly */
   protected List<String> highlyTrustedKeys = new ArrayList<String>();
 
   /**
    * Constructs a new LTI authentication handler, using the supplied user details service for performing user lookups.
-   * 
+   *
    * @param userDetailsService
    *          the user details service used to map user identifiers to more detailed information
    */
@@ -105,10 +111,10 @@ public class LtiLaunchAuthenticationHandler implements
     this.securityService = securityService;
     this.highlyTrustedKeys = highlyTrustedkeys;
   }
-  
+
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.springframework.security.oauth.provider.OAuthAuthenticationHandler#createAuthentication(javax.servlet.http.HttpServletRequest,
    *      org.springframework.security.oauth.provider.ConsumerAuthentication,
    *      org.springframework.security.oauth.provider.token.OAuthAccessProviderToken)
@@ -133,7 +139,7 @@ public class LtiLaunchAuthenticationHandler implements
 
     //We need to construct a complex ID to avoid confusion
     userIdFromConsumer = LTI_USER_ID_PREFIX + LTI_ID_DELIMITER + consumerGUID + LTI_ID_DELIMITER + userIdFromConsumer;
-       
+
     //if this is a trusted consumer we trust their details
     String oaAuthKey = request.getParameter("oauth_consumer_key");
     if (highlyTrustedKeys.contains(oaAuthKey)) {
@@ -142,17 +148,17 @@ public class LtiLaunchAuthenticationHandler implements
       String suppliedEid = request.getParameter("lis_person_sourcedid");
       //This is an optional field it could be null
       if (suppliedEid != null) {
-        userIdFromConsumer = suppliedEid; 
+        userIdFromConsumer = suppliedEid;
       } else {
         //if no eid is set we use the supplied ID
         userIdFromConsumer = request.getParameter(LTI_USER_ID_PARAM);
       }
     }
-    
+
     if (logger.isDebugEnabled()) {
       logger.debug("LTI user id is : {}", userIdFromConsumer);
     }
-    
+
     UserDetails userDetails = null;
     Collection<GrantedAuthority> userAuthorities = null;
     try {
@@ -176,9 +182,9 @@ public class LtiLaunchAuthenticationHandler implements
       userAuthorities.add(new GrantedAuthorityImpl(ROLE_OAUTH_USER));
       userAuthorities.add(new GrantedAuthorityImpl("ROLE_USER"));
       userAuthorities.add(new GrantedAuthorityImpl("ROLE_ANONYMOUS"));
-      
+
       logger.info("Returning user with {} authorities", userAuthorities.size());
-      
+
       userDetails = new User(userIdFromConsumer, "oauth", true, true, true, true, userAuthorities);
     }
     Authentication ltiAuth = new PreAuthenticatedAuthenticationToken(userDetails, authentication.getCredentials(),
@@ -186,7 +192,7 @@ public class LtiLaunchAuthenticationHandler implements
     SecurityContextHolder.getContext().setAuthentication(ltiAuth);
     return ltiAuth;
   }
-  
+
   /**
    * Enrich A collection of role grants with specified LTI memberships
    * @param roles
@@ -200,15 +206,16 @@ public class LtiLaunchAuthenticationHandler implements
         for (int i = 0; i < roleList.size(); i++) {
 
           /* Use a generic context and learner if none is given: */
-          context = StringUtils.trimToNull(context) == null ? "LTI" : context;
-          String learner = StringUtils.trimToNull(roleList.get(i)) == null
-            ? "USER" : roleList.get(i);
+          context = StringUtils.isBlank(context) ? DEFAULT_CONTEXT : context;
+          String learner = StringUtils.isBlank(roleList.get(i))
+            ? DEFAULT_LEARNER : roleList.get(i);
 
           /* Build the role */
           String role = context + "_" + learner;
 
           /* Make sure to not accept ROLE_… */
           if (role.trim().toUpperCase().startsWith("ROLE_")) {
+            logger.warn("Discarding attempt to acquire role “{}”", role);
             continue;
           }
 

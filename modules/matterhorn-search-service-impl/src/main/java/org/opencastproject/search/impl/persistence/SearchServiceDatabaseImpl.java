@@ -24,10 +24,10 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
@@ -70,7 +70,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * Creates {@link EntityManagerFactory} using persistence provider and properties passed via OSGi.
-   * 
+   *
    * @param cc
    */
   public void activate(ComponentContext cc) {
@@ -81,7 +81,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * Closes entity manager factory.
-   * 
+   *
    * @param cc
    */
   public void deactivate(ComponentContext cc) {
@@ -90,7 +90,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * OSGi callback to set persistence properties.
-   * 
+   *
    * @param persistenceProperties
    *          persistence properties
    */
@@ -100,7 +100,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * OSGi callback to set persistence provider.
-   * 
+   *
    * @param persistenceProvider
    *          {@link PersistenceProvider} object
    */
@@ -110,7 +110,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * OSGi callback to set the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -120,7 +120,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#deleteMediaPackage(String, Date)
    */
   @Override
@@ -166,7 +166,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAllMediaPackages()
    */
   @Override
@@ -199,7 +199,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAccessControlList(String)
    */
   @Override
@@ -229,7 +229,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#storeMediaPackage(MediaPackage,
    *      AccessControlList, Date)
    */
@@ -288,7 +288,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getMediaPackage(String)
    */
   @Override
@@ -332,7 +332,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getModificationDate(String)
    */
   @Override
@@ -372,7 +372,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getDeletionDate(String)
    */
   @Override
@@ -413,7 +413,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getOrganizationId(String)
    */
   @Override
@@ -453,7 +453,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /**
    * Gets a search entity by it's id, using the current organizational context.
-   * 
+   *
    * @param id
    *          the media package identifier
    * @param em

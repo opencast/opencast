@@ -15,22 +15,29 @@
  */
 package org.opencastproject.mediapackage;
 
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.util.DateTimeSupport;
+
+import org.codehaus.jettison.mapped.Configuration;
+import org.codehaus.jettison.mapped.MappedNamespaceConvention;
+import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.opencastproject.util.data.functions.Misc.chuck;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 /**
  * Convenience implementation that supports serializing and deserializing media packages.
@@ -46,7 +53,7 @@ public final class MediaPackageParser {
 
   /**
    * Serializes the media package to a string.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @return the serialized media package
@@ -59,6 +66,51 @@ public final class MediaPackageParser {
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
       StringWriter writer = new StringWriter();
       marshaller.marshal(mediaPackage, writer);
+      return writer.toString();
+    } catch (JAXBException e) {
+      throw new IllegalStateException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    }
+  }
+
+  /**
+   * Serializes the media package to a JSON string.
+   *
+   * @param mediaPackage
+   *          the media package
+   * @return the serialized media package
+   */
+  public static String getAsJSON(MediaPackage mediaPackage) {
+    if (mediaPackage == null) {
+      throw new IllegalArgumentException("Mediapackage must not be null");
+    }
+    try {
+      Marshaller marshaller = MediaPackageImpl.context.createMarshaller();
+
+      Configuration config = new Configuration();
+      config.setSupressAtAttributes(true);
+      MappedNamespaceConvention con = new MappedNamespaceConvention(config);
+      StringWriter writer = new StringWriter();
+      XMLStreamWriter xmlStreamWriter = new MappedXMLStreamWriter(con, writer) {
+        @Override
+        public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
+          super.writeStartElement("", local, "");
+        }
+
+        @Override
+        public void writeStartElement(String uri, String local) throws XMLStreamException {
+          super.writeStartElement("", local, "");
+        }
+
+        @Override
+        public void setPrefix(String pfx, String uri) throws XMLStreamException {
+        }
+
+        @Override
+        public void setDefaultNamespace(String uri) throws XMLStreamException {
+        }
+      };
+
+      marshaller.marshal(mediaPackage, xmlStreamWriter);
       return writer.toString();
     } catch (JAXBException e) {
       throw new IllegalStateException(e.getLinkedException() != null ? e.getLinkedException() : e);
@@ -91,10 +143,10 @@ public final class MediaPackageParser {
   /**
    * Serializes the media package to a {@link org.w3c.dom.Document}.
    * <p/>
-   * todo Implementation is currently defective since it misses various properties.
-   *   See http://opencast.jira.com/browse/MH-9489
-   *   Use {@link #getAsXmlDocument(MediaPackage)} instead if you do not need a serializer.
-   * 
+   * todo Implementation is currently defective since it misses various properties. See
+   * http://opencast.jira.com/browse/MH-9489 Use {@link #getAsXmlDocument(MediaPackage)} instead if you do not need a
+   * serializer.
+   *
    * @param mediaPackage
    *          the mediapackage
    * @param serializer
@@ -196,7 +248,7 @@ public final class MediaPackageParser {
 
   /**
    * Parses the media package and returns its object representation.
-   * 
+   *
    * @param xml
    *          the serialized media package
    * @return the media package instance
@@ -210,7 +262,7 @@ public final class MediaPackageParser {
 
   /**
    * Writes an xml representation of this MediaPackage to a stream.
-   * 
+   *
    * @param mediaPackage
    *          the mediaPackage
    * @param out

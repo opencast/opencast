@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4.4</version>
+    <version>1.5.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -33,6 +33,11 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
+    <!-- testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -45,7 +50,8 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Export-Package>
-              org.opencastproject.composer.api;version=${project.version}
+              org.opencastproject.composer.api;version=${project.version},
+              org.opencastproject.composer.layout;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>

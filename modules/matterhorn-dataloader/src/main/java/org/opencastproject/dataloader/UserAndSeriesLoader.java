@@ -15,22 +15,31 @@
  */
 package org.opencastproject.dataloader;
 
+import static org.opencastproject.security.api.DefaultOrganization.DEFAULT_ORGANIZATION_ID;
+
+import org.opencastproject.kernel.security.OrganizationDirectoryServiceImpl;
+import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.userdirectory.jpa.JpaUser;
-import org.opencastproject.userdirectory.jpa.JpaUserAndRoleProvider;
+import org.opencastproject.userdirectory.JpaGroup;
+import org.opencastproject.userdirectory.JpaGroupRoleProvider;
+import org.opencastproject.userdirectory.JpaRole;
+import org.opencastproject.userdirectory.JpaUser;
+import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang.StringUtils;
@@ -38,6 +47,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -97,11 +107,13 @@ public class UserAndSeriesLoader {
   /** The JPA-based user provider, which includes an addUser() method */
   protected JpaUserAndRoleProvider jpaUserProvider = null;
 
+  protected JpaGroupRoleProvider jpaGroupRoleProvider = null;
+
   /** The security service */
   protected SecurityService securityService = null;
 
   /** The organization directory */
-  protected OrganizationDirectoryService organizationDirectoryService = null;
+  protected OrganizationDirectoryServiceImpl organizationDirectoryService = null;
 
   /**
    * Callback on component activation.
@@ -141,16 +153,17 @@ public class UserAndSeriesLoader {
         acl.getEntries().add(new AccessControlEntry(SERIES_PREFIX + i + "_" + INSTRUCTOR_PREFIX, WRITE, true));
         acl.getEntries().add(new AccessControlEntry(SERIES_PREFIX + i + "_" + ADMIN_PREFIX, WRITE, true));
 
-        dc.set(DublinCore.PROPERTY_IDENTIFIER, seriesId);
-        dc.set(DublinCore.PROPERTY_TITLE, "Series #" + i);
-        dc.set(DublinCore.PROPERTY_CREATOR, "Creator #" + i);
-        dc.set(DublinCore.PROPERTY_CONTRIBUTOR, "Contributor #" + i);
+        try {
+          dc.set(DublinCore.PROPERTY_IDENTIFIER, seriesId);
+          dc.set(DublinCore.PROPERTY_TITLE, "Series #" + i);
+          dc.set(DublinCore.PROPERTY_CREATOR, "Creator #" + i);
+          dc.set(DublinCore.PROPERTY_CONTRIBUTOR, "Contributor #" + i);
 
-        for (Organization org : organizationDirectoryService.getOrganizations()) {
-          String orgId = org.getId();
+          Organization org = organizationDirectoryService.getOrganization(DEFAULT_ORGANIZATION_ID);
           try {
-            securityService.setUser(new User("userandseriesloader", orgId,
-                    new String[] { SecurityConstants.GLOBAL_ADMIN_ROLE }));
+            JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
+            securityService.setUser(new JaxbUser("userandseriesloader", jaxbOrganization, new JaxbRole(
+                    SecurityConstants.GLOBAL_ADMIN_ROLE, jaxbOrganization)));
             securityService.setOrganization(org);
 
             try {
@@ -172,26 +185,40 @@ public class UserAndSeriesLoader {
             securityService.setOrganization(null);
             securityService.setUser(null);
           }
+          logger.debug("Added series {}", dc);
+        } catch (NotFoundException e) {
+          logger.warn("Unable to find organization {}", e.getMessage());
         }
-        logger.debug("Added series {}", dc);
       }
 
-      load(STUDENT_PREFIX, 20, new String[] { USER_ROLE }, DefaultOrganization.DEFAULT_ORGANIZATION_ID);
+      load(STUDENT_PREFIX, 20, new String[] { USER_ROLE }, DEFAULT_ORGANIZATION_ID);
 
       load(INSTRUCTOR_PREFIX, 2, new String[] { USER_ROLE, INSTRUCTOR_ROLE },
-              DefaultOrganization.DEFAULT_ORGANIZATION_ID);
+              DEFAULT_ORGANIZATION_ID);
 
-      load(ADMIN_PREFIX, 1, new String[] { USER_ROLE, COURSE_ADMIN_ROLE }, DefaultOrganization.DEFAULT_ORGANIZATION_ID);
+      load(ADMIN_PREFIX, 1, new String[] { USER_ROLE, COURSE_ADMIN_ROLE }, DEFAULT_ORGANIZATION_ID);
 
-      loadLdapUser(DefaultOrganization.DEFAULT_ORGANIZATION_ID);
+      loadLdapUser(DEFAULT_ORGANIZATION_ID);
 
       logger.info("Finished loading sample series and users");
+
+      loadGroup("admin", DEFAULT_ORGANIZATION_ID, "Admins", "Admin group", new String[] {
+              COURSE_ADMIN_ROLE, INSTRUCTOR_ROLE, INSTRUCTOR_ROLE }, new String[] { "admin1", "admin2", "admin3",
+              "admin4" });
+      loadGroup("instructor", DEFAULT_ORGANIZATION_ID, "Instructors", "Instructors group",
+              new String[] { USER_ROLE, INSTRUCTOR_ROLE }, new String[] { "instructor1", "instructor2", "instructor3",
+                      "instructor4" });
+      loadGroup("student", DEFAULT_ORGANIZATION_ID, "Students", "Students group",
+              new String[] { USER_ROLE }, new String[] { "student1", "student2", "student3", "student4" });
+
+      logger.info("Finished loading sample groups");
     }
+
   }
 
   /**
    * Loads demo users into persistence.
-   * 
+   *
    * @param rolePrefix
    *          the role prefix
    * @param numPerSeries
@@ -210,12 +237,12 @@ public class UserAndSeriesLoader {
 
     for (int i = 1; i <= totalUsers; i++) {
       if (jpaUserProvider.loadUser(lowerCasePrefix + i, orgId) == null) {
-        Set<String> roleSet = new HashSet<String>();
+        Set<JpaRole> roleSet = new HashSet<JpaRole>();
         for (String additionalRole : additionalRoles) {
-          roleSet.add(additionalRole);
+          roleSet.add(new JpaRole(additionalRole, getOrganization(orgId)));
         }
-        roleSet.add(SERIES_PREFIX + (((i - 1) % NUM_SERIES) + 1) + "_" + rolePrefix);
-        JpaUser user = new JpaUser(lowerCasePrefix + i, lowerCasePrefix + i, orgId, roleSet);
+        roleSet.add(new JpaRole(SERIES_PREFIX + (((i - 1) % NUM_SERIES) + 1) + "_" + rolePrefix, getOrganization(orgId)));
+        JpaUser user = new JpaUser(lowerCasePrefix + i, lowerCasePrefix + i, getOrganization(orgId), roleSet);
         try {
           jpaUserProvider.addUser(user);
           logger.debug("Added {}", user);
@@ -227,22 +254,68 @@ public class UserAndSeriesLoader {
   }
 
   /**
+   * Loads demo group into persistence
+   *
+   * @param groupId
+   *          the group id
+   * @param orgId
+   *          the organization id
+   * @param name
+   *          the group name
+   * @param description
+   *          the group description
+   * @param additionalRoles
+   *          any additional roles to the group
+   * @param members
+   *          the members associated to this group
+   */
+  protected void loadGroup(String groupId, String orgId, String name, String description, String[] additionalRoles,
+          String[] members) {
+    if (jpaGroupRoleProvider.loadGroup(groupId, orgId) == null) {
+      Set<JpaRole> roles = new HashSet<JpaRole>();
+      for (String additionalRole : additionalRoles) {
+        roles.add(new JpaRole(additionalRole, getOrganization(orgId)));
+      }
+      JpaGroup group = new JpaGroup(groupId, getOrganization(orgId), name, description, roles, new HashSet<String>(
+              Arrays.asList(members)));
+      try {
+        jpaGroupRoleProvider.addGroup(group);
+      } catch (Exception e) {
+        logger.warn("Can not add {}: {}", group, e);
+      }
+    }
+  }
+
+  /**
    * Load a user for testing the ldap provider
-   * 
+   *
    * @param organizationId
    *          the organization
    */
   protected void loadLdapUser(String organizationId) {
-    Set<String> ldapUserRoles = new HashSet<String>();
-    ldapUserRoles.add(USER_ROLE);
+    Set<JpaRole> ldapUserRoles = new HashSet<JpaRole>();
+    ldapUserRoles.add(new JpaRole(USER_ROLE, getOrganization(organizationId)));
     // This is the public identifier for Josh Holtzman in the UC Berkeley Directory, which is available for anonymous
     // binding.
     String ldapUserId = "231693";
 
     if (jpaUserProvider.loadUser(ldapUserId, organizationId) == null) {
-      jpaUserProvider.addUser(new JpaUser(ldapUserId, "ldap", organizationId, ldapUserRoles));
+      jpaUserProvider.addUser(new JpaUser(ldapUserId, "ldap", getOrganization(organizationId), ldapUserRoles));
       logger.debug("Added ldap user '{}' into organization '{}'", ldapUserId, organizationId);
     }
+  }
+
+  /**
+   * Create a new organization from a default organization
+   *
+   * @param orgId
+   *          the organization identifier
+   * @return the created organization
+   */
+  protected JpaOrganization getOrganization(String orgId) {
+    DefaultOrganization org = new DefaultOrganization();
+    return new JpaOrganization(orgId, org.getName(), org.getServers(), org.getAdminRole(), org.getAnonymousRole(),
+            org.getProperties());
   }
 
   /**
@@ -251,6 +324,14 @@ public class UserAndSeriesLoader {
    */
   public void setJpaUserProvider(JpaUserAndRoleProvider jpaUserProvider) {
     this.jpaUserProvider = jpaUserProvider;
+  }
+
+  /**
+   * @param jpaGroupRoleProvider
+   *          the jpaGroupRoleProvider to set
+   */
+  public void setJpaGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
+    this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
   /**
@@ -274,7 +355,7 @@ public class UserAndSeriesLoader {
    *          the organizationDirectoryService to set
    */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
-    this.organizationDirectoryService = organizationDirectoryService;
+    this.organizationDirectoryService = (OrganizationDirectoryServiceImpl) organizationDirectoryService;
   }
 
 }

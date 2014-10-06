@@ -25,7 +25,7 @@ public class ServiceRegistryException extends Exception {
 
   /**
    * Creates a new service registry exception.
-   * 
+   *
    * @param message
    *          the error message
    * @param t
@@ -37,7 +37,7 @@ public class ServiceRegistryException extends Exception {
 
   /**
    * Creates a new service registry exception.
-   * 
+   *
    * @param message
    *          the error message
    */
@@ -47,7 +47,7 @@ public class ServiceRegistryException extends Exception {
 
   /**
    * Creates a new service registry exception.
-   * 
+   *
    * @param t
    *          the exception causing the error
    */

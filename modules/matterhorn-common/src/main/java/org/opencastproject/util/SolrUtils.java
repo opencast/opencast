@@ -42,7 +42,7 @@ public final class SolrUtils {
 
   /**
    * Clean up the user query input string to avoid invalid input parameters.
-   * 
+   *
    * @param q
    *          The input String.
    * @return The cleaned string.
@@ -62,7 +62,7 @@ public final class SolrUtils {
 
   /**
    * Returns a serialized version of the date or <code>null</code> if <code>null</code> was passed in for the date.
-   * 
+   *
    * @param date
    *          the date
    * @return the serialized date
@@ -82,7 +82,7 @@ public final class SolrUtils {
 
   /**
    * Returns the date or <code>null</code> if <code>null</code> was passed in for the date.
-   * 
+   *
    * @param date
    *          the serialized date in UTC format yyyy-MM-dd'T'HH:mm:ss'Z'
    * @return the date
@@ -97,7 +97,7 @@ public final class SolrUtils {
 
   /**
    * Returns an expression to search for any date that lies in between <code>startDate</date> and <code>endDate</date>.
-   * 
+   *
    * @param startDate
    *          the start date or none for an infinite left endpoint, "*" in solr query syntax
    * @param endDate

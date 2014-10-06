@@ -21,7 +21,7 @@ public interface TextLine {
 
   /**
    * Returns the text.
-   * 
+   *
    * @return the text
    */
   String getText();
@@ -30,7 +30,7 @@ public interface TextLine {
    * Returns the text's bounding box, if one exists. Note that the box was calculated from the line of text that
    * contained this text, so while the vertical position as well as the height will be ok, the box will most probably be
    * much wider than this single text.
-   * 
+   *
    * @return the boundaries
    */
   Rectangle getBoundaries();

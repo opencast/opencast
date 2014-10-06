@@ -139,7 +139,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * Return the solr index manager
-   * 
+   *
    * @return indexManager
    */
   public SolrIndexManager getSolrIndexManager() {
@@ -149,7 +149,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /**
    * Service activator, called via declarative services configuration. If the solr server url is configured, we try to
    * connect to it. If not, the solr data directory with an embedded Solr server is used.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -219,7 +219,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * Prepares the embedded solr environment.
-   * 
+   *
    * @param solrRoot
    *          the solr root directory
    */
@@ -261,7 +261,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * Prepares the embedded solr environment.
-   * 
+   *
    * @param url
    *          the url of the remote solr server
    */
@@ -290,7 +290,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#getByQuery(java.lang.String, int, int)
    */
   public SearchResult getByQuery(String query, int limit, int offset) throws SearchException {
@@ -304,7 +304,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#add(org.opencastproject.mediapackage.MediaPackage)
    */
   public Job add(MediaPackage mediaPackage) throws SearchException, MediaPackageException, IllegalArgumentException,
@@ -319,7 +319,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * Immediately adds the mediapackage to the search index.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @throws SearchException
@@ -343,7 +343,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
       throw new IllegalArgumentException("Unable to add a null mediapackage");
     }
     logger.debug("Attempting to add mediapackage {} to search index", mediaPackage.getIdentifier());
-    AccessControlList acl = authorizationService.getAccessControlList(mediaPackage);
+    AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
 
     Date now = new Date();
 
@@ -367,7 +367,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#delete(java.lang.String)
    */
   public Job delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException {
@@ -380,7 +380,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * Immediately removes the given mediapackage from the search service.
-   * 
+   *
    * @param mediaPackageId
    *          the mediapackage
    * @return <code>true</code> if the mediapackage was deleted
@@ -420,7 +420,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * Clears the complete solr index.
-   * 
+   *
    * @throws SearchException
    *           if clearing the index fails
    */
@@ -435,7 +435,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#getByQuery(org.opencastproject.search.api.SearchQuery)
    */
   public SearchResult getByQuery(SearchQuery q) throws SearchException {
@@ -449,19 +449,13 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#getForAdministrativeRead(org.opencastproject.search.api.SearchQuery)
    */
   @Override
   public SearchResult getForAdministrativeRead(SearchQuery q) throws SearchException, UnauthorizedException {
     User user = securityService.getUser();
-    Organization organization;
-    try {
-      organization = organizationDirectory.getOrganization(user.getOrganization());
-    } catch (NotFoundException e) {
-      throw new SearchException(e);
-    }
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(organization.getAdminRole()))
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole()))
       throw new UnauthorizedException(user, getClass().getName() + ".getForAdministrativeRead");
 
     try {
@@ -602,7 +596,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -612,7 +606,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -622,7 +616,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */

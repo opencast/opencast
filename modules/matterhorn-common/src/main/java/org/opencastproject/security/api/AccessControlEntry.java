@@ -45,7 +45,7 @@ public final class AccessControlEntry {
 
   /**
    * Constructs an access control entry for a role, action, and allow tuple
-   * 
+   *
    * @param role
    *          the role
    * @param action
@@ -82,7 +82,7 @@ public final class AccessControlEntry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -97,7 +97,7 @@ public final class AccessControlEntry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -107,7 +107,7 @@ public final class AccessControlEntry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

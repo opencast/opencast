@@ -28,6 +28,8 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -62,7 +64,7 @@ import java.util.Map;
 
 /**
  * Test for Series Service.
- * 
+ *
  */
 public class SeriesServiceImplTest {
 
@@ -101,8 +103,8 @@ public class SeriesServiceImplTest {
 
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new User("admin", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
-            new String[] { SecurityConstants.GLOBAL_ADMIN_ROLE });
+    User user = new JaxbUser("admin", new DefaultOrganization(), new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
+            new DefaultOrganization()));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);

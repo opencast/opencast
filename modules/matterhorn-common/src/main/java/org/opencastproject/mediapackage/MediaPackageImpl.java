@@ -164,7 +164,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Creates a media package object with the media package identifier.
-   * 
+   *
    * @param id
    *          the media package identifier
    */
@@ -174,7 +174,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getIdentifier()
    */
   @XmlAttribute(name = "id")
@@ -185,7 +185,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#setIdentifier(org.opencastproject.mediapackage.identifier.Id)
    */
   @Override
@@ -195,7 +195,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getDuration()
    */
   @XmlAttribute(name = "duration")
@@ -214,7 +214,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#setDuration(Long)
    */
   @Override
@@ -227,7 +227,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getDate()
    */
   @Override
@@ -237,7 +237,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Returns the recording time in utc format.
-   * 
+   *
    * @return the recording time
    */
   @XmlAttribute(name = "start")
@@ -249,7 +249,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Sets the date and time of recording in utc format.
-   * 
+   *
    * @param startTime
    *          the start time
    */
@@ -267,7 +267,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#elements()
    */
   @Override
@@ -277,7 +277,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getElements()
    */
   @Override
@@ -287,7 +287,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getElementByReference(org.opencastproject.mediapackage.MediaPackageReference)
    */
   @Override
@@ -329,7 +329,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getElementsByTags(java.util.Collection)
    */
   @Override
@@ -367,7 +367,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getAttachmentsByTags(java.util.Collection)
    */
   @Override
@@ -384,7 +384,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getCatalogsByTags(java.util.Collection)
    */
   @Override
@@ -401,7 +401,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getTracksByTags(java.util.Collection)
    */
   @Override
@@ -418,7 +418,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getElementsByFlavor(org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
   @Override
@@ -428,7 +428,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     List<MediaPackageElement> elements = new ArrayList<MediaPackageElement>();
     for (MediaPackageElement element : getElements()) {
-      if (flavor.equals(element.getFlavor()))
+      if (flavor.matches(element.getFlavor()))
         elements.add(element);
     }
     return elements.toArray(new MediaPackageElement[elements.size()]);
@@ -446,7 +446,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Returns <code>true</code> if the media package contains an element with the specified identifier.
-   * 
+   *
    * @param identifier
    *          the identifier
    * @return <code>true</code> if the media package contains an element with this identifier
@@ -532,7 +532,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getCatalogsByTag(java.lang.String)
    */
   @Override
@@ -576,7 +576,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getCatalogs(org.opencastproject.mediapackage.MediaPackageReference,
    *      boolean)
    */
@@ -651,7 +651,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getTrack(java.lang.String)
    */
   @Override
@@ -667,7 +667,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getTracks()
    */
   @XmlElementWrapper(name = "media")
@@ -696,7 +696,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getTracksByTag(java.lang.String)
    */
   @Override
@@ -713,7 +713,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getTracks(org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
   @Override
@@ -725,7 +725,7 @@ public final class MediaPackageImpl implements MediaPackage {
     Collection<Track> tracks = loadTracks();
     List<Track> candidates = new ArrayList<Track>(tracks);
     for (Track a : tracks) {
-      if (!flavor.equals(a.getFlavor())) {
+      if (a.getFlavor() == null || !a.getFlavor().matches(flavor)) {
         candidates.remove(a);
       }
     }
@@ -734,7 +734,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getTracks(org.opencastproject.mediapackage.MediaPackageReference)
    */
   @Override
@@ -744,7 +744,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getTracks(org.opencastproject.mediapackage.MediaPackageReference,
    *      boolean)
    */
@@ -783,7 +783,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getTracks(org.opencastproject.mediapackage.MediaPackageElementFlavor,
    *      org.opencastproject.mediapackage.MediaPackageReference)
    */
@@ -807,7 +807,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#hasTracks()
    */
   @Override
@@ -823,7 +823,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getUnclassifiedElements()
    */
   @Override
@@ -833,7 +833,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getUnclassifiedElements(org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
   @Override
@@ -853,7 +853,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#hasUnclassifiedElements(org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
   @Override
@@ -874,7 +874,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#hasUnclassifiedElements()
    */
   @Override
@@ -884,7 +884,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#addObserver(org.opencastproject.mediapackage.MediaPackageObserver)
    */
   @Override
@@ -896,7 +896,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getAttachment(java.lang.String)
    */
   @Override
@@ -912,7 +912,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getAttachments()
    */
   @XmlElementWrapper(name = "attachments")
@@ -941,7 +941,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getAttachmentsByTag(java.lang.String)
    */
   @Override
@@ -958,7 +958,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getAttachments(org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
   @Override
@@ -970,7 +970,7 @@ public final class MediaPackageImpl implements MediaPackage {
     Collection<Attachment> attachments = loadAttachments();
     List<Attachment> candidates = new ArrayList<Attachment>(attachments);
     for (Attachment a : attachments) {
-      if (!flavor.equals(a.getFlavor())) {
+      if (a.getFlavor() == null || !a.getFlavor().matches(flavor)) {
         candidates.remove(a);
       }
     }
@@ -979,7 +979,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getAttachments(org.opencastproject.mediapackage.MediaPackageReference)
    */
   @Override
@@ -989,7 +989,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getAttachments(org.opencastproject.mediapackage.MediaPackageReference,
    *      boolean)
    */
@@ -1027,7 +1027,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getAttachments(org.opencastproject.mediapackage.MediaPackageElementFlavor,
    *      org.opencastproject.mediapackage.MediaPackageReference)
    */
@@ -1051,7 +1051,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#hasAttachments()
    */
   @Override
@@ -1067,7 +1067,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getAttachments()
    */
   @XmlElementWrapper(name = "publications")
@@ -1094,7 +1094,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#removeElementById(java.lang.String)
    */
   @Override
@@ -1108,7 +1108,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#remove(org.opencastproject.mediapackage.MediaPackageElement)
    */
   @Override
@@ -1118,7 +1118,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#remove(org.opencastproject.mediapackage.Attachment)
    */
   @Override
@@ -1128,7 +1128,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#remove(org.opencastproject.mediapackage.Catalog)
    */
   @Override
@@ -1138,7 +1138,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#remove(org.opencastproject.mediapackage.Track)
    */
   @Override
@@ -1149,7 +1149,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Removes an element from the media package
-   * 
+   *
    * @param element
    *          the media package element
    */
@@ -1173,7 +1173,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#add(java.net.URI)
    */
   @Override
@@ -1211,7 +1211,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#add(org.opencastproject.mediapackage.MediaPackageElement)
    */
   @Override
@@ -1231,7 +1231,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#addDerived(org.opencastproject.mediapackage.MediaPackageElement,
    *      org.opencastproject.mediapackage.MediaPackageElement)
    */
@@ -1242,7 +1242,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#addDerived(org.opencastproject.mediapackage.MediaPackageElement,
    *      org.opencastproject.mediapackage.MediaPackageElement, java.util.Map)
    */
@@ -1269,7 +1269,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getDerived(org.opencastproject.mediapackage.MediaPackageElement,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
@@ -1291,7 +1291,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Notify observers of a removed media package element.
-   * 
+   *
    * @param element
    *          the removed element
    */
@@ -1309,7 +1309,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Notify observers of a removed media package element.
-   * 
+   *
    * @param element
    *          the removed element
    */
@@ -1336,7 +1336,7 @@ public final class MediaPackageImpl implements MediaPackage {
   /**
    * Integrates the element into the media package. This mainly involves moving the element into the media package file
    * structure.
-   * 
+   *
    * @param element
    *          the element to integrate
    */
@@ -1348,7 +1348,7 @@ public final class MediaPackageImpl implements MediaPackage {
   /**
    * Integrates the catalog into the media package. This mainly involves moving the catalog into the media package file
    * structure.
-   * 
+   *
    * @param catalog
    *          the catalog to integrate
    */
@@ -1364,7 +1364,7 @@ public final class MediaPackageImpl implements MediaPackage {
   /**
    * Integrates the track into the media package. This mainly involves moving the track into the media package file
    * structure.
-   * 
+   *
    * @param track
    *          the track to integrate
    */
@@ -1381,7 +1381,7 @@ public final class MediaPackageImpl implements MediaPackage {
   /**
    * Integrates the attachment into the media package. This mainly involves moving the attachment into the media package
    * file structure.
-   * 
+   *
    * @param attachment
    *          the attachment to integrate
    */
@@ -1397,7 +1397,7 @@ public final class MediaPackageImpl implements MediaPackage {
   /**
    * Returns a media package element identifier with the given prefix and the given number or a higher one as the
    * suffix. The identifier will be unique within the media package.
-   * 
+   *
    * @param prefix
    *          the identifier prefix
    * @param count
@@ -1420,7 +1420,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Unmarshals XML representation of a MediaPackage via JAXB.
-   * 
+   *
    * @param xml
    *          the serialized xml string
    * @return the deserialized media package
@@ -1455,7 +1455,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#clone()
    */
   @Override
@@ -1496,7 +1496,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Reads the media package from the input stream.
-   * 
+   *
    * @param xml
    *          the input stream
    * @return the deserialized media package
@@ -1514,7 +1514,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Reads the media package from an xml node.
-   * 
+   *
    * @param xml
    *          the node
    * @return the deserialized media package
@@ -1544,7 +1544,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getContributors()
    */
   @Override
@@ -1556,7 +1556,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getCreators()
    */
   @Override
@@ -1568,7 +1568,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getLanguage()
    */
   @Override
@@ -1578,7 +1578,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getLicense()
    */
   @Override
@@ -1588,7 +1588,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getSeries()
    */
   @Override
@@ -1598,7 +1598,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getSubjects()
    */
   @Override
@@ -1610,7 +1610,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getTitle()
    */
   @Override
@@ -1620,7 +1620,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#getSeriesTitle()
    */
   @Override
@@ -1630,7 +1630,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#setSeriesTitle(java.lang.String)
    */
   @Override
@@ -1640,7 +1640,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#addContributor(java.lang.String)
    */
   @Override
@@ -1652,7 +1652,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#addCreator(java.lang.String)
    */
   @Override
@@ -1664,7 +1664,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#addSubject(java.lang.String)
    */
   @Override
@@ -1676,7 +1676,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#removeContributor(java.lang.String)
    */
   @Override
@@ -1687,7 +1687,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#removeCreator(java.lang.String)
    */
   @Override
@@ -1698,7 +1698,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#removeSubject(java.lang.String)
    */
   @Override
@@ -1709,7 +1709,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#setDate(java.util.Date)
    */
   @Override
@@ -1722,7 +1722,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#setLanguage(java.lang.String)
    */
   @Override
@@ -1732,7 +1732,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#setLicense(java.lang.String)
    */
   @Override
@@ -1742,7 +1742,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#setSeries(java.lang.String)
    */
   @Override
@@ -1752,7 +1752,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.MediaPackage#setTitle(java.lang.String)
    */
   @Override
@@ -1762,7 +1762,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Returns the media package element that matches the given reference.
-   * 
+   *
    * @param reference
    *          the reference
    * @return the element
@@ -1779,7 +1779,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Registers a new media package element with this manifest.
-   * 
+   *
    * @param element
    *          the new element
    */
@@ -1823,7 +1823,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Removes the media package element from the manifest.
-   * 
+   *
    * @param element
    *          the element to remove
    */
@@ -1846,7 +1846,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Extracts the list of tracks from the media package.
-   * 
+   *
    * @return the tracks
    */
   private Collection<Track> loadTracks() {
@@ -1863,7 +1863,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Extracts the list of catalogs from the media package.
-   * 
+   *
    * @return the catalogs
    */
   private Collection<Catalog> loadCatalogs() {
@@ -1880,7 +1880,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
   /**
    * Extracts the list of attachments from the media package.
-   * 
+   *
    * @return the attachments
    */
   private Collection<Attachment> loadAttachments() {

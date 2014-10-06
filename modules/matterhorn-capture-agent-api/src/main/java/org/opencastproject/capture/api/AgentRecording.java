@@ -25,7 +25,7 @@ public interface AgentRecording extends Recording {
 
   /**
    * Gets a property from the local {@code Properties} object
-   * 
+   *
    * @param key
    *          The property name
    * @return The property value, or {@code null} if it doesn't exist
@@ -35,7 +35,7 @@ public interface AgentRecording extends Recording {
 
   /**
    * Sets a property in the local {@code Properties} object (by simply calling its own setProperty method)
-   * 
+   *
    * @param key
    *          The property name
    * @param value

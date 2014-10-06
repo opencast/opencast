@@ -122,7 +122,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
         // User switching is only allowed if the request is coming in with
         // the global admin role enabled
         if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
-          logger.warn("An unauthorized request is trying to switch from user '{}' to '{}'", originalUser.getUserName(),
+          logger.warn("An unauthorized request is trying to switch from user '{}' to '{}'", originalUser.getUsername(),
                   userHeader);
           ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
           return;
@@ -130,7 +130,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
         if (SecurityConstants.GLOBAL_ANONYMOUS_USERNAME.equals(userHeader)) {
           requestUser = SecurityUtil.createAnonymousUser(requestOrganization);
-          logger.trace("Request user is switched to '{}'", requestUser.getUserName());
+          logger.trace("Request user is switched to '{}'", requestUser.getUsername());
         } else {
           requestUser = userDirectory.loadUser(userHeader);
           if (requestUser != null) {
@@ -145,7 +145,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
       }
 
       // Execute the rest of the filter chain
-      logger.trace("Executing the filter chain with user '{}@{}'", requestUser.getUserName(),
+      logger.trace("Executing the filter chain with user '{}@{}'", requestUser.getUsername(),
               requestOrganization.getId());
       chain.doFilter(httpRequest, response);
 
@@ -165,7 +165,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
   /**
    * Sets the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -175,7 +175,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -185,7 +185,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
   /**
    * Sets a reference to the user directory service.
-   * 
+   *
    * @param userDirectory
    *          the user directory
    */

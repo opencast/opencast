@@ -15,16 +15,18 @@
  */
 package org.opencastproject.workflow.api;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.ComponentContext;
 
@@ -33,6 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Abstract base implementation for an operation handler, which implements a simple start operation that returns a
@@ -54,7 +59,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Activates this component with its properties once all of the collaborating services have been set
-   * 
+   *
    * @param cc
    *          The component's context, containing the properties used for configuration
    */
@@ -65,7 +70,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -75,7 +80,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -87,7 +92,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#destroy(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -97,7 +102,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -107,7 +112,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Adds a configuration option to the list of possible configuration options.
-   * 
+   *
    * @param name
    *          the option name
    * @param description
@@ -119,7 +124,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Removes the configuration option from the list of possible configuration options.
-   * 
+   *
    * @param name
    *          the option name
    */
@@ -130,7 +135,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * Converts a comma separated string into a set of values. Useful for converting operation configuration strings into
    * multi-valued sets.
-   * 
+   *
    * @param elements
    *          The comma space separated string
    * @return the set of values
@@ -148,24 +153,31 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     return list;
   }
 
+  /** {@link #asList(String)} as a function. */
+  protected Function<String, List<String>> asList = new Function<String, List<String>>() {
+    @Override public List<String> apply(String s) {
+      return asList(s);
+    }
+  };
+
   /**
    * Generates a filename using the base name of a source element and the extension of a derived element.
-   * 
+   *
    * @param source
-   *          the source mediapackage element
+   *          the source media package element
    * @param derived
-   *          the derived mediapackage element
+   *          the derived media package element
    * @return the filename
    */
   protected String getFileNameFromElements(MediaPackageElement source, MediaPackageElement derived) {
-    String fileName = FilenameUtils.getBaseName(source.getURI().getPath().toString());
-    String fileExtension = FilenameUtils.getExtension(derived.getURI().getPath().toString());
+    String fileName = FilenameUtils.getBaseName(source.getURI().getPath());
+    String fileExtension = FilenameUtils.getExtension(derived.getURI().getPath());
     return fileName + "." + fileExtension;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getId()
    */
   @Override
@@ -175,7 +187,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getDescription()
    */
   @Override
@@ -185,7 +197,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Creates a result for the execution of this workflow operation handler.
-   * 
+   *
    * @param action
    *          the action to take
    * @return the result
@@ -199,7 +211,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * <p>
    * Since there is no way for the workflow service to determine the queuing time (e. g. waiting on services), it needs
    * to be provided by the handler.
-   * 
+   *
    * @param action
    *          the action to take
    * @param timeInQueue
@@ -212,7 +224,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Creates a result for the execution of this workflow operation handler.
-   * 
+   *
    * @param mediaPackage
    *          the modified mediapackage
    * @param action
@@ -228,7 +240,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * <p>
    * Since there is no way for the workflow service to determine the queuing time (e. g. waiting on services), it needs
    * to be provided by the handler.
-   * 
+   *
    * @param mediaPackage
    *          the modified mediapackage
    * @param action
@@ -246,7 +258,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * <p>
    * Since there is no way for the workflow service to determine the queuing time (e. g. waiting on services), it needs
    * to be provided by the handler.
-   * 
+   *
    * @param mediaPackage
    *          the modified mediapackage
    * @param properties
@@ -265,7 +277,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * Sets the service registry. This method is here as a convenience for developers that need the registry to do job
    * waiting.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -281,7 +293,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * <li>{@link Job.Status#DELETED}</li>
    * </ul>
    * After that, the method returns with the actual outcomes of the jobs.
-   * 
+   *
    * @param jobs
    *          the jobs
    * @return the jobs and their outcomes
@@ -302,7 +314,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * <li>{@link Job.Status#DELETED}</li>
    * </ul>
    * After that, the method returns with the actual outcomes of the jobs.
-   * 
+   *
    * @param timeout
    *          the maximum amount of time in miliseconds to wait
    * @param jobs
@@ -321,9 +333,29 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     return barrier.waitForJobs(timeout);
   }
 
+  /** Get a configuration option. */
+  protected Option<String> getCfg(WorkflowInstance wi, String key) {
+    return option(wi.getCurrentOperation().getConfiguration(key));
+  }
+
+  /**
+   * Create an error function.
+   * <p/>
+   * Example usage: <code>getCfg(wi, "key").getOrElse(this.&lt;String&gt;cfgKeyMissing("key"))</code>
+   *
+   * @see #getCfg(WorkflowInstance, String)
+   */
+  protected <A> Function0<A> cfgKeyMissing(final String key) {
+    return new Function0<A>() {
+      @Override public A apply() {
+        return chuck(new WorkflowOperationException(key + " is missing or malformed"));
+      }
+    };
+  }
+
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -333,7 +365,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -349,12 +381,11 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     return getId();
   }
-
 }

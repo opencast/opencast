@@ -30,19 +30,19 @@ public class CaptureAdminResources {
   public static HttpResponse agents(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "agents"));
   }
-  
+
   public static HttpResponse agent(TrustedHttpClient client, String id) {
     return client.execute(new HttpGet(getServiceUrl() + "agents/" + id));
   }
-  
+
   public static HttpResponse recordings(TrustedHttpClient client) {
     return client.execute(new HttpGet(getServiceUrl() + "recordings"));
   }
-  
+
   public static HttpResponse recording(TrustedHttpClient client, String id) {
     return client.execute(new HttpGet(getServiceUrl() + "recordings/" + id));
   }
-  
+
   private static final String getServiceUrl() {
     return Main.getBaseUrl() + "/capture-admin/";
   }

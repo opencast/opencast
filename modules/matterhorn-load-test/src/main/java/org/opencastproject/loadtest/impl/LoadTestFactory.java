@@ -40,12 +40,12 @@ public class LoadTestFactory implements ManagedService {
 
   // Configuration for Load Testing.
   private Dictionary<String, String> configuration = null;
-  
+
   private ComponentContext componentContext = null;
-  
+
   /**
    * Sets the http client which this service uses to communicate with the core.
-   * 
+   *
    * @param client
    *          The client object to ingest the load testing to.
    */
@@ -56,7 +56,7 @@ public class LoadTestFactory implements ManagedService {
 
   /**
    * Updates when the configuration for the load testing changes.
-   * 
+   *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    **/
   @SuppressWarnings("unchecked")
@@ -70,10 +70,10 @@ public class LoadTestFactory implements ManagedService {
       logger.warn("No default properties for Load Testing. Missing or empty {FELIX_HOME}/conf/services/org.opencastproject.loadtest.impl.LoadTestFactory.properties?");
     }
   }
-   
+
   /**
    * Create a new load testing instance that will run by itself based on properties.
-   * 
+   *
    * @param properties
    *          The configuration to use for load testing.
    * @throws ConfigurationException
@@ -90,7 +90,7 @@ public class LoadTestFactory implements ManagedService {
   }
 
   /**
-   * 
+   *
    * @return A properties object containing the default configuration specified in the
    *         org.opencastproject.loadtest.impl.LoadTestFactory.properties
    * @throws ConfigurationException
@@ -112,10 +112,10 @@ public class LoadTestFactory implements ManagedService {
       throw new ConfigurationException("null", "Null configuration in updated!");
     }
   }
-  
+
   /**
    * Callback from the OSGi container once this service is started. This is where we register our shell commands.
-   * 
+   *
    * @param ctx
    *          the component context
    */

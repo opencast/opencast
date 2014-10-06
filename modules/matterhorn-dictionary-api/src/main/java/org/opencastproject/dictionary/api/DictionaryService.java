@@ -27,7 +27,7 @@ public interface DictionaryService {
 
   /**
    * Takes a given text represented as array of words and returns weather each word exist in the specified language
-   * 
+   *
    * @param text
    *          text represented as array of its words
    * @param language
@@ -38,24 +38,24 @@ public interface DictionaryService {
 
   /**
    * Returns an array of all the languages installed
-   * 
+   *
    * @return all the language codes of installed dictionaries
    */
   String[] getLanguages();
-  
+
   /**
    * Returns an array of all the language codes that contain a specified word
-   * 
+   *
    * @param word
    *          word that will be checked in which languages it exists
    * @return all the language codes that contain the specified word
    */
   String[] getLanguages(String word);
-  
+
   /**
    * For a given array of strings, get the possible languages for these words.  The most likely languages are sorted
    * earlier in the array.
-   * 
+   *
    * @param text Text being analyzed - represented as array of words
    * @return the detected languages, ordered by confidence
    */
@@ -63,7 +63,7 @@ public interface DictionaryService {
 
   /**
    * Adds a specified word to the dictionary for the specified language
-   * 
+   *
    * @param word
    *          word that will be added to the dictionary
    * @param language
@@ -73,7 +73,7 @@ public interface DictionaryService {
 
   /**
    * Adds a specified word to the dictionary for the specified language
-   * 
+   *
    * @param word
    *          word that will be added to the dictionary
    * @param language
@@ -87,7 +87,7 @@ public interface DictionaryService {
 
   /**
    * Adds a specified word to the dictionary for the specified language
-   * 
+   *
    * @param word
    *          word that will be added to the dictionary
    * @param language
@@ -99,17 +99,17 @@ public interface DictionaryService {
 
   /**
    * Adds a stop word. Stop words are words that occur frequently or are not wanted for some of the processes.
-   * 
+   *
    * @param word
    *          stop word being added
    * @param language
    *          language in which the stop word is being added
    */
   void markStopWord(String word, String language);
-  
+
   /**
    * Automatically parses dictionary and marks all stop words found
-   * 
+   *
    * @param threshold
    *          all words that appear more frequently than the specified threshold will be marked as stopwords
    *          frequency is percentage of the word occurrence in all the text
@@ -120,7 +120,7 @@ public interface DictionaryService {
 
   /**
    * Gets a normalized value of word frequency for a given language
-   * 
+   *
    * @param word
    *          word being tested
    * @param language
@@ -131,7 +131,7 @@ public interface DictionaryService {
 
   /**
    * Gets a number of times the word appeared in the specified language
-   * 
+   *
    * @param word
    *          word being tested
    * @param language
@@ -142,7 +142,7 @@ public interface DictionaryService {
 
   /**
    * Tests weather the word exists in any of the languages
-   * 
+   *
    * @param word
    *          word being tested
    * @return true if word is found in any of the languages, false otherwise
@@ -151,7 +151,7 @@ public interface DictionaryService {
 
   /**
    * Tests weather the word exists in the specified language
-   * 
+   *
    * @param word
    *          word being tested
    * @param language
@@ -162,7 +162,7 @@ public interface DictionaryService {
 
   /**
    * Tests weather the word is a stop word in any of the languages
-   * 
+   *
    * @param word
    *          word being tested
    * @return true if word is found to be a stop word in any of the languages, false otherwise
@@ -171,7 +171,7 @@ public interface DictionaryService {
 
   /**
    * Tests weather the word is a stop word in the specified language
-   * 
+   *
    * @param word
    *          word being tested
    * @param language
@@ -182,7 +182,7 @@ public interface DictionaryService {
 
   /**
    * Removes a dictionary of the specified language
-   * 
+   *
    * @param language
    *          language code for the dictionary to be removed
    */

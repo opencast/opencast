@@ -24,6 +24,7 @@ import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.capture.admin.api.Recording;
 import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -118,7 +119,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Sets the workflow service
-   * 
+   *
    * @param workflowService
    *          the workflowService to set
    */
@@ -174,7 +175,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getAgent(java.lang.String)
    */
   @Override
@@ -186,7 +187,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#updateAgent(Agent)
    */
   @Override
@@ -196,7 +197,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Gets an agent by name and organization.
-   * 
+   *
    * @param name
    *          the unique agent name
    * @param org
@@ -219,7 +220,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Gets an agent by name and organization, using an open entitymanager.
-   * 
+   *
    * @param name
    *          the unique agent name
    * @param org
@@ -241,7 +242,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Mix in the last-seen timestamp from the agent cache
-   * 
+   *
    * @param agent
    *          The Agent you wish to update
    * @param org
@@ -259,7 +260,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getAgentState(java.lang.String)
    */
   public String getAgentState(String agentName) throws NotFoundException {
@@ -270,7 +271,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#setAgentState(java.lang.String,
    *      java.lang.String)
    */
@@ -310,7 +311,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#setAgentUrl(String, String)
    */
   public boolean setAgentUrl(String agentName, String agentUrl) throws NotFoundException {
@@ -324,7 +325,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#removeAgent(java.lang.String)
    */
   public void removeAgent(String agentName) throws NotFoundException {
@@ -333,7 +334,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getKnownAgents()
    */
   public Map<String, Agent> getKnownAgents() {
@@ -341,7 +342,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     User user = securityService.getUser();
     Organization org = securityService.getOrganization();
     String orgAdmin = org.getAdminRole();
-    String[] roles = user.getRoles();
+    Set<Role> roles = user.getRoles();
     try {
       em = emf.createEntityManager();
       Query q = em.createNamedQuery("Agent.byOrganization");
@@ -359,8 +360,8 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
             continue;
           }
           boolean hasSchedulerRole = false;
-          for (String role : roles) {
-            if (schedulerRoles.contains(role)) {
+          for (Role role : roles) {
+            if (schedulerRoles.contains(role.getName())) {
               hasSchedulerRole = true;
               break;
             }
@@ -385,7 +386,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getAgentCapabilities(java.lang.String)
    */
   public Properties getAgentCapabilities(String agentName) throws NotFoundException {
@@ -394,7 +395,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getAgentConfiguration(java.lang.String)
    */
   public Properties getAgentConfiguration(String agentName) throws NotFoundException {
@@ -415,7 +416,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#setAgentConfiguration
    */
   public boolean setAgentConfiguration(String agentName, Properties configuration) {
@@ -447,7 +448,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Updates or adds an agent to the database.
-   * 
+   *
    * @param agent
    *          The Agent you wish to modify or add in the database.
    */
@@ -497,7 +498,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Removes an agent from the database.
-   * 
+   *
    * @param agentName
    *          The name of the agent you wish to remove.
    */
@@ -525,7 +526,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getRecordingState(java.lang.String)
    */
   public Recording getRecordingState(String id) throws NotFoundException {
@@ -542,7 +543,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#setRecordingState(java.lang.String,
    *      java.lang.String)
    * @throws IllegalArgumentException
@@ -582,7 +583,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Resumes a workflow instance associated with this capture, if one exists.
-   * 
+   *
    * @param recordingId
    *          the recording id, which is assumed to correspond to the scheduled event id
    * @param state
@@ -647,7 +648,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#removeRecording(java.lang.String)
    */
   public void removeRecording(String id) throws NotFoundException {
@@ -659,7 +660,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getKnownRecordings()
    */
   public Map<String, Recording> getKnownRecordings() {
@@ -678,7 +679,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#getName()
    */
   @Override
@@ -688,7 +689,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#updated(java.lang.String, java.util.Dictionary)
    */
   @Override
@@ -741,7 +742,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#deleted(java.lang.String)
    */
   @Override

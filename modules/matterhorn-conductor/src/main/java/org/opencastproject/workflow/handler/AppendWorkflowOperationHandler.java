@@ -53,12 +53,15 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
   /** Path to the hold state ui */
   public static final String UI_RESOURCE_PATH = "/ui/operation/append/index.html";
 
+  /** Title shown in Admin UI for Hold action */
+  public static final String HOLD_ACTION_TITLE = "Select Workflow";
+
   /** The workflow service instance */
   protected WorkflowService workflowService = null;
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#activate(org.osgi.service.component.ComponentContext)
    */
   @Override
@@ -70,11 +73,14 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
     // Add the ui piece that displays the capture information
     registerHoldStateUserInterface(UI_RESOURCE_PATH);
+
+    /* Replace the default title */
+    this.setHoldActionTitle(HOLD_ACTION_TITLE);
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -91,13 +97,13 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#resume(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext, java.util.Map)
    */
   @Override
-  public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context,
-          Map<String, String> properties) {
+  public WorkflowOperationResult resume(WorkflowInstance workflowInstance,
+      JobContext context, Map<String, String> properties) {
     String workflowDefinitionId = properties.get(OPT_WORKFLOW);
     for (Entry<String, String> entry : properties.entrySet()) {
       workflowInstance.setConfiguration(entry.getKey(), entry.getValue());
@@ -110,10 +116,12 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
   }
 
   /**
-   * Adds the operations found in the workflow defined by <code>workflowDefintionId</code> to the workflow instance and
-   * returns <code>true</code> if everything worked fine, <code>false</code> otherwhise.
-   * 
-   * 
+   * Adds the operations found in the workflow defined by
+   * <code>workflowDefintionId</code> to the workflow instance and returns
+   * <code>true</code> if everything worked fine, <code>false</code>
+   * otherwhise.
+   *
+   *
    * @param workflowInstance
    *          the instance to update
    * @param workflowDefinitionId
@@ -142,7 +150,7 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
 
   /**
    * Callback from the OSGi environment that will pass a reference to the workflow service upon component acitvation.
-   * 
+   *
    * @param service
    *          the workflow service
    */

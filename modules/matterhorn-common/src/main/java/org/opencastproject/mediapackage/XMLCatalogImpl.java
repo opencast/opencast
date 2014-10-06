@@ -66,14 +66,14 @@ import javax.xml.transform.stream.StreamResult;
  * <h3>Limitations</h3>
  * XMLCatalog supports only <em>one</em> prefix binding per namespace name, so you cannot create documents like the
  * following using XMLCatalog:
- * 
+ *
  * <pre>
  * &lt;root xmlns:x=&quot;http://x.demo.org&quot; xmlns:y=&quot;http://x.demo.org&quot;&gt;
  *   &lt;x:elem&gt;value&lt;/x:elem&gt;
  *   &lt;y:elem&gt;value&lt;/y:elem&gt;
  * &lt;/root&gt;
  * </pre>
- * 
+ *
  * However, reading of those documents is supported.
  */
 public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
@@ -114,7 +114,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Creates an abstract metadata container.
-   * 
+   *
    * @param id
    *          the element identifier withing the package
    * @param flavor
@@ -138,7 +138,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Creates an abstract metadata container.
-   * 
+   *
    * @param flavor
    *          the catalog flavor
    * @param uri
@@ -163,7 +163,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Bind a prefix to a namespace.
-   * 
+   *
    * @param prefix
    *          the prefix
    * @param namespaceName
@@ -175,7 +175,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Adds the element to the metadata collection.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @param value
@@ -190,7 +190,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Adds the element with the <code>xml:lang</code> attribute to the metadata collection.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @param value
@@ -211,7 +211,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Adds the element with the <code>xsi:type</code> attribute to the metadata collection.
-   * 
+   *
    * @param value
    *          the value
    * @param type
@@ -230,7 +230,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Adds an element with the <code>xml:lang</code> and <code>xsi:type</code> attributes to the metadata collection.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @param value
@@ -256,7 +256,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Adds an element with attributes to the catalog.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @param value
@@ -279,7 +279,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Adds the catalog element to the list of elements.
-   * 
+   *
    * @param element
    *          the element
    */
@@ -296,7 +296,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Completely removes an element.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    */
@@ -306,7 +306,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Removes all entries in a certain language from an element.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @param language
@@ -319,7 +319,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Removes values from an element or the complete element from the catalog.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @param language
@@ -345,7 +345,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Returns the values that are associated with the specified key.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @return the elements
@@ -360,7 +360,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Returns the values that are associated with the specified key.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @return all values of the element or an empty list if this element does not exist or does not have any values
@@ -373,7 +373,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Returns the values that are associated with the specified key.
-   * 
+   *
    * @param element
    *          the expandend name of the element
    * @param language
@@ -399,7 +399,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Returns the first value that is associated with the specified name.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @return the first value
@@ -414,7 +414,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Returns the first element that is associated with the specified name and attribute.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @param attributeEName
@@ -437,7 +437,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Returns the first value that is associated with the specified name and language.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @param language
@@ -450,7 +450,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Returns the first value that is associated with the specified name and language.
-   * 
+   *
    * @param element
    *          the expanded name of the element
    * @param type
@@ -470,7 +470,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Creates an xml document root and returns it.
-   * 
+   *
    * @return the document
    * @throws ParserConfigurationException
    *           If the xml parser environment is not correctly configured
@@ -486,7 +486,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
   /**
    * Serializes the given xml document to the associated file. Please note that this method does <em>not</em> close the
    * output stream. Anyone using this method is responsible for doing it by itself.
-   * 
+   *
    * @param document
    *          the document
    * @param docType
@@ -519,7 +519,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Transform an expanded name to a qualified name based on the registered binding.
-   * 
+   *
    * @param eName
    *          the expanded name to transform
    * @return the qualified name, e.g. <code>dcterms:title</code>
@@ -537,7 +537,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
   /**
    * Transform an qualified name consisting of prefix and local part to an expanded name, based on the registered
    * binding.
-   * 
+   *
    * @param prefix
    *          the prefix
    * @param localName
@@ -553,7 +553,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Transform an qualified name to an expanded name, based on the registered binding.
-   * 
+   *
    * @param qName
    *          the qualified name, e.g. <code>dcterms:title</code> or <code>title</code>
    * @return the expanded name
@@ -567,7 +567,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Splits a QName into its parts.
-   * 
+   *
    * @param qName
    *          the qname to split
    * @return an array of prefix (0) and local part (1). The prefix is "" if the qname belongs to the default namespace.
@@ -583,7 +583,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Returns a "prefixed name" consisting of namespace prefix and local name.
-   * 
+   *
    * @param prefix
    *          the namespace prefix, may be <code>null</code>
    * @param localName
@@ -623,7 +623,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Creates a new catalog element representation.
-     * 
+     *
      * @param value
      *          the element value
      */
@@ -633,7 +633,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Creates a new catalog element representation with name, value and attributes.
-     * 
+     *
      * @param value
      *          the element value
      * @param attributes
@@ -647,7 +647,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Returns the element namespace.
-     * 
+     *
      * @return the namespace
      */
     public String lookupPrefix() {
@@ -671,7 +671,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Returns the element value.
-     * 
+     *
      * @return the value
      */
     public String getValue() {
@@ -680,7 +680,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Returns <code>true</code> if the element contains attributes.
-     * 
+     *
      * @return <code>true</code> if the element contains attributes
      */
     public boolean hasAttributes() {
@@ -689,7 +689,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Returns the element's attributes.
-     * 
+     *
      * @return the attributes
      */
     public Map<EName, String> getAttributes() {
@@ -698,7 +698,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Returns <code>true</code> if the element contains an attribute with the given name.
-     * 
+     *
      * @return <code>true</code> if the element contains the attribute
      */
     public boolean hasAttribute(EName name) {
@@ -707,7 +707,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Returns the attribute value for the given attribute.
-     * 
+     *
      * @return the attribute or null
      */
     public String getAttribute(EName name) {
@@ -741,7 +741,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Returns the XML representation of this entry.
-     * 
+     *
      * @param document
      *          the document
      * @return the xml node
@@ -799,7 +799,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -832,7 +832,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Bind a prefix to a namespace.
-     * 
+     *
      * @param prefix
      *          the prefix
      * @param namespace
@@ -843,10 +843,6 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
         throw new IllegalArgumentException("Prefix must not be null");
       if (namespace == null)
         throw new IllegalArgumentException("Namespace must not be empty");
-
-      // Strip trailing slash to make sure lookups are not failing because of this
-      if (namespace.endsWith("/"))
-        namespace = namespace.substring(0, namespace.length() - 1);
 
       if (!allowRebind) {
         String namespaceCurrent = prefix2Namespace.get(prefix);
@@ -866,7 +862,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Returns the bound namespace.
-     * 
+     *
      * @throws NamespaceBindingException
      *           if the prefix is not bound
      */
@@ -880,13 +876,11 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     /**
      * Returns the prefix bound to this namespace
-     * 
+     *
      * @throws NamespaceBindingException
      *           if the namespace is not bound
      */
     public String lookupPrefix(String namespace) {
-      if (namespace.endsWith("/"))
-        namespace = namespace.substring(0, namespace.length() - 1);
       String prefix = namespace2prefix.get(namespace);
       if (prefix == null) {
         throw new NamespaceBindingException("Namespace '" + namespace + "' is not bound");
@@ -897,7 +891,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.XMLCatalog#toXml()
    */
   @Override
@@ -905,7 +899,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.XMLCatalog#toJson()
    */
   @Override
@@ -913,7 +907,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.XMLCatalog#toXml(java.io.OutputStream, boolean)
    */
   @Override
@@ -933,7 +927,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.XMLCatalog#toXmlString()
    */
   @Override

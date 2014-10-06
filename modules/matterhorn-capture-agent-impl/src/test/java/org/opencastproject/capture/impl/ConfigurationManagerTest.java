@@ -48,8 +48,12 @@ public class ConfigurationManagerTest {
   /** the singleton object to test with */
   private ConfigurationManager configManager;
 
+  private File testDir = null;
+
+  private XProperties basicProps = null;
+
   private static final Logger logger = LoggerFactory.getLogger(ConfigurationManagerTest.class);
-  
+
   @Before
   public void setUp() throws ConfigurationException, IOException, URISyntaxException {
     configManager = new ConfigurationManager();
@@ -74,8 +78,24 @@ public class ConfigurationManagerTest {
     }
     p.load(is);
     IOUtils.closeQuietly(is);
+
+    testDir = new File("./target", "configman-test");
+
+    basicProps = new XProperties();
+    basicProps.put("org.opencastproject.storage.dir",
+            testDir.getAbsolutePath());
+    basicProps.put(CaptureParameters.CAPTURE_FILESYSTEM_CACHE_URL,
+            new File(testDir, "cache").getAbsolutePath());
+    basicProps.put(CaptureParameters.CAPTURE_FILESYSTEM_VOLATILE_URL,
+            new File(testDir, "volatile").getAbsolutePath());
+
     p.put("org.opencastproject.storage.dir",
-            new File("./target", "configman-test").getAbsolutePath());
+            testDir.getAbsolutePath());
+    p.put(CaptureParameters.CAPTURE_FILESYSTEM_CACHE_URL,
+            new File(testDir, "cache").getAbsolutePath());
+    p.put(CaptureParameters.CAPTURE_FILESYSTEM_VOLATILE_URL,
+            new File(testDir, "volatile").getAbsolutePath());
+
 
     configManager.updated(p);
     configManager.updated(null);
@@ -281,7 +301,7 @@ public class ConfigurationManagerTest {
     registersAfter.refresh();
     replay(registersAfter);
     configurationManager.registerListener(registersBefore);
-    configurationManager.updated(new XProperties());
+    configurationManager.updated(basicProps);
     Thread.sleep(100);
     // A listener registered before an update should be refreshed as soon as the ConfigurationManager is updated.
     verify(registersBefore);
@@ -290,10 +310,11 @@ public class ConfigurationManagerTest {
     Thread.sleep(100);
     verify(registersAfter);
   }
-  
+
   @Test
-  public void testPropertiesAreStripped() {
+  public void testPropertiesAreStripped() throws ConfigurationException {
     configManager = new ConfigurationManager();
+    configManager.updated(basicProps);
     Properties properties = new Properties();
     String blanks = "blanks";
     String leadingAndTrailing = " spaces ";
@@ -306,12 +327,12 @@ public class ConfigurationManagerTest {
       logger.error(e.getMessage());
       Assert.fail("ConfigurationException cccured before the test could complete. ");
     }
-    
+
     Properties returnedProperties = configManager.getAllProperties();
     Assert.assertTrue("Configuration Manager doesn't trim blank entries properly. ",
             returnedProperties.getProperty(blanks).equalsIgnoreCase(""));
     Assert.assertTrue("Configuration Manager doesn't trim ntries with spaces properly. ", returnedProperties
             .getProperty(withoutLeadingAndTrailing).equalsIgnoreCase(withoutLeadingAndTrailing));
   }
-  
+
 }
