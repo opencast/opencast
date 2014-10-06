@@ -17,7 +17,7 @@
 define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage VideoJS Videodisplay";
-    var PLUGIN_TYPE = "engage_video";
+    var PLUGIN_TYPE = "engage_video";   
     var PLUGIN_VERSION = "1.0";
     var PLUGIN_TEMPLATE = "template.html";
     var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
@@ -915,6 +915,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                     theodulVideodisplayMaster.pause();
                     Engage.trigger(plugin.events.pause.getName());
                     theodulVideodisplayMaster.currentTime(theodulVideodisplayMaster.duration());
+                    Engage.trigger(plugin.events.seek.getName(), 0);
                 }
             });
             theodulVideodisplayMaster.on(event_html5player_volumechange, function() {
