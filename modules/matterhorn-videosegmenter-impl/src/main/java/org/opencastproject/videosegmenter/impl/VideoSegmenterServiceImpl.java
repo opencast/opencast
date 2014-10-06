@@ -287,10 +287,10 @@ VideoSegmenterService, ManagedService {
             time = matcher.group().substring(9);
           }
           endtime = Long.parseLong(time) * 1000;
-          Segment segement = videoContent.getTemporalDecomposition()
-            .createSegment("segement-" + segmentcount);
           long segmentLength = endtime-starttime;
           if(1000*stabilityThreshold < segmentLength){
+              Segment segement = videoContent.getTemporalDecomposition()
+                      .createSegment("segement-" + segmentcount);
 	          segement.setMediaTime(new MediaRelTimeImpl(starttime,
 	                endtime-starttime));
 	          segments.add(segement);
