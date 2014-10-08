@@ -1,6 +1,9 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import javax.net.ssl.*;
+import java.security.*;
+import java.security.cert.*;
 
 public class wget
 {
@@ -16,6 +19,90 @@ public class wget
       this.message = _message;
     }
   }
+
+  static  {
+    try {
+      // Create a trust manager that does not validate certificate chains
+      TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+          return null;
+        }
+        public void checkClientTrusted(X509Certificate[] certs, String authType) {
+        }
+        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+        }
+      }};
+
+      // Install the all-trusting trust manager
+      SSLContext sc = SSLContext.getInstance("SSL");
+      sc.init(null, trustAllCerts, new java.security.SecureRandom());
+      HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+      // Create all-trusting hostname verifier
+      HostnameVerifier allHostsValid = new HostnameVerifier() {
+        public boolean verify(String hostname, SSLSession session) {
+          return true;
+        }
+      };
+
+      // Install the all-trusting hostname verifier
+      HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+    }
+    catch (NoSuchAlgorithmException nsae) {
+      System.err.println("ERROR: No such cryptographic algorithm");
+      System.err.println(nsae.toString());
+      System.exit(20);
+    }
+    catch (KeyManagementException kme) {
+      System.err.println("ERROR: Key management exception");
+      System.err.println(kme.toString());
+      System.exit(21);
+    }
+  }
+
+  public static void getHttpsResponseCode(HttpURLConnection suc, _rcm rcm) throws Exception
+  {
+    try {
+      /* set timeout and user agent string */
+      suc.setConnectTimeout(30000);
+      suc.setReadTimeout(30000);
+      suc.setRequestProperty("User-Agent",
+        "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0)");
+//    suc.setRequestProperty("User-Agent",
+//      "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0");
+      suc.setRequestProperty("Connection", "close");
+
+      rcm.rc = suc.getResponseCode();
+      rcm.message = suc.getURL().toString();  // needed in case of 404
+    }
+    catch (MalformedURLException mue) {
+      rcm.rc = 420;  // Malformed URL
+      rcm.message = mue.getMessage();
+    }
+    catch (UnknownHostException uhe) {
+      rcm.rc = 421;  // Unknown host
+      rcm.message = uhe.getMessage();
+    }
+    catch (FileNotFoundException fnfe) {  // never thrown?!
+      rcm.rc = 404;  // Not Found
+      rcm.message = fnfe.getMessage();
+    }
+    catch (ConnectException ce) {
+      rcm.rc = 408;  // Request timeout
+      rcm.message = ce.getMessage();
+      if (rcm.message.equals("Connection refused")) {
+        rcm.rc = 422;  // Connection refused
+      }
+    }
+    catch (SocketTimeoutException ste) {
+      rcm.rc = 408;  // Request timeout
+      rcm.message = ste.getMessage();
+    }
+    catch (IOException ioe) {
+      rcm.rc = 423;  // Other I/O Exception
+      rcm.message = ioe.getMessage();
+    }
+  } // getHttpsResponseCode
 
   public static void getHttpResponseCode(HttpURLConnection huc, _rcm rcm) throws Exception
   {
@@ -82,7 +169,8 @@ public class wget
       System.exit(1);
     }
 
-    HttpURLConnection huc;
+    HttpURLConnection huc = null;
+    HttpsURLConnection suc = null;
     InputStream is = null;
     DataInputStream dis = null;
     _rcm rcm = new _rcm(-1, "");
@@ -90,19 +178,24 @@ public class wget
 
     try {
       URL url = new URL(args[0]);  // take only the first argument
-      huc = (HttpURLConnection)url.openConnection();
+      if (url.getProtocol() == "https") suc = (HttpsURLConnection)url.openConnection();
+      else huc = (HttpURLConnection)url.openConnection();
 
       /* Check for errors and repeat after sleep */
-      getHttpResponseCode(huc, rcm); ii = 0;
-      while (ii < 5) {
+      if (url.getProtocol() == "https") getHttpsResponseCode(suc, rcm);
+      else getHttpResponseCode(huc, rcm);
+      for (ii = 0; ii < 5; ) {
         rcc = rcm.rc / 100;
         if (rcm.rc == 408 || rcm.rc == 503) {
           System.err.println("WARNING: Service unavailable or timeout occurred - repeating...");
           Thread.currentThread().sleep(15000);
 
-          huc = (HttpURLConnection)url.openConnection();
+          if (url.getProtocol() == "https") suc = (HttpsURLConnection)url.openConnection();
+          else huc = (HttpURLConnection)url.openConnection();
 
-          getHttpResponseCode(huc, rcm); ii = ii + 1;
+          if (url.getProtocol() == "https") getHttpsResponseCode(suc, rcm);
+          else getHttpResponseCode(huc, rcm);
+          ii = ii + 1;
         }
         else if (rcm.rc < 0) {  // Response is not valid HTTP
           throw new IOException("Response is not valid HTTP");
@@ -132,7 +225,8 @@ public class wget
         }
       } // while
 
-      is = huc.getInputStream();
+      if (url.getProtocol() == "https") is = suc.getInputStream();
+      else is = huc.getInputStream();
       if (!head) {
         /* read stream and output it to stdout */
         dis = new DataInputStream(new BufferedInputStream(is));

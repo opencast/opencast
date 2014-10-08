@@ -54,7 +54,7 @@ while [ true ]; do
         else
           ERRTXT=" (success)..."
           case `os` in
-            CentOS | RHEL | Ubuntu | Debian | openSUSE ) ACT=2 ;;
+            CentOS | RHEL | Ubuntu | Debian | openSUSE | SLES | SciL | Amazon ) ACT=2 ;;
             MacOS ) ACT=5 ;;
           esac
         fi
