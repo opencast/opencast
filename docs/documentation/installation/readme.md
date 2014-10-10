@@ -36,6 +36,18 @@ integrated into the operating system.
     - Fedora
     - SLES
 
+
+Installation Across Multiple Servers
+------------------------------------
+
+For production systems it is recommended to install Matterhorn across multiple
+servers to separate the processing, management and presentation layer so that
+even if the processing layer is under full load people can still watch
+recodings unaffected since the presentation layer is running on a separate
+machine, …
+
+ - [Installation Across Multiple Servers](multiple-servers.md)
+
 Scripted Installation from Source
 ---------------------------------
 
