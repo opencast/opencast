@@ -122,6 +122,8 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
     var synchronizePath = "lib/synchronize";
     var mediaSourcesPath = "lib/videojs/videojs-media-sources";
     var hlsPath = "lib/videojs/videojs.hls.min";
+    var dashPath = "lib/videojs/dash.min";
+    var dashPluginPath = "lib/videojs/videojs-tech-dashjs"
     var videojs_swf_path = "lib/videojs/video-js.swf";
     var videoDisplaySizeFactor = 1.1;
     var videoDisplaySizeTimesCheck = 100; // the smaller the factor, the higher the times check!
@@ -186,6 +188,8 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
     var currentlySelectedVideodisplay = 0;
     var globalVideoSource = new Array();
     var videoResultions = new Array();
+    var loadDash = false;
+    var loadHls = false;
 
     function escapeRegExp(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -242,356 +246,384 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
             this.render();
         },
         render: function() {
-            Engage.log("Rendering video displays");
-            var src = (this.model.get("videoSources") && this.model.get("videoSources")["audio"]) ? this.model.get("videoSources")["audio"] : [];
-            var tempVars = {
-                ids: this.model.get("ids"),
-                type: this.model.get("type"),
-                sources: src
-            };
-            if (isEmbedMode && !isAudioOnly) {
-                tempVars.id = this.model.get("ids")[0];
-            }
-            // compile template and load into the html
-            this.$el.html(_.template(this.template, tempVars));
-
-            var i = 0;
-            var videoDisplays = this.model.get("ids");
-            var videoSources = this.model.get("videoSources");
-
-            if (!mediapackageError) {
-                // get aspect ratio
-                Engage.log("Calculating Aspect ratio");
-                aspectRatio = null;
-                var as1 = 0;
-                for (var flavor in videoResultions) {
-                    if ((aspectRatio == null) || (as1 < videoResultions[flavor])) {
-                        as1 = videoResultions[flavor][1];
-                        aspectRatio = videoResultions[flavor];
-                    }
-                }
-                for (var v in videoSources) {
-                    for (var j = 0; j < videoSources[v].length; ++j) {
-                        var aspectRatio_tmp = videoSources[v][j].resolution;
-                        var t_tmp = $.type(aspectRatio_tmp);
-                        if ((t_tmp === "string") && (/\d+x\d+/.test(aspectRatio_tmp))) {
-                            aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
-                            if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
-                                as1 = parseInt(aspectRatio_tmp[1]);
-                                aspectRatio = parseVideoResolution(videoSources[v][j].resolution);
-                            }
-                        }
-                    }
-                }
-
-                $(window).on("orientationchange", function(event) {
-                    Engage.log("Video: Device twisted");
-                    checkVideoDisplaySize();
-                    orderVideoDisplays(videoDisplays);
+            prepareRenderingVideoDisplay(this);
+        }
+    });    
+    
+    function prepareRenderingVideoDisplay(videoDataView) {
+        
+        if (loadHls) {
+            require([relative_plugin_path + mediaSourcesPath], function(videojsmedia) {
+                Engage.log("Video: Lib videojs media sources loaded");
+                require([relative_plugin_path + hlsPath], function(videojshls) {
+                    Engage.log("Video: Lib videojs HLS playback loaded");               
+                    renderVideoDisplay(videoDataView);
                 });
+            });
+        } else {
+            renderVideoDisplay(videoDataView);
+        }
+    }
+    
+    function renderVideoDisplay (videoDataView) {
+        Engage.log("Rendering video displays");
 
-                isAudioOnly = this.model.get("type") == "audio";
-                Engage.trigger(plugin.events.isAudioOnly.getName(), isAudioOnly);
+        var src = (videoDataView.model.get("videoSources") && videoDataView.model.get("videoSources")["audio"]) ? videoDataView.model.get("videoSources")["audio"] : [];
+        var tempVars = {
+            ids: videoDataView.model.get("ids"),
+            type: videoDataView.model.get("type"),
+            sources: src
+        };
+        if (isEmbedMode && !isAudioOnly) {
+            tempVars.id = videoDataView.model.get("ids")[0];
+        }
+        // compile template and load into the html
+        videoDataView.$el.html(_.template(videoDataView.template, tempVars));
 
-                if (isDesktopMode) {
-                    var i = 0;
-                    for (var v in videoSources) {
-                        if ((videoSources[v].length > 0) && (videoDisplays.length > i)) {
-                            initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
-                            ++i;
-                        }
-                    }
-                                        
-                    if ((aspectRatio != null) && (videoDisplays.length > 0)) {
-//                        aspectRatio[1] = parseInt(aspectRatio[1]);
-//                        aspectRatio[2] = parseInt(aspectRatio[2]);
-                        Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-                        Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100]);
-                        $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
-                        $("." + id_videoDisplayClass).each(function(index) {
-                            if ((index % 2) == 1) {
-                                $(this).css("float", "right");
-                            }
-                        });
-                        for (var i = 0; i < videoDisplays.length; ++i) {
-                            $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
-                        }
-                    } else {
-                        Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
-                    }
+        var i = 0;
+        var videoDisplays = videoDataView.model.get("ids");
+        var videoSources = videoDataView.model.get("videoSources");
 
-                    // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
-                    $("." + class_vjsposter).show();
-
-                    Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
-
-                    if (videoDisplays.length > 0) {
-                        var nr = 0;
-                        for (var v in videoSources) {
-                            if (videoSources[v].length > 0) {
-                                ++nr;
-                            }
-                        }
-
-                        // set first videoDisplay as master
-                        registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
-
-                        if (nr >= 2) {
-                            // throw some important synchronize.js-events for other plugins
-                            $(document).on(event_sjs_allPlayersReady, function(event) {
-                                videosReady = true;
-                                Engage.trigger(plugin.events.ready.getName());
-                            });
-                            $(document).on(event_sjs_playerLoaded, function(event) {
-                                Engage.trigger(plugin.events.playerLoaded.getName());
-                            });
-                            $(document).on(event_sjs_masterPlay, function(event) {
-                                Engage.trigger(plugin.events.play.getName(), true);
-                                pressedPlayOnce = true;
-                            });
-                            $(document).on(event_sjs_masterPause, function(event) {
-                                Engage.trigger(plugin.events.pause.getName(), true);
-                            });
-                            $(document).on(event_sjs_masterEnded, function(event) {
-                                Engage.trigger(plugin.events.ended.getName(), true);
-                            });
-                            $(document).on(event_sjs_masterTimeupdate, function(event, time) {
-                                Engage.trigger(plugin.events.timeupdate.getName(), time, true);
-                            });
-                            $(document).on(event_sjs_synchronizing, function(event) {
-                                Engage.trigger(plugin.events.synchronizing.getName());
-                            });
-                            $(document).on(event_sjs_buffering, function(event) {
-                                Engage.trigger(plugin.events.buffering.getName());
-                            });
-                            $(document).on(event_sjs_bufferedAndAutoplaying, function(event) {
-                                Engage.trigger(plugin.events.bufferedAndAutoplaying.getName());
-                            });
-                            $(document).on(event_sjs_bufferedButNotAutoplaying, function(event) {
-                                Engage.trigger(plugin.events.bufferedButNotAutoplaying.getName());
-                            });
-
-                            var i = 0;
-                            for (var vd in videoDisplays) {
-                                if (i > 0) {
-                                    // sync every other videodisplay with the master
-                                    $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
-                                    Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay");
-                                }
-                                ++i;
-                            }
-                            if (isUsingFlash) {
-                                $(document).trigger(event_sjs_isUsingFlash, []);
-                                $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
-                            }
-                        } else {
-                            videosReady = true;
-                            if (!isAudioOnly) {
-                                Engage.trigger(plugin.events.ready.getName());
-                            }
-                        }
-
-                        if (this.model.get("type") != "audio") {
-                            $(window).resize(function() {
-                                checkVideoDisplaySize();
-                            });
-                        }
-                    }
-                } else if (isEmbedMode) {
-                    var nrOfVideoSources = 0;
-                    var init = false;
-                    for (var v in videoSources) {
-                        if (videoSources[v].length > 0) {
-                            if (!init) { // just init the first video
-                                init = true;
-                                initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
-                            }
-                            globalVideoSource.push({
-                                id: videoDisplays[i],
-                                src: videoSources[v]
-                            });
-                        }
-                    }
-
-                    if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
-                        $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_switchPlayer + "\" class=\"" + class_vjs_switchPlayer + " " + class_vjs_control + " " + class_vjs_menu_button + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"></div>");
-                        $("#" + id_btn_switchPlayer).append(
-                            "<div class=\"vjs-control-content\">" +
-                            "<span class=\"" + class_vjs_control_text + "\">Switch player</span>" +
-                            "</div>" +
-                            "<div id=\"" + id_switchPlayer_value + "\" class=\"" + class_vjs_switchPlayer_value + "\">" +
-                            "Vid. 1" +
-                            "</div>" +
-                            "<div class=\"" + class_vjs_menu + "\">" +
-                            "<ul class=\"" + class_vjs_menu_content + "\">" +
-                            "<li id=\"" + id_btn_video1 + "\" aria-selected=\"true\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">Video 1</li>" +
-                            "<li id=\"" + id_btn_video2 + "\" aria-selected=\"false\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">Video 2</li>" +
-                            "</ul>" +
-                            "</div>"
-                        );
-                        $("#" + id_btn_video1).click(function(e) {
-                            $("#" + id_switchPlayer_value).html("Vid. 1");
-                            if (!currentlySelectedVideodisplay == 0) {
-                                currentlySelectedVideodisplay = 0;
-                                videojs(globalVideoSource[0].id).src(globalVideoSource[0].src);
-                            }
-                        });
-                        $("#" + id_btn_video2).click(function(e) {
-                            $("#" + id_switchPlayer_value).html("Vid. 2");
-                            if (!currentlySelectedVideodisplay == 1) {
-                                currentlySelectedVideodisplay = 1;
-                                videojs(globalVideoSource[1].id).src(globalVideoSource[1].src);
-                            }
-                        });
-                    }
-                    $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">Open in player</span></div></div>");
-                    $("." + class_audio_wrapper).append("<a id=\"" + id_btn_openInPlayer + "\" href=\"#\">Open in player</a>");
-
-                    $("#" + id_btn_openInPlayer).click(function(e) {
-                        e.preventDefault();
-                        var str = window.location.href;
-                        if (str.indexOf("mode=embed") == -1) {
-                            str += "&mode=embed";
-                        } else {
-                            str = replaceAll(str, "mode=embed", "mode=desktop");
-                        }
-                        Engage.trigger(plugin.events.pause.getName(), false);
-                        window.open(str, "_blank");
-                    });
-
-                    if ((aspectRatio != null) && (videoDisplays.length > 0)) {
-                        aspectRatio[1] = parseInt(aspectRatio[1]);
-                        aspectRatio[2] = parseInt(aspectRatio[2]);
-                        Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-                        Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
-                        $("." + id_videoDisplayClass).css("width", "100%");
-                        for (var i = 0; i < videoDisplays.length; ++i) {
-                            $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
-                        }
-                    } else {
-                        Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
-                    }
-
-                    // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
-                    $("." + class_vjsposter).show();
-                    Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
-
-                    if (videoDisplays.length > 0) {
-                        // set first videoDisplay as master
-                        registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], 1);
-
-                        videosReady = true;
-                        Engage.trigger(plugin.events.ready.getName());
-
-                        if (this.model.get("type") != "audio") {
-                            $(window).resize(function() {
-                                checkVideoDisplaySize();
-                            });
-                        }
-                    }
-
-                } else if (isMobileMode) {
-                    checkVideoDisplaySize();
-                    initMobileEvents();
-                    
-                    for (var v in videoSources) {
-                        if (videoSources[v].length > 0) {
-                            Engage.log("Init Video Display: " + v);
-                            initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
-                            ++i;
-                        }
-                    }
-
-                    Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
-
-                    if ((aspectRatio != null) && (videoDisplays.length > 0)) {
-                        aspectRatio[1] = parseInt(aspectRatio[1]);
-                        aspectRatio[2] = parseInt(aspectRatio[2]);
-                        Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-                        Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
-                    } else {
-                        Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
-                    }
-                    
-                    // Show poster
-                    $("." + class_vjsposter).show();
-
-                    if (videoDisplays.length > 0) {
-                        var nr = 0;
-                        for (var v in videoSources) {
-                            if (videoSources[v].length > 0) {
-                                ++nr;
-                            }
-                        }
-
-                        // first as masterdisplay
-                        registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
-                        
-                        if(nr >= 2) {
-                            // throw some important synchronize.js-events for other plugins
-                            $(document).on(event_sjs_allPlayersReady, function(event) {
-                                videosReady = true;
-                                Engage.trigger(plugin.events.ready.getName());
-                            });
-                            $(document).on(event_sjs_playerLoaded, function(event) {
-                                Engage.trigger(plugin.events.playerLoaded.getName());
-                            });
-                            $(document).on(event_sjs_masterPlay, function(event) {
-                                Engage.trigger(plugin.events.play.getName(), true);
-                                pressedPlayOnce = true;
-                            });
-                            $(document).on(event_sjs_masterPause, function(event) {
-                                Engage.trigger(plugin.events.pause.getName(), true);
-                            });
-                            $(document).on(event_sjs_masterEnded, function(event) {
-                                Engage.trigger(plugin.events.ended.getName(), true);
-                            });
-                            $(document).on(event_sjs_masterTimeupdate, function(event, time) {
-                                Engage.trigger(plugin.events.timeupdate.getName(), time, true);
-                            });
-                            $(document).on(event_sjs_synchronizing, function(event) {
-                                Engage.trigger(plugin.events.synchronizing.getName());
-                            });
-                            $(document).on(event_sjs_buffering, function(event) {
-                                Engage.trigger(plugin.events.buffering.getName());
-                            });
-                            $(document).on(event_sjs_bufferedAndAutoplaying, function(event) {
-                                Engage.trigger(plugin.events.bufferedAndAutoplaying.getName());
-                            });
-                            $(document).on(event_sjs_bufferedButNotAutoplaying, function(event) {
-                                Engage.trigger(plugin.events.bufferedButNotAutoplaying.getName());
-                            });
-                            var i = 0;
-                            for (var vd in videoDisplays) {
-                                if (i > 0) {
-                                    // sync every other videodisplay with the master
-                                    $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
-                                    Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay");
-                                }
-                                ++i;
-                            }
-                            if (isUsingFlash) {
-                                $(document).trigger(event_sjs_isUsingFlash, []);
-                                $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
-                            }
-                        } else {
-                            videosReady = true;
-                            if (!isAudioOnly) {
-                                Engage.trigger(plugin.events.ready.getName());
-                            }
-                        }
-
-                    }
-                    // Set Displays to correct size
-                    orderVideoDisplays(videoDisplays);
+        if (!mediapackageError) {
+            // get aspect ratio
+            Engage.log("Calculating Aspect ratio");
+            aspectRatio = null;
+            var as1 = 0;
+            for (var flavor in videoResultions) {
+                if ((aspectRatio == null) || (as1 < videoResultions[flavor])) {
+                    as1 = videoResultions[flavor][1];
+                    aspectRatio = videoResultions[flavor];
                 }
-                if (this.model.get("type") != "audio") {
-                    checkVideoDisplaySize();
-                    window.setTimeout(checkVideoDisplaySize, checkVideoDisplaySizeTimeout);
+            }
+            for (var v in videoSources) {
+                for (var j = 0; j < videoSources[v].length; ++j) {
+                    var aspectRatio_tmp = videoSources[v][j].resolution;
+                    var t_tmp = $.type(aspectRatio_tmp);
+                    if ((t_tmp === "string") && (/\d+x\d+/.test(aspectRatio_tmp))) {
+                        aspectRatio_tmp = aspectRatio_tmp.match(/(\d+)x(\d+)/);
+                        if ((aspectRatio == null) || (as1 < parseInt(aspectRatio_tmp[1]))) {
+                            as1 = parseInt(aspectRatio_tmp[1]);
+                            aspectRatio = parseVideoResolution(videoSources[v][j].resolution);
+                        }
+                    }
                 }
+            }
+
+            $(window).on("orientationchange", function(event) {
+                Engage.log("Video: Device twisted");
+                checkVideoDisplaySize();
+                orderVideoDisplays(videoDisplays);
+            });
+
+            isAudioOnly = videoDataView.model.get("type") == "audio";
+            Engage.trigger(plugin.events.isAudioOnly.getName(), isAudioOnly);
+
+            if (isDesktopMode) {
+                renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio);
+            } else if (isEmbedMode, videoSources, videoDisplays, aspectRatio) {
+                renderEmbed(videoDataView);
+            } else if (isMobileMode, videoSources, videoDisplays, aspectRatio) {
+                renderMobile(videoDataView);
+            }
+            if (videoDataView.model.get("type") != "audio") {
+                checkVideoDisplaySize();
+                window.setTimeout(checkVideoDisplaySize, checkVideoDisplaySizeTimeout);
             }
         }
-    });
+    }    
+
+    function renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio) {
+        var i = 0;
+        for (var v in videoSources) {          
+            if ((videoSources[v].length > 0) && (videoDisplays.length > i)) {
+                initVideojsVideo(videoDisplays[i], videoSources[v], videoDataView.videojs_swf);
+                ++i;
+            }
+        }
+
+        if ((aspectRatio != null) && (videoDisplays.length > 0)) {
+            Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+            Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100]);
+            $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
+            $("." + id_videoDisplayClass).each(function(index) {
+                if ((index % 2) == 1) {
+                    $(videoDataView).css("float", "right");
+                }
+            });
+            for (var i = 0; i < videoDisplays.length; ++i) {
+                $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+            }
+        } else {
+            Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
+        }
+
+        // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
+        $("." + class_vjsposter).show();
+
+        Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
+
+        if (videoDisplays.length > 0) {
+            var nr = 0;
+            for (var v in videoSources) {
+                if (videoSources[v].length > 0) {
+                    ++nr;
+                }
+            }
+
+            // set first videoDisplay as master
+            registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
+
+            if (nr >= 2) {
+                // throw some important synchronize.js-events for other plugins
+                $(document).on(event_sjs_allPlayersReady, function(event) {
+                    videosReady = true;
+                    Engage.trigger(plugin.events.ready.getName());
+                });
+                $(document).on(event_sjs_playerLoaded, function(event) {
+                    Engage.trigger(plugin.events.playerLoaded.getName());
+                });
+                $(document).on(event_sjs_masterPlay, function(event) {
+                    Engage.trigger(plugin.events.play.getName(), true);
+                    pressedPlayOnce = true;
+                });
+                $(document).on(event_sjs_masterPause, function(event) {
+                    Engage.trigger(plugin.events.pause.getName(), true);
+                });
+                $(document).on(event_sjs_masterEnded, function(event) {
+                    Engage.trigger(plugin.events.ended.getName(), true);
+                });
+                $(document).on(event_sjs_masterTimeupdate, function(event, time) {
+                    Engage.trigger(plugin.events.timeupdate.getName(), time, true);
+                });
+                $(document).on(event_sjs_synchronizing, function(event) {
+                    Engage.trigger(plugin.events.synchronizing.getName());
+                });
+                $(document).on(event_sjs_buffering, function(event) {
+                    Engage.trigger(plugin.events.buffering.getName());
+                });
+                $(document).on(event_sjs_bufferedAndAutoplaying, function(event) {
+                    Engage.trigger(plugin.events.bufferedAndAutoplaying.getName());
+                });
+                $(document).on(event_sjs_bufferedButNotAutoplaying, function(event) {
+                    Engage.trigger(plugin.events.bufferedButNotAutoplaying.getName());
+                });
+
+                var i = 0;
+                for (var vd in videoDisplays) {
+                    if (i > 0) {
+                        // sync every other videodisplay with the master
+                        $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
+                        Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay");
+                    }
+                    ++i;
+                }
+                if (isUsingFlash) {
+                    $(document).trigger(event_sjs_isUsingFlash, []);
+                    $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
+                }
+            } else {
+                videosReady = true;
+                if (!isAudioOnly) {
+                    Engage.trigger(plugin.events.ready.getName());
+                }
+            }
+
+            if (videoDataView.model.get("type") != "audio") {
+                $(window).resize(function() {
+                    checkVideoDisplaySize();
+                });
+            }
+        }
+    }           
+
+    function renderEmbed(videoDataView, videoSources, videoDisplays, aspectRatio) {
+        var nrOfVideoSources = 0;
+        var init = false;
+        for (var v in videoSources) {
+            if (videoSources[v].length > 0) {
+                if (!init) { // just init the first video
+                    init = true;
+                    initVideojsVideo(videoDisplays[i], videoSources[v], videoDataView.videojs_swf);
+                }
+                globalVideoSource.push({
+                    id: videoDisplays[i],
+                    src: videoSources[v]
+                });
+            }
+        }
+
+        if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
+            $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_switchPlayer + "\" class=\"" + class_vjs_switchPlayer + " " + class_vjs_control + " " + class_vjs_menu_button + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"></div>");
+            $("#" + id_btn_switchPlayer).append(
+                "<div class=\"vjs-control-content\">" +
+                "<span class=\"" + class_vjs_control_text + "\">Switch player</span>" +
+                "</div>" +
+                "<div id=\"" + id_switchPlayer_value + "\" class=\"" + class_vjs_switchPlayer_value + "\">" +
+                "Vid. 1" +
+                "</div>" +
+                "<div class=\"" + class_vjs_menu + "\">" +
+                "<ul class=\"" + class_vjs_menu_content + "\">" +
+                "<li id=\"" + id_btn_video1 + "\" aria-selected=\"true\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">Video 1</li>" +
+                "<li id=\"" + id_btn_video2 + "\" aria-selected=\"false\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">Video 2</li>" +
+                "</ul>" +
+                "</div>"
+            );
+            $("#" + id_btn_video1).click(function(e) {
+                $("#" + id_switchPlayer_value).html("Vid. 1");
+                if (!currentlySelectedVideodisplay == 0) {
+                    currentlySelectedVideodisplay = 0;
+                    videojs(globalVideoSource[0].id).src(globalVideoSource[0].src);
+                }
+            });
+            $("#" + id_btn_video2).click(function(e) {
+                $("#" + id_switchPlayer_value).html("Vid. 2");
+                if (!currentlySelectedVideodisplay == 1) {
+                    currentlySelectedVideodisplay = 1;
+                    videojs(globalVideoSource[1].id).src(globalVideoSource[1].src);
+                }
+            });
+        }
+        $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">Open in player</span></div></div>");
+        $("." + class_audio_wrapper).append("<a id=\"" + id_btn_openInPlayer + "\" href=\"#\">Open in player</a>");
+
+        $("#" + id_btn_openInPlayer).click(function(e) {
+            e.preventDefault();
+            var str = window.location.href;
+            if (str.indexOf("mode=embed") == -1) {
+                str += "&mode=embed";
+            } else {
+                str = replaceAll(str, "mode=embed", "mode=desktop");
+            }
+            Engage.trigger(plugin.events.pause.getName(), false);
+            window.open(str, "_blank");
+        });
+
+        if ((aspectRatio != null) && (videoDisplays.length > 0)) {
+            aspectRatio[1] = parseInt(aspectRatio[1]);
+            aspectRatio[2] = parseInt(aspectRatio[2]);
+            Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+            Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
+            $("." + id_videoDisplayClass).css("width", "100%");
+            for (var i = 0; i < videoDisplays.length; ++i) {
+                $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+            }
+        } else {
+            Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
+        }
+
+        // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
+        $("." + class_vjsposter).show();
+        Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
+
+        if (videoDisplays.length > 0) {
+            // set first videoDisplay as master
+            registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], 1);
+
+            videosReady = true;
+            Engage.trigger(plugin.events.ready.getName());
+
+            if (videoDataView.model.get("type") != "audio") {
+                $(window).resize(function() {
+                    checkVideoDisplaySize();
+                });
+            }
+        }    
+    }
+
+    function renderMobile(videoDataView, videoSources, videoDisplays, aspectRatio) {
+        checkVideoDisplaySize();
+        initMobileEvents();
+
+        for (var v in videoSources) {
+            if (videoSources[v].length > 0) {
+                Engage.log("Init Video Display: " + v);
+                initVideojsVideo(videoDisplays[i], videoSources[v], videoDataView.videojs_swf);
+                ++i;
+            }
+        }
+
+        Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
+
+        if ((aspectRatio != null) && (videoDisplays.length > 0)) {
+            Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
+            Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
+        } else {
+            Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
+        }
+
+        // Show poster
+        $("." + class_vjsposter).show();
+
+        if (videoDisplays.length > 0) {
+            var nr = 0;
+            for (var v in videoSources) {
+                if (videoSources[v].length > 0) {
+                    ++nr;
+                }
+            }
+
+            // first as masterdisplay
+            registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
+
+            if(nr >= 2) {
+                // throw some important synchronize.js-events for other plugins
+                $(document).on(event_sjs_allPlayersReady, function(event) {
+                    videosReady = true;
+                    Engage.trigger(plugin.events.ready.getName());
+                });
+                $(document).on(event_sjs_playerLoaded, function(event) {
+                    Engage.trigger(plugin.events.playerLoaded.getName());
+                });
+                $(document).on(event_sjs_masterPlay, function(event) {
+                    Engage.trigger(plugin.events.play.getName(), true);
+                    pressedPlayOnce = true;
+                });
+                $(document).on(event_sjs_masterPause, function(event) {
+                    Engage.trigger(plugin.events.pause.getName(), true);
+                });
+                $(document).on(event_sjs_masterEnded, function(event) {
+                    Engage.trigger(plugin.events.ended.getName(), true);
+                });
+                $(document).on(event_sjs_masterTimeupdate, function(event, time) {
+                    Engage.trigger(plugin.events.timeupdate.getName(), time, true);
+                });
+                $(document).on(event_sjs_synchronizing, function(event) {
+                    Engage.trigger(plugin.events.synchronizing.getName());
+                });
+                $(document).on(event_sjs_buffering, function(event) {
+                    Engage.trigger(plugin.events.buffering.getName());
+                });
+                $(document).on(event_sjs_bufferedAndAutoplaying, function(event) {
+                    Engage.trigger(plugin.events.bufferedAndAutoplaying.getName());
+                });
+                $(document).on(event_sjs_bufferedButNotAutoplaying, function(event) {
+                    Engage.trigger(plugin.events.bufferedButNotAutoplaying.getName());
+                });
+                var i = 0;
+                for (var vd in videoDisplays) {
+                    if (i > 0) {
+                        // sync every other videodisplay with the master
+                        $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
+                        Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay");
+                    }
+                    ++i;
+                }
+                if (isUsingFlash) {
+                    $(document).trigger(event_sjs_isUsingFlash, []);
+                    $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
+                }
+            } else {
+                videosReady = true;
+                if (!isAudioOnly) {
+                    Engage.trigger(plugin.events.ready.getName());
+                }
+            }        
+
+        }
+        // Set Displays to correct size
+        orderVideoDisplays(videoDisplays);    
+    }
+
 
     var VideoDataModel = Backbone.Model.extend({
         initialize: function(ids, videoSources, duration) {
@@ -1018,8 +1050,6 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                 videoSources[extractFlavorMainType(flavorsArray[i])] = [];
             }
 
-            //var hasPresenter = false;
-            //var hasPresentation = false;
             var hasVideo = false
             var hasAudio = false;
 
@@ -1036,6 +1066,12 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                             var resolution = (track.video && track.video.resolution) ? track.video.resolution : "";
                             // filter for different video sources
                             Engage.log("Adding video source: " + track.url + " (" + track.mimetype + ")");
+                            if (track.mimetype == "application/dash+xml") {
+                                loadDash = true;
+                            }
+                            if (track.mimetype == "application/x-mpegURL") {
+                                loadHls = true;
+                            }                            
                             videoSources[extractFlavorMainType(track.type)].push({
                                     src: track.url,
                                     type: track.mimetype,
@@ -1118,17 +1154,10 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
     // load video.js lib
     require([relative_plugin_path + videoPath], function(videojs) {
         Engage.log("Video: Lib video loaded");
-        require([relative_plugin_path + mediaSourcesPath], function(videojsmedia) {
-            Engage.log("Video: Lib videojs media sources loaded");
-            require([relative_plugin_path + hlsPath], function(videojshls) {
-                require([relative_plugin_path + mediaSourcesPath]);
-                Engage.log("Video: Lib videojs HLS playback loaded");
-                initCount -= 1;
-                if (initCount <= 0) {
-                    initPlugin();
-                }
-            });
-        });
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
     });
 
     // load synchronize.js lib
