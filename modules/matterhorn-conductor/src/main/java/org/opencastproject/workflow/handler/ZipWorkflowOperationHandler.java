@@ -252,6 +252,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
       attachment.addTag(tag);
       logger.trace("Tagging the archive of recording '{}' with '{}'", mediaPackage, tag);
     }
+    attachment.setMimeType(MimeTypes.ZIP);
 
     // The zip file is safely in the archive, so it's now safe to attempt to remove the original zip
     try {

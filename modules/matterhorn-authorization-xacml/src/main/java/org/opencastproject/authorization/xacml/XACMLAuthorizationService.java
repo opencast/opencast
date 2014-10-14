@@ -61,12 +61,6 @@ import org.jboss.security.xacml.core.JBossPDP;
 import org.jboss.security.xacml.core.model.context.AttributeType;
 import org.jboss.security.xacml.core.model.context.RequestType;
 import org.jboss.security.xacml.core.model.context.SubjectType;
-import org.jboss.security.xacml.core.model.policy.ActionType;
-import org.jboss.security.xacml.core.model.policy.ApplyType;
-import org.jboss.security.xacml.core.model.policy.AttributeValueType;
-import org.jboss.security.xacml.core.model.policy.EffectType;
-import org.jboss.security.xacml.core.model.policy.PolicyType;
-import org.jboss.security.xacml.core.model.policy.RuleType;
 import org.jboss.security.xacml.factories.RequestAttributeFactory;
 import org.jboss.security.xacml.factories.RequestResponseContextFactory;
 import org.jboss.security.xacml.interfaces.PolicyDecisionPoint;
@@ -82,7 +76,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 /**
@@ -452,14 +445,6 @@ public class XACMLAuthorizationService implements AuthorizationService {
     return Tuple.tuple(mp, attachment);
   }
 
-  private PolicyType unmarshalPolicy(InputStream in) {
-    try {
-      return ((JAXBElement<PolicyType>) XACMLUtils.jBossXacmlJaxbContext.createUnmarshaller().unmarshal(in)).getValue();
-    } catch (JAXBException e) {
-      throw new Error("Unable to unmarshall xacml document");
-    }
-  }
-
   /** Load an ACL from the given URI. */
   private Option<AccessControlList> loadAcl(final URI uri) {
     File file = fromWorkspace(uri);
@@ -469,38 +454,11 @@ public class XACMLAuthorizationService implements AuthorizationService {
     return withFile(file, new Function2<InputStream, File, AccessControlList>() {
       @Override
       public AccessControlList apply(InputStream in, File aclFile) {
-        final PolicyType policy = unmarshalPolicy(in);
-        final AccessControlList acl = new AccessControlList();
-        final List<AccessControlEntry> entries = acl.getEntries();
-        for (Object object : policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition()) {
-          if (object instanceof RuleType) {
-            RuleType rule = (RuleType) object;
-            if (rule.getTarget() == null) {
-              continue;
-            }
-            ActionType action = rule.getTarget().getActions().getAction().get(0);
-            String actionForAce = (String) action.getActionMatch().get(0).getAttributeValue().getContent().get(0);
-            String role = null;
-            JAXBElement<ApplyType> apply = (JAXBElement<ApplyType>) rule.getCondition().getExpression();
-            for (JAXBElement<?> element : apply.getValue().getExpression()) {
-              if (element.getValue() instanceof AttributeValueType) {
-                role = (String) ((AttributeValueType) element.getValue()).getContent().get(0);
-                break;
-              }
-            }
-            if (role == null) {
-              logger.warn("Unable to find a role in rule {}", rule);
-              continue;
-            }
-            AccessControlEntry ace = new AccessControlEntry(role, actionForAce, rule.getEffect().equals(
-                    EffectType.PERMIT));
-            entries.add(ace);
-          } else {
-            logger.debug("Skipping {}", object);
-          }
+        try {
+          return XACMLUtils.parseXacml(in);
+        } catch (JAXBException e) {
+          throw new Error("Unable to unmarshall XACML document: " + e);
         }
-
-        return acl;
       }
     });
   }

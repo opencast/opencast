@@ -99,7 +99,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
   private final int retryMaximumVariableTime;
 
   public StandAloneTrustedHttpClientImpl(String user, String pass, Option<Integer> nonceTimeoutRetries,
-          Option<Integer> retryBaseDelay, Option<Integer> retryMaximumVariableTime) {
+                                         Option<Integer> retryBaseDelay, Option<Integer> retryMaximumVariableTime) {
     this.user = user;
     this.pass = pass;
     this.nonceTimeoutRetries = nonceTimeoutRetries.getOrElse(DEFAULT_NONCE_TIMEOUT_RETRIES);
@@ -113,7 +113,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
   }
 
   public static <A> Function<Function<HttpResponse, A>, Either<Exception, A>> run(final TrustedHttpClient client,
-          final HttpUriRequest httpUriRequest) {
+                                                                                  final HttpUriRequest httpUriRequest) {
     return new Function<Function<HttpResponse, A>, Either<Exception, A>>() {
       @Override
       public Either<Exception, A> apply(Function<HttpResponse, A> responseHandler) {
@@ -154,7 +154,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
       // Run the request (the http client handles the multiple back-and-forth requests)
       HttpResponse response = null;
       try {
-        response = httpClient.execute(httpUriRequest);
+        response = new HttpResponseWrapper(httpClient.execute(httpUriRequest));
         responseMap.put(response, httpClient);
         return response;
       } catch (IOException e) {
@@ -170,7 +170,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
 
     HttpResponse response = null;
     try {
-      response = httpClient.execute(httpUriRequest);
+      response = new HttpResponseWrapper(httpClient.execute(httpUriRequest));
       if (nonceTimeoutRetries > 0 && hadNonceTimeoutResponse(response)) {
         httpClient.getConnectionManager().shutdown();
         response = retryAuthAndRequestAfterNonceTimeout(httpUriRequest, response);
@@ -192,11 +192,11 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
    * Retries a request if the nonce timed out during the request.
    *
    * @param httpUriRequest
-   *          The request to be made that isn't a GET, those are handled automatically.
+   *         The request to be made that isn't a GET, those are handled automatically.
    * @param response
-   *          The response with the bad nonce timeout in it.
+   *         The response with the bad nonce timeout in it.
    * @return A new response for the request if it was successful without the nonce timing out again or just the same
-   *         response it got if it ran out of attempts.
+   * response it got if it ran out of attempts.
    * @throws org.opencastproject.security.api.TrustedHttpClientException
    * @throws java.io.IOException
    * @throws org.apache.http.client.ClientProtocolException
@@ -217,7 +217,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
       long totalDelay = (retryBaseDelay * MILLISECONDS_IN_SECONDS + variableDelay);
       if (totalDelay > 0) {
         logger.info("Sleeping " + totalDelay + "ms before trying request " + httpUriRequest.getURI()
-                + " again due to a " + response.getStatusLine());
+                            + " again due to a " + response.getStatusLine());
         try {
           Thread.sleep(totalDelay);
         } catch (InterruptedException e) {
@@ -225,7 +225,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
         }
       }
       manuallyHandleDigestAuthentication(httpUriRequest, httpClient);
-      response = httpClient.execute(httpUriRequest);
+      response = new HttpResponseWrapper(httpClient.execute(httpUriRequest));
       if (!hadNonceTimeoutResponse(response)) {
         responseMap.put(response, httpClient);
         break;
@@ -239,7 +239,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
    * Determines if the nonce has timed out before a request could be performed.
    *
    * @param response
-   *          The response to test to see if it has timed out.
+   *         The response to test to see if it has timed out.
    * @return true if it has time out, false if it hasn't
    */
   private boolean hadNonceTimeoutResponse(HttpResponse response) {
@@ -251,11 +251,11 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
    * Handles the necessary handshake for digest authenticaion in the case where it isn't a GET operation.
    *
    * @param httpUriRequest
-   *          The request location to get the digest authentication for.
+   *         The request location to get the digest authentication for.
    * @param httpClient
-   *          The client to send the request through.
+   *         The client to send the request through.
    * @throws org.opencastproject.security.api.TrustedHttpClientException
-   *           Thrown if the client cannot be shutdown.
+   *         Thrown if the client cannot be shutdown.
    */
   private void manuallyHandleDigestAuthentication(HttpUriRequest httpUriRequest, HttpClient httpClient)
           throws TrustedHttpClientException {
@@ -291,7 +291,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
 
   @Override
   public <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<T> responseHandler, int connectionTimeout,
-          int socketTimeout) throws TrustedHttpClientException {
+                       int socketTimeout) throws TrustedHttpClientException {
     try {
       return responseHandler.handleResponse(execute(httpUriRequest, connectionTimeout, socketTimeout));
     } catch (IOException e) {
@@ -320,7 +320,7 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
    * {@inheritDoc}
    *
    * @see org.opencastproject.security.api.TrustedHttpClient#execute(org.apache.http.client.methods.HttpUriRequest,
-   *      org.apache.http.client.ResponseHandler)
+   * org.apache.http.client.ResponseHandler)
    */
   @Override
   public <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<T> responseHandler)
@@ -332,14 +332,14 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
    * Perform a request, and extract the realm and nonce values
    *
    * @param request
-   *          The request to execute in order to obtain the realm and nonce
+   *         The request to execute in order to obtain the realm and nonce
    * @return A String[] containing the {realm, nonce}
    */
   private String[] getRealmAndNonce(HttpRequestBase request) throws TrustedHttpClientException {
     DefaultHttpClient httpClient = new DefaultHttpClient();
     HttpResponse response;
     try {
-      response = httpClient.execute(request);
+      response = new HttpResponseWrapper(httpClient.execute(request));
     } catch (IOException e) {
       httpClient.getConnectionManager().shutdown();
       throw new TrustedHttpClientException(e);
@@ -361,6 +361,6 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
       }
     }
     httpClient.getConnectionManager().shutdown();
-    return new String[] { realm, nonce };
+    return new String[]{realm, nonce};
   }
 }
