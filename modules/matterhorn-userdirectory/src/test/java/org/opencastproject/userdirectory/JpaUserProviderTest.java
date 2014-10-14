@@ -15,19 +15,29 @@
  */
 package org.opencastproject.userdirectory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.opencastproject.util.data.Collections.set;
+
+import org.opencastproject.kernel.security.persistence.JpaOrganization;
+import org.opencastproject.security.api.Role;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
+import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.PasswordEncoder;
+
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-import junit.framework.Assert;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.easymock.EasyMock;
 import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.opencastproject.kernel.security.persistence.JpaOrganization;
-import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
-import org.opencastproject.util.PasswordEncoder;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,9 +45,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.junit.Assert.fail;
-import static org.opencastproject.util.data.Collections.set;
 
 public class JpaUserProviderTest {
 
@@ -90,23 +97,23 @@ public class JpaUserProviderTest {
     provider.addUser(user);
 
     User loadUser = provider.loadUser("user1");
-    Assert.assertNotNull(loadUser);
+    assertNotNull(loadUser);
 
-    Assert.assertEquals(user.getUsername(), loadUser.getUsername());
-    Assert.assertEquals(PasswordEncoder.encode(user.getPassword(), user.getUsername()), loadUser.getPassword());
-    Assert.assertEquals(user.getOrganization(), loadUser.getOrganization());
-    Assert.assertEquals(user.getRoles(), loadUser.getRoles());
+    assertEquals(user.getUsername(), loadUser.getUsername());
+    assertEquals(PasswordEncoder.encode(user.getPassword(), user.getUsername()), loadUser.getPassword());
+    assertEquals(user.getOrganization(), loadUser.getOrganization());
+    assertEquals(user.getRoles(), loadUser.getRoles());
 
-    Assert.assertNull("Loading 'does not exist' should return null", provider.loadUser("does not exist"));
-    Assert.assertNull("Loading 'does not exist' should return null", provider.loadUser("user1", org2.getId()));
+    assertNull("Loading 'does not exist' should return null", provider.loadUser("does not exist"));
+    assertNull("Loading 'does not exist' should return null", provider.loadUser("user1", org2.getId()));
 
     loadUser = provider.loadUser("user1", org1.getId());
-    Assert.assertNotNull(loadUser);
+    assertNotNull(loadUser);
 
-    Assert.assertEquals(user.getUsername(), loadUser.getUsername());
-    Assert.assertEquals(PasswordEncoder.encode(user.getPassword(), user.getUsername()), loadUser.getPassword());
-    Assert.assertEquals(user.getOrganization(), loadUser.getOrganization());
-    Assert.assertEquals(user.getRoles(), loadUser.getRoles());
+    assertEquals(user.getUsername(), loadUser.getUsername());
+    assertEquals(PasswordEncoder.encode(user.getPassword(), user.getUsername()), loadUser.getPassword());
+    assertEquals(user.getOrganization(), loadUser.getOrganization());
+    assertEquals(user.getRoles(), loadUser.getRoles());
   }
 
   @Test
@@ -116,14 +123,84 @@ public class JpaUserProviderTest {
     provider.addRole(astroRole);
 
     Iterator<Role> roles = provider.getRoles();
-    Assert.assertTrue("There should be one role", roles.hasNext());
+    assertTrue("There should be one role", roles.hasNext());
 
     Role role = roles.next();
-    Assert.assertEquals(astroRole.getName(), role.getName());
-    Assert.assertEquals(astroRole.getOrganization(), role.getOrganization());
-    Assert.assertEquals(astroRole.getDescription(), role.getDescription());
+    assertEquals(astroRole.getName(), role.getName());
+    assertEquals(astroRole.getOrganization(), role.getOrganization());
+    assertEquals(astroRole.getDescription(), role.getDescription());
 
-    Assert.assertFalse("There should onyl be one role", roles.hasNext());
+    assertFalse("There should onyl be one role", roles.hasNext());
+  }
+
+  @Test
+  public void testDeleteUser() throws Exception {
+    Set<JpaRole> authorities = new HashSet<JpaRole>();
+    authorities.add(new JpaRole("ROLE_ASTRO_101_SPRING_2011_STUDENT", org1));
+
+    JpaUser user1 = new JpaUser("user1", "pass1", org1, authorities);
+    JpaUser user2 = new JpaUser("user2", "pass1", org1, authorities);
+    JpaUser user3 = new JpaUser("user3", "pass1", org1, authorities);
+    JpaUser user4 = new JpaUser("user4", "pass1", org1, authorities);
+    provider.addUser(user1);
+    provider.addUser(user2);
+    provider.addUser(user3);
+    provider.addUser(user4);
+
+    User loadUser = provider.loadUser("user1");
+
+    assertNotNull(loadUser);
+
+    provider.deleteUser("user1", user1.getOrganization().getId());
+    provider.deleteUser("user2", user1.getOrganization().getId());
+    provider.deleteUser("user3", user1.getOrganization().getId());
+
+    assertNull(provider.loadUser("user1", org1.getId()));
+    assertNull(provider.loadUser("user2", org1.getId()));
+    assertNull(provider.loadUser("user3", org1.getId()));
+    assertNotNull(provider.loadUser("user4", org1.getId()));
+
+    try {
+      provider.deleteUser("user1", user1.getOrganization().getId());
+      fail("Should throw a NotFoundException");
+    } catch (NotFoundException e) {
+      assertTrue("User not found.", true);
+    }
+  }
+
+  @Test
+  public void testUpdateUser() throws Exception {
+    Set<JpaRole> authorities = new HashSet<JpaRole>();
+    authorities.add(new JpaRole("ROLE_ASTRO_101_SPRING_2011_STUDENT", org1));
+
+    JpaUser user = new JpaUser("user1", "pass1", org1, authorities);
+    provider.addUser(user);
+
+    User loadUser = provider.loadUser("user1");
+
+    assertNotNull(loadUser);
+
+    authorities.add(new JpaRole("ROLE_ASTRO_101_SPRING_2013_STUDENT", org1));
+    String newPassword = "newPassword";
+    JpaUser updateUser = new JpaUser(user.getUsername(), newPassword, org1, authorities);
+
+    User loadUpdatedUser = provider.updateUser(updateUser);
+    // User loadUpdatedUser = provider.loadUser(user.getUsername());
+
+    assertNotNull(loadUpdatedUser);
+    assertEquals(user.getUsername(), loadUpdatedUser.getUsername());
+    assertEquals(PasswordEncoder.encode(newPassword, user.getUsername()), loadUpdatedUser.getPassword());
+    assertEquals(authorities.size(), loadUpdatedUser.getRoles().size());
+
+    updateUser.username = "unknown";
+
+    try {
+      provider.updateUser(updateUser);
+      fail("Should throw a NotFoundException");
+    } catch (NotFoundException e) {
+      assertTrue("User not found.", true);
+    }
+
   }
 
   @Test
@@ -140,7 +217,7 @@ public class JpaUserProviderTest {
     JpaUser userTwo = new JpaUser("user2", "pass2", org1, authoritiesTwo);
     provider.addUser(userTwo);
 
-    Assert.assertEquals("There should be two roles", 2, IteratorUtils.toList(provider.getRoles()).size());
+    assertEquals("There should be two roles", 2, IteratorUtils.toList(provider.getRoles()).size());
   }
 
   @Test
@@ -157,7 +234,7 @@ public class JpaUserProviderTest {
     provider.addUser(userThree);
     provider.addUser(userFour);
 
-    Assert.assertEquals("There should be two roles", 4, IteratorUtils.toList(provider.getUsers()).size());
+    assertEquals("There should be two roles", 4, IteratorUtils.toList(provider.getUsers()).size());
   }
 
   @Test
@@ -187,12 +264,12 @@ public class JpaUserProviderTest {
     JpaUser userOne = new JpaUser("user1", "pass1", org1, authorities);
     provider.addUser(userOne);
 
-    Assert.assertEquals("There should be three roles", 3, IteratorUtils.toList(provider.getRoles()).size());
+    assertEquals("There should be three roles", 3, IteratorUtils.toList(provider.getRoles()).size());
 
     List<Role> rolesForUser = provider.getRolesForUser("user1");
-    Assert.assertEquals("There should be two roles", 2, rolesForUser.size());
-    Assert.assertEquals("ROLE_ONE", rolesForUser.get(0).getName());
-    Assert.assertEquals("ROLE_TWO", rolesForUser.get(1).getName());
+    assertEquals("There should be two roles", 2, rolesForUser.size());
+    assertEquals("ROLE_ONE", rolesForUser.get(0).getName());
+    assertEquals("ROLE_TWO", rolesForUser.get(1).getName());
   }
 
   @Test
@@ -209,10 +286,10 @@ public class JpaUserProviderTest {
     provider.addUser(userThree);
     provider.addUser(userFour);
 
-    Assert.assertEquals(2, IteratorUtils.toList(provider.findUsers("%tEsT%", 0, 0)).size());
-    Assert.assertEquals(1, IteratorUtils.toList(provider.findUsers("%tEsT%", 0, 1)).size());
+    assertEquals(2, IteratorUtils.toList(provider.findUsers("%tEsT%", 0, 0)).size());
+    assertEquals(1, IteratorUtils.toList(provider.findUsers("%tEsT%", 0, 1)).size());
     User user = provider.findUsers("%tEsT%", 1, 1).next();
-    Assert.assertEquals(userFour, user);
+    assertEquals(userFour, user);
   }
 
   @Test
@@ -228,11 +305,11 @@ public class JpaUserProviderTest {
     JpaUser userOne = new JpaUser("user1", "pass1", org1, authorities);
     provider.addUser(userOne);
 
-    Assert.assertEquals(2, IteratorUtils.toList(provider.findRoles("%coOL%", 0, 0)).size());
-    Assert.assertEquals(1, IteratorUtils.toList(provider.findRoles("%cOoL%", 0, 1)).size());
+    assertEquals(2, IteratorUtils.toList(provider.findRoles("%coOL%", 0, 0)).size());
+    assertEquals(1, IteratorUtils.toList(provider.findRoles("%cOoL%", 0, 1)).size());
 
-    Assert.assertEquals(3, IteratorUtils.toList(provider.findRoles("%oLe%", 0, 0)).size());
-    Assert.assertEquals(2, IteratorUtils.toList(provider.findRoles("%olE%", 1, 2)).size());
+    assertEquals(3, IteratorUtils.toList(provider.findRoles("%oLe%", 0, 0)).size());
+    assertEquals(2, IteratorUtils.toList(provider.findRoles("%olE%", 1, 2)).size());
   }
 
 }

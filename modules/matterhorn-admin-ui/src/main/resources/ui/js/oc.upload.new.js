@@ -774,8 +774,7 @@ ocUpload.Ingest = (function() {
       },
       success: function(data){
         window.debug = data;
-        //id = $('identifier', data).text();
-        id = $(ocUtils.xmlToString(data)).children().first().text()
+        id = $(data).find('[nodeName="dcterms:identifier"]').text();
       }
     });
     return id;
@@ -805,6 +804,7 @@ ocUpload.Ingest = (function() {
       if ($(elm).is('[type=checkbox]')) {
         if ($(elm).is(':checked')) {
           out[$(elm).attr('id')] = $(elm).val();
+	    console.log(out);
         }
       } else {
         out[$(elm).attr('id')] = $(elm).val();

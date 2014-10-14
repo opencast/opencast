@@ -53,6 +53,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
@@ -63,7 +64,6 @@ import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import org.easymock.EasyMock;
 import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.Ignore;
@@ -157,7 +157,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     EasyMock.replay(organizationDirectoryService);
     try {
       return new ServiceRegistryInMemoryImpl(distributionService, securityService, userDirectoryService,
-              organizationDirectoryService);
+              organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     } catch (ServiceRegistryException e) {
       throw new RuntimeException(e);
     }

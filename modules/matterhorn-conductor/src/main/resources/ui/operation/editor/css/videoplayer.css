@@ -1,0 +1,315 @@
+/****************************************************************************************/
+/* jquery ui changes
+/****************************************************************************************/
+.ui-slider-handle {
+  outline: none;
+}
+
+#video_overlay_msg {
+  position: absolute; 
+  top: 100px; 
+  color: #FFF; 
+  text-align: center;
+  font-size: 20px;
+  background-color: rgba(221, 221, 221, 0.3);
+  width: 640px;
+  padding: 10px 0;
+  z-index: 2147483647;
+}
+
+/****************************************************************************************/
+/* default theme
+/****************************************************************************************/
+.mhVideoPlayer.default {
+  float: left;
+  position: relative;
+  padding: 5px;
+  width: 90%;
+  border: 2px solid #666666;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  background: #000000;
+  /* 
+  background: #CCCCCC;
+  background-image: -moz-linear-gradient(top, #CCCCCC, #000000);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #CCCCCC),
+    color-stop(1, #000000) );
+  */
+  box-shadow: inset 0 15px 35px #000000;
+}
+
+.mhVideoPlayer.default div {
+  width: 98%;
+}
+
+.mhVideoPlayer.default .video-controls {
+  position: relative;
+  padding-top: 5px;
+  float: left;
+  clear: both;
+  width: 100%;
+}
+
+.mhVideoPlayer.default .video-play,.mhVideoPlayer.default .video-seek,.mhVideoPlayer.default .video-fullscreen,.mhVideoPlayer.default .volume-box,.video-timer
+  {
+  float: left;
+}
+
+/* play, pause */
+.mhVideoPlayer.default .video-play {
+  display: block;
+  width: 22px;
+  height: 22px;
+  margin-right: 15px;
+  opacity: 0.7;
+  -moz-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.mhVideoPlayer.default .video-prev-frame {
+  display: block;
+  width: 35px;
+  height: 22px;
+  margin-left: 75px;
+  margin-top: -24px;
+  opacity: 0.7;
+  -moz-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.mhVideoPlayer.default .video-next-frame {
+  display: block;
+  width: 35px;
+  height: 22px;
+  margin-left: 195px;
+  margin-top: -24px;
+  opacity: 0.7;
+  -moz-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.mhVideoPlayer.default .video-previous-marker {
+  display: block;
+  width: 35px;
+  height: 22px;
+  margin-left: 35px;
+  opacity: 0.7;
+  -moz-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.mhVideoPlayer.default .video-next-marker {
+  display: block;
+  width: 35px;
+  height: 22px;
+  margin-left: 235px;
+  margin-top: -24px;
+  opacity: 0.7;
+  -moz-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.mhVideoPlayer.default .video-split-button {
+  display: block;
+  width: 35px;
+  height: 22px;
+  margin-left: 115px;
+  margin-top: -24px;
+  opacity: 0.7;
+  -moz-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.mhVideoPlayer.default .video-play-pre-post {
+  display: block;
+  width: 35px;
+  height: 22px;
+  margin-left: 155px;
+  margin-top: -24px;
+  opacity: 0.7;
+  -moz-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+/* fullscreen */
+.mhVideoPlayer.default .video-fullscreen {
+  display: block;
+  width: 22px;
+  height: 22px;
+  margin-left: 10px;
+  margin-right: 15px;
+  opacity: 0.7;
+  -moz-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.mhVideoPlayer.default video {
+  float: left;
+}
+
+.mhVideoPlayer.default .video-play:hover {
+  opacity: 1;
+}
+
+.videocontrolsDiv {
+  width: 300px !important;
+  margin: 0 auto;
+}
+
+/* seek */
+.mhVideoPlayer.default .video-seek {
+  position: relative;
+  width: 100%;
+  height: 10px;
+  margin-top: 6px;
+  border: 1px solid #CCCCCC;
+  background: #FFFFFF;
+  background-image: -moz-linear-gradient(top, #666666, #FFFFFF);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #666666),
+    color-stop(1, #FFFFFF) );
+}
+
+.mhVideoPlayer.default .video-seek .ui-slider-handle {
+  width: 15px;
+  height: 15px;
+  border: 1px solid #333;
+  top: -4px;
+  /* round seeker */
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: #FFFFFF;
+  background-image: -moz-linear-gradient(top, #e7e9e7, #FFFFFF);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #e7e9e7),
+    color-stop(1, #FFFFFF) );
+}
+
+.mhVideoPlayer.default .video-seek .ui-slider-handle.ui-state-hover {
+  background: #fff;
+}
+
+.mhVideoPlayer.default .video-seek .ui-slider-range {
+  /* round left and right side of the slider */
+  -moz-border-radius: 15px;
+  -webkit-border-radius: 15px;
+  border-radius: 15px;
+  background: #898989;
+  background-image: -moz-linear-gradient(top, #535353, #898989);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #535353),
+    color-stop(1, #898989) );
+}
+
+/* timer */
+.mhVideoPlayer.default .video-timer {
+  margin-top: -22px;
+  margin-right: 40px;
+  float: right;
+  text-align: right;
+  color: #CCCCCC;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+/* volume */
+.mhVideoPlayer.default .volume-box {
+  position: absolute;
+  bottom: 18px;
+  right: 0px;
+  overflow: hidden;
+  width: 20px;
+  height: 30px;
+  color: #FFFFFF;
+  padding: 0px 10px;
+  -moz-transition: all 0.1s ease-in-out;
+  -webkit-transition: all 0.1s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+
+.mhVideoPlayer.default .volume-box:hover {
+  height: 135px;
+  padding-top: 5px;
+}
+
+.mhVideoPlayer.default .volume-box:hover .volume-slider {
+  position: relative;
+  visibility: visible;
+  opacity: 1;
+}
+
+.mhVideoPlayer.default .volume-slider {
+  position: relative;
+  height: 100px;
+  width: 7px;
+  left: 7px;
+  visiblity: hidden;
+  opacity: 0;
+  border: 1px solid #444;
+  background: #898989;
+  background-image: -moz-linear-gradient(top, #898989, #FFFFFF);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #898989),
+    color-stop(1, #FFFFFF) );
+  -moz-transition: all 0.1s ease-in-out;
+  -webkit-transition: all 0.1s ease-in-out;
+  -o-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+
+.mhVideoPlayer.default .volume-slider .ui-slider-handle {
+  width: 12px;
+  height: 12px;
+  left: -4px;
+  margin-bottom: -0.6em;
+  margin-left: 0;
+  border: 1px solid #333333;
+  /* round seeker */
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: #cccccc;
+  background-image: -moz-linear-gradient(top, #CCCCCC, #FFFFFF);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #CCCCCC),
+    color-stop(1, #FFFFFF) );
+}
+
+.mhVideoPlayer.default .volume-slider .ui-slider-handle.ui-state-hover {
+  background: #FFFFFF;
+}
+
+.mhVideoPlayer.default .volume-slider .ui-slider-range {
+  -moz-border-radius: 15px;
+  -webkit-border-radius: 15px;
+  border-radius: 15px;
+  background: #898989;
+  background-image: -moz-linear-gradient(top, #898989, #FFFFFF);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #898989),
+    color-stop(1, #FFFFFF) );
+}
+
+/* volume button */
+.mhVideoPlayer.default .volume-button {
+  position: absolute;
+  bottom: 0px;
+  display: block;
+  width: 22px;
+  height: 22px;
+  text-indent: -9999px;
+  opacity: 0.8;
+}

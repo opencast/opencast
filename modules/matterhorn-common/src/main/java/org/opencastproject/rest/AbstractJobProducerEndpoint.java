@@ -97,9 +97,7 @@ public abstract class AbstractJobProducerEndpoint {
   public abstract JobProducer getService();
 
   /**
-   *
-   *
-   * @return
+   * Return the service registry.
    */
   public abstract ServiceRegistry getServiceRegistry();
 

@@ -15,12 +15,14 @@
  */
 package org.opencastproject.job.api;
 
+import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
@@ -53,7 +55,7 @@ public abstract class AbstractJobProducer implements JobProducer {
    * Creates a new abstract job producer for jobs of the given type.
    *
    * @param jobType
-   *          the job type
+   *         the job type
    */
   public AbstractJobProducer(String jobType) {
     this.jobType = jobType;
@@ -117,6 +119,11 @@ public abstract class AbstractJobProducer implements JobProducer {
     return true;
   }
 
+  /** Shorthand for {@link #getServiceRegistry()}.incident() */
+  public Incidents incident() {
+    return getServiceRegistry().incident();
+  }
+
   /**
    * Returns a reference to the service registry.
    *
@@ -150,16 +157,13 @@ public abstract class AbstractJobProducer implements JobProducer {
    * associated job as the payload.
    *
    * @param job
-   *          the job to process
-   *
+   *         the job to process
    * @return the operation result
    * @throws Exception
    */
   protected abstract String process(Job job) throws Exception;
 
-  /**
-   * A utility class to run jobs
-   */
+  /** A utility class to run jobs */
   class JobRunner implements Callable<Void> {
 
     /** The job to dispatch */
@@ -172,9 +176,9 @@ public abstract class AbstractJobProducer implements JobProducer {
      * Constructs a new job runner
      *
      * @param job
-     *          the job to run
+     *         the job to run
      * @param currentJob
-     *          the current running job
+     *         the current running job
      */
     JobRunner(Job job, Job currentJob) {
       this.job = job;
@@ -206,6 +210,7 @@ public abstract class AbstractJobProducer implements JobProducer {
         logger.info(e.getMessage());
       } catch (Throwable e) {
         job.setStatus(Status.FAILED);
+        getServiceRegistry().incident().unhandledException(job, Severity.FAILURE, e);
         logger.error("Error handling operation '{}': {}", job.getOperation(), e);
         if (e instanceof ServiceRegistryException)
           throw (ServiceRegistryException) e;

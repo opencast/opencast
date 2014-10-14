@@ -79,12 +79,14 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
+import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
@@ -98,6 +100,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -559,7 +562,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
           WorkflowParsingException, NotFoundException {
 
     try {
-      logger.endUnitOfWork();
+      logger.startUnitOfWork();
       if (workflowDefinition == null)
         throw new IllegalArgumentException("workflow definition must not be null");
       if (sourceMediaPackage == null)
@@ -919,17 +922,24 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     // Update the workflow instance
     update(instance);
 
-    // Remove
-    logger.info("Removing temporary files for stopped workflow %s", workflowInstanceId);
-    for (MediaPackageElement elem : instance.getMediaPackage().getElements()) {
+    removeTempFiles(instance);
+
+    return instance;
+  }
+
+  private void removeTempFiles(WorkflowInstance workflowInstance) throws WorkflowDatabaseException,
+          UnauthorizedException, NotFoundException {
+    logger.info("Removing temporary files for workflow {}", workflowInstance);
+    for (MediaPackageElement elem : workflowInstance.getMediaPackage().getElements()) {
       try {
-        logger.debug("Removing temporary file %s for stopped workflow %d", elem.getURI(), workflowInstanceId);
+        logger.debug("Removing temporary file {} for workflow {}", elem.getURI(), workflowInstance);
         workspace.delete(elem.getURI());
       } catch (IOException e) {
-        logger.warn("Unable to delete mediapackage element %s", e.getMessage());
+        logger.warn("Unable to delete mediapackage element {}", e.getMessage());
+      } catch (NotFoundException e) {
+        // File was probably already deleted before...
       }
     }
-    return instance;
   }
 
   /**
@@ -939,20 +949,69 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    */
   @Override
   public void remove(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException,
-          UnauthorizedException, WorkflowParsingException {
+          UnauthorizedException, WorkflowParsingException, WorkflowStateException {
     WorkflowQuery query = new WorkflowQuery();
     query.withId(Long.toString(workflowInstanceId));
     WorkflowSet workflows = index.getWorkflowInstances(query, READ_PERMISSION, false);
     if (workflows.size() == 1) {
-      WorkflowInstance[] w = workflows.getItems();
+      WorkflowInstance instance = workflows.getItems()[0];
+
+      WorkflowInstance.WorkflowState state = instance.getState();
+      if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED && state != WorkflowState.STOPPED)
+        throw new WorkflowStateException("Workflow instance with state '" + state
+                + "' cannot be removed. Only states SUCCEEDED, FAILED & STOPPED are allowed");
+
       try {
-        assertPermission(w[0], WRITE_PERMISSION);
+        assertPermission(instance, WRITE_PERMISSION);
       } catch (MediaPackageException e) {
         throw new WorkflowParsingException(e);
       }
-      index.remove(workflowInstanceId);
+
+      // First, remove temporary files DO THIS BEFORE REMOVING FROM INDEX
+      try {
+        removeTempFiles(instance);
+      } catch (NotFoundException e) {
+        // If the files aren't their anymore, we don't have to cleanup up them :-)
+        logger.debug("Temporary files of workflow instance {} seem to be gone already...", workflowInstanceId);
+      }
+
+      // Second, remove jobs related to a operation which belongs to the workflow instance
+      List<WorkflowOperationInstance> operations = instance.getOperations();
+      for (WorkflowOperationInstance op : operations) {
+        if (op.getId() != null) {
+          long workflowOpId = op.getId();
+          if (workflowOpId != workflowInstanceId) {
+            try {
+              serviceRegistry.removeJob(workflowOpId);
+            } catch (ServiceRegistryException e) {
+              logger.warn("Problems while removing jobs related to workflow operation '{}': {}", workflowOpId,
+                      e.getMessage());
+            } catch (NotFoundException e) {
+              logger.debug("No jobs related to the workflow operation '{}' found in the service registry", workflowOpId);
+            }
+          }
+        }
+      }
+
+      // Third, remove workflow instance job itself
+      try {
+        serviceRegistry.removeJob(workflowInstanceId);
+      } catch (ServiceRegistryException e) {
+        logger.warn("Problems while removing workflow instance job '{}': {}", workflowInstanceId, e.getMessage());
+      } catch (NotFoundException e) {
+        logger.info("No workflow instance job '{}' found in the service registry", workflowInstanceId);
+      }
+
+      // At last, remove workflow instance from the index
+      try {
+        index.remove(workflowInstanceId);
+      } catch (NotFoundException e) {
+        // This should never happen, because we got workflow instance by querying the index...
+        logger.warn("Workflow instance could not be removed from index: {}", e);
+      }
     } else if (workflows.size() == 0) {
-      throw new NotFoundException();
+      throw new NotFoundException("Workflow instance with id '" + Long.toString(workflowInstanceId)
+              + "' could not be found");
     } else {
       throw new WorkflowDatabaseException("More than one workflow found with id: " + Long.toString(workflowInstanceId));
     }
@@ -1287,17 +1346,14 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    *
    * @param workflow
    *          the workflow instance
-   * @param e
-   *          the exception
+   * @param operation
+   *          the current workflow operation
    * @return the workflow instance
    * @throws WorkflowParsingException
    */
-  protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationException e)
+  protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationInstance operation)
           throws WorkflowDatabaseException, WorkflowParsingException, UnauthorizedException {
-    // Add the exception's localized message to the workflow instance
-    workflow.addErrorMessage(e.getLocalizedMessage());
-
-    WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) e.getOperation();
+    WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) operation;
     int failedAttempt = currentOperation.getFailedAttempts() + 1;
     currentOperation.setFailedAttempts(failedAttempt);
     currentOperation.addToExecutionHistory(currentOperation.getId());
@@ -1893,7 +1949,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     try {
       for (Organization org : organizationDirectoryService.getOrganizations()) {
         securityService.setOrganization(org);
-        WorkflowQuery workflowQuery = new WorkflowQuery().withState(WorkflowInstance.WorkflowState.PAUSED);
+        WorkflowQuery workflowQuery = new WorkflowQuery().withState(WorkflowInstance.WorkflowState.PAUSED).withCount(
+                Integer.MAX_VALUE);
         WorkflowSet workflowSet = getWorkflowInstances(workflowQuery);
         workflows.addAll(Arrays.asList(workflowSet.getItems()));
       }
@@ -1942,6 +1999,10 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    */
   protected void setServiceRegistry(ServiceRegistry registry) {
     this.serviceRegistry = registry;
+  }
+
+  public ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
   }
 
   /**
@@ -2168,4 +2229,46 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     }
   }
 
+  @Override
+  public void cleanupWorkflowInstances(int lifetime, WorkflowState state) throws UnauthorizedException,
+          WorkflowDatabaseException {
+    logger.info("Start cleaning up workflow instances older than {} days with status '{}'", lifetime, state);
+
+    int instancesCleaned = 0;
+    int cleaningFailed = 0;
+
+    WorkflowQuery query = new WorkflowQuery().withState(state).withDateBefore(DateUtils.addDays(new Date(), -lifetime))
+            .withCount(Integer.MAX_VALUE);
+    for (WorkflowInstance workflowInstance : getWorkflowInstances(query).getItems()) {
+      try {
+        remove(workflowInstance.getId());
+        instancesCleaned++;
+      } catch (WorkflowDatabaseException e) {
+        throw e;
+      } catch (UnauthorizedException e) {
+        throw e;
+      } catch (NotFoundException e) {
+        // Since we are in a cleanup operation, we don't have to care about NotFoundExceptions
+        logger.debug("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), e);
+      } catch (WorkflowParsingException e) {
+        logger.warn("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), e);
+        cleaningFailed++;
+      } catch (WorkflowStateException e) {
+        logger.warn("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), e);
+        cleaningFailed++;
+      }
+    }
+
+    if (instancesCleaned == 0 && cleaningFailed == 0) {
+      logger.info("No workflow instances found to clean up");
+      return;
+    }
+
+    if (instancesCleaned > 0)
+      logger.info("Cleaned up {} workflow instances", instancesCleaned);
+    if (cleaningFailed > 0) {
+      logger.warn("Cleaning failed for {} workflow instances", cleaningFailed);
+      throw new WorkflowDatabaseException("Unable to clean all workflow instances, see logs!");
+    }
+  }
 }

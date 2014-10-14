@@ -42,13 +42,13 @@ public class JaxbGroupList {
   public JaxbGroupList() {
   }
 
-  public JaxbGroupList(JaxbGroup role) {
-    groups.add(role);
+  public JaxbGroupList(JaxbGroup group) {
+    groups.add(group);
   }
 
-  public JaxbGroupList(Collection<JaxbGroup> roles) {
-    for (JaxbGroup role : roles)
-      roles.add(role);
+  public JaxbGroupList(Collection<JaxbGroup> groups) {
+    for (JaxbGroup group : groups)
+      groups.add(group);
   }
 
   /**

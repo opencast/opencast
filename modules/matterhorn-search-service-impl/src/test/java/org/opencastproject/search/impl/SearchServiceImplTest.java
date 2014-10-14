@@ -54,6 +54,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.PathSupport;
@@ -217,7 +218,7 @@ public class SearchServiceImplTest {
     service = new SearchServiceImpl();
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
     StaticMetadataService mdService = newStaticMetadataService(workspace);
 
@@ -395,6 +396,50 @@ public class SearchServiceImplTest {
     assertEquals(1, service.getByQuery(new SearchQuery().withText("Institut")).size());
   }
 
+  @Test
+  public void testSorting() throws Exception {
+    MediaPackage mediaPackageNewer = getMediaPackage("/manifest-full.xml");
+    MediaPackage mediaPackageOlder = getMediaPackage("/manifest-full-older.xml");
+    Job job = service.add(mediaPackageNewer);
+    Job job2 = service.add(mediaPackageOlder);
+    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job, job2);
+    barrier.waitForJobs();
+    String olderTitle = "Older Recording";
+    String newerTitle = "Land and Vegetation: Key players on the Climate Scene";
+
+    SearchQuery query = new SearchQuery();
+    query.withSort(SearchQuery.Sort.DATE_CREATED);
+    assertEquals(2, service.getByQuery(query).size());
+    assertEquals(olderTitle, service.getByQuery(query).getItems()[0].getDcTitle());
+    query.withSort(SearchQuery.Sort.DATE_CREATED, false);
+    assertEquals(newerTitle, service.getByQuery(query).getItems()[0].getDcTitle());
+    // reverse sequence as demo-data has inverse publication dates
+    query.withSort(SearchQuery.Sort.DATE_PUBLISHED);
+    assertEquals(newerTitle, service.getByQuery(query).getItems()[0].getDcTitle());
+    query.withSort(SearchQuery.Sort.DATE_PUBLISHED, false);
+    assertEquals(olderTitle, service.getByQuery(query).getItems()[0].getDcTitle());
+    SearchQuery q = new SearchQuery();
+    q.withSort(SearchQuery.Sort.TITLE);
+    assertEquals(newerTitle, service.getByQuery(q).getItems()[0].getDcTitle());
+    query.withSort(SearchQuery.Sort.TITLE, false);
+    assertEquals(2, service.getByQuery(q).size());
+    assertEquals(olderTitle, service.getByQuery(query).getItems()[0].getDcTitle());
+    query.withSort(SearchQuery.Sort.LICENSE);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.SERIES_ID);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.MEDIA_PACKAGE_ID);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.CONTRIBUTOR);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.CREATOR);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.LANGUAGE);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.SUBJECT);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+  }
+
   /**
    * Adds a simple media package that has a dublin core for the episode only.
    */
@@ -493,7 +538,7 @@ public class SearchServiceImplTest {
     job = service.delete(mediaPackage.getIdentifier().toString());
     barrier = new JobBarrier(serviceRegistry, 1000, job);
     barrier.waitForJobs();
-    Assert.assertEquals("Job to delete mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
+    Assert.assertEquals("Job to delete mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
     Assert.assertEquals("Unauthorized user was able to delete a mediapackage", Boolean.FALSE.toString(),
             job.getPayload());
 

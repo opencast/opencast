@@ -24,6 +24,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
@@ -36,8 +37,10 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
+import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -155,6 +158,26 @@ public class ConcatWorkflowOperationHandlerTest {
   }
 
   @Test
+  public void testResolutionByTrackNotMandatory() throws Exception {
+    setMockups();
+
+    // operation configuration
+    String targetTags = "engage,rss";
+    Map<String, String> configurations = new HashMap<String, String>();
+    configurations.put("source-flavor-part-0", "presentation/source");
+    configurations.put("source-flavor-part-1", "presenter/source");
+    configurations.put("source-flavor-part-1-mandatory", "false");
+    configurations.put("target-tags", targetTags);
+    configurations.put("target-flavor", "presenter/concat");
+    configurations.put("encoding-profile", "concat");
+    configurations.put("output-resolution", "part-1");
+
+    // run the operation handler
+    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+    Assert.assertEquals(Action.SKIP, result.getAction());
+  }
+
+  @Test
   public void testConcat2EncodedTracksWithTags() throws Exception {
     setMockups();
 
@@ -163,8 +186,8 @@ public class ConcatWorkflowOperationHandlerTest {
     Map<String, String> configurations = new HashMap<String, String>();
     configurations.put("source-flavor-part-0", "presentation/source");
     configurations.put("source-flavor-part-1", "presenter/source");
-    configurations.put("source-tag-part-0", "part0");
-    configurations.put("source-tag-part-1", "part1");
+    configurations.put("source-tags-part-0", "part0,part0b");
+    configurations.put("source-tags-part-1", "part1");
     configurations.put("target-tags", targetTags);
     configurations.put("target-flavor", "presenter/concat");
     configurations.put("encoding-profile", "concat");
@@ -181,27 +204,67 @@ public class ConcatWorkflowOperationHandlerTest {
   }
 
   @Test
-  public void testConcat2EncodedTracksWithSameFlavor() throws Exception {
+  public void testConcatMandatoryCheck() throws Exception {
     setMockups();
+
     // operation configuration
     String targetTags = "engage,rss";
     Map<String, String> configurations = new HashMap<String, String>();
-    configurations.put("source-flavor-part-0", "presenter/source");
-    configurations.put("source-flavor-part-1", "presenter/source");
-    configurations.put("source-tag-part-0", "part0");
-    configurations.put("source-tag-part-1", "part1");
+    configurations.put("source-flavor-part-0", "presentation/source");
+    configurations.put("source-flavor-part-1", "test/source");
     configurations.put("target-tags", targetTags);
     configurations.put("target-flavor", "presenter/concat");
     configurations.put("encoding-profile", "concat");
     configurations.put("output-resolution", "1900x1080");
 
-    try {
-      // run the operation handler
-      getWorkflowOperationResult(mp, configurations);
-      Assert.fail();
-    } catch (WorkflowOperationException e) {
-      Assert.assertNotNull("Does not support two inputs with same flavor!", e);
-    }
+    // run the operation handler
+    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+    Assert.assertEquals(Action.SKIP, result.getAction());
+  }
+
+  @Test
+  public void testConcatOptionalCheck() throws Exception {
+    setMockups();
+
+    // operation configuration
+    String targetTags = "engage,rss";
+    Map<String, String> configurations = new HashMap<String, String>();
+    configurations.put("source-flavor-part-0", "presentation/source");
+    configurations.put("source-flavor-part-1", "test/source");
+    configurations.put("source-flavor-part-1-mandatory", "false");
+    configurations.put("source-flavor-part-2", "presentation/source");
+    configurations.put("target-tags", targetTags);
+    configurations.put("target-flavor", "presenter/concat");
+    configurations.put("encoding-profile", "concat");
+    configurations.put("output-resolution", "1900x1080");
+
+    // run the operation handler
+    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+    Assert.assertEquals(Action.CONTINUE, result.getAction());
+  }
+
+  @Test
+  public void testConcatLessTracks() throws Exception {
+    setMockups();
+
+    // operation configuration
+    String targetTags = "engage,rss";
+    Map<String, String> configurations = new HashMap<String, String>();
+    configurations.put("source-flavor-part-0", "presentation/source");
+    configurations.put("target-tags", targetTags);
+    configurations.put("target-flavor", "presenter/concat");
+    configurations.put("encoding-profile", "concat");
+    configurations.put("output-resolution", "1900x1080");
+
+    // run the operation handler
+    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+    Assert.assertEquals(Action.SKIP, result.getAction());
+
+    // check track metadata
+    MediaPackage mpNew = result.getMediaPackage();
+    Track[] tracks = mpNew.getTracks(MediaPackageElementFlavor.parseFlavor("presenter/concat"));
+    Assert.assertEquals(1, tracks.length);
+    Assert.assertArrayEquals(StringUtils.split(targetTags, ","), tracks[0].getTags());
   }
 
   private void setMockups() throws EncoderException, MediaPackageException {
