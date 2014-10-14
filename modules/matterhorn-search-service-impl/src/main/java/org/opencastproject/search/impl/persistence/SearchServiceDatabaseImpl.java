@@ -47,6 +47,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.spi.PersistenceProvider;
 
 /**
@@ -142,8 +143,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      Query q = em.createNamedQuery("Search.getNoSeries");
-      @SuppressWarnings("unchecked")
+      TypedQuery<SearchEntity> q = (TypedQuery<SearchEntity>) em.createNamedQuery("Search.getNoSeries");
       List<SearchEntity> seriesList = q.getResultList();
       for (SearchEntity series : seriesList) {
         String mpSeriesId = MediaPackageParser.getFromXml(series.getMediaPackageXML()).getSeries();
