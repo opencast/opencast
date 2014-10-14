@@ -879,6 +879,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 callback(theodulVideodisplayMaster.volume());
             });
             Engage.on(plugin.events.seek.getName(), function(time) {
+                Engage.log("Video: Seek to " + time);
                 if (videosReady && pressedPlayOnce) {
                     var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
                     if (duration && (time < duration)) {
@@ -912,10 +913,12 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             });
             Engage.on(plugin.events.ended.getName(), function(time) {
                 if (videosReady) {
+                    Engage.log("Video: Video ended and ready");
                     theodulVideodisplayMaster.pause();
                     Engage.trigger(plugin.events.pause.getName());
-                    theodulVideodisplayMaster.currentTime(theodulVideodisplayMaster.duration());
-                    Engage.trigger(plugin.events.seek.getName(), 0);
+                    theodulVideodisplayMaster.currentTime(0);
+                    //theodulVideodisplayMaster.currentTime(theodulVideodisplayMaster.duration());
+                    //Engage.trigger(plugin.events.seek.getName(), 0);
                 }
             });
             theodulVideodisplayMaster.on(event_html5player_volumechange, function() {
