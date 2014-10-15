@@ -1,13 +1,13 @@
 ocCaptureAgent = new (function ()
   {
-  
+
     this.polling_time;
     this.last_updated;
     this.agentsObj = {};
     this.agentsObj["agents"] = [];
     this.agentsCount = undefined;
     this.dispAgCount = 0;
-    
+
     this.init = function ()
     {
       $.ajax({
@@ -17,32 +17,32 @@ ocCaptureAgent = new (function ()
         success : processAgents
       });
     }
-    
-    function displayAgentState(data){		
+
+    function displayAgentState(data){
       var agent_name = "";
       ocCaptureAgent.dispAgCount++;
-      ocCaptureAgent.polling_time = 0;			
+      ocCaptureAgent.polling_time = 0;
 
-      if ( data["properties-response"].properties != ""){			
-        $.each(data["properties-response"].properties.item,function(a,item){				
+      if ( data["properties-response"].properties != ""){
+        $.each(data["properties-response"].properties.item,function(a,item){
           if (item.key==="capture.agent.state.remote.polling.interval"){
             ocCaptureAgent.polling_time = item.value;
           }
           if (item.key==="capture.agent.name") {
             agent_name = item.value;
-          }				
-        });	
-      }				
-      if (ocCaptureAgent.polling_time > 0) {	
+          }
+        });
+      }
+      if (ocCaptureAgent.polling_time > 0) {
         $.each(ocCaptureAgent.agentsObj["agents"],function(i,item){
         // Added a 5 second slack to account for overheard processing the http request.
-		if ((item.name == agent_name) && (item["state"] == "shutting_down" || item["time-since-last-update"] > (ocCaptureAgent.polling_time + 5) * 1000 )) {						
+    if ((item.name == agent_name) && (item["state"] == "shutting_down" || item["time-since-last-update"] > (ocCaptureAgent.polling_time + 5) * 1000 )) {
             item.state = "offline";
             return false;
-          }	
-		});
+          }
+    });
       }
-      showAgentsStatus();		
+      showAgentsStatus();
     }
 
     function processOneAgent(agent){
@@ -71,9 +71,9 @@ ocCaptureAgent = new (function ()
             property.item = [property.item];
           }
           $.each(property.item,function(c,device){
-            if (device.key=="capture.device.names"){									
-              devices = device.value.toLowerCase().split(',');							
-              devices_arr = device.value.toLowerCase().split(',');										
+            if (device.key=="capture.device.names"){
+              devices = device.value.toLowerCase().split(',');
+              devices_arr = device.value.toLowerCase().split(',');
               return false;
             }
           });
@@ -82,7 +82,7 @@ ocCaptureAgent = new (function ()
           for(i=0;i<devices.length;i++) {
             agent.devices[i] = {
               "device": devices[i]
-            };              
+            };
             agent.devices[i]["properties"] = [];
           }
           $.each(property.item,function(c,device){
@@ -90,41 +90,41 @@ ocCaptureAgent = new (function ()
             var name = "",i;
             for (i=3;i<prop.length;i++){
               name += prop[i]+" ";
-            }						
+            }
             var index = $.inArray( prop[2].toLowerCase(), devices_arr);
-            if ( index != -1) {														
+            if ( index != -1) {
               agent.devices[index]["properties"].push({
                 "key":$.trim(name),
                 "value":device.value
-              });	
+              });
             }
           });
         } else {
-          agent[b.toString()] = property;	
+          agent[b.toString()] = property;
         }
-      });		
-    }	
-	
-    function processAgents(data){			
-      $.each(data.agents,function(a,agent){			
-        if ($.isArray(agent)) { 
-          $.each(agent,function(b,one){ 
-            processOneAgent(one); 
-          }); 
-        }	
+      });
+    }
+
+    function processAgents(data){
+      $.each(data.agents,function(a,agent){
+        if ($.isArray(agent)) {
+          $.each(agent,function(b,one){
+            processOneAgent(one);
+          });
+        }
         else processOneAgent(agent);
         ocCaptureAgent.agentsObj.agents = $(agent).toArray();
       });
-      ocCaptureAgent.agentsCount = ocCaptureAgent.agentsObj.agents.length;	
-      showAgentsStatus();									
-    }		
+      ocCaptureAgent.agentsCount = ocCaptureAgent.agentsObj.agents.length;
+      showAgentsStatus();
+    }
 
     function showAgentsStatus(){
-      //      var result = TrimPath.processDOMTemplate("tableTemplate", agentsObj);	
+      //      var result = TrimPath.processDOMTemplate("tableTemplate", agentsObj);
       //      $('#stage').empty().append(result);
 
       $('#addHeader').jqotesubtpl("templates/capture_agents-table.tpl", ocCaptureAgent.agentsObj);
-			 		
+
       $('#captureTable').tablesorter({
         cssHeader: 'oc-ui-sortable',
         cssAsc: 'oc-ui-sortable-Ascending',
@@ -134,30 +134,41 @@ ocCaptureAgent = new (function ()
             sorter: false
           }
         }
-      });				
-										
-	   
-      $("ul.propnav li").click(function() { 		  
-        //Drop down the subnav on click  
+      });
+
+
+      $("ul.propnav li").click(function() {
+        //Drop down the subnav on click
         $(this).find("ul.itemnav").slideDown('fast').show();
-	 			
+
         $(this).find('ul.itemnav li span.dev-prop-val').each(function(){
           var span_len = $(this).parents('li').width()-$(this).siblings('span').width();
-          if ($(this).width()>span_len) {	
+          if ($(this).width()>span_len) {
             var font_size = Math.round(parseFloat($(this).css('font-size')));
             var letters = Math.floor(span_len/font_size - 3);
             $(this).attr('title',$(this).text());
-            $(this).text($(this).text().substring(0,letters)+"...");													
+            $(this).text($(this).text().substring(0,letters)+"...");
           }
         });
-			   
-        $(this).hover(function() {  
-          }, function(){  
+
+        $(this).hover(function() {
+          }, function(){
             //When the mouse hovers out of the subnav, move it back up
-            $(this).find("ul.itemnav").slideUp('slow');   
-          });  
-			   			 
-      }); 				
+            $(this).find("ul.itemnav").slideUp('slow');
+          });
+
+      });
     }
-  
+
   })();
+
+function unregisterCaptureAgent(name) {
+  if (confirm('This may cause upcoming recordings for capture agent “'
+        + name + '” to fail, are you sure?')) {
+    $.ajax({
+      type : 'delete',
+      url : '/capture-admin/agents/' + name,
+      success : function() { window.location.reload(); }
+    });
+  }
+}
