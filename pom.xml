@@ -2170,11 +2170,6 @@
     </site>
   </distributionManagement>
 
-  <ciManagement>
-    <system>Bamboo</system>
-    <url>http://build.opencastproject.org/bamboo/browse/MH-TRUNK</url>
-  </ciManagement>
-
   <!-- Site Report generation settings -->
   <reporting>
     <plugins>
