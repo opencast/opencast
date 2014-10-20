@@ -61,6 +61,8 @@ var isBuffering = false;
 var continueProcessing = false;
 var jQMsg = undefined;
 var messageShown = false;
+var timeout_canplay = undefined;
+var timeout_canplay_delay = 5000; // ms
 
 // key codes
 var KEY_ENTER = 13;
@@ -147,12 +149,10 @@ editor.continueWorkflowFunction = null;
  *
  * @return true if everything went fine, false else
  */
-editor.getWorkflowID = function () {
-    ocUtils.log("Getting workflow ID...");
-    var postData = {
-        'id': parent.document.getElementById("holdWorkflowId").value
-    };
-    editor.workflowID = postData.id;
+editor.getWorkflowID = function() {
+    ocUtils.log("Getting workflow ID");
+
+    editor.workflowID = parent.document.getElementById("holdWorkflowId").value;
     if (!editor.workflowID) {
         ocUtils.log("Error: Could not retrieve workflow instance ID...");
         editor.error = true;
@@ -162,7 +162,7 @@ editor.getWorkflowID = function () {
             "This should not happen, please ask your Matterhorn administrator.",
             "Error", false);
     } else {
-        ocUtils.log("Done");
+        ocUtils.log("Done: Getting workflow ID");
     }
     return !editor.error;
 }
@@ -173,9 +173,10 @@ editor.getWorkflowID = function () {
  * @param jsonData json data
  * @return true if everything went fine, false else
  */
-editor.parseWorkflow = function (jsonData) {
+editor.parseWorkflow = function(jsonData) {
     if (!editor.error) {
-        ocUtils.log("Parsing workflow instance...");
+        ocUtils.log("Parsing workflow instance");
+
         try {
             editor.workflowParser = new $.workflowParser(jsonData);
             SMIL_FLAVOR_EPISODE = editor.workflowParser.targetSmilFlavor;
@@ -185,7 +186,8 @@ editor.parseWorkflow = function (jsonData) {
             editor.error = true;
             displayMsg("Could not parse workflow instance.", "Error");
         }
-        ocUtils.log("Done");
+
+        ocUtils.log("Done: Parsing workflow instance");
     }
     return !editor.error;
 }
@@ -196,9 +198,10 @@ editor.parseWorkflow = function (jsonData) {
  * @param jsonData json data
  * @return true if everything went fine, false else
  */
-editor.parseMediapackage = function (jsonData) {
+editor.parseMediapackage = function(jsonData) {
     if (!editor.error) {
-        ocUtils.log("Parsing mediapackage...");
+        ocUtils.log("Parsing mediapackage");
+
         try {
             editor.mediapackageParser = new $.mediapackageParser(jsonData, SMIL_FLAVOR_EPISODE);
             editor.mediapackageParser;
@@ -207,7 +210,8 @@ editor.parseMediapackage = function (jsonData) {
             editor.error = true;
             displayMsg("Could not parse mediapackage.", "Error");
         }
-        ocUtils.log("Done");
+
+        ocUtils.log("Done: Parsing mediapackage");
     }
     return !editor.error;
 }
@@ -218,9 +222,10 @@ editor.parseMediapackage = function (jsonData) {
  * @param xmlData xml data
  * @return true if everything went fine, false else
  */
-editor.parseSmil = function (xmlData) {
+editor.parseSmil = function(xmlData) {
     if (!editor.error) {
-        ocUtils.log("Parsing smil...");
+        ocUtils.log("Parsing smil");
+
         try {
             editor.smilParser = new $.smilParser(xmlData);
             editor.smil = editor.smilParser.smil;
@@ -230,7 +235,8 @@ editor.parseSmil = function (xmlData) {
             // editor.error = true;
             displayMsg("Could not parse smil.", "Error");
         }
-        ocUtils.log("Done");
+
+        ocUtils.log("Done: Parsing smil");
     }
     return !editor.error;
 }
@@ -240,18 +246,19 @@ editor.parseSmil = function (xmlData) {
  *
  * @param func function to execute after smil has been downloaded
  */
-editor.downloadSmil = function (func) {
+editor.downloadSmil = function(func) {
     if (!editor.error) {
-        ocUtils.log("Downloading smil...");
+        ocUtils.log("Downloading smil");
         $.ajax({
             dataType: "text", // get it as "text", don't use jQuery smart guess!
             type: "GET",
             url: editor.mediapackageParser.smil_url
-        }).done(function (data) {
-            ocUtils.log("Done");
+        }).done(function(data) {
+            ocUtils.log("Done: Downloading smil");
+
             editor.parseSmil(data);
             func();
-        }).fail(function (error) {
+        }).fail(function(error) {
             ocUtils.log("Error: Could not retrieve workflow instance");
             displayMsg("Could not retrieve workflow instance.", "Error");
         });
@@ -267,15 +274,17 @@ editor.downloadSmil = function (func) {
  * 5. parse the smil
  * @param func function to execute after smil has been parsed
  **/
-editor.getSmil = function (func) {
+editor.getSmil = function(func) {
     if (!editor.error) {
-        ocUtils.log("Downloading workflow instance (json)...");
+        ocUtils.log("Downloading workflow instance");
+
         $.ajax({
             type: "GET",
             dataType: "json",
             url: WORKFLOW_INSTANCE_PATH + editor.workflowID + WORKFLOW_INSTANCE_SUFFIX_JSON
-        }).done(function (data) {
-            ocUtils.log("Done");
+        }).done(function(data) {
+            ocUtils.log("Done: Downloading workflow instance");
+
             renewSessionID();
             editor.parseWorkflow(data);
             if (!editor.error) {
@@ -284,7 +293,7 @@ editor.getSmil = function (func) {
                     editor.downloadSmil(func);
                 }
             }
-        }).fail(function (error) {
+        }).fail(function(error) {
             ocUtils.log("Error: Could not retrieve smil");
             displayMsg("Could not retrieve smil.", "Error");
         });
@@ -297,11 +306,14 @@ editor.getSmil = function (func) {
  * @param xml response data
  * @return true if everything went fine, false else
  */
-editor.parseSmilResponse = function (xml_response_data) {
+editor.parseSmilResponse = function(xml_response_data) {
     if (!editor.error) {
-        ocUtils.log("Parsing smil response...");
+        ocUtils.log("Parsing smil response");
+
         editor.smilResponseParser = new $.smilResponseParser(xml_response_data);
-        ocUtils.log("Done");
+
+        ocUtils.log("Done: Parsing smil response");
+
         if (editor.smilResponseParser.smil) {
             editor.parseSmil(editor.smilResponseParser.smil);
         }
@@ -314,9 +326,9 @@ editor.parseSmilResponse = function (xml_response_data) {
  *
  * @param func function to execute after smil has been parsed
  */
-editor.createNewSmil = function (func) {
+editor.createNewSmil = function(func) {
     if (!editor.error) {
-        ocUtils.log("Creating new smil...");
+        ocUtils.log("Creating new smil");
         $.ajax({
             type: "POST",
             dataType: "text", // get it as "text", don't use jQuery smart guess!
@@ -324,14 +336,15 @@ editor.createNewSmil = function (func) {
             data: {
                 mediaPackage: editor.mediapackageParser.mediapackage
             }
-        }).done(function (xml_response_data) {
-            ocUtils.log("Done");
+        }).done(function(xml_response_data) {
+            ocUtils.log("Done: Creating new smil");
+
             editor.parseSmilResponse(xml_response_data);
             if (editor.smilResponseParser.smil) {
                 editor.parseSmil(editor.smilResponseParser.smil);
             }
             func();
-        }).fail(function (e) {
+        }).fail(function(e) {
             ocUtils.log("Error: Error creating smil: ");
             ocUtils.log(e);
             displayMsg("Error creating smil.", "Error");
@@ -340,7 +353,7 @@ editor.createNewSmil = function (func) {
     return !editor.error;
 }
 
-editor.addClips = function (strs, i, parID, start, duration, func) {
+editor.addClips = function(strs, i, parID, start, duration, func) {
     ocUtils.log("Adding track no " + (i + 1) + " / " + strs.length);
     $.ajax({
         type: "POST",
@@ -354,26 +367,26 @@ editor.addClips = function (strs, i, parID, start, duration, func) {
             start: start,
             duration: duration
         }
-    }).done(function (xml_response_data) {
+    }).done(function(xml_response_data) {
         editor.parseSmilResponse(xml_response_data);
         if (editor.smilResponseParser.smil) {
             editor.parseSmil(editor.smilResponseParser.smil);
         }
 
         if ((i + 1) < strs.length) {
-            window.setTimeout(function () {
+            window.setTimeout(function() {
                 editor.addClips(strs, i + 1, parID, start, duration, func);
             }, clipElementTimeoutTime);
         } else {
             func();
         }
-    }).fail(function (e) {
+    }).fail(function(e) {
         ocUtils.log("Error: Could not add clip");
         ocUtils.log(e);
         if (clipTimeoutsUntilFailure > 0) {
             ocUtils.log("Trying again...");
             --clipTimeoutsUntilFailure;
-            window.setTimeout(function () {
+            window.setTimeout(function() {
                 editor.addClips(strs, i, parID, start, duration, func);
             }, clipFailureTimeoutTime);
         } else {
@@ -389,9 +402,10 @@ editor.addClips = function (strs, i, parID, start, duration, func) {
  * @param func function to execute after smil response has been parsed
  * @return false if an error has been thrown in another editor function, true if operating (else)
  */
-editor.addPar = function (currParIndex) {
+editor.addPar = function(currParIndex) {
     if (!editor.error) {
-        ocUtils.log("Adding par...");
+        ocUtils.log("Adding par");
+
         $.ajax({
             type: "POST",
             dataType: "text", // get it as "text", don't use jQuery smart guess!
@@ -399,8 +413,9 @@ editor.addPar = function (currParIndex) {
             data: {
                 smil: editor.smil
             }
-        }).done(function (data) {
-            ocUtils.log("Done");
+        }).done(function(data) {
+            ocUtils.log("Done: Adding par");
+
             editor.parseSmilResponse(data);
             var par = {
                 "parID": editor.smilResponseParser.parID,
@@ -408,37 +423,38 @@ editor.addPar = function (currParIndex) {
             }
             ocUtils.log("Next parID: " + par.parID);
 
-            ocUtils.log("Downloading workflow instance (xml)...");
+            ocUtils.log("Downloading workflow instance");
             $.ajax({
                 type: "GET",
                 dataType: "text", // get it as "text", don't use jQuery smart guess!
                 url: WORKFLOW_INSTANCE_PATH + editor.workflowID + WORKFLOW_INSTANCE_SUFFIX_XML
-            }).done(function (wfXML) {
-                ocUtils.log("Done");
+            }).done(function(wfXML) {
+                ocUtils.log("Done: Downloading workflow instance");
+
                 var strs = getAllStringsOf(wfXML, "<ns3:track", "</ns3:track>");
                 var error = false;
 
                 var start = (parseFloat(editor.splitData.splits[currParIndex].clipBegin) * 1000).toFixed(0);
                 var duration = ((parseFloat(editor.splitData.splits[currParIndex].clipEnd) * 1000) - start).toFixed(0);
-                editor.addClips(strs, 0, par.parID, start, duration, function () {
+                editor.addClips(strs, 0, par.parID, start, duration, function() {
                     ocUtils.log("Continuing with next par element...");
-                    window.setTimeout(function () {
+                    window.setTimeout(function() {
                         editor.saveSplitListHelper(currParIndex + 1);
                     }, clipElementTimeoutTime);
                 });
-            }).fail(function (e) {
+            }).fail(function(e) {
                 ocUtils.log("Error: Could not get workflow instance");
                 ocUtils.log(e);
                 displayMsg("Could not get workflow instance. Please try again.", "Error");
                 editor.enableContinueProcessing(true);
             });
-        }).fail(function (e) {
+        }).fail(function(e) {
             ocUtils.log("Error: Could not add par element");
             ocUtils.log(e);
             if (parTimeoutsUntilFailure > 0) {
                 ocUtils.log("Trying again...");
                 --parTimeoutsUntilFailure;
-                window.setTimeout(function () {
+                window.setTimeout(function() {
                     editor.addPar(currParIndex);
                 }, parFailureTimeoutTime);
             } else {
@@ -450,7 +466,7 @@ editor.addPar = function (currParIndex) {
     return !editor.error;
 }
 
-editor.enableContinueProcessing = function (enable) {
+editor.enableContinueProcessing = function(enable) {
     if (enable) {
         $('#continueButton').removeAttr("disabled");
         $('#continueButton').button("refresh");
@@ -466,7 +482,7 @@ editor.enableContinueProcessing = function (enable) {
 /**
  * save split list helper
  */
-editor.saveSplitListHelper = function (startAtIndex) {
+editor.saveSplitListHelper = function(startAtIndex) {
     if (!editor.error) {
         startAtIndex = (startAtIndex && (startAtIndex >= 0)) ? startAtIndex : 0;
         if (startAtIndex == 0) {
@@ -482,9 +498,8 @@ editor.saveSplitListHelper = function (startAtIndex) {
                     editor.saveSplitListHelper(startAtIndex + 1);
                 }
             } else if (editor.splitData.splits.length > 0) {
-                ocUtils.log("Done");
                 if (!editor.error) {
-                    ocUtils.log("Sending smil...");
+                    ocUtils.log("Sending smil");
 
                     // Continue processing
                     // POST files/mediapackage/{mediaPackageID}/{mediaPackageElementID}
@@ -498,7 +513,7 @@ editor.saveSplitListHelper = function (startAtIndex) {
                         type: "GET",
                         dataType: "json",
                         url: WORKFLOW_INSTANCE_PATH + editor.workflowID + WORKFLOW_INSTANCE_SUFFIX_JSON
-                    }).done(function (data) {
+                    }).done(function(data) {
                         if (data && data.workflow && data.workflow.state) {
                             if (data.workflow.state.toLowerCase() == "paused") {
                                 // generate a random mediapackage element ID
@@ -510,8 +525,8 @@ editor.saveSplitListHelper = function (startAtIndex) {
                                     body +=
                                         'Content-Disposition: form-data; name="mediaPackageElementID"\r\n' + '\r\n' + editor.mediapackageParser.smil_episode_id + '\r\n' + '--' + boundary + '\r\n';
                                     body +=
-                                    // parameter name "file", local filename "smil.smil"
-                                    'Content-Disposition: form-data; name="file"; filename="smil.smil"\r\n' + 'Content-Type: application/smil\r\n' + '\r\n' + editor.smil + '\r\n' + '--' + boundary + '--' + '\r\n';
+                                        // parameter name "file", local filename "smil.smil"
+                                        'Content-Disposition: form-data; name="file"; filename="smil.smil"\r\n' + 'Content-Type: application/smil\r\n' + '\r\n' + editor.smil + '\r\n' + '--' + boundary + '--' + '\r\n';
                                     $.ajax({
                                         type: "POST",
                                         contentType: "multipart/form-data; boundary=" + boundary,
@@ -520,13 +535,13 @@ editor.saveSplitListHelper = function (startAtIndex) {
                                             FILE_MEDIAPACKAGE_PATH +
                                             "/" + editor.mediapackageParser.id +
                                             "/" + editor.mediapackageParser.smil_episode_id
-                                    }).done(function (data) {
-                                        ocUtils.log("Done");
-                                        ocUtils.log("Continuing workflow...");
+                                    }).done(function(data) {
+                                        ocUtils.log("Done: Sending smil");
+                                        ocUtils.log("Continuing workflow");
                                         if (editor.continueWorkflowFunction != null) {
                                             editor.continueWorkflowFunction();
                                         }
-                                    }).fail(function (e) {
+                                    }).fail(function(e) {
                                         ocUtils.log("Error: Error submitting smil file: ");
                                         ocUtils.log(e);
                                         displayMsg("Error submitting smil file. Please try again.", "Error");
@@ -538,7 +553,7 @@ editor.saveSplitListHelper = function (startAtIndex) {
                                     "Cancel editing", false);
                             }
                         }
-                    }).fail(function (error) {
+                    }).fail(function(error) {
                         displayMsg("Could not get the workflow state. Please cancel editing.",
                             "Cancel editing", false);
                     });
@@ -552,7 +567,7 @@ editor.saveSplitListHelper = function (startAtIndex) {
 /**
  * save smil
  */
-editor.saveSplitList = function (func) {
+editor.saveSplitList = function(func) {
     if (func && (func != null)) {
         editor.continueWorkflowFunction = func;
     }
@@ -562,7 +577,7 @@ editor.saveSplitList = function (func) {
     if (!editor.error && !isBuffering) {
         displayMsg("Continuing processing. This may take a while.\nPlease wait...", "Continuing processing.", false);
         editor.enableContinueProcessing(false);
-        editor.createNewSmil(function () {
+        editor.createNewSmil(function() {
             editor.saveSplitListHelper(0);
         });
     } else if (!continueProcessing_tmp && isBuffering) {
@@ -574,14 +589,14 @@ editor.saveSplitList = function (func) {
 /**
  * update UI split list
  */
-editor.updateSplitList = function (dontClickCancel, segmentsClickable) {
+editor.updateSplitList = function(dontClickCancel, segmentsClickable) {
     if (!editor.error) {
         if (!dontClickCancel) {
             cancelButtonClick();
         }
 
         var tmpTime = 0;
-        $.each(editor.splitData.splits, function (index, value) {
+        $.each(editor.splitData.splits, function(index, value) {
             value.clipEnd = parseFloat(value.clipEnd);
             value.clipBegin = parseFloat(value.clipBegin);
             if (value.enabled && (value.clipEnd != undefined) && (value.clipBegin != undefined)) {
@@ -896,8 +911,8 @@ function checkPrevAndNext(id, checkTimefields) {
             var current = editor.splitData.splits[id];
             // new first item
             if (id == 0) {
-		var clipBegin = parseFloat(current.clipBegin);
-		var clipEnd = parseFloat(current.clipEnd);
+                var clipBegin = parseFloat(current.clipBegin);
+                var clipEnd = parseFloat(current.clipEnd);
 
                 if (editor.splitData.splits.length > 1) {
                     var next = editor.splitData.splits[1];
@@ -915,8 +930,7 @@ function checkPrevAndNext(id, checkTimefields) {
                     // add new item to front
                     editor.splitData.splits.splice(0, 0, newSplitItem);
                     insertedFirstItem = true;
-                }
-		else if(clipBegin > 0) {
+                } else if (clipBegin > 0) {
                     ocUtils.log("Extending the first split element to (cpan - auto): (" + 0 + " - " + clipEnd + ")");
                     current.clipBegin = 0;
                 }
@@ -1128,28 +1142,28 @@ function setSplitListItemButtonHandler() {
         $('.clipItem').timefield();
 
         // add evtl handler for enter in editing fields
-        $('#clipBegin input').focus(function (e) {
+        $('#clipBegin input').focus(function(e) {
             inputFocused = true;
         });
-        $('#clipEnd input').focus(function (e) {
+        $('#clipEnd input').focus(function(e) {
             inputFocused = true;
         });
-        $('#clipBegin input').blur(function (e) {
+        $('#clipBegin input').blur(function(e) {
             inputFocused = false;
             okButtonClick();
         });
-        $('#clipEnd input').blur(function (e) {
+        $('#clipEnd input').blur(function(e) {
             inputFocused = false;
             okButtonClick();
         });
-        $('#clipBegin input').keyup(function (e) {
+        $('#clipBegin input').keyup(function(e) {
             var keyCode = e.keyCode || e.which();
             if (keyCode == KEY_ENTER) {
                 inputFocused = false;
                 okButtonClick();
             }
         });
-        $('#clipEnd input').keyup(function (e) {
+        $('#clipEnd input').keyup(function(e) {
             var keyCode = e.keyCode || e.which();
             if (keyCode == KEY_ENTER) {
                 inputFocused = false;
@@ -1360,11 +1374,11 @@ function displayMsg(msg, title, displayOKButton) {
                 title: title,
                 resizable: false,
                 buttons: {
-                    OK: function () {
+                    OK: function() {
                         $(this).dialog("close");
                     }
                 },
-                close: function (event, ui) {
+                close: function(event, ui) {
                     messageShown = false;
                 }
             });
@@ -1372,7 +1386,7 @@ function displayMsg(msg, title, displayOKButton) {
             $('<div />').html(msg).dialog({
                 title: title,
                 resizable: false,
-                close: function (event, ui) {
+                close: function(event, ui) {
                     messageShown = false;
                 }
             });
@@ -1459,7 +1473,7 @@ function clearEvents2() {
     editor.player.on("play", {
         duration: 0,
         endTime: getDuration()
-    }, function () {});
+    }, function() {});
     clearEvents();
 }
 
@@ -1482,7 +1496,7 @@ function onPlay(evt) {
 function onTimeout() {
     if (!timeoutUsed) {
         pauseVideo();
-        var check = function () {
+        var check = function() {
             endTime = currEvt.data.endTime;
             if (endTime > getCurrentTime()) {
                 playVideo();
@@ -1678,7 +1692,7 @@ function playWithoutDeleted_helper(full) {
 
                 playVideo();
 
-                timeout3 = window.setTimeout(function () {
+                timeout3 = window.setTimeout(function() {
                     pauseVideo();
                     currSplitItemClickedViaJQ = true;
                     setCurrentTime(segmentStart);
@@ -1691,7 +1705,7 @@ function playWithoutDeleted_helper(full) {
                 }, (clipStartTo - clipStartFrom) * 1000);
 
                 if (full) {
-                    timeout4 = window.setTimeout(function () {
+                    timeout4 = window.setTimeout(function() {
                         pauseVideo();
                         if (timeout3 != null) {
                             window.clearTimeout(timeout3);
@@ -1711,7 +1725,7 @@ function playWithoutDeleted_helper(full) {
                         }
                     }, ((clipStartTo - clipStartFrom) * 1000) + ((segmentEnd - segmentStart) * 1000));
                 } else {
-                    timeout4 = window.setTimeout(function () {
+                    timeout4 = window.setTimeout(function() {
                         pauseVideo();
                         if (timeout3 != null) {
                             window.clearTimeout(timeout3);
@@ -1737,7 +1751,7 @@ function playWithoutDeleted_helper(full) {
                 playVideo();
 
                 if (full) {
-                    timeout3 = window.setTimeout(function () {
+                    timeout3 = window.setTimeout(function() {
                         pauseVideo();
                         currSplitItemClickedViaJQ = true;
                         setCurrentTime(clipEndFrom);
@@ -1753,7 +1767,7 @@ function playWithoutDeleted_helper(full) {
                         }
                     }, ((segmentEnd - segmentStart) * 1000));
                 } else {
-                    timeout3 = window.setTimeout(function () {
+                    timeout3 = window.setTimeout(function() {
                         pauseVideo();
                         currSplitItemClickedViaJQ = true;
                         clearEvents();
@@ -1774,7 +1788,7 @@ function playWithoutDeleted_helper(full) {
 
                 playVideo();
 
-                timeout3 = window.setTimeout(function () {
+                timeout3 = window.setTimeout(function() {
                     pauseVideo();
                     currSplitItemClickedViaJQ = true;
                     setCurrentTime(segmentStart);
@@ -1934,15 +1948,15 @@ function addShortcuts() {
         url: ME_JSON,
         dataType: "json",
         async: false,
-        success: function (data) {
-            $.each(data.org.properties, function (key, value) {
+        success: function(data) {
+            $.each(data.org.properties, function(key, value) {
                 default_config[key] = value;
                 $('#' + key.replace(".", "_")).html(value);
             });
         }
     });
 
-    $.each(default_config, function (key, value) {
+    $.each(default_config, function(key, value) {
         $('#' + key.replace(".", "_")).html(value);
     });
 
@@ -1950,19 +1964,19 @@ function addShortcuts() {
     shortcut.add(default_config[SPLIT_AT_CURRENT_TIME], splitButtonClick, {
         disable_in_input: true,
     });
-    shortcut.add(default_config[PREVIOUS_FRAME], function () {
+    shortcut.add(default_config[PREVIOUS_FRAME], function() {
         pauseVideo();
         $('.video-prev-frame').click();
     }, {
         disable_in_input: true,
     });
-    shortcut.add(default_config[NEXT_FRAME], function () {
+    shortcut.add(default_config[NEXT_FRAME], function() {
         pauseVideo();
         $('.video-next-frame').click();
     }, {
         disable_in_input: true,
     });
-    shortcut.add(default_config[PLAY_PAUSE], function () {
+    shortcut.add(default_config[PLAY_PAUSE], function() {
         if (getPlayerPaused()) {
             playVideo();
         } else {
@@ -2028,7 +2042,7 @@ function clearSegmentList() {
 function initPlayButtons() {
     $('#clearList').button();
 
-    $('#clearList').click(function () {
+    $('#clearList').click(function() {
         clearSegmentList();
     });
 }
@@ -2055,7 +2069,7 @@ function zoomedIn() {
 }
 
 function updateWaveformClickEvent() {
-    $('#segmentsWaveform').click(function (evt) {
+    $('#segmentsWaveform').click(function(evt) {
         if (zoomedIn()) {
             if (evt) {
                 var offsetX = 0;
@@ -2092,7 +2106,7 @@ function prepareUI() {
         var waveform_presentation = false;
         var waveform_presenter_value;
         var waveform_presentation_value;
-        $.each(ocUtils.ensureArray(editor.mediapackageParser.mediapackage.attachments.attachment), function (key, value) {
+        $.each(ocUtils.ensureArray(editor.mediapackageParser.mediapackage.attachments.attachment), function(key, value) {
             if (value.type == WAVEFORM_FLAVOR_PRESENTER) {
                 ocUtils.log("Found waveform presenter");
                 waveform_presenter = true;
@@ -2106,7 +2120,7 @@ function prepareUI() {
         var value = waveform_presenter ? waveform_presenter_value : (waveform_presentation ? waveform_presentation_value : undefined);
         if (waveform_presenter || waveform_presentation) {
             $('#waveformImage').prop("src", value.url);
-            $('#waveformImage').load(function () {
+            $('#waveformImage').load(function() {
                 $('#segmentsWaveform').height($('#waveformImage').height());
                 $('#segmentsWaveform').width($('#videoHolder').width());
                 initialWaveformWidth = $('#segmentsWaveform').width();
@@ -2119,10 +2133,10 @@ function prepareUI() {
                     value: 1,
                     min: 1,
                     max: maxWaveformZoomSlider,
-                    slide: function (event, ui) {
+                    slide: function(event, ui) {
                         setWaveformWidth(ui.value);
                     },
-                    stop: function (event, ui) {
+                    stop: function(event, ui) {
                         editor.updateSplitList(false, !zoomedIn());
                         selectCurrentSplitItem();
                     }
@@ -2130,7 +2144,7 @@ function prepareUI() {
                 $("#waveformControls").show();
                 $("#slider-waveform-zoom .ui-slider-handle").unbind('keydown');
             });
-            $(window).resize(function (evt) {
+            $(window).resize(function(evt) {
                 if (waveformImageLoadDone) {
                     $('#segmentsWaveform').height($('#waveformImage').height());
                     $('#segmentsWaveform').width($('#videoHolder').width());
@@ -2169,7 +2183,7 @@ function prepareUI() {
     $('.video-play-pre-post').click(playWithoutDeleted);
 
     // add timelistener for current time in description div
-    editor.player.on("timeupdate", function () {
+    editor.player.on("timeupdate", function() {
         selectCurrentSplitItem();
     });
 
@@ -2181,39 +2195,41 @@ function prepareUI() {
  */
 function parseInitialSMIL() {
     if (editor.parsedSmil) {
-        ocUtils.log("smil found. Parsing...");
+        ocUtils.log("Smil found. Parsing");
         var insertedSplitItem = false;
         // check whether SMIL has already cutting points
         if (editor.parsedSmil.par) {
             editor.splitData.splits = [];
             editor.parsedSmil.par = ocUtils.ensureArray(editor.parsedSmil.par);
             var lastEnd = 0;
-            $.each(editor.parsedSmil.par, function (key, value) {
+            $.each(editor.parsedSmil.par, function(key, value) {
                 value.video = ocUtils.ensureArray(value.video);
                 var clipBegin = (value && value.video[0] && value.video[0].clipBegin) ? (parseFloat(value.video[0].clipBegin) / 1000) : 0;
                 var clipEnd = (value && value.video[0] && value.video[0].clipEnd) ? (parseFloat(value.video[0].clipEnd) / 1000) : getDuration();
-                if ((key > 0) && (lastEnd != clipBegin)) {
-                    ocUtils.log("Inserting a split element (1): (" + lastEnd + " - " + clipBegin + ")");
+                if ((clipBegin != undefined) && (clipEnd != undefined)) {
+                    if ((key > 0) && (lastEnd != clipBegin)) {
+                        ocUtils.log("Inserting a split element (1): (" + lastEnd + " - " + clipBegin + ")");
+                        editor.splitData.splits.push({
+                            clipBegin: parseFloat(lastEnd),
+                            clipEnd: parseFloat(clipBegin),
+                            enabled: false
+                        });
+                    }
+                    ocUtils.log("Inserting a split element (2): (" + clipBegin + " - " + clipEnd + ")");
                     editor.splitData.splits.push({
-                        clipBegin: parseFloat(lastEnd),
-                        clipEnd: parseFloat(clipBegin),
-                        enabled: false
+                        clipBegin: clipBegin,
+                        clipEnd: clipEnd,
+                        enabled: true
                     });
+                    lastEnd = clipEnd;
                 }
-                ocUtils.log("Inserting a split element (2): (" + clipBegin + " - " + clipEnd + ")");
-                editor.splitData.splits.push({
-                    clipBegin: clipBegin,
-                    clipEnd: clipEnd,
-                    enabled: true
-                });
-                lastEnd = clipEnd;
             });
             for (var i = 0; i < editor.splitData.splits.length; ++i) {
                 if (checkPrevAndNext(i, false).inserted) {
                     i = 0;
                 }
             }
-	    
+
             // check last segment
             var duration = getDuration();
             if (editor.splitData.splits.length > 0) {
@@ -2267,7 +2283,7 @@ function parseInitialSMIL() {
     editor.splitData.splits[0].enabled = !insertedFirstItem;
     editor.splitData.splits[editor.splitData.splits.length - 1].enabled = !insertedLastItem;
 
-    window.setTimeout(function () {
+    window.setTimeout(function() {
         if (!insertedFirstItem) {
             if (editor.splitData.splits.length == 1) {
                 $('#splitSegmentItem-0').css('width', '100%');
@@ -2306,7 +2322,10 @@ function positionWaveformAndTimeIndicator() {
  * when player is ready
  */
 function playerReady() {
+    cancelCanplayTimeout();
+    ocUtils.log("Player ready");
     if (!editor.ready) {
+        ocUtils.log("Initializing the editor");
         editor.ready = true;
 
         $("#cancelButton").css("color", "#FFFFFF");
@@ -2317,7 +2336,7 @@ function playerReady() {
         $('#segmentsWaveform').append('<div id="imageDiv"><img id="waveformImage" alt="waveform"/></div>');
         $('#segmentsWaveform').append('<div id="currentTimeDiv"></div>');
 
-        editor.player.bind("timeupdate", function () {
+        editor.player.bind("timeupdate", function() {
             positionWaveformAndTimeIndicator();
         });
 
@@ -2336,7 +2355,7 @@ function playerReady() {
             var presenter_smil = false;
             var presentation_smil = false;
             var episode_smil = false;
-            $.each(workflowInstance.mediapackage.metadata.catalog, function (key, value) {
+            $.each(workflowInstance.mediapackage.metadata.catalog, function(key, value) {
                 // load smil if there is already one
                 if (value.type == SMIL_FLAVOR_PRESENTER) {
                     presenter_smil = true;
@@ -2351,41 +2370,43 @@ function playerReady() {
             });
             if (presenter_smil || presentation_smil || episode_smil) {
                 // download smil
-                editor.getSmil(function () {
+                editor.getSmil(function() {
                     parseInitialSMIL();
                 });
             }
         }
     }
+    $("#loadingDisplay").hide();
+    $("#thePlayer").show();
 }
 
 function isBrowser(browser) {
     browser = browser.toLowerCase();
     switch (browser) {
-    case "opera":
-        return !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
-    case "chrome":
-        return !!window.chrome && !isBrowser("opera");
-    case "firefox":
-        return typeof InstallTrigger !== 'undefined';
-    case "safari":
-        return Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
-    case "ie":
-        return /*@cc_on!@*/ false || !!document.documentMode;
-    default:
-        return false;
+        case "opera":
+            return !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+        case "chrome":
+            return !!window.chrome && !isBrowser("opera");
+        case "firefox":
+            return typeof InstallTrigger !== 'undefined';
+        case "safari":
+            return Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+        case "ie":
+            return /*@cc_on!@*/ false || !!document.documentMode;
+        default:
+            return false;
     }
 }
 
 function renewSessionID() {
     window.clearTimeout(timeoutRenewSessionID);
     timeoutRenewSessionID = null;
-    timeoutRenewSessionID = window.setTimeout(function () {
+    timeoutRenewSessionID = window.setTimeout(function() {
         $.ajax({
             type: "GET",
             dataType: "json",
             url: WORKFLOW_INSTANCE_PATH + editor.workflowID + WORKFLOW_INSTANCE_SUFFIX_JSON
-        }).done(function (data) {
+        }).done(function(data) {
             ocUtils.log("Renewed session ID.");
 
             if (data && data.workflow && data.workflow.state) {
@@ -2396,7 +2417,7 @@ function renewSessionID() {
                         "Cancel editing");
                 }
             }
-        }).fail(function (error) {
+        }).fail(function(error) {
             ocUtils.log("Failed renewing session ID.");
 
             displayMsg("Could not renew the session ID. Please cancel editing.",
@@ -2407,10 +2428,22 @@ function renewSessionID() {
     }, 30000);
 }
 
+function cancelCanplayTimeout() {
+    window.clearTimeout(timeout_canplay);
+    timeout_canplay = undefined;
+}
+
+function setCanplayTimeout() {
+    timeout_canplay = window.setTimeout(function() {
+        $("#loadingDisplayText").html("The media source could not be loaded.\n Please refresh the page or try another browser.");
+        displayMsg("The media source could not be loaded.\n Please refresh the page or try another browser.", "Media source not loaded", false);
+    }, timeout_canplay_delay);
+}
+
 /**
  * document fully loaded
  */
-$(document).ready(function () {
+$(document).ready(function() {
     if (!editor.getWorkflowID()) {
         $("#editor").remove();
         $("#editorMetaData").remove();
@@ -2420,14 +2453,23 @@ $(document).ready(function () {
         $("#continueButton").remove();
         $("#holdActionUI").remove();
         $("#cancelButton").attr('title', 'Back').html('Back');
+        $("#cancelButtonLoading").attr('title', 'Back').html('Back');
         return false;
     }
+
+    ocUtils.log("Getting me info");
 
     $.ajax({
         url: '/info/me.json',
         type: 'GET',
         dataType: 'json',
-        success: function (data) {
+        async: false,
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            ocUtils.log("Done: Getting me info, ERROR: " + textStatus + ", " + errorThrown);
+        },
+        success: function(data) {
+            ocUtils.log("Done: Getting me info");
+
             if (data && data.org) {
                 var val1 = parseInt(data.org.properties["adminui.prePostRoll"]);
                 prePostRoll = (val1 && !isNaN(val1)) ? val1 : prePostRoll;
@@ -2439,6 +2481,7 @@ $(document).ready(function () {
     });
 
     editor.player = $('#videoPlayer');
+    setCanplayTimeout();
     editor.player.on("canplay", playerReady);
 
     $('.video-split-button').click(splitButtonClick);
@@ -2448,12 +2491,13 @@ $(document).ready(function () {
 
     $('#deleteButton').button();
     $('#cancelButton').button();
+    $('#cancelButtonLoading').button();
     $('#okButton').button();
 
     initPlayButtons();
     addShortcuts();
 
-    $(document).keydown(function (e) {
+    $(document).keydown(function(e) {
         var keyCode = e.keyCode || e.which();
         if (keyCode == KEY_SPACE) {
             clearEvents2();
@@ -2465,7 +2509,7 @@ $(document).ready(function () {
             isSeeking = false;
             return true;
         }
-    }).keyup(function (e) {
+    }).keyup(function(e) {
         var keyCode = e.keyCode || e.which();
         if (!($('input:checked').length > 0) && ((keyCode == KEY_LEFT) || (keyCode == KEY_UP) || (keyCode == KEY_RIGHT) || (keyCode == KEY_DOWN))) {
             isSeeking = false;
@@ -2477,20 +2521,20 @@ $(document).ready(function () {
         }
     });
 
-    $(document).click(function () {
+    $(document).click(function() {
         if (!currSplitItemClickedViaJQ) {
             clearEvents2();
         }
         currSplitItemClickedViaJQ = false;
     });
 
-    $(document).on("sjs:buffering", function (event) {
+    $(document).on("sjs:buffering", function(event) {
         isBuffering = true;
-        this.bufferingTimeout = setTimeout(function () {
+        this.bufferingTimeout = setTimeout(function() {
             $(document).trigger("sjs:bufferedButNotAutoplaying", []);
         }, bufferingTimeoutMS);
     });
-    $(document).on("sjs:bufferedAndAutoplaying", function (event) {
+    $(document).on("sjs:bufferedAndAutoplaying", function(event) {
         isBuffering = false;
         if (this.bufferingTimeout) {
             clearTimeout(this.bufferingTimeout);
@@ -2499,7 +2543,7 @@ $(document).ready(function () {
             editor.saveSplitList(null);
         }
     });
-    $(document).on("sjs:bufferedButNotAutoplaying", function (event) {
+    $(document).on("sjs:bufferedButNotAutoplaying", function(event) {
         isBuffering = false;
         if (this.bufferingTimeout) {
             clearTimeout(this.bufferingTimeout);
@@ -2509,16 +2553,16 @@ $(document).ready(function () {
         }
     });
 
-    $(window).resize(function () {
+    $(window).resize(function() {
         if (this.resizeTO) {
             clearTimeout(this.resizeTO);
         }
-        this.resizeTO = setTimeout(function () {
+        this.resizeTO = setTimeout(function() {
             $(this).trigger('resizeEnd');
         }, windowResizeMS);
     });
 
-    $(window).bind('resizeEnd', function () {
+    $(window).bind('resizeEnd', function() {
         // window has not been resized in windowResizeMS ms
         editor.updateSplitList(false, !zoomedIn());
         selectCurrentSplitItem();
