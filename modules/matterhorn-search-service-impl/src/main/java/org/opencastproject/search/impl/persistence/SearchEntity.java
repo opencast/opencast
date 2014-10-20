@@ -35,13 +35,18 @@ import javax.persistence.TemporalType;
 @NamedQueries({
         @NamedQuery(name = "Search.findAll", query = "SELECT s FROM SearchEntity s"),
         @NamedQuery(name = "Search.getCount", query = "SELECT COUNT(s) FROM SearchEntity s"),
-        @NamedQuery(name = "Search.findById", query = "SELECT s FROM SearchEntity s WHERE s.mediaPackageId=:mediaPackageId") })
+        @NamedQuery(name = "Search.findById", query = "SELECT s FROM SearchEntity s WHERE s.mediaPackageId=:mediaPackageId"),
+        @NamedQuery(name = "Search.findBySeriesId", query = "SELECT s FROM SearchEntity s WHERE s.seriesId=:seriesId"),
+        @NamedQuery(name = "Search.getNoSeries", query = "SELECT s FROM SearchEntity s WHERE s.seriesId IS NULL")})
 public class SearchEntity {
 
   /** media package id, primary key */
   @Id
   @Column(name = "id", length = 128)
   private String mediaPackageId;
+
+  @Column(name = "series_id", length = 128)
+  protected String seriesId;
 
   /** Organization id */
   @Column(name = "organization", length = 128)
@@ -175,5 +180,22 @@ public class SearchEntity {
    */
   public void setModificationDate(Date modificationDate) {
     this.modificationDate = modificationDate;
+  }
+
+  /**
+   * @return the series Id for this search entry
+   */
+  public String getSeriesId() {
+    return seriesId;
+  }
+
+  /**
+   * Sets the series ID
+   *
+   * @param seriesId
+   *          the series ID
+   */
+  public void setSeriesId(String seriesId) {
+    this.seriesId = seriesId;
   }
 }

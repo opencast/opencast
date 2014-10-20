@@ -81,17 +81,6 @@ CREATE TABLE mh_capture_agent_state (
   CONSTRAINT FK_mh_capture_agent_state_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE TABLE mh_dictionary (
-  text VARCHAR(255) NOT NULL,
-  language VARCHAR(5) NOT NULL,
-  weight DOUBLE,
-  count BIGINT,
-  stop_word TINYINT(1) DEFAULT 0,
-  PRIMARY KEY (text, language)
-) ENGINE=InnoDB;
-
-CREATE INDEX IX_mh_dictionary_weight ON mh_dictionary (weight);
-
 CREATE TABLE mh_host_registration (
   id BIGINT NOT NULL,
   host VARCHAR(255) NOT NULL,
@@ -185,6 +174,15 @@ CREATE TABLE mh_job_context (
 
 CREATE INDEX IX_mh_job_context_id ON mh_job_context (id);
 
+CREATE TABLE mh_job_mh_service_registration (
+  Job_id BIGINT NOT NULL,
+  servicesRegistration_id BIGINT NOT NULL,
+  PRIMARY KEY (Job_id, servicesRegistration_id),
+  KEY mhjobmhservice_registrationservicesRegistration_id (servicesRegistration_id),
+  CONSTRAINT FK_mh_job_mh_service_registration_Job_id FOREIGN KEY (Job_id) REFERENCES mh_job (id) ON DELETE CASCADE,
+  CONSTRAINT mhjobmhservice_registrationservicesRegistration_id FOREIGN KEY (servicesRegistration_id) REFERENCES mh_service_registration (id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 CREATE TABLE mh_incident (
   id BIGINT NOT NULL,
   jobid BIGINT,
@@ -215,10 +213,11 @@ CREATE TABLE mh_scheduled_event (
 
 CREATE TABLE mh_search (
   id VARCHAR(128) NOT NULL,
+  series_id VARCHAR(128),
   organization VARCHAR(128),
   deletion_date DATETIME,
   access_control TEXT(65535),
-  mediapackage_xml TEXT(65535),
+  mediapackage_xml MEDIUMTEXT,
   modification_date DATETIME,
   PRIMARY KEY (id),
   CONSTRAINT FK_mh_search_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
@@ -278,7 +277,7 @@ CREATE TABLE mh_episode_episode (
   organization VARCHAR(128),
   deletion_date DATETIME,
   access_control TEXT(65535),
-  mediapackage_xml TEXT(65535),
+  mediapackage_xml MEDIUMTEXT,
   modification_date DATETIME,
   PRIMARY KEY (id, version, organization),
   CONSTRAINT FK_mh_episode_episode_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE

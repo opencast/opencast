@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.6-SNAPSHOT</version>
+    <version>1.7-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -86,12 +86,32 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-sox-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-videosegmenter-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-caption-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-smil-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-silencedetection-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-videoeditor-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -188,6 +208,7 @@
             </Private-Package>
             <Service-Component>
               OSGI-INF/events/series-updated.xml,
+              OSGI-INF/operations/analyze-audio.xml,
               OSGI-INF/operations/analyze-text.xml,
               OSGI-INF/operations/analyze-videosegments.xml,
               OSGI-INF/operations/append.xml,
@@ -202,6 +223,7 @@
               OSGI-INF/operations/concat.xml,
               OSGI-INF/operations/coverart.xml,
               OSGI-INF/operations/delete-archive.xml,
+              OSGI-INF/operations/editor.xml,
               OSGI-INF/operations/distribute-acl.xml,
               OSGI-INF/operations/distribute-mediapackagepost.xml,
               OSGI-INF/operations/download-dvd.xml,
@@ -218,6 +240,7 @@
               OSGI-INF/operations/ingest.xml,
               OSGI-INF/operations/ingest-download.xml,
               OSGI-INF/operations/inspect.xml,
+              OSGI-INF/operations/normalize-audio.xml,
               OSGI-INF/operations/prepare-av.xml,
               OSGI-INF/operations/republish.xml,
               OSGI-INF/operations/retract-engage.xml,
@@ -226,10 +249,12 @@
               OSGI-INF/operations/searchindex-remove.xml,
               OSGI-INF/operations/schedule.xml,
               OSGI-INF/operations/segmentpreviews.xml,
+              OSGI-INF/operations/silence.xml,
               OSGI-INF/operations/speech-recognition.xml,
               OSGI-INF/operations/tag.xml,
               OSGI-INF/operations/trim.xml,
               OSGI-INF/operations/zip.xml,
+              OSGI-INF/operations/waveform.xml,
               OSGI-INF/operations/watermark.xml
             </Service-Component>
           </instructions>

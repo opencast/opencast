@@ -12,10 +12,10 @@
         <% $.each(data[j].users, function(key, user) { %>
         <tr>
           <td class="ui-state-active">
-            <%= user.username %>
+            <%! user.username %>
           </td>
           <td class="ui-state-active">
-            <%= user.roles %>
+            <%! user.roles %>
           </td>
         </tr>
         <% }); %>

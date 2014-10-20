@@ -276,6 +276,25 @@ public interface ServiceRegistry {
   Job getJob(long id) throws NotFoundException, ServiceRegistryException;
 
   /**
+   * Deletes a job from the service registry
+   * 
+   * @param id
+   *          the job id
+   */
+  void removeJob(long id) throws NotFoundException, ServiceRegistryException;
+
+  /**
+   * Removes all jobs which do not have a parent job (except workflow instance jobs) and which have passed their
+   * lifetime.
+   * 
+   * @param lifetime
+   *          lifetime in days
+   * @throws ServiceRegistryException
+   *           if removing the jobs fails
+   */
+  void removeParentlessJobs(int lifetime) throws ServiceRegistryException;
+
+  /**
    * Gets the current running job
    *
    * @return the current job
@@ -393,6 +412,14 @@ public interface ServiceRegistry {
    *           if there is a problem accessing the service registry
    */
   List<ServiceStatistics> getServiceStatistics() throws ServiceRegistryException;
+
+  /**
+   * Gets the count of the number of abnormal services across the whole system.
+   *
+   * @return the count of abnormal services
+   * @throws ServiceRegistryException
+   */
+  long countOfAbnormalServices() throws ServiceRegistryException;
 
   /**
    * Count the number of jobs of this type in this {@link Status} across all hosts.

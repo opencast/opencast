@@ -283,7 +283,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     SearchQuery searchQuery = new SearchQuery();
     searchQuery.withLimit(limit);
     searchQuery.withOffset(offset);
-    searchQuery.withCreationDateSort(true);
+    searchQuery.withSort(SearchQuery.Sort.DATE_CREATED);
     switch (type) {
       case Atom:
         if (atomTags != null && atomTags.size() > 0)

@@ -4,7 +4,7 @@
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
   <packaging>pom</packaging>
-  <version>1.6-SNAPSHOT</version>
+  <version>1.7-SNAPSHOT</version>
   <name>matterhorn</name>
   <description>The Opencast Project's Matterhorn software is a media capture, processing, and distribution system</description>
   <url>http://opencastproject.org</url>
@@ -72,11 +72,16 @@
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
+        <module>modules/matterhorn-silencedetection-api</module>
+        <module>modules/matterhorn-smil-api</module>
+        <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static</module>
         <module>modules/matterhorn-solr</module>
+        <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-userdirectory</module>
+        <module>modules/matterhorn-videoeditor-api</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
@@ -127,6 +132,7 @@
         </property>
       </activation>
       <modules>
+        <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
@@ -378,13 +384,10 @@
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dictionary-api</module>
-        <module>modules/matterhorn-dictionary-textcorpora</module>
+        <module>modules/matterhorn-dictionary-regexp</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-service-impl</module>
-        <!--
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        -->
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -393,11 +396,19 @@
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
+        <module>modules/matterhorn-silencedetection-api</module>
+        <module>modules/matterhorn-silencedetection-impl</module>
+        <module>modules/matterhorn-smil-api</module>
+        <module>modules/matterhorn-smil-impl</module>
+        <module>modules/matterhorn-sox-api</module>
+        <module>modules/matterhorn-sox-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
         <module>modules/matterhorn-textextractor-tesseract</module>
         <module>modules/matterhorn-userdirectory</module>
+        <module>modules/matterhorn-videoeditor-api</module>
+        <module>modules/matterhorn-videoeditor-impl</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -422,13 +433,10 @@
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dictionary-api</module>
-        <module>modules/matterhorn-dictionary-textcorpora</module>
+        <module>modules/matterhorn-dictionary-regexp</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-service-impl</module>
-        <!--
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        -->
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-metadata-api</module>
@@ -437,11 +445,19 @@
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
+        <module>modules/matterhorn-silencedetection-api</module>
+        <module>modules/matterhorn-silencedetection-impl</module>
+        <module>modules/matterhorn-smil-api</module>
+        <module>modules/matterhorn-smil-impl</module>
+        <module>modules/matterhorn-sox-api</module>
+        <module>modules/matterhorn-sox-impl</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
         <module>modules/matterhorn-textextractor-tesseract</module>
         <module>modules/matterhorn-userdirectory</module>
+        <module>modules/matterhorn-videoeditor-api</module>
+        <module>modules/matterhorn-videoeditor-impl</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -472,9 +488,17 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-series-service-api</module>
+        <module>modules/matterhorn-silencedetection-api</module>
+        <module>modules/matterhorn-silencedetection-remote</module>
+        <module>modules/matterhorn-smil-api</module>
+        <module>modules/matterhorn-smil-impl</module>
+        <module>modules/matterhorn-sox-api</module>
+        <module>modules/matterhorn-sox-remote</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-remote</module>
+        <module>modules/matterhorn-videoeditor-api</module>
+        <module>modules/matterhorn-videoeditor-remote</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-remote</module>
         <module>modules/matterhorn-webconsole</module>
@@ -697,8 +721,9 @@
         </property>
       </activation>
       <modules>
-        <module>modules/matterhorn-inspection-service-ffmpeg</module>
+        <module>modules/matterhorn-inspection-service-impl</module>
         <module>modules/matterhorn-dictionary-none</module>
+        <module>modules/matterhorn-dictionary-hunspell</module>
       </modules>
     </profile>
 

@@ -29,6 +29,7 @@ import java.net.URL;
 
 /** OSGi bound implementation. */
 public final class ServiceRegistryRemoteImpl extends ServiceRegistryRemoteBase {
+
   /** The http client to use when connecting to remote servers */
   private TrustedHttpClient client;
 

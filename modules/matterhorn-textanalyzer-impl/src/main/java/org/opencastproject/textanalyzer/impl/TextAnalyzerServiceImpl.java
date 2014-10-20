@@ -34,6 +34,7 @@ import org.opencastproject.metadata.mpeg7.Mpeg7CatalogImpl;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition;
 import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
+import org.opencastproject.metadata.mpeg7.Textual;
 import org.opencastproject.metadata.mpeg7.Video;
 import org.opencastproject.metadata.mpeg7.VideoSegment;
 import org.opencastproject.metadata.mpeg7.VideoText;
@@ -51,7 +52,6 @@ import org.opencastproject.textextractor.api.TextFrame;
 import org.opencastproject.textextractor.api.TextLine;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
-import org.opencastproject.metadata.mpeg7.Textual;
 
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,7 +183,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
         throw new TextAnalyzerException(e);
       }
     } else {
-      attachment = (Attachment) image;
+      attachment = image;
       imageUrl = attachment.getURI();
     }
 
@@ -221,8 +222,14 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
       logger.info("Text extraction of {} finished, {} lines found", attachment.getURI(), videoTexts.length);
 
       URI uri;
+      InputStream in;
       try {
-        uri = workspace.putInCollection(COLLECTION_ID, job.getId() + ".xml", mpeg7CatalogService.serialize(mpeg7));
+        in = mpeg7CatalogService.serialize(mpeg7);
+      } catch (IOException e) {
+        throw new TextAnalyzerException("Error serializing mpeg7", e);
+      }
+      try {
+        uri = workspace.putInCollection(COLLECTION_ID, job.getId() + ".xml", in);
       } catch (IOException e) {
         throw new TextAnalyzerException("Unable to put mpeg7 into the workspace", e);
       }

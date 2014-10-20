@@ -22,6 +22,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.HostRegistrationParser;
 import org.opencastproject.serviceregistry.api.IncidentService;
@@ -38,11 +39,13 @@ import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.QueryStringBuilder;
+import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -679,6 +682,32 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
     throw new ServiceRegistryException("Unable to get service statistics (" + responseStatusCode + ")");
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCountOfAbnormalServices()
+   */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @Override
+  public long countOfAbnormalServices() throws ServiceRegistryException {
+    QueryStringBuilder queryStringBuilder = new QueryStringBuilder("servicewarnings");
+    final HttpGet get = get(queryStringBuilder.toString());
+    HttpResponse response = null;
+    int responseStatusCode;
+    try {
+      response = getHttpClient().execute(get);
+      responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_OK) {
+        return Long.parseLong(EntityUtils.toString(response.getEntity()));
+      }
+    } catch (IOException e) {
+      throw new ServiceRegistryException("Unable to get service statistics", e);
+    } finally {
+      getHttpClient().close(response);
+    }
+    throw new ServiceRegistryException("Unable to get service statistics (" + responseStatusCode + ")");
+  }
+
   @Override
   public SystemLoad getLoad() throws ServiceRegistryException {
     throw new UnsupportedOperationException();
@@ -731,6 +760,56 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
       getHttpClient().close(response);
     }
     throw new IllegalStateException("Unable to get service statistics (" + responseStatusCode + ")");
+  }
+
+  @Override
+  public void removeJob(long id) throws NotFoundException, ServiceRegistryException {
+    HttpDelete delete = new HttpDelete(UrlSupport.concat(getServiceUrl(), "job", String.valueOf(id)));
+
+    HttpResponse response = null;
+    int responseStatusCode;
+    try {
+      response = getHttpClient().execute(delete);
+      responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
+        return;
+      } else if (responseStatusCode == HttpStatus.SC_NOT_FOUND) {
+        throw new NotFoundException();
+      }
+    } catch (TrustedHttpClientException e) {
+      throw new ServiceRegistryException(e);
+    } finally {
+      getHttpClient().close(response);
+    }
+    throw new ServiceRegistryException("Unable to remove job with ID " + id + " (" + responseStatusCode + ")");
+  }
+
+  @Override
+  public void removeParentlessJobs(int lifetime) throws ServiceRegistryException {
+    HttpPost post = post("removeparentlessjobs");
+
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("lifetime", String.valueOf(lifetime)));
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (UnsupportedEncodingException e) {
+      throw new IllegalStateException(e);
+    }
+
+    HttpResponse response = null;
+    try {
+      response = getHttpClient().execute(post);
+      int responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
+        logger.info("Parentless jobs successfully removed");
+        return;
+      }
+    } catch (TrustedHttpClientException e) {
+      throw new ServiceRegistryException(e);
+    } finally {
+      getHttpClient().close(response);
+    }
+    throw new ServiceRegistryException("Unable to remove parentless jobs");
   }
 
   @Override

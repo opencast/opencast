@@ -72,6 +72,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   /** The job identifier */
   protected AtomicLong idCounter = new AtomicLong();
 
+  /** Holds the current running job */
+  protected Job currentJob = null;
+
   /**
    * An (optional) security service. If set to a non-null value, this will be used to obtain the current user when
    * creating new jobs.
@@ -336,6 +339,16 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     return job;
   }
 
+  @Override
+  public void removeJob(long id) throws NotFoundException, ServiceRegistryException {
+    synchronized (jobs) {
+      if (!jobs.containsKey(id))
+        throw new NotFoundException("No job with ID '" + id + "' found");
+
+      jobs.remove(id);
+    }
+  }
+
   /**
    * Dispatches the job to the least loaded service or throws a <code>ServiceUnavailableException</code> if there is no
    * such service.
@@ -431,7 +444,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
           result.add(job);
 
         Long parentJobId = job.getParentJobId();
-        while (parentJobId != null) {
+        while (parentJobId != null && parentJobId > 0) {
           try {
             Job parentJob = getJob(job.getParentJobId());
             if (parentJob.getParentJobId().equals(id)) {
@@ -564,7 +577,17 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    */
   @Override
   public List<ServiceStatistics> getServiceStatistics() throws ServiceRegistryException {
-    throw new IllegalStateException("Operation not yet implemented");
+    throw new UnsupportedOperationException("Operation not yet implemented");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countOfAbnormalServices()
+   */
+  @Override
+  public long countOfAbnormalServices() throws ServiceRegistryException {
+    throw new UnsupportedOperationException("Operation not yet implemented");
   }
 
   /**
@@ -749,19 +772,36 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   @Override
   public Job getCurrentJob() {
-    // TODO Auto-generated method stub
-    return null;
+    return this.currentJob;
   }
 
   @Override
   public void setCurrentJob(Job job) {
-    // TODO Auto-generated method stub
+    this.currentJob = job;
   }
 
   @Override
   public List<HostRegistration> getHostRegistrations() throws ServiceRegistryException {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public void removeParentlessJobs(int lifetime) throws ServiceRegistryException {
+    synchronized (jobs) {
+      for (String serializedJob : jobs.values()) {
+        Job job = null;
+        try {
+          job = JobParser.parseJob(serializedJob);
+        } catch (IOException e) {
+          throw new IllegalStateException("Error unmarshaling job", e);
+        }
+
+        Long parentJobId = job.getParentJobId();
+        if (parentJobId == null | parentJobId < 1)
+          jobs.remove(job.getId());
+      }
+    }
   }
 
 }
