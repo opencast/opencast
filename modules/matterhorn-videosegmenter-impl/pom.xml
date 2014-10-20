@@ -11,7 +11,7 @@
   </parent>
   <properties>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
-    <checkstyle.skip>true</checkstyle.skip>
+    <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
     <!-- Matterhorn dependencies -->
@@ -26,11 +26,6 @@
       <version>${project.version}</version>
     </dependency>
     <!--  Thirdparty dependencies -->
-    <dependency>
-      <groupId>javax.media</groupId>
-      <artifactId>jmf</artifactId>
-      <version>2.1.1e</version>
-    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
