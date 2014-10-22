@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.videosegmenter.impl;
+package org.opencastproject.videosegmenter.ffmpeg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,7 +47,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.workspace.api.Workspace;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -75,7 +74,7 @@ public class VideoSegmenterTest {
   protected static final long mediaDuration = 20000L;
 
   /** Duration of the first segment */
-  protected static final long firstSegmentDuration = 11000L;
+  protected static final long firstSegmentDuration = 12000L;
 
   /** Duration of the seconds segment */
   protected static final long secondSegmentDuration = mediaDuration - firstSegmentDuration;

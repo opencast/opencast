@@ -724,6 +724,7 @@
         <module>modules/matterhorn-inspection-service-impl</module>
         <module>modules/matterhorn-dictionary-none</module>
         <module>modules/matterhorn-dictionary-hunspell</module>
+        <module>modules/matterhorn-videosegmenter-ffmpeg</module>
       </modules>
     </profile>
 
