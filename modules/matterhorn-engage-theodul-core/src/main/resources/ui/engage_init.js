@@ -34,6 +34,9 @@ requirejs.config({
         },
         "basil": {
             exports: "Basil"
+        },
+        "punch": {
+            deps: ["jquery", "jquery-ui"]
         }
     }
 });
