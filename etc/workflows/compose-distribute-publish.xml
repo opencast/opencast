@@ -217,6 +217,7 @@
     <!-- encode preview and editor base file as H.264 -->
     <operation
       id="compose"
+      if="${trimHold}"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Encoding videos for videoeditor preview">
@@ -277,6 +278,7 @@
       <configurations>
         <configuration key="source-flavors">*/preview</configuration>
         <configuration key="preview-flavors">*/preview</configuration>
+        <configuration key="skipped-flavors">*/work</configuration>
         <configuration key="smil-flavors">*/smil</configuration>
         <configuration key="target-smil-flavor">episode/smil</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>

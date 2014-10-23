@@ -79,6 +79,10 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
    */
   private static final String PREVIEW_FLAVORS_PROPERTY = "preview-flavors";
   /**
+   * Name of the configuration option that provides the source flavors on skipped videoeditor operation.
+   */
+  private static final String SKIPPED_FLAVORS_PROPERTY = "skipped-flavors";
+  /**
    * Name of the configuration option that provides the smil flavor as input.
    */
   private static final String SMIL_FLAVORS_PROPERTY = "smil-flavors";
@@ -102,11 +106,20 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
 
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_FLAVORS_PROPERTY, "The flavor for working files (tracks to edit).");
-    CONFIG_OPTIONS.put(PREVIEW_FLAVORS_PROPERTY, "The flavor for preview files (tracks to show in edit UI).");
-    CONFIG_OPTIONS.put(SMIL_FLAVORS_PROPERTY, "The flavor for input smil files.");
-    CONFIG_OPTIONS.put(TARGET_SMIL_FLAVOR_PROPERTY, "The flavor for target smil file.");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR_SUBTYPE_PROPERTY, "The flavor subtype for target media files.");
+    CONFIG_OPTIONS.put(SOURCE_FLAVORS_PROPERTY,
+            "The flavor for working files (tracks to edit).");
+    CONFIG_OPTIONS.put(PREVIEW_FLAVORS_PROPERTY,
+            "The flavor for preview files (tracks to show in edit UI).");
+    CONFIG_OPTIONS.put(SKIPPED_FLAVORS_PROPERTY,
+            "The flavor for working files if videoeditor operation is disabled."
+            + " This is an optional option."
+            + " Default value is given by \"" + SOURCE_FLAVORS_PROPERTY + "\".");
+    CONFIG_OPTIONS.put(SMIL_FLAVORS_PROPERTY,
+            "The flavor for input smil files.");
+    CONFIG_OPTIONS.put(TARGET_SMIL_FLAVOR_PROPERTY,
+            "The flavor for target smil file.");
+    CONFIG_OPTIONS.put(TARGET_FLAVOR_SUBTYPE_PROPERTY,
+            "The flavor subtype for target media files.");
   }
 
   /**
@@ -289,9 +302,13 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
 
     // get configuration
     WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();
-    String sourceTrackFlavorsProperty = StringUtils.trimToNull(worflowOperationInstance.getConfiguration(SOURCE_FLAVORS_PROPERTY));
-    if (sourceTrackFlavorsProperty == null) {
-      throw new WorkflowOperationException(String.format("Required configuration property %s not set.", SOURCE_FLAVORS_PROPERTY));
+    String sourceTrackFlavorsProperty = StringUtils.trimToNull(worflowOperationInstance.getConfiguration(SKIPPED_FLAVORS_PROPERTY));
+    if (sourceTrackFlavorsProperty == null || sourceTrackFlavorsProperty.isEmpty()) {
+      logger.info("\"{}\" option not set, use value of \"{}\"", SKIPPED_FLAVORS_PROPERTY, SOURCE_FLAVORS_PROPERTY);
+      sourceTrackFlavorsProperty = StringUtils.trimToNull(worflowOperationInstance.getConfiguration(SOURCE_FLAVORS_PROPERTY));
+      if (sourceTrackFlavorsProperty == null) {
+        throw new WorkflowOperationException(String.format("Required configuration property %s not set.", SOURCE_FLAVORS_PROPERTY));
+      }
     }
     String targetFlavorSubTypeProperty = StringUtils.trimToNull(worflowOperationInstance.getConfiguration(TARGET_FLAVOR_SUBTYPE_PROPERTY));
     if (targetFlavorSubTypeProperty == null) {
