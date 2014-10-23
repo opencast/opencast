@@ -18,9 +18,7 @@
 .displayWrapper {
 	height: inherit;
 }
-.resizeDemo {
-	border: 2px solid black;
-}
+
 @media screen and (orientation:landscape) {
 	.mobileVideoBox {
 		float:left;
@@ -33,24 +31,7 @@
 
 @media screen and (orientation:portrait) {
 	.mobileVideoBox {
-		width: 98%;
+		width: 98% !important;
 		margin-bottom: 10px;
 	}
-}
-
-.triangle-down-right {
-    width: 25%;
-    height: 0;
-    padding-top:25%;
-    overflow: hidden;
-}
-.triangle-down-right:after {
-    content: "";
-    display: block;
-    width: 0;
-    height: 0;
-    margin-top:-500px;
-     
-    border-top: 500px solid transparent;
-    border-right: 500px solid #4679BD;
 }

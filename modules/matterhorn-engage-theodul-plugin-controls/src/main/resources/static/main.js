@@ -235,10 +235,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                 this.$el.html(_.template(this.template, tempVars));
                 if (isDesktopMode || isMobileMode) {
                     initControlsEvents();
-
+                    if (isMobileMode) {
+                        initMobileEvents();
+                    };
                     // init dropdown menus
                     $("." + class_dropdown).dropdown();
                 }
+
             }
         }
     });
@@ -554,6 +557,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         }
     }
 
+    function initMobileEvents() {
+        console.log("Init Mobile Events in Control");
+        events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
+        events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
+        Engage.on(events.tapHold.getName(), function(display) {
+            console.log("Control: " + display);
+        });
+    }
     /**
      * getVolume
      */

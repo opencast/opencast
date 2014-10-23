@@ -248,7 +248,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
                 $(window).on("orientationchange", function(event) {
                     Engage.log("Video: Device twisted");
-                    checkVideoDisplaySize();
                     orderVideoDisplays(videoDisplays);
                 });
 
@@ -456,24 +455,13 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
                     console.group("Mobile Mode");
 
+                    // some specific mobile events
+                    events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
+                    events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
+
                     // total number of video displays and all active
                     var totalVideoDisplays  = videoDisplays.length;
                     var activeVideoDisplays = videoDisplays.length;
-
-                    // max size of display
-                    // minus footer and header
-                    var maxHeight = $(window).height() - 105;
-                    var maxWidth = $(window).width();
-
-                    var videoWidth = 0;
-                    var videoHeight = 0;
-
-                    var ratio = 0;
-
-                    console.log("Total: " + totalVideoDisplays + " with " + activeVideoDisplays + " active");
-                    console.log("Size of Area (w/h): " + maxWidth + "/" + maxHeight);
-
-                    //checkVideoDisplaySize();
 
                     // Init of videoDisplays
                     var i = 0;
@@ -484,47 +472,15 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                             ++i;
                         }
                     }
-
-                    // trigger event
                     Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
+                    orderVideoDisplays(videoDisplays);
 
-                    if ((aspectRatio != null) && (videoDisplays.length > 0)) {
-                        aspectRatio[1] = parseInt(aspectRatio[1]);
-                        aspectRatio[2] = parseInt(aspectRatio[2]);
-
-                        videoWidth = aspectRatio[1];
-                        videoHeight = aspectRatio[2];
-
-                        ratio = (aspectRatio[2] / aspectRatio[1])
-                        console.log("Calculated Ratio: " + ratio);
-                        
-                        Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
-                    } else {
-                        Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
-                    }
                     
-                    console.log("Calculated max. Videosize (w/h): " + videoWidth + "/" + videoHeight);
-
-                    // Set to init size
-                    $('.mobileVideoBox').height(videoHeight);
-                    $('.mobileVideoBox').width(videoWidth);
-
-                    console.log("Set Videobox to (w/h): "+$('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
                     
-                    if (videoWidth >= maxWidth) {
-                        console.log("Nicht breit genug:")
-                        var calcWidth = $('.mobileVideoBox').width(maxWidth * 0.8).width();
-                        $('.mobileVideoBox').height(calcWidth * ratio);
-                    }
-
-                    if (videoHeight >= maxHeight) {
-                        console.log("Nicht hoch genug");
-                        var calcHeight = $('.mobileVideoBox').height(maxHeight * 0.8).height();
-                        $('.mobileVideoBox').width(calcHeight * ratio);
-                    }
-
-
-                    console.log("Set Videobox finally to (w/h): "+$('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
+                    $(".displayWrapper").on('taphold', function(event) {
+                        console.log(event);
+                        Engage.trigger(plugin.events.tapHold.getName(), event.currentTarget.id);
+                    });
 
                     // Insert here init displays
                     // Show poster
@@ -600,8 +556,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                         }
 
                     }
-                    // Set Displays to correct size
-                    orderVideoDisplays(videoDisplays);
                 }
                 if (this.model.get("type") != "audio") {
                     checkVideoDisplaySize();
@@ -679,34 +633,60 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     }
 
     function orderVideoDisplays(videoDisplays) {
-        Engage.log(Engage.model.get("orientation"));
-        /*if (Engage.model.get("orientation") == "portrait") {
-            $("." + id_videoDisplayClass).css("width", "100%");
-            $("." + id_videoDisplayClass).css("height", (((1 / videoDisplays.length) * 100) - 2) + "%");
-        } else if (Engage.model.get("orientation") == "landscape") {
-            $("." + id_videoDisplayClass).css("height", "100%");
-            $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 2) + "%");
-        }*/
+                 // max size of display
+                    // minus footer and header
+                    var maxHeight = $(window).height() - 105;
+                    var maxWidth = $(window).width();
+
+                    var videoWidth = 0;
+                    var videoHeight = 0;
+
+                    var ratio = 0;
+
+                    console.log("Size of Area (w/h): " + maxWidth + "/" + maxHeight);
+
+                    if ((aspectRatio != null) && (videoDisplays.length > 0)) {
+                        aspectRatio[1] = parseInt(aspectRatio[1]);
+                        aspectRatio[2] = parseInt(aspectRatio[2]);
+
+                        videoWidth = aspectRatio[1];
+                        videoHeight = aspectRatio[2];
+
+                        ratio = (aspectRatio[2] / aspectRatio[1])
+                        console.log("Calculated Ratio: " + ratio);
+                        
+                        Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
+                    } else {
+                        Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
+                    }
+                    
+                    console.log("Calculated max. Videosize (w/h): " + videoWidth + "/" + videoHeight);
+
+                    // Set to init size
+                    $('.mobileVideoBox').height(videoHeight);
+                    $('.mobileVideoBox').width(videoWidth);
+
+                    console.log("Set Videobox to (w/h): "+$('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
+                    console.log("Breite: " + videoWidth);
+
+                    if (videoWidth > maxWidth) {
+                        console.log("Nicht breit genug:");
+                        $('.mobileVideoBox').width(maxWidth * 0.8);
+                        $('.mobileVideoBox').height((maxWidth * 0.8) * ratio);
+                    }
+
+                    if (videoHeight > maxHeight) {
+                        console.log("Nicht hoch genug");
+                        var calcHeight = $('.mobileVideoBox').height(maxHeight * 0.8).height();
+                        $('.mobileVideoBox').width( (maxHeight * 0.8)/ratio);
+                    }
+
     }
 
     function checkVideoDisplaySize() {
         // make sure the video height is not greater than the window height
         if (Engage.model.get("mode") == "mobile") {
-            /*var headerHeight = $('#mobile-header').height();
-            var footerHeight = $('#mobile-footer').height();
 
-            var total = headerHeight + footerHeight;
-            console.log("Calculating: " + headerHeight);
-            console.log("And: " + footerHeight);
-
-            if (Engage.model.get("orientation") == "portrait") {
-                $("#" + id_engageContent).css("height", ($(window).height()-total) * 0.9);
-                $("#" + id_engageContent).css("width", $(window).width() * 0.9);
-            } else if (Engage.model.get("orientation") == "landscape") {
-                $("#" + id_engageContent).css("height", ($(window).height()-total) * 0.9);
-                $("#" + id_engageContent).css("width", $(window).width() * 0.9);
-            };
-        */
         } else {
             $("#" + id_engageContent).css("max-width", "");
             for (var i = 0; i < videoDisplaySizeTimesCheck; ++i) {
