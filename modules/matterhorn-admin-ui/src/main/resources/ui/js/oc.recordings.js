@@ -973,6 +973,8 @@ ocRecordings = new (function() {
           $.cookie("filterField", field);
           $.cookie("filterText", text);
           ocRecordings.Configuration.page = 0;
+        } else {
+          this.clear();
         }
         refresh();
       },
