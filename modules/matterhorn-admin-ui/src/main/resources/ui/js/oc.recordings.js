@@ -894,6 +894,8 @@ ocRecordings = new (function() {
           ocRecordings.Configuration.filterField = field;
           ocRecordings.Configuration.filterText = text;
           ocRecordings.Configuration.page = 0;
+        } else {
+          this.clear();
         }
         refresh();
       },
