@@ -18,7 +18,7 @@ var WORKFLOW_RESTSERVICE = '/workflow/instance/';
 var DUBLIN_CORE_NS_URI = 'http://purl.org/dc/terms/';
 
 var postData = {
-    'id': parent.document.getElementById("holdWorkflowId").value
+    'id': ''
 };
 
 var catalogUrl = '';
@@ -29,57 +29,13 @@ var seriesChanged = false;
 var seriesServiceURL = false;
 var workflowInstance = null;
 var player = null;
+var tracks = {};
 var previewTracks = [];
-
-var inpoint = 0;
-var outpoint = 0;
-
-// Variables for the "In point"- and "Out point"- increase-/decrease-Buttons
-var secondsForward = 1;
-var secondsBackward = 1;
+var recordDate = null;
 
 var intervalTimer = 0;
-// Timeout of the Intervall Timer
 var timerTimeout = 1500;
 var timerSet = false; // -> temporary solution. clearInterval(timer) does not work properly
-
-function initCategories() {
-    var options = '';
-    for (var key in iTunesCategories) {
-        options += '<option value="' + key + '">' + iTunesCategories[key]['name']
-    }
-    $('#categorySelector').html(options);
-}
-
-function changedCategory() {
-    var categoryId = $('#categorySelector').val();
-    var options = '';
-
-    var category = iTunesCategories[categoryId];
-    options += '<option value="' + categoryId + '">-- Choose a Subcategory --</option>';
-    for (var i = 0; i < category['subCategories'].length; i++) {
-        var sub = category['subCategories'][i];
-        options += '<option value="' + sub.value + '">' + sub.name + '</option>';
-    }
-    $("#category").html(options);
-    changedSubCategory();
-}
-
-function changedSubCategory() {
-    var subject = $('#category option:selected').index() == 0 ? $('#categorySelector option:selected').text() : $('#category option:selected').text();
-    $("#meta-subject").val(subject);
-}
-
-function addSelectValues(selectId, from, to) {
-    for (var i = from; i <= to; i++) {
-        var option = $('<option/>');
-        option.attr({
-            'value': i
-        });
-        option.html(zeroFill(i, 2));
-        $('#' + selectId).append(option);
-    }
-}
 
 function zeroFill(number, width) {
     width -= number.toString().length;
@@ -88,288 +44,6 @@ function zeroFill(number, width) {
     }
     return number + ""; // always return a string
 }
-
-$(document).ready(function() {
-    addSelectValues('startTimeHour', 0, 23);
-    addSelectValues('startTimeMin', 0, 59);
-
-    $("#seriesLabel, #series").hide(); // TODO: Correct series code and comment in
-
-    var id = postData.id;
-    initCategories();
-    $('#categorySelector').change(function() {
-        changedCategory();
-    });
-    $('#category').change(function() {
-        changedSubCategory();
-    });
-    if (id == "") {
-        return;
-    }
-    var recordDate = null;
-    $('#recordDate').datepicker({
-        showOn: 'both',
-        buttonImage: '/admin/img/icons/calendar.gif',
-        buttonImageOnly: true,
-        dateFormat: 'yy-mm-dd'
-    });
-
-    $('.oc-ui-form-field').change(function() {
-        metadataChanged = true;
-    });
-
-    // load tracks
-    var tracks = {};
-    tracks.tracks = [];
-
-    $.ajax({
-        url: WORKFLOW_RESTSERVICE + id + ".json",
-        async: false,
-        success: function(data) {
-            // extract tracks
-            workflowInstance = data.workflow;
-            data = data.workflow.mediapackage.media.track;
-            var singleFile = true;
-            for (i = 0; i < data.length; i++) {
-                if (data[i].type.indexOf("work") != -1) {
-                    tracks.tracks.push(data[i]);
-                } else if (data[i].type.indexOf("preview") != -1) {
-                    previewTracks.push(data[i]);
-                }
-            }
-
-            // populate series field if information
-            var seriesid = workflowInstance.mediapackage.series;
-            if (seriesid) {
-                $('#ispartof').val(seriesid);
-                $('#series').val(workflowInstance.mediapackage.seriestitle);
-                $('#info-series')[0].innerHTML = workflowInstance.mediapackage.seriestitle;
-            }
-
-            // load metadata from DC xml for editing
-            $.each(ocUtils.ensureArray(workflowInstance.mediapackage.metadata.catalog), function(key, value) {
-                if (value.type == "dublincore/episode") {
-                    catalogUrl = value.url;
-                }
-            });
-            $.ajax({
-                url: catalogUrl,
-                dataType: 'xml',
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    $('div#errorMessage').html('error: ' + textStatus);
-                },
-                success: function(data) {
-                    DCmetadata = data;
-                    $(data.documentElement).children().each(function(index, elm) {
-                        var tagName = elm.tagName.split(/:/)[1];
-                        if ($(elm).text() != '') {
-                            $('#meta-' + tagName).val($(elm).text());
-                            if ($('#info-' + tagName).length > 0)
-                                $('#info-' + tagName)[0].innerHTML = $(elm).text();
-                            if (tagName === "category") {
-                                value = $(elm).text();
-                                $('#categorySelector').val(value.substr(0, 3));
-                                changedCategory();
-                                if (value.length > 3) {
-                                    $('#category').val(value);
-                                    changedSubCategory();
-                                }
-                            }
-                            if (tagName === "created") {
-                                $('#recordDate').datepicker('setDate', new Date($(elm).text()));
-                                $('#startTimeHour').val((new Date($(elm).text())).getHours());
-                                $('#startTimeMin').val((new Date($(elm).text())).getMinutes());
-                            }
-                        }
-                    });
-
-                    // save information that
-                    // some metadata changed
-                    $('.dcMetaField').change(function() {
-                        metadataChanged = true;
-                    });
-                    $('.ocMetaField').change(function() {
-                        metadataChanged = true;
-                    });
-                }
-            });
-        }
-    });
-
-    // create player
-    $('#videoPlayer').prepend('<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>');
-    player = $('#videoPlayer').mhPlayer({
-        fps: ((previewTracks[0] && previewTracks[0].video && previewTracks[0].video.framerate) ? previewTracks[0].video.framerate : 0),
-        duration: previewTracks[0].duration / 1000
-    });
-
-    if (previewTracks.length == 2) {
-        var videoSlave = '<video id="videoPlayerSlave"> Your browser does not support HTML5 video.</video>';
-        videoSlave = $(videoSlave).prepend(
-            '<source src="' + previewTracks[1].url + '" type="' + previewTracks[1].mimetype + '"/>')
-        $('#videoPlayer').after(videoSlave);
-        $('#videoPlayer').after('<div id="video_overlay_msg"></div>');
-
-        $('#videoPlayerSlave').show();
-
-        $("#video_overlay_msg").html("Loading videos...").show();
-        $.synchronizeVideos(0, "videoPlayer", "videoPlayerSlave");
-        $(document).on("sjs:buffering", function(event) {
-            // $("#video_overlay_msg").html("The videos are currently buffering...").show(); // TODO: Comment in
-        });
-        $(document).on("sjs:allPlayersReady", function(event) {
-            $("#video_overlay_msg").html("").hide();
-        });
-        $(document).on("sjs:bufferedAndAutoplaying", function(event) {
-            $("#video_overlay_msg").html("").hide();
-        });
-        $(document).on("sjs:bufferedButNotAutoplaying", function(event) {
-            $("#video_overlay_msg").html("").hide();
-        });
-    } else {
-        $('#videoPlayer').css("width", "100%");
-    }
-
-    $('#trackForm').append($('#template').jqote(tracks));
-
-    $('input[id^="chk"]').click(function(event) {
-        if ($("input:checked").length == 0) {
-            $('#trackError').show();
-            $(event.currentTarget).prop("checked", true);
-        } else {
-            $('#trackError').hide();
-        }
-    });
-
-    // create Buttons
-    $('.ui-button').button();
-    // disable continue
-    // $('#continueBtn').button('disable');
-
-    // hide some stuff we don't want to see
-    window.parent.$('#uploadContainer').hide(0);
-    $('#trimming-hint').toggle();
-
-    window.parent.$('#controlsTop').hide(0);
-    window.parent.$('#searchBox').hide(0);
-    window.parent.$('#tableContainer').hide(0);
-    window.parent.ocRecordings.disableRefresh();
-    window.parent.ocRecordings.stopStatisticsUpdate();
-    window.parent.$('#controlsFoot').hide(0);
-
-    $.ajax({
-        url: '/workflow/instance/' + id + '.xml',
-        dataType: 'xml',
-        success: function(data) {
-            // clone mediapackage for editing
-            mediapackage = ocUtils.createDoc('mediapackage', '');
-
-            $.xmlns["mp"] = "http://mediapackage.opencastproject.org";
-
-            $(data).find('mediapackage').clone();
-
-            var clone = $(data).find('mediapackage').clone();
-
-            $(clone).children().appendTo($(mediapackage.documentElement));
-            $(mediapackage.documentElement).attr('id', $(clone).attr('id'));
-            $(mediapackage.documentElement).attr('start', $(clone).attr('start'));
-            $(mediapackage.documentElement).attr('duration', $(clone).attr('duration'));
-        }
-    })
-
-    // save information that some metadata changed
-    $('.dcMetaField').change(function() {
-        metadataChanged = true;
-    });
-    $('.ocMetaField').change(function() {
-        metadataChanged = true;
-    });
-
-    // Event: collapsable title clicked, de-/collapse collapsables
-    $('.collapse-control2').click(function() {
-        $('#ui-icon').toggleClass('ui-icon-triangle-1-e');
-        $('#ui-icon').toggleClass('ui-icon-triangle-1-s');
-        $(this).next('.collapsable').toggle();
-        parent.ocRecordings.adjustHoldActionPanelHeight();
-    });
-
-    // TODO: use JSONP here so we can call services provided by other hosts in a distributed deployment
-    var thisHost = window.location.protocol + '//' + window.location.host;
-    $.ajax({
-        type: 'GET',
-        url: '/services/services.json',
-        data: {
-            serviceType: 'org.opencastproject.series',
-            host: thisHost
-        },
-        dataType: 'json',
-        success: function(data) {
-            if (data.services.service !== undefined) {
-                seriesServiceURL = data.services.service.host + data.services.service.path;
-                $('#series').removeAttr('disabled');
-                ocUtils.log('Initializing autocomplete for series field')
-                $('#series')
-                    .autocomplete({
-                        source: function(request, response) {
-                            $.ajax({
-                                url: seriesServiceURL + '/series.json?q=' + request.term,
-                                dataType: 'json',
-                                type: 'GET',
-                                success: function(data) {
-                                    var series_list = [];
-                                    $.each(data.catalogs, function() {
-                                        series_list.push({
-                                            value: this[DUBLIN_CORE_NS_URI]['title'][0].value,
-                                            id: this[DUBLIN_CORE_NS_URI]['identifier'][0].value
-                                        });
-                                    });
-                                    response(series_list);
-                                },
-                                error: function() {
-                                    ocUtils.log('could not retrieve series_data');
-                                }
-                            });
-                        },
-                        select: function(event, ui) {
-                            $('#ispartof').val(ui.item.id);
-                        },
-                        change: function(event, ui) {
-                            if ($('#ispartof').val() === '' && $('#series').val() !== '') {
-                                ocUtils.log("Searching for series in series endpoint");
-                                $
-                                    .ajax({
-                                        url: seriesServiceURL + '/series.json?seriesTitle=' + $('#series').val(),
-                                        type: 'get',
-                                        dataType: 'json',
-                                        success: function(data) {
-                                            var series_input = $('#series').val(),
-                                                series_list = data["catalogs"],
-                                                series_title, series_id;
-
-                                            if (series_list.length !== 0) {
-                                                series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
-                                                series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
-                                                $('#ispartof').val(series_id);
-                                            }
-                                        }
-                                    });
-                            } else if ($('#ispartof').val() === '' && $('#series').val() === '') {
-                                $('#ispartof').val('');
-                            }
-                        },
-                        search: function() {
-                            $('#ispartof').val('');
-                        }
-                    });
-                $('#series').change(function() {
-                    seriesChanged = true;
-                });
-            }
-        }
-    });
-
-    parent.ocRecordings.adjustHoldActionPanelHeight();
-});
 
 /**
  * Returns the Input Time in Milliseconds
@@ -475,16 +149,6 @@ function in_de_creaseObject(obj, val) {
             }
         }
     }
-}
-
-/**
- * calculates the new length of the media and shows the result in the according field
- */
-function calculateNewLength() {
-    inPoint = getTimeInMilliseconds($('#inPoint').val());
-    outPoint = getTimeInMilliseconds($('#outPoint').val());
-    newLength = (outPoint - inPoint) / 1000;
-    $('#newLength').val(getTimeString(Math.floor(newLength / 3600), Math.floor(newLength / 60), newLength % 60));
 }
 
 /**
@@ -637,52 +301,55 @@ function continueWorkflowHelper() {
 }
 
 /**
- * Continues the Workflow
+ * continues the workflow
  */
 function continueWorkflow() {
     editor.saveSplitList(continueWorkflowHelper);
 }
 
+/**
+ * cancels the operation
+ */
 function cancel() {
     window.parent.location.href = "/admin";
-    // window.parent.location.href = window.parent.location.href;
 }
 
 function updateDCMetadata() {
     ocUtils.log("Updating DC metadata");
 
-    $('.dcMetaField').each(
-        function() {
-            var $field = $(this);
-            var fieldname = $field.attr('name');
-            if (fieldname === 'created') {
-                recordDate = $('#recordDate').datepicker('getDate').getTime() / 1000; // Get date in milliseconds, convert to seconds
+    $('.dcMetaField').each(function() {
+        var $field = $(this);
+        var fieldname = $field.attr('name');
+        if (fieldname == 'created') {
+            if ($('#recordDate').val() != "") {
+                // get date in milliseconds, convert to seconds
+                recordDate = ($('#recordDate').datepicker('getDate') && $('#recordDate').datepicker('getDate').getTime()) ? ($('#recordDate').datepicker('getDate').getTime() / 1000) : 0;
                 recordDate += $('#startTimeHour').val() * 3600;
                 // hour to seconds, add to date
                 recordDate += $('#startTimeMin').val() * 60;
                 // minutes to seconds, add to date
                 recordDate = recordDate * 1000; // back to milliseconds
-                recordDate = ocUtils.toISODate(recordDate); // = (new Date(recordDate)).format("isoUTCdateTime");
+                recordDate = ocUtils.toISODate(recordDate);
             }
-            if ($field.val() != '') {
-                var $dcelm = false; // $(DCmetadata.documentElement).find('dcterms\\:' + $field.attr('name'));
-                $(DCmetadata.documentElement).children().each(function(index, elm) {
-                    if (elm.tagName == 'dcterms:' + fieldname) {
-                        $dcelm = $(elm);
-                    }
-                });
-                if ($dcelm !== false) {
-                    ocUtils.log("updating " + $field.attr('name') + " to: " + $field.val());
-                    $field.attr('name') === "created" ? $dcelm.text(recordDate) : $dcelm.text($field.val());
-                } else {
-                    ocUtils.log("creating " + $field.attr('name') + " with value: " + $field.val());
-                    $field.attr('name') === "created" ? $('<dcterms:' + $field.attr('name') + '>').text(recordDate).appendTo(
-                        DCmetadata.documentElement) : $('<dcterms:' + $field.attr('name') + '>').text($field.val()).appendTo(
-                        DCmetadata.documentElement);
+        }
+        if ($field.val() != '') {
+            var $dcelm = false;
+            $(DCmetadata.documentElement).children().each(function(index, elm) {
+                if (elm.tagName == 'dcterms:' + fieldname) {
+                    $dcelm = $(elm);
                 }
+            });
+            if ($dcelm !== false) {
+                ocUtils.log("updating " + $field.attr('name') + " to: " + $field.val());
+                $field.attr('name') === "created" ? $dcelm.text(recordDate) : $dcelm.text($field.val());
+            } else {
+                ocUtils.log("creating " + $field.attr('name') + " with value: " + $field.val());
+                $field.attr('name') === "created" ? $('<dcterms:' + $field.attr('name') + '>').text(recordDate).appendTo(
+                    DCmetadata.documentElement) : $('<dcterms:' + $field.attr('name') + '>').text($field.val()).appendTo(
+                    DCmetadata.documentElement);
             }
-        });
-
+        }
+    });
 }
 
 // Update the MediaPackage instances metadata fields
@@ -779,3 +446,345 @@ function saveDCMetadata() {
         }
     });
 }
+
+
+/***********************************************************************/
+/***********************************************************************/
+
+function loadTracks() {
+    ocUtils.log("Loading tracks");
+
+    tracks.tracks = [];
+    ocUtils.log("Loading workflow instance data from '" + WORKFLOW_RESTSERVICE + postData.id + ".json" + "'");
+    $.ajax({
+        url: WORKFLOW_RESTSERVICE + postData.id + ".json",
+        async: false,
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            ocUtils.log("Done: Loading workflow instance, ERROR: " + textStatus + ", " + errorThrown);
+            $('div#errorMessage').html('error: ' + textStatus);
+        },
+        success: function(data) {
+            ocUtils.log("Done: Loading workflow instance data");
+
+            // extract tracks
+            workflowInstance = data.workflow;
+            data = data.workflow.mediapackage.media.track;
+            var singleFile = true;
+            for (i = 0; i < data.length; i++) {
+                if (data[i].type.indexOf("work") != -1) {
+                    tracks.tracks.push(data[i]);
+                } else if (data[i].type.indexOf("preview") != -1) {
+                    previewTracks.push(data[i]);
+                }
+            }
+
+            // populate series field if information
+            var seriesid = workflowInstance.mediapackage.series;
+            if (seriesid) {
+                $('#ispartof').val(seriesid);
+                $('#series').val(workflowInstance.mediapackage.seriestitle);
+                $('#info-series')[0].innerHTML = workflowInstance.mediapackage.seriestitle;
+            }
+
+            // load metadata from DC xml for editing
+            $.each(ocUtils.ensureArray(workflowInstance.mediapackage.metadata.catalog), function(key, value) {
+                if (value.type == "dublincore/episode") {
+                    catalogUrl = value.url;
+                }
+            });
+
+            ocUtils.log("Loading catalog data from '" + catalogUrl + "'");
+            $.ajax({
+                url: catalogUrl,
+                dataType: 'xml',
+                async: false,
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    ocUtils.log("Done: Loading catalog data, ERROR: " + textStatus + ", " + errorThrown);
+                    $('div#errorMessage').html('error: ' + textStatus);
+                },
+                success: function(data) {
+                    ocUtils.log("Done: Loading catalog data");
+
+                    DCmetadata = data;
+                    $(data.documentElement).children().each(function(index, elm) {
+                        var tagName = elm.tagName.split(/:/)[1];
+                        if ($(elm).text() != '') {
+                            $('#meta-' + tagName).val($(elm).text());
+                            if ($('#info-' + tagName).length > 0)
+                                $('#info-' + tagName)[0].innerHTML = $(elm).text();
+                            if (tagName === "category") {
+                                value = $(elm).text();
+                                $('#categorySelector').val(value.substr(0, 3));
+                                changedCategory();
+                                if (value.length > 3) {
+                                    $('#category').val(value);
+                                    changedSubCategory();
+                                }
+                            }
+                            if (tagName === "created") {
+                                $('#recordDate').datepicker('setDate', new Date($(elm).text()));
+                                $('#startTimeHour').val((new Date($(elm).text())).getHours());
+                                $('#startTimeMin').val((new Date($(elm).text())).getMinutes());
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+    ocUtils.log("Done: Loading tracks");
+}
+
+function createPlayer() {
+    ocUtils.log("Creating player");
+    ocUtils.log("#Preview tracks: " + previewTracks.length);
+    ocUtils.log("Preview track #1: URL: '" + previewTracks[0].url + "', type='" + previewTracks[0].mimetype + "'");
+
+    $('#videoPlayer').prepend('<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>');
+
+    var fps = (previewTracks[0] && previewTracks[0].video && previewTracks[0].video.framerate) ? previewTracks[0].video.framerate : 0;
+    var duration = previewTracks[0].duration / 1000;
+    ocUtils.log("FPS: '" + fps + "',  duration: '" + duration + "'");
+
+    player = $('#videoPlayer').mhPlayer({
+        fps: fps,
+        duration: duration
+    });
+
+    if (previewTracks.length >= 2) {
+        ocUtils.log("Preview track #1: URL: '" + previewTracks[1].url + "', type='" + previewTracks[1].mimetype + "'");
+
+        var videoSlave = '<video id="videoPlayerSlave">Your browser does not support HTML5 video.</video>';
+        videoSlave = $(videoSlave).prepend('<source src="' + previewTracks[1].url + '" type="' + previewTracks[1].mimetype + '"/>')
+        $('#videoPlayer').after(videoSlave);
+        $('#videoPlayer').after('<div id="video_overlay_msg"></div>');
+
+        $('#videoPlayerSlave').show();
+
+        $("#video_overlay_msg").html("Loading videos...").show();
+        $.synchronizeVideos(0, "videoPlayer", "videoPlayerSlave");
+        $(document).on("sjs:buffering", function(event) {
+            // $("#video_overlay_msg").html("The videos are currently buffering...").show(); // TODO: Comment in
+        });
+        $(document).on("sjs:allPlayersReady", function(event) {
+            $("#video_overlay_msg").html("").hide();
+        });
+        $(document).on("sjs:bufferedAndAutoplaying", function(event) {
+            $("#video_overlay_msg").html("").hide();
+        });
+        $(document).on("sjs:bufferedButNotAutoplaying", function(event) {
+            $("#video_overlay_msg").html("").hide();
+        });
+    } else {
+        $('#videoPlayer').css("width", "100%");
+    }
+
+    ocUtils.log("Done: Creating player");
+}
+
+function changedCategory() {
+    var categoryId = $('#categorySelector').val();
+    var options = '';
+
+    var category = iTunesCategories[categoryId];
+    options += '<option value="' + categoryId + '">-- Choose a Subcategory --</option>';
+    for (var i = 0; i < category['subCategories'].length; i++) {
+        var sub = category['subCategories'][i];
+        options += '<option value="' + sub.value + '">' + sub.name + '</option>';
+    }
+    $("#category").html(options);
+    changedSubCategory();
+}
+
+function changedSubCategory() {
+    var subject = $('#category option:selected').index() == 0 ? $('#categorySelector option:selected').text() : $('#category option:selected').text();
+    $("#meta-subject").val(subject);
+}
+
+function setSelectValues(selectId, from, to) {
+    for (var i = from; i <= to; i++) {
+        var option = $('<option/>');
+        option.attr({
+            'value': i
+        });
+        option.html(zeroFill(i, 2));
+        $('#' + selectId).append(option);
+    }
+}
+
+function initUI() {
+    ocUtils.log("Initializing UI");
+
+    setSelectValues('startTimeHour', 0, 23);
+    setSelectValues('startTimeMin', 0, 59);
+
+    $('#recordDate').datepicker({
+        showOn: 'both',
+        buttonImage: '/admin/img/icons/calendar.gif',
+        buttonImageOnly: true,
+        dateFormat: 'yy-mm-dd'
+    });
+
+    // load categories
+    var options = '';
+    for (var key in iTunesCategories) {
+        options += '<option value="' + key + '">' + iTunesCategories[key]['name']
+    }
+    $('#categorySelector').html(options);
+
+    $('#trackForm').append($('#template').jqote(tracks));
+
+    // event: collapsable title clicked, de-/collapse collapsables
+    $('.collapse-control2').click(function() {
+        $('#ui-icon').toggleClass('ui-icon-triangle-1-e');
+        $('#ui-icon').toggleClass('ui-icon-triangle-1-s');
+        $(this).next('.collapsable').toggle();
+        parent.ocRecordings.adjustHoldActionPanelHeight();
+    });
+
+    // create buttons
+    $('.ui-button').button();
+
+    // hide some stuff we don't want to see
+    $("#seriesLabel, #series").hide(); // TODO: Correct series code and comment in
+    window.parent.ocRecordings.disableRefresh();
+    window.parent.ocRecordings.stopStatisticsUpdate();
+    window.parent.$('#uploadContainer, #controlsTop, #searchBox, #tableContainer, #controlsFoot').hide();
+    $('#trimming-hint').toggle();
+
+    $('input[id^="chk"]').click(function(event) {
+        if ($("input:checked").length == 0) {
+            $('#trackError').show();
+            $(event.currentTarget).prop("checked", true);
+        } else {
+            $('#trackError').hide();
+        }
+    });
+    $('#categorySelector').change(function() {
+        changedCategory();
+    });
+    $('#category').change(function() {
+        changedSubCategory();
+    });
+    $('.oc-ui-form-field').change(function() {
+        metadataChanged = true;
+    });
+    $('.dcMetaField').change(function() {
+        metadataChanged = true;
+    });
+    $('.ocMetaField').change(function() {
+        metadataChanged = true;
+    });
+    $('#series').change(function() {
+        seriesChanged = true;
+    });
+
+    parent.ocRecordings.adjustHoldActionPanelHeight();
+
+    ocUtils.log("Done: Initializing UI");
+}
+
+function initSeriesAutocomplete() {
+    ocUtils.log("Initializing series autocomplete field");
+
+    $('#series').autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: '/series/series.json?q=' + request.term,
+                dataType: 'json',
+                type: 'GET',
+                success: function(data) {
+                    var series_list = [];
+                    $.each(data.catalogs, function() {
+                        series_list.push({
+                            value: this[DUBLIN_CORE_NS_URI]['title'][0].value,
+                            id: this[DUBLIN_CORE_NS_URI]['identifier'][0].value
+                        });
+                    });
+                    response(series_list);
+                    $('#series').removeAttr('disabled');
+                },
+                error: function() {
+                    ocUtils.log('Could not retreive series data');
+                }
+            });
+        },
+        select: function(event, ui) {
+            $('#ispartof').val(ui.item.id);
+        },
+        change: function(event, ui) {
+            if ($('#ispartof').val() === '' && $('#series').val() !== '') {
+                ocUtils.log("Searching for series in series endpoint");
+                $.ajax({
+                    url: seriesServiceURL + '/series.json?seriesTitle=' + $('#series').val(),
+                    type: 'get',
+                    dataType: 'json',
+                    success: function(data) {
+                        var series_input = $('#series').val(),
+                            series_list = data["catalogs"],
+                            series_title, series_id;
+
+                        if (series_list.length != 0) {
+                            series_title = series_list[0][DUBLIN_CORE_NS_URI]["title"] ? series_list[0][DUBLIN_CORE_NS_URI]["title"][0].value : "";
+                            series_id = series_list[0][DUBLIN_CORE_NS_URI]["identifier"] ? series_list[0][DUBLIN_CORE_NS_URI]["identifier"][0].value : "";
+                            $('#ispartof').val(series_id);
+                        }
+                    }
+                });
+            } else if (($('#ispartof').val() == '') && ($('#series').val() == '')) {
+                $('#ispartof').val('');
+            }
+        },
+        search: function() {
+            $('#ispartof').val('');
+        }
+    });
+
+    ocUtils.log("Done: Initializing series autocomplete field");
+}
+
+function getWorkflowInstanceData() {
+    ocUtils.log("Getting workflow instance data");
+
+    $.ajax({
+        url: '/workflow/instance/' + postData.id + '.xml',
+        dataType: 'xml',
+        async: false,
+        success: function(data) {
+            // clone mediapackage for editing
+            mediapackage = ocUtils.createDoc('mediapackage', '');
+            $.xmlns["mp"] = "http://mediapackage.opencastproject.org";
+            $(data).find('mediapackage').clone();
+            var clone = $(data).find('mediapackage').clone();
+            $(clone).children().appendTo($(mediapackage.documentElement));
+            $(mediapackage.documentElement).attr('id', $(clone).attr('id'));
+            $(mediapackage.documentElement).attr('start', $(clone).attr('start'));
+            $(mediapackage.documentElement).attr('duration', $(clone).attr('duration'));
+            ocUtils.log("Workflow instance data: 'id' = '" + $(clone).attr('id') + "', 'start' = '" + $(clone).attr('start') + "', 'duration' = '" + $(clone).attr('duration') + "'");
+        }
+    });
+
+    ocUtils.log("Done: Getting workflow instance data");
+}
+
+function getPostdataId() {
+    ocUtils.log("Getting post data ID");
+
+    postData.id = parent.document.getElementById("holdWorkflowId").value;
+
+    ocUtils.log("Post data ID = '" + postData.id + "'");
+    ocUtils.log("Done: Getting post data ID");
+
+    return (postData.id != "");
+}
+
+$(document).ready(function() {
+    if (getPostdataId()) {
+        loadTracks();
+        initUI();
+        getWorkflowInstanceData();
+        initSeriesAutocomplete();
+        createPlayer();
+    }
+});
