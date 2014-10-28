@@ -47,5 +47,18 @@
       </ns3:video>
     </ns3:track>
   </ns3:media>
+  <ns3:metadata>
+    <ns3:catalog type="presenter/smil" id="8515934d-b016-4369-8715-69b30c46c810">
+      <ns3:mimetype>text/xml</ns3:mimetype>
+      <ns3:tags/>
+      <ns3:url>/smil_filled.smil</ns3:url>
+    </ns3:catalog>
+    <ns3:catalog type="episode/smil" id="8515934d-b016-4369-8715-69b30c46c111">
+      <ns3:mimetype>text/xml</ns3:mimetype>
+      <ns3:tags/>
+      <ns3:url>/smil_filled.smil</ns3:url>
+    </ns3:catalog>
+  </ns3:metadata>
+  <ns3:attachments/>
   <ns3:publications/>
 </ns3:mediapackage>
