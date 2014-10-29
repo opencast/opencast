@@ -16,12 +16,18 @@
       <% $.each(service.servers, function (key, server) { %>
       <tr valign="top">
         <td class="ui-state-active">
-            <img style="vertical-align:middle; margin-right:5px;" src=<% if (server.online) { %><% if(server.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %> "/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/>
-		  	<% if (server.state != "NORMAL") { %>
-		  	<img style="vertical-align:middle; margin-right:5px;" src=<% if (server.state == "WARNING") { %>"/admin/img/icons/lightbulb.png" title="Warning State" <% } else { %> "/admin/img/icons/exclamation.png" title="Error State" <% } %>/>
-		  	<a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-right:5px;" href="host=<%! server.host %>&serviceType=<%! server.type %>">Sanitize</a>
-		  	<% } %>
-			<span style="vertical-align:middle;"><%! server.host %></span>
+          <img style="vertical-align:middle; margin-right:5px; width: 16px; height: 16px;"
+            src=<% if (server.online) { %><% if(server.maintenance) { %>"/admin/img/icons/maintenance.png"
+            title="Maintenance Mode"<% } else { %> "/admin/img/icons/available.png"
+            title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/>
+          <% if (server.state != "NORMAL") { %>
+          <img style="vertical-align:middle; margin-right:5px; width: 16px; height: 16px;"
+            src=<% if (server.state == "WARNING") { %>"/admin/img/icons/lightbulb.png"
+            title="Warning State" <% } else { %> "/admin/img/icons/exclamation.png" title="Error State" <% } %>/>
+          <a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-right:5px;"
+            href="host=<%! server.host %>&serviceType=<%! server.type %>">Sanitize</a>
+          <% } %>
+          <span style="vertical-align:middle;"><%! server.host %></span>
         </td>
         <td class="ui-state-active center">
           <%! server.finished %>

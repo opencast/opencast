@@ -1,7 +1,12 @@
 <div>
   <% $.each(data[j].serversView, function(key, server) { %>
-  <h2><img src=<% if (server.online) { %><% if (server.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %>"/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/> <%! server.host %></h2>
-  <input class="server-maintenance" value="<%! server.online %>" name="<%! server.host %>" type="checkbox" <% if (server.maintenance) { %> checked="checked" <% } %>> Maintenance</input>
+  <h2><img style="width: 16px; height: 16px;"
+    src=<% if (server.online) { %><% if (server.maintenance) { %>"/admin/img/icons/maintenance.png"
+    title="Maintenance Mode"<% } else { %>"/admin/img/icons/available.png"
+    title="Online"<% } } else {%>"/admin/img/icons/offline.png"
+    title="Offline"<% } %>/> <%! server.host %></h2>
+  <input class="server-maintenance" value="<%! server.online %>" name="<%! server.host %>"
+    type="checkbox" <% if (server.maintenance) { %> checked="checked" <% } %>> Maintenance</input>
   <table id="statsTable" class="ui-widget" cellspacing="0" width="100%">
     <thead>
       <tr>
@@ -17,11 +22,17 @@
       <% $.each(server.services, function(key, service) { %>
       <tr valign="top">
         <td class="ui-state-active">
-          <img style="vertical-align:middle; margin-right:5px;" src=<% if (service.online) { %><% if (service.maintenance) { %>"/admin/img/icons/maintenance.png" title="Maintenance Mode"<% } else { %> "/admin/img/icons/available.png" title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/>
+          <img style="vertical-align:middle; margin-right:5px; width: 16px; height: 16px;"
+            src=<% if (service.online) { %><% if (service.maintenance) { %>"/admin/img/icons/maintenance.png"
+            title="Maintenance Mode"<% } else { %> "/admin/img/icons/available.png"
+            title="Online"<% } } else {%>"/admin/img/icons/offline.png" title="Offline"<% } %>/>
           <% if (service.state != "NORMAL") { %>
-		  <img style="vertical-align:middle; margin-right:5px;" src=<% if (service.state == "WARNING") { %>"/admin/img/icons/lightbulb.png" title="Warning State" <% } else { %> "/admin/img/icons/exclamation.png" title="Error State" <% } %>/>
-		  <a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-right: 5px;" href="host=<%! server.host %>&serviceType=<%! service.type %>">Sanitize</a>
-		  <% } %>
+          <img style="vertical-align:middle; margin-right:5px; width: 16px; height: 16px;"
+            src=<% if (service.state == "WARNING") { %>"/admin/img/icons/lightbulb.png"
+            title="Warning State" <% } else { %> "/admin/img/icons/exclamation.png" title="Error State" <% } %>/>
+          <a class="service-sanitize" title="Sanitize" style="vertical-align:middle; margin-right: 5px;"
+            href="host=<%! server.host %>&serviceType=<%! service.type %>">Sanitize</a>
+          <% } %>
           <span style="vertical-align:middle;"><%! ocStatistics.labelName(service.id) %></span>
         </td>
         <td class="ui-state-active center">
