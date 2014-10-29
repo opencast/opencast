@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Before;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.smil.api.SmilService;
@@ -56,7 +57,6 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
-import org.springframework.util.Assert;
 
 /**
  * Test class for {@link VideoEditorWorkflowOperationHandler}
@@ -148,7 +148,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
     WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration());
 
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.start(workflowInstance, null);
-    Assert.notNull(result, "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult");
+    Assert.assertNotNull("VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
     EasyMock.verify(workspaceMock);
 
     WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();
@@ -159,7 +159,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
 
     // each preview track (e.g. presenter/preview) should have an own smil catalog in media package
     Catalog[] previewSmilCatalogs = result.getMediaPackage().getCatalogs(new MediaPackageElementFlavor("presenter", "smil"));
-    Assert.notEmpty(previewSmilCatalogs);
+    Assert.assertTrue(previewSmilCatalogs != null && previewSmilCatalogs.length > 0);
     for (Track track : result.getMediaPackage().getTracks()) {
       if (track.getFlavor().matches(previewFlavor)) {
         boolean smilCatalogFound = false;
@@ -172,25 +172,29 @@ public class VideoEditorWorkflowOperationHandlerTest {
             break;
           }
         }
-        Assert.isTrue(smilCatalogFound,
-                "Mediapackage doesn't contain a smil catalog with flavor " + trackSmilFlavor.toString());
+        Assert.assertTrue("Mediapackage doesn't contain a smil catalog with flavor "
+                + trackSmilFlavor.toString(),
+                smilCatalogFound);
       }
     }
 
     // an "target-smil-flavor catalog" schould be in media package
     String targetSmilFlavorProperty = worflowOperationInstance.getConfiguration("target-smil-flavor");
     Catalog[] episodeSmilCatalogs = result.getMediaPackage().getCatalogs(MediaPackageElementFlavor.parseFlavor(targetSmilFlavorProperty));
-    Assert.notEmpty(episodeSmilCatalogs,
-            "Mediapackage should contain catalog with flavor " + targetSmilFlavorProperty);
-    Assert.isTrue(episodeSmilCatalogs[0].getURI().compareTo(URI.create(episodeSmilUri)) == 0,
-            "Target smil catalog URI does not match");
+    Assert.assertTrue(
+            "Mediapackage should contain catalog with flavor " + targetSmilFlavorProperty,
+            episodeSmilCatalogs != null && episodeSmilCatalogs.length > 0);
+    Assert.assertTrue("Target smil catalog URI does not match",
+            episodeSmilCatalogs[0].getURI().compareTo(URI.create(episodeSmilUri)) == 0);
   }
 
   @Test
   public void testEditorOperationSkip() throws WorkflowOperationException {
     WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration());
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.skip(workflowInstance, null);
-    Assert.notNull(result, "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult");
+    Assert.assertNotNull(
+            "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult",
+            result);
 
     // mediapackage should contain new derived track with flavor given by "target-flavor-subtype" configuration
     WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();
@@ -200,14 +204,18 @@ public class VideoEditorWorkflowOperationHandlerTest {
     TrackSelector trackSelector = new TrackSelector();
     trackSelector.addFlavor(skippedFlavorsProperty);
     Collection<Track> skippedTracks = trackSelector.select(result.getMediaPackage(), false);
-    Assert.notEmpty(skippedTracks, "Mediapackage does not contain any tracks matching flavor " + skippedFlavorsProperty);
+    Assert.assertTrue("Mediapackage does not contain any tracks matching flavor "
+            + skippedFlavorsProperty,
+            skippedTracks != null && !skippedTracks.isEmpty());
 
     for (Track skippedTrack : skippedTracks) {
       MediaPackageElementFlavor derivedTrackFlavor = MediaPackageElementFlavor.flavor(
               skippedTrack.getFlavor().getType(), targetFlavorSubtypeProperty);
       MediaPackageElement[] derivedElements = result.getMediaPackage().getDerived(
               skippedTrack, derivedTrackFlavor);
-      Assert.notEmpty(derivedElements, "Media package should contain track with flavor " + derivedTrackFlavor.toString());
+      Assert.assertTrue("Media package should contain track with flavor "
+              + derivedTrackFlavor.toString(),
+              derivedElements != null && derivedElements.length > 0);
     }
   }
 
@@ -218,7 +226,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
     configuration.put("target-flavor-subtype", "edited");
     WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mp, configuration);
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.skip(workflowInstance, null);
-    Assert.notNull(result, "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult");
+    Assert.assertNotNull("VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
 
     // mediapackage should contain new derived track with flavor given by "target-flavor-subtype" configuration
     WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();
@@ -228,16 +236,20 @@ public class VideoEditorWorkflowOperationHandlerTest {
     TrackSelector trackSelector = new TrackSelector();
     trackSelector.addFlavor(skippedFlavorsProperty);
     Collection<Track> skippedTracks = trackSelector.select(result.getMediaPackage(), false);
-    Assert.notEmpty(skippedTracks, "Mediapackage does not contain any tracks matching flavor " + skippedFlavorsProperty);
+    Assert.assertTrue("Mediapackage does not contain any tracks matching flavor "
+            + skippedFlavorsProperty,
+            skippedTracks != null && !skippedTracks.isEmpty());
 
     for (Track skippedTrack : skippedTracks) {
       MediaPackageElementFlavor derivedTrackFlavor = MediaPackageElementFlavor.flavor(
               skippedTrack.getFlavor().getType(), targetFlavorSubtypeProperty);
       MediaPackageElement[] derivedElements = result.getMediaPackage().getDerived(
               skippedTrack, derivedTrackFlavor);
-      Assert.notEmpty(derivedElements, "Media package should contain track with flavor " + derivedTrackFlavor.toString());
-      Assert.isTrue(derivedElements[0].getFlavor().getSubtype().equals(targetFlavorSubtypeProperty),
-              "Mediapackage schould contain a derived track with flavor subtype " + targetFlavorSubtypeProperty);
+      Assert.assertTrue("Media package should contain track with flavor " + derivedTrackFlavor.toString(),
+              derivedElements != null && derivedElements.length > 0);
+      Assert.assertTrue("Mediapackage schould contain a derived track with flavor subtype "
+              + targetFlavorSubtypeProperty,
+              derivedElements[0].getFlavor().getSubtype().equals(targetFlavorSubtypeProperty));
     }
   }
 
@@ -246,7 +258,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
           URISyntaxException, NotFoundException, IOException, ProcessFailedException, ServiceRegistryException, MediaPackageException {
     // filled smil file
     URI episodeSmilURI = VideoEditorWorkflowOperationHandlerTest.class
-            .getResource("/smil_filled.smil").toURI();
+            .getResource("/editor_smil_filled.smil").toURI();
     File episodeSmilFile = new File(episodeSmilURI);
 
     // setup mock services
@@ -281,7 +293,9 @@ public class VideoEditorWorkflowOperationHandlerTest {
     WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mpSmil, getDefaultConfiguration());
     // run test
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.resume(workflowInstance, null, null);
-    Assert.notNull(result, "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult");
+    Assert.assertNotNull(
+            "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult",
+            result);
 
     EasyMock.verify(workspaceMock, job, serviceRegistry, videoEditorServiceMock);
 
@@ -293,15 +307,18 @@ public class VideoEditorWorkflowOperationHandlerTest {
     TrackSelector trackSelector = new TrackSelector();
     trackSelector.addFlavor(sourceFlavorsProperty);
     Collection<Track> sourceTracks = trackSelector.select(result.getMediaPackage(), false);
-    Assert.notEmpty(sourceTracks, "Mediapackage does not contain any tracks matching flavor " + sourceFlavorsProperty);
+    Assert.assertTrue("Mediapackage does not contain any tracks matching flavor "
+            + sourceFlavorsProperty,
+            sourceTracks != null && !sourceTracks.isEmpty());
 
     for (Track sourceTrack : sourceTracks) {
       MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.flavor(
               sourceTrack.getFlavor().getType(), targetFlavorSubtypeProperty);
 
       Track[] targetTracks = result.getMediaPackage().getTracks(targetFlavor);
-      Assert.notEmpty(targetTracks,
-              "Media package doesn't contain track with flavor " + targetFlavor.toString());
+      Assert.assertTrue("Media package doesn't contain track with flavor "
+              + targetFlavor.toString(),
+              targetTracks != null && targetTracks.length > 0);
     }
   }
 }
