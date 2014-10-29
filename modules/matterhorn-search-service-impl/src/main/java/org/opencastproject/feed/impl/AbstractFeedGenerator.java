@@ -644,12 +644,16 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         trackLength = 0;
         if (((TrackImpl) element).hasVideo()) {
           List<VideoStream> video = ((TrackImpl) element).getVideo();
-          trackLength += metadata.getDcExtent() / 1000 * video.get(0).getBitRate() / 8;
+          if (video != null && video.get(0) != null && video.get(0).getBitRate() != null) {
+            trackLength += metadata.getDcExtent() / 1000 * video.get(0).getBitRate() / 8;
+          }
         }
 
         if (((TrackImpl) element).hasAudio()) {
           List<AudioStream> audio = ((TrackImpl) element).getAudio();
-          trackLength += metadata.getDcExtent() / 1000 * audio.get(0).getBitRate() / 8;
+          if (audio != null && audio.get(0) != null && audio.get(0).getBitRate() != null) {
+            trackLength += metadata.getDcExtent() / 1000 * audio.get(0).getBitRate() / 8;
+          }
         }
       }
 
