@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
   <id>retract</id>
-  <title>Retract media package</title>
+  <title>Retract Media</title>
   <tags>
 	<tag>archive</tag>
   </tags>
@@ -16,15 +16,15 @@
           <span>
             <input id="engage" name="engage" type="checkbox" checked="checked" class="configField" value="Matterhorn Engage Player" />
             <span>&nbsp;Matterhorn Engage Player</span>
-            <input id="youtube" name="youtube" type="checkbox" checked="checked" class="configField" value="Youtube" />
+            <input id="youtube" name="youtube" type="checkbox" checked="checked" class="configField" value="YouTube" />
             <span>&nbsp;Youtube</span>
           </span>
         </li>
       </ul>
     </fieldset>
 
-    <script type="text/javascript">   
-      var ocWorkflowPanel = ocWorkflowPanel || {};        
+    <script type="text/javascript">
+      var ocWorkflowPanel = ocWorkflowPanel || {};
       ocWorkflowPanel.registerComponents = function(components){
         /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
          * into the workflow. The new ocAdmin.Component key must match the components array key.
@@ -53,7 +53,7 @@
   ]]>
   </configuration_panel>
   <operations>
-  
+
     <!-- Retract from engage player -->
 
     <operation
@@ -61,7 +61,7 @@
       fail-on-error="true"
       exception-handler-workflow="error"
       if="${engage}"
-      description="Retract media package from the engage player">
+      description="Retract media package from Engage Player">
     </operation>
 
     <!-- Retract from youtube -->
@@ -71,7 +71,7 @@
       fail-on-error="true"
       exception-handler-workflow="error"
       if="${youtube}"
-      description="Retract media package from youtube">
+      description="Retract media package from YouTube">
     </operation>
 
     <!-- Archive the current state of the mediapackage -->
@@ -84,7 +84,7 @@
     </operation>
 
     <!-- Cleanup the working file repository -->
- 
+
     <operation
       id="cleanup"
       fail-on-error="false"
@@ -93,7 +93,7 @@
         <configuration key="preserve-flavors"></configuration>
       </configurations>
     </operation>
-  
+
   </operations>
-  
+
 </definition>
