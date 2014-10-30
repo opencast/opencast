@@ -650,6 +650,21 @@ install_prog() {
       [ $? -ne 0 ] && return 1
       ;;
     Debian )
+      case "$1" in
+        xz ) prog=xz-utils ;;
+      # yacc ) prog="flex bison" ;;
+        yacc ) prog=bison ;;
+        perl-dbi ) prog=libdbi-perl ;;
+        git ) prog=git-core ;;
+        ImageMagick ) prog=imagemagick ;;
+        gsl-devel ) prog=libgsl0-dev ;;
+        gmp ) prog=libgmp10 ;;
+        zlib-devel ) prog=zlib1g-dev ;;
+        Xext-devel ) prog="libx11-dev libxpm-dev x11proto-xext-dev libxext-dev" ;;
+        * ) prog="$1" ;;
+      esac
+      sudox apt-get -y install $prog
+      [ $? -ne 0 ] && return 1
       ;;
     openSUSE )
       ;;
@@ -848,6 +863,22 @@ preinstall_scons() {
   return 0
 }
 #
+disable_cdrom_src() {
+  TMPFILE=`mktemp /tmp/${0##*/}-sources.list.XXXXX`
+  sudox awk '{
+    if (match($0, "(deb|deb-src)[ \t]+cdrom:")) {
+      sub("^[ \t]*", "");
+      if (!match($0, "^#")) { printf("# "); }
+    }
+    print $0;
+  }' /etc/apt/sources.list > $TMPFILE
+  [ $? -ne 0 ] && return 1
+  sudox cp $TMPFILE /etc/apt/sources.list
+  [ $? -ne 0 ] && return 1
+  sudox rm -f $TMPFILE
+  return 0
+}
+#
 check_prereq() {
   case `os` in
     CentOS | RHEL | SciL )
@@ -901,6 +932,7 @@ check_prereq() {
       chkprog wget    || install_prog wget     || return 1
       chkprog zip     || install_prog zip      || return 1
       chkprog unzip   || install_prog unzip    || return 1
+      chkprog xz      || install_prog xz       || return 1
       chkprog alien   || install_prog alien    || return 1
       chkprog gcc     || install_prog gcc      || return 1
       chkprog g++     || install_prog g++      || return 1
@@ -939,6 +971,48 @@ check_prereq() {
       fi
       ;;
     Debian )
+      disable_cdrom_src || return 1
+      sudox apt-get update || return 1
+      #
+      chkprog wget    || install_prog wget     || return 1
+      chkprog zip     || install_prog zip      || return 1
+      chkprog unzip   || install_prog unzip    || return 1
+      chkprog xz      || install_prog xz       || return 1
+      chkprog gcc     || install_prog gcc      || return 1
+      chkprog g++     || install_prog g++      || return 1
+      chkprog yacc    || install_prog yacc     || return 1
+      chkprog patch   || install_prog patch    || return 1
+      chkprog libtool || install_prog libtool  || return 1
+      # this was reported as missing on some systems and is needed by git
+      chkprog dbiprof || install_prog perl-dbi || return 1
+      chkprog git     || install_prog git      || return 1
+      # These are needed for Windows compile
+      chkprog jam     || install_prog jam      || return 1
+      chkprog yasm    || preinstall_yasm       || return 1
+      chkprog scons   || preinstall_scons      || return 1
+      #fix_scons || return 1
+      #
+      # convert (part of ImageMagick) is needed by ocropus_libs/iulib
+      #chkprog convert || install_prog ImageMagick  || return 1
+      #
+      # automake is missing on some systems and is needed by gsl-devel
+      chkprog automake   || install_prog automake  || return 1
+      # gsl-devel is needed by ocropus
+      chkprog gsl-config || install_prog gsl-devel || return 1
+      #
+      # desktop-file-utils is needed by some versions of rpmlint
+      chkprog desktop-file-install || install_prog desktop-file-utils || return 1
+      #
+      # libgmp is missing on some systems and is needed by mingw32-gcc
+      chklib gmp || install_prog gmp || return 1
+      #
+      if [ ! -f /usr/include/zlib.h ]; then
+        install_prog zlib-devel || return 1
+      fi
+      # check for X11 extensions files
+      if [ ! -f /usr/include/X11/extensions/XShm.h ]; then
+        install_prog Xext-devel || return 1
+      fi
       ;;
     openSUSE )
       ;;

@@ -33,6 +33,7 @@ Opencast.pager = (function ()
         var OFFSET = 2;
         // variables
         var LINK_PREFIX;
+        var linkParams;
         var text;
         var link;
         var currentPageId;
@@ -41,9 +42,25 @@ Opencast.pager = (function ()
         var spanBeforeSet = false;
         var spanAfterSet = false;
         $('.navigation').empty();
-        if (getCurrentSearchQuery() != null) LINK_PREFIX = "index.html?q=" + getCurrentSearchQuery() + "&page=";
-        else
-        LINK_PREFIX = "index.html?page=";
+        LINK_PREFIX = "index.html";
+        linkParams = "?";
+
+        // Add series Id
+        linkParams += getCurrentSeriesQuery() ? "seriesId=" +
+                getCurrentSeriesQuery() + "&" : "";
+
+        // Add free text filters
+        linkParams += getCurrentSearchQuery() ? "q=" +
+                getCurrentSearchQuery() + "&" : "";
+
+        // Add sort order
+        linkParams += getCurrentSorting()  ? "sort=" +
+                getCurrentSorting() + "&" : "";
+
+        // Add page to the end
+        linkParams += "page=";
+        LINK_PREFIX += linkParams;
+
         // get the current page id
         currentPageId = getCurrentPageID();
         // get the max page id
@@ -173,6 +190,28 @@ Opencast.pager = (function ()
     
     /**
      * @memberOf Opencast.pager
+     * @description Gets the current series query
+     * @return The current series query
+     */
+    function getCurrentSeriesQuery()
+    {
+        var value = $.getURLParameter("seriesId");
+        return value;
+    }
+
+    /**
+     * @memberOf Opencast.pager
+     * @description Gets the current sorting
+     * @return The current sorting
+     */
+    function getCurrentSorting()
+    {
+        var value = $.getURLParameter("sort");
+        return value;
+    }
+
+    /**
+     * @memberOf Opencast.pager
      * @description Gets the max page ID
      * @return The maximum number of pages
      */
@@ -183,11 +222,13 @@ Opencast.pager = (function ()
         if (total % 10 != 0) maxPage += 1;
         return Math.max(1, maxPage);
     }
-    
+
     return {
         testGetCurrentPage: testGetCurrentPage,
         getCurrentPageID: getCurrentPageID,
         getCurrentSearchQuery: getCurrentSearchQuery,
+        getCurrentSeriesQuery: getCurrentSeriesQuery,
+        getCurrentSorting: getCurrentSorting,
         renderPager: renderPager
     };
 }());
