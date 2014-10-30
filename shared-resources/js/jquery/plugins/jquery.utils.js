@@ -22,7 +22,7 @@
     var loggingEnabled = false;
     var asciiAlphabet;
     var asciiAlphabetCashed = false;
-    
+
     /**
      * @description Returns the ascii alphabet lower case (internal function for cashing)
      * @return the alphabet lower case
@@ -44,7 +44,7 @@
     $.isNumber = function(n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
     }
-    
+
     /**
      * @description Returns the ascii alphabet lower case
      * @return the alphabet lower case
@@ -59,7 +59,7 @@
         }
         return asciiAlphabet;
     }
-    
+
     /**
      * @description Returns the ASCII value of char
      * @param char Character to get the ASCII value from
@@ -69,7 +69,7 @@
     {
         return $.getAsciiAlphabet()[charToConvert]||'';
     }
-   
+
     /**
      * @description Returns a time in the URL time format, e.g. 30m10s
      * @param data Time in the format ab:cd:ef
@@ -97,7 +97,7 @@
 	}
 	return 0;
     }
-        
+
     /**
      * @description Returns the Input Time in Milliseconds
      * @param data Data in the Format ab:cd:ef
@@ -129,7 +129,7 @@
         }
         return 0;
     }
-    
+
     /**
      * @description Returns formatted Seconds
      * @param seconds Seconds to format
@@ -162,7 +162,7 @@
         result += seconds % 60;
         return result;
     }
-    
+
     /**
      * @description Converts a date to a human readable date string
      * @param date
@@ -185,7 +185,7 @@
         datestring += d.getFullYear();
         return datestring;
     }
-    
+
     /**
      * @description Converts a date to a human readable time string
      * @param date
@@ -200,7 +200,7 @@
         var s = (d.getSeconds() >= 10) ? d.getSeconds() : "0".concat(d.getSeconds());
         return (h + timeSeparator + m);
     }
-    
+
     /**
      * @description Converts a UTC date string to date
      * @param dcc UTC date string, e.g. dcc = 2011-03-07T00:00:00+01:00
@@ -233,17 +233,17 @@
         }
         return date;
     }
-    
+
     /**
      * @description Returns a map of URL Arguments
      * @return a map of URL Arguments if successful, {} else
      */
-    $.parseURL = function ()
+    $.parseURL = function()
     {
         var vars = {}; // Use object to avoid issues with associative arrays
         var hash, hashes;
         var argsIndex = window.location.href.indexOf('?');
-        if (argsIndex >= 0) 
+        if (argsIndex >= 0)
         {
             hashes = window.location.href.slice(argsIndex + 1).split('&');
             if ($.isArray(hashes))
@@ -257,7 +257,7 @@
         }
         return vars;
     }
-       
+
     /**
      * @description Returns the url map to string, connected via links
      * @param map URL Map (e.g. created via parseURL())
@@ -294,7 +294,7 @@
         }
         return str;
     }
-    
+
     /**
      * @description Removes the duplicate URL parameters, e.g. url?a=b&a=c&a=d => url?a=d
      * @return a cleaned URL
@@ -306,7 +306,7 @@
         windLoc = (windLoc.indexOf('?') != -1) ? window.location.href.substring(0, window.location.href.indexOf('?')) : windLoc;
         return windLoc + $.urlMapToString(urlArr, "?", "&", "=");
     }
-    
+
     /**
      * @description Checks whether URL parameters are duplicate and cleans it if appropriate (clean => page reload)
      */
@@ -332,7 +332,7 @@
 	url = url.substring(0, url.indexOf('?')) + "?id=" + id;
 	return url;
     }
-    
+
     /**
      * @description Checks whether URL parameters are duplicate and cleans it if appropriate and returns the cleaned URL afterwards
      * @param embed true if watch.html should be replaced with embed.html, false if embed.html should be replaced with watch.html
@@ -391,7 +391,7 @@
         }
         return (embed ? windLoc.replace(/watch.html/g, 'embed.html') : windLoc.replace(/embed.html/g, 'watch.html')) + str;
     }
-    
+
     /**
      * @description Returns the value of URL-Parameter 'name'
      *              Current used URL Parameters:
@@ -433,7 +433,7 @@
         }
         return urlParam;
     }
-    
+
     /**
      * @description Parses Seconds
      *
@@ -522,7 +522,7 @@
         }
         return 0;
     }
-    
+
     /**
      * @description create date in format MM/DD/YYYY
      * @param timeDate Time and Date
@@ -532,7 +532,7 @@
         timeDate = (typeof timeDate === 'string') ? timeDate.substring(0, 10) : "n.a.";
         return timeDate;
     }
-    
+
     /**
      * @description Returns a random Number in between [min, max]
      * @param min Min Value
@@ -551,7 +551,7 @@
         }
         return (min + parseInt(Math.random() * (max - min + 1)));
     }
-    
+
     /**
      * @description Returns if 'haystack' starts with 'start'
      * @param haystack String to search in
@@ -566,7 +566,7 @@
         }
         return false;
     }
-    
+
     /**
      * @description Enables or disables the Logs
      * @param true for enabling Logs, false else
@@ -575,7 +575,7 @@
     {
         loggingEnabled = logEnabled||false;
     }
-    
+
     /**
      * @description Returns whether logging is enabled or not
      * @param true for logging is enabled, false else
@@ -584,7 +584,7 @@
     {
         return loggingEnabled;
     }
-    
+
     /**
      * @description Logs given arguments -- uses console.log; does NOT check loggingEnabled
      * @param any arguments console.log-valid
@@ -606,7 +606,7 @@
         }
         return false;
     }
-    
+
     /**
      * @description Logs given arguments -- uses console.log
      * @param any arguments console.log-valid
