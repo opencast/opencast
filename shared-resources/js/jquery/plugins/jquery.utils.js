@@ -235,85 +235,60 @@
     }
     
     /**
-     * @description Returns an Array of URL Arguments
-     * @return an Array of URL Arguments if successful, [] else
+     * @description Returns a map of URL Arguments
+     * @return a map of URL Arguments if successful, {} else
      */
-    $.parseURL = function()
+    $.parseURL = function ()
     {
-        var vars = [],
-            hash;
-        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-        if ($.isArray(hashes))
+        var vars = {}; // Use object to avoid issues with associative arrays
+        var hash, hashes;
+        var argsIndex = window.location.href.indexOf('?');
+        if (argsIndex >= 0) 
         {
-            for (var i = 0; i < hashes.length; i++)
+            hashes = window.location.href.slice(argsIndex + 1).split('&');
+            if ($.isArray(hashes))
             {
-                hash = hashes[i].split('=');
-                vars.push(hash[0]);
-                vars[hash[0]] = hash[1];
+                for (var i = 0; i < hashes.length; i++)
+                {
+                    hash = hashes[i].split('=');
+                    vars[hash[0]] = hash[1];
+                }
             }
         }
         return vars;
     }
-    
+       
     /**
-     * @description Removes the duplicates of a given array
-     * @param arr Array to remove the duplicates of
-     * @return a copy of arr wihout its duplicates if arr is a valid array, [] else
-     */
-    $.removeDuplicates = function(arr)
-    {
-        var newArr = [];
-        // check whether arr is an Array
-        if ($.isArray(arr))
-        {
-            var ni = 0;
-            var dupl = false;
-            for (var i = 0; i < arr.length; ++i)
-            {
-                for (var j = i + 1;
-                (j < arr.length) && !dupl; ++j)
-                {
-                    if (arr[i] == arr[j])
-                    {
-                        dupl = true;
-                    }
-                }
-                if (!dupl)
-                {
-                    newArr[ni] = arr[i];
-                    ++ni;
-                }
-                dupl = false;
-            }
-        }
-        return newArr;
-    }
-    
-    /**
-     * @description Returns the url array to string, connected via links
-     * @param arr URL Array (e.g. created via parseURL())
+     * @description Returns the url map to string, connected via links
+     * @param map URL Map (e.g. created via parseURL())
      * @param link11 first link (e.g. comes directly after the .html: ?)
      * @param link12 second link, connects the parameters (e.g. &)
      * @param link2 third link, connects the first and the second value of an URL parameter (e.g. =)
-     * @return the url array to string, connected via links, if arr is a valid array, '' else
+     * @return the url array to string, connected via links, if map is a valid Object, '' else
      */
-    $.urlArrayToString = function(arr, link11, link12, link2)
+    $.urlMapToString = function(map, link11, link12, link2)
     {
         var str = '';
-        // check whether arr is an Array
-        if ($.isArray(arr))
+        // check whether map is an Object
+        if ($.isPlainObject(map))
         {
+            i = 0;
             // Set default values if nothings given
             link11 = link11 || '?';
             link12 = link12 || '&';
             link2 = link2 || '=';
-            for (var i = 0; i < arr.length; ++i)
+
+            for (var value in map)
             {
-                var parsedUrlAt = $.getURLParameter(arr[i]);
-                if ((parsedUrlAt !== undefined) && (parsedUrlAt !== null))
+                if(map.hasOwnProperty(value))
                 {
-                    var l = (i == 0) ? link11 : link12;
-                    str += l + arr[i] + link2 + $.parseURL()[arr[i]];
+                    var parsedUrlAt = $.getURLParameter(value);
+                    if ((parsedUrlAt !== undefined) && (parsedUrlAt !== null))
+                    {
+                        var l = (i == 0) ? link11 : link12;
+                        str += l + value + link2 + $.parseURL()[value];
+                    }
+                    i++;
                 }
             }
         }
@@ -326,10 +301,10 @@
      */
     $.getCleanedURL = function()
     {
-        var urlArr = $.removeDuplicates($.parseURL());
+        var urlArr = $.parseURL();
         var windLoc = window.location.href;
         windLoc = (windLoc.indexOf('?') != -1) ? window.location.href.substring(0, window.location.href.indexOf('?')) : windLoc;
-        return windLoc + $.urlArrayToString(urlArr, "?", "&", "=");
+        return windLoc + $.urlMapToString(urlArr, "?", "&", "=");
     }
     
     /**
@@ -377,7 +352,7 @@
             var seconds = parseInt($.getTimeInMilliseconds(Opencast.Player.getCurrentTime())) / 1000;
         }
         // parse URL string -- modified version of $.parseURL-module
-        var vars = [],
+        var vars = {},
             hash,
             str = window.location.href + ((videoQuality != false) ? ("&quality=" + videoQuality) : '') + (withTime ? ("&t=" +  seconds) : '');
         var hashes = str.slice(str.indexOf('?') + 1).split('&');
@@ -386,32 +361,33 @@
             for (var i = 0; i < hashes.length; i++)
             {
                 hash = hashes[i].split('=');
-                vars.push(hash[0]);
                 vars[hash[0]] = hash[1];
             }
         }
-        var urlArr = $.removeDuplicates(vars);
+
         var windLoc = window.location.href;
         windLoc = (windLoc.indexOf('?') != -1) ? window.location.href.substring(0, window.location.href.indexOf('?')) : windLoc;
-        // URL parameter array to string
+        // URL parameter map to string
         var str = '';
-        for (var i = 0; i < urlArr.length; ++i)
+        var i = 0;
+        for (var value in vars)
         {
             var l = (i == 0) ? '?' : '&';
-            var parsedUrlAt = $.getURLParameter(urlArr[i]);
-            if ((parsedUrlAt !== undefined) && (parsedUrlAt !== null) && (urlArr[i] != 'quality') && (urlArr[i] != 't') && (urlArr[i] != 'play'))
+            var parsedUrlAt = $.getURLParameter(value);
+            if ((parsedUrlAt !== undefined) && (parsedUrlAt !== null) && (value != 'quality') && (value != 't') && (value != 'play'))
             {
-                str += l + urlArr[i] + '=' + $.parseURL()[urlArr[i]];
-            } else if((videoQuality != false) && (urlArr[i] == 'quality'))
+                str += l + value + '=' + $.parseURL()[value];
+            } else if((videoQuality != false) && value == 'quality')
             {
-                str += l + urlArr[i] + "=" + videoQuality;
-            } else if(urlArr[i] == 'play')
+                str += l + value + "=" + videoQuality;
+            } else if(value == 'play')
             {
-                str += l + urlArr[i] + "=" + (play ? "true" : "false");
-            } else if(withTime && (urlArr[i] == 't'))
+                str += l + value + "=" + (play ? "true" : "false");
+            } else if(withTime && (value == 't'))
             {
-                str += l + urlArr[i] + "=" + seconds;
+                str += l + value + "=" + seconds;
             }
+            i++;
         }
         return (embed ? windLoc.replace(/watch.html/g, 'embed.html') : windLoc.replace(/embed.html/g, 'watch.html')) + str;
     }
