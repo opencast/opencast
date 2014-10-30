@@ -329,7 +329,13 @@ public class StreamingDistributionService extends AbstractJobProducer implements
         if (uriString.contains("mp4:")) {
           uriString += ".mp4";
           uriString = uriString.replace("mp4:", "");
-        } else uriString += ".flv";
+        } else if (uriString.contains("flv:")) {
+          uriString += ".flv";
+          uriString = uriString.replace("flv:", "");
+        } else if (uriString.contains("mp3:")) {
+          uriString += ".mp3";
+          uriString = uriString.replace("mp3:", "");
+        }
       }
       String[] splitUrl = uriString.substring(streamingUrl.length() + 1).split("/");
       if (splitUrl.length < 4) {
@@ -366,10 +372,6 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     String elementId = element.getIdentifier();
     String fileName = FilenameUtils.getBaseName(element.getURI().toString());
     String tag = FilenameUtils.getExtension(element.getURI().toString()) + ":";
-
-    // removes the tag for flv files, but keeps it for all others (mp4 needs it)
-    if ("flv:".equals(tag))
-      tag = "";
 
     return new URI(UrlSupport.concat(streamingUrl, tag + channelId, mp.getIdentifier().compact(), elementId, fileName));
   }
