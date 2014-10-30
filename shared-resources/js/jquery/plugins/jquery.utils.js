@@ -43,7 +43,7 @@
      */
     $.isNumber = function(n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
-    }
+    };
 
     /**
      * @description Returns the ascii alphabet lower case
@@ -58,7 +58,7 @@
             asciiAlphabetCashed = true;
         }
         return asciiAlphabet;
-    }
+    };
 
     /**
      * @description Returns the ASCII value of char
@@ -68,7 +68,7 @@
     $.toAscii = function(charToConvert)
     {
         return $.getAsciiAlphabet()[charToConvert]||'';
-    }
+    };
 
     /**
      * @description Returns a time in the URL time format, e.g. 30m10s
@@ -96,7 +96,7 @@
 	    }
 	}
 	return 0;
-    }
+    };
 
     /**
      * @description Returns the Input Time in Milliseconds
@@ -128,7 +128,7 @@
             }
         }
         return 0;
-    }
+    };
 
     /**
      * @description Returns formatted Seconds
@@ -161,7 +161,7 @@
         }
         result += seconds % 60;
         return result;
-    }
+    };
 
     /**
      * @description Converts a date to a human readable date string
@@ -184,7 +184,7 @@
         datestring += yearSeparator;
         datestring += d.getFullYear();
         return datestring;
-    }
+    };
 
     /**
      * @description Converts a date to a human readable time string
@@ -199,7 +199,7 @@
         var m = (d.getMinutes() >= 10) ? d.getMinutes() : "0".concat(d.getMinutes());
         var s = (d.getSeconds() >= 10) ? d.getSeconds() : "0".concat(d.getSeconds());
         return (h + timeSeparator + m);
-    }
+    };
 
     /**
      * @description Converts a UTC date string to date
@@ -232,7 +232,7 @@
             }
         }
         return date;
-    }
+    };
 
     /**
      * @description Returns a map of URL Arguments
@@ -256,7 +256,7 @@
             }
         }
         return vars;
-    }
+    };
 
     /**
      * @description Returns the url map to string, connected via links
@@ -293,7 +293,7 @@
             }
         }
         return str;
-    }
+    };
 
     /**
      * @description Removes the duplicate URL parameters, e.g. url?a=b&a=c&a=d => url?a=d
@@ -305,7 +305,7 @@
         var windLoc = window.location.href;
         windLoc = (windLoc.indexOf('?') != -1) ? window.location.href.substring(0, window.location.href.indexOf('?')) : windLoc;
         return windLoc + $.urlMapToString(urlArr, "?", "&", "=");
-    }
+    };
 
     /**
      * @description Checks whether URL parameters are duplicate and cleans it if appropriate (clean => page reload)
@@ -319,7 +319,7 @@
         {
             window.location = newLoc;
         }
-    }
+    };
 
     /**
      * @description Returns a clean URL only containing the ID
@@ -331,7 +331,7 @@
 	var id = $.getURLParameter('id');
 	url = url.substring(0, url.indexOf('?')) + "?id=" + id;
 	return url;
-    }
+    };
 
     /**
      * @description Checks whether URL parameters are duplicate and cleans it if appropriate and returns the cleaned URL afterwards
@@ -390,7 +390,7 @@
             i++;
         }
         return (embed ? windLoc.replace(/watch.html/g, 'embed.html') : windLoc.replace(/embed.html/g, 'watch.html')) + str;
-    }
+    };
 
     /**
      * @description Returns the value of URL-Parameter 'name'
@@ -432,7 +432,7 @@
             return null;
         }
         return urlParam;
-    }
+    };
 
     /**
      * @description Parses Seconds
@@ -521,7 +521,7 @@
             }
         }
         return 0;
-    }
+    };
 
     /**
      * @description create date in format MM/DD/YYYY
@@ -531,7 +531,7 @@
     {
         timeDate = (typeof timeDate === 'string') ? timeDate.substring(0, 10) : "n.a.";
         return timeDate;
-    }
+    };
 
     /**
      * @description Returns a random Number in between [min, max]
@@ -550,7 +550,7 @@
             return min;
         }
         return (min + parseInt(Math.random() * (max - min + 1)));
-    }
+    };
 
     /**
      * @description Returns if 'haystack' starts with 'start'
@@ -565,7 +565,7 @@
             return (haystack.substring(0, start.length).indexOf(start) != -1);
         }
         return false;
-    }
+    };
 
     /**
      * @description Enables or disables the Logs
@@ -574,7 +574,7 @@
     $.enableLogging = function(logEnabled)
     {
         loggingEnabled = logEnabled||false;
-    }
+    };
 
     /**
      * @description Returns whether logging is enabled or not
@@ -583,7 +583,7 @@
     $.loggingEnabled = function()
     {
         return loggingEnabled;
-    }
+    };
 
     /**
      * @description Logs given arguments -- uses console.log; does NOT check loggingEnabled
@@ -605,7 +605,7 @@
             return true;
         }
         return false;
-    }
+    };
 
     /**
      * @description Logs given arguments -- uses console.log
@@ -627,5 +627,5 @@
             return true;
         }
         return false;
-    }
+    };
 })(jQuery);
