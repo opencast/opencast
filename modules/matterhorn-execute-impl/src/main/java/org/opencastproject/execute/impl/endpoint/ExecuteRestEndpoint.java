@@ -114,6 +114,9 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
       } else if ((inputElementStr == null) && (inputMpStr != null)) {
         MediaPackage inputMp = MediaPackageParser.getFromXml(inputMpStr);
         retJob = service.execute(exec, params, inputMp, outputFileName, expectedType);
+      } else {
+        logger.error("Not input MediaPackage OR not input MediaPackageElement");
+        return Response.status(Response.Status.BAD_REQUEST).build();
       }
 
       return Response.ok(new JaxbJob(retJob)).build();
