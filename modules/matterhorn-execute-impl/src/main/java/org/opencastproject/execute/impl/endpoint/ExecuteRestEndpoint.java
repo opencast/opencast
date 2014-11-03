@@ -56,21 +56,8 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ExecuteRestEndpoint.class);
 
-  /** Sample element (track) */
-  //private static final String sampleElement = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:track id=\"ea68fa85-24ea-4b52-a1ed-2a3c610738bd\" xmlns:ns2=\"http://mediapackage.opencastproject.org\"><mimetype>audio/mp4</mimetype><tags/><url>http://engagedev.matterhorn.uvigo.es:8080/files/collection/composer/63.mp4</url><checksum type=\"md5\">1052c49ba6458a8a3efdda44b40cde91</checksum><duration>274089</duration><audio id=\"audio-1\"><device/><encoder type=\"AAC\"/><channels>2</channels><bitrate>80580.0</bitrate></audio><video id=\"video-1\"><device/><encoder type=\"AVC\"/><bitrate>872881.0</bitrate><framerate>25.0</framerate><resolution>1280x720</resolution><scantype type=\"Progressive\"/></video></ns2:track>";
-
   /** The text analyzer */
   protected ExecuteService service;
-
-  /**
-   * Callback from OSGi that is called when this service is activated.
-   *
-   * @param cc
-   *          OSGi component context
-   */
-  public void activate(ComponentContext cc) {
-    //String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
-  }
 
 
   @POST
