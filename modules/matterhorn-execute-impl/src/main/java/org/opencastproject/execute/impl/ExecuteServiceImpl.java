@@ -87,7 +87,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   protected Workspace workspace;
 
   /**
-   * List of allowed commands that can be run with an executor. By convention, an empty set means any command can be run
+   * List of allowed commands that can be run with an executor. By convention, an empty set doesn't mean any command can be run.
+   * An '*'  in the service configuration means any command can be executed
    */
   protected final Set<String> allowedCommands = new HashSet<String>();
 
@@ -238,7 +239,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     List<String> arguments = new ArrayList<String>(job.getArguments());
 
     // Check this operation is allowed
-    if (!allowedCommands.isEmpty() && !allowedCommands.contains(arguments.get(0)))
+    if (!allowedCommands.contains("*") && !allowedCommands.contains(arguments.get(0)))
       throw new ExecuteException("Command '" + arguments.get(0) + "' is not allowed");
 
     String outFileName = null;
