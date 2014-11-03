@@ -71,7 +71,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
     HttpResponse response = null;
 
     try {
-      String inElementStr = MediaPackageElementParser.getAsXml(inElement);      
+      String inElementStr = MediaPackageElementParser.getAsXml(inElement);
       List<NameValuePair> formStringParams = new ArrayList<NameValuePair>();
       formStringParams.add(new BasicNameValuePair(EXEC_FORM_PARAM, exec));
       formStringParams.add(new BasicNameValuePair(PARAMS_FORM_PARAM, params));
@@ -115,7 +115,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
     HttpResponse response = null;
 
     try {
-      String mpStr = MediaPackageParser.getAsXml(mp);      
+      String mpStr = MediaPackageParser.getAsXml(mp);
       List<NameValuePair> formStringParams = new ArrayList<NameValuePair>();
       formStringParams.add(new BasicNameValuePair(EXEC_FORM_PARAM, exec));
       formStringParams.add(new BasicNameValuePair(PARAMS_FORM_PARAM, params));

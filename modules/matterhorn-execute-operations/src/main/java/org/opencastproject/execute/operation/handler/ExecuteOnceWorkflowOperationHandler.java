@@ -47,7 +47,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * Runs an operation once with using elements within a certain MediaPackage as parameters 
+ * Runs an operation once with using elements within a certain MediaPackage as parameters
  */
 public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -85,7 +85,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
   private MediaInspectionService inspectionService = null;
 
   /** The workspace service */
-  protected Workspace workspace; 
+  protected Workspace workspace;
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
@@ -103,7 +103,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
@@ -142,11 +142,11 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
 
     // Process the result element
     MediaPackageElement resultElement = null;
-    
+
     try {
       Job job = executeService.execute(exec, params, mediaPackage, outputFilename, expectedType);
 
-      // Wait for all jobs to be finished                                                                                                                                                                                              
+      // Wait for all jobs to be finished
       if (!waitForStatus(job).isSuccess())
         throw new WorkflowOperationException("Execute operation failed");
 
@@ -178,17 +178,17 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
           resultElement.setFlavor(targetFlavor);
 
         // Set new tags
-        if (targetTags != null) 
+        if (targetTags != null)
           // Assume the tags starting with "-" means we want to eliminate such tags form the result element
           for (String tag : asList(targetTags)) {
             if (tag.startsWith("-"))
               // We remove the tag resulting from stripping all the '-' characters at the beginning of the tag
               resultElement.removeTag(tag.replaceAll("^-+", ""));
             else
-              resultElement.addTag(tag);              
+              resultElement.addTag(tag);
           }
 
-      } 
+      }
 
       WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, job.getQueueTime());
       logger.debug("Execute operation {} completed", operation.getId());
@@ -271,5 +271,5 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
    */
   protected void setMediaInspectionService(MediaInspectionService mediaInspectionService) {
     this.inspectionService = mediaInspectionService;
-  } 
+  }
 }

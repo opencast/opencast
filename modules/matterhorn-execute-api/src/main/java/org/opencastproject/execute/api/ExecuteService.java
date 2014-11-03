@@ -17,7 +17,7 @@
 package org.opencastproject.execute.api;
 
 import org.opencastproject.job.api.Job;
-import org.opencastproject.mediapackage.MediaPackage; 
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 
 /**
@@ -25,10 +25,10 @@ import org.opencastproject.mediapackage.MediaPackageElement;
  */
 
 public interface ExecuteService {
-  
+
   /** Receipt type */
   String JOB_TYPE = "org.opencastproject.execute";
-  
+
   /** Placeholder to be replaced by the actual track location in the command line */
   String INPUT_FILE_PATTERN = "#{in}";
 
@@ -37,7 +37,7 @@ public interface ExecuteService {
 
   /** The subdirectory of the REST endpoint for this service */
   String ENDPOINT_NAME = "execute";
-  
+
   /** Name of the form parameter in the REST endpoints that contains the name of the command */
   String EXEC_FORM_PARAM = "exec";
 
@@ -46,7 +46,7 @@ public interface ExecuteService {
 
   /** Name of the form parameter in the REST endpoints that contains the serialized input element */
   String INPUT_ELEM_FORM_PARAM = "inputElement";
-  
+
   /** Name of the form parameter in the REST endpoints that contains the serialized input element */
   String INPUT_MP_FORM_PARAM = "inputMediaPackage";
 

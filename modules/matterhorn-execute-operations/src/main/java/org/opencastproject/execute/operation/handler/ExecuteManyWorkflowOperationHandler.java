@@ -89,7 +89,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
   private MediaInspectionService inspectionService = null;
 
   /** The workspace service */
-  protected Workspace workspace; 
+  protected Workspace workspace;
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
@@ -178,7 +178,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
       MediaPackageElement[] resultElements = new MediaPackageElement[inputElements.length];
       long totalTimeInQueue = 0;
 
-      for (int i = 0; i < inputElements.length; i++) 
+      for (int i = 0; i < inputElements.length; i++)
         jobs[i] = executeService.execute(exec, params, inputElements[i], outputFilename, expectedType);
 
       // Wait for all jobs to be finished                                                                                                                                                                                              
@@ -189,7 +189,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
       HashMap<Integer,Job> jobMap = new HashMap<Integer,Job>();
       for (int i = 0; i < jobs.length; i++) {
         // Add this job's queue time to the total
-        totalTimeInQueue += jobs[i].getQueueTime();        
+        totalTimeInQueue += jobs[i].getQueueTime();
         if (StringUtils.trimToNull(jobs[i].getPayload()) != null) {
           resultElements[i] = MediaPackageElementParser.getFromXml(jobs[i].getPayload());
           if (resultElements[i].getElementType() == MediaPackageElement.Type.Track) {
@@ -210,7 +210,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
         }
       }
 
-      for (int i = 0; i < resultElements.length; i++) {        
+      for (int i = 0; i < resultElements.length; i++) {
         if (resultElements[i] != inputElements[i]) {
           // Store new element to mediaPackage
           mediaPackage.addDerived(resultElements[i], inputElements[i]);
@@ -223,17 +223,17 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
           // Set new flavor
           if (targetFlavor != null)
             resultElements[i].setFlavor(targetFlavor);
-        } 
+        }
 
         // Set new tags
-        if (targetTags != null) 
+        if (targetTags != null)
           // Assume the tags starting with "-" means we want to eliminate such tags form the result element
           for (String tag : asList(targetTags)) {
             if (tag.startsWith("-"))
               // We remove the tag resulting from stripping all the '-' characters at the beginning of the tag
               resultElements[i].removeTag(tag.replaceAll("^-+", ""));
             else
-              resultElements[i].addTag(tag);              
+              resultElements[i].addTag(tag);
           }
 
       }
@@ -319,5 +319,5 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
    */
   protected void setMediaInspectionService(MediaInspectionService mediaInspectionService) {
     this.inspectionService = mediaInspectionService;
-  } 
+  }
 }
