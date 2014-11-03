@@ -286,6 +286,22 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     }
   }
 
+
+  /**
+   * Does the actual processing
+   *
+   * @param arguments
+   *          The list containing the program and its arguments
+   * @param mp
+   *          MediaPackage used in the operation
+   * @param outFileName
+   *          The name of the resulting file
+   * @param expectedType
+   *          The expected element type
+   * @return A {@code String} containing the command output
+   * @throws ExecuteException
+   *           if some internal error occurred
+   */
   public String doProcess(List<String> arguments, MediaPackage mp, String outFileName, Type expectedType)
           throws ExecuteException {
 
@@ -357,18 +373,16 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * Does the actual processing
-   * 
-   * @param exec
-   *          The command to run
-   * @param params
-   *          The CLI line including the command name
-   * @param element
-   *          A Matterhorn track
+   *
+   * @param arguments
+   *          The list containing the program and its arguments
+   * @param outFileName
+   *          The name of the resulting file
+   * @param expectedType
+   *          The expected element type
    * @return A {@code String} containing the command output
    * @throws ExecuteException
    *           if some internal error occurred
-   * @throws NotFoundException
-   *           if the mediapackage element could not be found in the workspace
    */
   public String doProcess(List<String> arguments, MediaPackageElement element, String outFileName, Type expectedType)
           throws ExecuteException {
