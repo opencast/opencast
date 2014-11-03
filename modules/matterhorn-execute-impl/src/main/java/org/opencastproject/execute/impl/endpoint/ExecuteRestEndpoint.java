@@ -117,7 +117,7 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
       }
 
       Job retJob = null;
-      // FIXME: Falta o caso no que ningún estea inicializado
+      // FIXME: We are not considering the case where none of them is initialized
       if ((inputElementStr != null) && (inputMpStr != null)) {
         logger.error("Only one input MediaPackage OR input MediaPackageElement can be set at the same time");
         return Response.status(Response.Status.BAD_REQUEST).build();

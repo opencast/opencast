@@ -97,7 +97,6 @@ public class ExecuteServiceTest {
   }
 
   @Test
-  // FIXME Buscar un xeito de testear que se xenera ben a liña de comandos
   public void testNoElements() throws ExecuteException, NotFoundException {
     List<String> params = new ArrayList<String>();
     params.add("echo");
@@ -112,7 +111,6 @@ public class ExecuteServiceTest {
   }
 
   @Test
-  // FIXME Buscar un xeito de testear que se xenera ben a liña de comandos
   public void testWithInputElement() throws ExecuteException, NotFoundException {
     List<String> params = new ArrayList<String>();
     params.add("echo");
