@@ -76,17 +76,6 @@
       </testResource>
     </testResources>
     <plugins>
-      <!-- Require Java 6 or higher for building -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.5.1</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -108,51 +97,6 @@
           </instructions>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-	<version>1.6</version>
-        <executions>
-          <execution>
-            <id>copy-to-felix</id>
-            <phase>install</phase>
-            <configuration>
-              <target if="deployTo">
-                <copy
-                  file="${project.build.directory}/${project.build.finalName}.jar"
-                  todir="${deployTo}" failonerror="false" />
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>opencast</id>
-      <name>Opencast Repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-    <repository>
-      <id>opencast.snapshots</id>
-      <name>Opencast SNAPSHOTS</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public-snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-  </repositories>
 </project>
