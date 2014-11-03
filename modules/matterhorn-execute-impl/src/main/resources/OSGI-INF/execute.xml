@@ -6,18 +6,10 @@
     <service>
       <provide interface="org.opencastproject.execute.api.ExecuteService" />
     </service>
-    <!-- <reference name="textExtractor" interface="org.opencastproject.textextractor.api.TextExtractor"
-      cardinality="1..1" policy="static" bind="setTextExtractor" />-->
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
       cardinality="1..1" policy="static" bind="setServiceRegistry" />
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
       policy="static" bind="setWorkspace" />
-    <!--<reference name="mpeg7service" interface="org.opencastproject.metadata.mpeg7.Mpeg7CatalogService"
-      cardinality="1..1" policy="static" bind="setMpeg7CatalogService" />-->
-    <!--<reference name="dictionaryService" interface="org.opencastproject.dictionary.api.DictionaryService"
-      cardinality="1..1" policy="static" bind="setDictionaryService" />-->
-    <!--<reference name="composer" interface="org.opencastproject.composer.api.ComposerService"
-      cardinality="1..1" policy="static" bind="setComposerService" />-->
     <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
       cardinality="1..1" policy="static" bind="setSecurityService" />
     <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
