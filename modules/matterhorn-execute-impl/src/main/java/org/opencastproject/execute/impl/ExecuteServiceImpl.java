@@ -156,10 +156,10 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
     logger.debug("Creating Execute Job for command: {}", exec);
 
-    if (StringUtils.trimToNull(exec) == null)
+    if (StringUtils.isBlank(exec))
       throw new IllegalArgumentException("The command to execute cannot be null");
 
-    if (StringUtils.trimToNull(params) == null)
+    if (StringUtils.isBlank(params))
       throw new IllegalArgumentException("The command arguments cannot be null");
 
     if (inElement == null)
@@ -198,10 +198,10 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type expectedType)
           throws ExecuteException {
 
-    if (StringUtils.trimToNull(exec) == null)
+    if (StringUtils.isBlank(exec))
       throw new IllegalArgumentException("The command to execute cannot be null");
 
-    if (StringUtils.trimToNull(params) == null)
+    if (StringUtils.isBlank(params))
       throw new IllegalArgumentException("The command arguments cannot be null");
 
     if (mp == null)
