@@ -187,7 +187,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
             else
               resultElement.addTag(tag);
           }
-	}
+        }
       }
 
       WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, job.getQueueTime());

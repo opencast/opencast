@@ -235,7 +235,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
             else
               resultElements[i].addTag(tag);
           }
-	}
+        }
       }
 
       WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, totalTimeInQueue);
