@@ -304,7 +304,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
       // Get the substitution pattern.
       // The following pattern matches, any construct with the form
       // #{name}
-      // , where 'name' is the name of a certain property. It is stored in the backreference group 1.
+      // , where 'name' is the value of a certain property. It is stored in the backreference group 1.
       // Optionally, expressions can take a parameter, like
       // #{name(parameter)}
       // , where 'parameter' is the name of a certain parameter.
