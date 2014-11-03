@@ -422,10 +422,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     int result = 0;
 
     try {
-
       logger.info("Running command {}", arguments.get(0));
-
-      logger.debug("Starting subprocess {} with arguments {}", subprocess, StringUtils.join(arguments, ", "));
+      logger.debug("Starting subprocess {} with arguments {}", arguments.get(0), StringUtils.join(arguments.subList(1, arguments.size()), ", "));
 
       ProcessBuilder pb = new ProcessBuilder(arguments);
       pb.redirectErrorStream(true);
