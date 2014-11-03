@@ -430,22 +430,22 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     }
   }
 
-  private String runCommand(List<String> arguments, File outFile, Type expectedType) throws ExecuteException {
+  private String runCommand(List<String> command, File outFile, Type expectedType) throws ExecuteException {
 
     Process p = null;
     int result = 0;
 
     try {
-      logger.info("Running command {}", arguments.get(0));
-      logger.debug("Starting subprocess {} with arguments {}", arguments.get(0), StringUtils.join(arguments.subList(1, arguments.size()), ", "));
+      logger.info("Running command {}", command.get(0));
+      logger.debug("Starting subprocess {} with arguments {}", command.get(0), StringUtils.join(command.subList(1, command.size()), ", "));
 
-      ProcessBuilder pb = new ProcessBuilder(arguments);
+      ProcessBuilder pb = new ProcessBuilder(command);
       pb.redirectErrorStream(true);
 
       p = pb.start();
       result = p.waitFor();
 
-      logger.debug("Command {} finished with result {}", arguments.get(0), result);
+      logger.debug("Command {} finished with result {}", command.get(0), result);
 
       if (result == 0) {
         // Read the command output
@@ -474,15 +474,15 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         }
 
         throw new ExecuteException(String.format("Process %s returned error code %d with this output:\n%s",
-                arguments.get(0), result, line.trim()));
+                command.get(0), result, line.trim()));
       }
     } catch (InterruptedException e) {
       throw new ExecuteException("The executor thread has been unexpectedly interrupted", e);
     } catch (IOException e) {
       // Only log the first argument, the executable, as other arguments may contain sensitive values
       // e.g. MySQL password/user, paths, etc. that should not be shown to caller
-      logger.error("Could not start subprocess {}", arguments.get(0));
-      throw new ExecuteException("Could not start subprocess: " + arguments.get(0), e);
+      logger.error("Could not start subprocess {}", command.get(0));
+      throw new ExecuteException("Could not start subprocess: " + command.get(0), e);
     } catch (UnsupportedElementException e) {
       throw new ExecuteException("Couldn't create a new MediaPackage element of type " + expectedType.toString(), e);
     } catch (ConfigurationException e) {
