@@ -178,7 +178,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
           resultElement.setFlavor(targetFlavor);
 
         // Set new tags
-        if (targetTags != null)
+        if (targetTags != null) {
           // Assume the tags starting with "-" means we want to eliminate such tags form the result element
           for (String tag : asList(targetTags)) {
             if (tag.startsWith("-"))
@@ -187,7 +187,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
             else
               resultElement.addTag(tag);
           }
-
+	}
       }
 
       WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, job.getQueueTime());

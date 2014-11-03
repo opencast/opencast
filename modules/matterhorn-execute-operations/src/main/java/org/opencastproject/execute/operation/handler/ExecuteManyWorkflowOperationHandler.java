@@ -134,7 +134,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
 
     MediaPackageElementFlavor matchingFlavor = null;
     if (sourceFlavor != null)
-    matchingFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavor);
+        matchingFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavor);
 
     // Unmarshall target flavor
     MediaPackageElementFlavor targetFlavor = null;
@@ -226,7 +226,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
         }
 
         // Set new tags
-        if (targetTags != null)
+        if (targetTags != null) {
           // Assume the tags starting with "-" means we want to eliminate such tags form the result element
           for (String tag : asList(targetTags)) {
             if (tag.startsWith("-"))
@@ -235,7 +235,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
             else
               resultElements[i].addTag(tag);
           }
-
+	}
       }
 
       WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, totalTimeInQueue);
