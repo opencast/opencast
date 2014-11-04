@@ -271,15 +271,21 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         output = encoderEngine.mux(audioFile, videoFile, profile, properties);
       } catch (EncoderException e) {
         Map<String, String> params = new HashMap<String, String>();
-        if (audioFile != null)
+        if (audioFile != null) {
           params.put("audio", audioTrack.getURI().toString());
-        if (videoFile != null)
+        } else {
+          params.put("audio", "EMPTY");
+        }
+        if (videoFile != null) {
           params.put("video", videoTrack.getURI().toString());
+        } else {
+          params.put("video", "EMPTY");
+        }
         params.put("profile", profile.getIdentifier());
         if (properties != null) {
           params.put("properties", properties.toString());
         } else {
-          params.put("properties", "null");
+          params.put("properties", "EMPTY");
         }
         incident().recordFailure(job, ENCODING_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
