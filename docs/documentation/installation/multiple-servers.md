@@ -270,3 +270,11 @@ Set the base URL of the server hosting the engage tools:
 ```
 org.opencastproject.engage.ui.url=http://<ENGAGE-URL>:8080
 ```
+
+### services/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.properties
+
+To ensure that jobs are not dispatched by non-admin nodes you may also want to set:
+
+```
+dispatchinterval=0
+```
