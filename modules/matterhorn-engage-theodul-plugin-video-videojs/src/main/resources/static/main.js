@@ -455,39 +455,57 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
                     console.group("Mobile Mode");
 
+                    var notActive = {
+                        list : [],
+                        inActive : function(name) {
+                            return true;
+                        }
+                    }
+
                     // some specific mobile events
-                    events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
-                    events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
+                    events.tapHold      = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
+                    events.resize       = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
+                    events.swipeLeft    = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
+                    events.deactivate   = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
+                    events.activate     = new Engage.Event("Video:activate", "videoDisplay activated", "both");
+                    events.resize       = new Engage.Event("Video:resize", "videoDisplay resized", "both");
+
+                    Engage.on(plugin.events.deactivate.getName(), function(id) {
+                        console.log("deactivate:  " + id);
+                    });
 
                     // total number of video displays and all active
                     var totalVideoDisplays  = videoDisplays.length;
-                    var activeVideoDisplays = videoDisplays.length;
 
                     // Init of videoDisplays
                     var i = 0;
                     for (var v in videoSources) {
                         if (videoSources[v].length > 0) {
-                            console.log("Init Video Display: " + v);
+                            console.log("Init Video Display: " + v + " .. " + i);
+                            console.log(videoDisplays[i]);
                             initVideojsVideo(videoDisplays[i], videoSources[v], this.videojs_swf);
                             ++i;
                         }
                     }
+
+
                     Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
                     orderVideoDisplays(videoDisplays);
-
                     
-                    
-                    $(".displayWrapper").on('taphold', function(event) {
+                    $(".video-js").on('taphold', function(event) {
                         console.log(event);
                         Engage.trigger(plugin.events.tapHold.getName(), event.currentTarget.id);
                     });
 
-                    // Insert here init displays
+                    $(".video-js").on('swipeleft', function(event){
+                        console.log(event);
+                        Engage.trigger(plugin.events.swipeLeft.getName(), event.currentTarget.id);
+                    });
+
                     // Show poster
                     $("." + class_vjsposter).show();
 
-                    // Show default videoDisplays
-                    
+                    // at least one display
                     if (videoDisplays.length > 0) {
 
                         // count video sources

@@ -561,8 +561,16 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         console.log("Init Mobile Events in Control");
         events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
         events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
+        events.swipeLeft = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
+        events.deactivate   = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
+
         Engage.on(events.tapHold.getName(), function(display) {
             console.log("Control: " + display);
+            Engage.trigger(plugin.events.deactivate.getName(), display);
+        });
+
+        Engage.on(events.swipeLeft.getName(), function(target){
+            console.log('Control: ' + target);
         });
     }
     /**
