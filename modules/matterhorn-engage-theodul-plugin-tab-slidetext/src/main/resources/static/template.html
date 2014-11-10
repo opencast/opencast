@@ -6,7 +6,7 @@
         <img class="media-object pull-left" src="<%= segment.image_url %>" alt="Segment <%= i %>" />
         <div class="media-body">
             <h4 class="media-heading">
-                Segment <%= i %>
+                <p class="lang_segment">Segment</p> <%= i %>
             </h4>
             <div class="media-time">
                 <%= segment.time %>
@@ -20,6 +20,6 @@
     </div>
     <% ++i; }); %>
     <% } else { %>
-    <p>No slides available.</p>
+    <p class="lang_noSlidesAvailable">No slides available.</p>
     <% } %>
 </div>

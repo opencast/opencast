@@ -71,18 +71,32 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var hotkey_volDown = "volDown";
     var hotkey_volUp = "volUp";
     var mediapackageError = false;
+    var numberOfPlugins = 0;
     
     var basilOptions = {
         namespace: 'mhStorage'
     };
     Basil = new window.Basil(basilOptions);    
 
-    function browserSupported() {             
-        console.log("Override Browser" + Basil.get("overrideBrowser"));
-        if (Basil.get("overrideBrowser") != null && Basil.get("overrideBrowser")) {          
+    function browserSupported() {
+        if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
+            console.log("Override Browser " + Basil.get("overrideBrowser"));
             return true;
         }         
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari) || (Bowser.msie && Bowser.version >= browser_minVersion_msie);
+    }
+
+    function translate() {
+	$.getJSON("language/theodul_language.json", function(data) {
+    	    if(data) {
+	    	var key = Object.keys(data);
+		for (var i = 0; i < key.length; i++)	{
+		    var lang_value = key[i];
+		    engageCore.log("data[" + lang_value + "] = " + data[lang_value]);
+		    $("." + lang_value).html(data[lang_value]);
+		}
+	    }
+	});
     }
 
     // theodul core init
@@ -187,7 +201,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             engageCore.model.get("pluginsInfo").fetch({
                                 success: function(pluginInfos) {
                                     // load plugin as requirejs module
-                                    if (pluginInfos.get("pluginlist") && pluginInfos.get("pluginlist").plugins !== undefined) {
+                                    if ((pluginInfos.get("pluginlist").plugins != undefined) && pluginInfos.get("pluginlist")) {
+					numberOfPlugins = pluginInfos.get("pluginlist").plugins.length;
                                         if ($.isArray(pluginInfos.get("pluginlist").plugins)) {
                                             $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
                                                 var plugin_name = value["name"];
@@ -239,6 +254,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                                 $("#" + id_browserWarning).hide().detach();
                                 $("#" + id_engage_view).show();
+				translate();
                                 if (engageCore.model.desktop || engageCore.model.mobile) {
                                     window.setTimeout(function() {
                                         if ($("#" + id_volume).html() == "") {
