@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, EngageModel, EngageTabLogic) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, EngageModel, EngageTabLogic) {
     "use strict";
 
     var events = {
@@ -48,6 +48,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
     var id_browserWarning = "browserWarning";
     var id_volume = "volume";
     var id_btn_reloadPage = "btn_reloadPage";
+    var id_btn_tryAnyway = "btn_tryAnyway";
     var id_customError = "customError";
     var id_customError_str = "customError_str";
     var class_loading = "loading";
@@ -70,8 +71,17 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
     var hotkey_volDown = "volDown";
     var hotkey_volUp = "volUp";
     var mediapackageError = false;
+    
+    var basilOptions = {
+        namespace: 'mhStorage'
+    };
+    Basil = new window.Basil(basilOptions);    
 
-    function browserSupported() {
+    function browserSupported() {             
+        console.log("Override Browser" + Basil.get("overrideBrowser"));
+        if (Basil.get("overrideBrowser") != null && Basil.get("overrideBrowser")) {          
+            return true;
+        }         
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari) || (Bowser.msie && Bowser.version >= browser_minVersion_msie);
     }
 
@@ -102,7 +112,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
             return name;
         });
     }
-   
 
     // core main
     var EngageCore = Backbone.View.extend({
@@ -132,7 +141,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
                 var cssAttr = {
                     type: "text/css",
                     rel: "stylesheet"
-                };
+                };                
                 // template obj
                 var core_template = "none";
                 // path to the require module with the view logic
@@ -171,7 +180,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
                         engageCore.template = template;
                         $(engageCore.el).html(_.template(template)).trigger("create");
                         // run init function of the view
-                        engageCore.pluginView.initView();
+                        engageCore.pluginView.initView();                       
                         if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                             // BEGIN LOAD PLUGINS
                             // fetch plugin information
@@ -225,7 +234,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
                     $("#" + id_loading2).show();
                     window.setTimeout(function() {
                         $("#" + id_loadingProgressbar2).css("width", "100%");
-                        window.setTimeout(function() {
+                        window.setTimeout(function() {                           
                             $("." + class_loading).hide().detach();
                             if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                                 $("#" + id_browserWarning).hide().detach();
@@ -249,6 +258,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
                                 $("#" + id_engage_view + ", #" + id_customError).hide().detach();
                                 $("body").css("min-width", "");
                                 $("#" + id_browserWarning).show();
+                                $("#" + id_btn_tryAnyway).click(function(e) {
+                                    e.preventDefault();
+                                    window.open(window.location.href+"&browser=all");
+                                });
                             }
                         }, loadingDelay2);
                     }, loadingDelay1);
@@ -308,26 +321,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
     var engageCore = new EngageCore();
     // fire init event
     engageCore.trigger(events.coreInit.getName());
-    
-    
-     
-    // translation
-    $.getJSON('language/theodul_language.json', function(data) {
-    	if(data) {
-	    	var key = Object.keys(data);
-				//console.log(data.length);
-				
-				for (var i = 0; i < key.length; i++)	{
-					var lang_class = "."+key[i];
-					var lang_value = key[i];
-					
-					$(lang_class).html(data[lang_value]);
-							
-					//console.log('data: '+lang_class+', '+ data[lang_value]);
-				}
-			}
-		});
-		
 
     // BEGIN Private core functions
 
@@ -481,8 +474,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
                     }
                 }
             });
-         
-            
         } // END Private core functions
 
     return engageCore;
