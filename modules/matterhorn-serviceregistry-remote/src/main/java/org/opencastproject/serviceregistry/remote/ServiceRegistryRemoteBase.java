@@ -682,6 +682,32 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
     throw new ServiceRegistryException("Unable to get service statistics (" + responseStatusCode + ")");
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCountOfAbnormalServices()
+   */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @Override
+  public long countOfAbnormalServices() throws ServiceRegistryException {
+    QueryStringBuilder queryStringBuilder = new QueryStringBuilder("servicewarnings");
+    final HttpGet get = get(queryStringBuilder.toString());
+    HttpResponse response = null;
+    int responseStatusCode;
+    try {
+      response = getHttpClient().execute(get);
+      responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_OK) {
+        return Long.parseLong(EntityUtils.toString(response.getEntity()));
+      }
+    } catch (IOException e) {
+      throw new ServiceRegistryException("Unable to get service statistics", e);
+    } finally {
+      getHttpClient().close(response);
+    }
+    throw new ServiceRegistryException("Unable to get service statistics (" + responseStatusCode + ")");
+  }
+
   @Override
   public SystemLoad getLoad() throws ServiceRegistryException {
     throw new UnsupportedOperationException();

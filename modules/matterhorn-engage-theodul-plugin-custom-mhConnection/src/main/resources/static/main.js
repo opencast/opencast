@@ -156,7 +156,9 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                             }
                         }
                         model.trigger("change");
+                        Engage.log("Mediapackage Data change event thrown");
                     } else {
+                        Engage.log("Mediapackage data not loaded successfully");
                         Engage.trigger(plugin.events.mediaPackageModelError.getName(), "Media information could not be loaded successfully.");
                     }
                 }

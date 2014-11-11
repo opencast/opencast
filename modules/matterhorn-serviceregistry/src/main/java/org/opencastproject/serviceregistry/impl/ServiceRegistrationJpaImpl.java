@@ -77,7 +77,9 @@ import javax.xml.bind.annotation.XmlType;
                 + "WHERE rh.serviceType = :serviceType AND (rh.serviceState = org.opencastproject.serviceregistry.api.ServiceState.WARNING OR "
                 + "rh.serviceState = org.opencastproject.serviceregistry.api.ServiceState.ERROR)"),
         @NamedQuery(name = "ServiceRegistration.relatedservices.warning", query = "SELECT rh FROM ServiceRegistration rh "
-                + "WHERE rh.serviceType = :serviceType AND rh.serviceState = org.opencastproject.serviceregistry.api.ServiceState.WARNING") })
+                + "WHERE rh.serviceType = :serviceType AND rh.serviceState = org.opencastproject.serviceregistry.api.ServiceState.WARNING"),
+        @NamedQuery(name = "ServiceRegistration.countNotNormal", query = "SELECT count(rh) FROM ServiceRegistration rh "
+                + "WHERE rh.serviceState <> org.opencastproject.serviceregistry.api.ServiceState.NORMAL AND rh.hostRegistration.active = true") })
 public class ServiceRegistrationJpaImpl extends JaxbServiceRegistration {
 
   /** The logger */

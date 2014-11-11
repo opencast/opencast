@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, EngageModel, EngageTabLogic) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, EngageModel, EngageTabLogic) {
     "use strict";
 
     var events = {
@@ -48,6 +48,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
     var id_browserWarning = "browserWarning";
     var id_volume = "volume";
     var id_btn_reloadPage = "btn_reloadPage";
+    var id_btn_tryAnyway = "btn_tryAnyway";
     var id_customError = "customError";
     var id_customError_str = "customError_str";
     var class_loading = "loading";
@@ -70,9 +71,32 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
     var hotkey_volDown = "volDown";
     var hotkey_volUp = "volUp";
     var mediapackageError = false;
+    var numberOfPlugins = 0;
+    
+    var basilOptions = {
+        namespace: 'mhStorage'
+    };
+    Basil = new window.Basil(basilOptions);    
 
     function browserSupported() {
+        if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
+            console.log("Override Browser " + Basil.get("overrideBrowser"));
+            return true;
+        }         
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari) || (Bowser.msie && Bowser.version >= browser_minVersion_msie);
+    }
+
+    function translate() {
+	$.getJSON("language/theodul_language.json", function(data) {
+    	    if(data) {
+	    	var key = Object.keys(data);
+		for (var i = 0; i < key.length; i++)	{
+		    var lang_value = key[i];
+		    engageCore.log("data[" + lang_value + "] = " + data[lang_value]);
+		    $("." + lang_value).html(data[lang_value]);
+		}
+	    }
+	});
     }
 
     // theodul core init
@@ -131,7 +155,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
                 var cssAttr = {
                     type: "text/css",
                     rel: "stylesheet"
-                };
+                };                
                 // template obj
                 var core_template = "none";
                 // path to the require module with the view logic
@@ -170,14 +194,15 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
                         engageCore.template = template;
                         $(engageCore.el).html(_.template(template)).trigger("create");
                         // run init function of the view
-                        engageCore.pluginView.initView();
+                        engageCore.pluginView.initView();                       
                         if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                             // BEGIN LOAD PLUGINS
                             // fetch plugin information
                             engageCore.model.get("pluginsInfo").fetch({
                                 success: function(pluginInfos) {
                                     // load plugin as requirejs module
-                                    if (pluginInfos.get("pluginlist") && pluginInfos.get("pluginlist").plugins !== undefined) {
+                                    if ((pluginInfos.get("pluginlist").plugins != undefined) && pluginInfos.get("pluginlist")) {
+					numberOfPlugins = pluginInfos.get("pluginlist").plugins.length;
                                         if ($.isArray(pluginInfos.get("pluginlist").plugins)) {
                                             $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
                                                 var plugin_name = value["name"];
@@ -224,11 +249,12 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
                     $("#" + id_loading2).show();
                     window.setTimeout(function() {
                         $("#" + id_loadingProgressbar2).css("width", "100%");
-                        window.setTimeout(function() {
+                        window.setTimeout(function() {                           
                             $("." + class_loading).hide().detach();
                             if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                                 $("#" + id_browserWarning).hide().detach();
                                 $("#" + id_engage_view).show();
+				translate();
                                 if (engageCore.model.desktop || engageCore.model.mobile) {
                                     window.setTimeout(function() {
                                         if ($("#" + id_volume).html() == "") {
@@ -248,6 +274,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "e
                                 $("#" + id_engage_view + ", #" + id_customError).hide().detach();
                                 $("body").css("min-width", "");
                                 $("#" + id_browserWarning).show();
+                                $("#" + id_btn_tryAnyway).click(function(e) {
+                                    e.preventDefault();
+                                    window.open(window.location.href+"&browser=all");
+                                });
                             }
                         }, loadingDelay2);
                     }, loadingDelay1);

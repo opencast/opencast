@@ -722,12 +722,13 @@ public class SolrRequester {
     if (q.getOffset() > 0)
       query.setStart(q.getOffset());
 
-    if (q.isSortByPublicationDate()) {
-      query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
-    } else if (q.isSortByCreationDate()) {
-      query.addSortField(Schema.DC_CREATED, ORDER.desc);
-      // If the dublin core field dc:created has not been filled in...
-      query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
+    if (q.getSort() != null) {
+      ORDER order = q.isSortAscending() ? ORDER.asc : ORDER.desc;
+      query.addSortField(getSortField(q.getSort()), order);
+    }
+
+    if (!SearchQuery.Sort.DATE_CREATED.equals(q.getSort())) {
+      query.addSortField(getSortField(SearchQuery.Sort.DATE_CREATED), ORDER.desc);
     }
 
     query.setFields("* score");
@@ -781,6 +782,44 @@ public class SolrRequester {
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Returns the search index' field name that corresponds to the sort field.
+   *
+   * @param sort
+   *          the sort field
+   * @return the field name in the search index
+   */
+  protected String getSortField(SearchQuery.Sort sort) {
+    switch (sort) {
+      case TITLE:
+        return Schema.DC_TITLE_SORT;
+      case CONTRIBUTOR:
+        return Schema.DC_CONTRIBUTOR_SORT;
+      case DATE_CREATED:
+        return Schema.DC_CREATED;
+      case DATE_PUBLISHED:
+        return Schema.OC_MODIFIED;
+      case CREATOR:
+        return Schema.DC_CREATOR_SORT;
+      case LANGUAGE:
+        return Schema.DC_LANGUAGE;
+      case LICENSE:
+        return Schema.DC_LICENSE_SORT;
+      case MEDIA_PACKAGE_ID:
+        return Schema.ID;
+      case SERIES_ID:
+        return Schema.DC_IS_PART_OF;
+      case SUBJECT:
+        return Schema.DC_SUBJECT_SORT;
+      case DESCRIPTION:
+        return Schema.DC_DESCRIPTION_SORT;
+      case PUBLISHER:
+        return Schema.DC_PUBLISHER_SORT;
+      default:
+        throw new IllegalArgumentException("No mapping found between sort field and index");
+    }
   }
 
 }

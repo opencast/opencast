@@ -359,31 +359,31 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             // setup listeners for the playback rate
             $("#" + id_playbackRate050).click(function(e) {
                 e.preventDefault();
-                $("#" + id_playbackRateIndicator).html("0.5");
+                $("#" + id_playbackRateIndicator).html("50%");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5);
                 Basil.set(storage_playbackRate, "0.5");
             });
             $("#" + id_playbackRate075).click(function(e) {
                 e.preventDefault();
-                $("#" + id_playbackRateIndicator).html("0.75");
+                $("#" + id_playbackRateIndicator).html("75%");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75);
                 Basil.set(storage_playbackRate, "0.75");
             });
             $("#" + id_playbackRate100).click(function(e) {
                 e.preventDefault();
-                $("#" + id_playbackRateIndicator).html("1.0");
+                $("#" + id_playbackRateIndicator).html("100%");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0);
                 Basil.set(storage_playbackRate, "1.0");
             });
             $("#" + id_playbackRate125).click(function(e) {
                 e.preventDefault();
-                $("#" + id_playbackRateIndicator).html("1.25");
+                $("#" + id_playbackRateIndicator).html("125%");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25);
                 Basil.set(storage_playbackRate, "1.25");
             });
             $("#" + id_playbackRate150).click(function(e) {
                 e.preventDefault();
-                $("#" + id_playbackRateIndicator).html("1.5");
+                $("#" + id_playbackRateIndicator).html("150%");
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5);
                 Basil.set(storage_playbackRate, "1.5");
             });
@@ -701,11 +701,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                         }
                         var val = Math.round((duration / 1000) - currentTime);
                         val = ((val >= 0) && (val <= (duration / 1000))) ? val : "-";
-                        $("#" + id_playbackRemTime050).html(formatSeconds(!isNaN(val) ? (1.5 * val) : val));
-                        $("#" + id_playbackRemTime075).html(formatSeconds(!isNaN(val) ? (1.25 * val) : val));
-                        $("#" + id_playbackRemTime100).html(formatSeconds(!isNaN(val) ? (1.0 * val) : val));
-                        $("#" + id_playbackRemTime125).html(formatSeconds(!isNaN(val) ? (0.75 * val) : val));
-                        $("#" + id_playbackRemTime150).html(formatSeconds(!isNaN(val) ? (0.5 * val) : val));
+                        $("#" + id_playbackRemTime050).html(formatSeconds(!isNaN(val) ? (val / 0.5) : val));
+                        $("#" + id_playbackRemTime075).html(formatSeconds(!isNaN(val) ? (val / 0.75) : val));
+                        $("#" + id_playbackRemTime100).html(formatSeconds(!isNaN(val) ? (val) : val));
+                        $("#" + id_playbackRemTime125).html(formatSeconds(!isNaN(val) ? (val / 1.25) : val));
+                        $("#" + id_playbackRemTime150).html(formatSeconds(!isNaN(val) ? (val / 1.5) : val));
                     } else {
                         $("#" + id_slider).slider("option", "value", 0);
                     }

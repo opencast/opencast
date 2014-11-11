@@ -1,26 +1,26 @@
 <!-- theodul controls plugin desktop mode -->
 <div id="navigation_wrapper">
     <div id="navigation_control">
-        <div id="backward_button" class="controlbutton">
-            <img src="<%= plugin_path %>images/backward.png" />
+        <div id="backward_button" class="controlbutton" role="button" aria-label="Go to previous chapter">
+            <img src="<%= plugin_path %>images/backward.png" aria-label="previous chapter" title="previous chapter" alt="previous chapter" />
         </div>
-        <div id="playpause_controls" class="controlbutton">
-            <img id="play_button" class="playpause_btn" src="<%= plugin_path %>images/play.png" /> 
-            <img id="pause_button" class="playpause_btn" style="display: none;" src="<%= plugin_path %>images/pause.png" />
+        <div id="playpause_controls" class="controlbutton" role="button" aria-label="Play or Pause the video">
+            <img id="play_button" class="playpause_btn" src="<%= plugin_path %>images/play.png" aria-label="Play Video" /> 
+            <img id="pause_button" class="playpause_btn" style="display: none;" src="<%= plugin_path %>images/pause.png" aria-label="Pause Video" />
         </div>
-        <div id="forward_button" class="controlbutton">
-            <img src="<%= plugin_path %>images/forward.png" />
+        <div id="forward_button" class="controlbutton" role="button" aria-label="Go to next chapter">
+            <img src="<%= plugin_path %>images/forward.png" aria-label="next chapter" title="next chapter" alt="next chapter" />
         </div>
         <div class="clear"></div>
     </div>
-    <div id="volume"></div>
+    <div id="volume" role="slider" aria-label="Volume Slider"></div>
     <div class="volume_icon" id="volumeIcon">
-        <img id="unmute_button" class="mute_btn" src="<%= plugin_path %>images/volume.png" />
-        <img id="mute_button" class="mute_btn" style="display: none;" src="<%= plugin_path %>images/volumeMuted.png" /> 
+        <img id="unmute_button" class="mute_btn" src="<%= plugin_path %>images/volume.png" role="button" aria-label="Mute Volume" />
+        <img id="mute_button" class="mute_btn" style="display: none;" src="<%= plugin_path %>images/volumeMuted.png" role="button" aria-label="Unmute Volume" /> 
     </div>
     <div id="navigation_time">
         <% if((typeof startTime !== "undefined") && (typeof duration !== "undefined")) { %>
-        <input id="navigation_time_current" class="form-control" type="text" value="<%= startTime %>" /><span id="navigation_time_current_overview"> / <span id="navigation_time_duration"><%= duration %></span></span>
+        <input id="navigation_time_current" class="form-control" type="text" value="<%= startTime %>" role="timer" aria-label="Input field shows current video time. Can be edited." /><span id="navigation_time_current_overview"> / <span id="navigation_time_duration" aria-label="Total length of the video: <%= duration %>"><%= duration %></span></span>
         <% } else { %>
         <input id="navigation_time_current" type="text" value="00:00:00" /><span> / <span id="navigation_time_duration">00:00:00</span></span>
         <% } %>
@@ -28,7 +28,7 @@
     <!-- ##### Logo ##### -->
     <div id="navigation_logo">
         <% if(typeof logoLink !== "undefined") { %>
-        <a href="<%= logoLink %>">
+        <a href="<%= logoLink %>" role="link" aria-label="Opencast Logo: Go to Media Module">
         <% } %>
         <img src="<%= plugin_path %>images/logo.png" />
         <% if(typeof logoLink !== "undefined") { %>
@@ -39,13 +39,13 @@
     <div id="menu">
         <div class="btn-group">
             <div class="btn-group">
-                <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown">
+                <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="Speed Button. Select speed from dropdown.">
                 <span class="glyphicon glyphicon-time"></span>
                 <span id="playbackRateIndicator">1.0</span>
                 <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
-                    <li class="disabled" role="presentation"><a id="playbackDescription" role="menuitem" tabindex="-1" href="#"><b>Playback rate</b> (remaining time)</a></li>
+                    <li class="disabled" role="presentation"><a id="playbackDescription" role="menuitem" tabindex="-1" href="#"><b><p class="lang_playbackRate">Playback rate</p></b> (<p class="lang_remainingTime">remaining time</p>)</a></li>
                     <li class="divider"></li>
                     <li role="presentation"><a id="playback050" role="menuitem" tabindex="-1" href="#"><b>0.5</b> (<span id="playbackRemTime050"></span>)</a></li>
                     <li role="presentation"><a id="playback075" role="menuitem" tabindex="-1" href="#"><b>0.75</b> (<span id="playbackRemTime075"></span>)</a></li>
@@ -54,12 +54,12 @@
                     <li role="presentation"><a id="playback150" role="menuitem" tabindex="-1" href="#"><b>1.5</b> (<span id="playbackRemTime150"></span>)</a></li>
                 </ul>
             </div>
-            <button id="fullscreen_button" type="button" class="btn btn-default disabled">
+            <button id="fullscreen_button" type="button" class="btn btn-default disabled" role="button" aria-label="Fullscreen video">
             <span class="glyphicon glyphicon-fullscreen"></span>
             </button>
         </div>
         <div class="btn-group">
-            <button id="embed_button" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown">
+            <button id="embed_button" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" aria-label="Embed Button. Select embed size from dropdown.">
             <span class="glyphicon glyphicon-share"></span>
             <span class="caret"></span>
             </button>
@@ -74,7 +74,7 @@
     </div>
     <div class="clear"></div>
     <!-- ##### Slider ##### -->
-    <div id="slider"></div>
+    <div id="slider" role="progressbar"></div>
     <div id="segment_wrapper">
         <% if((typeof durationMS !== "undefined") && (typeof segments !== "undefined") && (segments.length > 0)) { var i = 0; %>
         <% _.each(segments, function(segment) { %>
