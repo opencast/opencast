@@ -32,6 +32,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         nextEpisode: new EngageEvent("Core:nextEpisode", "", "trigger"),
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
         volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
+        translate: new EngageEvent("Core:translate", "", "trigger"),
         mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler")
     };
 
@@ -72,7 +73,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var hotkey_volUp = "volUp";
     var mediapackageError = false;
     var numberOfPlugins = 0;
-    
+
     var basilOptions = {
         namespace: 'mhStorage'
     };
@@ -86,15 +87,22 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari) || (Bowser.msie && Bowser.version >= browser_minVersion_msie);
     }
 
-    function translate() {
-	$.getJSON("language/theodul_language.json", function(data) {
+    function detectLanguage() {
+	return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function translate(language) {
+	var jsonstr = "language/theodul_language_en.json";
+	if(language == "de") {
+	    console.log("Chosing german translations");
+	    var jsonstr = "language/theodul_language_de.json";
+	} else {
+	    console.log("Chosing english translations");
+	    // No other languages supported, yet
+	}
+	$.getJSON(jsonstr, function(data) {
     	    if(data) {
-	    	var key = Object.keys(data);
-		for (var i = 0; i < key.length; i++)	{
-		    var lang_value = key[i];
-		    engageCore.log("data[" + lang_value + "] = " + data[lang_value]);
-		    $("." + lang_value).html(data[lang_value]);
-		}
+		engageCore.trigger(events.translate.getName(), data);
 	    }
 	});
     }
@@ -254,7 +262,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                                 $("#" + id_browserWarning).hide().detach();
                                 $("#" + id_engage_view).show();
-				translate();
+				translate(detectLanguage());
                                 if (engageCore.model.desktop || engageCore.model.mobile) {
                                     window.setTimeout(function() {
                                         if ($("#" + id_volume).html() == "") {

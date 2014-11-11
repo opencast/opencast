@@ -35,6 +35,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var plugin;
     var events = {
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
+        translate: new Engage.Event("Core:translate", "", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
@@ -88,6 +89,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var mediapackageChange = "change:mediaPackage";
     var initCount = 3;
     var mediapackageError = false;
+    var translations = new Array();
 
     var DescriptionTabView = Backbone.View.extend({
         initialize: function(mediaPackageModel, template) {
@@ -108,7 +110,15 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                     series: this.model.get("series"),
                     contributor: this.model.get("contributor"),
                     date: this.model.get("date"),
-                    views: Engage.model.get("views").get("stats").views
+                    views: Engage.model.get("views").get("stats").views,
+		    str_title: translate("title", "Title"),
+		    str_noTitle: translate("noTitle", "No title"),
+		    str_creator: translate("creator", "Creator"),
+		    str_contributor: translate("presenter", "Contributor"),
+		    str_views: translate("views", "Views"),
+		    str_series: translate("series", "Series"),
+		    str_recordingDate: translate("recordingDate", "Recording date"),
+		    str_description: translate("description", "Description")
                 };
                 // try to format the date
                 if (Moment(tempVars.date) != null) {
@@ -148,6 +158,10 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         }
     });
 
+    function translate(str, strIfNotFound) {
+	return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
+
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
@@ -162,6 +176,14 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
             });
             Engage.model.get("views").on("change", function() {
                 descriptionTabView.render();
+            });
+            Engage.on(plugin.events.translate.getName(), function(data) {
+	    	var key = Object.keys(data);
+		for (var i = 0; i < key.length; i++)	{
+		    var lang_value = key[i];
+		    translations[lang_value] = data[lang_value];
+		}
+		descriptionTabView.render();
             });
         }
     }
