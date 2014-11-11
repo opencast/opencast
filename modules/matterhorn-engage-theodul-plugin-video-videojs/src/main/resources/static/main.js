@@ -472,6 +472,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
                     Engage.on(plugin.events.deactivate.getName(), function(id) {
                         console.log("deactivate:  " + id);
+                        notActive.list.push(id);
                     });
 
                     // total number of video displays and all active
