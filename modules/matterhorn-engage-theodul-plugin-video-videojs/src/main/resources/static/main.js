@@ -319,11 +319,14 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
             Engage.trigger(plugin.events.isAudioOnly.getName(), isAudioOnly);
 
             if (isDesktopMode) {
+                Engage.log("Render Desktop");
                 renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio);
-            } else if (isEmbedMode, videoSources, videoDisplays, aspectRatio) {
-                renderEmbed(videoDataView);
-            } else if (isMobileMode, videoSources, videoDisplays, aspectRatio) {
-                renderMobile(videoDataView);
+            } else if (isEmbedMode && videoSources && videoDisplays && aspectRatio) {
+                console.log('Render Embed');
+                renderEmbed(videoDataView, videoSources, videoDisplays, aspectRatio);
+            } else if (isMobileMode && videoSources && videoDisplays && aspectRatio) {
+                Engage.log("Render Mobile");
+                renderMobile(videoDataView, videoSources, videoDisplays, aspectRatio);
             }
             if (videoDataView.model.get("type") != "audio") {
                 checkVideoDisplaySize();
@@ -536,6 +539,7 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
         checkVideoDisplaySize();
         initMobileEvents();
 
+        var i = 0;
         for (var v in videoSources) {
             if (videoSources[v].length > 0) {
                 Engage.log("Init Video Display: " + v);
