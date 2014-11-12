@@ -1,3 +1,13 @@
+<!-- theodul controls plugin desktop mode -->
+<% if((typeof str_title !== "undefined")
+   && (typeof str_noTitle !== "undefined")
+   && (typeof str_creator !== "undefined")
+   && (typeof str_contributor !== "undefined")
+   && (typeof str_views !== "undefined")
+   && (typeof str_series !== "undefined")
+   && (typeof str_recordingDate !== "undefined")
+   && (typeof str_description !== "undefined")
+   && (typeof str_noDescriptionAvailable !== "undefined")) { %>
 <!-- theodul tab description plugin desktop mode -->
 <div id="engage_description_tab_content">
     <% if(typeof description !== "undefined" 
@@ -70,5 +80,7 @@
     </div>
     <div class="clear"></div>
     <% } else { %>
+    <%= str_noDescriptionAvailable %>
     <% } %>
 </div>
+<% } %>

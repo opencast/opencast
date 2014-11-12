@@ -111,14 +111,15 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                     contributor: this.model.get("contributor"),
                     date: this.model.get("date"),
                     views: Engage.model.get("views").get("stats").views,
-		    str_title: translate("title", "Title"),
-		    str_noTitle: translate("noTitle", "No title"),
-		    str_creator: translate("creator", "Creator"),
-		    str_contributor: translate("presenter", "Contributor"),
-		    str_views: translate("views", "Views"),
-		    str_series: translate("series", "Series"),
-		    str_recordingDate: translate("recordingDate", "Recording date"),
-		    str_description: translate("description", "Description")
+                    str_title: translate("title", "Title"),
+                    str_noTitle: translate("noTitle", "No title"),
+                    str_creator: translate("creator", "Creator"),
+                    str_contributor: translate("presenter", "Contributor"),
+                    str_views: translate("views", "Views"),
+                    str_series: translate("series", "Series"),
+                    str_recordingDate: translate("recordingDate", "Recording date"),
+                    str_description: translate("description", "Description"),
+                    str_noDescriptionAvailable: translate("noDescriptionAvailable", "No description available.")
                 };
                 // try to format the date
                 if (Moment(tempVars.date) != null) {
@@ -147,7 +148,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                 }
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
-         /*
+                /*
 	      $(".description-item").mouseover(function() {
 	      $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
 	      }).mouseout(function() {
@@ -159,7 +160,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     });
 
     function translate(str, strIfNotFound) {
-	return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
 
     function initPlugin() {
@@ -178,12 +179,12 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                 descriptionTabView.render();
             });
             Engage.on(plugin.events.translate.getName(), function(data) {
-	    	var key = Object.keys(data);
-		for (var i = 0; i < key.length; i++)	{
-		    var lang_value = key[i];
-		    translations[lang_value] = data[lang_value];
-		}
-		descriptionTabView.render();
+                var key = Object.keys(data);
+                for (var i = 0; i < key.length; i++) {
+                    var lang_value = key[i];
+                    translations[lang_value] = data[lang_value];
+                }
+                descriptionTabView.render();
             });
         }
     }
