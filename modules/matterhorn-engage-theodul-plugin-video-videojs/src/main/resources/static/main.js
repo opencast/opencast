@@ -736,7 +736,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     function orderVideoDisplays(videoDisplays) {
         // max size of display
         // minus footer and header
-        var maxHeight = $(window).height() - 105;
+        var maxHeight = $(window).height() - 120;
         var maxWidth = $(window).width();
 
         var videoWidth = 0;
@@ -763,24 +763,32 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
         console.log("Calculated max. Videosize (w/h): " + videoWidth + "/" + videoHeight);
 
+        $('#videojs_wrapper').height(maxHeight);
+
+        if (Engage.model.get("orientation") == "portrait") {
+            $('.mobileVideoBox').height((((1 / videoDisplays.length) * 100) - 0.5) + "%");
+        };
         // Set to init size
-        $('.mobileVideoBox').height(videoHeight);
-        $('.mobileVideoBox').width(videoWidth);
+        //$('.mobileVideoBox').width(videoWidth);
+        //$('.mobileVideoBox').height(videoHeight);
+
 
         console.log("Set Videobox to (w/h): " + $('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
         console.log("Breite: " + videoWidth);
 
-        if (videoWidth > maxWidth) {
+        /*if (videoWidth > maxWidth) {
             console.log("Nicht breit genug:");
             $('.mobileVideoBox').width(maxWidth * 0.8);
             $('.mobileVideoBox').height((maxWidth * 0.8) * ratio);
-        }
-
+            console.log("Set Videobox to (w/h): " + $('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
+        }*/
+        /*
         if (videoHeight > maxHeight) {
-            console.log("Nicht hoch genug");
-            var calcHeight = $('.mobileVideoBox').height(maxHeight * 0.8).height();
+            console.log("Video Höhe zu groß");
+            var calcHeight = $('.mobileVideoBox').height((maxHeight * 0.8) * ratio).height();
             $('.mobileVideoBox').width((maxHeight * 0.8) / ratio);
-        }
+            console.log("Set Videobox to (w/h): " + $('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
+        }*/
     }
 
     function checkVideoDisplaySize() {

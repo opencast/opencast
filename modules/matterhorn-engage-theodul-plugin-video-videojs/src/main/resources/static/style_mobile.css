@@ -16,13 +16,14 @@
 }*/
 
 .displayWrapper {
-	height: inherit;
+	height: 100%;
 }
 
 @media screen and (orientation:landscape) {
 	.mobileVideoBox {
 		float:left;
 		width: 49% !important;
+		height: 100% !important;
 	}
 	.mobileVideoBox:nth-child(2) {
 		float:right;
