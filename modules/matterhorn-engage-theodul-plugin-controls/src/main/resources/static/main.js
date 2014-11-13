@@ -63,7 +63,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "handler"),
-        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler")
+        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler"),
+        translate: new Engage.Event("Core:translate", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -155,7 +156,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var id_playbackRemTime150 = "playbackRemTime150";
     var class_dropdown = "dropdown-toggle";
 
-    /* don"t change these variables */
+    /* don't change these variables */
     var videosReady = false;
     var videoDataModelChange = "change:videoDataModel";
     var mediapackageChange = "change:mediaPackage";
@@ -179,6 +180,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var embedWidthThree;
     var embedWidthFour;
     var embedWidthFive;
+    var translations = new Array();
     var entityMap = {
         "&": "&amp;",
         "<": "&lt;",
@@ -187,6 +189,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         "'": '&#39;',
         "/": '&#x2F;'
     };
+
+    function translate(str, strIfNotFound) {
+        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
 
     function escapeHtml(string) {
         return String(string).replace(/[&<>"'\/]/g, function(s) {
@@ -228,7 +234,22 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                     durationMS: (duration && (duration > 0)) ? duration : 1, // duration in ms
                     duration: (duration ? formatSeconds(duration / 1000) : formatSeconds(0)), // formatted duration
                     logoLink: logoLink,
-                    segments: segments
+                    segments: segments,
+                    str_prevChapter: translate("prevChapter", "Go to previous chapter"),
+                    str_nextChapter: translate("nextChapter", "Go to next chapter"),
+                    str_playPauseVideo: translate("playPauseVideo", "Play or pause the video"),
+                    str_playVideo: translate("playVideo", "Play the video"),
+                    str_pauseVideo: translate("pauseVideo", "Pause the video"),
+                    str_volumeSlider: translate("volumeSlider", "Volume slider"),
+                    str_muteVolume: translate("muteVolume", "Mute volume"),
+                    str_unmuteVolume: translate("unmuteVolume", "Unmute Volume"),
+                    str_message_inputField: translate("message_inputField", "Input field shows current video time. Can be edited."),
+                    str_totalVideoLength: translate("totalVideoLength", "Total length of the video:"),
+                    str_openMediaModule: translate("openMediaModule", "Go to Media Module"),
+                    str_playbackRateButton: translate("playbackRateButton", "Playback rate button. Select playback rate from dropdown."),
+                    str_playbackRate: translate("playbackRate", "Playback rate"),
+                    str_remainingTime: translate("remainingTime", "remaining time"),
+                    str_embedButton: translate("embedButton", "Embed Button. Select embed size from dropdown.")
                 };
 
                 // compile template and load into the html
@@ -615,7 +636,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if ((isDesktopMode || isMobileMode) && plugin.inserted) {
-            new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
+            var controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
                 aspectRatioWidth = as[0] || 0;
                 aspectRatioHeight = as[1] || 0;
@@ -725,6 +746,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                 if (!mediapackageError) {
                     $("#" + id_segmentNo + no).removeClass("segmentHover");
                 }
+            });
+            Engage.on(plugin.events.translate.getName(), function(data) {
+                var key = Object.keys(data);
+                for (var i = 0; i < key.length; i++) {
+                    var lang_value = key[i];
+                    translations[lang_value] = data[lang_value];
+                }
+                controlsView.render();
             });
             loadStoredInitialValues();
         }

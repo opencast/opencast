@@ -1,17 +1,21 @@
 <!-- theodul description plugin desktop mode -->
+<% if((typeof str_videoTitle !== "undefined")
+   && (typeof str_creator !== "undefined")
+   && (typeof str_date !== "undefined")) { %>
 <div id="engage_basic_description">
     <% if(typeof title !== "undefined" ){ %>
-    <div id="engage_basic_description_title" aria-label="Video title: <%= title %>"><%= title %></div>
+    <div id="engage_basic_description_title" aria-label="<%= str_videoTitle %>: <%= title %>"><%= title %></div>
     <% } %>
     <div id="engage_basic_description_info">
         <% if(typeof creator !== "undefined" ){ %>
-        <div id="engage_basic_description_creator" class="engage_basic_description_wrap"  aria-label="Lecturer: <%= creator %>"><%= creator %></div>
+        <div id="engage_basic_description_creator" class="engage_basic_description_wrap"  aria-label="<%= str_creator %>: <%= creator %>"><%= creator %></div>
         <% } %>
         <% if((typeof creator !== "undefined" ) && (typeof date !== "undefined" ) && (creator !== "")) { %>
         <div class="engage_basic_description_wrap">, &nbsp;</div>
         <% } %>
         <% if(typeof date !== "undefined" ){ %>
-        <div id="engage_basic_description_date" aria-label="Date: <%= date %>"><%= date %></div>
+        <div id="engage_basic_description_date" aria-label="<%= str_date %>: <%= date %>"><%= date %></div>
         <% } %>
     </div>
 </div>
+<% } %>

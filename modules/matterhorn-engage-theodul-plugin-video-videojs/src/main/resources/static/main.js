@@ -14,10 +14,10 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_core"], function(require, $, _, Backbone, Basil, Engage) {
+define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_core"], function(require, $, _, Backbone, Basil, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage VideoJS Videodisplay";
-    var PLUGIN_TYPE = "engage_video";   
+    var PLUGIN_TYPE = "engage_video";
     var PLUGIN_VERSION = "1.0";
     var PLUGIN_TEMPLATE = "template.html";
     var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
@@ -64,20 +64,13 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
         sliderStop: new Engage.Event("Slider:stop", "slider stopped", "handler"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "handler"),
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
+        translate: new Engage.Event("Core:translate", "", "handler")
     };
 
     var isDesktopMode = false;
     var isEmbedMode = false;
     var isMobileMode = false;
-    
-    var flavors = "";
-    var mimetypes = "";
-
-    var basilOptions = {
-        namespace: 'mhStorage'
-    };
-    Basil = new window.Basil(basilOptions);
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
@@ -190,6 +183,19 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
     var videoResultions = new Array();
     var loadDash = false;
     var loadHls = false;
+    var flavors = "";
+    var mimetypes = "";
+    var translations = new Array();
+    var videoDataView = undefined;
+
+    var basilOptions = {
+        namespace: "mhStorage"
+    };
+    Basil = new window.Basil(basilOptions);
+
+    function translate(str, strIfNotFound) {
+        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
 
     function escapeRegExp(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -198,22 +204,29 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
     function replaceAll(string, find, replace) {
         return string.replace(new RegExp(escapeRegExp(find), "g"), replace);
     }
-    
+
     function preferedFormat() {
         if (Basil.get("preferedFormat") == null) {
             return null;
         }
         switch (Basil.get("preferedFormat")) {
-            case "hls" : return "application/x-mpegURL" ;
-            case "dash" : return "application/dash+xml" ;    
-            case "rtmp" : return "rtmp/mp4";
-            case "mp4" : return "video/mp4";
-            case "webm" : return "video/webm";
-            case "audio" : return "audio/";
-            default : return null;
+            case "hls":
+                return "application/x-mpegURL";
+            case "dash":
+                return "application/dash+xml";
+            case "rtmp":
+                return "rtmp/mp4";
+            case "mp4":
+                return "video/mp4";
+            case "webm":
+                return "video/webm";
+            case "audio":
+                return "audio/";
+            default:
+                return null;
         }
     }
-    
+
     function acceptFormat(track) {
         if (preferedFormat() == 0 || mimetypes.indexOf(preferedFormat()) == -1) {
             return true; //prefered format is not available, accept all
@@ -224,7 +237,7 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
             return false;
         }
     }
-    
+
     function parseVideoResolution(resolution) {
         var res = resolution.match(/(\d+)x(\d+)/);
         res[1] = parseInt(res[1]);
@@ -248,15 +261,15 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
         render: function() {
             prepareRenderingVideoDisplay(this);
         }
-    });    
-    
+    });
+
     function prepareRenderingVideoDisplay(videoDataView) {
-        
+
         if (loadHls) {
             require([relative_plugin_path + mediaSourcesPath], function(videojsmedia) {
                 Engage.log("Video: Lib videojs media sources loaded");
                 require([relative_plugin_path + hlsPath], function(videojshls) {
-                    Engage.log("Video: Lib videojs HLS playback loaded");               
+                    Engage.log("Video: Lib videojs HLS playback loaded");
                     renderVideoDisplay(videoDataView);
                 });
             });
@@ -264,15 +277,17 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
             renderVideoDisplay(videoDataView);
         }
     }
-    
-    function renderVideoDisplay (videoDataView) {
+
+    function renderVideoDisplay(videoDataView) {
         Engage.log("Rendering video displays");
 
         var src = (videoDataView.model.get("videoSources") && videoDataView.model.get("videoSources")["audio"]) ? videoDataView.model.get("videoSources")["audio"] : [];
         var tempVars = {
             ids: videoDataView.model.get("ids"),
             type: videoDataView.model.get("type"),
-            sources: src
+            sources: src,
+            str_error_AudioCodecNotSupported: translate("error_AudioCodecNotSupported", "Error: The audio codec is not supported by this browser."),
+            str_error_AudioElementNotSupported: translate("error_AudioElementNotSupported", "Error: Your browser does not support the audio element.")
         };
         if (isEmbedMode && !isAudioOnly) {
             tempVars.id = videoDataView.model.get("ids")[0];
@@ -333,11 +348,11 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                 window.setTimeout(checkVideoDisplaySize, checkVideoDisplaySizeTimeout);
             }
         }
-    }    
+    }
 
     function renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio) {
         var i = 0;
-        for (var v in videoSources) {          
+        for (var v in videoSources) {
             if ((videoSources[v].length > 0) && (videoDisplays.length > i)) {
                 initVideojsVideo(videoDisplays[i], videoSources[v], videoDataView.videojs_swf);
                 ++i;
@@ -437,7 +452,7 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                 });
             }
         }
-    }           
+    }
 
     function renderEmbed(videoDataView, videoSources, videoDisplays, aspectRatio) {
         var nrOfVideoSources = 0;
@@ -459,35 +474,35 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
             $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_switchPlayer + "\" class=\"" + class_vjs_switchPlayer + " " + class_vjs_control + " " + class_vjs_menu_button + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"></div>");
             $("#" + id_btn_switchPlayer).append(
                 "<div class=\"vjs-control-content\">" +
-                "<span class=\"" + class_vjs_control_text + "\">Switch player</span>" +
+                "<span class=\"" + class_vjs_control_text + "\">" + translate("switchPlayer", "Switch player") + "</span>" +
                 "</div>" +
                 "<div id=\"" + id_switchPlayer_value + "\" class=\"" + class_vjs_switchPlayer_value + "\">" +
                 "Vid. 1" +
                 "</div>" +
                 "<div class=\"" + class_vjs_menu + "\">" +
                 "<ul class=\"" + class_vjs_menu_content + "\">" +
-                "<li id=\"" + id_btn_video1 + "\" aria-selected=\"true\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">Video 1</li>" +
-                "<li id=\"" + id_btn_video2 + "\" aria-selected=\"false\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">Video 2</li>" +
+                "<li id=\"" + id_btn_video1 + "\" aria-selected=\"true\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">" + translate("video", "Video") + " 1</li>" +
+                "<li id=\"" + id_btn_video2 + "\" aria-selected=\"false\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">" + translate("video", "Video") + " 2</li>" +
                 "</ul>" +
                 "</div>"
             );
             $("#" + id_btn_video1).click(function(e) {
-                $("#" + id_switchPlayer_value).html("Vid. 1");
+                $("#" + id_switchPlayer_value).html(translate("video_short", "Vid.") + " 1");
                 if (!currentlySelectedVideodisplay == 0) {
                     currentlySelectedVideodisplay = 0;
                     videojs(globalVideoSource[0].id).src(globalVideoSource[0].src);
                 }
             });
             $("#" + id_btn_video2).click(function(e) {
-                $("#" + id_switchPlayer_value).html("Vid. 2");
+                $("#" + id_switchPlayer_value).html(translate("video_short", "Vid.") + " 2");
                 if (!currentlySelectedVideodisplay == 1) {
                     currentlySelectedVideodisplay = 1;
                     videojs(globalVideoSource[1].id).src(globalVideoSource[1].src);
                 }
             });
         }
-        $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">Open in player</span></div></div>");
-        $("." + class_audio_wrapper).append("<a id=\"" + id_btn_openInPlayer + "\" href=\"#\">Open in player</a>");
+        $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">" + translate("openInPlayer", "Open in player") + "</span></div></div>");
+        $("." + class_audio_wrapper).append("<a id=\"" + id_btn_openInPlayer + "\" href=\"#\">" + translate("openInPlayer", "Open in player") + "</a>");
 
         $("#" + id_btn_openInPlayer).click(function(e) {
             e.preventDefault();
@@ -530,7 +545,7 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                     checkVideoDisplaySize();
                 });
             }
-        }    
+        }
     }
 
     function renderMobile(videoDataView, videoSources, videoDisplays, aspectRatio) {
@@ -571,7 +586,7 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
             // first as masterdisplay
             registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
 
-            if(nr >= 2) {
+            if (nr >= 2) {
                 // throw some important synchronize.js-events for other plugins
                 $(document).on(event_sjs_allPlayersReady, function(event) {
                     videosReady = true;
@@ -623,20 +638,20 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                 if (!isAudioOnly) {
                     Engage.trigger(plugin.events.ready.getName());
                 }
-            }        
+            }
         }
         // Set Displays to correct size
         orderVideoDisplays(videoDisplays);
-        console.groupEnd();    
+        console.groupEnd();
     }
 
     function initMobileEvents() {
-        events.tapHold      = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
-        events.resize       = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
-        events.swipeLeft    = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
-        events.deactivate   = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
-        events.activate     = new Engage.Event("Video:activate", "videoDisplay activated", "both");
-        events.resize       = new Engage.Event("Video:resize", "videoDisplay resized", "both");
+        events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
+        events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
+        events.swipeLeft = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
+        events.deactivate = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
+        events.activate = new Engage.Event("Video:activate", "videoDisplay activated", "both");
+        events.resize = new Engage.Event("Video:resize", "videoDisplay resized", "both");
 
         Engage.on(plugin.events.deactivate.getName(), function(id) {
             Engage.log("Video: Deactivate: " + id);
@@ -647,7 +662,7 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
             Engage.trigger(plugin.events.tapHold.getName(), event.currentTarget.id);
         });
 
-        $(".video-js").on('swipeleft', function(event){
+        $(".video-js").on('swipeleft', function(event) {
             Engage.log(event);
             Engage.trigger(plugin.events.swipeLeft.getName(), event.currentTarget.id);
         });
@@ -719,54 +734,53 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
     }
 
     function orderVideoDisplays(videoDisplays) {
-                 // max size of display
-                    // minus footer and header
-                    var maxHeight = $(window).height() - 105;
-                    var maxWidth = $(window).width();
+        // max size of display
+        // minus footer and header
+        var maxHeight = $(window).height() - 105;
+        var maxWidth = $(window).width();
 
-                    var videoWidth = 0;
-                    var videoHeight = 0;
+        var videoWidth = 0;
+        var videoHeight = 0;
 
-                    var ratio = 0;
+        var ratio = 0;
 
-                    console.log("Size of Area (w/h): " + maxWidth + "/" + maxHeight);
+        console.log("Size of Area (w/h): " + maxWidth + "/" + maxHeight);
 
-                    if ((aspectRatio != null) && (videoDisplays.length > 0)) {
-                        aspectRatio[1] = parseInt(aspectRatio[1]);
-                        aspectRatio[2] = parseInt(aspectRatio[2]);
+        if ((aspectRatio != null) && (videoDisplays.length > 0)) {
+            aspectRatio[1] = parseInt(aspectRatio[1]);
+            aspectRatio[2] = parseInt(aspectRatio[2]);
 
-                        videoWidth = aspectRatio[1];
-                        videoHeight = aspectRatio[2];
+            videoWidth = aspectRatio[1];
+            videoHeight = aspectRatio[2];
 
-                        ratio = (aspectRatio[2] / aspectRatio[1])
-                        console.log("Calculated Ratio: " + ratio);
-                        
-                        Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
-                    } else {
-                        Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
-                    }
-                    
-                    console.log("Calculated max. Videosize (w/h): " + videoWidth + "/" + videoHeight);
+            ratio = (aspectRatio[2] / aspectRatio[1])
+            console.log("Calculated Ratio: " + ratio);
 
-                    // Set to init size
-                    $('.mobileVideoBox').height(videoHeight);
-                    $('.mobileVideoBox').width(videoWidth);
+            Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
+        } else {
+            Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
+        }
 
-                    console.log("Set Videobox to (w/h): "+$('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
-                    console.log("Breite: " + videoWidth);
+        console.log("Calculated max. Videosize (w/h): " + videoWidth + "/" + videoHeight);
 
-                    if (videoWidth > maxWidth) {
-                        console.log("Nicht breit genug:");
-                        $('.mobileVideoBox').width(maxWidth * 0.8);
-                        $('.mobileVideoBox').height((maxWidth * 0.8) * ratio);
-                    }
+        // Set to init size
+        $('.mobileVideoBox').height(videoHeight);
+        $('.mobileVideoBox').width(videoWidth);
 
-                    if (videoHeight > maxHeight) {
-                        console.log("Nicht hoch genug");
-                        var calcHeight = $('.mobileVideoBox').height(maxHeight * 0.8).height();
-                        $('.mobileVideoBox').width( (maxHeight * 0.8)/ratio);
-                    }
+        console.log("Set Videobox to (w/h): " + $('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
+        console.log("Breite: " + videoWidth);
 
+        if (videoWidth > maxWidth) {
+            console.log("Nicht breit genug:");
+            $('.mobileVideoBox').width(maxWidth * 0.8);
+            $('.mobileVideoBox').height((maxWidth * 0.8) * ratio);
+        }
+
+        if (videoHeight > maxHeight) {
+            console.log("Nicht hoch genug");
+            var calcHeight = $('.mobileVideoBox').height(maxHeight * 0.8).height();
+            $('.mobileVideoBox').width((maxHeight * 0.8) / ratio);
+        }
     }
 
     function checkVideoDisplaySize() {
@@ -893,14 +907,14 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                     if (duration && (time < duration)) {
                         audioPlayer.currentTime = time;
                     } else {
-                        Engage.trigger(plugin.events.customError.getName(), "The given time (" + formatSeconds(time) + ") has to be smaller than the duration (" + formatSeconds(duration) + ").");
+                        Engage.trigger(plugin.events.customError.getName(), translate("givenTime", "The given time") + " (" + formatSeconds(time) + ") " + translate("hasToBeSmallerThanDuration", "has to be smaller than the duration") + " (" + formatSeconds(duration) + ").");
                         Engage.trigger(plugin.events.timeupdate.getName(), audioPlayer.currentTime);
                     }
                 } else {
                     if (!videosReady) {
-                        Engage.trigger(plugin.events.customNotification.getName(), "Please wait until the video has been loaded to set a time.");
+                        Engage.trigger(plugin.events.customNotification.getName(), translate("msg_waitToSetTime", "Please wait until the video has been loaded to set a time."));
                     } else { // pressedPlayOnce
-                        Engage.trigger(plugin.events.customNotification.getName(), "Please start playing the video once to set a time.");
+                        Engage.trigger(plugin.events.customNotification.getName(), translate("msg_startPlayingToSetTime", "Please start playing the video once to set a time."));
                     }
                     Engage.trigger(plugin.events.timeupdate.getName(), 0);
                 }
@@ -913,9 +927,9 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                     audioPlayer.currentTime = normTime;
                 } else {
                     if (!videosReady) {
-                        Engage.trigger(plugin.events.customNotification.getName(), "Please wait until the video has been loaded to seek.");
+                        Engage.trigger(plugin.events.customNotification.getName(), translate("msg_waitToSeek", "Please wait until the video has been loaded to seek."));
                     } else { // pressedPlayOnce
-                        Engage.trigger(plugin.events.customNotification.getName(), "Please start playing the video once to seek.");
+                        Engage.trigger(plugin.events.customNotification.getName(), translate("msg_startPlayingToSeek", "Please start playing the video once to seek."));
                     }
                     Engage.trigger(plugin.events.timeupdate.getName(), 0);
                 }
@@ -1005,14 +1019,14 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                     if (duration && (time < duration)) {
                         theodulVideodisplayMaster.currentTime(time);
                     } else {
-                        Engage.trigger(plugin.events.customError.getName(), "The given time (" + formatSeconds(time) + ") has to be smaller than the duration (" + formatSeconds(duration) + ").");
+                        Engage.trigger(plugin.events.customError.getName(), translate("givenTime", "The given time") + " (" + formatSeconds(time) + ") " + translate("hasToBeSmallerThanDuration", "has to be smaller than the duration") + " (" + formatSeconds(duration) + ").");
                         Engage.trigger(plugin.events.timeupdate.getName(), theodulVideodisplayMaster.currentTime());
                     }
                 } else {
                     if (!videosReady) {
-                        Engage.trigger(plugin.events.customNotification.getName(), "Please wait until the video has been loaded to set a time.");
+                        Engage.trigger(plugin.events.customNotification.getName(), translate("msg_waitToSetTime", "Please wait until the video has been loaded to set a time."));
                     } else { // pressedPlayOnce
-                        Engage.trigger(plugin.events.customNotification.getName(), "Please start playing the video once to set a time.");
+                        Engage.trigger(plugin.events.customNotification.getName(), translate("msg_startPlayingToSetTime", "Please start playing the video once to set a time."));
                     }
                     Engage.trigger(plugin.events.timeupdate.getName(), 0);
                 }
@@ -1024,9 +1038,9 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                     theodulVideodisplayMaster.currentTime(normTime);
                 } else {
                     if (!videosReady) {
-                        Engage.trigger(plugin.events.customNotification.getName(), "Please wait until the video has been loaded to seek.");
+                        Engage.trigger(plugin.events.customNotification.getName(), translate("msg_waitToSeek", "Please wait until the video has been loaded to seek."));
                     } else { // pressedPlayOnce
-                        Engage.trigger(plugin.events.customNotification.getName(), "Please start playing the video once to seek.");
+                        Engage.trigger(plugin.events.customNotification.getName(), translate("msg_startPlayingToSeek", "Please start playing the video once to seek."));
                     }
                     Engage.trigger(plugin.events.timeupdate.getName(), 0);
                 }
@@ -1049,7 +1063,7 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
             });
         }
     }
-    
+
     function extractFlavorMainType(flavor) {
         var types = flavor.split("/");
         if (types.length > 0) {
@@ -1057,7 +1071,7 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
         }
         return "presenter" //fallback value, should never be returned, but does no harm 
     }
-    
+
     function setupStreams(tracks, attachments) {
         Engage.log("setting up streams");
         var mediaInfo = {};
@@ -1074,16 +1088,16 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                 //rtmp is treated different for video.js. Mimetype and 
                 //url have to be changed                      
                 if (mediaInfo.tracks[i].mimetype == "video/mp4" &&
-                     (mediaInfo.tracks[i].url.indexOf("rtmp://") > -1 || 
-                     mediaInfo.tracks[i].url.indexOf("RTMP://") > -1)) {                         
+                    (mediaInfo.tracks[i].url.indexOf("rtmp://") > -1 ||
+                        mediaInfo.tracks[i].url.indexOf("RTMP://") > -1)) {
                     mediaInfo.tracks[i].mimetype = "rtmp/mp4";
                     mediaInfo.tracks[i].url = replaceAll(mediaInfo.tracks[i].url, "mp4:", "&mp4:");
                 }
-                
+
                 //Adaptive streaming manifests don't have a resolution. Extract these from regular videos.
                 if (mediaInfo.tracks[i].mimetype.match(/video/g) && mediaInfo.tracks[i] &&
-                        mediaInfo.tracks[i].video && mediaInfo.tracks[i].video.resolution &&
-                        videoResultions[extractFlavorMainType(mediaInfo.tracks[i].type)] == null) {
+                    mediaInfo.tracks[i].video && mediaInfo.tracks[i].video.resolution &&
+                    videoResultions[extractFlavorMainType(mediaInfo.tracks[i].type)] == null) {
                     videoResultions[extractFlavorMainType(mediaInfo.tracks[i].type)] = parseVideoResolution(mediaInfo.tracks[i].video.resolution);
                 }
 
@@ -1110,13 +1124,13 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
             // look for video source
             var duration = 0;
             if (mediaInfo.tracks) {
-                $(mediaInfo.tracks).each(function(i, track) {    
+                $(mediaInfo.tracks).each(function(i, track) {
                     if (track.mimetype && track.type && acceptFormat(track)) {
                         if (track.mimetype.match(/video/g) || track.mimetype.match(/application/g) || track.mimetype.match(/rtmp/g)) {
                             hasVideo = true;
                             if (track.duration > duration) {
                                 duration = track.duration;
-                            }                                    
+                            }
                             var resolution = (track.video && track.video.resolution) ? track.video.resolution : "";
                             // filter for different video sources
                             Engage.log("Adding video source: " + track.url + " (" + track.mimetype + ")");
@@ -1125,13 +1139,13 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                             }
                             if (track.mimetype == "application/x-mpegURL") {
                                 loadHls = true;
-                            }                            
+                            }
                             videoSources[extractFlavorMainType(track.type)].push({
-                                    src: track.url,
-                                    type: track.mimetype,
-                                    typemh: track.type,
-                                    resolution: resolution
-                                });
+                                src: track.url,
+                                type: track.mimetype,
+                                typemh: track.type,
+                                resolution: resolution
+                            });
                         } else if (track.mimetype.match(/audio/g)) {
                             hasAudio = true;
                             if (track.duration > duration) {
@@ -1156,7 +1170,7 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
 
                 if (hasVideo || !hasAudio) {
                     delete videoSources.audio;
-                }               
+                }
             }
             if (mediaInfo.attachments && (mediaInfo.attachments.length > 0)) {
                 $(mediaInfo.attachments).each(function(i, attachment) {
@@ -1167,7 +1181,7 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
                 });
             }
             var i = 0;
-            for (var v in videoSources) {                        
+            for (var v in videoSources) {
                 if (videoSources[v].length > 0) {
                     var name = videoDisplayNamePrefix.concat(i);
                     videoDisplays.push(name);
@@ -1181,22 +1195,34 @@ define(["require", "jquery", "underscore", "backbone", "basil" ,"engage/engage_c
     function initPlugin() {
         Engage.log("init Plugin " + initCount);
         // only init if plugin template was inserted into the DOM
-        if (plugin.inserted) {           
+        if (plugin.inserted) {
             // set path to swf player
             var videojs_swf = plugin.pluginPath + videojs_swf_path;
 
             Engage.model.on(videoDataModelChange, function() {
-                new VideoDataView(this.get("videoDataModel"), plugin.template, videojs_swf);
+                videoDataView = new VideoDataView(this.get("videoDataModel"), plugin.template, videojs_swf);
             });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
             });
-            Engage.model.get("mediaPackage").on("change", function () {
+            Engage.model.get("mediaPackage").on("change", function() {
                 setupStreams(this.get("tracks"), this.get("attachments"));
+            });
+            Engage.on(plugin.events.translate.getName(), function(data) {
+                var key = Object.keys(data);
+                for (var i = 0; i < key.length; i++) {
+                    var lang_value = key[i];
+                    translations[lang_value] = data[lang_value];
+                }
+                /*
+        if(videoDataView) {
+                    videoDataView.render(); // TODO: Does not work as is, find workaround
+        }
+        */
             });
             if (Engage.model.get("mediaPackage").get("tracks")) {
                 Engage.log("Mediapackage already available.")
-                setupStreams(Engage.model.get("mediaPackage").get("tracks"),Engage.model.get("mediaPackage").get("attachments"));
+                setupStreams(Engage.model.get("mediaPackage").get("tracks"), Engage.model.get("mediaPackage").get("attachments"));
             }
         }
     }

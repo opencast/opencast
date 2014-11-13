@@ -35,7 +35,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var plugin;
     var events = {
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
+        translate: new Engage.Event("Core:translate", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -83,11 +84,18 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     /* change these variables */
     // nothing to see here...
 
-    /* don"t change these variables */
+    /* don't change these variables */
     var initCount = 2;
     var id_engage_description = "engage_description";
     var mediapackageChange = "change:mediaPackage";
     var mediapackageError = false;
+    var translations = new Array();
+    var locale = "en";
+    var dateFormat = "MMMM Do YYYY";
+
+    function translate(str, strIfNotFound) {
+        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
 
     // view //
 
@@ -106,11 +114,17 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                 var tempVars = {
                     title: this.model.get("title"),
                     creator: this.model.get("creator"),
-                    date: this.model.get("date")
+                    date: this.model.get("date"),
+		    str_videoTitle: translate("videoTitle", "Video title"),
+		    str_creator: translate("creator", "Creator"),
+		    str_date: translate("date", "Date")
                 };
+		Moment.locale(locale, {
+                    // customizations
+		});
                 // try to format the date
                 if (Moment(tempVars.date) != null) {
-                    tempVars.date = Moment(tempVars.date).format("MMMM Do YYYY");
+                    tempVars.date = Moment(tempVars.date).format(dateFormat);
                 }
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
@@ -121,11 +135,22 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if ((isDesktopMode || isMobileMode) && plugin.inserted) {
-            Moment.locale("en", {
-                // customizations
-            });
             // create a new view with the media package model and the template
-            new DescriptionView(Engage.model.get("mediaPackage"), plugin.template);
+            var descriptionView = new DescriptionView(Engage.model.get("mediaPackage"), plugin.template);
+            Engage.on(plugin.events.translate.getName(), function(data) {
+                var key = Object.keys(data);
+                for (var i = 0; i < key.length; i++) {
+                    var lang_value = key[i];
+                    translations[lang_value] = data[lang_value];
+                }
+		if(data.value_locale != "undefined") {
+		    locale = data.value_locale;
+		}
+		if(data.value_dateFormat != "undefined") {
+		    dateFormat = data.value_dateFormat;
+		}
+                descriptionView.render();
+            });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
             });
