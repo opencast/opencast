@@ -163,7 +163,7 @@ fi
 MATTERHORN_OPTS="$GOSH $DEBUG $FELIX $GRAPHICS $JETTY $JAVA $LOGGING $JMX $DISABLE_PHONEHOME $ADD_OPTS"
 
 # Execute Capture-Agent device configuration
-$IS_CA && $CA/device_config.sh
+$IS_CA && [ -f $CA/device_config.sh ] && $CA/device_config.sh
 
 # Make sure matterhorn bundles are reloaded
 clean_felix_cache
