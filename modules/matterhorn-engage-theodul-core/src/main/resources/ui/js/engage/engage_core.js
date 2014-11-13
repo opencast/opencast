@@ -73,8 +73,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var hotkey_volUp = "volUp";
     var mediapackageError = false;
     var numberOfPlugins = 0;
-    var translatedEvent = null;
-    var translated = false;
     var translationData = null;
 
     var basilOptions = {
@@ -103,22 +101,21 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         } else { // No other languages supported, yet
             console.log("Chosing english translations");
         }
-        $.getJSON(jsonstr, function(data) {
-            if (data) {
-                data.value_locale = language;
-		translated = true;
-		translationData = data;
-            }
-        });
+	$.ajax({ 
+	    url: jsonstr, 
+	    dataType: "json",
+	    async: false, 
+	    success: function(data){
+		if (data) {
+                    data.value_locale = language;
+		    translationData = data;
+		} 
+	    } 
+	});
     }
 
     function triggerTranslated() {
-	translatedEvent = window.setInterval(function() {
-	    if(translated) {
-		window.clearInterval(translatedEvent);
-                engageCore.trigger(events.translate.getName(), translationData);
-	    }
-	}, 1000);
+        engageCore.trigger(events.translate.getName(), translationData);
     }
 
     // theodul core init
