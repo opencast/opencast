@@ -38,7 +38,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         segmentMouseout: new Engage.Event("Segment:mouseOut", "the mouse is off a segment", "both"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
+        translate: new Engage.Event("Core:translate", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -95,6 +96,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var mediapackageChange = "change:mediaPackage";
     var initCount = 2;
     var mediapackageError = false;
+    var translations = new Array();
 
     /**
      * Segment
@@ -107,6 +109,10 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         this.image_url = image_url;
         this.text = text;
     };
+
+    function translate(str, strIfNotFound) {
+        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
 
     /**
      * Returns the input time in milliseconds
@@ -190,7 +196,9 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                     }
                 }
                 var tempVars = {
-                    segments: segments
+                    segments: segments,
+                    str_segment: translate("segment", "Segment"),
+                    str_noSlidesAvailable: translate("noSlidesAvailable", "No slides available.")
                 };
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
@@ -227,9 +235,17 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         // only init if plugin template was inserted into the DOM
         if (plugin.inserted) {
             // create a new view with the media package model and the template
-            new SlidetextTabView(Engage.model.get("mediaPackage"), plugin.template);
+            var slidetextTabView = new SlidetextTabView(Engage.model.get("mediaPackage"), plugin.template);
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
+            });
+            Engage.on(plugin.events.translate.getName(), function(data) {
+                var key = Object.keys(data);
+                for (var i = 0; i < key.length; i++) {
+                    var lang_value = key[i];
+                    translations[lang_value] = data[lang_value];
+                }
+                slidetextTabView.render();
             });
         }
     }

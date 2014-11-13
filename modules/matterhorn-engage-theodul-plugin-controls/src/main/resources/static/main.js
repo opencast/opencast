@@ -156,7 +156,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var id_playbackRemTime150 = "playbackRemTime150";
     var class_dropdown = "dropdown-toggle";
 
-    /* don"t change these variables */
+    /* don't change these variables */
     var videosReady = false;
     var videoDataModelChange = "change:videoDataModel";
     var mediapackageChange = "change:mediaPackage";

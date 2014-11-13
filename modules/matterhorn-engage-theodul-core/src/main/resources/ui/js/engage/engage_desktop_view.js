@@ -72,7 +72,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "en
     /*
      * logic to insert a plugin with name and type to the player in desktop mode
      */
-    var insertPluginToDOM = function(plugin) {
+    var insertPluginToDOM = function(plugin, plugin_name, translationData) {
         // switch plugin type to insert the plugin to the right DOM element and execute custom view code
         switch (plugin.type) {
             case id_engage_controls:
@@ -88,7 +88,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "en
             case id_engage_tab:
                 var tab_ref = plugin.name.replace(/ /g, "_");
                 // insert tab navigation line
-                var tabNavTag = "<li><a href=\"#" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + "\">" + plugin.name + "</a></li>";
+                var tabNavTag = "<li><a href=\"#" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + "\">" + ((translationData[plugin_name] != undefined) ? translationData[plugin_name] : plugin.name) + "</a></li>";
                 $("#" + id_engage_tab_nav).prepend(tabNavTag);
                 // insert tab content
                 var tabTag = "<div class=\"" + class_tab_pane + "\" id=\"" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + "\">" + plugin.templateProcessed + "</div>";
