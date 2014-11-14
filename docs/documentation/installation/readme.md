@@ -33,7 +33,7 @@ integrated into the operating system.
     - [CentOS](rpm-rhel-sl-centos.md)
     - [Scientific Linux](rpm-rhel-sl-centos.md)
  - Other Common Systems
-    - Fedora
+    - [Fedora](rpm-fedora.md)
     - SLES
 
 
