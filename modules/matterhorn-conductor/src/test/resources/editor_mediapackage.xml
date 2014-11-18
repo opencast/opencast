@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns3:mediapackage xmlns:ns3="http://mediapackage.opencastproject.org"
+                  start="2014-10-27T18:10:00Z"
+                  id="eb18ea5d-d948-4c18-9566-1cf929563493"
+                  duration="217626">
+  <ns3:title>editor test</ns3:title>
+  <ns3:license>Creative Commons 3.0: Attribution-NonCommercial-NoDerivs</ns3:license>
+  <ns3:media>
+    <ns3:track type="presenter/work" id="66177125-bf92-46bd-b404-e5eb11790faa">
+      <ns3:mimetype>video/mp4</ns3:mimetype>
+      <ns3:tags/>
+      <ns3:url>http://localhost:8080/files/mediapackage/eb18ea5d-d948-4c18-9566-1cf929563493/905f86b4-a0eb-47db-b54f-9f0e5f12b14b/mh720p.mp4</ns3:url>
+      <ns3:checksum type="md5">595605f4265e4d0d474d61df066d5d2b</ns3:checksum>
+      <ns3:duration>217649</ns3:duration>
+      <ns3:audio id="audio-1">
+        <ns3:device/>
+        <ns3:encoder type="MP3 (MPEG audio layer 3)"/>
+        <ns3:channels>2</ns3:channels>
+        <ns3:bitrate>128003.0</ns3:bitrate>
+      </ns3:audio>
+      <ns3:video id="video-1">
+        <ns3:device/>
+        <ns3:encoder type="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"/>
+        <ns3:bitrate>894012.0</ns3:bitrate>
+        <ns3:framerate>29.99784</ns3:framerate>
+        <ns3:resolution>1280x720</ns3:resolution>
+      </ns3:video>
+    </ns3:track>
+    <ns3:track ref="track:66177125-bf92-46bd-b404-e5eb11790faa" type="presenter/preview" id="93864247-489c-44bc-a185-07cd1a9d7006">
+      <ns3:mimetype>video/mp4</ns3:mimetype>
+      <ns3:tags/>
+      <ns3:url>http://localhost:8080/files/mediapackage/eb18ea5d-d948-4c18-9566-1cf929563493/93864247-489c-44bc-a185-07cd1a9d7006/mh720p.mp4</ns3:url>
+      <ns3:checksum type="md5">a448d41a5dc335a2c2da1846386fed83</ns3:checksum>
+      <ns3:duration>217751</ns3:duration>
+      <ns3:audio id="audio-1">
+        <ns3:device/>
+        <ns3:encoder type="AAC (Advanced Audio Coding)"/>
+        <ns3:channels>2</ns3:channels>
+        <ns3:bitrate>171248.0</ns3:bitrate>
+      </ns3:audio>
+      <ns3:video id="video-1">
+        <ns3:device/>
+        <ns3:encoder type="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"/>
+        <ns3:bitrate>3617209.0</ns3:bitrate>
+        <ns3:framerate>29.97003</ns3:framerate>
+        <ns3:resolution>1280x720</ns3:resolution>
+      </ns3:video>
+    </ns3:track>
+  </ns3:media>
+  <ns3:publications/>
+</ns3:mediapackage>

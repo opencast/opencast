@@ -103,7 +103,13 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-smil-api</artifactId>
       <version>${project.version}</version>
-    </dependency>    
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-smil-impl</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-silencedetection-api</artifactId>
