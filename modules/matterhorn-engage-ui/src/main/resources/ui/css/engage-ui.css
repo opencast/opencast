@@ -3,6 +3,9 @@
     background-color: #A72123;
     border-color: #E7E7E7;
 }
+#nav-dropdownLoggedin {
+    display: none;
+}
 /* title */
 .navbar-default .navbar-brand {
     color: #FFF;
@@ -30,7 +33,7 @@
 .navbar-default .navbar-nav > .open > a:hover, 
 .navbar-default .navbar-nav > .open > a:focus {
     color: #555;
-    background-color: #D5D5D5;
+    background-color: #FBB900;
 }
 /* caret */
 .navbar-default .navbar-nav > .dropdown > a .caret {

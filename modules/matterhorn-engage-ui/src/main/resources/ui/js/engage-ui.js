@@ -74,28 +74,74 @@ $(document).ready(function() {
         sessionStorage.setItem('historyStack', JSON.stringify(stack));
     }
 
+    function setUsername(name) {
+	$("#nav-userName").html(name);
+	$("#nav-login").hide();
+	$("#nav-dropdownLoggedin").show();
+    }
+
+    function initLogin() {
+	$("#navbarLogin").click(function() {
+	    alert("Not ready, yet.");
+	});
+    }
+
+    function resetAnonymousUser() {
+	$("#nav-userName").html("");
+	$("#nav-dropdownLoggedin").hide();
+	$("#nav-login").show();
+	initLogin();
+    }
+
     function getInfo() {
         $.ajax({
             url: '/info/me.json',
             dataType: 'json',
             success: function(data) {
-                $.log("Info loaded");
+                $.log("User information loaded");
 
-                if (data && data.org && data.org.properties) {
-                    var logo = data.org.properties.logo_large ? data.org.properties.logo_large : "";
-                    var player = data.org.properties.player ? data.org.properties.player : "";
+		if(data) {
+		    if(data.roles && (data.roles.length > 0)) {
+			var notAnonymous = false;
+			for(var i = 0; i < data.roles.length; ++i) {
+			    if(data.roles[i] != "ROLE_ANONYMOUS") {
+				notAnonymous = true;
+			    }
+			}
+			if(notAnonymous) {
+			    $("#nav-logoutLink").attr("href", "/j_spring_security_logout");
+			    $.log("User is not anonymous");
+			    if(data.username) {
+				$.log("Username found: " + data.username);
+				setUsername(data.username);
+			    } else {
+				$.log("Username not found");
+			    }
+			} else {
+			    $.log("User is anonymous");
+			    resetAnonymousUser();
+			}
+		    } else {
+			$.log("Error: No role");
+			resetAnonymousUser();
+		    }
+                    if (data.org && data.org.properties) {
+			var logo = data.org.properties.logo_large ? data.org.properties.logo_large : "";
+			var player = data.org.properties.player ? data.org.properties.player : "";
 
-                    $('.page-header h1').before("<img src='" + logo + "' class='img-responsive'>");
+			$('.page-header h1').before("<img src='" + logo + "' class='img-responsive'>");
 
-                    if (player == "theodul") {
-                        playerEndpoint = playerEndpoint + "theodul/ui/core.html?id=";
+			if (player == "theodul") {
+                            playerEndpoint = playerEndpoint + "theodul/ui/core.html?id=";
+			} else {
+                            playerEndpoint = playerEndpoint + "ui/watch.html?id=";
+			}
                     } else {
-                        playerEndpoint = playerEndpoint + "ui/watch.html?id=";
+			$.log("Error: No info data received.");
+			resetAnonymousUser();
                     }
-                } else {
-                    // TODO
-                    $.log("Error: No info data received.");
-                }
+		}
+
                 $.log("Chosen player: " + player);
             }
         })
