@@ -116,12 +116,11 @@ $(document).ready(function() {
 	    askingForCredentials = true;
 	    var username = "User";
 	    var password = "Password";
-	    alertify.prompt("Please enter your username:", function (us, u) {
-		if (us) {
+	    bootbox.prompt("Please enter your username:", function(u) {
+		if ((u !== null) & (u.length > 0)) {
 		    username = u;
-		    alertify.prompt("Please enter your password:", function (ps, p) {
-			if (ps) {
-			    askingForCredentials = false;
+		    bootbox.prompt("Please enter your password:", function(p) {
+			if ((p !== null) & (p.length > 0)) {
 			    password = p;
 			    $.ajax({
 				type: "POST",
@@ -132,24 +131,27 @@ $(document).ready(function() {
 				    "_spring_security_remember_me": true
 				}
 			    }).done(function(msg) {
-				console.log(username + ", " + password);
-				console.log(msg);
+				password = "";
 				if(msg.indexOf(springLoggedInStrCheck) == -1) {
 				    alertify.success(msg_loginSuccessful + " '" + username + "'.");
-				    password = "";
 				    initialize();
 				} else {
 				    alertify.error(msg_loginFailed + " '" + username + "'.");
 				}
+				askingForCredentials = false;
+			    }).fail(function(msg) {
+				password = "";
+				alertify.error(msg_loginFailed + " '" + username + "'.");
+				askingForCredentials = false;
 			    });
 			} else {
 			    askingForCredentials = false;
 			}
-		    }, password);
+		    });
 		} else {
 		    askingForCredentials = false;
 		}
-	    }, username);
+	    });
 	}
     }
 
