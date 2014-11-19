@@ -111,15 +111,18 @@ $(document).ready(function() {
         sessionStorage.setItem("historyStack", JSON.stringify(stack));
     }
 
+    var msg_enterUsername = "Please enter your username:";
+    var msg_enterPassword = "Please enter your password:";
+
     function login() {
 	if(!askingForCredentials) {
 	    askingForCredentials = true;
 	    var username = "User";
 	    var password = "Password";
-	    bootbox.prompt("Please enter your username:", function(u) {
+	    bootbox.prompt(msg_enterUsername, function(u) {
 		if ((u !== null) & (u.length > 0)) {
 		    username = u;
-		    bootbox.prompt("Please enter your password:", function(p) {
+		    bootbox.prompt(msg_enterPassword, function(p) {
 			if ((p !== null) & (p.length > 0)) {
 			    password = p;
 			    $.ajax({
@@ -153,6 +156,17 @@ $(document).ready(function() {
 		}
 	    });
 	}
+    }
+
+    function logout() {
+	$.ajax({
+	    type: "GET",
+	    url: springSecurityLogoutURL,
+	}).done(function(msg) {
+	    initialize();
+	}).fail(function(msg) {
+	    $($nav_logoutLink).attr("href", springSecurityLogoutURL);
+	});
     }
 
     function setUsername(name) {
@@ -190,7 +204,7 @@ $(document).ready(function() {
 			    }
 			}
 			if(notAnonymous) {
-			    $($nav_logoutLink).attr("href", springSecurityLogoutURL);
+			    $($nav_logoutLink).click(logout);
 			    $.log("User is not anonymous");
 			    if(data.username) {
 				$.log("Username found: " + data.username);
