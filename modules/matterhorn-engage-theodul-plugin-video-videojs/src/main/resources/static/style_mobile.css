@@ -2,18 +2,6 @@
 #content-box {
 	padding-top: 2%
 }
-#engage_content {
-/*	margin-left: auto;
-	margin-right: auto;
-	*/
-}
-/*.videoDisplay:nth-child(even) {
-	float: right;
-}
-.videoDisplay:nth-child(odd) {
-	float: left;
-	padding-right: 2%;
-}*/
 
 .displayWrapper {
 	height: 100%;
@@ -23,7 +11,7 @@
 	.mobileVideoBox {
 		float:left;
 		width: 49% !important;
-		height: 100% !important;
+		height: 90% !important;
 	}
 	.mobileVideoBox:nth-child(2) {
 		float:right;

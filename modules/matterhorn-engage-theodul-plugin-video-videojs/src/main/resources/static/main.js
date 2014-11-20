@@ -639,6 +639,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         }
         // Set Displays to correct size
         orderVideoDisplays(videoDisplays);
+        checkVideoDisplaySize();
         console.groupEnd();
     }
 
