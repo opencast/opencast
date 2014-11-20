@@ -36,6 +36,7 @@ $(document).ready(function() {
     var $next = ".next";
     var $previous = ".previous";
     var askingForCredentials = false;
+    var checkLoggedOut = false;
 
     function initialize() {
         $.enableLogging(true);
@@ -120,10 +121,10 @@ $(document).ready(function() {
 	    var username = "User";
 	    var password = "Password";
 	    bootbox.prompt(msg_enterUsername, function(u) {
-		if ((u !== null) & (u.length > 0)) {
+		if ((u !== null) && (u.length > 0)) {
 		    username = u;
 		    bootbox.prompt(msg_enterPassword, function(p) {
-			if ((p !== null) & (p.length > 0)) {
+			if ((p !== null) && (p.length > 0)) {
 			    password = p;
 			    $.ajax({
 				type: "POST",
@@ -163,6 +164,7 @@ $(document).ready(function() {
 	    type: "GET",
 	    url: springSecurityLogoutURL,
 	}).done(function(msg) {
+	    checkLoggedOut = true;
 	    initialize();
 	}).fail(function(msg) {
 	    $($nav_logoutLink).attr("href", springSecurityLogoutURL);
@@ -188,6 +190,10 @@ $(document).ready(function() {
 	initLogin();
     }
 
+    String.prototype.endsWith = function(suffix) {
+	return this.indexOf(suffix, this.length - suffix.length) !== -1;
+    };
+
     function getInfo() {
         $.ajax({
             url: infoMeURL,
@@ -204,6 +210,9 @@ $(document).ready(function() {
 			    }
 			}
 			if(notAnonymous) {
+			    if(checkLoggedOut) {
+				window.location = springSecurityLogoutURL;
+			    }
 			    $($nav_logoutLink).click(logout);
 			    $.log("User is not anonymous");
 			    if(data.username) {
@@ -213,6 +222,7 @@ $(document).ready(function() {
 				$.log("Username not found");
 			    }
 			} else {
+			    checkLoggedOut = false;
 			    $.log("User is anonymous");
 			    resetAnonymousUser();
 			}
