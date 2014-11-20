@@ -734,6 +734,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     function orderVideoDisplays(videoDisplays) {
         // max size of display
         // minus footer and header
+        Engage.log("Video: Actual Orientation: " + Engage.model.get("orientation"));
+        
         var maxHeight = $(window).height() - 120;
         var maxWidth = $(window).width();
 
