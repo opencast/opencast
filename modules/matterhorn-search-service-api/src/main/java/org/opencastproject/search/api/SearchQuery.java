@@ -25,8 +25,6 @@ import java.util.Date;
 public class SearchQuery {
   protected boolean includeEpisode = true;
   protected boolean includeSeries = false;
-  protected boolean sortByCreationDate = false;
-  protected boolean sortByPublicationDate = false;
   protected String id;
   protected String seriesId;
   protected String text;
@@ -36,6 +34,12 @@ public class SearchQuery {
   protected String[] tags = null;
   protected MediaPackageElementFlavor[] flavors = null;
   protected Date deletedDate = null;
+  protected Sort sort = Sort.DATE_CREATED;
+  protected boolean sortAscending = true;
+
+  public enum Sort {
+    DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER
+  }
 
   public SearchQuery includeEpisodes(boolean includeEpisode) {
     this.includeEpisode = includeEpisode;
@@ -109,24 +113,6 @@ public class SearchQuery {
     return includeSeries;
   }
 
-  public SearchQuery withCreationDateSort(boolean sortByDate) {
-    this.sortByCreationDate = sortByDate;
-    return this;
-  }
-
-  public boolean isSortByCreationDate() {
-    return sortByCreationDate;
-  }
-
-  public SearchQuery withPublicationDateSort(boolean sortByDate) {
-    this.sortByPublicationDate = sortByDate;
-    return this;
-  }
-
-  public boolean isSortByPublicationDate() {
-    return sortByPublicationDate;
-  }
-
   public MediaPackageElementFlavor[] getElementFlavors() {
     return flavors;
   }
@@ -152,5 +138,47 @@ public class SearchQuery {
 
   public Date getDeletedDate() {
     return deletedDate;
+  }
+
+   /**
+   * Sort the results by the specified field in ascending order.
+   *
+   * @param sort
+   *          the sort field
+   */
+  public SearchQuery withSort(Sort sort) {
+    return withSort(sort, true);
+  }
+
+  /**
+   * Sort the results by the specified field, either ascending or descending.
+   *
+   * @param sort
+   *          the sort field
+   * @param ascending
+   *          whether to sort ascending (true) or descending (false)
+   */
+  public SearchQuery withSort(Sort sort, boolean ascending) {
+    this.sort = sort;
+    this.sortAscending = ascending;
+    return this;
+  }
+
+  /**
+   * Return the field to use in sorting the results of the query.
+   *
+   * @return the sort field
+   */
+  public Sort getSort() {
+    return sort;
+  }
+
+  /**
+   * Return whether to sort the results in ascending order.
+   *
+   * @return whether the search results should be sorted in ascending order
+   */
+  public boolean isSortAscending() {
+    return sortAscending;
   }
 }

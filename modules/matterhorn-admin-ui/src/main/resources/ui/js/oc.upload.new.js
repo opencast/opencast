@@ -804,6 +804,7 @@ ocUpload.Ingest = (function() {
       if ($(elm).is('[type=checkbox]')) {
         if ($(elm).is(':checked')) {
           out[$(elm).attr('id')] = $(elm).val();
+	    console.log(out);
         }
       } else {
         out[$(elm).attr('id')] = $(elm).val();

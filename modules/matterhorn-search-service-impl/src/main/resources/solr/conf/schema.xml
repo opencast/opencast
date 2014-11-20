@@ -239,7 +239,7 @@
     <field name="dc_extent" type="integer" indexed="false" stored="true" />
     <field name="dc_language" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_temporal" type="text" indexed="true" stored="true" omitNorms="true"/>
-    <field name="dc_is_part_of" type="text" indexed="true" stored="true" omitNorms="true"/>
+    <field name="dc_is_part_of" type="string" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_replaces" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_type" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="dc_available_from" type="date" indexed="true" stored="true" omitNorms="true"/>
@@ -291,6 +291,15 @@
     <field name="oc_elementtags" type="text" indexed="true" stored="true" omitNorms="true"/>
     <field name="oc_elementflavors" type="text" indexed="true" stored="true" omitNorms="true"/>
 
+    <!-- sortable fields -->
+    <field name="dc_title-sort" type="string" indexed="true" stored="false" multiValued="false" />
+    <field name="dc_subject-sort" type="string" indexed="true" stored="false" multiValued="false" />
+    <field name="dc_creator-sort" type="string" indexed="true" stored="false" multiValued="false" />
+    <field name="dc_publisher-sort" type="string" indexed="true" stored="false" multiValued="false" />
+    <field name="dc_contributor-sort" type="string" indexed="true" stored="false" multiValued="false" />
+    <field name="dc_description-sort" type="string" indexed="true" stored="false" multiValued="false" />
+    <field name="dc_license-sort" type="string" indexed="true" stored="false" multiValued="false" />
+
     <!-- The dynamic fields with segment text and hint -->
     <dynamicField name="oc_text_*" type="text" indexed="true" stored="true"/>
     <dynamicField name="oc_hint_*" type="text" indexed="false" stored="true"/>
@@ -321,21 +330,28 @@
   <copyField source="dc_spatial_*" dest="dc_spatial-sum"/>
   <copyField source="dc_access_rights_*" dest="dc_access_rights-sum"/>
   <copyField source="dc_license_*" dest="dc_license-sum"/>
+  <copyField source="dc_license_*" dest="dc_license-sort"/>
 
   <copyField source="dc_title_*" dest="fulltext"/>
   <copyField source="dc_title_*" dest="dc_title-sum"/>
+  <copyField source="dc_title_*" dest="dc_title-sort"/>
   <copyField source="dc_subject_*" dest="fulltext"/>
   <copyField source="dc_subject_*" dest="dc_subject-sum"/>
+  <copyField source="dc_subject_*" dest="dc_subject-sort"/>
   <copyField source="dc_creator_*" dest="fulltext"/>
   <copyField source="dc_creator_*" dest="dc_creator-sum"/>
+  <copyField source="dc_creator_*" dest="dc_creator-sort"/>
   <copyField source="dc_abstract_*" dest="fulltext"/>
   <copyField source="dc_abstract_*" dest="dc_abstract-sum"/>
   <copyField source="dc_description_*" dest="fulltext"/>
   <copyField source="dc_description_*" dest="dc_description-sum"/>
+  <copyField source="dc_description_*" dest="dc_description-sort"/>
   <copyField source="dc_publisher_*" dest="fulltext"/>
   <copyField source="dc_publisher_*" dest="dc_publisher-sum"/>
+  <copyField source="dc_publisher_*" dest="dc_publisher-sort"/>
   <copyField source="dc_contributor_*" dest="fulltext"/>
   <copyField source="dc_contributor_*" dest="dc_contributor-sum"/>
+  <copyField source="dc_contributor_*" dest="dc_contributor-sort"/>
   <copyField source="oc_keywords" dest="fulltext"/>
   <copyField source="oc_text_*" dest="fulltext"/>
 

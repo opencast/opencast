@@ -4,9 +4,13 @@
         <!-- styles -->
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="css/engage-ui.css">
+        <link rel="stylesheet" type="text/css" href="js/alertify/alertify.css">
+        <link rel="stylesheet" type="text/css" href="js/alertify/alertify-bootstrap-3.css">
         <!-- scripts -->
         <script type="text/javascript" src="/engage/ui/js/jquery/jquery.js"></script>
         <script type="text/javascript" src="js/jquery.liveSearch.js"></script>
+        <script type="text/javascript" src="js/bootbox.js"></script>
+        <script type="text/javascript" src="js/alertify/alertify.js"></script>
         <script type="text/javascript" src="js/seedrandom.js"></script>
         <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.utils.js"></script>
         <script type="text/javascript" src="js/bootstrap.min.js"></script>
@@ -36,6 +40,17 @@
                         <li id="navbarEpisodes" data-search="episodes" class="active"><a>Episodes</a></li>
                         <li id="navbarSeries" data-search="series"><a>Series</a></li>
                     </ul>
+                    <ul class="nav navbar-nav navbar-right" id="nav-login">
+                        <li id="navbarLogin"><a>Login</a></li>
+                    </ul>
+		    <ul class="nav navbar-nav navbar-right" id="nav-dropdownLoggedin">
+		        <li class="dropdown">
+			    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Logged in as: <span id="nav-userName">Anonymous</span> <span class="caret"></span></a>
+			    <ul class="dropdown-menu" role="menu">
+			        <li><a id="nav-logoutLink" href="">Logout</a></li>
+			    </ul>
+			</li>
+		    </ul>
                     <form id="oc-search-form" class="navbar-form navbar-right" role="search" autocomplete="off">
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="Search" name="q">
@@ -47,6 +62,7 @@
         </div>
         <div class="container main-grid">
         <div class="page-header">
+	    <img id="headerLogo" src="" class="img-responsive">
             <h1>Media Module</h1>
         </div>
         <div class="container-fluid" id="main-container">

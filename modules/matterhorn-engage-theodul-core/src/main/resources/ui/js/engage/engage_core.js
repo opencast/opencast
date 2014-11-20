@@ -32,6 +32,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         nextEpisode: new EngageEvent("Core:nextEpisode", "", "trigger"),
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
         volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
+        translate: new EngageEvent("Core:translate", "", "trigger"),
         mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler")
     };
 
@@ -40,7 +41,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var browser_minVersion_chrome = 30;
     var browser_minVersion_opera = 20;
     var browser_minVersion_safari = 7;
-    var browser_minVersion_msie = 9;    
+    var browser_minVersion_msie = 9;
     var id_engage_view = "engage_view";
     var id_loading1 = "loading1";
     var id_loading2 = "loading2";
@@ -71,18 +72,50 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var hotkey_volDown = "volDown";
     var hotkey_volUp = "volUp";
     var mediapackageError = false;
-    
-    var basilOptions = {
-        namespace: 'mhStorage'
-    };
-    Basil = new window.Basil(basilOptions);    
+    var numberOfPlugins = 0;
+    var translationData = null;
 
-    function browserSupported() {             
-        console.log("Override Browser" + Basil.get("overrideBrowser"));
-        if (Basil.get("overrideBrowser") != null && Basil.get("overrideBrowser")) {          
+    var basilOptions = {
+        namespace: "mhStorage"
+    };
+    Basil = new window.Basil(basilOptions);
+
+    function browserSupported() {
+        if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
+            console.log("Override Browser " + Basil.get("overrideBrowser"));
             return true;
-        }         
+        }
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari) || (Bowser.msie && Bowser.version >= browser_minVersion_msie);
+    }
+
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function translate(language) {
+        var jsonstr = "language/theodul_language_en.json";
+
+        if (language == "de") {
+            console.log("Chosing german translations");
+            var jsonstr = "language/theodul_language_de.json";
+        } else { // No other languages supported, yet
+            console.log("Chosing english translations");
+        }
+	$.ajax({ 
+	    url: jsonstr, 
+	    dataType: "json",
+	    async: false, 
+	    success: function(data){
+		if (data) {
+                    data.value_locale = language;
+		    translationData = data;
+		} 
+	    } 
+	});
+    }
+
+    function triggerTranslated() {
+        engageCore.trigger(events.translate.getName(), translationData);
     }
 
     // theodul core init
@@ -119,6 +152,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         initialize: function() {
             $("." + class_loading).show();
             $("#" + id_loading1).show();
+            translate(detectLanguage());
             // the main core is our global event system
             this.dispatcher = _.clone(Backbone.Events);
             // link to the engage model
@@ -141,7 +175,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 var cssAttr = {
                     type: "text/css",
                     rel: "stylesheet"
-                };                
+                };
                 // template obj
                 var core_template = "none";
                 // path to the require module with the view logic
@@ -180,14 +214,15 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         engageCore.template = template;
                         $(engageCore.el).html(_.template(template)).trigger("create");
                         // run init function of the view
-                        engageCore.pluginView.initView();                       
+                        engageCore.pluginView.initView();
                         if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                             // BEGIN LOAD PLUGINS
                             // fetch plugin information
                             engageCore.model.get("pluginsInfo").fetch({
                                 success: function(pluginInfos) {
                                     // load plugin as requirejs module
-                                    if (pluginInfos.get("pluginlist") && pluginInfos.get("pluginlist").plugins !== undefined) {
+                                    if ((pluginInfos.get("pluginlist").plugins != undefined) && pluginInfos.get("pluginlist")) {
+                                        numberOfPlugins = pluginInfos.get("pluginlist").plugins.length;
                                         if ($.isArray(pluginInfos.get("pluginlist").plugins)) {
                                             $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
                                                 var plugin_name = value["name"];
@@ -234,11 +269,12 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     $("#" + id_loading2).show();
                     window.setTimeout(function() {
                         $("#" + id_loadingProgressbar2).css("width", "100%");
-                        window.setTimeout(function() {                           
+                        window.setTimeout(function() {
                             $("." + class_loading).hide().detach();
                             if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                                 $("#" + id_browserWarning).hide().detach();
                                 $("#" + id_engage_view).show();
+				triggerTranslated();
                                 if (engageCore.model.desktop || engageCore.model.mobile) {
                                     window.setTimeout(function() {
                                         if ($("#" + id_volume).html() == "") {
@@ -260,7 +296,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                 $("#" + id_browserWarning).show();
                                 $("#" + id_btn_tryAnyway).click(function(e) {
                                     e.preventDefault();
-                                    window.open(window.location.href+"&browser=all");
+                                    window.open(window.location.href + "&browser=all");
                                 });
                             }
                         }, loadingDelay2);
@@ -454,7 +490,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         plugin.template = template;
                         plugin.pluginPath = "engage/theodul/" + plugin_path;
                         // load the compiled HTML into the component
-                        engageCore.pluginView.insertPlugin(plugin);
+                        engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
                         // plugin load done counter
                         plugins_loaded[plugin_name] = true;
                         // check if all plugins are ready

@@ -48,7 +48,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         bufferedButNotAutoplaying: new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler"),
-        audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "handler")
+        audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "handler"),
+        translate: new Engage.Event("Core:translate", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -99,7 +100,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var alertifyDisplayDatetime = false;
     var alertifyPath = "lib/alertify/alertify";
 
-    /* don"t change these variables */
+    /* don't change these variables */
     var isAudioOnly = false;
     var alertify;
     var mediapackageError = false;
@@ -108,6 +109,13 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var videoLoaded = false;
     var videoLoadMsgDisplayed = false;
     var videoBuffering = false;
+    var translations = new Array();
+    var locale = "en";
+    var dateFormat = "MMMM Do YYYY, h:mm:ss a";
+
+    function translate(str, strIfNotFound) {
+        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
 
     /**
      * Format the current date and time
@@ -119,7 +127,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
 
         // try to format the date
         if (Moment(date) != null) {
-            date = Moment(new Date()).format("MMMM Do YYYY, h:mm:ss a");
+            date = Moment(new Date()).format(dateFormat);
         }
         return date;
     }
@@ -138,7 +146,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
      * Initialize the plugin
      */
     function initPlugin() {
-        Moment.locale("en", {
+        Moment.locale(locale, {
             // customizations
         });
 
@@ -151,22 +159,38 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
             if (!videoLoaded && !mediapackageError && !codecError) {
                 videoLoadMsgDisplayed = true;
                 if (!isAudioOnly) {
-                    alertify.error(getAlertifyMessage("The video is loading. Please wait a moment."));
+                    alertify.error(getAlertifyMessage(translate("error_videoLoading", "The video is loading. Please wait a moment.")));
                 } else {
-                    alertify.error(getAlertifyMessage("The audio is loading. Please wait a moment."));
+                    alertify.error(getAlertifyMessage(translate("error_audioLoading", "The audio is loading. Please wait a moment.")));
                 }
             }
         }, alertifyVideoLoadMessageThreshold);
 
+        Engage.on(plugin.events.translate.getName(), function(data) {
+            var key = Object.keys(data);
+            for (var i = 0; i < key.length; i++) {
+                var lang_value = key[i];
+                translations[lang_value] = data[lang_value];
+            }
+	    if(data.value_locale != "undefined") {
+		locale = data.value_locale;
+	    }
+	    if(data.value_dateFormatFull != "undefined") {
+		dateFormat = data.value_dateFormatFull;
+	    }
+            Moment.locale(locale, {
+		// customizations
+            });
+        });
         Engage.on(plugin.events.isAudioOnly.getName(), function(audio) {
             isAudioOnly = audio;
         });
         Engage.on(plugin.events.ready.getName(), function() {
             if (!videoLoaded && videoLoadMsgDisplayed && !mediapackageError && !codecError) {
                 if (!isAudioOnly) {
-                    alertify.success(getAlertifyMessage("The video has been loaded successfully."));
+                    alertify.success(getAlertifyMessage(translate("msg_videoLoadedSuccessfully", "The video has been loaded successfully.")));
                 } else {
-                    alertify.success(getAlertifyMessage("The audio has been loaded successfully."));
+                    alertify.success(getAlertifyMessage(translate("msg_audioLoadedSuccessfully", "The audio has been loaded successfully.")));
                 }
             }
             videoLoaded = true;
@@ -174,19 +198,19 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         Engage.on(plugin.events.buffering.getName(), function() {
             if (!videoBuffering && !mediapackageError && !codecError) {
                 videoBuffering = true;
-                alertify.success(getAlertifyMessage("The video is currently buffering. Please wait a moment."));
+                alertify.success(getAlertifyMessage(translate("msg_videoBuffering", "The video is currently buffering. Please wait a moment.")));
             }
         });
         Engage.on(plugin.events.bufferedAndAutoplaying.getName(), function() {
             if (videoBuffering && !mediapackageError && !codecError) {
                 videoBuffering = false;
-                alertify.success(getAlertifyMessage("The video has been buffered successfully and is now autoplaying."));
+                alertify.success(getAlertifyMessage(translate("msg_videoBufferedSuccessfullyAndAutoplaying", "The video has been buffered successfully and is now autoplaying.")));
             }
         });
         Engage.on(plugin.events.bufferedButNotAutoplaying.getName(), function() {
             if (videoBuffering && !mediapackageError && !codecError) {
                 videoBuffering = false;
-                alertify.success(getAlertifyMessage("The video has been buffered successfully."));
+                alertify.success(getAlertifyMessage(translate("msg_videoBufferedSuccessfully", "The video has been buffered successfully.")));
             }
         });
         Engage.on(plugin.events.customNotification.getName(), function(msg) {
@@ -203,11 +227,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         });
         Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
             mediapackageError = true;
-            alertify.error(getAlertifyMessage("Error: " + msg));
+            alertify.error(getAlertifyMessage(translate("error", "Error") + ": " + msg));
         });
         Engage.on(plugin.events.audioCodecNotSupported.getName(), function() {
             codecError = true;
-            alertify.error(getAlertifyMessage("Error: The audio codec is not supported by this browser"));
+            alertify.error(getAlertifyMessage(translate("error_AudioCodecNotSupported", "Error: The audio codec is not supported by this browser")));
         });
     }
 

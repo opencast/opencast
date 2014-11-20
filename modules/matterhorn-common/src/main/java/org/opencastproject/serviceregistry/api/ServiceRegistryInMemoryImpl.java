@@ -577,7 +577,17 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    */
   @Override
   public List<ServiceStatistics> getServiceStatistics() throws ServiceRegistryException {
-    throw new IllegalStateException("Operation not yet implemented");
+    throw new UnsupportedOperationException("Operation not yet implemented");
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countOfAbnormalServices()
+   */
+  @Override
+  public long countOfAbnormalServices() throws ServiceRegistryException {
+    throw new UnsupportedOperationException("Operation not yet implemented");
   }
 
   /**
