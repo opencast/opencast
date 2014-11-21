@@ -181,9 +181,7 @@ else
 	echo $$ > $pidfile
 	set -o monitor
 	pushd $MATTERHORN &> /dev/null
-	sudo -u $MATTERHORN_USER \
-		java $MATTERHORN_OPTS -jar $MATTERHORN/bin/felix.jar \
-		$FELIX_CACHE_DIR
+	su -c "java $MATTERHORN_OPTS -jar $MATTERHORN/bin/felix.jar $FELIX_CACHE_DIR" $MATTERHORN_USER
 	rm -f $pidfile
 	popd &> /dev/null
 fi
