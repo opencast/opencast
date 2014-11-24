@@ -356,6 +356,12 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     // Create the feed
     Feed f = createFeed(type, getIdentifier(), new ContentImpl(getName()), new ContentImpl(getDescription()),
             getFeedLink());
+
+    // Set the copyright
+    if (StringUtils.isNotBlank(getCopyright()))
+      f.setCopyright(getCopyright());
+
+    // Adjust the feed encoding
     f.setEncoding(ENCODING);
 
     // Set iTunes tags
