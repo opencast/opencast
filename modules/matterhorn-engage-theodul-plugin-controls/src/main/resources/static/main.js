@@ -158,6 +158,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
     /* don't change these variables */
     var videosReady = false;
+    var enableFullscreenButton = false;
+    var currentTime = 0;
     var videoDataModelChange = "change:videoDataModel";
     var mediapackageChange = "change:mediaPackage";
     var event_slidestart = "slidestart";
@@ -172,6 +174,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var isAudioOnly = false;
     var segments = {};
     var mediapackageError = false;
+    var aspectRatioTriggered = false;
     var aspectRatioWidth;
     var aspectRatioHeight;
     var aspectRatio;
@@ -257,8 +260,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                 if (isDesktopMode || isMobileMode) {
                     initControlsEvents();
 
+                    if (aspectRatioTriggered) {
+                        calculateEmbedAspectRatios();
+                        addEmbedRatioEvents();
+                    }
+
+                    ready();
+                    playPause();
+                    mute();
+                    timeUpdate();
+
                     // init dropdown menus
                     $("." + class_dropdown).dropdown();
+
+                    addNonFlashEvents();
                 }
             }
         }
@@ -422,7 +437,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
     function addEmbedRatioEvents() {
         if (!mediapackageError) {
-            // setup listeners for the embed
+            // setup listeners for the embed buttons
             $("#" + id_embed0).click(function(e) {
                 e.preventDefault();
                 triggerEmbedMessage(embedWidthOne, embedHeightOne);
@@ -465,9 +480,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         }
     }
 
-    /**
-     * getVolume
-     */
     function initControlsEvents() {
         if (!mediapackageError) {
             // disable not used buttons
@@ -575,9 +587,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         }
     }
 
-    /**
-     * getVolume
-     */
     function getVolume() {
         if (isMute) {
             return 0;
@@ -595,20 +604,84 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             embedWidthFour = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFour);
             embedWidthFive = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFive);
 
-            $("#embed0").html("Embed " + embedWidthOne + "x" + embedHeightOne);
-            $("#embed1").html("Embed " + embedWidthTwo + "x" + embedHeightTwo);
-            $("#embed2").html("Embed " + embedWidthThree + "x" + embedHeightThree);
-            $("#embed3").html("Embed " + embedWidthFour + "x" + embedHeightFour);
-            $("#embed4").html("Embed " + embedWidthFive + "x" + embedHeightFive);
+            $("#" + id_embed0).html("Embed " + embedWidthOne + "x" + embedHeightOne);
+            $("#" + id_embed1).html("Embed " + embedWidthTwo + "x" + embedHeightTwo);
+            $("#" + id_embed2).html("Embed " + embedWidthThree + "x" + embedHeightThree);
+            $("#" + id_embed3).html("Embed " + embedWidthFour + "x" + embedHeightFour);
+            $("#" + id_embed4).html("Embed " + embedWidthFive + "x" + embedHeightFive);
         } else {
             embedWidthOne = 310;
             embedHeightOne = 70;
 
-            $("#embed0").html("Embed " + embedWidthOne + "x" + embedHeightOne);
-            $("#embed1, #embed2, #embed3, embed4").hide();
+            $("#" + id_embed0).html("Embed " + embedWidthOne + "x" + embedHeightOne);
+            $("#" + id_embed1 + ", " + "#" + id_embed2 + ", " + "#" + id_embed3 + ", " + "#" + id_embed4 + ", ").hide();
         }
 
-        $("#embed_button").removeClass("disabled");
+        $("#" + id_embed_button).removeClass("disabled");
+    }
+
+    function ready() {
+        if (videosReady) {
+            greyIn(id_play_button);
+            enable(id_play_button);
+            if (!isAudioOnly) {
+                enableFullscreenButton = true;
+                $("#" + id_fullscreen_button).removeClass("disabled");
+            }
+        }
+    }
+
+    function playPause() {
+        if (isPlaying) {
+            $("#" + id_play_button).hide();
+            $("#" + id_pause_button).show();
+            if (!usingFlash && !isAudioOnly) {
+                $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
+                var pbr = Basil.get(storage_playbackRate);
+                if (pbr) {
+                    $("#" + id_playbackRateIndicator).html(pbr);
+                    Engage.trigger(plugin.events.playbackRateChanged.getName(), parseInt(pbr));
+                }
+            }
+        } else {
+            $("#" + id_play_button).show();
+            $("#" + id_pause_button).hide();
+        }
+    }
+
+    function mute() {
+        if (isMute) {
+            $("#" + id_unmute_button).hide();
+            $("#" + id_mute_button).show();
+            Engage.trigger(plugin.events.volumeSet.getName(), 0);
+        } else {
+            $("#" + id_unmute_button).show();
+            $("#" + id_mute_button).hide();
+            Engage.trigger(plugin.events.volumeSet.getName(), getVolume());
+        }
+    }
+
+    function timeUpdate() {
+        if (videosReady) {
+            // set slider
+            var duration = parseInt(Engage.model.get("videoDataModel").get("duration"));
+            if (!isSliding && duration) {
+                var normTime = (currentTime / (duration / 1000)) * 1000;
+                $("#" + id_slider).slider("option", "value", normTime);
+                if (!$("#" + id_navigation_time_current).is(":focus")) {
+                    $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
+                }
+            }
+            var val = Math.round((duration / 1000) - currentTime);
+            val = ((val >= 0) && (val <= (duration / 1000))) ? val : "-";
+            $("#" + id_playbackRemTime050).html(formatSeconds(!isNaN(val) ? (val / 0.5) : val));
+            $("#" + id_playbackRemTime075).html(formatSeconds(!isNaN(val) ? (val / 0.75) : val));
+            $("#" + id_playbackRemTime100).html(formatSeconds(!isNaN(val) ? (val) : val));
+            $("#" + id_playbackRemTime125).html(formatSeconds(!isNaN(val) ? (val / 1.25) : val));
+            $("#" + id_playbackRemTime150).html(formatSeconds(!isNaN(val) ? (val / 1.5) : val));
+        } else {
+            $("#" + id_slider).slider("option", "value", 0);
+        }
     }
 
     /**
@@ -619,11 +692,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         if ((isDesktopMode || isMobileMode) && plugin.inserted) {
             var controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
-                aspectRatioWidth = as[0] || 0;
-                aspectRatioHeight = as[1] || 0;
-                aspectRatio = as[2] || 0;
-                calculateEmbedAspectRatios();
-                addEmbedRatioEvents();
+                if (as) {
+                    aspectRatioWidth = as[0] || 0;
+                    aspectRatioHeight = as[1] || 0;
+                    aspectRatio = as[2] || 0;
+                    aspectRatioTriggered = true;
+                    calculateEmbedAspectRatios();
+                    addEmbedRatioEvents();
+                }
             });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
@@ -637,50 +713,32 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             });
             Engage.on(plugin.events.ready.getName(), function() {
                 if (!mediapackageError) {
-                    greyIn(id_play_button);
-                    enable(id_play_button);
                     videosReady = true;
-                    if (!isAudioOnly) {
-                        $("#" + id_fullscreen_button).removeClass("disabled");
-                    }
+                    ready();
                 }
             });
             Engage.on(plugin.events.play.getName(), function() {
                 if (!mediapackageError && videosReady) {
-                    $("#" + id_play_button).hide();
-                    $("#" + id_pause_button).show();
                     isPlaying = true;
-                    if (!usingFlash && !isAudioOnly) {
-                        $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
-                        var pbr = Basil.get(storage_playbackRate);
-                        if (pbr) {
-                            $("#" + id_playbackRateIndicator).html(pbr);
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), parseInt(pbr));
-                        }
-                    }
+                    playPause();
                 }
             });
             Engage.on(plugin.events.pause.getName(), function() {
                 if (!mediapackageError && videosReady) {
-                    $("#" + id_play_button).show();
-                    $("#" + id_pause_button).hide();
                     isPlaying = false;
+                    playPause();
                 }
             });
             Engage.on(plugin.events.mute.getName(), function() {
                 if (!mediapackageError) {
-                    $("#" + id_unmute_button).hide();
-                    $("#" + id_mute_button).show();
                     isMute = true;
-                    Engage.trigger(plugin.events.volumeSet.getName(), 0);
+                    mute();
                 }
             });
             Engage.on(plugin.events.unmute.getName(), function() {
                 if (!mediapackageError) {
-                    $("#" + id_unmute_button).show();
-                    $("#" + id_mute_button).hide();
                     isMute = false;
-                    Engage.trigger(plugin.events.volumeSet.getName(), getVolume());
+                    mute();
                 }
             });
             Engage.on(plugin.events.fullscreenChange.getName(), function() {
@@ -689,28 +747,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                     Engage.trigger(plugin.events.fullscreenCancel.getName());
                 }
             });
-            Engage.on(plugin.events.timeupdate.getName(), function(currentTime) {
+            Engage.on(plugin.events.timeupdate.getName(), function(_currentTime) {
                 if (!mediapackageError) {
-                    if (videosReady) {
-                        // set slider
-                        var duration = parseInt(Engage.model.get("videoDataModel").get("duration"));
-                        if (!isSliding && duration) {
-                            var normTime = (currentTime / (duration / 1000)) * 1000;
-                            $("#" + id_slider).slider("option", "value", normTime);
-                            if (!$("#" + id_navigation_time_current).is(":focus")) {
-                                $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
-                            }
-                        }
-                        var val = Math.round((duration / 1000) - currentTime);
-                        val = ((val >= 0) && (val <= (duration / 1000))) ? val : "-";
-                        $("#" + id_playbackRemTime050).html(formatSeconds(!isNaN(val) ? (val / 0.5) : val));
-                        $("#" + id_playbackRemTime075).html(formatSeconds(!isNaN(val) ? (val / 0.75) : val));
-                        $("#" + id_playbackRemTime100).html(formatSeconds(!isNaN(val) ? (val) : val));
-                        $("#" + id_playbackRemTime125).html(formatSeconds(!isNaN(val) ? (val / 1.25) : val));
-                        $("#" + id_playbackRemTime150).html(formatSeconds(!isNaN(val) ? (val / 1.5) : val));
-                    } else {
-                        $("#" + id_slider).slider("option", "value", 0);
-                    }
+                    currentTime = _currentTime;
+                    timeUpdate();
                 }
             });
             Engage.on(plugin.events.ended.getName(), function() {
