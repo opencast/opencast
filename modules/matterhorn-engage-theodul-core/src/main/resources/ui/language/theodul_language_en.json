@@ -59,5 +59,8 @@
     "msg_waitToSetTime": "Please wait until the video has been loaded to set a time.",
     "msg_startPlayingToSetTime": "Please start playing the video once to set a time.",
     "msg_waitToSeek": "Please wait until the video has been loaded to seek.",
-    "msg_startPlayingToSeek": "Please start playing the video once to seek."
+    "msg_startPlayingToSeek": "Please start playing the video once to seek.",
+    "loggedInAs": "Logged in as",
+    "notLoggedIn": "Not logged in",
+    "checkingLoginStatus": "Checking login status..."
 }

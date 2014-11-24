@@ -87,31 +87,79 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var USERTRACKING_ENDPOINT = "/usertracking";
     var USERTRACKING_ENDPOINT_FOOTPRINTS = "/footprint.json";
     var USERTRACKING_ENDPOINT_STATS = "/stats.json";
+    var INFO_ME_ENDPOINT = "/info/me.json";
 
-    /* don"t change these variables */
+    /* don't change these variables */
     var mediaPackageID = "";
     var initCount = 1;
     var mediaPackage; // mediaPackage data
     var mediaInfo; // media info like video tracks and attachments
 
-    var MediaPackageModel = Backbone.Model.extend({
-        urlRoot: SEARCH_ENDPOINT,
+    var InfoMeModel = Backbone.Model.extend({
+        urlRoot: INFO_ME_ENDPOINT,
         initialize: function() {
-            Engage.log("MhConnection: Init MediaPackageModel");
+            Engage.log("MhConnection: Init InfoMe model");
             this.update();
         },
         update: function() {
+            Engage.log("MhConnection: Updating InfoMe model");
+            // request model data
+            this.fetch({
+                data: {},
+                success: function(model) {
+		    model.loggedIn = false;
+		    model.username = "Anonymous";
+		    model.roles = [];
+		    var attr = model.attributes;
+		    if(attr.username) {
+			Engage.log("Username found: " + attr.username);
+			model.username = attr.username;
+		    } else {
+			Engage.log("No username found.");
+		    }
+		    if(attr.roles && (attr.roles.length > 0)) {
+			model.roles = attr.roles;
+			var notAnonymous = false;
+			for(var i = 0; i < attr.roles.length; ++i) {
+			    if(attr.roles[i] != "ROLE_ANONYMOUS") {
+				notAnonymous = true;
+			    }
+			}
+			model.loggedIn = notAnonymous;
+			if(notAnonymous) {
+			    Engage.log("User has one or more roles.");
+			} else {
+			    Engage.log("User has no role.");
+			}
+		    } else {
+			Engage.log("Error: No roles found.");
+		    }
+		    model.trigger("change");
+                }
+            });
+        },
+        defaults: {}
+    });
+
+    var MediaPackageModel = Backbone.Model.extend({
+        urlRoot: SEARCH_ENDPOINT,
+        initialize: function() {
+            Engage.log("MhConnection: Init MediaPackage model");
+            this.update();
+        },
+        update: function() {
+            Engage.log("MhConnection: Updating MediaPackage model");
             // request model data
             this.fetch({
                 data: {
                     id: mediaPackageID
                 },
                 success: function(model) {
-                    var mediaPackage; // Mediapackage data
+                    var mediaPackage; // mediapackage data
                     if (model.attributes && model.attributes["search-results"] && model.attributes["search-results"].result) {
                         mediaPackage = model.attributes["search-results"].result;
                         if (mediaPackage) {
-                            // format silent the model data, see dublin core for reference names
+                            // format the model data, see dublin core for reference names
                             if (mediaPackage.mediapackage) {
                                 if (mediaPackage.mediapackage.media && mediaPackage.mediapackage.media.track) {
                                     if (!mediaPackage.mediapackage.media.track.length) {
@@ -178,7 +226,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var ViewsModel = Backbone.Model.extend({
         urlRoot: USERTRACKING_ENDPOINT + USERTRACKING_ENDPOINT_STATS,
         initialize: function() {
-            Engage.log("MhConnection: Init ViewsModel");
+            Engage.log("MhConnection: Init Views model");
             this.put();
         },
         put: function() {
@@ -309,6 +357,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
      * Initialize the plugin
      */
     function initPlugin() {
+        Engage.model.set("infoMe", new InfoMeModel());
         Engage.model.set("mediaPackage", new MediaPackageModel());
         Engage.model.set("views", new ViewsModel());
         Engage.model.set("footprints", new FootprintCollection());

@@ -154,6 +154,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var id_playbackRemTime100 = "playbackRemTime100";
     var id_playbackRemTime125 = "playbackRemTime125";
     var id_playbackRemTime150 = "playbackRemTime150";
+    var id_loggedInAs = "loggedInAs";
+    var id_str_loginlogout = "str_loginlogout";
+    var id_dropdownMenuLoginInfo = "dropdownMenuLoginInfo";
     var class_dropdown = "dropdown-toggle";
 
     /* don't change these variables */
@@ -161,11 +164,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var enableFullscreenButton = false;
     var currentTime = 0;
     var videoDataModelChange = "change:videoDataModel";
+    var infoMeChange = "change:infoMe";
     var mediapackageChange = "change:mediaPackage";
     var event_slidestart = "slidestart";
     var event_slidestop = "slidestop";
     var plugin_path = "";
-    var initCount = 5;
+    var initCount = 6;
     var isPlaying = false;
     var isSliding = false;
     var isMute = false;
@@ -183,6 +187,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var embedWidthThree;
     var embedWidthFour;
     var embedWidthFive;
+    var loggedIn = false;
+    var username = "Anonymous";
     var translations = new Array();
     var entityMap = {
         "&": "&amp;",
@@ -211,6 +217,21 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     function getAspectRatioHeight(originalWidth, originalHeight, width) {
         var height = Math.round(originalHeight / originalWidth * width);
         return height;
+    }
+
+    function checkLoginStatus() {
+        if (Engage.model.get("infoMe").loggedIn) {
+            loggedIn = true;
+            username = Engage.model.get("infoMe").username;
+            $("#" + id_loggedInAs).html(translate("loggedInAs", "Logged in as") + ": " + username);
+            $("#" + id_str_loginlogout).html("Logout");
+        } else {
+            loggedIn = false;
+            username = "Anonymous";
+            $("#" + id_loggedInAs).html(translate("notLoggedIn", "Not logged in"));
+            $("#" + id_str_loginlogout).html("Login");
+        }
+        $("#" + id_dropdownMenuLoginInfo).removeClass("disabled");
     }
 
     var ControlsView = Backbone.View.extend({
@@ -252,7 +273,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                     str_playbackRateButton: translate("playbackRateButton", "Playback rate button. Select playback rate from dropdown."),
                     str_playbackRate: translate("playbackRate", "Playback rate"),
                     str_remainingTime: translate("remainingTime", "remaining time"),
-                    str_embedButton: translate("embedButton", "Embed Button. Select embed size from dropdown.")
+                    str_embedButton: translate("embedButton", "Embed Button. Select embed size from dropdown."),
+                    loggedIn: false,
+                    str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
+                    str_loginLogout: ""
                 };
 
                 // compile template and load into the html
@@ -274,6 +298,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                     $("." + class_dropdown).dropdown();
 
                     addNonFlashEvents();
+
+                    checkLoginStatus();
                 }
             }
         }
@@ -805,6 +831,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
         // listen on a change/set of the video data model
         Engage.model.on(videoDataModelChange, function() {
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
+
+        // listen on a change/set of the InfoMe model
+        Engage.model.on(infoMeChange, function() {
             initCount -= 1;
             if (initCount == 0) {
                 initPlugin();
