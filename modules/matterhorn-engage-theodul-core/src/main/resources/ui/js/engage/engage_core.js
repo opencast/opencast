@@ -176,7 +176,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             }).done(function(msg) {
                                 password = "";
                                 if (msg.indexOf(springLoggedInStrCheck) == -1) {
-                                    engageCore.trigger(events.customSuccess.getName(), "Successfully logged in as " + " '" + username + "'. Please reload the page.");
+                                    engageCore.trigger(events.customSuccess.getName(), "Successfully logged in. Please reload the page if the page does not reload automatically.");
                                     $("#" + id_btn_login).hide();
                                     $("#" + id_btn_reloadPage).click(function(e) {
                                         e.preventDefault();
@@ -185,13 +185,12 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                     $("#" + id_btn_reloadPage).show();
                                     location.reload();
                                 } else {
-                                    engageCore.trigger(events.customError.getName(), "Failed to log in as " + " '" + username + "'.");
+                                    engageCore.trigger(events.customError.getName(), "Failed to log in.");
                                 }
                                 askingForCredentials = false;
                             }).fail(function(msg) {
                                 password = "";
-                                console.log("FAILED TO LOG IN!");
-                                // alertify.error(msg_loginFailed + " '" + username + "'.");
+                                engageCore.trigger(events.customError.getName(), "Failed to log in.");
                                 askingForCredentials = false;
                             });
                         } else {
