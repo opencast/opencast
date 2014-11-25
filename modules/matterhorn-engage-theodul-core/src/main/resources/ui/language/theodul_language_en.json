@@ -60,7 +60,17 @@
     "msg_startPlayingToSetTime": "Please start playing the video once to set a time.",
     "msg_waitToSeek": "Please wait until the video has been loaded to seek.",
     "msg_startPlayingToSeek": "Please start playing the video once to seek.",
-    "loggedInAs": "Logged in as",
-    "notLoggedIn": "Not logged in",
-    "checkingLoginStatus": "Checking login status..."
+    "loggedIn": "Logged in",
+    "loggedOut": "Logged out",
+    "checkingLoginStatus": "Checking login status...",
+    "loginLogout": "Log in/Log out",
+    "login": "Log in",
+    "logout": "Log out",
+    "enterUsername": "Please enter your username",
+    "enterPassword": "Please enter your password",
+    "loggingOut": "You are being logged out, please wait a moment.",
+    "loginSuccessful": "Successfully logged in. Please reload the page if the page does not reload automatically.",
+    "logoutSuccessful": "Successfully logged out. Please reload the page if the page does not reload automatically.",
+    "loginFailed": "Failed to log in.",
+    "logoutFailed": "Failed to log out."
 }

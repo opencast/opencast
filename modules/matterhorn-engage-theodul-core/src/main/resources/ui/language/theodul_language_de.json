@@ -60,7 +60,16 @@
     "msg_startPlayingToSetTime": "Bitte das Video einmal starten, um eine Zeit zu setzen.",
     "msg_waitToSeek": "Bitte warten, bis das Video geladen wurde, um eine Zeit zu setzen.",
     "msg_startPlayingToSeek": "Bitte das Video einmal starten, um eine Zeit zu setzen.",
-    "loggedInAs": "Eingeloggt als",
-    "notLoggedIn": "Nicht eingeloggt",
-    "checkingLoginStatus": "Login-Status wird überprüft..."
+    "loggedIn": "Eingeloggt",
+    "loggedOut": "Ausgeloggt",
+    "checkingLoginStatus": "Login-Status wird überprüft...",
+    "loginLogout": "Einloggen/Ausloggen",
+    "login": "Einloggen",
+    "logout": "Ausloggen",
+    "enterUsername": "Bitte geben Sie ihren Nutzernamen ein",
+    "enterPassword": "Bitte geben Sie ihr Password ein",
+    "loggingOut": "Sie werden ausgeloggt. Bitte warten Sie einen Moment.",
+    "loginSuccessful": "Sie wurden erfolgreich eingeloggt. Bitte laden Sie diese Seite neu, falls sie nicht autoamtisch neu geladen wird.",
+    "logoutSuccessful": "Sie wurden erfolgreich ausgeloggt. Bitte laden Sie diese Seite neu, falls sie nicht autoamtisch neu geladen wird.",
+    "logoutFailed": "Ausloggen fehlgeschlagen."
 }

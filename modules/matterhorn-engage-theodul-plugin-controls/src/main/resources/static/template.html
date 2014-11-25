@@ -54,28 +54,6 @@
     </div>
     <!-- ##### Navigation ##### -->
     <div id="menu">
-      <% if((typeof loggedIn !== "undefined")
-      && (typeof str_checkingStatus !== "undefined")
-      && (typeof str_loginLogout !== "undefined")) { %>
-        <div class="btn-group">
-            <button id="dropdownMenuLoginInfo" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="Login/Logout">
-		<span id="loggedInAs"><%= str_checkingStatus %></span>
-		<span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-                <li role="presentation">
-		    <a id="loginlogout" role="menuitem" tabindex="-1" href="#">
-		        <% if((typeof loggedIn !== "undefined") && !loggedIn) { %>
-                        <span class="glyphicon glyphicon-log-in"></span>
-			<% } else { %>
-                        <span class="glyphicon glyphicon-log-out"></span>
-			<% } %>
-		        <b><span id="str_loginlogout"><%= str_loginLogout %></span></b>
-		    </a>
-		</li>
-            </ul>
-	</div>
-        <% } %>
         <div class="btn-group">
             <div class="btn-group">
                 <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_playbackRateButton %>">
@@ -110,6 +88,29 @@
                 <li role="presentation"><a id="embed4" role="menuitem" tabindex="-1" href="#"></a></li>
             </ul>
         </div>
+      <% if((typeof loggedIn !== "undefined")
+      && (typeof str_checkingStatus !== "undefined")
+      && (typeof str_loginLogout !== "undefined")) { %>
+        <div class="btn-group">
+            <button id="dropdownMenuLoginInfo" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_loginLogout %>">
+	        <span class="glyphicon glyphicon-user"></span>
+		<span id="loggedInNotLoggedIn"><%= str_checkingStatus %></span>
+		<span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation">
+		    <a id="loginlogout" role="menuitem" tabindex="-1" href="#">
+		        <% if((typeof loggedIn !== "undefined") && !loggedIn) { %>
+                        <span class="glyphicon glyphicon-log-in"></span>
+			<% } else { %>
+                        <span class="glyphicon glyphicon-log-out"></span>
+			<% } %>
+		        <span id="str_loginlogout"></span>
+		    </a>
+		</li>
+            </ul>
+	</div>
+        <% } %>
     </div>
     <div class="clear"></div>
     <!-- ##### Slider ##### -->

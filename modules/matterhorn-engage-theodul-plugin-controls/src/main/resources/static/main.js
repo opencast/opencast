@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_core"], function(require, $, _, Backbone, Basil, Engage) {
+define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "engage/engage_core"], function(require, $, _, Backbone, Basil, Bootbox, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage Controls";
     var PLUGIN_TYPE = "engage_controls";
@@ -55,6 +55,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "trigger"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
         customOKMessage: new Engage.Event("Notification:customOKMessage", "a custom message with an OK button", "trigger"),
+        customSuccess: new Engage.Event("Notification:customSuccess", "a custom success message", "trigger"),
+        customError: new Engage.Event("Notification:customError", "an error occurred", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "handler"),
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
@@ -154,7 +156,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var id_playbackRemTime100 = "playbackRemTime100";
     var id_playbackRemTime125 = "playbackRemTime125";
     var id_playbackRemTime150 = "playbackRemTime150";
-    var id_loggedInAs = "loggedInAs";
+    var id_loggedInNotLoggedIn = "loggedInNotLoggedIn";
+    var id_loginlogout = "loginlogout";
     var id_str_loginlogout = "str_loginlogout";
     var id_dropdownMenuLoginInfo = "dropdownMenuLoginInfo";
     var class_dropdown = "dropdown-toggle";
@@ -190,6 +193,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var loggedIn = false;
     var username = "Anonymous";
     var translations = new Array();
+    var askingForCredentials = false;
+    var springSecurityLoginURL = "/j_spring_security_check";
+    var springSecurityLogoutURL = "/j_spring_security_logout";
+    var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
     var entityMap = {
         "&": "&amp;",
         "<": "&lt;",
@@ -219,17 +226,77 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         return height;
     }
 
+    function login() {
+        if (!askingForCredentials) {
+            askingForCredentials = true;
+            var username = "User";
+            var password = "Password";
+            Bootbox.prompt(translate("enterUsername", "Please enter your username"), function(u) {
+                if ((u !== null) && (u.length > 0)) {
+                    username = u;
+                    Bootbox.prompt(translate("enterPassword", "Please enter your password"), function(p) {
+                        if ((p !== null) && (p.length > 0)) {
+                            password = p;
+                            $.ajax({
+                                type: "POST",
+                                url: springSecurityLoginURL,
+                                data: {
+                                    "j_username": username,
+                                    "j_password": password,
+                                    "_spring_security_remember_me": true
+                                }
+                            }).done(function(msg) {
+                                password = "";
+                                if (msg.indexOf(springLoggedInStrCheck) == -1) {
+                                    Engage.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Sie wurden erfolgreich eingeloggt. Bitte laden Sie diese Seite neu, falls sie nicht autoamtisch neu geladen wird."));
+                                    location.reload();
+                                } else {
+                                    Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
+                                }
+                                askingForCredentials = false;
+                            }).fail(function(msg) {
+                                password = "";
+                                Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
+                                askingForCredentials = false;
+                            });
+                        } else {
+                            askingForCredentials = false;
+                        }
+                    });
+                } else {
+                    askingForCredentials = false;
+                }
+            });
+        }
+    }
+
+    function logout() {
+        Engage.trigger(events.customSuccess.getName(), translate("loggingOut", "You are being logged out, please wait a moment."));
+        $.ajax({
+            type: "GET",
+            url: springSecurityLogoutURL,
+        }).done(function(msg) {
+            location.reload();
+            Engage.trigger(events.customSuccess.getName(), translate("logoutSuccessful", "Successfully logged out. Please reload the page if the page does not reload automatically."));
+        }).fail(function(msg) {
+            Engage.trigger(events.customSuccess.getName(), translate("logoutFailed", "Failed to log out."));
+        });
+    }
+
     function checkLoginStatus() {
+        $("#" + id_loginlogout).unbind("click");
         if (Engage.model.get("infoMe").loggedIn) {
             loggedIn = true;
             username = Engage.model.get("infoMe").username;
-            $("#" + id_loggedInAs).html(translate("loggedInAs", "Logged in as") + ": " + username);
-            $("#" + id_str_loginlogout).html("Logout");
+            $("#" + id_loggedInNotLoggedIn).html(username);
+            $("#" + id_str_loginlogout).html(translate("logout", "Log out"));
+            $("#" + id_loginlogout).click(logout);
         } else {
             loggedIn = false;
             username = "Anonymous";
-            $("#" + id_loggedInAs).html(translate("notLoggedIn", "Not logged in"));
-            $("#" + id_str_loginlogout).html("Login");
+            $("#" + id_loggedInNotLoggedIn).html(translate("loggedOut", "Logged out"));
+            $("#" + id_str_loginlogout).html(translate("login", "Log in"));
+            $("#" + id_loginlogout).click(login);
         }
         $("#" + id_dropdownMenuLoginInfo).removeClass("disabled");
     }
@@ -276,7 +343,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                     str_embedButton: translate("embedButton", "Embed Button. Select embed size from dropdown."),
                     loggedIn: false,
                     str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
-                    str_loginLogout: ""
+                    str_loginLogout: translate("loginLogout", "Login/Logout")
                 };
 
                 // compile template and load into the html
