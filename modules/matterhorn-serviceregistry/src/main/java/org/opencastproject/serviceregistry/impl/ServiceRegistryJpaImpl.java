@@ -2028,6 +2028,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** OSGi DI. */
   public void setIncidentService(IncidentService incidentService) {
+    // Manually resolve the cyclic dependency between the incident service and the service registry
+    ((OsgiIncidentService)incidentService).setServiceRegistry(this);
     this.incidents = new Incidents(this, incidentService);
   }
 
