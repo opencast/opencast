@@ -282,7 +282,7 @@
                 </td>
                 <td>
                   <input id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" 
-                    type="checkbox" value="true" />
+                    type="checkbox" value="true" <#if item.defaultValue??>checked="${item.defaultValue}" defaultChecked="${item.defaultValue}"</#if> />
                 </td>
                 <td class="form_field_description">${item.description!}</td>
                 <#elseif item.type == "file">
