@@ -27,8 +27,10 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -56,6 +58,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -438,11 +441,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "addMediaPackage",
       description = "<p>Create and ingest media package from media tracks with additional Dublin Core metadata. It is "
         + "mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC "
-        + "catalog with a title included. The identifier of the newly created media package will be a randumm UUIDv4. This "
-        + "endpoint is not meant to be used by capture agents for scheduled recordings. It's primary use is for manual "
-        + "ingests with command line tools like curl.</p> "
-        + "<p>Multiple tracks can be ingested by using multiple form fields. It's important, however, to always set the"
+        + "catalog with a title included.  The identifier of the newly created media package will be taken from the "
+        + "<em>identifier</em> field or the episode DublinCore catalog (deprecated<sup>*</sup>). If no identifier is "
+        + "set, a newa randumm UUIDv4 will be generated. This endpoint is not meant to be used by capture agents for "
+        + "scheduled recordings. It's primary use is for manual ingests with command line tools like curl.</p> "
+        + "<p>Multiple tracks can be ingested by using multiple form fields. It's important, however, to always set the "
         + "flavor of the next media file <em>before</em> sending the media file itself.</p>"
+        + "<b>(*)</b> The special treatment of the identifier field is deprecated any may be removed in future versions "
+        + "without further notice in favor of a random UUID generation to ensure uniqueness of identifiers. "
         + "<h3>Example curl command:</h3>"
         + "<p>Ingest one video file:</p>"
         + "<p><pre>\n"
@@ -510,11 +516,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "addMediaPackage",
       description = "<p>Create and ingest media package from media tracks with additional Dublin Core metadata. It is "
         + "mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC "
-        + "catalog with a title included. The identifier of the newly created media package will be a randumm UUIDv4. This "
-        + "endpoint is not meant to be used by capture agents for scheduled recordings. It's primary use is for manual "
-        + "ingests with command line tools like curl.</p> "
-        + "<p>Multiple tracks can be ingested by using multiple form fields. It's important, however, to always set the"
+        + "catalog with a title included.  The identifier of the newly created media package will be taken from the "
+        + "<em>identifier</em> field or the episode DublinCore catalog (deprecated<sup>*</sup>). If no identifier is "
+        + "set, a newa randumm UUIDv4 will be generated. This endpoint is not meant to be used by capture agents for "
+        + "scheduled recordings. It's primary use is for manual ingests with command line tools like curl.</p> "
+        + "<p>Multiple tracks can be ingested by using multiple form fields. It's important, however, to always set the "
         + "flavor of the next media file <em>before</em> sending the media file itself.</p>"
+        + "<b>(*)</b> The special treatment of the identifier field is deprecated any may be removed in future versions "
+        + "without further notice in favor of a random UUID generation to ensure uniqueness of identifiers. "
         + "<h3>Example curl command:</h3>"
         + "<p>Ingest one video file:</p>"
         + "<p><pre>\n"
@@ -599,6 +608,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
               /* Fields for DC catalog */
             } else if (dcterms.contains(fieldName)) {
+              if ("identifier".equals(fieldName)) {
+                /* Use the identifier for the mediapackage */
+                mp.setIdentifier(new IdImpl(value));
+              }
               EName en = new EName(DublinCore.TERMS_NS_URI, fieldName);
               if (dcc == null) {
                 dcc = dublinCoreService.newInstance();
@@ -609,6 +622,12 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             } else if ("episodeDCCatalogUri".equals(fieldName)) {
               try {
                 URI dcurl = new URI(value);
+                DublinCoreCatalog dc = new DublinCoreCatalogImpl(new URL(value).openStream());
+                EName en = new EName(DublinCore.TERMS_NS_URI, "identifier");
+                String id = dc.getFirst(en);
+                if (id != null) {
+                  mp.setIdentifier(new IdImpl(id));
+                }
                 ingestService.addCatalog(dcurl, MediaPackageElements.EPISODE, mp);
                 episodeDCCatalogNumber += 1;
               } catch (java.net.URISyntaxException e) {
@@ -619,9 +638,16 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
               /* Episode metadata DC catalog (XML) as string */
             } else if ("episodeDCCatalog".equals(fieldName)) {
+              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
+              DublinCoreCatalog dc = new DublinCoreCatalogImpl(is);
+              EName en = new EName(DublinCore.TERMS_NS_URI, "identifier");
+              String id = dc.getFirst(en);
+              if (id != null) {
+                mp.setIdentifier(new IdImpl(id));
+              }
+              is.reset();
               String fileName = "episode" + episodeDCCatalogNumber + ".xml";
               episodeDCCatalogNumber += 1;
-              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
               ingestService.addCatalog(is, fileName, MediaPackageElements.EPISODE, mp);
 
               /* Series by URL */
