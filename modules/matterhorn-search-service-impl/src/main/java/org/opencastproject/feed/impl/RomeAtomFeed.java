@@ -88,6 +88,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
     setUpdated(originalFeed.getUpdatedDate());
     setTitleEx(toRomeAtomContent(originalFeed.getTitle()));
     setId(originalFeed.getUri());
+    setCopyright(originalFeed.getCopyright());
     List <Link> otherLinks = new ArrayList <Link>();
     otherLinks.add(new LinkImpl(originalFeed.getLink()));
     setOtherLinks(toRomeAtomLinks(otherLinks));
