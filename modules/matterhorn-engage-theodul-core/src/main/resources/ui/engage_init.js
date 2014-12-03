@@ -34,6 +34,9 @@ requirejs.config({
         },
         "basil": {
             exports: "Basil"
+        },
+        "bootbox": {
+            exports: "Bootbox"
         }
     }
 });

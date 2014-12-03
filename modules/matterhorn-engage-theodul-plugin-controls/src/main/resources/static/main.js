@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_core"], function(require, $, _, Backbone, Basil, Engage) {
+define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "engage/engage_core"], function(require, $, _, Backbone, Basil, Bootbox, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage Controls";
     var PLUGIN_TYPE = "engage_controls";
@@ -55,6 +55,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "trigger"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
         customOKMessage: new Engage.Event("Notification:customOKMessage", "a custom message with an OK button", "trigger"),
+        customSuccess: new Engage.Event("Notification:customSuccess", "a custom success message", "trigger"),
+        customError: new Engage.Event("Notification:customError", "an error occurred", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "handler"),
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
@@ -154,16 +156,23 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var id_playbackRemTime100 = "playbackRemTime100";
     var id_playbackRemTime125 = "playbackRemTime125";
     var id_playbackRemTime150 = "playbackRemTime150";
+    var id_loggedInNotLoggedIn = "loggedInNotLoggedIn";
+    var id_loginlogout = "loginlogout";
+    var id_str_loginlogout = "str_loginlogout";
+    var id_dropdownMenuLoginInfo = "dropdownMenuLoginInfo";
     var class_dropdown = "dropdown-toggle";
 
     /* don't change these variables */
     var videosReady = false;
+    var enableFullscreenButton = false;
+    var currentTime = 0;
     var videoDataModelChange = "change:videoDataModel";
+    var infoMeChange = "change:infoMe";
     var mediapackageChange = "change:mediaPackage";
     var event_slidestart = "slidestart";
     var event_slidestop = "slidestop";
     var plugin_path = "";
-    var initCount = 5;
+    var initCount = 6;
     var isPlaying = false;
     var isSliding = false;
     var isMute = false;
@@ -172,6 +181,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var isAudioOnly = false;
     var segments = {};
     var mediapackageError = false;
+    var aspectRatioTriggered = false;
     var aspectRatioWidth;
     var aspectRatioHeight;
     var aspectRatio;
@@ -180,7 +190,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var embedWidthThree;
     var embedWidthFour;
     var embedWidthFive;
+    var loggedIn = false;
+    var username = "Anonymous";
     var translations = new Array();
+    var askingForCredentials = false;
+    var springSecurityLoginURL = "/j_spring_security_check";
+    var springSecurityLogoutURL = "/j_spring_security_logout";
+    var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
     var entityMap = {
         "&": "&amp;",
         "<": "&lt;",
@@ -208,6 +224,81 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     function getAspectRatioHeight(originalWidth, originalHeight, width) {
         var height = Math.round(originalHeight / originalWidth * width);
         return height;
+    }
+
+    function login() {
+        if (!askingForCredentials) {
+            askingForCredentials = true;
+            var username = "User";
+            var password = "Password";
+            Bootbox.prompt(translate("enterUsername", "Please enter your username"), function(u) {
+                if ((u !== null) && (u.length > 0)) {
+                    username = u;
+                    Bootbox.prompt(translate("enterPassword", "Please enter your password"), function(p) {
+                        if ((p !== null) && (p.length > 0)) {
+                            password = p;
+                            $.ajax({
+                                type: "POST",
+                                url: springSecurityLoginURL,
+                                data: {
+                                    "j_username": username,
+                                    "j_password": password,
+                                    "_spring_security_remember_me": true
+                                }
+                            }).done(function(msg) {
+                                password = "";
+                                if (msg.indexOf(springLoggedInStrCheck) == -1) {
+                                    Engage.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Sie wurden erfolgreich eingeloggt. Bitte laden Sie diese Seite neu, falls sie nicht autoamtisch neu geladen wird."));
+                                    location.reload();
+                                } else {
+                                    Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
+                                }
+                                askingForCredentials = false;
+                            }).fail(function(msg) {
+                                password = "";
+                                Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
+                                askingForCredentials = false;
+                            });
+                        } else {
+                            askingForCredentials = false;
+                        }
+                    });
+                } else {
+                    askingForCredentials = false;
+                }
+            });
+        }
+    }
+
+    function logout() {
+        Engage.trigger(events.customSuccess.getName(), translate("loggingOut", "You are being logged out, please wait a moment."));
+        $.ajax({
+            type: "GET",
+            url: springSecurityLogoutURL,
+        }).done(function(msg) {
+            location.reload();
+            Engage.trigger(events.customSuccess.getName(), translate("logoutSuccessful", "Successfully logged out. Please reload the page if the page does not reload automatically."));
+        }).fail(function(msg) {
+            Engage.trigger(events.customSuccess.getName(), translate("logoutFailed", "Failed to log out."));
+        });
+    }
+
+    function checkLoginStatus() {
+        $("#" + id_loginlogout).unbind("click");
+        if (Engage.model.get("infoMe").loggedIn) {
+            loggedIn = true;
+            username = Engage.model.get("infoMe").username;
+            $("#" + id_loggedInNotLoggedIn).html(username);
+            $("#" + id_str_loginlogout).html(translate("logout", "Log out"));
+            $("#" + id_loginlogout).click(logout);
+        } else {
+            loggedIn = false;
+            username = "Anonymous";
+            $("#" + id_loggedInNotLoggedIn).html(translate("loggedOut", "Logged out"));
+            $("#" + id_str_loginlogout).html(translate("login", "Log in"));
+            $("#" + id_loginlogout).click(login);
+        }
+        $("#" + id_dropdownMenuLoginInfo).removeClass("disabled");
     }
 
     var ControlsView = Backbone.View.extend({
@@ -249,7 +340,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                     str_playbackRateButton: translate("playbackRateButton", "Playback rate button. Select playback rate from dropdown."),
                     str_playbackRate: translate("playbackRate", "Playback rate"),
                     str_remainingTime: translate("remainingTime", "remaining time"),
-                    str_embedButton: translate("embedButton", "Embed Button. Select embed size from dropdown.")
+                    str_embedButton: translate("embedButton", "Embed Button. Select embed size from dropdown."),
+                    loggedIn: false,
+                    str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
+                    str_loginLogout: translate("loginLogout", "Login/Logout")
                 };
 
                 // compile template and load into the html
@@ -257,8 +351,22 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                 if (isDesktopMode || isMobileMode) {
                     initControlsEvents();
 
+                    if (aspectRatioTriggered) {
+                        calculateEmbedAspectRatios();
+                        addEmbedRatioEvents();
+                    }
+
+                    ready();
+                    playPause();
+                    mute();
+                    timeUpdate();
+
                     // init dropdown menus
                     $("." + class_dropdown).dropdown();
+
+                    addNonFlashEvents();
+
+                    checkLoginStatus();
                 }
             }
         }
@@ -422,7 +530,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
     function addEmbedRatioEvents() {
         if (!mediapackageError) {
-            // setup listeners for the embed
+            // setup listeners for the embed buttons
             $("#" + id_embed0).click(function(e) {
                 e.preventDefault();
                 triggerEmbedMessage(embedWidthOne, embedHeightOne);
@@ -465,9 +573,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         }
     }
 
-    /**
-     * getVolume
-     */
     function initControlsEvents() {
         if (!mediapackageError) {
             // disable not used buttons
@@ -575,9 +680,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         }
     }
 
-    /**
-     * getVolume
-     */
     function getVolume() {
         if (isMute) {
             return 0;
@@ -595,20 +697,84 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             embedWidthFour = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFour);
             embedWidthFive = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFive);
 
-            $("#embed0").html("Embed " + embedWidthOne + "x" + embedHeightOne);
-            $("#embed1").html("Embed " + embedWidthTwo + "x" + embedHeightTwo);
-            $("#embed2").html("Embed " + embedWidthThree + "x" + embedHeightThree);
-            $("#embed3").html("Embed " + embedWidthFour + "x" + embedHeightFour);
-            $("#embed4").html("Embed " + embedWidthFive + "x" + embedHeightFive);
+            $("#" + id_embed0).html("Embed " + embedWidthOne + "x" + embedHeightOne);
+            $("#" + id_embed1).html("Embed " + embedWidthTwo + "x" + embedHeightTwo);
+            $("#" + id_embed2).html("Embed " + embedWidthThree + "x" + embedHeightThree);
+            $("#" + id_embed3).html("Embed " + embedWidthFour + "x" + embedHeightFour);
+            $("#" + id_embed4).html("Embed " + embedWidthFive + "x" + embedHeightFive);
         } else {
             embedWidthOne = 310;
             embedHeightOne = 70;
 
-            $("#embed0").html("Embed " + embedWidthOne + "x" + embedHeightOne);
-            $("#embed1, #embed2, #embed3, embed4").hide();
+            $("#" + id_embed0).html("Embed " + embedWidthOne + "x" + embedHeightOne);
+            $("#" + id_embed1 + ", " + "#" + id_embed2 + ", " + "#" + id_embed3 + ", " + "#" + id_embed4 + ", ").hide();
         }
 
-        $("#embed_button").removeClass("disabled");
+        $("#" + id_embed_button).removeClass("disabled");
+    }
+
+    function ready() {
+        if (videosReady) {
+            greyIn(id_play_button);
+            enable(id_play_button);
+            if (!isAudioOnly) {
+                enableFullscreenButton = true;
+                $("#" + id_fullscreen_button).removeClass("disabled");
+            }
+        }
+    }
+
+    function playPause() {
+        if (isPlaying) {
+            $("#" + id_play_button).hide();
+            $("#" + id_pause_button).show();
+            if (!usingFlash && !isAudioOnly) {
+                $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
+                var pbr = Basil.get(storage_playbackRate);
+                if (pbr) {
+                    $("#" + id_playbackRateIndicator).html(pbr);
+                    Engage.trigger(plugin.events.playbackRateChanged.getName(), parseInt(pbr));
+                }
+            }
+        } else {
+            $("#" + id_play_button).show();
+            $("#" + id_pause_button).hide();
+        }
+    }
+
+    function mute() {
+        if (isMute) {
+            $("#" + id_unmute_button).hide();
+            $("#" + id_mute_button).show();
+            Engage.trigger(plugin.events.volumeSet.getName(), 0);
+        } else {
+            $("#" + id_unmute_button).show();
+            $("#" + id_mute_button).hide();
+            Engage.trigger(plugin.events.volumeSet.getName(), getVolume());
+        }
+    }
+
+    function timeUpdate() {
+        if (videosReady) {
+            // set slider
+            var duration = parseInt(Engage.model.get("videoDataModel").get("duration"));
+            if (!isSliding && duration) {
+                var normTime = (currentTime / (duration / 1000)) * 1000;
+                $("#" + id_slider).slider("option", "value", normTime);
+                if (!$("#" + id_navigation_time_current).is(":focus")) {
+                    $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
+                }
+            }
+            var val = Math.round((duration / 1000) - currentTime);
+            val = ((val >= 0) && (val <= (duration / 1000))) ? val : "-";
+            $("#" + id_playbackRemTime050).html(formatSeconds(!isNaN(val) ? (val / 0.5) : val));
+            $("#" + id_playbackRemTime075).html(formatSeconds(!isNaN(val) ? (val / 0.75) : val));
+            $("#" + id_playbackRemTime100).html(formatSeconds(!isNaN(val) ? (val) : val));
+            $("#" + id_playbackRemTime125).html(formatSeconds(!isNaN(val) ? (val / 1.25) : val));
+            $("#" + id_playbackRemTime150).html(formatSeconds(!isNaN(val) ? (val / 1.5) : val));
+        } else {
+            $("#" + id_slider).slider("option", "value", 0);
+        }
     }
 
     /**
@@ -619,11 +785,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         if ((isDesktopMode || isMobileMode) && plugin.inserted) {
             var controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
-                aspectRatioWidth = as[0] || 0;
-                aspectRatioHeight = as[1] || 0;
-                aspectRatio = as[2] || 0;
-                calculateEmbedAspectRatios();
-                addEmbedRatioEvents();
+                if (as) {
+                    aspectRatioWidth = as[0] || 0;
+                    aspectRatioHeight = as[1] || 0;
+                    aspectRatio = as[2] || 0;
+                    aspectRatioTriggered = true;
+                    calculateEmbedAspectRatios();
+                    addEmbedRatioEvents();
+                }
             });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
@@ -637,50 +806,32 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             });
             Engage.on(plugin.events.ready.getName(), function() {
                 if (!mediapackageError) {
-                    greyIn(id_play_button);
-                    enable(id_play_button);
                     videosReady = true;
-                    if (!isAudioOnly) {
-                        $("#" + id_fullscreen_button).removeClass("disabled");
-                    }
+                    ready();
                 }
             });
             Engage.on(plugin.events.play.getName(), function() {
                 if (!mediapackageError && videosReady) {
-                    $("#" + id_play_button).hide();
-                    $("#" + id_pause_button).show();
                     isPlaying = true;
-                    if (!usingFlash && !isAudioOnly) {
-                        $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
-                        var pbr = Basil.get(storage_playbackRate);
-                        if (pbr) {
-                            $("#" + id_playbackRateIndicator).html(pbr);
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), parseInt(pbr));
-                        }
-                    }
+                    playPause();
                 }
             });
             Engage.on(plugin.events.pause.getName(), function() {
                 if (!mediapackageError && videosReady) {
-                    $("#" + id_play_button).show();
-                    $("#" + id_pause_button).hide();
                     isPlaying = false;
+                    playPause();
                 }
             });
             Engage.on(plugin.events.mute.getName(), function() {
                 if (!mediapackageError) {
-                    $("#" + id_unmute_button).hide();
-                    $("#" + id_mute_button).show();
                     isMute = true;
-                    Engage.trigger(plugin.events.volumeSet.getName(), 0);
+                    mute();
                 }
             });
             Engage.on(plugin.events.unmute.getName(), function() {
                 if (!mediapackageError) {
-                    $("#" + id_unmute_button).show();
-                    $("#" + id_mute_button).hide();
                     isMute = false;
-                    Engage.trigger(plugin.events.volumeSet.getName(), getVolume());
+                    mute();
                 }
             });
             Engage.on(plugin.events.fullscreenChange.getName(), function() {
@@ -689,28 +840,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                     Engage.trigger(plugin.events.fullscreenCancel.getName());
                 }
             });
-            Engage.on(plugin.events.timeupdate.getName(), function(currentTime) {
+            Engage.on(plugin.events.timeupdate.getName(), function(_currentTime) {
                 if (!mediapackageError) {
-                    if (videosReady) {
-                        // set slider
-                        var duration = parseInt(Engage.model.get("videoDataModel").get("duration"));
-                        if (!isSliding && duration) {
-                            var normTime = (currentTime / (duration / 1000)) * 1000;
-                            $("#" + id_slider).slider("option", "value", normTime);
-                            if (!$("#" + id_navigation_time_current).is(":focus")) {
-                                $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
-                            }
-                        }
-                        var val = Math.round((duration / 1000) - currentTime);
-                        val = ((val >= 0) && (val <= (duration / 1000))) ? val : "-";
-                        $("#" + id_playbackRemTime050).html(formatSeconds(!isNaN(val) ? (val / 0.5) : val));
-                        $("#" + id_playbackRemTime075).html(formatSeconds(!isNaN(val) ? (val / 0.75) : val));
-                        $("#" + id_playbackRemTime100).html(formatSeconds(!isNaN(val) ? (val) : val));
-                        $("#" + id_playbackRemTime125).html(formatSeconds(!isNaN(val) ? (val / 1.25) : val));
-                        $("#" + id_playbackRemTime150).html(formatSeconds(!isNaN(val) ? (val / 1.5) : val));
-                    } else {
-                        $("#" + id_slider).slider("option", "value", 0);
-                    }
+                    currentTime = _currentTime;
+                    timeUpdate();
                 }
             });
             Engage.on(plugin.events.ended.getName(), function() {
@@ -765,6 +898,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
         // listen on a change/set of the video data model
         Engage.model.on(videoDataModelChange, function() {
+            initCount -= 1;
+            if (initCount == 0) {
+                initPlugin();
+            }
+        });
+
+        // listen on a change/set of the InfoMe model
+        Engage.model.on(infoMeChange, function() {
             initCount -= 1;
             if (initCount == 0) {
                 initPlugin();

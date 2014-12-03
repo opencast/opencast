@@ -8,6 +8,8 @@ $(document).ready(function() {
     var stack = new Array();
     var visited = 1;
 
+    var msg_enterUsername = "Please enter your username:";
+    var msg_enterPassword = "Please enter your password:";
     var msg_html_sthWentWrong = "<h2> Something went wrong. Try again! </h2>";
     var msg_html_noepisodes = "<h2>No Episodes available</h2>";
     var msg_html_noseries = "<h2>No Series available</h2>";
@@ -55,7 +57,7 @@ $(document).ready(function() {
                 "rest": null
             });
         }
-	$($main_container).html(msg_html_loading);
+        $($main_container).html(msg_html_loading);
         $($navbarEpisodes).addClass("active");
         $($navbarSeries).removeClass("active");
         active = "episodes";
@@ -63,7 +65,7 @@ $(document).ready(function() {
     }
 
     $(window).load(function() {
-	initialize();
+        initialize();
     });
 
     $(window).on("popstate", function(event) {
@@ -112,86 +114,83 @@ $(document).ready(function() {
         sessionStorage.setItem("historyStack", JSON.stringify(stack));
     }
 
-    var msg_enterUsername = "Please enter your username:";
-    var msg_enterPassword = "Please enter your password:";
-
     function login() {
-	if(!askingForCredentials) {
-	    askingForCredentials = true;
-	    var username = "User";
-	    var password = "Password";
-	    bootbox.prompt(msg_enterUsername, function(u) {
-		if ((u !== null) && (u.length > 0)) {
-		    username = u;
-		    bootbox.prompt(msg_enterPassword, function(p) {
-			if ((p !== null) && (p.length > 0)) {
-			    password = p;
-			    $.ajax({
-				type: "POST",
-				url: springSecurityLoginURL,
-				data: {
-				    "j_username": username,
-				    "j_password": password,
-				    "_spring_security_remember_me": true
-				}
-			    }).done(function(msg) {
-				password = "";
-				if(msg.indexOf(springLoggedInStrCheck) == -1) {
-				    alertify.success(msg_loginSuccessful + " '" + username + "'.");
-				    initialize();
-				} else {
-				    alertify.error(msg_loginFailed + " '" + username + "'.");
-				}
-				askingForCredentials = false;
-			    }).fail(function(msg) {
-				password = "";
-				alertify.error(msg_loginFailed + " '" + username + "'.");
-				askingForCredentials = false;
-			    });
-			} else {
-			    askingForCredentials = false;
-			}
-		    });
-		} else {
-		    askingForCredentials = false;
-		}
-	    });
-	}
+        if (!askingForCredentials) {
+            askingForCredentials = true;
+            var username = "User";
+            var password = "Password";
+            bootbox.prompt(msg_enterUsername, function(u) {
+                if ((u !== null) && (u.length > 0)) {
+                    username = u;
+                    bootbox.prompt(msg_enterPassword, function(p) {
+                        if ((p !== null) && (p.length > 0)) {
+                            password = p;
+                            $.ajax({
+                                type: "POST",
+                                url: springSecurityLoginURL,
+                                data: {
+                                    "j_username": username,
+                                    "j_password": password,
+                                    "_spring_security_remember_me": true
+                                }
+                            }).done(function(msg) {
+                                password = "";
+                                if (msg.indexOf(springLoggedInStrCheck) == -1) {
+                                    alertify.success(msg_loginSuccessful + " '" + username + "'.");
+                                    initialize();
+                                } else {
+                                    alertify.error(msg_loginFailed + " '" + username + "'.");
+                                }
+                                askingForCredentials = false;
+                            }).fail(function(msg) {
+                                password = "";
+                                alertify.error(msg_loginFailed + " '" + username + "'.");
+                                askingForCredentials = false;
+                            });
+                        } else {
+                            askingForCredentials = false;
+                        }
+                    });
+                } else {
+                    askingForCredentials = false;
+                }
+            });
+        }
     }
 
     function logout() {
-	$.ajax({
-	    type: "GET",
-	    url: springSecurityLogoutURL,
-	}).done(function(msg) {
-	    checkLoggedOut = true;
-	    initialize();
-	}).fail(function(msg) {
-	    $($nav_logoutLink).attr("href", springSecurityLogoutURL);
-	});
+        $.ajax({
+            type: "GET",
+            url: springSecurityLogoutURL,
+        }).done(function(msg) {
+            checkLoggedOut = true;
+            initialize();
+        }).fail(function(msg) {
+            $($nav_logoutLink).attr("href", springSecurityLogoutURL);
+        });
     }
 
     function setUsername(name) {
-	$($nav_userName).html(name);
-	$($nav_login).hide();
-	$($nav_dropdownLoggedin).show();
+        $($nav_userName).html(name);
+        $($nav_login).hide();
+        $($nav_dropdownLoggedin).show();
     }
 
     function initLogin() {
-	$($navbarLogin).click(function() {
-	    $($nav_login).click(login);
-	});
+        $($navbarLogin).click(function() {
+            $($nav_login).click(login);
+        });
     }
 
     function resetAnonymousUser() {
-	$($nav_userName).html("");
-	$($nav_dropdownLoggedin).hide();
-	$($nav_login).show();
-	initLogin();
+        $($nav_userName).html("");
+        $($nav_dropdownLoggedin).hide();
+        $($nav_login).show();
+        initLogin();
     }
 
     String.prototype.endsWith = function(suffix) {
-	return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        return this.indexOf(suffix, this.length - suffix.length) !== -1;
     };
 
     function getInfo() {
@@ -201,50 +200,50 @@ $(document).ready(function() {
             success: function(data) {
                 $.log("User information loaded");
 
-		if(data) {
-		    if(data.roles && (data.roles.length > 0)) {
-			var notAnonymous = false;
-			for(var i = 0; i < data.roles.length; ++i) {
-			    if(data.roles[i] != "ROLE_ANONYMOUS") {
-				notAnonymous = true;
-			    }
-			}
-			if(notAnonymous) {
-			    if(checkLoggedOut) {
-				window.location = springSecurityLogoutURL;
-			    }
-			    $($nav_logoutLink).click(logout);
-			    $.log("User is not anonymous");
-			    if(data.username) {
-				$.log("Username found: " + data.username);
-				setUsername(data.username);
-			    } else {
-				$.log("Username not found");
-			    }
-			} else {
-			    checkLoggedOut = false;
-			    $.log("User is anonymous");
-			    resetAnonymousUser();
-			}
-		    } else {
-			$.log("Error: No role");
-			resetAnonymousUser();
-		    }
-                    if (data.org && data.org.properties) {
-			var logo = data.org.properties.logo_large ? data.org.properties.logo_large : "";
-			$($headerLogo).attr("src", logo);
-
-			var player = data.org.properties.player ? data.org.properties.player : "";
-			if (player == "theodul") {
-                            playerEndpoint = playerEndpoint + corePlayerURL;
-			} else {
-                            playerEndpoint = playerEndpoint + oldPlayerURL;
-			}
+                if (data) {
+                    if (data.roles && (data.roles.length > 0)) {
+                        var notAnonymous = false;
+                        for (var i = 0; i < data.roles.length; ++i) {
+                            if (data.roles[i] != "ROLE_ANONYMOUS") {
+                                notAnonymous = true;
+                            }
+                        }
+                        if (notAnonymous) {
+                            if (checkLoggedOut) {
+                                window.location = springSecurityLogoutURL;
+                            }
+                            $($nav_logoutLink).click(logout);
+                            $.log("User is not anonymous");
+                            if (data.username) {
+                                $.log("Username found: " + data.username);
+                                setUsername(data.username);
+                            } else {
+                                $.log("Username not found");
+                            }
+                        } else {
+                            checkLoggedOut = false;
+                            $.log("User is anonymous");
+                            resetAnonymousUser();
+                        }
                     } else {
-			$.log("Error: No info data received.");
-			resetAnonymousUser();
+                        $.log("Error: No role");
+                        resetAnonymousUser();
                     }
-		}
+                    if (data.org && data.org.properties) {
+                        var logo = data.org.properties.logo_large ? data.org.properties.logo_large : "";
+                        $($headerLogo).attr("src", logo);
+
+                        var player = data.org.properties.player ? data.org.properties.player : "";
+                        if (player == "theodul") {
+                            playerEndpoint = playerEndpoint + corePlayerURL;
+                        } else {
+                            playerEndpoint = playerEndpoint + oldPlayerURL;
+                        }
+                    } else {
+                        $.log("Error: No info data received.");
+                        resetAnonymousUser();
+                    }
+                }
 
                 $.log("Chosen player: " + player);
             }

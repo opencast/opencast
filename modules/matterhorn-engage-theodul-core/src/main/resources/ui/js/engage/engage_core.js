@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, EngageModel, EngageTabLogic) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, EngageModel, EngageTabLogic) {
     "use strict";
 
     var events = {
@@ -33,6 +33,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
         volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
         translate: new EngageEvent("Core:translate", "", "trigger"),
+        customSuccess: new EngageEvent("Notification:customSuccess", "a custom success message", "trigger"),
+        customError: new EngageEvent("Notification:customError", "an error occurred", "trigger"),
         mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler")
     };
 
@@ -49,12 +51,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var id_browserWarning = "browserWarning";
     var id_volume = "volume";
     var id_btn_reloadPage = "btn_reloadPage";
+    var id_btn_login = "btn_login";
     var id_btn_tryAnyway = "btn_tryAnyway";
     var id_customError = "customError";
     var id_customError_str = "customError_str";
     var class_loading = "loading";
 
-    /* don"t change these variables */
+    /* don't change these variables */
     var plugins_loaded = {};
     var loadingDelay1 = 500;
     var loadingDelay2 = 1000;
@@ -74,6 +77,11 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var mediapackageError = false;
     var numberOfPlugins = 0;
     var translationData = null;
+    var loggedIn = false;
+    var username = "Anonymous";
+    var askingForCredentials = false;
+    var springSecurityLoginURL = "/j_spring_security_check";
+    var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
 
     var basilOptions = {
         namespace: "mhStorage"
@@ -101,17 +109,17 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         } else { // No other languages supported, yet
             console.log("Chosing english translations");
         }
-	$.ajax({ 
-	    url: jsonstr, 
-	    dataType: "json",
-	    async: false, 
-	    success: function(data){
-		if (data) {
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
                     data.value_locale = language;
-		    translationData = data;
-		} 
-	    } 
-	});
+                    translationData = data;
+                }
+            }
+        });
     }
 
     function triggerTranslated() {
@@ -144,6 +152,70 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         this.toString = (function() {
             return name;
         });
+    }
+
+    function login() {
+        if (!askingForCredentials) {
+            askingForCredentials = true;
+            var username = "User";
+            var password = "Password";
+            Bootbox.prompt("Please enter your username:", function(u) {
+                if ((u !== null) && (u.length > 0)) {
+                    username = u;
+                    Bootbox.prompt("Please enter your password:", function(p) {
+                        if ((p !== null) && (p.length > 0)) {
+                            password = p;
+                            $.ajax({
+                                type: "POST",
+                                url: springSecurityLoginURL,
+                                data: {
+                                    "j_username": username,
+                                    "j_password": password,
+                                    "_spring_security_remember_me": true
+                                }
+                            }).done(function(msg) {
+                                password = "";
+                                if (msg.indexOf(springLoggedInStrCheck) == -1) {
+                                    engageCore.trigger(events.customSuccess.getName(), "Successfully logged in. Please reload the page if the page does not reload automatically.");
+                                    $("#" + id_btn_login).hide();
+                                    $("#" + id_btn_reloadPage).click(function(e) {
+                                        e.preventDefault();
+                                        location.reload();
+                                    });
+                                    $("#" + id_btn_reloadPage).show();
+                                    location.reload();
+                                } else {
+                                    engageCore.trigger(events.customError.getName(), "Failed to log in.");
+                                }
+                                askingForCredentials = false;
+                            }).fail(function(msg) {
+                                password = "";
+                                engageCore.trigger(events.customError.getName(), "Failed to log in.");
+                                askingForCredentials = false;
+                            });
+                        } else {
+                            askingForCredentials = false;
+                        }
+                    });
+                } else {
+                    askingForCredentials = false;
+                }
+            });
+        }
+    }
+
+    function getLoginStatus() {
+        if (engageCore.model.get("infoMe")) {
+            if (engageCore.model.get("infoMe").loggedIn) {
+                loggedIn = true;
+                username = engageCore.model.get("infoMe").username;
+            } else {
+                loggedIn = false;
+                username = "Anonymous";
+            }
+            return loggedIn ? 1 : 0;
+        }
+        return -1;
     }
 
     // core main
@@ -258,9 +330,16 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             this.dispatcher.on(events.mediaPackageModelError.getName(), function(str) {
                 mediapackageError = true;
                 $("." + class_loading).hide().detach();
-                $("#" + id_engage_view + ", #" + id_btn_reloadPage).hide().detach();
+                $("#" + id_engage_view).hide().detach();
+                $("#" + id_btn_reloadPage).hide();
                 $("#" + id_customError_str).html(str);
-                $("#" + id_customError).show();
+                if (getLoginStatus() == 0) {
+                    $("#" + id_btn_login).click(login);
+                    $("#" + id_customError + ", #" + id_btn_login).show();
+                } else {
+                    // TODO: Logged in as...
+                    $("#" + id_btn_login).hide();
+                }
             });
             // load plugins done, hide loading and show content
             this.dispatcher.on(events.plugin_load_done.getName(), function() {
@@ -271,13 +350,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         $("#" + id_loadingProgressbar2).css("width", "100%");
                         window.setTimeout(function() {
                             $("." + class_loading).hide().detach();
-                            if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
+                            if (engageCore.model.browserSupported) {
                                 $("#" + id_browserWarning).hide().detach();
                                 $("#" + id_engage_view).show();
-				triggerTranslated();
-                                if (engageCore.model.desktop || engageCore.model.mobile) {
+                                triggerTranslated();
+                                if (engageCore.model.desktop) {
                                     window.setTimeout(function() {
-                                        if ($("#" + id_volume).html() == "") {
+                                        if ($("#" + id_volume).html() === undefined) {
                                             $("#" + id_btn_reloadPage).click(function(e) {
                                                 e.preventDefault();
                                                 location.reload();
@@ -286,10 +365,11 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                             $("body").css("min-width", "");
                                             $("#" + id_customError).show();
                                         } else {
-                                            $("#" + id_customError).detach();
+                                            $("#" + id_customError + ", #" + id_btn_login).hide().detach();
                                         }
                                     }, errorCheckDelay);
                                 }
+                                // TODO: Error/loading checks for embed and mobile
                             } else {
                                 $("#" + id_engage_view + ", #" + id_customError).hide().detach();
                                 $("body").css("min-width", "");
