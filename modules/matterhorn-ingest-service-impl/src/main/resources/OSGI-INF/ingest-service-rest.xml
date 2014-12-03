@@ -22,4 +22,6 @@
     cardinality="1..1" policy="static" target="(type=persistence)" bind="setPersistenceProperties" />
   <reference name="serviceregistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" 
     cardinality="1..1" policy="static" bind="setServiceRegistry" />
+  <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
+    cardinality="1..1" policy="static" bind="setHttpClient" />
 </scr:component>

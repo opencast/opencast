@@ -28,6 +28,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
@@ -48,6 +49,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -58,7 +61,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -114,6 +116,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /** The default workflow definition */
   private String defaultWorkflowDefinitionId = null;
+
+  /** The http client */
+  private TrustedHttpClient httpClient;
 
   /** Dublin Core Terms: http://purl.org/dc/terms/ */
   private static List<String> dcterms = Arrays.asList("abstract", "accessRights", "accrualMethod",
@@ -622,12 +627,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             } else if ("episodeDCCatalogUri".equals(fieldName)) {
               try {
                 URI dcurl = new URI(value);
-                DublinCoreCatalog dc = new DublinCoreCatalogImpl(new URL(value).openStream());
-                EName en = new EName(DublinCore.TERMS_NS_URI, "identifier");
-                String id = dc.getFirst(en);
-                if (id != null) {
-                  mp.setIdentifier(new IdImpl(id));
-                }
+                updateMediaPackageID(mp, dcurl);
                 ingestService.addCatalog(dcurl, MediaPackageElements.EPISODE, mp);
                 episodeDCCatalogNumber += 1;
               } catch (java.net.URISyntaxException e) {
@@ -639,12 +639,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               /* Episode metadata DC catalog (XML) as string */
             } else if ("episodeDCCatalog".equals(fieldName)) {
               InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
-              DublinCoreCatalog dc = new DublinCoreCatalogImpl(is);
-              EName en = new EName(DublinCore.TERMS_NS_URI, "identifier");
-              String id = dc.getFirst(en);
-              if (id != null) {
-                mp.setIdentifier(new IdImpl(id));
-              }
+              updateMediaPackageID(mp, is);
               is.reset();
               String fileName = "episode" + episodeDCCatalogNumber + ".xml";
               episodeDCCatalogNumber += 1;
@@ -728,6 +723,54 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  /**
+   * Try updating the identifier of a mediapackage with the identifier from a episode DublinCore catalog.
+   *
+   * @param mp
+   *          MediaPackage to modify
+   * @param is
+   *          InputStream containing the episode DublinCore catalog
+   */
+  private void updateMediaPackageID(MediaPackage mp, InputStream is) throws IOException {
+    DublinCoreCatalog dc = new DublinCoreCatalogImpl(is);
+    EName en = new EName(DublinCore.TERMS_NS_URI, "identifier");
+    String id = dc.getFirst(en);
+    if (id != null) {
+      mp.setIdentifier(new IdImpl(id));
+    }
+  }
+
+  /**
+   * Try updating the identifier of a mediapackage with the identifier from a episode DublinCore catalog.
+   *
+   * @param mp
+   *          MediaPackage to modify
+   * @param uri
+   *          URI to get the episode DublinCore catalog from
+   */
+  private void updateMediaPackageID(MediaPackage mp, URI uri) throws IOException {
+    InputStream in = null;
+    HttpResponse response = null;
+    try {
+      if (uri.toString().startsWith("http")) {
+        HttpGet get = new HttpGet(uri);
+        response = httpClient.execute(get);
+        int httpStatusCode = response.getStatusLine().getStatusCode();
+        if (httpStatusCode != 200) {
+          throw new IOException(uri + " returns http " + httpStatusCode);
+        }
+        in = response.getEntity().getContent();
+      } else {
+        in = uri.toURL().openStream();
+      }
+      updateMediaPackageID(mp, in);
+      in.close();
+    } finally {
+      IOUtils.closeQuietly(in);
+      httpClient.close(response);
     }
   }
 
@@ -1311,6 +1354,16 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    */
   void setPersistenceProperties(Map<String, Object> persistenceProperties) {
     this.persistenceProperties = persistenceProperties;
+  }
+
+  /**
+   * Sets the trusted http client
+   *
+   * @param httpClient
+   *          the http client
+   */
+  public void setHttpClient(TrustedHttpClient httpClient) {
+    this.httpClient = httpClient;
   }
 
 }
