@@ -24,29 +24,29 @@
 
       $.xmlns["mp"] = "http://mediapackage.opencastproject.org";
       var PLAYER_URL = window.location.protocol + "//" + window.location.host + '/admin/embed.html';
-      
+
       var uploaderUrl = "/ingest/filechooser-local.html";
       var uploadFrame = null;
-      
+
       var currentFile = null;
-      
+
       var captionUrl = null;
       var player = null;
-      
+
       // Captions upload
       var ocUpload = {};
       ocUpload.Listener = {};
       ocUpload.Listener.filename = null;
       ocUpload.Listener.mediaPackage = '';
       ocUpload.Listener.flavor = 'captions/timedtext';
-      
+
       ocUpload.Listener.setCaptions = function(captionUrl){
-    	  if(player)
-          	player.setCaptionsURL(captionUrl);
-    	  
-    	  $('#player-container #oc-captions').html(captionUrl);
+        if(player)
+            player.setCaptionsURL(captionUrl);
+
+        $('#player-container #oc-captions').html(captionUrl);
       }
-      
+
       ocUpload.Listener.startUpload = function() {
         if (ocUpload.Listener.filename != null) {
           $('#upload-container').css('display','none');
@@ -58,51 +58,51 @@
           uploadFrame.contentWindow.document.uploadForm.submit();
         }
       }
-      
+
 
       /** Upload automatically the captions filename to preview it */
-      ocUpload.formFieldChanged = function(){ 
-    	$('#file-display-container').removeClass('hidden'); 
+      ocUpload.formFieldChanged = function(){
+      $('#file-display-container').removeClass('hidden');
          var uploadFrame = document.getElementById("filechooser-ajax");
-  		 var captionFile = uploadFrame.contentWindow.document.uploadForm.file.value;
-  		 
-  		 ocUpload.Listener.filename = captionFile;
+       var captionFile = uploadFrame.contentWindow.document.uploadForm.file.value;
+
+       ocUpload.Listener.filename = captionFile;
          $('#continueBtn').css('display', 'inline-block');
          ocUpload.Listener.startUpload();
       }
-      
+
       ocUpload.Listener.uploadComplete = function () {
         // Get the captions filename
         var fileNameArray = ocUpload.Listener.filename.split("\\");
         var fileName = fileNameArray[fileNameArray.length-1];
-        
+
         $('#filename-container').text(fileName);
-		
+
         // Get the modified mediapackage
         var mp = uploadFrame.contentWindow.document.getElementById("mp").value;
         ocUpload.Listener.mediaPackage = mp;
-        
+
         // Find the captions filename url in the mediapackage
         $(mp).find('catalog[type="captions/timedtext"] > url')
-        		.each(
-        			function(key,el){
-        				if(new RegExp(fileName).exec($(el).text()))
-        						captionUrl = $(el).text();	
-       				}
-        		);
-        
-        ocUpload.Listener.setCaptions(captionUrl);	
-        
+            .each(
+              function(key,el){
+                if(new RegExp(fileName).exec($(el).text()))
+                    captionUrl = $(el).text();
+               }
+            );
+
+        ocUpload.Listener.setCaptions(captionUrl);
+
         // Replace the captions uploader
         $(uploadFrame).load(function(){
-        	 $('#loading-container').css('display','none');
-        	 $('#upload-container').css('display','table-cell');
+           $('#loading-container').css('display','none');
+           $('#upload-container').css('display','table-cell');
         });
         $('#i18n_captions_upload_label').html('Select a different file:<br><span style="font-size:x-small; margin-right: 50px;">(Must be DFXP-File)</span>');
         uploadFrame.src = '/ingest/filechooser-local.html';
       }
-      
-      
+
+
       ocUpload.Listener.uploadFailed = function() {
         $('#loading-container').css('display','none');
         $('#upload-container').css('display','table-cell');
@@ -119,29 +119,29 @@
           return '';
         }
       }
-      
+
       function cancel() {
         window.parent.location.href = "/admin";
       }
 
       function continueWorkflow(withCaptions) {
-    	  var uploadFrame = document.getElementById("filechooser-ajax");
+        var uploadFrame = document.getElementById("filechooser-ajax");
           var mp = ocUpload.Listener.mediaPackage;
           if(withCaptions)
-          	parent.ocRecordings.Hold.changedMediaPackage = mp;
+            parent.ocRecordings.Hold.changedMediaPackage = mp;
           else
-        	parent.ocRecordings.Hold.changedMediaPackage = null; 
+          parent.ocRecordings.Hold.changedMediaPackage = null;
           parent.ocRecordings.continueWorkflow();
       }
 
       $(document).ready(function() {
-    	uploadFrame = document.getElementById("filechooser-ajax");
+      uploadFrame = document.getElementById("filechooser-ajax");
         var id = parent.document.getElementById("holdWorkflowId").value;
-        
+
         // load preview player and metadata
         $.ajax({
           url : '/workflow/instance/' + id + '.xml',
-          dataType : 'xml',    
+          dataType : 'xml',
           success : function(data) {
             // put mediapackge into form (for upload of captions file)
             var mp = xmlToString($(data).find("mp|mediapackage")[0]);
@@ -152,50 +152,51 @@
             // Let the find.find.find like that. Otherwise is does not work with namespace
             $(data.documentElement).find("mediapackage").find("metadata").find("catalog").each(function(index, elm) {
               if ($(elm).attr('type') == 'captions/timedtext') {
-            	captionUrl = $(elm).find('url').text();
+              captionUrl = $(elm).find('url').text();
                 var captionsFile = $(elm).find('url').text().split(/\//);
                 currentFile = captionsFile;
                 captionsFile = captionsFile[captionsFile.length-1];
                 $('#file-display-container').css('display','table-cell');
                 $('#filename-container').text(captionsFile);
               }
-            }); 
+            });
             // call preview player
             // deactivating since not needed for current mock-up
             var previewFiles = new Array();
             // Let the find.find.find like that. Otherwise is does not work with namespace
             $(data.documentElement).find("mediapackage").find("media").find("track").each(function(index, elm) {
               var type = $(elm).attr('type').split(/\//)[1];
-              var mimetype = $(elm).find('mimetype').text();
-              if ((type == 'preview' || type == 'delivery') && mimetype == 'video/x-flv') {
-            	var url = $(elm).find('url').text();
-            	$.ajax({
-            		  async: false,
+              var mimetype = $(elm).find('mimetype').text().split(/\//)[0];
+              if ((type == 'preview' || type == 'delivery') && mimetype == 'video') {
+              var url = $(elm).find('url').text();
+              $.ajax({
+                  async: false,
                       url : url,
                       success: function() {
-                    	  previewFiles.push(url);
+                        previewFiles.push(url);
                       }
-            	}); 
+              });
               }
             });
             if (previewFiles.length > 0) {
-              var url = PLAYER_URL + '?';
+              var url = PLAYER_URL + '?hideControls=false&hideAPLogo=true';
               for (var i = 0; i < previewFiles.length; i++) {
                 if (i == 0) {
-                  url += 'videoUrl=';
+                  url += '&videoUrl=';
                 } else {
                   url += '&videoUrl' + (i+1) + '=';
                 }
                 url += previewFiles[i];
               }
-              
+
               $('#player-container').load(function(){
-	                  player = document.getElementById("player-container").contentWindow.Opencast.Player;
-	               	  if(captionUrl)
-	               		ocUpload.Listener.setCaptions(captionUrl); 
+                    player = document.getElementById("player-container").contentWindow.Opencast.Player;
+                    if (captionUrl) {
+                      ocUpload.Listener.setCaptions(captionUrl);
+                    }
 
               });
-              
+
               $('#player-container').attr('src', url);
             } else {
               $('#player-container').html("<center><b>No preview media files found for this media package.<b></center>");
@@ -216,7 +217,7 @@
         <br>
         <span style="font-size:x-small">
             (Must be DFXP-File)
-        </span> 
+        </span>
       </div>
       <div id="loading-container" class="spandiv hidden"></div>
       <div id="upload-container" style="display:table-cell;float:left;height:60px;">
@@ -224,7 +225,7 @@
         </iframe>
       </div>
     </div>
-    
+
     <div id="file-display-container" class="hidden" style="padding-left:12.5%;">
       <span id="i18n_captions_upload_label"><b>Current captions file:</b>&nbsp;</span>
       <span id="filename-container" class="spandiv"></span>
