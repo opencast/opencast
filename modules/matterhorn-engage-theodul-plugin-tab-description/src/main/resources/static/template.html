@@ -1,3 +1,13 @@
+<!-- theodul controls plugin desktop mode -->
+<% if((typeof str_title !== "undefined")
+   && (typeof str_noTitle !== "undefined")
+   && (typeof str_creator !== "undefined")
+   && (typeof str_contributor !== "undefined")
+   && (typeof str_views !== "undefined")
+   && (typeof str_series !== "undefined")
+   && (typeof str_recordingDate !== "undefined")
+   && (typeof str_description !== "undefined")
+   && (typeof str_noDescriptionAvailable !== "undefined")) { %>
 <!-- theodul tab description plugin desktop mode -->
 <div id="engage_description_tab_content">
     <% if(typeof description !== "undefined" 
@@ -8,18 +18,18 @@
         && typeof date !== "undefined") { %>
     <div class="descriptionTabLeft">
         <div class="description-item">
-            <p class="description-item-header">Title</p>
+            <p class="description-item-header"><%= str_title %></p>
             <p class="description-item-body">
                 <% if(title != "") { %>
                 <%= title %>
                 <% } else { %>
-                No title
+	        <p><%= str_noTitle %></p>
                 <% } %>
             </p>
         </div>
         <% if(creator != "") { %>
         <div class="description-item">
-            <p class="description-item-header">Creator</p>
+            <p class="description-item-header"><%= str_creator %></p>
             <p class="description-item-body">
                 <%= creator %>
             </p>
@@ -27,7 +37,7 @@
         <% } %>
         <% if(contributor != "") { %>
         <div class="description-item">
-            <p class="description-item-header">Presenter</p>
+            <p class="description-item-header"><%= str_presenter %></p>
             <p class="description-item-body">
                 <%= contributor %>
             </p>
@@ -35,7 +45,7 @@
         <% } %>
         <% if(views != "") { %>
         <div class="description-item">
-            <p class="description-item-header">Views</p>
+            <p class="description-item-header"><%= str_views %></p>
             <p class="description-item-body">
                 <%= views %>
             </p>
@@ -45,7 +55,7 @@
     <div class="descriptionTabRight">
         <% if(series != "") { %>
         <div class="description-item ">
-            <p class="description-item-header">Series</p>
+            <p class="description-item-header"><%= str_series %></p>
             <p class="description-item-body">
                 <%= series %>
             </p>
@@ -53,7 +63,7 @@
         <% } %>
         <% if(date != "") { %>
         <div class="description-item">
-            <p class="description-item-header">Recording Date</p>
+            <p class="description-item-header"><%= str_recordingDate %></p>
             <p class="description-item-body">
                 <%= date %>
             </p>
@@ -61,7 +71,7 @@
         <% } %>
         <% if(description != "") { %>
         <div class="description-item">
-            <p class="description-item-header">Description</p>
+            <p class="description-item-header"><%= str_description %></p>
             <p class="description-item-body">
                 <%= description %>
             </p>
@@ -70,6 +80,7 @@
     </div>
     <div class="clear"></div>
     <% } else { %>
-    No description available.
+    <%= str_noDescriptionAvailable %>
     <% } %>
 </div>
+<% } %>

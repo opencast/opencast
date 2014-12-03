@@ -35,7 +35,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var plugin;
     var events = {
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
+        translate: new Engage.Event("Core:translate", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -83,11 +84,14 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     /* change these variables */
     var class_tabGroupItem = "tab-group-item";
 
-    /* don"t change these variables */
+    /* don't change these variables */
     var viewsModelChange = "change:views";
     var mediapackageChange = "change:mediaPackage";
     var initCount = 3;
     var mediapackageError = false;
+    var translations = new Array();
+    var locale = "en";
+    var dateFormat = "MMMM Do YYYY, h:mm:ss a";
 
     var DescriptionTabView = Backbone.View.extend({
         initialize: function(mediaPackageModel, template) {
@@ -108,11 +112,23 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                     series: this.model.get("series"),
                     contributor: this.model.get("contributor"),
                     date: this.model.get("date"),
-                    views: Engage.model.get("views").get("stats").views
+                    views: Engage.model.get("views").get("stats").views,
+                    str_title: translate("title", "Title"),
+                    str_noTitle: translate("noTitle", "No title"),
+                    str_creator: translate("creator", "Creator"),
+                    str_contributor: translate("presenter", "Contributor"),
+                    str_views: translate("views", "Views"),
+                    str_series: translate("series", "Series"),
+                    str_recordingDate: translate("recordingDate", "Recording date"),
+                    str_description: translate("description", "Description"),
+                    str_noDescriptionAvailable: translate("noDescriptionAvailable", "No description available.")
                 };
                 // try to format the date
+                Moment.locale(locale, {
+                    // customizations
+                });
                 if (Moment(tempVars.date) != null) {
-                    tempVars.date = Moment(tempVars.date).format("MMMM Do YYYY, h:mm:ss a");
+                    tempVars.date = Moment(tempVars.date).format(dateFormat);
                 }
                 if (!tempVars.creator) {
                     tempVars.creator = "";
@@ -137,7 +153,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                 }
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
-         /*
+                /*
 	      $(".description-item").mouseover(function() {
 	      $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
 	      }).mouseout(function() {
@@ -148,15 +164,29 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         }
     });
 
+    function translate(str, strIfNotFound) {
+        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
+
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
-            Moment.locale("en", {
-                // customizations
-            });
-
             // create a new view with the media package model and the template
             var descriptionTabView = new DescriptionTabView(Engage.model.get("mediaPackage"), plugin.template);
+            Engage.on(plugin.events.translate.getName(), function(data) {
+                var key = Object.keys(data);
+                for (var i = 0; i < key.length; i++) {
+                    var lang_value = key[i];
+                    translations[lang_value] = data[lang_value];
+                }
+                if (data.value_locale != "undefined") {
+                    locale = data.value_locale;
+                }
+                if (data.value_dateFormat != "undefined") {
+                    dateFormat = data.value_dateFormat;
+                }
+                descriptionTabView.render();
+            });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
             });

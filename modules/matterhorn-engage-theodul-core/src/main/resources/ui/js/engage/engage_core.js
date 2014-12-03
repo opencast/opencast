@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, EngageModel, EngageTabLogic) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, EngageModel, EngageTabLogic) {
     "use strict";
 
     var events = {
@@ -32,6 +32,9 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         nextEpisode: new EngageEvent("Core:nextEpisode", "", "trigger"),
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
         volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
+        translate: new EngageEvent("Core:translate", "", "trigger"),
+        customSuccess: new EngageEvent("Notification:customSuccess", "a custom success message", "trigger"),
+        customError: new EngageEvent("Notification:customError", "an error occurred", "trigger"),
         mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler")
     };
 
@@ -40,7 +43,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var browser_minVersion_chrome = 30;
     var browser_minVersion_opera = 20;
     var browser_minVersion_safari = 7;
-    var browser_minVersion_msie = 9;    
+    var browser_minVersion_msie = 9;
     var id_engage_view = "engage_view";
     var id_loading1 = "loading1";
     var id_loading2 = "loading2";
@@ -48,12 +51,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var id_browserWarning = "browserWarning";
     var id_volume = "volume";
     var id_btn_reloadPage = "btn_reloadPage";
+    var id_btn_login = "btn_login";
     var id_btn_tryAnyway = "btn_tryAnyway";
     var id_customError = "customError";
     var id_customError_str = "customError_str";
     var class_loading = "loading";
 
-    /* don"t change these variables */
+    /* don't change these variables */
     var plugins_loaded = {};
     var loadingDelay1 = 500;
     var loadingDelay2 = 1000;
@@ -71,18 +75,55 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var hotkey_volDown = "volDown";
     var hotkey_volUp = "volUp";
     var mediapackageError = false;
-    
-    var basilOptions = {
-        namespace: 'mhStorage'
-    };
-    Basil = new window.Basil(basilOptions);    
+    var numberOfPlugins = 0;
+    var translationData = null;
+    var loggedIn = false;
+    var username = "Anonymous";
+    var askingForCredentials = false;
+    var springSecurityLoginURL = "/j_spring_security_check";
+    var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
 
-    function browserSupported() {             
-        console.log("Override Browser" + Basil.get("overrideBrowser"));
-        if (Basil.get("overrideBrowser") != null && Basil.get("overrideBrowser")) {          
+    var basilOptions = {
+        namespace: "mhStorage"
+    };
+    Basil = new window.Basil(basilOptions);
+
+    function browserSupported() {
+        if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
+            console.log("Override Browser " + Basil.get("overrideBrowser"));
             return true;
-        }         
+        }
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari) || (Bowser.msie && Bowser.version >= browser_minVersion_msie);
+    }
+
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function translate(language) {
+        var jsonstr = "language/theodul_language_en.json";
+
+        if (language == "de") {
+            console.log("Chosing german translations");
+            var jsonstr = "language/theodul_language_de.json";
+        } else { // No other languages supported, yet
+            console.log("Chosing english translations");
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translationData = data;
+                }
+            }
+        });
+    }
+
+    function triggerTranslated() {
+        engageCore.trigger(events.translate.getName(), translationData);
     }
 
     // theodul core init
@@ -113,12 +154,77 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         });
     }
 
+    function login() {
+        if (!askingForCredentials) {
+            askingForCredentials = true;
+            var username = "User";
+            var password = "Password";
+            Bootbox.prompt("Please enter your username:", function(u) {
+                if ((u !== null) && (u.length > 0)) {
+                    username = u;
+                    Bootbox.prompt("Please enter your password:", function(p) {
+                        if ((p !== null) && (p.length > 0)) {
+                            password = p;
+                            $.ajax({
+                                type: "POST",
+                                url: springSecurityLoginURL,
+                                data: {
+                                    "j_username": username,
+                                    "j_password": password,
+                                    "_spring_security_remember_me": true
+                                }
+                            }).done(function(msg) {
+                                password = "";
+                                if (msg.indexOf(springLoggedInStrCheck) == -1) {
+                                    engageCore.trigger(events.customSuccess.getName(), "Successfully logged in. Please reload the page if the page does not reload automatically.");
+                                    $("#" + id_btn_login).hide();
+                                    $("#" + id_btn_reloadPage).click(function(e) {
+                                        e.preventDefault();
+                                        location.reload();
+                                    });
+                                    $("#" + id_btn_reloadPage).show();
+                                    location.reload();
+                                } else {
+                                    engageCore.trigger(events.customError.getName(), "Failed to log in.");
+                                }
+                                askingForCredentials = false;
+                            }).fail(function(msg) {
+                                password = "";
+                                engageCore.trigger(events.customError.getName(), "Failed to log in.");
+                                askingForCredentials = false;
+                            });
+                        } else {
+                            askingForCredentials = false;
+                        }
+                    });
+                } else {
+                    askingForCredentials = false;
+                }
+            });
+        }
+    }
+
+    function getLoginStatus() {
+        if (engageCore.model.get("infoMe")) {
+            if (engageCore.model.get("infoMe").loggedIn) {
+                loggedIn = true;
+                username = engageCore.model.get("infoMe").username;
+            } else {
+                loggedIn = false;
+                username = "Anonymous";
+            }
+            return loggedIn ? 1 : 0;
+        }
+        return -1;
+    }
+
     // core main
     var EngageCore = Backbone.View.extend({
         el: $("#" + id_engage_view),
         initialize: function() {
             $("." + class_loading).show();
             $("#" + id_loading1).show();
+            translate(detectLanguage());
             // the main core is our global event system
             this.dispatcher = _.clone(Backbone.Events);
             // link to the engage model
@@ -141,7 +247,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 var cssAttr = {
                     type: "text/css",
                     rel: "stylesheet"
-                };                
+                };
                 // template obj
                 var core_template = "none";
                 // path to the require module with the view logic
@@ -180,14 +286,15 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         engageCore.template = template;
                         $(engageCore.el).html(_.template(template)).trigger("create");
                         // run init function of the view
-                        engageCore.pluginView.initView();                       
+                        engageCore.pluginView.initView();
                         if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
                             // BEGIN LOAD PLUGINS
                             // fetch plugin information
                             engageCore.model.get("pluginsInfo").fetch({
                                 success: function(pluginInfos) {
                                     // load plugin as requirejs module
-                                    if (pluginInfos.get("pluginlist") && pluginInfos.get("pluginlist").plugins !== undefined) {
+                                    if ((pluginInfos.get("pluginlist").plugins != undefined) && pluginInfos.get("pluginlist")) {
+                                        numberOfPlugins = pluginInfos.get("pluginlist").plugins.length;
                                         if ($.isArray(pluginInfos.get("pluginlist").plugins)) {
                                             $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
                                                 var plugin_name = value["name"];
@@ -223,9 +330,16 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             this.dispatcher.on(events.mediaPackageModelError.getName(), function(str) {
                 mediapackageError = true;
                 $("." + class_loading).hide().detach();
-                $("#" + id_engage_view + ", #" + id_btn_reloadPage).hide().detach();
+                $("#" + id_engage_view).hide().detach();
+                $("#" + id_btn_reloadPage).hide();
                 $("#" + id_customError_str).html(str);
-                $("#" + id_customError).show();
+                if (getLoginStatus() == 0) {
+                    $("#" + id_btn_login).click(login);
+                    $("#" + id_customError + ", #" + id_btn_login).show();
+                } else {
+                    // TODO: Logged in as...
+                    $("#" + id_btn_login).hide();
+                }
             });
             // load plugins done, hide loading and show content
             this.dispatcher.on(events.plugin_load_done.getName(), function() {
@@ -234,14 +348,15 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     $("#" + id_loading2).show();
                     window.setTimeout(function() {
                         $("#" + id_loadingProgressbar2).css("width", "100%");
-                        window.setTimeout(function() {                           
+                        window.setTimeout(function() {
                             $("." + class_loading).hide().detach();
-                            if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
+                            if (engageCore.model.browserSupported) {
                                 $("#" + id_browserWarning).hide().detach();
                                 $("#" + id_engage_view).show();
-                                if (engageCore.model.desktop || engageCore.model.mobile) {
+                                triggerTranslated();
+                                if (engageCore.model.desktop) {
                                     window.setTimeout(function() {
-                                        if ($("#" + id_volume).html() == "") {
+                                        if ($("#" + id_volume).html() === undefined) {
                                             $("#" + id_btn_reloadPage).click(function(e) {
                                                 e.preventDefault();
                                                 location.reload();
@@ -250,17 +365,18 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                             $("body").css("min-width", "");
                                             $("#" + id_customError).show();
                                         } else {
-                                            $("#" + id_customError).detach();
+                                            $("#" + id_customError + ", #" + id_btn_login).hide().detach();
                                         }
                                     }, errorCheckDelay);
                                 }
+                                // TODO: Error/loading checks for embed and mobile
                             } else {
                                 $("#" + id_engage_view + ", #" + id_customError).hide().detach();
                                 $("body").css("min-width", "");
                                 $("#" + id_browserWarning).show();
                                 $("#" + id_btn_tryAnyway).click(function(e) {
                                     e.preventDefault();
-                                    window.open(window.location.href+"&browser=all");
+                                    window.open(window.location.href + "&browser=all");
                                 });
                             }
                         }, loadingDelay2);
@@ -454,7 +570,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         plugin.template = template;
                         plugin.pluginPath = "engage/theodul/" + plugin_path;
                         // load the compiled HTML into the component
-                        engageCore.pluginView.insertPlugin(plugin);
+                        engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
                         // plugin load done counter
                         plugins_loaded[plugin_name] = true;
                         // check if all plugins are ready

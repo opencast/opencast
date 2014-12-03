@@ -1,10 +1,12 @@
 <!-- theodul video videojs plugin desktop mode -->
+<% if((typeof str_error_AudioCodecNotSupported !== "undefined")
+   && (typeof str_error_AudioElementNotSupported !== "undefined")) { %>
 <% if((typeof type !== "undefined") && (type == "audio")) { %>
 	<div class="audio_wrapper">
 		<% if(typeof sources !== "undefined") { %>
 			<div class="audioDisplayError">
 			  <div class="alert alert-danger" role="alert">
-			    Error: The audio codec is not supported by this browser
+			  <p><%= str_error_AudioCodecNotSupported %></p>
 			  </div>
 			</div>
 			<div class="audioDisplay">
@@ -14,7 +16,7 @@
 				      <source src="<%= src.src %>" type="<%= src.type %>" />
 				    <% } %>
 				  <% }); %>
-				  Your browser does not support the audio element.
+				  <p><%= str_error_AudioElementNotSupported %></p>
 				</audio>
 			</div>
 		<% } %>
@@ -31,4 +33,5 @@
 			<% i++;}); %>
 		<% } %>
 	</div>
+<% } %>
 <% } %>

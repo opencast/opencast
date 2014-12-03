@@ -1,0 +1,399 @@
+body {
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+#waveformControls {
+    display: none;
+    float: right;
+    width: 500px;
+    margin-top: 5px;
+    margin-right: 2%;
+}
+
+#slider-waveform-zoom {
+    float: left;
+    width: 95%;
+}
+
+#zoomin {
+    float: right;
+}
+
+.holdStateUI {
+  min-width: 785px;
+}
+
+#videoContainer {
+  clear: both;
+  border: none;
+  width: 100%;
+  margin: 0 auto;
+}
+
+#videoPlayer {
+  width: 49%;
+  max-height: 300px;
+}
+
+#videoPlayerSlave {
+  float: left;
+  width: 49%;
+  margin-left: 10px;
+  max-height: 300px;
+  display: none;
+}
+
+.hidden {
+  display: none;
+}
+
+input.pointInput {
+  width: 60px;
+  border: 0px solid white;
+}
+
+#actions {
+  margin: 0 auto;
+  margin-top: 16px;
+  text-align: center;
+  width: 100%;
+}
+
+.rule {
+  width: 115px;
+  margin-right: 62%;
+}
+
+a.secondaryButton,a.secondaryButton:link,a.secondaryButton:visited {
+  margin-right: 16px;
+  cursor: pointer;
+  color: #2d8f8b;
+}
+
+a.secondaryButton:hover,a.secondaryButton:focus {
+  color: #2d8f8b;
+  text-decoration: underline;
+}
+
+#metadata-container {
+  margin-bottom: 8px;
+}
+
+#trackForm table {
+  width: 90%;
+  margin: 0 auto;
+}
+
+#trackError {
+  color: red;
+  margin: 0 auto;
+}
+
+.formField-list label {
+  width: 30%;
+  float: left;
+  text-align: right;
+  margin-right: 5px;
+}
+
+#splitter {
+  background-color: lime;
+  width: 250px;
+  float: left;
+}
+
+#editor {
+  height: 350px;
+  width: 95%;
+}
+
+#shortcuts {
+    display: none;
+}
+
+#boxes {
+  padding-left: 0px;
+  /* padding-top: 20px; */
+  width: 100%;
+  float: left;
+  min-width: 785px;
+}
+
+#splitElementsHolder {
+  height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#segment_list_actions {
+    float: right;
+}
+
+#leftBoxDescription {
+  font-weight:bold;
+  float: left;
+  width: 69%;
+}
+
+#leftBox {
+  float: left;
+  border: 1px solid black;
+  width: 69%;
+  height: 600px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+#rightBoxDescription {
+  font-weight:bold;
+  float: right;
+  margin-left: 10px;
+  width: 26%;
+}
+
+#rightBox {
+  float: right;
+  border: 1px solid black;
+  width: 26%;
+}
+
+#rightBox table {
+  font-size: 0.9em;
+}
+
+#buttons {
+  float: left;
+  width: 350px;
+}
+
+#newTime {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+#shortcuts {
+  margin-left: 10px;
+  margin-top: 10px;
+  height: 30px;
+}
+
+#clearList {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  height: 30px;
+}
+
+#cancelButton {
+  
+}
+
+#okButton {
+  background-color: lime;
+}
+
+.playButton {
+  width: 20px !important;
+}
+
+#rightBox input {
+  width: 95px;
+  margin-top: 10px;
+}
+
+#descriptionDiv {
+  margin: 10px;
+}
+
+#segmentsWaveform {
+  height: 122px;
+  width: 100%;
+  float: left;
+  margin-top: 5px;
+  position: relative;
+}
+
+#currentTimeDiv {
+  border-right: 1px solid green;
+  width: 1px;
+  height: 100%;
+  position: absolute;
+  /* Firefox */
+  -moz-box-sizing: border-box;
+  /* WebKit */
+  -webkit-box-sizing: border-box;
+  /* Opera 9.5+, Google Chrome */
+  box-sizing: border-box;
+  z-index: 3;
+}
+
+#imageDiv {
+  width: 100%;
+  position: absolute;
+  z-index: 0;
+}
+
+#waveformImage {
+  width: 100%;
+  height: 122px;
+}
+
+#splitSegments {
+  height: 100%;
+  width: 100%;
+  float: left;
+  position: absolute;
+  z-index: 1;
+}
+
+.splitSegmentItem {
+  border-right: 1px solid #990000;
+  float: left;
+  height: 100%;
+  background-color: #FFFFFF;
+  color: #000000;
+  /* Firefox */
+  -moz-box-sizing: border-box;
+  /* WebKit */
+  -webkit-box-sizing: border-box;
+  /* Opera 9.5+, Google Chrome */
+  box-sizing: border-box;
+  opacity: 0.6;
+  filter:alpha(opacity=60); /* For IE8 and earlier */
+}
+
+.splitSegmentItemSelected {
+  border-right: 1px solid #990000;
+  float: left;
+  height: 100%;
+  background-color: #79c966;
+  color: #000000;
+  /* Firefox */
+  -moz-box-sizing: border-box;
+  /* WebKit */
+  -webkit-box-sizing: border-box;
+  /* Opera 9.5+, Google Chrome */
+  box-sizing: border-box;
+  opacity: 0.6;
+  filter:alpha(opacity=60); /* For IE8 and earlier */
+}
+
+.splitItem {
+  border: 1px solid black;
+  height: 50px;
+  margin: 1px;
+  overflow: hidden;
+  color: #000000;
+  /* Firefox */
+  -moz-box-sizing: border-box;
+  /* WebKit */
+  -webkit-box-sizing: border-box;
+  /* Opera 9.5+, Google Chrome */
+  box-sizing: border-box;
+  position: relative;
+  z-index: 0;
+}
+
+.splitItemSelected {
+  border: 1px solid #0000FF;
+  background-color: #79c966;
+  color: #000000;
+}
+
+.disabled {
+  background-color: #ce4f4f;
+  /* color: #000000; */
+  /* opacity: 0.6; */
+  /* filter: alpha(opacity = 60); */ /* For IE8 and earlier */
+}
+
+.hover {
+  background-color: #5792d4;
+  color: #000000;
+  opacity: 0.6;
+  filter:alpha(opacity=60); /* For IE8 and earlier */
+}
+
+.splitNumber {
+  background-color: #d2eecb;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+}
+
+.splitItemDiv {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+  position: absolute;
+}
+
+.splitItemBoxUp {
+    height: 39%;
+}
+
+.splitItemBoxDown {
+    height: 60%;
+}
+
+.segmentButtons {
+    float: left;
+    width: 80%;
+}
+
+.splitRemoverDiv {
+    float: right;
+    width: 10%;
+}
+
+.splitText {
+  margin-left: 10px;
+  float: left;
+  width: 315px;
+}
+
+.splitRemover {
+  float: right;
+  width: 30px;
+  margin-top: 2px;
+}
+
+.splitRemoverDiv {
+  z-index: 1;
+  position: absolute;
+  right: 0;
+}
+
+.splitRemoverLink {
+  height: 20px;
+}
+
+.splitAdderLink {
+  height: 20px;
+}
+
+.clipItem {
+  border-color: black;
+}
+
+.floatLeft {
+  float: left;
+}
+
+.floatRight {
+  float: right;
+}
+
+.frameButton {
+  height: 22px;
+  vertical-align: middle;
+  opacity: 0.7;
+  
+  -moz-transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out; 
+}

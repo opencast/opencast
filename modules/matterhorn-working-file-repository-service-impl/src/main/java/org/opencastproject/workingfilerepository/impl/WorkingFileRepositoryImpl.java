@@ -680,11 +680,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       FileUtils.deleteDirectory(destDir);
       throw new IllegalStateException("unable to copy file" + e);
     }
-    File parentDirectory = source.getParentFile();
-    if (parentDirectory.isDirectory() && parentDirectory.list().length == 0) {
-      logger.debug("Attempting to delete empty collection directory {}", parentDirectory.getAbsolutePath());
-      FileUtils.deleteQuietly(parentDirectory);
-    }
     return getURI(toMediaPackage, toMediaPackageElement, dest.getName());
   }
 

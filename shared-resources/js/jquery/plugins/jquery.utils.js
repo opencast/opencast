@@ -22,7 +22,7 @@
     var loggingEnabled = false;
     var asciiAlphabet;
     var asciiAlphabetCashed = false;
-    
+
     /**
      * @description Returns the ascii alphabet lower case (internal function for cashing)
      * @return the alphabet lower case
@@ -43,8 +43,8 @@
      */
     $.isNumber = function(n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
-    }
-    
+    };
+
     /**
      * @description Returns the ascii alphabet lower case
      * @return the alphabet lower case
@@ -58,8 +58,8 @@
             asciiAlphabetCashed = true;
         }
         return asciiAlphabet;
-    }
-    
+    };
+
     /**
      * @description Returns the ASCII value of char
      * @param char Character to get the ASCII value from
@@ -68,8 +68,8 @@
     $.toAscii = function(charToConvert)
     {
         return $.getAsciiAlphabet()[charToConvert]||'';
-    }
-   
+    };
+
     /**
      * @description Returns a time in the URL time format, e.g. 30m10s
      * @param data Time in the format ab:cd:ef
@@ -96,8 +96,8 @@
 	    }
 	}
 	return 0;
-    }
-        
+    };
+
     /**
      * @description Returns the Input Time in Milliseconds
      * @param data Data in the Format ab:cd:ef
@@ -128,8 +128,8 @@
             }
         }
         return 0;
-    }
-    
+    };
+
     /**
      * @description Returns formatted Seconds
      * @param seconds Seconds to format
@@ -161,8 +161,8 @@
         }
         result += seconds % 60;
         return result;
-    }
-    
+    };
+
     /**
      * @description Converts a date to a human readable date string
      * @param date
@@ -184,8 +184,8 @@
         datestring += yearSeparator;
         datestring += d.getFullYear();
         return datestring;
-    }
-    
+    };
+
     /**
      * @description Converts a date to a human readable time string
      * @param date
@@ -199,8 +199,8 @@
         var m = (d.getMinutes() >= 10) ? d.getMinutes() : "0".concat(d.getMinutes());
         var s = (d.getSeconds() >= 10) ? d.getSeconds() : "0".concat(d.getSeconds());
         return (h + timeSeparator + m);
-    }
-    
+    };
+
     /**
      * @description Converts a UTC date string to date
      * @param dcc UTC date string, e.g. dcc = 2011-03-07T00:00:00+01:00
@@ -232,106 +232,81 @@
             }
         }
         return date;
-    }
-    
+    };
+
     /**
-     * @description Returns an Array of URL Arguments
-     * @return an Array of URL Arguments if successful, [] else
+     * @description Returns a map of URL Arguments
+     * @return a map of URL Arguments if successful, {} else
      */
     $.parseURL = function()
     {
-        var vars = [],
-            hash;
-        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-        if ($.isArray(hashes))
+        var vars = {}; // Use object to avoid issues with associative arrays
+        var hash, hashes;
+        var argsIndex = window.location.href.indexOf('?');
+        if (argsIndex >= 0)
         {
-            for (var i = 0; i < hashes.length; i++)
+            hashes = window.location.href.slice(argsIndex + 1).split('&');
+            if ($.isArray(hashes))
             {
-                hash = hashes[i].split('=');
-                vars.push(hash[0]);
-                vars[hash[0]] = hash[1];
+                for (var i = 0; i < hashes.length; i++)
+                {
+                    hash = hashes[i].split('=');
+                    vars[hash[0]] = hash[1];
+                }
             }
         }
         return vars;
-    }
-    
+    };
+
     /**
-     * @description Removes the duplicates of a given array
-     * @param arr Array to remove the duplicates of
-     * @return a copy of arr wihout its duplicates if arr is a valid array, [] else
-     */
-    $.removeDuplicates = function(arr)
-    {
-        var newArr = [];
-        // check whether arr is an Array
-        if ($.isArray(arr))
-        {
-            var ni = 0;
-            var dupl = false;
-            for (var i = 0; i < arr.length; ++i)
-            {
-                for (var j = i + 1;
-                (j < arr.length) && !dupl; ++j)
-                {
-                    if (arr[i] == arr[j])
-                    {
-                        dupl = true;
-                    }
-                }
-                if (!dupl)
-                {
-                    newArr[ni] = arr[i];
-                    ++ni;
-                }
-                dupl = false;
-            }
-        }
-        return newArr;
-    }
-    
-    /**
-     * @description Returns the url array to string, connected via links
-     * @param arr URL Array (e.g. created via parseURL())
+     * @description Returns the url map to string, connected via links
+     * @param map URL Map (e.g. created via parseURL())
      * @param link11 first link (e.g. comes directly after the .html: ?)
      * @param link12 second link, connects the parameters (e.g. &)
      * @param link2 third link, connects the first and the second value of an URL parameter (e.g. =)
-     * @return the url array to string, connected via links, if arr is a valid array, '' else
+     * @return the url array to string, connected via links, if map is a valid Object, '' else
      */
-    $.urlArrayToString = function(arr, link11, link12, link2)
+    $.urlMapToString = function(map, link11, link12, link2)
     {
         var str = '';
-        // check whether arr is an Array
-        if ($.isArray(arr))
+        // check whether map is an Object
+        if ($.isPlainObject(map))
         {
+            i = 0;
             // Set default values if nothings given
             link11 = link11 || '?';
             link12 = link12 || '&';
             link2 = link2 || '=';
-            for (var i = 0; i < arr.length; ++i)
+
+            for (var value in map)
             {
-                var parsedUrlAt = $.getURLParameter(arr[i]);
-                if ((parsedUrlAt !== undefined) && (parsedUrlAt !== null))
+                if(map.hasOwnProperty(value))
                 {
-                    var l = (i == 0) ? link11 : link12;
-                    str += l + arr[i] + link2 + $.parseURL()[arr[i]];
+                    var parsedUrlAt = $.getURLParameter(value);
+                    if ((parsedUrlAt !== undefined) && (parsedUrlAt !== null))
+                    {
+                        var l = (i == 0) ? link11 : link12;
+                        str += l + value + link2 + $.parseURL()[value];
+                    }
+                    i++;
                 }
             }
         }
         return str;
-    }
-    
+    };
+
     /**
      * @description Removes the duplicate URL parameters, e.g. url?a=b&a=c&a=d => url?a=d
      * @return a cleaned URL
      */
     $.getCleanedURL = function()
     {
-        var urlArr = $.removeDuplicates($.parseURL());
+        var urlArr = $.parseURL();
         var windLoc = window.location.href;
         windLoc = (windLoc.indexOf('?') != -1) ? window.location.href.substring(0, window.location.href.indexOf('?')) : windLoc;
-        return windLoc + $.urlArrayToString(urlArr, "?", "&", "=");
-    }
-    
+        return windLoc + $.urlMapToString(urlArr, "?", "&", "=");
+    };
+
     /**
      * @description Checks whether URL parameters are duplicate and cleans it if appropriate (clean => page reload)
      */
@@ -344,7 +319,7 @@
         {
             window.location = newLoc;
         }
-    }
+    };
 
     /**
      * @description Returns a clean URL only containing the ID
@@ -356,8 +331,8 @@
 	var id = $.getURLParameter('id');
 	url = url.substring(0, url.indexOf('?')) + "?id=" + id;
 	return url;
-    }
-    
+    };
+
     /**
      * @description Checks whether URL parameters are duplicate and cleans it if appropriate and returns the cleaned URL afterwards
      * @param embed true if watch.html should be replaced with embed.html, false if embed.html should be replaced with watch.html
@@ -377,7 +352,7 @@
             var seconds = parseInt($.getTimeInMilliseconds(Opencast.Player.getCurrentTime())) / 1000;
         }
         // parse URL string -- modified version of $.parseURL-module
-        var vars = [],
+        var vars = {},
             hash,
             str = window.location.href + ((videoQuality != false) ? ("&quality=" + videoQuality) : '') + (withTime ? ("&t=" +  seconds) : '');
         var hashes = str.slice(str.indexOf('?') + 1).split('&');
@@ -386,36 +361,37 @@
             for (var i = 0; i < hashes.length; i++)
             {
                 hash = hashes[i].split('=');
-                vars.push(hash[0]);
                 vars[hash[0]] = hash[1];
             }
         }
-        var urlArr = $.removeDuplicates(vars);
+
         var windLoc = window.location.href;
         windLoc = (windLoc.indexOf('?') != -1) ? window.location.href.substring(0, window.location.href.indexOf('?')) : windLoc;
-        // URL parameter array to string
+        // URL parameter map to string
         var str = '';
-        for (var i = 0; i < urlArr.length; ++i)
+        var i = 0;
+        for (var value in vars)
         {
             var l = (i == 0) ? '?' : '&';
-            var parsedUrlAt = $.getURLParameter(urlArr[i]);
-            if ((parsedUrlAt !== undefined) && (parsedUrlAt !== null) && (urlArr[i] != 'quality') && (urlArr[i] != 't') && (urlArr[i] != 'play'))
+            var parsedUrlAt = $.getURLParameter(value);
+            if ((parsedUrlAt !== undefined) && (parsedUrlAt !== null) && (value != 'quality') && (value != 't') && (value != 'play'))
             {
-                str += l + urlArr[i] + '=' + $.parseURL()[urlArr[i]];
-            } else if((videoQuality != false) && (urlArr[i] == 'quality'))
+                str += l + value + '=' + $.parseURL()[value];
+            } else if((videoQuality != false) && value == 'quality')
             {
-                str += l + urlArr[i] + "=" + videoQuality;
-            } else if(urlArr[i] == 'play')
+                str += l + value + "=" + videoQuality;
+            } else if(value == 'play')
             {
-                str += l + urlArr[i] + "=" + (play ? "true" : "false");
-            } else if(withTime && (urlArr[i] == 't'))
+                str += l + value + "=" + (play ? "true" : "false");
+            } else if(withTime && (value == 't'))
             {
-                str += l + urlArr[i] + "=" + seconds;
+                str += l + value + "=" + seconds;
             }
+            i++;
         }
         return (embed ? windLoc.replace(/watch.html/g, 'embed.html') : windLoc.replace(/embed.html/g, 'watch.html')) + str;
-    }
-    
+    };
+
     /**
      * @description Returns the value of URL-Parameter 'name'
      *              Current used URL Parameters:
@@ -456,8 +432,8 @@
             return null;
         }
         return urlParam;
-    }
-    
+    };
+
     /**
      * @description Parses Seconds
      *
@@ -545,8 +521,8 @@
             }
         }
         return 0;
-    }
-    
+    };
+
     /**
      * @description create date in format MM/DD/YYYY
      * @param timeDate Time and Date
@@ -555,8 +531,8 @@
     {
         timeDate = (typeof timeDate === 'string') ? timeDate.substring(0, 10) : "n.a.";
         return timeDate;
-    }
-    
+    };
+
     /**
      * @description Returns a random Number in between [min, max]
      * @param min Min Value
@@ -574,8 +550,8 @@
             return min;
         }
         return (min + parseInt(Math.random() * (max - min + 1)));
-    }
-    
+    };
+
     /**
      * @description Returns if 'haystack' starts with 'start'
      * @param haystack String to search in
@@ -589,8 +565,8 @@
             return (haystack.substring(0, start.length).indexOf(start) != -1);
         }
         return false;
-    }
-    
+    };
+
     /**
      * @description Enables or disables the Logs
      * @param true for enabling Logs, false else
@@ -598,8 +574,8 @@
     $.enableLogging = function(logEnabled)
     {
         loggingEnabled = logEnabled||false;
-    }
-    
+    };
+
     /**
      * @description Returns whether logging is enabled or not
      * @param true for logging is enabled, false else
@@ -607,8 +583,8 @@
     $.loggingEnabled = function()
     {
         return loggingEnabled;
-    }
-    
+    };
+
     /**
      * @description Logs given arguments -- uses console.log; does NOT check loggingEnabled
      * @param any arguments console.log-valid
@@ -629,8 +605,8 @@
             return true;
         }
         return false;
-    }
-    
+    };
+
     /**
      * @description Logs given arguments -- uses console.log
      * @param any arguments console.log-valid
@@ -651,5 +627,5 @@
             return true;
         }
         return false;
-    }
+    };
 })(jQuery);
