@@ -374,12 +374,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
-                if (isDesktopMode || isMobileMode) {
+                if (isDesktopMode) {
                     initControlsEvents();
-
-                    if (isMobileMode) {
-                        initMobileEvents();
-                    };
 
                     if (aspectRatioTriggered) {
                         calculateEmbedAspectRatios();
@@ -392,6 +388,21 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     timeUpdate();
                     // init dropdown menus
                     $("." + class_dropdown).dropdown();
+
+                    addNonFlashEvents();
+
+                    checkLoginStatus();
+                } else if (isMobileMode) {
+
+                    initControlsEvents();
+                    initMobileEvents();
+
+                    ready();
+                    playPause();
+                    mute();
+                    timeUpdate();
+                    // init dropdown menus
+                    //$("." + class_dropdown).dropdown();
 
                     addNonFlashEvents();
 
@@ -839,8 +850,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     aspectRatioHeight = as[1] || 0;
                     aspectRatio = as[2] || 0;
                     aspectRatioTriggered = true;
-                    calculateEmbedAspectRatios();
-                    addEmbedRatioEvents();
+                    if(isDesktopMode) {
+                        calculateEmbedAspectRatios();
+                        addEmbedRatioEvents();
+                    }
                 }
             });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {

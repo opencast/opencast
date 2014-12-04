@@ -15,7 +15,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'engage/engage_model', 'jquery.mobile', 'punch'], function(require, $, _, Backbone, EngageCore, EngageModel) {
+define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'engage/engage_model', 'jquery.mobile'], function(require, $, _, Backbone, EngageCore, EngageModel) {
     'use strict'; // strict mode in all our application
 
     /*
