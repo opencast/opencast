@@ -735,8 +735,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         // max size of display
         // minus footer and header
 
-        var maxHeight = $(window).height() - 120;
-        var maxWidth = $(window).width();
+        var maxHeight = window.screen.height - 120;
+        var maxWidth = window.screen.width;
+        
         Engage.log("$(window).height():" + $(window).height());
         Engage.log("$(window).width():" + $(window).width());
 
