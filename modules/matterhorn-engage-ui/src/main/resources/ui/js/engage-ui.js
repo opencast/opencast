@@ -8,16 +8,19 @@ $(document).ready(function() {
     var stack = new Array();
     var visited = 1;
 
-    var msg_enterUsername = "Please enter your username:";
-    var msg_enterPassword = "Please enter your password:";
+    var title_enterUsernamePassword = "Login";
+    var placeholder_username = "Username";
+    var placeholder_password = "Password";
+    var placeholder_rememberMe = "Remember me";
+    var msg_enterUsernamePassword = "Please enter your username and password:";
     var msg_html_sthWentWrong = "<h2> Something went wrong. Try again! </h2>";
     var msg_html_noepisodes = "<h2>No Episodes available</h2>";
     var msg_html_noseries = "<h2>No Series available</h2>";
     var msg_html_loading = "<h2>Loading...</h2>";
     var msg_html_mediapackageempty = "<h2>The mediapackage is empty</h2>";
     var msg_html_nodata = "<h2>No data available</h2>";
-    var msg_loginSuccessful = "Successfully logged in as user";
-    var msg_loginFailed = "Failed to log in as user";
+    var msg_loginSuccessful = "Successfully logged in. Please reload the page if the page does not reload automatically.";
+    var msg_loginFailed = "Failed to log in.";
     var infoMeURL = "/info/me.json";
     var corePlayerURL = "theodul/ui/core.html?id=";
     var oldPlayerURL = "ui/watch.html?id=";
@@ -37,7 +40,7 @@ $(document).ready(function() {
     var $main_container = "#main-container";
     var $next = ".next";
     var $previous = ".previous";
-    var askingForCredentials = false;
+    var askedForLogin = false;
     var checkLoggedOut = false;
 
     function initialize() {
@@ -115,47 +118,71 @@ $(document).ready(function() {
     }
 
     function login() {
-        if (!askingForCredentials) {
-            askingForCredentials = true;
+	if(!askedForLogin) {
+	    askedForLogin = true;
             var username = "User";
             var password = "Password";
-            bootbox.prompt(msg_enterUsername, function(u) {
-                if ((u !== null) && (u.length > 0)) {
-                    username = u;
-                    bootbox.prompt(msg_enterPassword, function(p) {
-                        if ((p !== null) && (p.length > 0)) {
-                            password = p;
-                            $.ajax({
-                                type: "POST",
-                                url: springSecurityLoginURL,
-                                data: {
-                                    "j_username": username,
-                                    "j_password": password,
-                                    "_spring_security_remember_me": true
-                                }
-                            }).done(function(msg) {
-                                password = "";
-                                if (msg.indexOf(springLoggedInStrCheck) == -1) {
-                                    alertify.success(msg_loginSuccessful + " '" + username + "'.");
-                                    initialize();
-                                } else {
+	    bootbox.dialog({
+		title: title_enterUsernamePassword,
+		message: '<form class="form-signin">' +
+		    '<h2 class="form-signin-heading">' + msg_enterUsernamePassword + '</h2>' +
+		    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + placeholder_username + '" required="true" autofocus="" />' +
+		    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + placeholder_password + '" required="true" />' +
+		    '<label class="checkbox">' +
+		    '<input type="checkbox" value="' + placeholder_rememberMe + '" id="rememberMe" name="rememberMe" checked> ' + placeholder_rememberMe +
+		    '</label>' +
+		    '</form>',
+		buttons: {
+		    cancel: {
+			label: "Cancel",
+			className: "btn-default",
+			callback: function () {
+			    askedForLogin = false;
+			}
+		    },
+		    login: {
+			label: "Log in",
+			className: "btn-success",
+			callback: function () {
+			    var username = $("#username").val().trim();
+			    var password = $("#password").val().trim();
+			    if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
+				$.ajax({
+                                    type: "POST",
+                                    url: springSecurityLoginURL,
+                                    data: {
+					"j_username": username,
+					"j_password": password,
+					"_spring_security_remember_me": $("#rememberMe").is(":checked")
+                                    }
+				}).done(function(msg) {
+                                    password = "";
+                                    if (msg.indexOf(springLoggedInStrCheck) == -1) {
+					location.reload();
+					alertify.success(msg_loginSuccessful + " '" + username + "'.");
+					initialize();
+                                    } else {
+					alertify.error(msg_loginFailed + " '" + username + "'.");
+                                    }
+				    askedForLogin = false;
+				}).fail(function(msg) {
+                                    password = "";
                                     alertify.error(msg_loginFailed + " '" + username + "'.");
-                                }
-                                askingForCredentials = false;
-                            }).fail(function(msg) {
-                                password = "";
-                                alertify.error(msg_loginFailed + " '" + username + "'.");
-                                askingForCredentials = false;
-                            });
-                        } else {
-                            askingForCredentials = false;
-                        }
-                    });
-                } else {
-                    askingForCredentials = false;
-                }
-            });
-        }
+				    askedForLogin = false;
+				});
+			    } else {
+				askedForLogin = false;
+			    }
+			}
+		    }
+		},
+		className: "usernamePassword-modal",
+		onEscape: function() {
+		    askedForLogin = false;
+		},
+		closeButton: false
+	    });
+	}
     }
 
     function logout() {

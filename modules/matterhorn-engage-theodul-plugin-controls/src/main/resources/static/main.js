@@ -118,6 +118,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var embedHeightFour = 480;
     var embedHeightFive = 720;
     var logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
+
+    /* don't change these variables */
     var storage_playbackRate = "playbackRate";
     var storage_volume = "volume";
     var storage_muted = "muted";
@@ -193,7 +195,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var loggedIn = false;
     var username = "Anonymous";
     var translations = new Array();
-    var askingForCredentials = false;
+    var askedForLogin = false;
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
@@ -227,46 +229,70 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     }
 
     function login() {
-        if (!askingForCredentials) {
-            askingForCredentials = true;
+        if (!askedForLogin) {
+            askedForLogin = true;
             var username = "User";
             var password = "Password";
-            Bootbox.prompt(translate("enterUsername", "Please enter your username"), function(u) {
-                if ((u !== null) && (u.length > 0)) {
-                    username = u;
-                    Bootbox.prompt(translate("enterPassword", "Please enter your password"), function(p) {
-                        if ((p !== null) && (p.length > 0)) {
-                            password = p;
-                            $.ajax({
-                                type: "POST",
-                                url: springSecurityLoginURL,
-                                data: {
-                                    "j_username": username,
-                                    "j_password": password,
-                                    "_spring_security_remember_me": true
-                                }
-                            }).done(function(msg) {
-                                password = "";
-                                if (msg.indexOf(springLoggedInStrCheck) == -1) {
-                                    Engage.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Sie wurden erfolgreich eingeloggt. Bitte laden Sie diese Seite neu, falls sie nicht autoamtisch neu geladen wird."));
-                                    location.reload();
-                                } else {
+	    
+	    Bootbox.dialog({
+		title: translate("login", "Log in"),
+		message: '<form class="form-signin">' +
+		    '<h2 class="form-signin-heading">' + translate("enterUsernamePassword", "Please enter your username and password") + '</h2>' +
+		    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate("username", "Username") + '" required="true" autofocus="" />' +
+		    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + translate("password", "Password") + '" required="true" />' +
+		    '<label class="checkbox">' +
+		    '<input type="checkbox" value="' + translate("rememberMe", "Remember me") + '" id="rememberMe" name="rememberMe" checked> ' + translate("rememberMe", "Remember me") +
+		    '</label>' +
+		    '</form>',
+		buttons: {
+		    cancel: {
+			label: translate("cancel", "Cancel"),
+			className: "btn-default",
+			callback: function () {
+			    askedForLogin = false;
+			}
+		    },
+		    login: {
+			label: translate("login", "Log in"),
+			className: "btn-success",
+			callback: function () {
+			    var username = $("#username").val().trim();
+			    var password = $("#password").val().trim();
+			    if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
+				$.ajax({
+                                    type: "POST",
+                                    url: springSecurityLoginURL,
+                                    data: {
+					"j_username": username,
+					"j_password": password,
+					"_spring_security_remember_me": $("#rememberMe").is(":checked")
+                                    }
+				}).done(function(msg) {
+                                    password = "";
+                                    if (msg.indexOf(springLoggedInStrCheck) == -1) {
+					Engage.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Successfully logged in. Please reload the page if the page does not reload automatically."));
+					location.reload();
+                                    } else {
+					Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
+                                    }
+                                    askedForLogin = false;
+				}).fail(function(msg) {
+                                    password = "";
                                     Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
-                                }
-                                askingForCredentials = false;
-                            }).fail(function(msg) {
-                                password = "";
-                                Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
-                                askingForCredentials = false;
-                            });
-                        } else {
-                            askingForCredentials = false;
-                        }
-                    });
-                } else {
-                    askingForCredentials = false;
-                }
-            });
+                                    askedForLogin = false;
+				});
+			    } else {
+				askedForLogin = false;
+			    }
+			}
+		    }
+		},
+		className: "usernamePassword-modal",
+		onEscape: function() {
+		    askedForLogin = false;
+		},
+		closeButton: false
+	    });
         }
     }
 
