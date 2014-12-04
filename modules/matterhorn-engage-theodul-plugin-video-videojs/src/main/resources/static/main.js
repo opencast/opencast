@@ -735,7 +735,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         // max size of display
         // minus footer and header
         Engage.log("Video: Actual Orientation: " + Engage.model.get("orientation"));
-        
+
         var maxHeight = $(window).height() - 120;
         var maxWidth = $(window).width();
 
@@ -794,7 +794,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     function checkVideoDisplaySize() {
         // make sure the video height is not greater than the window height
         if (Engage.model.get("mode") == "mobile") {
-
+            
         } else {
             $("#" + id_engageContent).css("max-width", "");
             for (var i = 0; i < videoDisplaySizeTimesCheck; ++i) {
