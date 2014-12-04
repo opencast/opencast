@@ -736,8 +736,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         // minus footer and header
         Engage.log("Video: Actual Orientation: " + Engage.model.get("orientation"));
 
-        var maxHeight = $(window).height() - 120;
-        var maxWidth = $(window).width();
+        var maxHeight = window.innerHeight - 120;
+        var maxWidth = window.innerWidth;
         Engage.log("Size of Displayarea (w/h): " + maxWidth + "/" + maxHeight); 
         var videoWidth = 0;
         var videoHeight = 0;
