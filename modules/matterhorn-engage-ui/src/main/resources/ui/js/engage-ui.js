@@ -19,8 +19,8 @@ $(document).ready(function() {
     var msg_html_loading = "<h2>Loading...</h2>";
     var msg_html_mediapackageempty = "<h2>The mediapackage is empty</h2>";
     var msg_html_nodata = "<h2>No data available</h2>";
-    var msg_loginSuccessful = "Successfully logged in as user";
-    var msg_loginFailed = "Failed to log in as user";
+    var msg_loginSuccessful = "Successfully logged in. Please reload the page if the page does not reload automatically.";
+    var msg_loginFailed = "Failed to log in.";
     var infoMeURL = "/info/me.json";
     var corePlayerURL = "theodul/ui/core.html?id=";
     var oldPlayerURL = "ui/watch.html?id=";
@@ -158,6 +158,7 @@ $(document).ready(function() {
 				}).done(function(msg) {
                                     password = "";
                                     if (msg.indexOf(springLoggedInStrCheck) == -1) {
+					location.reload();
 					alertify.success(msg_loginSuccessful + " '" + username + "'.");
 					initialize();
                                     } else {

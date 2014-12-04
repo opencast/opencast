@@ -39,6 +39,11 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     };
 
     /* change these variables */
+    var title_enterUsernamePassword = "Login";
+    var placeholder_username = "Username";
+    var placeholder_password = "Password";
+    var placeholder_rememberMe = "Remember me";
+    var msg_enterUsernamePassword = "Please enter your username and password:";
     var browser_minVersion_firefox = 24;
     var browser_minVersion_chrome = 30;
     var browser_minVersion_opera = 20;
@@ -79,7 +84,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var translationData = null;
     var loggedIn = false;
     var username = "Anonymous";
-    var askingForCredentials = false;
+    var askedForLogin = false;
     var springSecurityLoginURL = "/j_spring_security_check";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
 
@@ -155,53 +160,76 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     }
 
     function login() {
-        if (!askingForCredentials) {
-            askingForCredentials = true;
+	if(!askedForLogin) {
+	    askedForLogin = true;
             var username = "User";
             var password = "Password";
-            Bootbox.prompt("Please enter your username:", function(u) {
-                if ((u !== null) && (u.length > 0)) {
-                    username = u;
-                    Bootbox.prompt("Please enter your password:", function(p) {
-                        if ((p !== null) && (p.length > 0)) {
-                            password = p;
-                            $.ajax({
-                                type: "POST",
-                                url: springSecurityLoginURL,
-                                data: {
-                                    "j_username": username,
-                                    "j_password": password,
-                                    "_spring_security_remember_me": true
-                                }
-                            }).done(function(msg) {
-                                password = "";
-                                if (msg.indexOf(springLoggedInStrCheck) == -1) {
-                                    engageCore.trigger(events.customSuccess.getName(), "Successfully logged in. Please reload the page if the page does not reload automatically.");
-                                    $("#" + id_btn_login).hide();
-                                    $("#" + id_btn_reloadPage).click(function(e) {
-                                        e.preventDefault();
-                                        location.reload();
-                                    });
-                                    $("#" + id_btn_reloadPage).show();
-                                    location.reload();
-                                } else {
+	    Bootbox.dialog({
+		title: title_enterUsernamePassword,
+		message: '<form class="form-signin">' +
+		    '<h2 class="form-signin-heading">' + msg_enterUsernamePassword + '</h2>' +
+		    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + placeholder_username + '" required="true" autofocus="" />' +
+		    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + placeholder_password + '" required="true" />' +
+		    '<label class="checkbox">' +
+		    '<input type="checkbox" value="' + placeholder_rememberMe + '" id="rememberMe" name="rememberMe" checked> ' + placeholder_rememberMe +
+		    '</label>' +
+		    '</form>',
+		buttons: {
+		    cancel: {
+			label: "Cancel",
+			className: "btn-default",
+			callback: function () {
+			    askedForLogin = false;
+			}
+		    },
+		    login: {
+			label: "Log in",
+			className: "btn-success",
+			callback: function () {
+			    var username = $("#username").val().trim();
+			    var password = $("#password").val().trim();
+			    if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
+				$.ajax({
+                                    type: "POST",
+                                    url: springSecurityLoginURL,
+                                    data: {
+					"j_username": username,
+					"j_password": password,
+					"_spring_security_remember_me": $("#rememberMe").is(":checked")
+                                    }
+				}).done(function(msg) {
+                                    password = "";
+                                    if (msg.indexOf(springLoggedInStrCheck) == -1) {
+					engageCore.trigger(events.customSuccess.getName(), "Successfully logged in. Please reload the page if the page does not reload automatically.");
+					$("#" + id_btn_login).hide();
+					$("#" + id_btn_reloadPage).click(function(e) {
+                                            e.preventDefault();
+                                            location.reload();
+					});
+					$("#" + id_btn_reloadPage).show();
+					location.reload();
+                                    } else {
+					engageCore.trigger(events.customError.getName(), "Failed to log in.");
+                                    }
+				    askedForLogin = false;
+				}).fail(function(msg) {
+                                    password = "";
                                     engageCore.trigger(events.customError.getName(), "Failed to log in.");
-                                }
-                                askingForCredentials = false;
-                            }).fail(function(msg) {
-                                password = "";
-                                engageCore.trigger(events.customError.getName(), "Failed to log in.");
-                                askingForCredentials = false;
-                            });
-                        } else {
-                            askingForCredentials = false;
-                        }
-                    });
-                } else {
-                    askingForCredentials = false;
-                }
-            });
-        }
+				    askedForLogin = false;
+				});
+			    } else {
+				askedForLogin = false;
+			    }
+			}
+		    }
+		},
+		className: "usernamePassword-modal",
+		onEscape: function() {
+		    askedForLogin = false;
+		},
+		closeButton: false
+	    });
+	}
     }
 
     function getLoginStatus() {
