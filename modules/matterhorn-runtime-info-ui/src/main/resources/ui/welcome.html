@@ -17,13 +17,14 @@
                   var col = $('#docs1');
                   var pathToDocs = data.rest[i].docs.replace(/^.*\/\/[^\/]+/, '');
                   col.append("<li>" + data.rest[i].description + " <a href='" + pathToDocs + "'>Docs</a></li>");
-				          if(data.rest[i].description.toLowerCase() == "Capture REST Endpoint".toLowerCase()) {
-				            $('#col3m').append('<br /><a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
-				            capt = true;
-				          } else if(data.rest[i].description.toLowerCase() == "Confidence Monitoring REST Endpoint".toLowerCase()) {
-				            $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" href="/confidence-monitoring">Go to Confidence Monitoring</a>');
-				            confMon = true;
-				          }
+                  if(data.rest[i].description.toLowerCase() == "Capture REST Endpoint".toLowerCase()) {
+                    $('#col3m').append('<br /><a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
+                    capt = true;
+                  } else if(data.rest[i].description.toLowerCase() == "Confidence Monitoring REST Endpoint".toLowerCase()) {
+                    $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" '
+                        + 'href="/confidence-monitoring">Go to Confidence Monitoring</a>');
+                    confMon = true;
+                  }
                })
             } else if("engage" == section) {
                $('#engagelink').attr('href', data.engage + '/engage/ui');
@@ -31,15 +32,12 @@
                $('#adminlink').attr('href', data.admin + '/admin/');
             }
           });
-		      if(!capt) {
-		        $('#col3m').hide();
-		      }
-		      if(!confMon) {
-		        $('#col4m').hide();
-		      }
-		      if(typeof analytics == "undefined") {
-		        $('#col5m').hide();
-		      }
+          if(capt) {
+            $('#col3m').show();
+          }
+          if(confMon) {
+            $('#col4m').show();
+          }
         });
       });
     </script>
@@ -52,8 +50,11 @@
         <div id="opencastlogo"><a href="http://www.opencastproject.org"><img src="img/mh_logos/OpencastLogo.png" alt="Opencast" width="143" height="38" hspace="20" vspace="5" border="0" /></a></div>
         <h1>1.7 Development Snapshot</h1>
         <div id="promotext">
-          <p>Matterhorn is a free, open-source system that provides a lecture capture solution and an enterprise media infrastructure for educational audio and video content.</p>
-          <p>Learn more about the features of Matterhorn by taking the <a href="http://opencast.org/matterhorn/product-tour">Product Tour</a> or viewing an <a href="http://opencast.org/matterhorn/features">Overview of Features</a>. </p>
+          <p>Matterhorn is a free, open-source system that provides a lecture capture solution and an enterprise media
+            infrastructure for educational audio and video content.</p>
+          <p>Learn more about the features of Matterhorn by taking the
+            <a href="http://opencast.org/matterhorn/product-tour">Product Tour</a> or viewing an
+           <a href="http://opencast.org/matterhorn/features">Overview of Features</a>. </p>
         </div>
       </div>
       <div id="middlebanner">
@@ -84,7 +85,7 @@
         </div>
       </div>
       <div id="middlebanner2">
-        <div id="col3m">
+        <div id="col3m" style="display: none;">
           <img src="img/welcome/capture_icon.png" width="70" height="70" />
           <h2>Capture Tools</h2>
           <p>These tools enable you to capture immediately and to modify the capture settings:</p>
@@ -93,7 +94,7 @@
             <li>Test new configurations</li>
           </ul>
         </div>
-        <div id="col4m">
+        <div id="col4m" style="display: none;">
           <img src="img/welcome/confidence_monitoring_icon.png" width="80" height="61" />
           <h2>Confidence Monitoring</h2>
           <p>These tools enable you to watch the status of the capture devices:</p>
@@ -143,8 +144,12 @@
         </div>
       </div>
       <div id="footer">
-        <p>Opencast Matterhorn code is licensed under the <a href="http://www.osedu.org/licenses/ECL-2.0/ecl2.txt">Educational Community License, Version 2.0</a>.<br />
-        All other (non-code) intellectual property is licensed under a <a href="http://creativecommons.org/licenses/by/3.0/us/" rel="license">Creative Commons Attribution 3.0 United States License</a>.<br />Permissions beyond the scope of this license may be available <a href="http://www.opencastproject.org/contact" rel="cc:morePermissions">on request</a>.</p>
+        <p>Opencast Matterhorn code is licensed under the
+          <a href="http://www.osedu.org/licenses/ECL-2.0/ecl2.txt">Educational Community License, Version 2.0</a>.<br />
+          All other (non-code) intellectual property is licensed under a
+          <a href="http://creativecommons.org/licenses/by/3.0/us/" rel="license">Creative Commons Attribution 3.0 United
+          States License</a>.<br />Permissions beyond the scope of this license may be available
+          <a href="http://www.opencastproject.org/contact" rel="cc:morePermissions">on request</a>.</p>
       </div>
     </div>
   </body>

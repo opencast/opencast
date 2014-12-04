@@ -59,12 +59,13 @@ public class AuthenticationSuccessHandler implements
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
           Authentication authentication) throws IOException, ServletException {
 
-    // If the user originally attempted to access a specific URI other than /, but was forwarded to the login page,
-    // redirect the user back to that initial URI.
+    /* If the user originally attempted to access a specific URI other than /, but was forwarded to the login page,
+     * redirect the user back to that initial URI. But only if the request target was a user interface any not some kind
+     * of data. */
     HttpSession session = request.getSession();
     String initialRequestUri = (String) session.getAttribute(INITIAL_REQUEST_PATH);
     session.removeAttribute(INITIAL_REQUEST_PATH);
-    if (initialRequestUri != null) {
+    if (initialRequestUri != null && initialRequestUri.toLowerCase().contains(".htm")) {
       response.sendRedirect(initialRequestUri);
       return;
     }

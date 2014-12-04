@@ -3,6 +3,9 @@
     background-color: #A72123;
     border-color: #E7E7E7;
 }
+#nav-dropdownLoggedin {
+    display: none;
+}
 /* title */
 .navbar-default .navbar-brand {
     color: #FFF;
@@ -30,7 +33,7 @@
 .navbar-default .navbar-nav > .open > a:hover, 
 .navbar-default .navbar-nav > .open > a:focus {
     color: #555;
-    background-color: #D5D5D5;
+    background-color: #FBB900;
 }
 /* caret */
 .navbar-default .navbar-nav > .dropdown > a .caret {
@@ -184,4 +187,43 @@ strong {
 .oc-search-btn:hover {
     background: #FBB900;
     border-color: #FBB900;
+}
+.form-signin {
+    max-width: 380px;
+    margin: 0 auto;
+    background-color: #fff;
+    /* padding: 15px 35px 45px; */
+    /* border: 1px solid rgba(0,0,0,0.1); */
+}
+
+.form-signin-heading,
+.checkbox {
+    margin-bottom: 30px;
+}
+
+.checkbox {
+    font-weight: normal;
+}
+
+.form-control-custom {
+    position: relative;
+    font-size: 16px;
+    height: auto;
+    padding: 10px;
+    @include box-sizing(border-box);
+    &:focus {
+	z-index: 2;
+    }
+}
+
+#username {
+    margin-bottom: -1px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+#password {
+    margin-bottom: 20px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
