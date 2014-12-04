@@ -771,7 +771,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
         Engage.log("Videosize (w/h): " + videoWidth + "/" + videoHeight);
 
-        $('#videojs_wrapper').height(maxHeight);
+        if (Engage.model.get("orientation") == "landscape") {
+            $('#videojs_wrapper').height($(window).height() - 120);
+        } else{
+            $('#videojs_wrapper').height(maxHeight);
+        }
+        
 
         if (Engage.model.get("orientation") == "portrait") {
             if (videoDisplays.length > 1) {
