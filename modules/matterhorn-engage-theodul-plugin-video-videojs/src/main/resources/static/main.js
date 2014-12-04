@@ -737,7 +737,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
         var maxHeight = window.screen.height - 120;
         var maxWidth = window.screen.width;
-        
+
         Engage.log("$(window).height():" + $(window).height());
         Engage.log("$(window).width():" + $(window).width());
 
@@ -771,10 +771,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
         Engage.log("Videosize (w/h): " + videoWidth + "/" + videoHeight);
 
-        $('#videojs_wrapper').height(maxHeight);
+        $('#videojs_wrapper').height(window.innerHeight - 120);
 
         if (Engage.model.get("orientation") == "portrait") {
-            $('.mobileVideoBox').height((((1 / videoDisplays.length) * 100) - 0.5) + "%");
+            if (videoDisplays.length > 1) {
+                $('.mobileVideoBox').height((((1 / videoDisplays.length) * 100) - 0.5) + "%");
+            } else {
+                $('.mobileVideoBox').height(videoHeight);
+            }
         };
         // Set to init size
         //$('.mobileVideoBox').width(videoWidth);
