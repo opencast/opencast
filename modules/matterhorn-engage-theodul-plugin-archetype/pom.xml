@@ -4,7 +4,7 @@
 
   <groupId>org.opencastproject</groupId>
   <artifactId>matterhorn-theodul-plugin</artifactId>
-  <version>1.6-SNAPSHOT</version>
+  <version>1.7-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
 
   <name>matterhorn-engage-theodul-plugin-archetype</name>
