@@ -555,6 +555,7 @@
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
+	<module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-serviceregistry</module>
       </modules>
     </profile>

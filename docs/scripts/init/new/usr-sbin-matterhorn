@@ -78,9 +78,6 @@ DEBUG_SUSPEND="n"
 FELIX_CONFIG_DIR=/etc/matterhorn
 FELIX_WORK_DIR=/srv/matterhorn
 FELIX_CACHE_DIR="/tmp/matterhorn/felix-cache"
-JMX_REMOTE_PORT="1099"
-JMX_REMOTE_AUTHENTICATE="false"
-JMX_REMOTE_SSL="false"
 ADD_OPTS=""
 if [ -f $MATTERHORN/lib/matterhorn/matterhorn-capture-agent-impl*.jar ]
 then
@@ -125,12 +122,6 @@ FELIX="${FELIX} -Dfelix.config.properties=file:${FELIX_CONFIG_DIR}/config.proper
 FELIX="${FELIX} -Dfelix.system.properties=file:${FELIX_CONFIG_DIR}/system.properties"
 FELIX="${FELIX} -Dfelix.fileinstall.dir=$FELIX_CONFIG_DIR/load"
 
-# Configure Java Management Extensions (JMX) 
-JMX="-Dcom.sun.management.jmxremote"
-JMX="${JMX} -Dcom.sun.management.jmxremote.port=${JMX_REMOTE_PORT}"
-JMX="${JMX} -Dcom.sun.management.jmxremote.authenticate=${JMX_REMOTE_AUTHENTICATE}"
-JMX="${JMX} -Dcom.sun.management.jmxremote.ssl=${JMX_REMOTE_SSL}"
-
 LOGGING="-Dopencast.logdir=$LOGDIR"
 LOGGING="${LOGGING} -Dbundles.configuration.location=$FELIX_CONFIG_DIR"
 LOGGING="${LOGGING} -Djava.util.logging.config.file=$FELIX_CONFIG_DIR/services/java.util.logging.properties"
@@ -163,7 +154,7 @@ fi
 MATTERHORN_OPTS="$GOSH $DEBUG $FELIX $GRAPHICS $JETTY $JAVA $LOGGING $JMX $DISABLE_PHONEHOME $ADD_OPTS"
 
 # Execute Capture-Agent device configuration
-$IS_CA && $CA/device_config.sh
+$IS_CA && [ -f $CA/device_config.sh ] && $CA/device_config.sh
 
 # Make sure matterhorn bundles are reloaded
 clean_felix_cache
