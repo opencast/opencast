@@ -37,7 +37,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "A mediapackage model error occured", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "when the core loaded the event successfully", "handler"),
         getMediaInfo: new Engage.Event("MhConnection:getMediaInfo", "", "handler"),
-        getMediaPackage: new Engage.Event("MhConnection:getMediaPackage", "", "handler")
+        getMediaPackage: new Engage.Event("MhConnection:getMediaPackage", "", "handler"),
+        translate: new Engage.Event("Core:translate", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -91,9 +92,14 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
     /* don't change these variables */
     var mediaPackageID = "";
-    var initCount = 1;
+    var initCount = 2;
     var mediaPackage; // mediaPackage data
     var mediaInfo; // media info like video tracks and attachments
+    var translations = new Array();
+
+    function translate(str, strIfNotFound) {
+        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
 
     var InfoMeModel = Backbone.Model.extend({
         urlRoot: INFO_ME_ENDPOINT,
@@ -207,7 +213,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                         Engage.log("Mediapackage Data change event thrown");
                     } else {
                         Engage.log("Mediapackage data not loaded successfully");
-                        Engage.trigger(plugin.events.mediaPackageModelError.getName(), "Media information could not be loaded successfully.");
+                        Engage.trigger(plugin.events.mediaPackageModelError.getName(), translate("error_mediaPackageInformationNotLoaded", "Media information could not be loaded successfully."));
                     }
                 }
             });
@@ -325,7 +331,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             mediaInfo.creator = mediaPackage.dcCreator;
             mediaInfo.date = mediaPackage.dcCreated;
         } else {
-            Engage.trigger(plugin.events.mediaPackageModelError.getName(), "No media information are available.");
+            Engage.trigger(plugin.events.mediaPackageModelError.getName(), translate("error_noMediaInformationAvailable", "No media information are available."));
         }
     }
 
@@ -347,7 +353,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 mediaPackage = data["search-results"].result;
                 extractMediaInfo();
             } else {
-                Engage.trigger(plugin.events.mediaPackageModelError.getName(), "A requested search endpoint is currently not available.");
+                Engage.trigger(plugin.events.mediaPackageModelError.getName(), translate("error_endpointNotAvailable", "A requested search endpoint is currently not available."));
             }
             callback();
         });
@@ -404,6 +410,19 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     // all plugins loaded
     Engage.on(plugin.events.plugin_load_done.getName(), function() {
         Engage.log("MhConnection: Plugin load done");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
+
+    Engage.on(plugin.events.translate.getName(), function(data) {
+        Engage.log("MhConnection: Translation load done");
+        var key = Object.keys(data);
+        for (var i = 0; i < key.length; i++) {
+            var lang_value = key[i];
+            translations[lang_value] = data[lang_value];
+        }
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();

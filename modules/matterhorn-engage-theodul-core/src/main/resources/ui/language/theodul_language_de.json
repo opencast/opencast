@@ -71,9 +71,15 @@
     "rememberMe": "Speichern",
     "cancel": "Abbrechen",
     "login": "Einloggen",
+    "reloadPage": "Seite neu laden",
     "enterUsernamePassword": "Bitte geben Sie ihren Nutzernamen und ihr Passwort ein:",
     "loggingOut": "Sie werden ausgeloggt. Bitte warten Sie einen Moment.",
     "loginSuccessful": "Sie wurden erfolgreich eingeloggt. Bitte laden Sie diese Seite neu, falls sie nicht autoamtisch neu geladen wird.",
     "logoutSuccessful": "Sie wurden erfolgreich ausgeloggt. Bitte laden Sie diese Seite neu, falls sie nicht autoamtisch neu geladen wird.",
-    "logoutFailed": "Ausloggen fehlgeschlagen."
+    "loginFailed": "Einloggen fehlgeschlagen.",
+    "logoutFailed": "Ausloggen fehlgeschlagen.",
+    "error_mediaPackageInformationNotLoaded": "Es gibt zwei mögliche Gründe fur diesen Fehler:<ul><li>Die Aufzeichnung ist nicht mehr verfügbar</li><li>Die Aufzeichnung ist geschützt und ist nur für eingeloggte Nutzer verfügbar</li></ul>",
+    "error_noMediaInformationAvailable": "Es sind keine Medien-Informationen verfügbar.",
+    "error_endpointNotAvailable": "Ein angefragter Such-Endpoint ist momentan nicht verfügbar.",
+    "error_unknown": "Ein Fehler ist aufgetreten. Bitte laden Sie diese Seite neu."
 }
