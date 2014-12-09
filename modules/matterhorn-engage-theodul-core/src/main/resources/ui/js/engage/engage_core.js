@@ -216,7 +216,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 					$("#" + id_btn_reloadPage).show();
 					location.reload();
                                     } else {
-					console.log(translationData);
 					engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
                                     }
 				    askedForLogin = false;
