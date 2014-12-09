@@ -39,11 +39,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     };
 
     /* change these variables */
-    var title_enterUsernamePassword = "Login";
-    var placeholder_username = "Username";
-    var placeholder_password = "Password";
-    var placeholder_rememberMe = "Remember me";
-    var msg_enterUsernamePassword = "Please enter your username and password:";
     var browser_minVersion_firefox = 24;
     var browser_minVersion_chrome = 30;
     var browser_minVersion_opera = 20;
@@ -105,7 +100,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
     }
 
-    function translate(language) {
+    function initTranslate(language) {
         var jsonstr = "language/theodul_language_en.json";
 
         if (language == "de") {
@@ -125,6 +120,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 }
             }
         });
+    }
+
+    function translateCoreHTML() {
+	$("#str_error").html(translate("error", "Error"));
+	$("#customError_str").html(translate("error_unknown", "An error occurred. Please reload the page."));
+	$("#str_reloadPage").html(translate("reloadPage", "Reload page"));
+	$("#str_login").html(translate("login", "Log in"));
     }
 
     function triggerTranslated() {
@@ -159,31 +161,36 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         });
     }
 
+    function translate(str, strIfNotFound) {
+        return ((translationData != null) && (translationData[str] != undefined)) ? translationData[str] : strIfNotFound;
+    }
+
     function login() {
 	if(!askedForLogin) {
 	    askedForLogin = true;
             var username = "User";
             var password = "Password";
+
 	    Bootbox.dialog({
-		title: title_enterUsernamePassword,
+		title: translate("login", "Log in"),
 		message: '<form class="form-signin">' +
-		    '<h2 class="form-signin-heading">' + msg_enterUsernamePassword + '</h2>' +
-		    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + placeholder_username + '" required="true" autofocus="" />' +
-		    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + placeholder_password + '" required="true" />' +
+		    '<h2 class="form-signin-heading">' + translate("enterUsernamePassword", "Please enter your username and password") + '</h2>' +
+		    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate("username", "Username") + '" required="true" autofocus="" />' +
+		    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + translate("password", "Password") + '" required="true" />' +
 		    '<label class="checkbox">' +
-		    '<input type="checkbox" value="' + placeholder_rememberMe + '" id="rememberMe" name="rememberMe" checked> ' + placeholder_rememberMe +
+		    '<input type="checkbox" value="' + translate("rememberMe", "Remember me") + '" id="rememberMe" name="rememberMe" checked> ' + translate("rememberMe", "Remember me") +
 		    '</label>' +
 		    '</form>',
 		buttons: {
 		    cancel: {
-			label: "Cancel",
+			label: translate("cancel", "Cancel"),
 			className: "btn-default",
 			callback: function () {
 			    askedForLogin = false;
 			}
 		    },
 		    login: {
-			label: "Log in",
+			label: translate("login", "Log in"),
 			className: "btn-success",
 			callback: function () {
 			    var username = $("#username").val().trim();
@@ -200,7 +207,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 				}).done(function(msg) {
                                     password = "";
                                     if (msg.indexOf(springLoggedInStrCheck) == -1) {
-					engageCore.trigger(events.customSuccess.getName(), "Successfully logged in. Please reload the page if the page does not reload automatically.");
+					engageCore.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Successfully logged in. Please reload the page if the page does not reload automatically."));
 					$("#" + id_btn_login).hide();
 					$("#" + id_btn_reloadPage).click(function(e) {
                                             e.preventDefault();
@@ -209,12 +216,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 					$("#" + id_btn_reloadPage).show();
 					location.reload();
                                     } else {
-					engageCore.trigger(events.customError.getName(), "Failed to log in.");
+					console.log(translationData);
+					engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
                                     }
 				    askedForLogin = false;
 				}).fail(function(msg) {
                                     password = "";
-                                    engageCore.trigger(events.customError.getName(), "Failed to log in.");
+                                    engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
 				    askedForLogin = false;
 				});
 			    } else {
@@ -252,7 +260,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         initialize: function() {
             $("." + class_loading).show();
             $("#" + id_loading1).show();
-            translate(detectLanguage());
+            initTranslate(detectLanguage());
             // the main core is our global event system
             this.dispatcher = _.clone(Backbone.Events);
             // link to the engage model
@@ -312,7 +320,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     $.get(core_template, function(template) {
                         // set template, render it and add it to DOM
                         engageCore.template = template;
-                        $(engageCore.el).html(_.template(template)).trigger("create");
+                        $(engageCore.el).html(_.template(template)).trigger("create"); // variables do not work in here!
                         // run init function of the view
                         engageCore.pluginView.initView();
                         if (engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
@@ -371,45 +379,44 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             });
             // load plugins done, hide loading and show content
             this.dispatcher.on(events.plugin_load_done.getName(), function() {
-                if (!mediapackageError) {
-                    $("#" + id_loading1).hide().detach();
-                    $("#" + id_loading2).show();
+                $("#" + id_loading1).hide().detach();
+                $("#" + id_loading2).show();
+                window.setTimeout(function() {
+                    $("#" + id_loadingProgressbar2).css("width", "100%");
                     window.setTimeout(function() {
-                        $("#" + id_loadingProgressbar2).css("width", "100%");
-                        window.setTimeout(function() {
-                            $("." + class_loading).hide().detach();
-                            if (engageCore.model.browserSupported) {
-                                $("#" + id_browserWarning).hide().detach();
-                                $("#" + id_engage_view).show();
-                                triggerTranslated();
-                                if (engageCore.model.desktop) {
-                                    window.setTimeout(function() {
-                                        if ($("#" + id_volume).html() === undefined) {
-                                            $("#" + id_btn_reloadPage).click(function(e) {
-                                                e.preventDefault();
-                                                location.reload();
-                                            });
-                                            $("#" + id_engage_view).hide().detach();
-                                            $("body").css("min-width", "");
-                                            $("#" + id_customError).show();
-                                        } else {
-                                            $("#" + id_customError + ", #" + id_btn_login).hide().detach();
-                                        }
-                                    }, errorCheckDelay);
-                                }
-                                // TODO: Error/loading checks for embed and mobile
-                            } else {
-                                $("#" + id_engage_view + ", #" + id_customError).hide().detach();
-                                $("body").css("min-width", "");
-                                $("#" + id_browserWarning).show();
-                                $("#" + id_btn_tryAnyway).click(function(e) {
-                                    e.preventDefault();
-                                    window.open(window.location.href + "&browser=all");
-                                });
+                        $("." + class_loading).hide().detach();
+                        if (engageCore.model.browserSupported) {
+                            $("#" + id_browserWarning).hide().detach();
+                            $("#" + id_engage_view).show();
+                            triggerTranslated();
+			    translateCoreHTML();
+                            if (engageCore.model.desktop) {
+                                window.setTimeout(function() {
+                                    if ($("#" + id_volume).html() === undefined) {
+                                        $("#" + id_btn_reloadPage).click(function(e) {
+                                            e.preventDefault();
+                                            location.reload();
+                                        });
+                                        $("#" + id_engage_view).hide().detach();
+                                        $("body").css("min-width", "");
+                                        $("#" + id_customError).show();
+                                    } else {
+                                        $("#" + id_customError + ", #" + id_btn_login).hide().detach();
+                                    }
+                                }, errorCheckDelay);
                             }
-                        }, loadingDelay2);
-                    }, loadingDelay1);
-                }
+                            // TODO: Error/loading checks for embed and mobile
+                        } else {
+                            $("#" + id_engage_view + ", #" + id_customError).hide().detach();
+                            $("body").css("min-width", "");
+                            $("#" + id_browserWarning).show();
+                            $("#" + id_btn_tryAnyway).click(function(e) {
+                                e.preventDefault();
+                                window.open(window.location.href + "&browser=all");
+                            });
+                        }
+                    }, loadingDelay2);
+                }, loadingDelay1);
             });
         },
         // bind a key event as a string to given theodul event
