@@ -213,7 +213,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                         Engage.log("Mediapackage Data change event thrown");
                     } else {
                         Engage.log("Mediapackage data not loaded successfully");
-                        Engage.trigger(plugin.events.mediaPackageModelError.getName(), translate("error_mediaPackageInformationNotLoaded", "Media information could not be loaded successfully."));
+                        Engage.trigger(plugin.events.mediaPackageModelError.getName(), translate("error_mediaPackageInformationNotLoaded", "There are two possible reasons for this error:<ul><li>The media is not available any more</li><li>The media is protected and you need to log in</li></ul>"));
                     }
                 }
             });
