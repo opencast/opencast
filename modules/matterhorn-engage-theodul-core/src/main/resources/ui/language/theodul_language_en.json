@@ -71,10 +71,15 @@
     "rememberMe": "Remember me",
     "cancel": "Cancel",
     "login": "Log in",
+    "reloadPage": "Reload page",
     "enterUsernamePassword": "Please enter your username and password:",
     "loggingOut": "You are being logged out, please wait a moment.",
     "loginSuccessful": "Successfully logged in. Please reload the page if the page does not reload automatically.",
     "logoutSuccessful": "Successfully logged out. Please reload the page if the page does not reload automatically.",
     "loginFailed": "Failed to log in.",
-    "logoutFailed": "Failed to log out."
+    "logoutFailed": "Failed to log out.",
+    "error_mediaPackageInformationNotLoaded": "There are two possible reasons for this error:<ul><li>The media is not available any more</li><li>The media is protected and you need to log in</li></ul>",
+    "error_noMediaInformationAvailable": "No media information are available.",
+    "error_endpointNotAvailable": "A requested search endpoint is currently not available.",
+    "error_unknown": "An error occurred. Please reload the page."
 }
