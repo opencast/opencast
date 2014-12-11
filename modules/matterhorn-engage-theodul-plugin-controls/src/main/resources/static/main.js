@@ -51,6 +51,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "", "trigger"),
         sliderStart: new Engage.Event("Slider:start", "", "trigger"),
         sliderStop: new Engage.Event("Slider:stop", "", "trigger"),
+        sliderMousein: new Engage.Event("Slider:mouseIn", "the mouse entered the slider", "trigger"),
+        sliderMouseout: new Engage.Event("Slider:mouseOut", "the mouse is off the slider", "trigger"),
+        sliderMousemove: new Engage.Event("Slider:mouseMoved", "the mouse is moving over the slider", "trigger"),
         volumeSet: new Engage.Event("Video:volumeSet", "", "trigger"),
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "trigger"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
@@ -233,66 +236,66 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             askedForLogin = true;
             var username = "User";
             var password = "Password";
-	    
-	    Bootbox.dialog({
-		title: translate("login", "Log in"),
-		message: '<form class="form-signin">' +
-		    '<h2 class="form-signin-heading">' + translate("enterUsernamePassword", "Please enter your username and password") + '</h2>' +
-		    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate("username", "Username") + '" required="true" autofocus="" />' +
-		    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + translate("password", "Password") + '" required="true" />' +
-		    '<label class="checkbox">' +
-		    '<input type="checkbox" value="' + translate("rememberMe", "Remember me") + '" id="rememberMe" name="rememberMe" checked> ' + translate("rememberMe", "Remember me") +
-		    '</label>' +
-		    '</form>',
-		buttons: {
-		    cancel: {
-			label: translate("cancel", "Cancel"),
-			className: "btn-default",
-			callback: function () {
-			    askedForLogin = false;
-			}
-		    },
-		    login: {
-			label: translate("login", "Log in"),
-			className: "btn-success",
-			callback: function () {
-			    var username = $("#username").val().trim();
-			    var password = $("#password").val().trim();
-			    if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
-				$.ajax({
+
+            Bootbox.dialog({
+                title: translate("login", "Log in"),
+                message: '<form class="form-signin">' +
+                    '<h2 class="form-signin-heading">' + translate("enterUsernamePassword", "Please enter your username and password") + '</h2>' +
+                    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate("username", "Username") + '" required="true" autofocus="" />' +
+                    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + translate("password", "Password") + '" required="true" />' +
+                    '<label class="checkbox">' +
+                    '<input type="checkbox" value="' + translate("rememberMe", "Remember me") + '" id="rememberMe" name="rememberMe" checked> ' + translate("rememberMe", "Remember me") +
+                    '</label>' +
+                    '</form>',
+                buttons: {
+                    cancel: {
+                        label: translate("cancel", "Cancel"),
+                        className: "btn-default",
+                        callback: function() {
+                            askedForLogin = false;
+                        }
+                    },
+                    login: {
+                        label: translate("login", "Log in"),
+                        className: "btn-success",
+                        callback: function() {
+                            var username = $("#username").val().trim();
+                            var password = $("#password").val().trim();
+                            if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
+                                $.ajax({
                                     type: "POST",
                                     url: springSecurityLoginURL,
                                     data: {
-					"j_username": username,
-					"j_password": password,
-					"_spring_security_remember_me": $("#rememberMe").is(":checked")
+                                        "j_username": username,
+                                        "j_password": password,
+                                        "_spring_security_remember_me": $("#rememberMe").is(":checked")
                                     }
-				}).done(function(msg) {
+                                }).done(function(msg) {
                                     password = "";
                                     if (msg.indexOf(springLoggedInStrCheck) == -1) {
-					Engage.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Successfully logged in. Please reload the page if the page does not reload automatically."));
-					location.reload();
+                                        Engage.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Successfully logged in. Please reload the page if the page does not reload automatically."));
+                                        location.reload();
                                     } else {
-					Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
+                                        Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
                                     }
                                     askedForLogin = false;
-				}).fail(function(msg) {
+                                }).fail(function(msg) {
                                     password = "";
                                     Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
                                     askedForLogin = false;
-				});
-			    } else {
-				askedForLogin = false;
-			    }
-			}
-		    }
-		},
-		className: "usernamePassword-modal",
-		onEscape: function() {
-		    askedForLogin = false;
-		},
-		closeButton: false
-	    });
+                                });
+                            } else {
+                                askedForLogin = false;
+                            }
+                        }
+                    }
+                },
+                className: "usernamePassword-modal",
+                onEscape: function() {
+                    askedForLogin = false;
+                },
+                closeButton: false
+            });
         }
     }
 
@@ -680,6 +683,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 isSliding = false;
                 Engage.trigger(plugin.events.sliderStop.getName(), ui.value);
             });
+            $("#" + id_slider).mouseover(function(e) {
+                e.preventDefault();
+                Engage.trigger(plugin.events.sliderMousein.getName());
+            }).mouseout(function(e) {
+                e.preventDefault();
+                Engage.trigger(plugin.events.sliderMouseout.getName());
+            }).mousemove(function(e) {
+                e.preventDefault();
+                var currPos = e.clientX / ($("#" + id_slider).width() + $("#" + id_slider).offset().left);
+                var dur = (duration && (duration > 0)) ? duration : 1;
+                currPos = (currPos < 0) ? 0 : ((currPos > 1) ? 1 : currPos);
+                Engage.trigger(plugin.events.sliderMousemove.getName(), currPos * dur);
+            });
+            // volume event
             $("#" + id_volume).on(event_slidestop, function(event, ui) {
                 Engage.trigger(plugin.events.unmute.getName());
             });
