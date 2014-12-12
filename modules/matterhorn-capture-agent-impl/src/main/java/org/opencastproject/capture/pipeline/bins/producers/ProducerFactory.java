@@ -132,7 +132,8 @@ public final class ProducerFactory {
    * Returns true if the ProducerType does require a source to create, returns false if ProducerType is null, doesn't
    * exist or doesn't require the source location.
    *
-   * @param type The type of Producer that needs to be checked whether it requires a source.
+   * @param type
+   *          The type of Producer that needs to be checked whether it requires a source.
    * @return Returns true if it requires a source, false otherwise.
    */
   public boolean requiresSrc(ProducerType type) {

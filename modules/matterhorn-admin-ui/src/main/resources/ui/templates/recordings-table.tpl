@@ -7,16 +7,26 @@
       </tr>
       <tr>
         <th class="ui-state-default ui-helper-hidden bulkSelect"><input type="checkbox" id="selectAllRecordings" onclick="ocRecordings.selectAll(this.checked);" /></th>
-        <th id="sortTitle" width="25%" class="ui-widget-header sortable"><div>Title<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
-    <th id="sortPresenter" width="15%" class="ui-widget-header sortable"><div>Presenter<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
-    <th id="sortSeries" width="15%" class="ui-widget-header sortable"><div>Course/Series<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
-    <% if (ocRecordings.Configuration.state == 'upcoming' || ocRecordings.Configuration.state == 'capturing') { %>
-    <th class="ui-widget-header" style="white-space:nowrap;padding-left:5px;padding-right:5px;">Capture Agent</th>
-    <% } %>
-    <th id="sortDate" width="18%" class="ui-widget-header sortable"><div>Recording Date&amp;Time<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
-    <th width="17%" class="ui-widget-header">Status</th>
-    <th width="10%" class="ui-widget-header">Action</th>
-    </tr>
+        <th id="sortTitle" width="30%" class="ui-widget-header sortable"><div class="column-title">Title<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
+    	<th id="sortPresenter" width="5%" class="ui-widget-header sortable"><div class="column-title">Presenter<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
+    	<th id="sortSeries" width="15%" class="ui-widget-header sortable"><div class="column-title">Course/Series<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
+        <th id="sortAgent" width="10%" class="ui-widget-header sortable"><div class="column-title">Capture Agent</div></th>
+    	<th id="sortDate" width="10%" class="ui-widget-header sortable"><div class="column-title">Recording Date &amp; Time<div class="sort-icon ui-icon ui-icon-triangle-2-n-s"></div></div></th>
+    	<% if (ocRecordings.Configuration.state == 'failed') { %>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div class="column-title">Failure Date &amp; Time</div></th>
+	<% } %>
+	<% if (ocRecordings.Configuration.state == 'finished') { %>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div class="column-title">Finished Date &amp; Time</div></th>
+	<% } %>
+	<% if (ocRecordings.Configuration.state == 'hold') { %>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div class="column-title">Hold Date &amp; Time</div></th>
+	<% } %>
+	<% if (ocRecordings.Configuration.state == 'processing') { %>
+	<th id="sortFailDate" width="10%" class="ui-widget-header"><div class="column-title">Processing Date &amp; Time</div></th>
+	<% } %>
+    	<th width="10%" class="ui-widget-header">Status</th>
+    	<th width="10%" class="ui-widget-header">Action</th>
+      </tr>
     </thead>
     <tbody>
       <% for(var i = 0; i < data[j].recordings.length; i++) { %>
@@ -33,14 +43,17 @@
         <td class="ui-state-active">
           <%! (data[j].recordings[i].seriesTitle) ? data[j].recordings[i].seriesTitle : ''  %>
         </td>
-        <% if (ocRecordings.Configuration.state == 'upcoming' || ocRecordings.Configuration.state == 'capturing') { %>
-        <td class="ui-state-active" style="white-space:nowrap;">
+        <td class="ui-state-active">
           <%= data[j].recordings[i].captureAgent %>
         </td>
-        <% } %>
         <td class="ui-state-active">
           <%= data[j].recordings[i].start %>
         </td>
+        <% if (ocRecordings.Configuration.state == 'failed' || ocRecordings.Configuration.state == 'hold' || ocRecordings.Configuration.state == 'finished' || ocRecordings.Configuration.state == 'processing') { %>
+  		  <td class="ui-state-active">
+            <%= data[j].recordings[i].end %>
+          </td>
+		<% } %>
         <td class="status-column-cell ui-state-active">
 
           <div class="workflowActionButton ui-helper-clearfix" style="float:left;">
@@ -52,8 +65,12 @@
             <% if (data[j].recordings[i].error) { %>
             <div class="foldable">
               <div class="fold-header" style="color:red;font-weight:bold;"><%= data[j].recordings[i].state %></div>
+              <% if (!data[j].recordings[i].incident) { %>
               <div class="fold-body">
                 <%= data[j].recordings[i].error %>
+              <% } else { %>
+              <div id="workflowId-<%= data[j].recordings[i].id %>" class="fold-body empty">
+              <% } %>
               </div>
             </div>
             <% } else { %>

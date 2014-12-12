@@ -658,11 +658,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           throw new IngestException(e);
         }
       }
+      in.close();
+    } catch (IOException e) {
+      logger.error("Error updating series from DublinCoreCatalog: {}", e.getMessage());
     } finally {
       IOUtils.closeQuietly(in);
       httpClient.close(response);
     }
   }
+
 
   /**
    * {@inheritDoc}

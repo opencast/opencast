@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-serviceregistry</artifactId>
   <name>matterhorn-serviceregistry</name>
@@ -7,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.5.1</version>
+    <version>1.6.0</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -18,6 +17,16 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-json</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-workflow-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -39,11 +48,6 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-json</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -110,7 +114,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.0.1</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
@@ -128,9 +131,15 @@
             <Service-Component>
               OSGI-INF/serviceregistry.xml,
               OSGI-INF/maintenance_shell.xml,
-              OSGI-INF/serviceregistry-endpoint.xml
+              OSGI-INF/serviceregistry-endpoint.xml,
+              OSGI-INF/incident-service.xml,
+              OSGI-INF/incident-service-endpoint.xml,
+              OSGI-INF/nop-service.xml
             </Service-Component>
-            <JPA-PersistenceUnits>org.opencastproject.serviceregistry</JPA-PersistenceUnits>
+            <JPA-PersistenceUnits>
+              org.opencastproject.serviceregistry,
+              org.opencastproject.incident
+            </JPA-PersistenceUnits>
           </instructions>
         </configuration>
       </plugin>

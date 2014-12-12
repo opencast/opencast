@@ -283,7 +283,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     SearchQuery searchQuery = new SearchQuery();
     searchQuery.withLimit(limit);
     searchQuery.withOffset(offset);
-    searchQuery.withCreationDateSort(true);
+    searchQuery.withSort(SearchQuery.Sort.DATE_CREATED);
     switch (type) {
       case Atom:
         if (atomTags != null && atomTags.size() > 0)
@@ -356,6 +356,12 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     // Create the feed
     Feed f = createFeed(type, getIdentifier(), new ContentImpl(getName()), new ContentImpl(getDescription()),
             getFeedLink());
+
+    // Set the copyright
+    if (StringUtils.isNotBlank(getCopyright()))
+      f.setCopyright(getCopyright());
+
+    // Adjust the feed encoding
     f.setEncoding(ENCODING);
 
     // Set iTunes tags
@@ -644,12 +650,16 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         trackLength = 0;
         if (((TrackImpl) element).hasVideo()) {
           List<VideoStream> video = ((TrackImpl) element).getVideo();
-          trackLength += metadata.getDcExtent() / 1000 * video.get(0).getBitRate() / 8;
+          if (video != null && video.get(0) != null && video.get(0).getBitRate() != null) {
+            trackLength += metadata.getDcExtent() / 1000 * video.get(0).getBitRate() / 8;
+          }
         }
 
         if (((TrackImpl) element).hasAudio()) {
           List<AudioStream> audio = ((TrackImpl) element).getAudio();
-          trackLength += metadata.getDcExtent() / 1000 * audio.get(0).getBitRate() / 8;
+          if (audio != null && audio.get(0) != null && audio.get(0).getBitRate() != null) {
+            trackLength += metadata.getDcExtent() / 1000 * audio.get(0).getBitRate() / 8;
+          }
         }
       }
 

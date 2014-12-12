@@ -15,6 +15,7 @@
  */
 package org.opencastproject.capture.pipeline.bins.producers;
 
+import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.pipeline.bins.CaptureDevice;
 import org.opencastproject.capture.pipeline.bins.CaptureDeviceNullPointerException;
 import org.opencastproject.capture.pipeline.bins.GStreamerElementFactory;
@@ -25,18 +26,26 @@ import org.opencastproject.capture.pipeline.bins.UnableToCreateGhostPadsForBinEx
 import org.opencastproject.capture.pipeline.bins.UnableToLinkGStreamerElementsException;
 import org.opencastproject.capture.pipeline.bins.UnableToSetElementPropertyBecauseElementWasNullException;
 
+import org.apache.commons.lang.StringUtils;
 import org.gstreamer.Element;
 import org.gstreamer.Pad;
 
 import java.util.Properties;
 
 public abstract class AudioProducer extends ProducerBin {
-
   /**
    * Audio convert is used to convert any input audio into a format usable by gstreamer. Might not be strictly
    * necessary.
    **/
   protected Element audioconvert;
+  /**
+   * Volume is used to control the volume level of the audio capture.
+   */
+  protected Element volume;
+  /**
+   * The volume level to set the volume element to.
+   */
+  private double volumeLevel = 1.0;
 
   /**
    * Super class for all audio Producers whether they are test, pulse, alsa or other. To create a descendant to create a
@@ -73,7 +82,7 @@ public abstract class AudioProducer extends ProducerBin {
   }
 
   /**
-   * Create all the common element for audio sources an audio converter.
+   * Create all the common element for audio sources an audio converter and a volume control.
    *
    * @throws UnableToCreateElementException
    *           If the necessary module to create an audioconverter isn't present then this Exception is thrown.
@@ -82,6 +91,27 @@ public abstract class AudioProducer extends ProducerBin {
     super.createElements();
     audioconvert = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(),
             GStreamerElements.AUDIOCONVERT, null);
+    volume = GStreamerElementFactory.getInstance().createElement(captureDevice.getFriendlyName(),
+            GStreamerElements.VOLUME, null);
+  }
+
+  /**
+   * @see org.opencastproject.capture.pipeline.bins.PartialBin#setElementProperties()
+   **/
+  @Override
+  protected synchronized void setElementProperties() throws UnableToSetElementPropertyBecauseElementWasNullException {
+    super.setElementProperties();
+    setVolumeProperties();
+  }
+
+  private void setVolumeProperties() {
+    String volumeString = StringUtils.trimToNull(properties.getProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX
+            + captureDevice.getFriendlyName() + CaptureParameters.CAPTURE_DEVICE_VOLUME));
+    if (volumeString != null) {
+      volumeLevel = Double.parseDouble(volumeString);
+    }
+    volume.set(CaptureParameters.CAPTURE_DEVICE_VOLUME.substring(1), volumeLevel);
+    logger.debug("Using a volume level of " + volumeLevel);
   }
 
   /**

@@ -1,14 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.opencastproject</groupId>
   <artifactId>matterhorn-lti</artifactId>
   <packaging>bundle</packaging>
   <name>matterhorn-lti</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.5.1</version>
+    <version>1.6.0</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -48,10 +46,9 @@
   </dependencies>
   <build>
     <plugins>
-    <plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>2.4.1</version>
         <executions>
           <execution>
             <id>copy-player</id>
@@ -70,13 +67,13 @@
                     <include>embed.html</include>
                     <include>preview.xml</include>
                     <include>playerProductInstall.swf/</include>
-                  </includes>                  
+                  </includes>
                   <filtering>false</filtering>
                 </resource>
               </resources>
             </configuration>
           </execution>
-            <execution>
+          <execution>
             <id>copy-player2</id>
             <phase>validate</phase>
             <goals>
@@ -89,7 +86,7 @@
                   <directory>../../shared-resources/player/</directory>
                   <includes>
                     <include>Videodisplay.swf/</include>
-                  </includes>                  
+                  </includes>
                   <filtering>false</filtering>
                 </resource>
               </resources>
@@ -107,9 +104,9 @@
                 <resource>
                   <directory>../../shared-resources/</directory>
                   <includes>
-                     <include>jquery/**</include>
-                     <include>trimpath/**</include>
-                  </includes>                  
+                    <include>jquery/**</include>
+                    <include>trimpath/**</include>
+                  </includes>
                   <filtering>false</filtering>
                 </resource>
               </resources>
@@ -165,10 +162,10 @@
                 <resource>
                   <directory>../../shared-resources/js/</directory>
                   <includes>
-                    <include> **/** </include> 
+                    <include> **/** </include>
                   </includes>
                   <excludes>
-                  <exclude> servicedata.json </exclude>
+                    <exclude> servicedata.json </exclude>
                   </excludes>
                   <filtering>false</filtering>
                 </resource>
@@ -214,30 +211,29 @@
             </configuration>
           </execution>
           <execution>
-			<id>copy-json</id>
-			<phase>validate</phase>
-			<goals>
-				<goal>copy-resources</goal>
-			</goals>
-			<configuration>
-				<outputDirectory>${basedir}/target/classes/tools/player/json</outputDirectory>
-				<resources>
-						<resource>
-							<directory>../../shared-resources/json/</directory>
-						<includes>
-							<include> **/** </include>
-						</includes>
-						<filtering>false</filtering>
-					</resource>
-				</resources>
-			</configuration>
-		</execution>
+            <id>copy-json</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/tools/player/json</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../shared-resources/json/</directory>
+                  <includes>
+                    <include> **/** </include>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.0.1</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
@@ -256,7 +252,6 @@
           </instructions>
         </configuration>
       </plugin>
-      
     </plugins>
   </build>
 </project>

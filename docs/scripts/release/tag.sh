@@ -8,14 +8,14 @@ FUNCTIONS="functions.sh"
 
 #The version the POMs are in the release branch.
 #E.g. BRANCH_VER=1.3-SNAPSHOT
-BRANCH_VER=
+BRANCH_VER=1.6.0-SNAPSHOT
 
 #The new version of our release as it will show up in the tags
 #E.g. RELEASE_VER=1.3-rc5
-RELEASE_VER=
+RELEASE_VER=1.6.0
 
 #The jira ticket this work is being done under (must be open)
-JIRA_TICKET=
+JIRA_TICKET=MH-10473
 
 #=======You should not need to modify anything below this line=================
 
@@ -54,9 +54,9 @@ updatePomVersions -w $WORK_DIR -o $BRANCH_VER -n $RELEASE_VER
 case "$RELEASE_TYPE" in
 0)
     # Release candidate
-    git commit -a -m "$JIRA_TICKET: Committing $RELEASE_VER to branch to contain POM changes and tag"
-    git tag $keyOpts -s $RELEASE_VER -m "Release $RELEASE_VER"
-    git revert --no-edit HEAD
+    git commit -a -m "$JIRA_TICKET: Committing $RELEASE_VER to branch to contain POM changes and tag" || exit 1
+    git tag $keyOpts -s $RELEASE_VER -m "Release $RELEASE_VER" || exit 1
+    git revert --no-edit HEAD || exit 1
 
     echo "Summary:"
     echo "-Modified pom files, and tagged $RELEASE_VER"
@@ -69,34 +69,32 @@ case "$RELEASE_TYPE" in
     ;;
 1)
     #Final release
-    git commit -a -m "$JIRA_TICKET: Committing $RELEASE_VER directly to $curBranch in preparation for final release."
+    git commit -a -m "$JIRA_TICKET: Committing $RELEASE_VER directly to $curBranch in preparation for final release." || exit 1
 
     #Final version of the branch into master, and tag!
-    git checkout master
-    git merge --no-ff r/$RELEASE_VER
-    git tag $keyOpts -s $RELEASE_VER -m "Release $RELEASE_VER"
+    git checkout master || exit 1
+    git merge -s recursive -Xtheirs --no-ff  $curBranch || exit 1
+    git tag $keyOpts -s $RELEASE_VER -m "Release $RELEASE_VER" || exit 1
 
     #Pop this off the release branch since we do not want the POM version changes in develop
     #(remember that we changed them with the branch script)
-    git checkout r/$RELEASE_VER
-    git revert --no-edit HEAD
+    git checkout r/$RELEASE_VER || exit 1
+    git revert --no-edit HEAD || exit 1
 
     #Merge everything into develop
-    git checkout develop
-    git merge --no-ff r/$RELEASE_VER
-    git branch -d r/$RELEASE_VER
+    git checkout develop || exit 1
+    git merge --no-ff $curBranch || exit 1
 
     echo "Summary:"
     echo "-Merged r/$RELEASE_VER into master"
     echo "-Merged r/$RELEASE_VER into develop"
-    echo "-Deleted local r/$RELEASE_VER"
     echo "We can push these changes to the public repo, and delete the remote branch for you as well."
     yesno -d no "Do you want this script to do that automatically for you?" push
     if [[ "$push" ]]; then
-        git push origin develop
-        git push origin master
-        git push --tags origin
-        git push origin :r/$RELEASE_VER
+        git push origin develop || exit 1
+        git push origin master || exit 1
+        git push --tags origin || exit 1
+        git push origin $curBranch || exit 1
     fi
     ;;
 esac

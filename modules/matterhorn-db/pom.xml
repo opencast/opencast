@@ -1,14 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.opencastproject</groupId>
   <artifactId>matterhorn-db</artifactId>
   <packaging>bundle</packaging>
   <name>matterhorn-db</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.5.1</version>
+    <version>1.6.0</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -74,7 +72,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.0.1</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
@@ -83,7 +80,7 @@
             <Import-Package>
                 *;resolution:=optional
              </Import-Package>
-             <Embed-Dependency>
+            <Embed-Dependency>
               c3p0;inline=true,
               h2;inline=true,
               mysql-connector-java;inline=true,

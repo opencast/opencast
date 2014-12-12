@@ -18,7 +18,6 @@ package org.opencastproject.textanalyzer.impl;
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.dictionary.api.DictionaryService;
-import org.opencastproject.dictionary.api.DictionaryService.DICT_TOKEN;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
@@ -36,7 +35,6 @@ import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition;
 import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
 import org.opencastproject.metadata.mpeg7.Textual;
-import org.opencastproject.metadata.mpeg7.TextualImpl;
 import org.opencastproject.metadata.mpeg7.Video;
 import org.opencastproject.metadata.mpeg7.VideoSegment;
 import org.opencastproject.metadata.mpeg7.VideoText;
@@ -55,14 +53,13 @@ import org.opencastproject.textextractor.api.TextLine;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -186,7 +183,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
         throw new TextAnalyzerException(e);
       }
     } else {
-      attachment = (Attachment) image;
+      attachment = image;
       imageUrl = attachment.getURI();
     }
 
@@ -300,14 +297,9 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    *           if accessing the image fails
    */
   protected VideoText[] analyze(File imageFile, String id) throws TextAnalyzerException {
-    boolean languagesInstalled;
-    if (dictionaryService.getLanguages().length == 0) {
-      languagesInstalled = false;
-      logger.warn("There are no language packs installed.  All text extracted from video will be considered valid.");
-    } else {
-      languagesInstalled = true;
-    }
 
+    /* Call the text extractor implementation to extract the text from the
+     * provided image file */
     List<VideoText> videoTexts = new ArrayList<VideoText>();
     TextFrame textFrame = null;
     try {
@@ -320,45 +312,21 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
       throw new TextAnalyzerException(e);
     }
 
+    /* Get detected text as raw string */
     int i = 1;
     for (TextLine line : textFrame.getLines()) {
-      VideoText videoText = new VideoTextImpl(id + "-" + i++);
-      videoText.setBoundary(line.getBoundaries());
-      Textual text = null;
-      if (languagesInstalled) {
-        String[] potentialWords = line.getText() == null ? new String[0] : line.getText().split("\\W");
-        String[] languages = dictionaryService.detectLanguage(potentialWords);
-        if (languages.length == 0) {
-          // There are languages installed, but these words are part of one of those languages
-          logger.debug("No languages found for '{}'.", line.getText());
-          continue;
-        } else {
-          String language = languages[0];
-          DICT_TOKEN[] tokens = dictionaryService.cleanText(potentialWords, language);
-          StringBuilder cleanLine = new StringBuilder();
-          for (int j = 0; j < potentialWords.length; j++) {
-            if (tokens[j] == DICT_TOKEN.WORD) {
-              if (cleanLine.length() > 0) {
-                cleanLine.append(" ");
-              }
-              cleanLine.append(potentialWords[j]);
-            }
-          }
-          // TODO: Ensure that the language returned by the dictionary is compatible with the MPEG-7 schema
-          text = new TextualImpl(cleanLine.toString(), language);
+      if (line.getText() != null) {
+        VideoText videoText = new VideoTextImpl(id + "-" + i++);
+        videoText.setBoundary(line.getBoundaries());
+        Textual text = dictionaryService.cleanUpText(line.getText());
+        if (text != null) {
+          videoText.setText(text);
+          videoTexts.add(videoText);
         }
-      } else {
-        logger.debug("No languages installed.  For better results, please install at least one language pack");
-        text = new TextualImpl(line.getText());
-      }
-
-      if (StringUtils.isNotBlank(text.getText())) {
-        videoText.setText(text);
-        videoTexts.add(videoText);
-      } else {
-        logger.debug("No valid text found for line '{}'", line);
       }
     }
+
+
     return videoTexts.toArray(new VideoText[videoTexts.size()]);
   }
 

@@ -15,12 +15,11 @@
  */
 package org.opencastproject.fsresources;
 
-import java.io.BufferedReader;
-import java.util.logging.Level;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,6 +28,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.zip.CRC32;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -161,7 +161,7 @@ public class StaticResourceServlet extends HttpServlet {
           return;
         }
         if (ranges.size() == 1) {
-          Range range = (Range) ranges.get(0);
+          Range range = ranges.get(0);
           resp.addHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + range.length);
           long length = range.end - range.start + 1;
           if (length < Integer.MAX_VALUE) {
@@ -228,7 +228,7 @@ public class StaticResourceServlet extends HttpServlet {
   protected void copy(File f, ServletOutputStream out, Iterator<Range> ranges, String contentType) throws IOException {
     IOException exception = null;
     while ((exception == null) && (ranges.hasNext())) {
-      Range currentRange = (Range) ranges.next();
+      Range currentRange = ranges.next();
       // Writing MIME header.
       out.println();
       out.println("--" + mimeSeparation);
@@ -384,29 +384,34 @@ public class StaticResourceServlet extends HttpServlet {
     } catch (IOException e) {
       return e;
     }
-    IOException exception = null;
+    // MH-10447, fix for files of size 2048*C bytes
     long bytesToRead = end - start + 1;
     byte[] buffer = new byte[2048];
     int len = buffer.length;
-    while ((bytesToRead > 0) && (len >= buffer.length)) {
-      try {
-        len = istream.read(buffer);
-        if (bytesToRead >= len) {
+    try {
+      len = (int) bytesToRead % buffer.length;
+      if (len > 0) {
+        len = istream.read(buffer, 0, len);
+        if (len > 0) {
+          // This test coud actually be "if (len != -1)"
           ostream.write(buffer, 0, len);
           bytesToRead -= len;
-        } else {
-          ostream.write(buffer, 0, (int) bytesToRead);
-          bytesToRead = 0;
-        }
-      } catch (IOException e) {
-        exception = e;
-        len = -1;
+          if (bytesToRead == 0)
+            return null;
+        } else
+          return null;
       }
-      if (len < buffer.length) {
-        break;
+
+      for (len = istream.read(buffer); len > 0; len = istream.read(buffer)) {
+        ostream.write(buffer, 0, len);
+        bytesToRead -= len;
+        if (bytesToRead < 1)
+          break;
       }
+    } catch (IOException e) {
+      return e;
     }
-    return exception;
+    return null;
   }
 
   protected class Range {
