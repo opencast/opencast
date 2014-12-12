@@ -31,6 +31,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.spi.PersistenceProvider;
 
 /**
@@ -68,15 +70,26 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /** The security service */
   protected SecurityService securityService;
 
-  /**
+  /** Whether the persistence provider has been set */
+  private boolean hasPersistence = false;
+
+  /** Whether the persistence properties have been set */
+  private boolean hasPersistenceProperties = false;
+
+ /**
    * Creates {@link EntityManagerFactory} using persistence provider and properties passed via OSGi.
    *
    * @param cc
+   * @throws SearchServiceDatabaseException 
    */
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc) throws SearchServiceDatabaseException {
     logger.info("Activating persistence manager for search service");
     emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.search.impl.persistence",
             persistenceProperties);
+    this.hasPersistence = true;
+    if (this.hasPersistenceProperties) {
+      this.populateSeriesData();
+    }
   }
 
   /**
@@ -93,9 +106,14 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    *
    * @param persistenceProperties
    *          persistence properties
+   * @throws SearchServiceDatabaseException 
    */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
+  public void setPersistenceProperties(Map<String, Object> persistenceProperties) throws SearchServiceDatabaseException {
     this.persistenceProperties = persistenceProperties;
+    this.hasPersistenceProperties = true;
+    if (this.hasPersistence) {
+      this.populateSeriesData();
+    }
   }
 
   /**
@@ -116,6 +134,36 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  private void populateSeriesData() throws SearchServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      TypedQuery<SearchEntity> q = (TypedQuery<SearchEntity>) em.createNamedQuery("Search.getNoSeries");
+      List<SearchEntity> seriesList = q.getResultList();
+      for (SearchEntity series : seriesList) {
+        String mpSeriesId = MediaPackageParser.getFromXml(series.getMediaPackageXML()).getSeries();
+        if (StringUtils.isNotBlank(mpSeriesId) && !mpSeriesId.equals(series.getSeriesId())) {
+          logger.info("Fixing missing series ID for episode {}, series is {}", series.getMediaPackageId(), mpSeriesId);
+          series.setSeriesId(mpSeriesId);
+          em.merge(series);
+        }
+      }
+      tx.commit();
+    } catch (Exception e) {
+      logger.error("Could not update media package: {}", e.getMessage());
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw new SearchServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
   }
 
   /**
@@ -253,6 +301,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         searchEntity.setMediaPackageXML(mediaPackageXML);
         searchEntity.setAccessControl(AccessControlParser.toXml(acl));
         searchEntity.setModificationDate(now);
+        searchEntity.setSeriesId(mediaPackage.getSeries());
         em.persist(searchEntity);
       } else {
         // Ensure this user is allowed to update this media package
@@ -271,6 +320,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         entity.setMediaPackageXML(mediaPackageXML);
         entity.setAccessControl(AccessControlParser.toXml(acl));
         entity.setModificationDate(now);
+        entity.setSeriesId(mediaPackage.getSeries());
         em.merge(entity);
       }
       tx.commit();
