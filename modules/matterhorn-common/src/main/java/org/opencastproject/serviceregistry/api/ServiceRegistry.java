@@ -21,14 +21,12 @@ import org.opencastproject.util.NotFoundException;
 
 import java.util.List;
 
-/**
- * Manages clustered services and the {@link Job}s they may create to enable asynchronous job handling.
- */
+/** Manages clustered services and the {@link Job}s they may create to enable asynchronous job handling. */
 public interface ServiceRegistry {
 
   /**
    * Registers a host as a provider of Matterhorn services.
-   * 
+   *
    * @param host
    *          The base URL for this server
    * @param maxConcurrentJobs
@@ -40,7 +38,7 @@ public interface ServiceRegistry {
 
   /**
    * Removes a Matterhorn server from service.
-   * 
+   *
    * @param host
    *          The base URL for this server
    * @throws ServiceRegistryException
@@ -50,10 +48,9 @@ public interface ServiceRegistry {
 
   /**
    * Enable an inactive host as a provider of Matterhorn services.
-   * 
+   *
    * @param host
    *          The base URL for this server
-   * 
    * @throws NotFoundException
    *           if the host does not exist
    * @throws ServiceRegistryException
@@ -63,7 +60,7 @@ public interface ServiceRegistry {
 
   /**
    * Disables a Matterhorn server from service.
-   * 
+   *
    * @param host
    *          The base URL for this server
    * @throws NotFoundException
@@ -75,7 +72,7 @@ public interface ServiceRegistry {
 
   /**
    * Returns the total number of jobs that can be handled by the currently registered hosts.
-   * 
+   *
    * @return the total number of jobs that can be processed concurrently
    * @throws ServiceRegistryException
    *           if communication with the service registry fails
@@ -84,22 +81,22 @@ public interface ServiceRegistry {
 
   /**
    * Registers a host to handle a specific type of job
-   * 
+   *
    * @param serviceType
    *          The job type
    * @param host
    *          The base URL where the service that can handle this service type can be found
    * @param path
    *          The path to the service endpoint
+   * @return the service registration
    * @throws ServiceRegistryException
    *           if communication with the service registry fails
-   * @return the service registration
    */
   ServiceRegistration registerService(String serviceType, String host, String path) throws ServiceRegistryException;
 
   /**
    * Registers a host to handle a specific type of job
-   * 
+   *
    * @param serviceType
    *          The service type
    * @param host
@@ -108,16 +105,16 @@ public interface ServiceRegistry {
    *          The path to the service endpoint
    * @param jobProducer
    *          Whether this service registration produces {@link Job}s to track long running operations
+   * @return the service registration
    * @throws ServiceRegistryException
    *           if communication with the service registry fails
-   * @return the service registration
    */
   ServiceRegistration registerService(String serviceType, String host, String path, boolean jobProducer)
           throws ServiceRegistryException;
 
   /**
    * Unregisters a host from handling a specific type of job
-   * 
+   *
    * @param serviceType
    *          The service type
    * @param host
@@ -129,7 +126,7 @@ public interface ServiceRegistry {
 
   /**
    * Sets a registered host's maintenance status
-   * 
+   *
    * @param host
    *          The base URL where the service that can handle this service type can be found
    * @param maintenance
@@ -149,7 +146,7 @@ public interface ServiceRegistry {
    * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
    * need the link.
    * </p>
-   * 
+   *
    * @param type
    *          the type of service responsible for this job
    * @param operation
@@ -168,7 +165,7 @@ public interface ServiceRegistry {
    * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
    * need the link.
    * </p>
-   * 
+   *
    * @param type
    *          the type of service responsible for this job
    * @param operation
@@ -189,7 +186,7 @@ public interface ServiceRegistry {
    * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
    * need the link.
    * </p>
-   * 
+   *
    * @param type
    *          the type of service responsible for this job
    * @param operation
@@ -213,7 +210,7 @@ public interface ServiceRegistry {
    * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
    * need the link.
    * </p>
-   * 
+   *
    * @param type
    *          the type of service responsible for this job
    * @param operation
@@ -236,7 +233,7 @@ public interface ServiceRegistry {
    * Create and store a new job. If <code>enqueueImmediately</code> is true, the job will be in the
    * {@link Status#QUEUED} state and will be dispatched as soon as possible. Otherwise, it will be
    * {@link Status#INSTANTIATED}.
-   * 
+   *
    * @param type
    *          the type of service responsible for this job
    * @param operation
@@ -259,7 +256,7 @@ public interface ServiceRegistry {
 
   /**
    * Update the job in the database
-   * 
+   *
    * @param job
    * @return the updated job
    * @throws NotFoundException
@@ -271,7 +268,7 @@ public interface ServiceRegistry {
 
   /**
    * Gets a receipt by its ID, or null if not found
-   * 
+   *
    * @param id
    *          the job id
    * @return the job or null
@@ -279,15 +276,34 @@ public interface ServiceRegistry {
   Job getJob(long id) throws NotFoundException, ServiceRegistryException;
 
   /**
-   * Gets the current running job
+   * Deletes a job from the service registry
    * 
+   * @param id
+   *          the job id
+   */
+  void removeJob(long id) throws NotFoundException, ServiceRegistryException;
+
+  /**
+   * Removes all jobs which do not have a parent job (except workflow instance jobs) and which have passed their
+   * lifetime.
+   * 
+   * @param lifetime
+   *          lifetime in days
+   * @throws ServiceRegistryException
+   *           if removing the jobs fails
+   */
+  void removeParentlessJobs(int lifetime) throws ServiceRegistryException;
+
+  /**
+   * Gets the current running job
+   *
    * @return the current job
    */
   Job getCurrentJob();
 
   /**
    * Sets the current running job
-   * 
+   *
    * @param job
    *          the current job
    */
@@ -295,7 +311,7 @@ public interface ServiceRegistry {
 
   /**
    * Gets the list of jobs that match the specified parameters.
-   * 
+   *
    * @param serviceType
    *          The jobs run by this type of service. If null, jobs from all hosts will be returned.
    * @param status
@@ -308,18 +324,25 @@ public interface ServiceRegistry {
 
   /**
    * Get all child jobs from a job
-   * 
+   *
    * @param id
    *          the parent job id
    * @return a list of the child jobs ordered by execution
    * @throws ServiceRegistryException
    *           if there is a problem accessing the service registry
    */
-  List<Job> getChildJobs(long id) throws NotFoundException, ServiceRegistryException;
+  List<Job> getChildJobs(long id) throws ServiceRegistryException;
+
+  /**
+   * Return a facility to record job incidents.
+   *
+   * @see org.opencastproject.job.api.Incident
+   */
+  Incidents incident();
 
   /**
    * Finds the service registrations for this kind of job, ordered by load (lightest to heaviest).
-   * 
+   *
    * @param serviceType
    *          The type of service that must be handled by the hosts
    * @return A list of hosts that handle this job type, in order of their running and queued job load
@@ -330,7 +353,7 @@ public interface ServiceRegistry {
 
   /**
    * Finds the service registrations for this kind of job, including offline services and those in maintenance mode.
-   * 
+   *
    * @param serviceType
    *          The type of service that must be handled by the hosts
    * @return A list of hosts that handle this job type
@@ -341,7 +364,7 @@ public interface ServiceRegistry {
 
   /**
    * Finds the service registrations on the given host, including offline services and those in maintenance mode.
-   * 
+   *
    * @param host
    *          The host
    * @return A list of service registrations on a single host
@@ -352,7 +375,7 @@ public interface ServiceRegistry {
 
   /**
    * Finds a single service registration by host and type, even if the service is offline or in maintenance mode.
-   * 
+   *
    * @param serviceType
    *          The type of service
    * @param host
@@ -365,7 +388,7 @@ public interface ServiceRegistry {
 
   /**
    * Finds all service registrations, including offline services and those in maintenance mode.
-   * 
+   *
    * @return A list of service registrations
    * @throws ServiceRegistryException
    *           if there is a problem accessing the service registry
@@ -374,7 +397,7 @@ public interface ServiceRegistry {
 
   /**
    * Finds all host registrations, including offline hosts and those in maintenance mode.
-   * 
+   *
    * @return A list of host registrations
    * @throws ServiceRegistryException
    *           if there is a problem accessing the service registry
@@ -383,7 +406,7 @@ public interface ServiceRegistry {
 
   /**
    * Gets performance and runtime statistics for each known service registration.
-   * 
+   *
    * @return the service statistics
    * @throws ServiceRegistryException
    *           if there is a problem accessing the service registry
@@ -391,8 +414,16 @@ public interface ServiceRegistry {
   List<ServiceStatistics> getServiceStatistics() throws ServiceRegistryException;
 
   /**
+   * Gets the count of the number of abnormal services across the whole system.
+   *
+   * @return the count of abnormal services
+   * @throws ServiceRegistryException
+   */
+  long countOfAbnormalServices() throws ServiceRegistryException;
+
+  /**
    * Count the number of jobs of this type in this {@link Status} across all hosts.
-   * 
+   *
    * @param serviceType
    *          The jobs run by this type of service. If null, the returned count will refer to all types of jobs.
    * @param status
@@ -405,7 +436,7 @@ public interface ServiceRegistry {
 
   /**
    * Count the number of jobs running the given operation in this {@link Status}.
-   * 
+   *
    * @param serviceType
    *          The jobs run by this type of service
    * @param operation
@@ -420,7 +451,7 @@ public interface ServiceRegistry {
 
   /**
    * Count the number of jobs in this {@link Status} on this host
-   * 
+   *
    * @param serviceType
    *          The jobs run by this type of service
    * @param host
@@ -435,7 +466,7 @@ public interface ServiceRegistry {
 
   /**
    * Count the number of jobs executing the given operation in this {@link Status} on this host.
-   * 
+   *
    * @param serviceType
    *          The jobs run by this type of service
    * @param host
@@ -452,9 +483,8 @@ public interface ServiceRegistry {
 
   /**
    * Get the load factors for each registered node.
-   * 
+   *
    * @return the load values
-   * 
    * @throws ServiceRegistryException
    *           if there is a problem accessing the service registry
    */
@@ -462,7 +492,7 @@ public interface ServiceRegistry {
 
   /**
    * Sets the given service to NORMAL state
-   * 
+   *
    * @param serviceType
    *          the service type
    * @param host

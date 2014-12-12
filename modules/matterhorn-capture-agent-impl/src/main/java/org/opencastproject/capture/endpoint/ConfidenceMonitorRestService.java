@@ -72,14 +72,14 @@ public class ConfidenceMonitorRestService {
 
   /**
    * Callback from OSGi that is called when this service is activated.
-   * 
+   *
    * @param cc
    *          OSGi component context
    */
   public void activate(ComponentContext cc) {
   }
 
-  
+
   /**
    * OSGI activate method. Will be called on service activation.
    */
@@ -89,7 +89,7 @@ public class ConfidenceMonitorRestService {
 
   /**
    * Set {@link org.opencastproject.capture.api.ConfidenceMonitor} service.
-   * 
+   *
    * @param service
    *          Service implemented {@link org.opencastproject.capture.api.ConfidenceMonitor}
    */
@@ -99,7 +99,7 @@ public class ConfidenceMonitorRestService {
 
   /**
    * Unset {@link org.opencastproject.capture.api.ConfidenceMonitor} service.
-   * 
+   *
    * @param service
    *          Service implemented {@link org.opencastproject.capture.api.ConfidenceMonitor}
    */
@@ -109,7 +109,7 @@ public class ConfidenceMonitorRestService {
 
   /**
    * Gets the most recent frame from the monitoring service
-   * 
+   *
    * @param device
    *          The name of the device from which you want a frame
    * @return The image as a image/jpeg
@@ -136,7 +136,7 @@ public class ConfidenceMonitorRestService {
 
   /**
    * Gets a list of available devices from the monitoring service
-   * 
+   *
    * @return The list of devices in XML format
    */
   @GET
@@ -187,7 +187,7 @@ public class ConfidenceMonitorRestService {
 
   /**
    * Returns the RMS values for device after a given Unix timestamp.
-   * 
+   *
    * @param device
    *          Friendly name of the audio device
    * @param timestamp

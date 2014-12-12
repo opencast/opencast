@@ -8,42 +8,18 @@
   <description>Republish the recording metadata</description>
   <operations>
 
-    <!-- tag the dublin core catalogs so they will be distributed and added to search -->
+    <!-- Download and Republish recording metadata -->
 
     <operation
-      id="tag"
-      description="Tagging dublin core catalogs for publishing">
-      <configurations>
-        <configuration key="source-flavors">dublincore/*</configuration>
-        <configuration key="target-tags">+distribute</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Distribute to download server -->
-
-    <operation
-      id="distribute-download"
+      id="publish-engage"
       max-attempts="2"
       fail-on-error="false"
       exception-handler-workflow="error"
-      description="Distributing to progressive downloads">
+      description="Download and Publish to Engage">
       <configurations>
-        <configuration key="source-tags">distribute</configuration>
+        <configuration key="download-source-flavors">dublincore/*</configuration>
+        <configuration key="merge-only">true</configuration>
         <configuration key="check-availability">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Republish the recording -->
-
-    <operation
-      id="republish"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Published">
-      <configurations>
-        <configuration key="source-flavors">dublincore/episode, dublincore/series</configuration>
-        <configuration key="merge">true</configuration>
-        <configuration key="existing-only">true</configuration>
       </configurations>
     </operation>
 

@@ -31,7 +31,7 @@ public class EmbeddedSolrServerWrapper extends EmbeddedSolrServer {
 
   /**
    * Creates a new wrapped instance of the
-   * 
+   *
    * @param coreContainer
    *          the core container
    * @param coreName

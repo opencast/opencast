@@ -25,10 +25,10 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.security.api.User;
 import org.opencastproject.series.impl.SeriesServiceDatabase;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.util.NotFoundException;
@@ -79,7 +79,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /**
    * Creates {@link EntityManagerFactory} using persistence provider and properties passed via OSGi.
-   * 
+   *
    * @param cc
    */
   public void activate(ComponentContext cc) {
@@ -90,7 +90,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /**
    * Closes entity manager factory.
-   * 
+   *
    * @param cc
    */
   public void deactivate(ComponentContext cc) {
@@ -99,7 +99,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /**
    * OSGi callback to set persistence properties.
-   * 
+   *
    * @param persistenceProperties
    *          persistence properties
    */
@@ -109,7 +109,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /**
    * OSGi callback to set persistence provider.
-   * 
+   *
    * @param persistenceProvider
    *          {@link PersistenceProvider} object
    */
@@ -119,7 +119,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /**
    * OSGi callback to set the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -129,7 +129,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /**
    * OSGi callback to set dublin core catalog service.
-   * 
+   *
    * @param dcService
    *          {@link DublinCoreCatalogService} object
    */
@@ -139,7 +139,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /**
    * Serializes Dublin core catalog and returns it as String.
-   * 
+   *
    * @param dc
    *          {@link DublinCoreCatalog} to be serialized
    * @return String presenting serialized dublin core
@@ -157,7 +157,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /**
    * Parses Dublin core stored as string.
-   * 
+   *
    * @param dcXML
    *          string representation of Dublin core
    * @return parsed {@link DublinCoreCatalog}
@@ -171,7 +171,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#deleteSeries(java.lang.String)
    */
   @Override
@@ -211,7 +211,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#getAllSeries()
    */
   @SuppressWarnings("unchecked")
@@ -243,7 +243,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#getAccessControlList(java.lang.String)
    */
   @Override
@@ -272,7 +272,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#storeSeries(org.opencastproject.metadata.dublincore.
    * DublinCoreCatalog)
    */
@@ -334,7 +334,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#getSeries(java.lang.String)
    */
   @Override
@@ -376,7 +376,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#storeSeriesAccessControl(java.lang.String,
    * org.opencastproject.security.api.AccessControlList)
    */
@@ -450,7 +450,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /**
    * Gets a series by its ID, using the current organizational context.
-   * 
+   *
    * @param id
    *          the series identifier
    * @param em

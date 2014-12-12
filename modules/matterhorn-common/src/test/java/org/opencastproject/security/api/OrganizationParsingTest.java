@@ -47,36 +47,39 @@ public class OrganizationParsingTest {
 
   private boolean compareXMLattsEqual(String in1, String in2) {
     if (in1.equals(in2)) {
-      return  true;
-    }        
+      return true;
+    }
     String[] strings1 = StringUtils.stripEnd(in1, " /").split(" ");
     String[] strings2 = StringUtils.stripEnd(in2, " /").split(" ");
     Arrays.sort(strings1);
     Arrays.sort(strings2);
-    assertEquals("Organization XML not formed as expected - error in number of XML attributes", strings1.length, strings2.length);
+    assertEquals("Organization XML not formed as expected - error in number of XML attributes", strings1.length,
+            strings2.length);
     for (int i = 0; i < strings1.length; i++) {
-      if (!(strings1[i].equals(strings2[i]))) { 
-        assertEquals("Organization XML not formed as expected - xml-attributes don't match", "<" + in1 + ">","<" + in2 + ">");
+      if (!(strings1[i].equals(strings2[i]))) {
+        assertEquals("Organization XML not formed as expected - xml-attributes don't match", "<" + in1 + ">", "<" + in2
+                + ">");
       }
-    }  
+    }
     return true;
   }
-  
+
   private boolean compareXMLTagsEqual(String in1, String in2) {
     if (in1.equals(in2)) {
       return true;
     }
     String[] strings1 = in1.split("><");
     String[] strings2 = in2.split("><");
-    
+
     Arrays.sort(strings1);
     Arrays.sort(strings2);
-    assertEquals("Organization XML not formed as expected - error in number of XML tags", strings1.length, strings2.length);
+    assertEquals("Organization XML not formed as expected - error in number of XML tags", strings1.length,
+            strings2.length);
     for (int i = 0; i < strings1.length; i++) {
-      if (!compareXMLattsEqual(strings1[i],strings2[i])) { 
-        return false; 
+      if (!compareXMLattsEqual(strings1[i], strings2[i])) {
+        return false;
       }
-    }  
+    }
     return true;
   }
 
@@ -94,11 +97,11 @@ public class OrganizationParsingTest {
           break;
         }
       }
-     assertTrue(found);
+      assertTrue(found);
     }
     assertEquals(org.getProperties(), organization.getProperties());
   }
-  
+
   @Test
   public void testMarshalOrganization() throws Exception {
     StringWriter writer = new StringWriter();
@@ -107,16 +110,16 @@ public class OrganizationParsingTest {
 
     String expectedOutput = IOUtils.toString(getClass().getResourceAsStream(ORG_XML_FILE), "UTF-8");
     String producedOutput = writer.toString();
-   
+
     boolean val = compareXMLTagsEqual(expectedOutput, producedOutput);
-    assertTrue("Organization XML not formed as expected",val);
+    assertTrue("Organization XML not formed as expected", val);
 
     StreamSource streamSource = new StreamSource(new StringReader(producedOutput));
     JaxbOrganization organization = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbOrganization.class)
             .getValue();
     compareOrgs(org, organization);
   }
-  
+
   @Test
   public void testUnmarshalOrganization() throws Exception {
     Organization org = new DefaultOrganization();

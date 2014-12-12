@@ -18,11 +18,11 @@ package org.opencastproject.capture.impl;
 /** This class is used to throw exceptions while trying to start a capture. **/
 public class UnableToStartCaptureException extends RuntimeException {
   private static final long serialVersionUID = 3683577250029869724L;
-  private String message; 
+  private String message;
   public UnableToStartCaptureException(String message) {
-    this.message = message;    
+    this.message = message;
   }
-  
+
   @Override
   public String getMessage() {
     return message;

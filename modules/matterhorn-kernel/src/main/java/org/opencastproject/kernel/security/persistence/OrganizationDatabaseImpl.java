@@ -55,7 +55,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
 
   /**
    * Creates {@link EntityManagerFactory} using persistence provider and properties passed via OSGi.
-   * 
+   *
    * @param cc
    */
   public void activate(ComponentContext cc) {
@@ -65,7 +65,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
 
   /**
    * Closes entity manager factory.
-   * 
+   *
    * @param cc
    */
   public void deactivate(ComponentContext cc) {
@@ -74,7 +74,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
 
   /**
    * OSGi callback to set persistence properties.
-   * 
+   *
    * @param persistenceProperties
    *          persistence properties
    */
@@ -84,7 +84,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
 
   /**
    * OSGi callback to set persistence provider.
-   * 
+   *
    * @param persistenceProvider
    *          {@link PersistenceProvider} object
    */
@@ -94,7 +94,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
 
   /**
    * OSGi callback to set the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -153,6 +153,9 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
         organizationEntity.setName(org.getName());
         organizationEntity.setAdminRole(org.getAdminRole());
         organizationEntity.setAnonymousRole(org.getAnonymousRole());
+        for (Map.Entry<String, Integer> servers : org.getServers().entrySet()) {
+          organizationEntity.addServer(servers.getKey(), servers.getValue());
+        }
         organizationEntity.setServers(org.getServers());
         organizationEntity.setProperties(org.getProperties());
         em.merge(organizationEntity);
@@ -265,7 +268,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
 
   /**
    * Return the persisted organization entity by its id
-   * 
+   *
    * @param id
    *          the organization id
    * @param em

@@ -16,21 +16,27 @@
 
 package org.opencastproject.composer.impl;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.composer.api.EncoderEngine;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncoderListener;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Option;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -40,8 +46,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
+import javax.activation.MimetypesFileTypeMap;
 
 /**
  * Wrapper around any kind of command line controllable encoder.
@@ -51,10 +56,7 @@ import static org.opencastproject.util.data.Option.some;
  * only <em>one</em> file will be the result of the encoding. Imagine encoding to an image series.
  */
 public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine implements EncoderEngine {
-
-  /**
-   * If true STDERR and STDOUT of the spawned process will be mixed so that both can be read via STDIN
-   */
+  /** If true STDERR and STDOUT of the spawned process will be mixed so that both can be read via STDIN */
   private static final boolean REDIRECT_ERROR_STREAM = true;
 
   /** the encoder binary */
@@ -83,39 +85,41 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#needsLocalWorkCopy()
    */
+  @Override
   public boolean needsLocalWorkCopy() {
     return false;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#encode(java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
   @Override
-  public Option<File> encode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException {
-    return process(null, mediaSource, format, properties);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.composer.api.EncoderEngine#trim(java.io.File,
-   *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
-   */
-  @Override
-  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
+  public Option<File> encode(File mediaSource, EncodingProfile format, Map<String, String> properties)
           throws EncoderException {
     return process(null, mediaSource, format, properties);
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
+   * @see org.opencastproject.composer.api.EncoderEngine#trim(java.io.File,
+   *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
+   */
+  @Override
+  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration,
+          Map<String, String> properties) throws EncoderException {
+    return process(null, mediaSource, format, properties);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see org.opencastproject.composer.api.EncoderEngine#mux(java.io.File, java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile, java.util.Map)
    */
@@ -127,21 +131,24 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * (non-Javadoc)
-   * 
-   * @see org.opencastproject.composer.api.EncoderEngine#extract(java.io.File,
-   *      org.opencastproject.composer.api.EncodingProfile, java.util.Map, long[])
+   *
+   * @see org.opencastproject.composer.api.EncoderEngine#extract(File, EncodingProfile, Map, double...)
    */
   @Override
-  public List<File> extract(File mediaSource, EncodingProfile format, Map<String, String> properties, long... times)
+  public List<File> extract(File mediaSource, EncodingProfile format, Map<String, String> properties, double... times)
           throws EncoderException {
 
     List<File> extractedImages = new LinkedList<File>();
-    for (long time : times) {
+    for (double time : times) {
       Map<String, String> params = new HashMap<String, String>();
       if (properties != null) {
         params.putAll(properties);
       }
-      params.put("time", Long.toString(time));
+
+      DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
+      ffmpegFormat.setDecimalSeparator('.');
+      DecimalFormat df = new DecimalFormat("0.000", ffmpegFormat);
+      params.put("time", df.format(time));
       try {
         for (File image : process(null, mediaSource, format, params)) {
           extractedImages.add(image);
@@ -162,7 +169,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   /**
    * Executes the command line encoder with the given set of files and properties and using the provided encoding
    * profile.
-   * 
+   *
    * @param audioSource
    *          the audio file (used when muxing)
    * @param videoSource
@@ -175,68 +182,55 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    * @throws EncoderException
    *           if processing fails
    */
-  protected Option<File> process(File audioSource, File videoSource, EncodingProfile profile, Map<String, String> properties)
-          throws EncoderException {
+  protected Option<File> process(File audioSource, File videoSource, EncodingProfile profile,
+          Map<String, String> properties) throws EncoderException {
     // Fist, update the parameters
     if (properties != null)
       params.putAll(properties);
     // build command
-    BufferedReader in = null;
-    Process encoderProcess = null;
     if (videoSource == null && audioSource == null) {
       throw new IllegalArgumentException("At least one track must be specified.");
     }
+    // Set encoding parameters
+    if (audioSource != null) {
+      final String audioInput = FilenameUtils.normalize(audioSource.getAbsolutePath());
+      params.put("in.audio.path", audioInput);
+      params.put("in.audio.name", FilenameUtils.getBaseName(audioInput));
+      params.put("in.audio.suffix", FilenameUtils.getExtension(audioInput));
+      params.put("in.audio.filename", FilenameUtils.getName(audioInput));
+      params.put("in.audio.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(audioInput));
+    }
+    if (videoSource != null) {
+      final String videoInput = FilenameUtils.normalize(videoSource.getAbsolutePath());
+      params.put("in.video.path", videoInput);
+      params.put("in.video.name", FilenameUtils.getBaseName(videoInput));
+      params.put("in.video.suffix", FilenameUtils.getExtension(videoInput));
+      params.put("in.video.filename", FilenameUtils.getName(videoInput));
+      params.put("in.video.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(videoInput));
+    }
+    final File parentFile = videoSource != null ? videoSource : audioSource;
+
+    final String outDir = parentFile.getAbsoluteFile().getParent();
+    final String outSuffix = processParameters(profile.getSuffix());
+    final String outFileName = FilenameUtils.getBaseName(parentFile.getName())
+            + (params.containsKey("time") ? "_" + properties.get("time") : "")
+            // generate random name if multiple jobs are producing file with identical name (MH-7673)
+            + "_" + UUID.randomUUID().toString();
+    params.put("out.dir", outDir);
+    params.put("out.name", outFileName);
+    params.put("out.suffix", outSuffix);
+
+    // create encoder process.
+    // no special working dir is set which means the working dir of the
+    // current java process is used.
+    // TODO: Parallelisation (threading)
+    final List<String> command = buildCommand(profile);
+    final String commandStr = mlist(command).mkString(" ");
+    logger.info("Executing encoding command: {}", commandStr);
+
+    BufferedReader in = null;
+    Process encoderProcess = null;
     try {
-      // Set encoding parameters
-      String audioInput = null;
-      if (audioSource != null) {
-        audioInput = FilenameUtils.normalize(audioSource.getAbsolutePath());
-        params.put("in.audio.path", audioInput);
-        params.put("in.audio.name", FilenameUtils.getBaseName(audioInput));
-        params.put("in.audio.suffix", FilenameUtils.getExtension(audioInput));
-        params.put("in.audio.filename", FilenameUtils.getName(audioInput));
-        params.put("in.audio.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(audioInput));
-      }
-      if (videoSource != null) {
-        String videoInput = FilenameUtils.normalize(videoSource.getAbsolutePath());
-        params.put("in.video.path", videoInput);
-        params.put("in.video.name", FilenameUtils.getBaseName(videoInput));
-        params.put("in.video.suffix", FilenameUtils.getExtension(videoInput));
-        params.put("in.video.filename", FilenameUtils.getName(videoInput));
-        params.put("in.video.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(videoInput));
-      }
-      File parentFile;
-      if (videoSource == null) {
-        parentFile = audioSource;
-      } else {
-        parentFile = videoSource;
-      }
-      String outDir = parentFile.getAbsoluteFile().getParent();
-      String outFileName = FilenameUtils.getBaseName(parentFile.getName());
-      String outSuffix = processParameters(profile.getSuffix());
-
-      if (params.containsKey("time")) {
-        outFileName += "_" + properties.get("time");
-      }
-
-      // generate random name if multiple jobs are producing file with identical name (MH-7673)
-      outFileName += "_" + UUID.randomUUID().toString();
-
-      params.put("out.dir", outDir);
-      params.put("out.name", outFileName);
-      params.put("out.suffix", outSuffix);
-
-      // create encoder process.
-      // no special working dir is set which means the working dir of the
-      // current java process is used.
-      // TODO: Parallelisation (threading)
-      List<String> command = buildCommand(profile);
-      StringBuilder sb = new StringBuilder();
-      for (String cmd : command) {
-        sb.append(cmd);
-        sb.append(" ");
-      }
-      logger.info("Executing encoding command: {}", sb);
       ProcessBuilder pbuilder = new ProcessBuilder(command);
       pbuilder.redirectErrorStream(REDIRECT_ERROR_STREAM);
       encoderProcess = pbuilder.start();
@@ -252,7 +246,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       encoderProcess.waitFor();
       int exitCode = encoderProcess.exitValue();
       if (exitCode != 0) {
-        throw new EncoderException(this, "Encoder exited abnormally with status " + exitCode);
+        throw new CmdlineEncoderException(this, "Encoder exited abnormally with status " + exitCode, commandStr);
       }
 
       if (audioSource != null) {
@@ -285,7 +279,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
               new Object[] { (audioSource == null ? "N/A" : audioSource.getName()),
                       (videoSource == null ? "N/A" : videoSource.getName()), profile.getName(), e.getMessage() });
       fireEncodingFailed(this, profile, e, audioSource, videoSource);
-      throw new EncoderException(this, e.getMessage(), e);
+      throw new CmdlineEncoderException(this, e.getMessage(), commandStr, e);
     } finally {
       IoSupport.closeQuietly(in);
       IoSupport.closeQuietly(encoderProcess);
@@ -294,7 +288,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Deletes all valid files found in a list
-   * 
+   *
    * @param outputFiles
    *          list containing files
    */
@@ -313,7 +307,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Handles the encoder output by analyzing it first and then firing it off to the registered listeners.
-   * 
+   *
    * @param format
    *          the target media format
    * @param message
@@ -328,7 +322,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Specifies the encoder binary.
-   * 
+   *
    * @param binary
    *          path to the binary
    */
@@ -341,7 +335,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   /**
    * Returns the parameters that will replace the variable placeholders on the commandline, such as
    * <code>in.video.name</code> etc.
-   * 
+   *
    * @return the parameters
    */
   protected Map<String, String> getCommandlineParameters() {
@@ -350,7 +344,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Creates the command that is sent to the commandline encoder.
-   * 
+   *
    * @return the commandline
    * @throws EncoderException
    *           in case of any error
@@ -364,14 +358,21 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       for (Map.Entry<String, String> e : params.entrySet()) {
         result = result.replace("#{" + e.getKey() + "}", e.getValue());
       }
-      command.add(result);
+      result = result.replace("#{space}", " ");
+
+      /* Remove unused commandline parts */
+      result = result.replaceAll("#\\{.*?\\}", "");
+
+      if (StringUtils.trimToNull(result) != null) {
+        command.add(result);
+      }
     }
     return command;
   }
 
   /**
    * Creates the arguments for the commandline.
-   * 
+   *
    * @param format
    *          the encoding profile
    * @return the argument list
@@ -384,7 +385,8 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   }
 
   /**
-   * @param commandline Never null
+   * @param commandline
+   *          Never null
    * @return Split string on spaces, except if between quotes (i.e. treat \“hello world\” as one token)
    */
   private List<String> splitCommandArgsWithCare(final String commandline) {
@@ -407,7 +409,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Processes the command options by replacing the templates with their actual values.
-   * 
+   *
    * @return the commandline
    */
   protected String processParameters(String cmd) {
@@ -423,7 +425,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   /**
    * Set the commandline options in a single string. Parameters in the form of <code>#{param}</code> will be
    * substituted.
-   * 
+   *
    * @see #addParam(String, String)
    */
   public void setCmdlineOptions(String cmdlineOptions) {
@@ -432,7 +434,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /**
    * Adds a command line parameter that will be substituted along with the default parameters.
-   * 
+   *
    * @see #setCmdlineOptions(String)
    */
   public void addParam(String name, String value) {
@@ -442,7 +444,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   /**
    * Tells the registered listeners that the given track has been encoded into <code>file</code>, using the encoding
    * format <code>format</code>.
-   * 
+   *
    * @param sourceFiles
    *          the original files
    * @param format
@@ -513,7 +515,6 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       ArrayList<String> suffixes = new ArrayList<String>();
       
       for (String tag : profile.getTags()) {
-logger.info("tag {} with suffix {}", tag, profile.getSuffix(tag));        
         String outSuffix = processParameters(profile.getSuffix(tag));
         params.put("out.suffix" + "." + tag, outSuffix);
         suffixes.add(outSuffix);

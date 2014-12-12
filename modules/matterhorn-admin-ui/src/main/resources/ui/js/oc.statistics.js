@@ -34,6 +34,7 @@ ocStatistics = new (function() {
     	self.refreshInterval = window.setInterval(refresh, delay * 1000);
     }
   }
+  
 
   /**
    * The labels for the UI.  TODO: i18n
@@ -47,7 +48,12 @@ ocStatistics = new (function() {
     "org_opencastproject_distribution_download"  : "Media distribution (local downloads)",
     "org_opencastproject_distribution_streaming" : "Media distribution (local streaming)",
     "org_opencastproject_distribution_itunesu"   : "Media distribution (iTunes)",
+    "org_opencastproject_sox"                    : "SoX (sound processing)",
+    "org_opencastproject_nop"                    : "No Operation Service (Testing)",
     "org_opencastproject_publication_youtube"    : "Media publication (YouTube)",
+    "org_opencastproject_smil"                   : "SMIL service",
+    "org_opencastproject_videoeditor"            : "Video editor",
+    "org_opencastproject_silencedetection"       : "Silence detection",
     "org_opencastproject_gstreamer"              : "GStreamer Launch Service",
     "org_opencastproject_inspection"             : "Media inspection",
     "org_opencastproject_workflow"               : "Workflow",
@@ -129,25 +135,23 @@ ocStatistics = new (function() {
     		success: $.proxy(function(data, textStatus, jqXHR) {
     			$(this).prev().remove();
     			$(this).remove();
-		        $.ajax({
-		          url: SERVERS_STATS_URL,
-		          dataType: 'json',
-		          success: function (data) {
-		            var servicesInWarningState = 0;
-		            var badge = $('#statistics_badge');
-		            $.each(data.statistics.service, function(index, serviceInstance) {
-                        var serviceState = serviceInstance.serviceRegistration.service_state;
-                        if (serviceState != null && serviceState != 'NORMAL') {
-		                  servicesInWarningState ++;
-		         		}
-		            });
-		            if (servicesInWarningState > 0) {
-		                badge.html(servicesInWarningState);
-		            } else {
-		          	  badge.empty();
-		            }
-		          }
-		        });
+        	//TODO: This should really just call the same function in the init html...
+      	    var url = '/services/servicewarnings';
+            $.ajax(
+            {
+              url: url,
+              dataType: 'json',
+              success: function (data)
+              {
+                var servicesInWarningState = data;
+                var badge = $('#statistics_badge');
+                if (servicesInWarningState > 0) {
+                  badge.html(data);
+                } else {
+                  badge.empty();
+                }
+              }
+            });
     		}, this)
     	});
     });

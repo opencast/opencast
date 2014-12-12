@@ -23,7 +23,7 @@ import org.opencastproject.util.NotFoundException;
 
 /**
  * Defines methods for indexing, retrieving and searching through index.
- * 
+ *
  */
 public interface SeriesServiceIndex {
   /**
@@ -38,7 +38,7 @@ public interface SeriesServiceIndex {
 
   /**
    * Index (new or existing) Dublin core representing series.
-   * 
+   *
    * @param dublinCore
    *          {@link DublinCoreCatalog} representing series
    * @throws SeriesServiceDatabaseException
@@ -48,7 +48,7 @@ public interface SeriesServiceIndex {
 
   /**
    * Index access control for existing series entry.
-   * 
+   *
    * @param seriesId
    *          ID of series for which access control will be associated with
    * @param accessControl
@@ -62,7 +62,7 @@ public interface SeriesServiceIndex {
 
   /**
    * Removes series from index.
-   * 
+   *
    * @param seriesID
    *          ID of the series to be removed
    * @throws SeriesServiceDatabaseException
@@ -72,7 +72,7 @@ public interface SeriesServiceIndex {
 
   /**
    * Gets Dublin core representing series.
-   * 
+   *
    * @param seriesID
    *          series to be retrieved
    * @return {@link DublinCoreCatalog} representing series
@@ -85,7 +85,7 @@ public interface SeriesServiceIndex {
 
   /**
    * Retrieves access control for series with specified ID.
-   * 
+   *
    * @param seriesID
    *          ID of the series for which access control will be retrieved
    * @return {@link AccessControlList} for series with specified ID
@@ -98,7 +98,7 @@ public interface SeriesServiceIndex {
 
   /**
    * Search over indexed series with query.
-   * 
+   *
    * @param query
    *          {@link SeriesQuery} object storing query parameters
    * @return List of all matching series
@@ -109,7 +109,7 @@ public interface SeriesServiceIndex {
 
   /**
    * Returns number of series in search index, across all organizations.
-   * 
+   *
    * @return number of series in search index
    * @throws SeriesServiceDatabaseException
    *           if count cannot be retrieved

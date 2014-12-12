@@ -1,14 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.opencastproject</groupId>
   <artifactId>matterhorn-admin-ui</artifactId>
   <packaging>bundle</packaging>
   <name>matterhorn-admin-ui</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.4.3</version>
+    <version>1.6.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -69,7 +67,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>2.4.1</version>
         <executions>
           <execution>
             <id>copy-player</id>
@@ -292,7 +289,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.0.1</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
@@ -310,34 +306,33 @@
     </plugins>
   </build>
   <reporting>
-		<plugins>
-			<plugin>
-				<groupId>gr.abiss.mvn.plugins</groupId>
-				<artifactId>maven-jstools-plugin</artifactId>
-				<version>0.7</version>
-				<inherited>false</inherited>
-				<configuration>
-					<!-- the default is src/main/js -->
-					<jsDir>${basedir}/src/main/resources/ui/js</jsDir>
-					<!-- this is actually the default -->
-					<includes>**/*.js</includes>
-					<!-- maybe you need to exclude compressed JS files -->
-					<excludes>**/*-compressed.js</excludes>
-					<!-- this is actually the default -->
-					<caseSensitive>true</caseSensitive>
-					<!-- for more configuration properties, see the goals documentation -->
-				</configuration>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<!-- include the desired reports -->
-							<report>jslint</report>
-							<!--<report>jsdoc</report>-->
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
-		</plugins>
-	</reporting>
+    <plugins>
+      <plugin>
+        <groupId>gr.abiss.mvn.plugins</groupId>
+        <artifactId>maven-jstools-plugin</artifactId>
+        <version>0.7</version>
+        <inherited>false</inherited>
+        <configuration>
+          <!-- the default is src/main/js -->
+          <jsDir>${basedir}/src/main/resources/ui/js</jsDir>
+          <!-- this is actually the default -->
+          <includes>**/*.js</includes>
+          <!-- maybe you need to exclude compressed JS files -->
+          <excludes>**/*-compressed.js</excludes>
+          <!-- this is actually the default -->
+          <caseSensitive>true</caseSensitive>
+          <!-- for more configuration properties, see the goals documentation -->
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <!-- include the desired reports -->
+              <report>jslint</report>
+              <!--<report>jsdoc</report>-->
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
-

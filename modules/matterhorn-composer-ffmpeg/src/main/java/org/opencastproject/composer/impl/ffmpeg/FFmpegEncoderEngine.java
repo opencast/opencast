@@ -20,11 +20,14 @@ import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.impl.AbstractCmdlineEncoderEngine;
 import org.opencastproject.util.data.Option;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,10 +44,10 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
   /** The ffmpeg commandline suffix */
   public static final String CMD_SUFFIX = "ffmpeg.command";
 
-  private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpegpath";
+  private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpeg.path";
 
   /** Format for trim times */
-  private static final String TIME_FORMAT = "%02d:%02d:%02d";
+  private static final String TIME_FORMAT = "%02d:%02d:";
 
   /** The trimming start time property name */
   public static final String PROP_TRIMMING_START_TIME = "trim.start";
@@ -75,27 +78,34 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.impl.AbstractCmdlineEncoderEngine#trim(java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */
   @Override
-  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
-          throws EncoderException {
+  public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration,
+          Map<String, String> properties) throws EncoderException {
     if (properties == null)
       properties = new HashMap<String, String>();
-    start /= 1000;
-    duration /= 1000;
-    properties.put(PROP_TRIMMING_START_TIME,
-            String.format(TIME_FORMAT, (long) Math.floor(start / 3600), (start % 3600) / 60, (start % 60)));
-    properties.put(PROP_TRIMMING_DURATION,
-            String.format(TIME_FORMAT, (long) Math.floor(duration / 3600), (duration % 3600) / 60, (duration % 60)));
+    double startD = (double) start / 1000;
+    double durationD = (double) duration / 1000;
+    DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
+    ffmpegFormat.setDecimalSeparator('.');
+    DecimalFormat df = new DecimalFormat("00.000", ffmpegFormat);
+    properties.put(
+            PROP_TRIMMING_START_TIME,
+            String.format(TIME_FORMAT, (long) Math.floor(startD / 3600), (long) (startD % 3600) / 60)
+                    + df.format(startD % 60));
+    properties.put(
+            PROP_TRIMMING_DURATION,
+            String.format(TIME_FORMAT, (long) Math.floor(durationD / 3600), (long) (durationD % 3600) / 60)
+                    + df.format(durationD % 60));
     return super.trim(mediaSource, format, start, duration, properties);
   }
 
   /**
    * Creates the arguments for the commandline.
-   * 
+   *
    * @param format
    *          the format
    * @return the argument list
@@ -123,9 +133,6 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
     // Replace the commandline parameters passed in at compile time
     commandline = processParameters(commandline);
 
-    // Remove unused commandline parts
-    commandline = commandline.replaceAll("#\\{.*?\\}", "");
-
     String[] args = commandline.split(" ");
     for (String a : args)
       if (!"".equals(a.trim()))
@@ -135,7 +142,7 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
 
   /**
    * Handles the encoder output by analyzing it first and then firing it off to the registered listeners.
-   * 
+   *
    * @param sourceFiles
    *          the source files that are currently being encoded
    * @param format
@@ -184,7 +191,7 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.impl.AbstractEncoderEngine#getOutputFile(java.io.File,
    *      org.opencastproject.composer.api.EncodingProfile)
    */

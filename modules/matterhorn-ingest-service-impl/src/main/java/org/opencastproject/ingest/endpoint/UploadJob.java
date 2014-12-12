@@ -28,7 +28,7 @@ import javax.persistence.Table;
 
 /**
  * Holds information about a file upload.
- * 
+ *
  */
 @Entity
 @Table(name = "mh_upload")

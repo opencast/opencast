@@ -61,7 +61,7 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
 
   /**
    * Populates the catalog.
-   * 
+   *
    * @param in
    *          The input stream containing the content
    * @throws IllegalStateException
@@ -78,7 +78,7 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
 
   /**
    * Creates a new mpeg-7 metadata container file.
-   * 
+   *
    * @return the new mpeg-7 metadata container
    */
   public static Mpeg7CatalogImpl newInstance() {
@@ -106,7 +106,7 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
 
   /**
    * Saves the mpeg-7 metadata container to disk.
-   * 
+   *
    * @throws ParserConfigurationException
    *           if the xml parser environment is not correctly configured
    * @throws TransformerException
@@ -141,7 +141,7 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
     Element rootElement = doc.createElementNS("urn:mpeg:mpeg7:schema:2001", "Mpeg7");
     rootElement.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:mpeg7", "urn:mpeg7:schema:2001");
     rootElement.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xsi",
-            "http://www.w3.org/2001/XMLSchema-instance/");
+            "http://www.w3.org/2001/XMLSchema-instance");
     doc.appendChild(rootElement);
     return doc;
   }
@@ -322,7 +322,7 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
 
   /**
    * Removes the content element of the specified type with the given identifier.
-   * 
+   *
    * @param id
    *          the content element identifier
    * @param type

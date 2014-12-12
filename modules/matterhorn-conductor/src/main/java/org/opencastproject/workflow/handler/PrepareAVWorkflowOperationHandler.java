@@ -91,7 +91,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param composerService
    *          the local composer service
    */
@@ -102,7 +102,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -112,7 +112,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -122,7 +122,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -139,7 +139,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   /**
    * Merges audio and video track of the selected flavor and adds it to the media package. If there is nothing to mux, a
    * new track with the target flavor is created (pointing to the original url).
-   * 
+   *
    * @param src
    *          The source media package
    * @param operation
@@ -324,7 +324,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /**
    * Prepares a video track. If the mediapackage is specified, the prepared track will be added to it.
-   * 
+   *
    * @param videoTrack
    *          the track containing the video
    * @param mediaPackage
@@ -359,10 +359,13 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   }
 
   /**
-   * 
-   * 
+   * Finds a suitable audio track from the mediapackage
+   *
    * @param videoTrack
-   * @return
+   *          the video track
+   * @param mediaPackage
+   *          the mediapackage
+   * @return the found audio track
    */
   private Track findAudioTrack(Track videoTrack, MediaPackage mediaPackage) {
     MediaPackageElementFlavor flavor = new MediaPackageElementFlavor("*", videoTrack.getFlavor().getSubtype());

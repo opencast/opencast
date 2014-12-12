@@ -24,13 +24,16 @@ import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -56,7 +59,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -127,7 +130,8 @@ public class HoldStateTest {
     service.setSecurityService(securityService);
 
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authzService.getAccessControlList((MediaPackage) EasyMock.anyObject())).andReturn(acl).anyTimes();
+    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
+            .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
@@ -138,7 +142,8 @@ public class HoldStateTest {
     service.setUserDirectoryService(userDirectoryService);
 
     Organization organization = new DefaultOrganization();
-    List<Organization> organizationList = Arrays.asList(new Organization[] { organization });
+    List<Organization> organizationList = new ArrayList<Organization>();
+    organizationList.add(organization);
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganizations()).andReturn(organizationList).anyTimes();
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
@@ -151,7 +156,7 @@ public class HoldStateTest {
     service.addMetadataService(mds);
 
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
-            userDirectoryService, organizationDirectoryService);
+            userDirectoryService, organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
     dao = new WorkflowServiceSolrIndex();
     dao.solrRoot = sRoot + File.separator + "solr";
@@ -193,9 +198,8 @@ public class HoldStateTest {
     service.removeWorkflowListener(pauseListener);
 
     // The variable "testproperty" should have been replaced by "foo", but not "anotherproperty"
-    String xml = WorkflowParser.toXml(workflow);
-    Assert.assertTrue(xml.contains("foo"));
-    Assert.assertTrue(xml.contains("anotherproperty"));
+    Assert.assertEquals("foo", workflow.getOperations().get(0).getConfiguration("testkey"));
+    Assert.assertEquals("${anotherproperty}", workflow.getOperations().get(1).getConfiguration("testkey"));
 
     // Simulate a user resuming and submitting new properties (this time, with a value for "anotherproperty") to the
     // workflow
@@ -213,11 +217,9 @@ public class HoldStateTest {
     Assert.assertEquals("Workflow expected to succeed", 1, succeedListener.countStateChanges(WorkflowState.SUCCEEDED));
 
     WorkflowInstance fromDb = service.getWorkflowById(workflow.getId());
-    String xmlFromDb = WorkflowParser.toXml(fromDb);
     logger.info("checking for the existence of 'anotherproperty', which should have been replaced");
-    Assert.assertTrue("the 'anotherproperty' key should have been replaced", !xmlFromDb.contains("anotherproperty"));
-    Assert.assertTrue("the 'testproperty' key should have been set to 'foo'", xmlFromDb.contains("foo"));
-    Assert.assertTrue("'bar' should have been set as a property value", xmlFromDb.contains("bar"));
+    Assert.assertEquals("foo", fromDb.getOperations().get(0).getConfiguration("testkey"));
+    Assert.assertEquals("bar", fromDb.getOperations().get(1).getConfiguration("testkey"));
   }
 
   @Test

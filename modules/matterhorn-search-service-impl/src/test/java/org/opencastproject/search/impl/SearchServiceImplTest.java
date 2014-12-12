@@ -18,7 +18,6 @@ package org.opencastproject.search.impl;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
@@ -43,18 +42,23 @@ import org.opencastproject.search.impl.solr.SolrIndexManager;
 import org.opencastproject.search.impl.solr.SolrRequester;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
@@ -86,7 +90,7 @@ import java.util.Map;
 
 /**
  * Tests the functionality of the search service.
- * 
+ *
  * todo setup scenario where gathering metadata from both the media package and the dublin core is required
  * (StaticMetadataServiceMediaPackageImpl, StaticMetadataServiceDublinCoreImpl)
  */
@@ -113,15 +117,17 @@ public class SearchServiceImplTest {
   /** Other student role */
   private static final String ROLE_OTHER_STUDENT = "ROLE_OTHER_STUDENT";
 
+  private final DefaultOrganization defaultOrganization = new DefaultOrganization();
+
   /** A user with permissions. */
-  private final User userWithPermissions = new User("sample", "opencastproject.org", new String[] { ROLE_STUDENT,
-          ROLE_OTHER_STUDENT, new DefaultOrganization().getAnonymousRole() });
+  private final User userWithPermissions = new JaxbUser("sample", defaultOrganization, new JaxbRole(ROLE_STUDENT,
+          defaultOrganization), new JaxbRole(ROLE_OTHER_STUDENT, defaultOrganization), new JaxbRole(
+          defaultOrganization.getAnonymousRole(), defaultOrganization));
 
   /** A user without permissions. */
-  private final User userWithoutPermissions = new User("sample", "opencastproject.org", new String[] { "ROLE_NOTHING",
-          new DefaultOrganization().getAnonymousRole() });
+  private final User userWithoutPermissions = new JaxbUser("sample", defaultOrganization, new JaxbRole("ROLE_NOTHING",
+          defaultOrganization), new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, defaultOrganization));
 
-  private final Organization defaultOrganization = new DefaultOrganization();
   private final User defaultUser = userWithPermissions;
 
   private Responder<User> userResponder;
@@ -153,15 +159,12 @@ public class SearchServiceImplTest {
   @SuppressWarnings("unchecked")
   @Before
   public void setUp() throws Exception {
-    final File dcFile = new File(getClass().getResource("/dublincore.xml").toURI());
-    final File dcSeriesFile = new File(getClass().getResource("/series-dublincore.xml").toURI());
-    Assert.assertNotNull(dcFile);
-
     // workspace
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
+      @Override
       public File answer() throws Throwable {
-        return EasyMock.getCurrentArguments()[0].toString().contains("series") ? dcSeriesFile : dcFile;
+        return new File(new URI(EasyMock.getCurrentArguments()[0].toString()));
       }
     }).anyTimes();
     EasyMock.replay(workspace);
@@ -174,8 +177,8 @@ public class SearchServiceImplTest {
     EasyMock.expect(securityService.getOrganization()).andAnswer(organizationResponder).anyTimes();
     EasyMock.replay(securityService);
 
-    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
-            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
+    User anonymous = new JaxbUser("anonymous", defaultOrganization, new JaxbRole(
+            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, defaultOrganization));
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
@@ -215,10 +218,10 @@ public class SearchServiceImplTest {
     service = new SearchServiceImpl();
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
-    // Mock the series service
     StaticMetadataService mdService = newStaticMetadataService(workspace);
+
     SeriesService seriesService = EasyMock.createNiceMock(SeriesService.class);
     EasyMock.replay(seriesService);
 
@@ -235,11 +238,11 @@ public class SearchServiceImplTest {
             workspace, Arrays.asList(mdService), seriesService, mpeg7CatalogService, securityService));
 
     // acl
-    String anonymousRole = securityService.getOrganization().getAnonymousRole();
+    String anonymousRole = ((Organization) securityService.getOrganization()).getAnonymousRole();
     acl = new AccessControlList(new AccessControlEntry(anonymousRole, "read", true));
     authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authorizationService.getAccessControlList((MediaPackage) EasyMock.anyObject())).andReturn(acl)
-            .anyTimes();
+    EasyMock.expect(authorizationService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
+            .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.expect(
             authorizationService.hasPermission((MediaPackage) EasyMock.anyObject(), (String) EasyMock.anyObject()))
             .andReturn(true).anyTimes();
@@ -393,6 +396,50 @@ public class SearchServiceImplTest {
     assertEquals(1, service.getByQuery(new SearchQuery().withText("Institut")).size());
   }
 
+  @Test
+  public void testSorting() throws Exception {
+    MediaPackage mediaPackageNewer = getMediaPackage("/manifest-full.xml");
+    MediaPackage mediaPackageOlder = getMediaPackage("/manifest-full-older.xml");
+    Job job = service.add(mediaPackageNewer);
+    Job job2 = service.add(mediaPackageOlder);
+    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job, job2);
+    barrier.waitForJobs();
+    String olderTitle = "Older Recording";
+    String newerTitle = "Land and Vegetation: Key players on the Climate Scene";
+
+    SearchQuery query = new SearchQuery();
+    query.withSort(SearchQuery.Sort.DATE_CREATED);
+    assertEquals(2, service.getByQuery(query).size());
+    assertEquals(olderTitle, service.getByQuery(query).getItems()[0].getDcTitle());
+    query.withSort(SearchQuery.Sort.DATE_CREATED, false);
+    assertEquals(newerTitle, service.getByQuery(query).getItems()[0].getDcTitle());
+    // reverse sequence as demo-data has inverse publication dates
+    query.withSort(SearchQuery.Sort.DATE_PUBLISHED);
+    assertEquals(newerTitle, service.getByQuery(query).getItems()[0].getDcTitle());
+    query.withSort(SearchQuery.Sort.DATE_PUBLISHED, false);
+    assertEquals(olderTitle, service.getByQuery(query).getItems()[0].getDcTitle());
+    SearchQuery q = new SearchQuery();
+    q.withSort(SearchQuery.Sort.TITLE);
+    assertEquals(newerTitle, service.getByQuery(q).getItems()[0].getDcTitle());
+    query.withSort(SearchQuery.Sort.TITLE, false);
+    assertEquals(2, service.getByQuery(q).size());
+    assertEquals(olderTitle, service.getByQuery(query).getItems()[0].getDcTitle());
+    query.withSort(SearchQuery.Sort.LICENSE);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.SERIES_ID);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.MEDIA_PACKAGE_ID);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.CONTRIBUTOR);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.CREATOR);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.LANGUAGE);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+    query.withSort(SearchQuery.Sort.SUBJECT);
+    assertEquals(2, service.getByQuery(query).size()); // Just checking that the search index works for this field
+  }
+
   /**
    * Adds a simple media package that has a dublin core for the episode only.
    */
@@ -440,20 +487,7 @@ public class SearchServiceImplTest {
    */
   @Test
   public void testAddFullMediaPackage() throws Exception {
-    MediaPackageBuilderFactory builderFactory = MediaPackageBuilderFactory.newInstance();
-    MediaPackageBuilder mediaPackageBuilder = builderFactory.newMediaPackageBuilder();
-    URL rootUrl = SearchServiceImplTest.class.getResource("/");
-    mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(rootUrl));
-
-    // Load the simple media package
-    MediaPackage mediaPackage = null;
-    InputStream is = null;
-    try {
-      is = SearchServiceImplTest.class.getResourceAsStream("/manifest-full.xml");
-      mediaPackage = mediaPackageBuilder.loadFromXml(is);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
+    MediaPackage mediaPackage = getMediaPackage("/manifest-full.xml");
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries().add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));
@@ -495,22 +529,22 @@ public class SearchServiceImplTest {
     userResponder.setResponse(userWithoutPermissions);
 
     Map<String, Integer> servers = new HashMap<String, Integer>();
-    servers.put("localhost", 8080);
-    Organization org = new JaxbOrganization(DefaultOrganization.DEFAULT_ORGANIZATION_ID,
+    servers.put("http://localhost", 8080);
+    organizationResponder.setResponse(new JaxbOrganization(DefaultOrganization.DEFAULT_ORGANIZATION_ID,
             DefaultOrganization.DEFAULT_ORGANIZATION_NAME, servers, DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN,
-            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, null);
-    organizationResponder.setResponse(org);
+            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, null));
 
     // Try to delete it
     job = service.delete(mediaPackage.getIdentifier().toString());
     barrier = new JobBarrier(serviceRegistry, 1000, job);
     barrier.waitForJobs();
-    Assert.assertEquals("Job to delete mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
+    Assert.assertEquals("Job to delete mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
     Assert.assertEquals("Unauthorized user was able to delete a mediapackage", Boolean.FALSE.toString(),
             job.getPayload());
 
     // Second try with a "fixed" roleset
-    User adminUser = new User("admin", "opencastproject.org", new String[] { new DefaultOrganization().getAdminRole() });
+    User adminUser = new JaxbUser("admin", defaultOrganization, new JaxbRole(defaultOrganization.getAdminRole(),
+            defaultOrganization));
     userResponder.setResponse(adminUser);
     Date deletedDate = new Date();
     job = service.delete(mediaPackage.getIdentifier().toString());
@@ -537,28 +571,13 @@ public class SearchServiceImplTest {
 
   /**
    * Ads a media package with one dublin core for the episode and one for the series.
-   * 
+   *
    * todo media package needs to return a series id for this test to work
    */
   @Test
   @Ignore
   public void testAddSeriesMediaPackage() throws Exception {
-    MediaPackageBuilderFactory builderFactory = MediaPackageBuilderFactory.newInstance();
-    MediaPackageBuilder mediaPackageBuilder = builderFactory.newMediaPackageBuilder();
-    URL rootUrl = SearchServiceImplTest.class.getResource("/");
-    mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(rootUrl));
-
-    // Load the simple media package
-    MediaPackage mediaPackage = null;
-    InputStream is = null;
-    try {
-      is = SearchServiceImplTest.class.getResourceAsStream("/manifest-full.xml");
-      mediaPackage = mediaPackageBuilder.loadFromXml(is);
-    } catch (MediaPackageException e) {
-      fail("Error loading full media package");
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
+    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
 
     // Make sure our mocked ACL has the read and write permission
     acl.getEntries().add(new AccessControlEntry(ROLE_STUDENT, SearchService.READ_PERMISSION, true));

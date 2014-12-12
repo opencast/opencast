@@ -31,21 +31,21 @@ public interface WorkflowOperationInstance extends Configurable {
 
   /**
    * Gets the operation type.
-   * 
+   *
    * @return the operation type
    */
   String getTemplate();
 
   /**
    * Gets the unique identifier for this operation, or null.
-   * 
+   *
    * @return the identifier, or null if this operation has not yet run
    */
   Long getId();
 
   /**
    * Sets the unique identifier for this operation.
-   * 
+   *
    * @param id
    *          the identifier
    */
@@ -53,7 +53,7 @@ public interface WorkflowOperationInstance extends Configurable {
 
   /**
    * Gets the operation description
-   * 
+   *
    * @return the description
    */
   String getDescription();
@@ -65,7 +65,7 @@ public interface WorkflowOperationInstance extends Configurable {
 
   /**
    * Sets the state of this operation
-   * 
+   *
    * @param state
    *          the state to set
    */
@@ -73,14 +73,14 @@ public interface WorkflowOperationInstance extends Configurable {
 
   /**
    * Gets the URL for the hold state.
-   * 
+   *
    * @return the URL of the hold state, if any, for this operation
    */
   String getHoldStateUserInterfaceUrl();
 
   /**
    * Returns the title for the link to this operations hold state UI, a default String if no title is set.
-   * 
+   *
    * @return title to be displayed
    */
   String getHoldActionTitle();
@@ -117,7 +117,7 @@ public interface WorkflowOperationInstance extends Configurable {
    * <p>
    * If both <code>getExecuteCondition()</code> and <code>getSkipCondition</code> return a non-null value, the execute
    * condition takes precedence.
-   * 
+   *
    * @return the excecution condition.
    */
   String getExecutionCondition();
@@ -131,7 +131,7 @@ public interface WorkflowOperationInstance extends Configurable {
    * <p>
    * If both <code>getExecuteCondition()</code> and <code>getSkipCondition</code> return a non-null value, the execute
    * condition takes precedence.
-   * 
+   *
    * @return the excecution condition.
    */
   String getSkipCondition();
@@ -139,7 +139,7 @@ public interface WorkflowOperationInstance extends Configurable {
   /**
    * Returns <code>true</code> if this operation can be continued by the user from an optional hold state. A return
    * value of <code>null</code> indicates that this operation instance does not have a hold state.
-   * 
+   *
    * @return <code>true</code> if this operation instance is continuable
    */
   Boolean isContinuable();
@@ -149,35 +149,35 @@ public interface WorkflowOperationInstance extends Configurable {
    * operation is aborted from its hold state, the workflow is put into
    * {@link org.opencastproject.workflow.api.WorkflowInstance.WorkflowState#STOPPED}. A return value of
    * <code>null</code> indicates that this operation instance does not have a hold state.
-   * 
+   *
    * @return <code>true</code> if this operation instance is abortable
    */
   Boolean isAbortable();
 
   /**
    * Return the strategy to use in case of operation failure
-   * 
+   *
    * @return a strategy from {@link org.opencastproject.workflow.api.RetryStrategy}.
    */
   RetryStrategy getRetryStrategy();
 
   /**
    * Returns the number of attempts the workflow service will make to execute this operation.
-   * 
+   *
    * @return the maximum number of retries before failing
    */
   int getMaxAttempts();
 
   /**
    * Returns the number of failed executions that have previously been attempted.
-   * 
+   *
    * @return the number of previous attempts
    */
   int getFailedAttempts();
 
   /**
    * Sets the current execution host
-   * 
+   *
    * @param executionHost
    *          the execution host
    */
@@ -185,14 +185,14 @@ public interface WorkflowOperationInstance extends Configurable {
 
   /**
    * Returns the current execution host
-   * 
+   *
    * @return the execution host
    */
   String getExecutionHost();
 
   /**
    * Adds a failed job to the execution history
-   * 
+   *
    * @param jobId
    *          the failed job id
    */
@@ -200,7 +200,7 @@ public interface WorkflowOperationInstance extends Configurable {
 
   /**
    * Returns a list of failed job executions
-   * 
+   *
    * @return the execution history
    */
   List<Long> getExecutionHistory();

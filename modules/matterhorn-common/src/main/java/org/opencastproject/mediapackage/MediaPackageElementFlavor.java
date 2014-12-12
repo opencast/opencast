@@ -16,17 +16,18 @@
 
 package org.opencastproject.mediapackage;
 
+import org.opencastproject.util.data.Function;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 /**
  * ELement flavors describe {@link MediaPackageElement}s in a semantic way. They reveal or give at least a hint about
  * the meaning of an element.
- * 
+ *
  */
 @XmlJavaTypeAdapter(MediaPackageElementFlavor.FlavorAdapter.class)
 public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPackageElementFlavor>, Serializable {
@@ -58,7 +59,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
 
   /**
    * Creates a new element type with the given type, subtype and a description.
-   * 
+   *
    * @param type
    *          the major type
    * @param subtype
@@ -81,7 +82,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
 
   /**
    * Creates a new element type with the given type and subtype.
-   * 
+   *
    * @param type
    *          the major type
    * @param subtype
@@ -91,12 +92,17 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     this(type, subtype, null);
   }
 
+  /** Constructor function for {@link #MediaPackageElementFlavor(String, String)}. */
+  public static MediaPackageElementFlavor flavor(String type, String subtype) {
+    return new MediaPackageElementFlavor(type, subtype);
+  }
+
   /**
    * Returns the major type of this element type. Major types are more of a technical description.
    * <p/>
    * For example, if the element type is a presentation movie which is represented as <code>presentation/source</code>,
    * this method will return <code>track</code>.
-   * 
+   *
    * @return the type
    */
   public String getType() {
@@ -108,7 +114,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    * <p/>
    * For example, if the element type is a presentation movie which is represented as <code>presentation/source</code>,
    * this method will return <code>presentation</code>.
-   * 
+   *
    * @return the subtype
    */
   public String getSubtype() {
@@ -117,7 +123,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
 
   /**
    * Returns the element type description.
-   * 
+   *
    * @return the description
    */
   public String getDescription() {
@@ -133,7 +139,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
 
   /**
    * Adds an equivalent type / subtype definition for this element type.
-   * 
+   *
    * @param type
    *          major type
    * @param subtype
@@ -168,7 +174,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    * <p/>
    * For example, a gzipped file may have both of these element types defined, <code>application/x-compressed</code> or
    * <code>application/x-gzip</code>.
-   * 
+   *
    * @return <code>true</code> if this mime type is an equivalent
    */
   public boolean isEquivalentTo(String type, String subtype) {
@@ -185,7 +191,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
 
   /**
    * Defines equality between flavors and strings.
-   * 
+   *
    * @param flavor
    *          string of the form "type/subtype"
    */
@@ -210,7 +216,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
 
   /**
    * Creates a new media package element flavor.
-   * 
+   *
    * @param s
    *          the media package flavor
    * @return the media package element flavor object
@@ -225,6 +231,13 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
       throw new IllegalArgumentException("Unable to create element flavor from '" + s + "'");
     return new MediaPackageElementFlavor(parts[0], parts[1]);
   }
+
+  public static final Function<String, MediaPackageElementFlavor> parseFlavor =
+          new Function<String, MediaPackageElementFlavor>() {
+            @Override public MediaPackageElementFlavor apply(String s) {
+              return parseFlavor(s);
+            }
+          };
 
   /**
    * Helper class to store type/subtype equivalents for a given element type.

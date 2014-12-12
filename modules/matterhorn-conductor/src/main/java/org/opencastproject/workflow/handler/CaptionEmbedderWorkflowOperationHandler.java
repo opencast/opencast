@@ -52,7 +52,7 @@ import java.util.TreeMap;
 
 /**
  * Workflow operation handler for embedding captions in QuickTime movies.
- * 
+ *
  */
 public class CaptionEmbedderWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -95,7 +95,7 @@ public class CaptionEmbedderWorkflowOperationHandler extends AbstractWorkflowOpe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -105,7 +105,7 @@ public class CaptionEmbedderWorkflowOperationHandler extends AbstractWorkflowOpe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
@@ -121,7 +121,7 @@ public class CaptionEmbedderWorkflowOperationHandler extends AbstractWorkflowOpe
   /**
    * Media package is searched for suitable QuickTime files and caption Catalogs based on configuration. Each caption is
    * converted to SRT format and embedding is executed.
-   * 
+   *
    * @param src
    *          source media package
    * @param operation
@@ -170,7 +170,7 @@ public class CaptionEmbedderWorkflowOperationHandler extends AbstractWorkflowOpe
     }
 
     // Wait until all embedding jobs have returned
-    JobBarrier.Result embeddingResult = waitForStatus(jobs.values().toArray(new Job[jobs.size()]));  
+    JobBarrier.Result embeddingResult = waitForStatus(jobs.values().toArray(new Job[jobs.size()]));
     if (!embeddingResult.isSuccess()) {
       throw new WorkflowOperationException("Encoding failed");
     }
@@ -199,7 +199,7 @@ public class CaptionEmbedderWorkflowOperationHandler extends AbstractWorkflowOpe
 
   /**
    * Searches for QuickTime files with specified flavor.
-   * 
+   *
    * @param mediaPackage
    *          media package to be searched
    * @param flavor
@@ -220,7 +220,7 @@ public class CaptionEmbedderWorkflowOperationHandler extends AbstractWorkflowOpe
   /**
    * Searches for specified caption catalogs and converts them to output format. Given media package is also updated
    * with converted captions.
-   * 
+   *
    * @param mediaPackage
    *          media package to be searched
    * @param flavor

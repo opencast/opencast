@@ -26,7 +26,7 @@ public interface XmlElement {
 
   /**
    * Returns an xml node representation of this element.
-   * 
+   *
    * @param document
    *          the enclosing xml document
    * @return the xml node

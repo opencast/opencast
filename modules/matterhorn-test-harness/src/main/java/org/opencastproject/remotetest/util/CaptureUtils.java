@@ -46,7 +46,7 @@ public final class CaptureUtils {
 
   /**
    * Returns <code>true</code> if the capture agent with id <code>{@link #CAPTURE_AGENT_ID}</code> is online.
-   * 
+   *
    * @param agent
    *          the agent identifier
    * @return <code>true</code> if the agent is online
@@ -59,7 +59,7 @@ public final class CaptureUtils {
   /**
    * Returns <code>true</code> if the capture agent with id <code>captureAgentId</code> is currently capturing. If the
    * agent is not online, an {@link IllegalStateException} is thrown.
-   * 
+   *
    * @param captureAgentId
    *          the capture agent
    * @return <code>true</code> if the agent is capturing

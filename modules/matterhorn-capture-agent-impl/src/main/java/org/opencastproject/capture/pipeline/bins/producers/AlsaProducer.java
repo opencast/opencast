@@ -34,7 +34,7 @@ public class AlsaProducer extends AudioProducer {
 
   /**
    * Creates a ProducerBin specifically designed to capture from an ALSA source.
-   * 
+   *
    * @param captureDevice
    *          The ALSA source {@code CaptureDevice} to create Producer around
    * @param properties
@@ -62,7 +62,7 @@ public class AlsaProducer extends AudioProducer {
 
   /**
    * Create all the elements required for an ALSA source
-   * 
+   *
    * @throws UnableToCreateElementException
    *           If the platform is not Linux, or the correct module is not installed to support an alsasrc this Exception
    *           is thrown.
@@ -76,17 +76,18 @@ public class AlsaProducer extends AudioProducer {
 
   /**
    * Set the correct location for the ALSA source
-   * 
+   *
    * @throws UnableToSetElementPropertyBecauseElementWasNullException
    *           If the alsasrc Element is null this Exception is thrown
    **/
   @Override
   protected synchronized void setElementProperties() throws UnableToSetElementPropertyBecauseElementWasNullException {
+    super.setElementProperties();
     if (alsasrc != null) {
       if (captureDevice.getLocation() != null) {
         alsasrc.set(GStreamerProperties.DEVICE, captureDevice.getLocation());
       }
-    } 
+    }
     else {
       throw new UnableToSetElementPropertyBecauseElementWasNullException(alsasrc, GStreamerProperties.DEVICE);
     }
@@ -94,12 +95,12 @@ public class AlsaProducer extends AudioProducer {
 
   /** Add all the necessary elements to the bin. **/
   protected void addElementsToBin() {
-    bin.addMany(alsasrc, queue, audioconvert);
+    bin.addMany(alsasrc, queue, volume, audioconvert);
   }
 
   /**
    * Link all the necessary elements together.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           If any of the elements will not link together it throws an exception.
    */
@@ -107,8 +108,10 @@ public class AlsaProducer extends AudioProducer {
   protected void linkElements() throws UnableToLinkGStreamerElementsException {
     if (!alsasrc.link(queue)) {
       throw new UnableToLinkGStreamerElementsException(captureDevice, alsasrc, queue);
-    } else if (!queue.link(audioconvert)) {
-      throw new UnableToLinkGStreamerElementsException(captureDevice, queue, audioconvert);
+    } else if (!queue.link(volume)) {
+      throw new UnableToLinkGStreamerElementsException(captureDevice, queue, volume);
+    } else if (!volume.link(audioconvert)) {
+      throw new UnableToLinkGStreamerElementsException(captureDevice, volume, audioconvert);
     }
   }
 

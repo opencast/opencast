@@ -69,7 +69,7 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -79,7 +79,7 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override
@@ -89,7 +89,7 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from OSGi to set a reference to the youtube publication service.
-   * 
+   *
    * @param service
    *          the service to set
    */
@@ -145,7 +145,7 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override

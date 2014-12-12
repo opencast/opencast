@@ -51,12 +51,12 @@ public class FilesinkConsumer extends ConsumerBin {
           UnableToCreateElementException {
     super(captureDevice, properties);
   }
-  
+
   /** Set filesink location */
   @Override
   protected void setElementProperties() throws IllegalArgumentException,
           UnableToSetElementPropertyBecauseElementWasNullException {
-  
+
     if (filesink == null) {
       throw new UnableToSetElementPropertyBecauseElementWasNullException(filesink, GStreamerProperties.LOCATION);
     } else if (captureDevice.getOutputPath() == null || captureDevice.getOutputPath().isEmpty()) {
@@ -65,15 +65,15 @@ public class FilesinkConsumer extends ConsumerBin {
       filesink.set(GStreamerProperties.LOCATION, captureDevice.getOutputPath());
     }
   }
-  
+
   /** Adds queue and filesink Elements to the bin. */
   @Override
   protected void addElementsToBin() {
     bin.addMany(queue, filesink);
   }
-  
+
   /**
-   * Link the queue to the filesink Element. 
+   * Link the queue to the filesink Element.
    * @throws UnableToLinkGStreamerElementsException
    */
   @Override
@@ -81,7 +81,7 @@ public class FilesinkConsumer extends ConsumerBin {
     if (!queue.link(filesink))
       throw new UnableToLinkGStreamerElementsException(captureDevice, queue, filesink);
   }
-  
+
   /**
    * Returns the queue as the Sink for this Consumer. Will be used to create the ghostpads to link this Consumer to the
    * Producer.
@@ -90,7 +90,7 @@ public class FilesinkConsumer extends ConsumerBin {
   public Element getSrc() {
     return queue;
   }
-  
+
   @Override
   public boolean isVideoDevice() {
     return true;

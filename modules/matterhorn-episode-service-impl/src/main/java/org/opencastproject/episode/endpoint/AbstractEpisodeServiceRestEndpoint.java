@@ -16,6 +16,7 @@
 package org.opencastproject.episode.endpoint;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.opencastproject.episode.api.ArchivedMediaPackageElement;
 import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
@@ -46,6 +47,7 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,8 +67,10 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -164,6 +168,38 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
     });
   }
 
+  @POST
+  @Path("applyToSeries/{wfDefId}")
+  @RestQuery(name = "applyToSeries", description = "Apply a workflow to a series or several series if the pattern matches more. You can test the pattern using the find endpoint.", pathParameters = { @RestParameter(name = "wfDefId", type = RestParameter.Type.STRING, description = "The ID of the workflow to apply", defaultValue = "full", isRequired = true) }, restParameters = {
+          @RestParameter(name = "seriesId", type = RestParameter.Type.STRING, description = "The id of a series to apply this workflow to. Either this or the series title is required.", isRequired = false),
+          @RestParameter(name = "seriesTitle", type = RestParameter.Type.STRING, description = "The title of a series to apply this workflow to. Either this or the series id is required.", isRequired = false) }, reponses = {
+          @RestResponse(description = "The workflows have been started.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+          @RestResponse(description = "Returned if both the series id and series title are not provided. The reason being that we can't search for episodes within a series without at least one of them.", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "No content is returned.")
+  public Response applyWorkflowToSeries(@PathParam("wfDefId") final String wfId,
+          @FormParam("seriesId") final String seriesId, @FormParam("seriesTitle") final String seriesTitle,
+          @Context final HttpServletRequest req) {
+    if (StringUtils.isBlank(seriesId) && StringUtils.isBlank(seriesTitle)) {
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
+    final EpisodeQuery search = query(getSecurityService());
+
+    if (StringUtils.isNotBlank(seriesId)) {
+      search.seriesId(seriesId.trim());
+    }
+
+    if (StringUtils.isNotBlank(seriesTitle)) {
+      search.seriesTitle(seriesTitle.trim());
+    }
+
+    List<String> mpIds = new ArrayList<String>();
+    final SearchResult sr = getEpisodeService().find(search, uriRewriter);
+    for (SearchResultItem searchResult : sr.getItems()) {
+      mpIds.add(searchResult.getId());
+    }
+
+    return applyWorkflowToMediapackageIds(wfId, mpIds, req);
+  }
+
 //  @POST
 //  @Path("applyworkflow")
 //  @RestQuery(name = "applyworkflow",
@@ -206,23 +242,34 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
   public Response applyWorkflow(@PathParam("wfDefId") final String wfId,
                                 @FormParam("mediaPackageIds") final List<String> mpIds,
                                 @Context final HttpServletRequest req) {
+    return applyWorkflowToMediapackageIds(wfId, mpIds, req);
+  }
+
+  /**
+   * Applies a workflow to a list of mediapackage ids
+   * @param workflowId The id of the workflow you want to run against the list of mediapackages.
+   * @param mediaPackageIds The list of mediapackage ids that the workflow will be run on each of them.
+   * @param request The request so that we can get the workflow variables
+   * @return A no content response if the request was sucessful
+   */
+  private Response applyWorkflowToMediapackageIds(final String workflowId, final List<String> mediaPackageIds,
+          final HttpServletRequest request) {
     return handleException(new Function0.X<Response>() {
-      @Override public Response xapply() throws Exception {
-        final Map<String, String[]> params = (Map<String, String[]>) req.getParameterMap();
+      @Override
+      public Response xapply() throws Exception {
+        Map<String, String[]> params = request.getParameterMap();
         // filter and reduce String[] to String
-        final Map<String, String> wfp = mlist(params.entrySet().iterator()).foldl(
-                Collections.<String, String>map(),
+        final Map<String, String> wfp = mlist(params.entrySet().iterator()).foldl(Collections.<String, String> map(),
                 new Function2<Map<String, String>, Map.Entry<String, String[]>, Map<String, String>>() {
                   @Override
                   public Map<String, String> apply(Map<String, String> wfConf, Map.Entry<String, String[]> param) {
                     final String key = param.getKey();
-                    if (!"mediaPackageIds".equalsIgnoreCase(key))
-                      wfConf.put(key, param.getValue()[0]);
+                    wfConf.put(key, param.getValue()[0]);
                     return wfConf;
                   }
                 });
-        final WorkflowDefinition wfd = getWorkflowService().getWorkflowDefinitionById(wfId);
-        getEpisodeService().applyWorkflow(workflow(wfd, wfp), uriRewriter, mpIds);
+        final WorkflowDefinition wfd = getWorkflowService().getWorkflowDefinitionById(workflowId);
+        getEpisodeService().applyWorkflow(workflow(wfd, wfp), uriRewriter, mediaPackageIds);
         return Response.noContent().build();
       }
     });
@@ -240,10 +287,13 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
                                 @RestParameter(name = "contributor", isRequired = false, description = "Filter results by the mediapackage's contributor", type = STRING),
                                 @RestParameter(name = "language", isRequired = false, description = "Filter results by mediapackage's language.", type = STRING),
                                 @RestParameter(name = "series", isRequired = false, description = "Filter results by mediapackage's series identifier.", type = STRING),
+                                @RestParameter(name = "seriesTitle", isRequired = false, description = "Filter results by mediapackage's series title.", type = STRING),
                                 @RestParameter(name = "license", isRequired = false, description = "Filter results by mediapackage's license.", type = STRING),
                                 @RestParameter(name = "title", isRequired = false, description = "Filter results by mediapackage's title.", type = STRING),
+                                @RestParameter(name = "episodes", type = RestParameter.Type.STRING, defaultValue = "false", description = "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".", isRequired = false),
                                 @RestParameter(name = "limit", type = RestParameter.Type.STRING, defaultValue = "10", description = "The maximum number of items to return per page. Values less than 0 set no limit. Non-integer values cause \"not found\".", isRequired = false),
                                 @RestParameter(name = "offset", type = RestParameter.Type.STRING, defaultValue = "0", description = "The page number.", isRequired = false),
+                                @RestParameter(name = "admin", type = RestParameter.Type.STRING, defaultValue = "false", description = "Whether this is an administrative query", isRequired = false),
                                 @RestParameter(name = "sort", type = RestParameter.Type.STRING, description = "The sort order.  May include any "
                                   + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
                                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", isRequired = false),
@@ -258,6 +308,7 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
                               @QueryParam("contributor") final String contributor,
                               @QueryParam("language") final String language,
                               @QueryParam("series") final String series,
+                              @QueryParam("seriesTitle") final String seriesTitle,
                               @QueryParam("license") final String license,
                               @QueryParam("title") final String title,
                               @QueryParam("tag") final String[] tags,
@@ -286,31 +337,34 @@ public abstract class AbstractEpisodeServiceRestEndpoint implements HttpMediaPac
 
         if (offset != null)
           search.offset(offset);
-        
+
         if (tags != null)
           search.elementTags(mlist(tags).bind(Strings.trimToNil).value());
-        
+
         if (StringUtils.isNotBlank(id))
           search.id(id.trim());
-        
+
         if (StringUtils.isNotBlank(text))
           search.text(text.trim());
-        
+
         if (StringUtils.isNotBlank(creator))
           search.creator(creator.trim());
-        
+
         if (StringUtils.isNotBlank(contributor))
           search.contributor(contributor.trim());
-        
+
         if (StringUtils.isNotBlank(language))
           search.language(language.trim());
-        
+
         if (StringUtils.isNotBlank(series))
           search.seriesId(series.trim());
-        
+
+        if (StringUtils.isNotBlank(seriesTitle))
+          search.seriesTitle(seriesTitle.trim());
+
         if (StringUtils.isNotBlank(license))
           search.license(license.trim());
-        
+
         if (StringUtils.isNotBlank(title))
           search.title(title.trim());
 

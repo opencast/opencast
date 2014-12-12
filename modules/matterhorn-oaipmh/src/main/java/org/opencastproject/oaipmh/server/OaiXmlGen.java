@@ -16,25 +16,27 @@
 
 package org.opencastproject.oaipmh.server;
 
-import org.opencastproject.oaipmh.OaiPmhConstants;
-import org.opencastproject.oaipmh.util.XmlGen;
-import org.opencastproject.search.api.SearchResult;
-import org.opencastproject.search.api.SearchResultItem;
-import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import javax.xml.XMLConstants;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcSecond;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
+
+import org.opencastproject.oaipmh.OaiPmhConstants;
+import org.opencastproject.oaipmh.util.XmlGen;
+import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.search.api.SearchResultItem;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import javax.xml.XMLConstants;
 
 /**
  * OAI-PMH specific XML generator.
@@ -54,53 +56,35 @@ public abstract class OaiXmlGen extends XmlGen {
    * Create the OAI-PMH tag.
    */
   Element oai(Node... nodes) {
-    List<Node> combined = Collections.concat(
-            _(
-                    schemaLocation(OaiPmhConstants.OAI_2_0_SCHEMA_LOCATION),
-                    $eTxt("responseDate", toUtcSecond(new Date()))
-            ),
-            Arrays.asList(nodes));
-    return $e("OAI-PMH",
-        OaiPmhConstants.OAI_2_0_XML_NS,
-        _(
-            ns("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)
-        ),
-        combined);
+    List<Node> combined = new ArrayList<Node>(Arrays.asList(nodes));
+    combined.addAll(_(schemaLocation(OaiPmhConstants.OAI_2_0_SCHEMA_LOCATION),
+            $eTxt("responseDate", toUtcSecond(new Date()))));
+    return $e("OAI-PMH", OaiPmhConstants.OAI_2_0_XML_NS, _(ns("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)),
+            combined);
   }
 
   /**
    * Create the dublin core tag from single nodes.
    */
   Element dc(Node... nodes) {
-    List<Node> combined = Collections.concat(
-            _(schemaLocation(OaiPmhConstants.OAI_DC_SCHEMA_LOCATION)),
-            _(nodes));
-    return $e("oai_dc:dc",
-        OaiPmhConstants.OAI_DC_XML_NS,
-        _(
-            ns("dc", "http://purl.org/dc/elements/1.1/"),
-            ns("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)
-        ),
-        combined);
+    List<Node> combined = new ArrayList<Node>(Arrays.asList(nodes));
+    combined.addAll(_(schemaLocation(OaiPmhConstants.OAI_DC_SCHEMA_LOCATION)));
+    return $e("oai_dc:dc", OaiPmhConstants.OAI_DC_XML_NS,
+            _(ns("dc", "http://purl.org/dc/elements/1.1/"), ns("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)),
+            combined);
   }
 
   /**
    * Create the dublin core tag from a search result item.
    */
   Element dc(SearchResultItem item) {
-    return dc(
-        $e("dc:title", $txtBlank(item.getDcTitle())),
-        $e("dc:creator", $txtBlank(item.getDcCreator())),
-        $e("dc:subject", $txtBlank(item.getDcSubject())),
-        $e("dc:description", $txtBlank(item.getDcDescription())),
-        $e("dc:publisher", $txtBlank(item.getDcPublisher())),
-        $e("dc:contributor", $txtBlank(item.getDcContributor())),
-        $e("dc:date", $txtBlank(repository.toSupportedGranularity(item.getDcCreated()))),
-        $e("dc:type", $txtBlank(item.getDcType())),
-        $e("dc:identifier", $txtBlank(item.getId())),
-        $e("dc:language", $txtBlank(item.getDcLanguage())),
-        $e("dc:rights", $txtBlank(item.getDcLicense()))
-    );
+    return dc($e("dc:title", $txtBlank(item.getDcTitle())), $e("dc:creator", $txtBlank(item.getDcCreator())),
+            $e("dc:subject", $txtBlank(item.getDcSubject())), $e("dc:description", $txtBlank(item.getDcDescription())),
+            $e("dc:publisher", $txtBlank(item.getDcPublisher())),
+            $e("dc:contributor", $txtBlank(item.getDcContributor())),
+            $e("dc:date", $txtBlank(repository.toSupportedGranularity(item.getDcCreated()))),
+            $e("dc:type", $txtBlank(item.getDcType())), $e("dc:identifier", $txtBlank(item.getId())),
+            $e("dc:language", $txtBlank(item.getDcLanguage())), $e("dc:rights", $txtBlank(item.getDcLicense())));
   }
 
   /**
@@ -117,48 +101,37 @@ public abstract class OaiXmlGen extends XmlGen {
     final Option<Option<String>> token;
     if (offset + result.size() < result.getTotalSize()) {
       // more to come...
-      token = some(some(repository.saveQuery(new ResumableQuery(result.getQuery(),
-          metadataPrefix,
-          offset,
-          repository.getResultLimit()))));
+      token = some(some(repository.saveQuery(new ResumableQuery(result.getQuery(), metadataPrefix, offset, repository
+              .getResultLimit()))));
     } else if (resumptionToken.isSome()) {
       // last page reached
-      token = some(Option.<String>none());
+      token = some(Option.<String> none());
     } else {
       token = none();
     }
     // ... then transform it into a node
-    return token
-        .map(new Function<Option<String>, Node>() {
-          @Override
-          public Node apply(Option<String> token) {
-            return $e("resumptionToken",
-                $a("completeListSize", Long.toString(result.getTotalSize())),
-                $a("cursor", Integer.toString(offset)),
-                token.map(mkText).getOrElse(nodeZero));
-          }
-        })
-        .getOrElse(nodeZero);
+    return token.map(new Function<Option<String>, Node>() {
+      @Override
+      public Node apply(Option<String> token) {
+        return $e("resumptionToken", $a("completeListSize", Long.toString(result.getTotalSize())),
+                $a("cursor", Integer.toString(offset)), token.map(mkText).getOrElse(nodeZero));
+      }
+    }).getOrElse(nodeZero);
   }
 
   /**
    * Create a record element.
    */
   Element record(SearchResultItem item, Node metadata) {
-    return $e("record",
-        header(item),
-        $e("metadata",
-            metadata));
+    return $e("record", header(item), $e("metadata", metadata));
   }
 
   /**
    * Create a metadata format element.
    */
   Element metadataFormat(MetadataFormat f) {
-    return $e("metadataFormat",
-        $eTxt("metadataPrefix", f.getPrefix()),
-        $eTxt("schema", f.getSchema().toString()),
-        $eTxt("metadataNamespace", f.getNamespace().toString()));
+    return $e("metadataFormat", $eTxt("metadataPrefix", f.getPrefix()), $eTxt("schema", f.getSchema().toString()),
+            $eTxt("metadataNamespace", f.getNamespace().toString()));
   }
 
   /**
@@ -172,21 +145,25 @@ public abstract class OaiXmlGen extends XmlGen {
    * Create the header element for a result item.
    */
   Element header(SearchResultItem item) {
-    return $e("header",
-        $eTxt("identifier", item.getId()),
-        $eTxt("datestamp",
-            option(item.getModified()).map(repository.toSupportedGranularity).getOrElse(Functions.defaultValue("", "created"))
+    return $e(
+            "header",
+            $eTxt("identifier", item.getId()),
+            $eTxt("datestamp",
+                    option(item.getModified()).map(repository.toSupportedGranularity).getOrElse(
+                            Functions.defaultValue("", "created"))
             // todo output setSpec and deleted status
             // How to determine the media type?
             // There is a field oc_mediatype in the index but this one distinguishes
             // only audioVisual and series.
-        ));
+            ));
   }
 
   /**
    * Merge two node arrays into a list.
    */
   protected List<Node> merge(Node[] a, Node... b) {
-    return Collections.concat(_(a), _(b));
+    List<Node> merge = new ArrayList<Node>(_(a));
+    merge.addAll(_(b));
+    return merge;
   }
 }

@@ -82,7 +82,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * Sets the workspace to use.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -92,7 +92,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * Sets the trusted http client
-   * 
+   *
    * @param client
    *          the trusted http client
    */
@@ -102,7 +102,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -210,8 +210,9 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
         continue;
       }
 
+      HttpResponse response = null;
       try {
-        HttpResponse response = client.execute(delete);
+        response = client.execute(delete);
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == HttpStatus.SC_NO_CONTENT || statusCode == HttpStatus.SC_OK) {
           logger.info("Sucessfully deleted external URI {}", delete.getURI());
@@ -223,6 +224,8 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
       } catch (TrustedHttpClientException e) {
         logger.warn("Unable to execute DELETE request on external URI {}", delete.getURI());
         throw new WorkflowOperationException(e);
+      } finally {
+        client.close(response);
       }
     }
 
@@ -231,7 +234,7 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override

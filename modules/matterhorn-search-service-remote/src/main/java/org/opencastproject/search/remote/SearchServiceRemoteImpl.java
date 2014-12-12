@@ -54,7 +54,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#add(org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
@@ -63,7 +63,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new SearchException("Unable to assemble a remote search request for mediapackage " + mediaPackage, e);
     }
@@ -87,7 +87,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#delete(java.lang.String)
    */
   @Override
@@ -111,7 +111,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#getByQuery(org.opencastproject.search.api.SearchQuery)
    */
   @Override
@@ -131,7 +131,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#getForAdministrativeRead(org.opencastproject.search.api.SearchQuery)
    */
   @Override
@@ -152,7 +152,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.search.api.SearchService#getByQuery(java.lang.String, int, int)
    */
   @Override
@@ -178,7 +178,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
 
   /**
    * Builds the a search URL.
-   * 
+   *
    * @param q
    *          the search query
    * @param admin
@@ -189,7 +189,8 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
     StringBuilder url = new StringBuilder();
     List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
 
-    if (q.getSeriesId() != null || q.getElementFlavors() != null || q.getElementTags() != null) {
+    // MH-10216, Choose "/expisode.xml" endpoint when querying by mediapackage id (i.e. episode id ) to recieve full mp data
+    if (q.getId() != null || q.getSeriesId() != null || q.getElementFlavors() != null || q.getElementTags() != null) {
       url.append("/episode.xml?");
 
       if (q.getSeriesId() != null)

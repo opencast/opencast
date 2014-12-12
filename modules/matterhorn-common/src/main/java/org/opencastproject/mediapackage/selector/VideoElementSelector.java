@@ -43,7 +43,7 @@ public class VideoElementSelector extends AbstractMediaPackageElementSelector<Tr
 
   /**
    * Creates a new selector that will restrict the result of <code>select()</code> to the given flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -53,7 +53,7 @@ public class VideoElementSelector extends AbstractMediaPackageElementSelector<Tr
 
   /**
    * Creates a new selector that will restrict the result of <code>select()</code> to the given flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -63,7 +63,7 @@ public class VideoElementSelector extends AbstractMediaPackageElementSelector<Tr
 
   /**
    * Specifies an explicit video flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -77,7 +77,7 @@ public class VideoElementSelector extends AbstractMediaPackageElementSelector<Tr
 
   /**
    * Specifies an explicit video flavor.
-   * 
+   *
    * @param flavor
    *          the flavor
    */
@@ -89,7 +89,7 @@ public class VideoElementSelector extends AbstractMediaPackageElementSelector<Tr
 
   /**
    * Returns the explicit video flavor or <code>null</code> if none was specified.
-   * 
+   *
    * @return the video flavor
    */
   public MediaPackageElementFlavor getVideoFlavor() {
@@ -99,7 +99,7 @@ public class VideoElementSelector extends AbstractMediaPackageElementSelector<Tr
   /**
    * Returns a track or a number of tracks from the media package that together contain video and video. If no such
    * combination can be found, e. g. there is no video or video at all, an empty array is returned.
-   * 
+   *
    * @see org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage, boolean)
    */
   @Override

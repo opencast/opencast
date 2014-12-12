@@ -13,14 +13,15 @@
  *  permissions and limitations under the License.
  *
  */
-
 package org.opencastproject.util;
 
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
@@ -31,8 +32,8 @@ import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 
+import com.google.common.io.Resources;
 import de.schlichtherle.io.FileWriter;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -52,6 +53,8 @@ import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.FileLock;
+import java.nio.charset.Charset;
+import java.util.Properties;
 
 /**
  * Contains operations concerning IO.
@@ -82,7 +85,7 @@ public final class IoSupport {
    * Closes a <code>Closable</code> quietly so that no exceptions are thrown.
    *
    * @param s
-   *         maybe null
+   *          maybe null
    */
   public static boolean closeQuietly(final Closeable s) {
     if (s == null) {
@@ -100,7 +103,7 @@ public final class IoSupport {
    * Closes a <code>StreamHelper</code> quietly so that no exceptions are thrown.
    *
    * @param s
-   *         maybe null
+   *          maybe null
    */
   public static boolean closeQuietly(final StreamHelper s) {
     if (s == null) {
@@ -118,7 +121,7 @@ public final class IoSupport {
    * Closes the processes input, output and error streams.
    *
    * @param process
-   *         the process
+   *          the process
    * @return <code>true</code> if the streams were closed
    */
   public static boolean closeQuietly(final Process process) {
@@ -143,7 +146,7 @@ public final class IoSupport {
    * have error, input and output streams.
    *
    * @param is
-   *         the input stream
+   *          the input stream
    * @return the stream content
    */
   public static String getOutput(InputStream is) {
@@ -173,9 +176,9 @@ public final class IoSupport {
    * Writes the contents variable to the {@code URL}. Note that the URL must be a local {@code URL}.
    *
    * @param file
-   *         The {@code URL} of the local file you wish to write to.
+   *          The {@code URL} of the local file you wish to write to.
    * @param contents
-   *         The contents of the file you wish to create.
+   *          The contents of the file you wish to create.
    * @throws URISyntaxException
    */
   public static void writeUTF8File(URL file, String contents) throws IOException {
@@ -190,9 +193,9 @@ public final class IoSupport {
    * Writes the contents variable to the {@code File}.
    *
    * @param file
-   *         The {@code File} of the local file you wish to write to.
+   *          The {@code File} of the local file you wish to write to.
    * @param contents
-   *         The contents of the file you wish to create.
+   *          The contents of the file you wish to create.
    */
   public static void writeUTF8File(File file, String contents) throws IOException {
     writeUTF8File(file.getAbsolutePath(), contents);
@@ -202,23 +205,26 @@ public final class IoSupport {
    * Writes the contents variable to the {@code File} located at the filename.
    *
    * @param filename
-   *         The {@code File} of the local file you wish to write to.
+   *          The {@code File} of the local file you wish to write to.
    * @param contents
-   *         The contents of the file you wish to create.
+   *          The contents of the file you wish to create.
    */
   public static void writeUTF8File(String filename, String contents) throws IOException {
     FileWriter out = new FileWriter(filename);
-    out.write(contents);
-    closeQuietly(out);
+    try {
+      out.write(contents);
+    } finally {
+      closeQuietly(out);
+    }
   }
 
   /**
    * Convenience method to read in a file from a local source.
    *
    * @param url
-   *         The {@code URL} to read the source data from.
+   *          The {@code URL} to read the source data from.
    * @return A String containing the source data or null in the case of an error.
-   * @deprecated this method doesn't support UTF8 or handle HTTP response codes 
+   * @deprecated this method doesn't support UTF8 or handle HTTP response codes
    */
   public static String readFileFromURL(URL url) {
     return readFileFromURL(url, null);
@@ -228,10 +234,10 @@ public final class IoSupport {
    * Convenience method to read in a file from either a remote or local source.
    *
    * @param url
-   *         The {@code URL} to read the source data from.
+   *          The {@code URL} to read the source data from.
    * @param trustedClient
-   *         The {@code TrustedHttpClient} which should be used to communicate with the remote server. This can be null
-   *         for local file reads.
+   *          The {@code TrustedHttpClient} which should be used to communicate with the remote server. This can be null
+   *          for local file reads.
    * @return A String containing the source data or null in the case of an error.
    * @deprecated this method doesn't support UTF8 or handle HTTP response codes
    */
@@ -283,6 +289,57 @@ public final class IoSupport {
     return sb.toString();
   }
 
+  public static Properties loadPropertiesFromFile(final String path) {
+    try {
+      return loadPropertiesFromStream(new FileInputStream(path));
+    } catch (FileNotFoundException e) {
+      return chuck(e);
+    }
+  }
+
+  public static Properties loadPropertiesFromUrl(final URL url) {
+    try {
+      return loadPropertiesFromStream(url.openStream());
+    } catch (IOException e) {
+      return chuck(e);
+    }
+  }
+
+  /** Load properties from a stream. Close the stream after reading. */
+  public static Properties loadPropertiesFromStream(final InputStream stream) {
+    return withResource(stream, new Function.X<InputStream, Properties>() {
+      @Override public Properties xapply(InputStream in) throws Exception {
+        final Properties p = new Properties();
+        p.load(in);
+        return p;
+      }
+    });
+  }
+
+  /** Load a properties file from the classpath using the class loader of {@link IoSupport}. */
+  public static Properties loadPropertiesFromClassPath(String resource) {
+    return loadPropertiesFromClassPath(resource, IoSupport.class);
+  }
+
+  /** Load a properties file from the classpath using the class loader of the given class. */
+  public static Properties loadPropertiesFromClassPath(final String resource, final Class<?> clazz) {
+    for (InputStream in : openClassPathResource(resource, clazz)) {
+      return withResource(in, new Function<InputStream, Properties>() {
+        @Override
+        public Properties apply(InputStream is) {
+          final Properties p = new Properties();
+          try {
+            p.load(is);
+          } catch (Exception e) {
+            throw new Error("Cannot load resource " + resource + "@" + clazz);
+          }
+          return p;
+        }
+      });
+    }
+    return chuck(new FileNotFoundException(resource + " does not exist"));
+  }
+
   /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
    *
@@ -308,11 +365,52 @@ public final class IoSupport {
   }
 
   /**
+   * Open a classpath resource using the class loader of the given class.
+   *
+   * @return an input stream to the resource wrapped in a Some or none if the resource cannot be found
+   */
+  public static Option<InputStream> openClassPathResource(String resource, Class<?> clazz) {
+    return option(clazz.getResourceAsStream(resource));
+  }
+
+  /**
+   * Open a classpath resource using the class loader of {@link IoSupport}.
+   *
+   * @see #openClassPathResource(String, Class)
+   */
+  public static Option<InputStream> openClassPathResource(String resource) {
+    return openClassPathResource(resource, IoSupport.class);
+  }
+
+  /**
+   * Load a classpath resource into a string using UTF-8 encoding and the class loader of the given class.
+   *
+   * @return the content of the resource wrapped in a Some or none in case of any error
+   */
+  public static Option<String> loadFileFromClassPathAsString(String resource, Class<?> clazz) {
+    try {
+      final URL url = clazz.getResource(resource);
+      return url != null ? some(Resources.toString(clazz.getResource(resource), Charset.forName("UTF-8"))) : none(String.class);
+    } catch (IOException e) {
+      return none();
+    }
+  }
+
+  /**
+   * Load a classpath resource into a string using the class loader of {@link IoSupport}.
+   *
+   * @see #loadFileFromClassPathAsString(String, Class)
+   */
+  public static Option<String> loadFileFromClassPathAsString(String resource) {
+    return loadFileFromClassPathAsString(resource, IoSupport.class);
+  }
+
+  /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
    * <p/>
    * <strong>Please note:</strong> The outcome of <code>f</code> is wrapped into a some. Therefore <code>f</code> is
-   * <em>not</em> allowed to return <code>null</code>. Use an <code>Option</code> instead and {@link org.opencastproject.util.data.Option#flatten() flatten}
-   * the overall result.
+   * <em>not</em> allowed to return <code>null</code>. Use an <code>Option</code> instead and
+   * {@link org.opencastproject.util.data.Option#flatten() flatten} the overall result.
    *
    * @return none, if the file does not exist
    */
@@ -337,10 +435,12 @@ public final class IoSupport {
    *          error handler transforming an exception into something else
    * @param f
    *          stream handler
-   * @deprecated use {@link #withResource(org.opencastproject.util.data.Function0, org.opencastproject.util.data.Function, org.opencastproject.util.data.Function)} instead
+   * @deprecated use
+   *             {@link #withResource(org.opencastproject.util.data.Function0, org.opencastproject.util.data.Function, org.opencastproject.util.data.Function)}
+   *             instead
    */
   public static <A, Err> Either<Err, A> withStream(Function0<InputStream> s, Function<Exception, Err> toErr,
-                                                   Function<InputStream, A> f) {
+          Function<InputStream, A> f) {
     InputStream in = null;
     try {
       in = s.apply();
@@ -363,8 +463,7 @@ public final class IoSupport {
    *          resource handler
    */
   public static <A, Err, B extends Closeable> Either<Err, A> withResource(Function0<B> r,
-                                                                          Function<Exception, Err> toErr,
-                                                                          Function<B, A> f) {
+          Function<Exception, Err> toErr, Function<B, A> f) {
     B b = null;
     try {
       b = r.apply();
@@ -389,9 +488,7 @@ public final class IoSupport {
     }
   }
 
-  /**
-   * Handle multiple streams inside <code>f</code> and ensure that they get closed properly.
-   */
+  /** Handle multiple streams inside <code>f</code> and ensure that they get closed properly. */
   public static <A> A withStreams(InputStream[] in, OutputStream[] out, Function2<InputStream[], OutputStream[], A> f) {
     try {
       return f.apply(in, out);
@@ -405,9 +502,34 @@ public final class IoSupport {
     }
   }
 
-  /**
-   * Create a function that creates a {@link java.io.FileInputStream}.
-   */
+  /** Like {@link IOUtils#toString(java.net.URL, String)} but without checked exception. */
+  public static String readToString(URL url, String encoding) {
+    try {
+      return IOUtils.toString(url, encoding);
+    } catch (IOException e) {
+      return chuck(e);
+    }
+  }
+
+  /** Function that reads an input stream into a string using utf-8 encoding. Stream does not get closed. */
+  public static final Function<InputStream, String> readToString = new Function.X<InputStream, String>() {
+    @Override public String xapply(InputStream in) throws IOException {
+      return IOUtils.toString(in, "utf-8");
+    }
+  };
+
+  /** Wrap function <code>f</code> to close the input stream after usage. */
+  public static <A> Function<InputStream, A> closeAfterwards(final Function<InputStream, ? extends A> f) {
+    return new Function<InputStream, A>() {
+      @Override public A apply(InputStream in) {
+        final A a = f.apply(in);
+        IOUtils.closeQuietly(in);
+        return a;
+      }
+    };
+  }
+
+  /** Create a function that creates a {@link java.io.FileInputStream}. */
   public static Function0<InputStream> fileInputStream(final File a) {
     return new Function0.X<InputStream>() {
       @Override
@@ -425,26 +547,28 @@ public final class IoSupport {
   /**
    * Run function <code>f</code> having exclusive read/write access to the given file.
    * <p/>
-   * Please note that the implementation uses Java NIO {@link java.nio.channels.FileLock} which
-   * only guarantees that two Java processes cannot interfere with each other.
+   * Please note that the implementation uses Java NIO {@link java.nio.channels.FileLock} which only guarantees that two
+   * Java processes cannot interfere with each other.
    * <p/>
-   * The implementation blocks until a lock can be aquired.
+   * The implementation blocks until a lock can be acquired.
    */
   public static synchronized <A> A locked(File file, Function<File, A> f) {
-    final Effect0 lock = aquireLock(file);
+    final Effect0 key = acquireLock(file);
     try {
       return f.apply(file);
     } finally {
-      lock.apply();
+      key.apply();
     }
   }
 
-  private static Effect0 aquireLock(File file) {
+  /** Acquire a lock on a file. Return a key to release the lock. */
+  private static Effect0 acquireLock(File file) {
     try {
       final RandomAccessFile raf = new RandomAccessFile(file, "rw");
       final FileLock lock = raf.getChannel().lock();
       return new Effect0() {
-        @Override protected void run() {
+        @Override
+        protected void run() {
           try {
             lock.release();
           } catch (IOException ignore) {

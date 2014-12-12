@@ -20,7 +20,7 @@ import org.opencastproject.mediapackage.XmlElement;
 
 /**
  * Models a keyword annotation with relevance, confidence and the keyword itself.
- * 
+ *
  * <pre>
  * &lt;complexType name=&quot;KeywordAnnotationType&quot;&gt;
  *   &lt;sequence&gt;
@@ -57,14 +57,14 @@ public interface KeywordAnnotation extends XmlElement {
 
   /**
    * Returns the keyword.
-   * 
+   *
    * @return the keyword
    */
   String getKeyword();
 
   /**
    * Returns the type of this keyword annotation. The default value is <code>main</code>.
-   * 
+   *
    * @return the keyword type
    */
   Type getType();

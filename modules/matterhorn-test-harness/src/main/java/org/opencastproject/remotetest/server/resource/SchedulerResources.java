@@ -38,7 +38,7 @@ public class SchedulerResources {
   private static final String getServiceUrl() {
     return Main.getBaseUrl() + "/scheduler/";
   }
-  
+
   public static HttpResponse addEvent(TrustedHttpClient client, String event) throws Exception {
     HttpPut put = new HttpPut(getServiceUrl() + "event");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -46,7 +46,7 @@ public class SchedulerResources {
     put.setEntity(new UrlEncodedFormEntity(params));
     return client.execute(put);
   }
-  
+
   public static HttpResponse updateEvent(TrustedHttpClient client, String event) throws Exception {
     HttpPost post = new HttpPost(getServiceUrl() + "updateEvent");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -54,15 +54,15 @@ public class SchedulerResources {
     post.setEntity(new UrlEncodedFormEntity(params));
     return client.execute(post);
   }
-  
+
   public static HttpResponse getEvent(TrustedHttpClient client, String id) throws Exception {
     return client.execute(new HttpGet(getServiceUrl() + "getEvent/" + id));
   }
-  
+
   public static HttpResponse getDublinCoreMetadata(TrustedHttpClient client, String id) throws Exception {
     return client.execute(new HttpGet(getServiceUrl() + "getDublinCoreMetadata/" + id));
   }
-  
+
   public static HttpResponse findConflictingEvents(TrustedHttpClient client, String event) throws Exception {
     HttpPost post = new HttpPost(getServiceUrl() + "findConflictingEvents");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -70,11 +70,11 @@ public class SchedulerResources {
     post.setEntity(new UrlEncodedFormEntity(params));
     return client.execute(post);
   }
-  
+
   public static HttpResponse removeEvent(TrustedHttpClient client, String id) throws Exception {
     return client.execute(new HttpGet(getServiceUrl() + "removeEvent/" + id));
   }
-  
+
   public static HttpResponse getEvents(TrustedHttpClient client) throws Exception {
     return client.execute(new HttpGet(getServiceUrl() + "getEvents"));
   }
@@ -82,11 +82,11 @@ public class SchedulerResources {
   public static HttpResponse getUpcomingEvents(TrustedHttpClient client) throws Exception {
     return client.execute(new HttpGet(getServiceUrl() + "getUpcomingEvents"));
   }
-  
+
   public static HttpResponse getCalendarForCaptureAgent(TrustedHttpClient client, String id) throws Exception {
     return client.execute(new HttpGet(getServiceUrl() + "getCalendarForCaptureAgent/" + id));
   }
-  
+
   public static HttpResponse getCaptureAgentMetadata(TrustedHttpClient client, String id) throws Exception {
     return client.execute(new HttpGet(getServiceUrl() + "getCaptureAgentMetadata/" + id));
   }

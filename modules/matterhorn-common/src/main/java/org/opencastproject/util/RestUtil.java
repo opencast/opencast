@@ -16,25 +16,29 @@
 
 package org.opencastproject.util;
 
-import org.opencastproject.rest.RestConstants;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple;
-import org.osgi.service.component.ComponentContext;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.regex.Pattern;
-
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Strings.split;
 import static org.opencastproject.util.data.functions.Strings.trimToNil;
+
+import org.opencastproject.job.api.JaxbJob;
+import org.opencastproject.job.api.Job;
+import org.opencastproject.rest.RestConstants;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Monadics;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
+
+import org.osgi.service.component.ComponentContext;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.regex.Pattern;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /** Utility functions for REST endpoints. */
 public final class RestUtil {
@@ -42,27 +46,25 @@ public final class RestUtil {
   }
 
   /**
-   * Return the endpoint's server URL and the service path by extracting the relevant parameters
-   * from the ComponentContext.
-   * 
+   * Return the endpoint's server URL and the service path by extracting the relevant parameters from the
+   * ComponentContext.
+   *
    * @return (serverUrl, servicePath)
-   * @throws Error if the service path is not configured for this component
+   * @throws Error
+   *           if the service path is not configured for this component
    */
   public static Tuple<String, String> getEndpointUrl(ComponentContext cc) {
-    final String serverUrl = option(
-        cc.getBundleContext().getProperty("org.opencastproject.server.url")).getOrElse(
-        UrlSupport.DEFAULT_BASE_URL);
-    final String servicePath = option(
-        (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY)).getOrElse(
-        Option.<String> error(RestConstants.SERVICE_PATH_PROPERTY + " property not configured"));
+    final String serverUrl = option(cc.getBundleContext().getProperty("org.opencastproject.server.url")).getOrElse(
+            UrlSupport.DEFAULT_BASE_URL);
+    final String servicePath = option((String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY)).getOrElse(
+            Option.<String> error(RestConstants.SERVICE_PATH_PROPERTY + " property not configured"));
     return tuple(serverUrl, servicePath);
   }
 
   /** Create a file response. */
-  public static Response.ResponseBuilder fileResponse(File f, String contentType,
-                                                      Option<String> fileName) {
+  public static Response.ResponseBuilder fileResponse(File f, String contentType, Option<String> fileName) {
     final Response.ResponseBuilder b = Response.ok(f).header("Content-Type", contentType)
-        .header("Content-Length", f.length());
+            .header("Content-Length", f.length());
     for (String fn : fileName)
       b.header("Content-Disposition", "attachment; filename=" + fn);
     return b;
@@ -70,16 +72,21 @@ public final class RestUtil {
 
   /**
    * create a partial file response
-   * @param f the requested file
-   * @param contentType the contentType to send
-   * @param fileName the filename to send
-   * @param rangeHeader the range header
+   *
+   * @param f
+   *          the requested file
+   * @param contentType
+   *          the contentType to send
+   * @param fileName
+   *          the filename to send
+   * @param rangeHeader
+   *          the range header
    * @return the Responsebuilder
-   * @throws IOException if something goes wrong
+   * @throws IOException
+   *           if something goes wrong
    */
-  public static Response.ResponseBuilder partialFileResponse(File f, String contentType,
-                                                             Option<String> fileName,
-                                                             String rangeHeader) throws IOException {
+  public static Response.ResponseBuilder partialFileResponse(File f, String contentType, Option<String> fileName,
+          String rangeHeader) throws IOException {
 
     String rangeValue = rangeHeader.trim().substring("bytes=".length());
     long fileLength = f.length();
@@ -114,9 +121,8 @@ public final class RestUtil {
   }
 
   /** Create a stream response. */
-  public static Response.ResponseBuilder streamResponse(InputStream in, String contentType,
-                                                        Option<Long> streamLength,
-                                                        Option<String> fileName) {
+  public static Response.ResponseBuilder streamResponse(InputStream in, String contentType, Option<Long> streamLength,
+          Option<String> fileName) {
     final Response.ResponseBuilder b = Response.ok(in).header("Content-Type", contentType);
     for (Long l : streamLength)
       b.header("Content-Length", l);
@@ -125,9 +131,18 @@ public final class RestUtil {
     return b;
   }
 
-  /** Return JSON if <code>format</code> == json, XML else. */
+  /**
+   * Return JSON if <code>format</code> == json, XML else.
+   *
+   * @deprecated use {@link #getResponseType(String)}
+   */
   public static MediaType getResponseFormat(String format) {
     return "json".equalsIgnoreCase(format) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
+  }
+
+  /** Return JSON if <code>type</code> == json, XML else. */
+  public static MediaType getResponseType(String type) {
+    return "json".equalsIgnoreCase(type) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
   }
 
   private static final Function<String, String[]> CSV_SPLIT = split(Pattern.compile(","));
@@ -138,10 +153,12 @@ public final class RestUtil {
    * x=comma,separated,,%20value -&gt; ["comma", "separated", "value"]
    */
   public static Monadics.ListMonadic<String> splitCommaSeparatedParam(Option<String> param) {
-    for (String p : param) return mlist(CSV_SPLIT.apply(p)).bind(trimToNil);
+    for (String p : param)
+      return mlist(CSV_SPLIT.apply(p)).bind(trimToNil);
     return mlist();
   }
 
+  /** Response builder functions. */
   public static final class R {
     private R() {
     }
@@ -154,8 +171,32 @@ public final class RestUtil {
       return Response.ok().entity(entity).build();
     }
 
+    public static Response ok(boolean entity) {
+      return Response.ok().entity(Boolean.toString(entity)).build();
+    }
+
+    public static Response ok(Jsons.Obj json) {
+      return Response.ok().entity(json.toJson()).type(MediaType.APPLICATION_JSON_TYPE).build();
+    }
+
+    public static Response ok(Job job) {
+      return Response.ok().entity(new JaxbJob(job)).build();
+    }
+
+    public static Response ok(MediaType type, Object entity) {
+      return Response.ok(entity, type).build();
+    }
+
     public static Response notFound() {
       return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    public static Response notFound(Object entity) {
+      return Response.status(Response.Status.NOT_FOUND).entity(entity).build();
+    }
+
+    public static Response notFound(Object entity, MediaType type) {
+      return Response.status(Response.Status.NOT_FOUND).entity(entity).type(type).build();
     }
 
     public static Response serverError() {
@@ -172,6 +213,10 @@ public final class RestUtil {
 
     public static Response badRequest() {
       return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    public static Response badRequest(String msg) {
+      return Response.status(Response.Status.BAD_REQUEST).entity(msg).build();
     }
   }
 }

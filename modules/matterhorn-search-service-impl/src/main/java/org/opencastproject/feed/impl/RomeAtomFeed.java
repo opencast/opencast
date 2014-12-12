@@ -51,7 +51,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Creates a new feed of type <code>SyndFeed</code>.
-   * 
+   *
    * @param feed
    *          the original feed
    * @param feedInfo
@@ -63,7 +63,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Converts the replay feed to a rome feed, that can then be written to the reponse.
-   * 
+   *
    * @param originalFeed
    *          the original feed
    * @param feedInfo
@@ -88,6 +88,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
     setUpdated(originalFeed.getUpdatedDate());
     setTitleEx(toRomeAtomContent(originalFeed.getTitle()));
     setId(originalFeed.getUri());
+    setCopyright(originalFeed.getCopyright());
     List <Link> otherLinks = new ArrayList <Link>();
     otherLinks.add(new LinkImpl(originalFeed.getLink()));
     setOtherLinks(toRomeAtomLinks(otherLinks));
@@ -108,7 +109,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
         e.setUpdated(entry.getUpdatedDate());
         e.setId(entry.getUri());
         List<com.sun.syndication.feed.atom.Link> links = toRomeAtomLinks(entry.getLinks());
-        links.addAll(toRomeAtomEnclosures(entry.getEnclosures())); 
+        links.addAll(toRomeAtomEnclosures(entry.getEnclosures()));
         e.setOtherLinks(links);
         // todo this strategy seems to work but is unproven
         //if (links.size() > 0)
@@ -121,7 +122,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Converts a list of categories to a <code>ROME</code> category list.
-   * 
+   *
    * @param categories
    *          original categories
    * @return <code>ROME</code> category list
@@ -141,7 +142,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Converts the content to a <code>ROME</code> object.
-   * 
+   *
    * @param content
    *          original content
    * @return <code>ROME</code> content object
@@ -158,7 +159,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Converts a list of content elements to a <code>ROME</code> content list.
-   * 
+   *
    * @param contents
    *          original contents
    * @return <code>ROME</code> content list
@@ -175,7 +176,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Converts a list of enclosures to a <code>ROME</code> enclosure list.
-   * 
+   *
    * @param enclosures
    *          original enclosures
    * @return <code>ROME</code> enclosure list
@@ -198,7 +199,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Converts a list of links to a <code>ROME</code> link list.
-   * 
+   *
    * @param links
    *          original links
    * @return <code>ROME</code> link list
@@ -224,7 +225,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Converts a list of persons to a <code>ROME</code> person list.
-   * 
+   *
    * @param persons
    *          original persons
    * @return <code>ROME</code> person list
@@ -245,7 +246,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Returns the rome version of the feed extensions.
-   * 
+   *
    * @param modules
    *          the feed extensions
    * @return the rome feed extensions
@@ -267,7 +268,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Creates a rome compatible dublin core module.
-   * 
+   *
    * @param dcExtension
    *          the dublin core feed extension
    * @return the rome module
@@ -301,7 +302,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Creates a rome compatible itunes feed module.
-   * 
+   *
    * @param ext
    *          the itunes feed extension
    * @return the rome module
@@ -323,7 +324,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
 
   /**
    * Creates a rome compatible itunes feed entry extension.
-   * 
+   *
    * @param ext
    *          the itunes entry extension
    * @return the rome module

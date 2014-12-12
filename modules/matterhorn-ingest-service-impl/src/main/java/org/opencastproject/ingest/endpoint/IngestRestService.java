@@ -28,8 +28,10 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -47,6 +49,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -113,6 +117,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   /** The default workflow definition */
   private String defaultWorkflowDefinitionId = null;
 
+  /** The http client */
+  private TrustedHttpClient httpClient;
+
   /** Dublin Core Terms: http://purl.org/dc/terms/ */
   private static List<String> dcterms = Arrays.asList("abstract", "accessRights", "accrualMethod",
           "accrualPeriodicity", "accrualPolicy", "alternative", "audience", "available", "bibliographicCitation",
@@ -142,7 +149,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Returns the maximum number of concurrent ingest operations or <code>-1</code> if no limit is enforced.
-   * 
+   *
    * @return the maximum number of concurrent ingest operations
    * @see #isIngestLimitEnabled()
    */
@@ -152,7 +159,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the maximum number of concurrent ingest operations. Use <code>-1</code> to indicate no limit.
-   * 
+   *
    * @param ingestLimit
    *          the limit
    */
@@ -162,7 +169,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Returns <code>true</code> if a maximum number of concurrent ingest operations has been defined.
-   * 
+   *
    * @return <code>true</code> if there is a maximum number of concurrent ingests
    */
   protected synchronized boolean isIngestLimitEnabled() {
@@ -271,12 +278,18 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addTrack")
-  @RestQuery(name = "addTrackInputStream", description = "Add a media track to a given media package using an input stream", restParameters = {
-          @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
-          @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+  @RestQuery(
+    name = "addTrackInputStream",
+    description = "Add a media track to a given media package using an input stream",
+    restParameters = {
+      @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+      @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
+    bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
+    reponses = {
+      @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+      @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+    returnDescription = "")
   public Response addMediaPackageTrack(@Context HttpServletRequest request) {
     return addMediaPackageElement(request, MediaPackageElement.Type.Track);
   }
@@ -360,57 +373,69 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   protected Response addMediaPackageElement(HttpServletRequest request, MediaPackageElement.Type type) {
     MediaPackageElementFlavor flavor = null;
+    InputStream in = null;
     try {
-      InputStream in = null;
       String fileName = null;
       MediaPackage mp = null;
-      if (ServletFileUpload.isMultipartContent(request)) {
-        boolean isDone = false;
-        for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
-          FileItemStream item = iter.next();
-          String fieldName = item.getFieldName();
-          if (item.isFormField()) {
-            if ("flavor".equals(fieldName)) {
-              String flavorString = Streams.asString(item.openStream());
-              if (flavorString != null) {
-                flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
-              }
-            } else if ("mediaPackage".equals(fieldName)) {
-              mp = factory.newMediaPackageBuilder().loadFromXml(item.openStream());
-            }
-          } else {
-            // once the body gets read iter.hasNext must not be invoked or the stream can not be read
-            // MH-9579
-            fileName = item.getName();
-            in = item.openStream();
-            isDone = true;
-          }
-          if (isDone) {
-            break;
-          }
-        }
-        if (MediaPackageSupport.sanityCheck(mp).isSome())
-          return Response.serverError().status(Status.BAD_REQUEST).build();
-        switch (type) {
-          case Attachment:
-            mp = ingestService.addAttachment(in, fileName, flavor, mp);
-            break;
-          case Catalog:
-            mp = ingestService.addCatalog(in, fileName, flavor, mp);
-            break;
-          case Track:
-            mp = ingestService.addTrack(in, fileName, flavor, mp);
-            break;
-          default:
-            throw new IllegalStateException("Type must be one of track, catalog, or attachment");
-        }
-        // ingestService.ingest(mp);
-        return Response.ok(MediaPackageParser.getAsXml(mp)).build();
+      /* Only accept multipart/form-data */
+      if (!ServletFileUpload.isMultipartContent(request)) {
+        return Response.serverError().status(Status.BAD_REQUEST).build();
       }
-      return Response.serverError().status(Status.BAD_REQUEST).build();
+      boolean isDone = false;
+      for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
+        FileItemStream item = iter.next();
+        String fieldName = item.getFieldName();
+        if (item.isFormField()) {
+          if ("flavor".equals(fieldName)) {
+            String flavorString = Streams.asString(item.openStream());
+            if (flavorString != null) {
+              flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
+            }
+          } else if ("mediaPackage".equals(fieldName)) {
+            try {
+              mp = factory.newMediaPackageBuilder().loadFromXml(item.openStream());
+            } catch (MediaPackageException e) {
+              return Response.serverError().status(Status.BAD_REQUEST).build();
+            }
+          }
+        } else {
+          if (flavor == null) {
+            /* A flavor has to be specified in the request prior the video file */
+            return Response.serverError().status(Status.BAD_REQUEST).build();
+          }
+          fileName = item.getName();
+          in = item.openStream();
+          isDone = true;
+        }
+        if (isDone) {
+          break;
+        }
+      }
+      /* Check if we actually got a valid request including a message body and
+       * a valid mediapackage to attach the element to */
+      if (in == null || mp == null || MediaPackageSupport.sanityCheck(mp).isSome()) {
+        return Response.serverError().status(Status.BAD_REQUEST).build();
+      }
+      switch (type) {
+        case Attachment:
+          mp = ingestService.addAttachment(in, fileName, flavor, mp);
+          break;
+        case Catalog:
+          mp = ingestService.addCatalog(in, fileName, flavor, mp);
+          break;
+        case Track:
+          mp = ingestService.addTrack(in, fileName, flavor, mp);
+          break;
+        default:
+          throw new IllegalStateException("Type must be one of track, catalog, or attachment");
+      }
+      // ingestService.ingest(mp);
+      return Response.ok(MediaPackageParser.getAsXml(mp)).build();
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    } finally {
+      IOUtils.closeQuietly(in);
     }
   }
 
@@ -418,8 +443,33 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addMediaPackage")
-  @RestQuery(name = "addMediaPackage", description = "Create and ingest media package from media tracks with additional Dublin Core metadata. Notice: It is mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC catalog with a title included.", restParameters = {
-          @RestParameter(description = "The kind of media track. This has to be specified in the request prior to each media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+  @RestQuery(name = "addMediaPackage",
+      description = "<p>Create and ingest media package from media tracks with additional Dublin Core metadata. It is "
+        + "mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC "
+        + "catalog with a title included.  The identifier of the newly created media package will be taken from the "
+        + "<em>identifier</em> field or the episode DublinCore catalog (deprecated<sup>*</sup>). If no identifier is "
+        + "set, a newa randumm UUIDv4 will be generated. This endpoint is not meant to be used by capture agents for "
+        + "scheduled recordings. It's primary use is for manual ingests with command line tools like curl.</p> "
+        + "<p>Multiple tracks can be ingested by using multiple form fields. It's important, however, to always set the "
+        + "flavor of the next media file <em>before</em> sending the media file itself.</p>"
+        + "<b>(*)</b> The special treatment of the identifier field is deprecated any may be removed in future versions "
+        + "without further notice in favor of a random UUID generation to ensure uniqueness of identifiers. "
+        + "<h3>Example curl command:</h3>"
+        + "<p>Ingest one video file:</p>"
+        + "<p><pre>\n"
+        + "curl -f -i --digest -u matterhorn_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
+        + "    http://localhost:8080/ingest/addMediaPackage -F creator='John Doe' -F title='Test Recording' \\\n"
+        + "    -F 'flavor=presentation/source' -F 'BODY=@test-recording.mp4' \n"
+        + "</pre></p>"
+        + "<p>Ingest two video files:</p>"
+        + "<p><pre>\n"
+        + "curl -f -i --digest -u matterhorn_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
+        + "    http://localhost:8080/ingest/addMediaPackage -F creator='John Doe' -F title='Test Recording' \\\n"
+        + "    -F 'flavor=presentation/source' -F 'BODY=@test-recording-vga.mp4' \\\n"
+        + "    -F 'flavor=presenter/source' -F 'BODY=@test-recording-camera.mp4' \n"
+        + "</pre></p>",
+      restParameters = {
+          @RestParameter(description = "The kind of media track. This has to be specified prior to each media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
           @RestParameter(description = "Episode metadata value", isRequired = false, name = "abstract", type = RestParameter.Type.STRING),
           @RestParameter(description = "Episode metadata value", isRequired = false, name = "accessRights", type = RestParameter.Type.STRING),
           @RestParameter(description = "Episode metadata value", isRequired = false, name = "available", type = RestParameter.Type.STRING),
@@ -452,10 +502,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "Episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalog", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
           @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
-          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING), }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
-          @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) },
+      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
+      reponses = {
+          @RestResponse(description = "Ingest successfull. Returns workflow instance as xml", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Ingest failed due to invalid requests.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Ingest failed. Something went wrong internally. Please have a look at the log files",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+      returnDescription = "")
   public Response addMediaPackage(@Context HttpServletRequest request) {
     return addMediaPackage(request, null);
   }
@@ -464,8 +518,35 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addMediaPackage/{wdID}")
-  @RestQuery(name = "addMediaPackage", description = "Create and ingest media package from media tracks with additional Dublin Core metadata. Notice: It is mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC catalog with a title included.", pathParameters = { @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = {
-          @RestParameter(description = "The kind of media track. This has to be specified in the request prior to each media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+  @RestQuery(name = "addMediaPackage",
+      description = "<p>Create and ingest media package from media tracks with additional Dublin Core metadata. It is "
+        + "mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC "
+        + "catalog with a title included.  The identifier of the newly created media package will be taken from the "
+        + "<em>identifier</em> field or the episode DublinCore catalog (deprecated<sup>*</sup>). If no identifier is "
+        + "set, a newa randumm UUIDv4 will be generated. This endpoint is not meant to be used by capture agents for "
+        + "scheduled recordings. It's primary use is for manual ingests with command line tools like curl.</p> "
+        + "<p>Multiple tracks can be ingested by using multiple form fields. It's important, however, to always set the "
+        + "flavor of the next media file <em>before</em> sending the media file itself.</p>"
+        + "<b>(*)</b> The special treatment of the identifier field is deprecated any may be removed in future versions "
+        + "without further notice in favor of a random UUID generation to ensure uniqueness of identifiers. "
+        + "<h3>Example curl command:</h3>"
+        + "<p>Ingest one video file:</p>"
+        + "<p><pre>\n"
+        + "curl -f -i --digest -u matterhorn_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
+        + "    http://localhost:8080/ingest/addMediaPackage/full -F creator='John Doe' -F title='Test Recording' \\\n"
+        + "    -F 'flavor=presentation/source' -F 'BODY=@test-recording.mp4' \n"
+        + "</pre></p>"
+        + "<p>Ingest two video files:</p>"
+        + "<p><pre>\n"
+        + "curl -f -i --digest -u matterhorn_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
+        + "    http://localhost:8080/ingest/addMediaPackage/full -F creator='John Doe' -F title='Test Recording' \\\n"
+        + "    -F 'flavor=presentation/source' -F 'BODY=@test-recording-vga.mp4' \\\n"
+        + "    -F 'flavor=presenter/source' -F 'BODY=@test-recording-camera.mp4' \n"
+        + "</pre></p>",
+      pathParameters = {
+          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) },
+      restParameters = {
+          @RestParameter(description = "The kind of media track. This has to be specified prior to each media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
           @RestParameter(description = "Episode metadata value", isRequired = false, name = "abstract", type = RestParameter.Type.STRING),
           @RestParameter(description = "Episode metadata value", isRequired = false, name = "accessRights", type = RestParameter.Type.STRING),
           @RestParameter(description = "Episode metadata value", isRequired = false, name = "available", type = RestParameter.Type.STRING),
@@ -498,10 +579,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "Episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalog", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
           @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
-          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
-          @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) },
+      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
+      reponses = {
+          @RestResponse(description = "Ingest successfull. Returns workflow instance as XML", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Ingest failed due to invalid requests.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Ingest failed. Something went wrong internally. Please have a look at the log files",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+      returnDescription = "")
   public Response addMediaPackage(@Context HttpServletRequest request, @PathParam("wdID") String wdID) {
     MediaPackageElementFlavor flavor = null;
     try {
@@ -516,7 +601,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
-            String value = Streams.asString(item.openStream());
+            String value = Streams.asString(item.openStream(), "UTF-8");
             /* Ignore empty fields */
             if ("".equals(value)) {
               continue;
@@ -542,6 +627,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             } else if ("episodeDCCatalogUri".equals(fieldName)) {
               try {
                 URI dcurl = new URI(value);
+                updateMediaPackageID(mp, dcurl);
                 ingestService.addCatalog(dcurl, MediaPackageElements.EPISODE, mp);
                 episodeDCCatalogNumber += 1;
               } catch (java.net.URISyntaxException e) {
@@ -552,9 +638,11 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
               /* Episode metadata DC catalog (XML) as string */
             } else if ("episodeDCCatalog".equals(fieldName)) {
+              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
+              updateMediaPackageID(mp, is);
+              is.reset();
               String fileName = "episode" + episodeDCCatalogNumber + ".xml";
               episodeDCCatalogNumber += 1;
-              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
               ingestService.addCatalog(is, fileName, MediaPackageElements.EPISODE, mp);
 
               /* Series by URL */
@@ -614,15 +702,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           return Response.serverError().status(Status.BAD_REQUEST).build();
         }
 
-        Catalog[] dccs = mp.getCatalogs(MediaPackageElements.EPISODE);
-        for (int i = 0; i < dccs.length; i++) {
-          EName en = new EName(DublinCore.TERMS_NS_URI, "identifier");
-          String id = ((DublinCoreCatalog) dccs[i]).getFirst(en);
-          if (id != null) {
-            mp.setIdentifier(new IdImpl(id));
-          }
-        }
-
         /* Add episode mediapackage if metadata were send separately */
         if (dcc != null) {
           ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -644,6 +723,54 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  /**
+   * Try updating the identifier of a mediapackage with the identifier from a episode DublinCore catalog.
+   *
+   * @param mp
+   *          MediaPackage to modify
+   * @param is
+   *          InputStream containing the episode DublinCore catalog
+   */
+  private void updateMediaPackageID(MediaPackage mp, InputStream is) throws IOException {
+    DublinCoreCatalog dc = new DublinCoreCatalogImpl(is);
+    EName en = new EName(DublinCore.TERMS_NS_URI, "identifier");
+    String id = dc.getFirst(en);
+    if (id != null) {
+      mp.setIdentifier(new IdImpl(id));
+    }
+  }
+
+  /**
+   * Try updating the identifier of a mediapackage with the identifier from a episode DublinCore catalog.
+   *
+   * @param mp
+   *          MediaPackage to modify
+   * @param uri
+   *          URI to get the episode DublinCore catalog from
+   */
+  private void updateMediaPackageID(MediaPackage mp, URI uri) throws IOException {
+    InputStream in = null;
+    HttpResponse response = null;
+    try {
+      if (uri.toString().startsWith("http")) {
+        HttpGet get = new HttpGet(uri);
+        response = httpClient.execute(get);
+        int httpStatusCode = response.getStatusLine().getStatusCode();
+        if (httpStatusCode != 200) {
+          throw new IOException(uri + " returns http " + httpStatusCode);
+        }
+        in = response.getEntity().getContent();
+      } else {
+        in = uri.toURL().openStream();
+      }
+      updateMediaPackageID(mp, in);
+      in.close();
+    } finally {
+      IOUtils.closeQuietly(in);
+      httpClient.close(response);
     }
   }
 
@@ -787,6 +914,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           mp = factory.newMediaPackageBuilder().loadFromXml(formData.getFirst(key));
         }
       }
+      if (mp == null) {
+        logger.warn("Rejected ingest without mediapackage.");
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
       return ingest(mp, wfConfig);
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
@@ -886,7 +1017,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   /**
    * Creates an upload job and returns an HTML form ready for uploading the file to the newly created upload job.
    * Returns 500 if something goes wrong unexpectedly
-   * 
+   *
    * @return HTML form ready for uploading the file
    */
   @GET
@@ -962,7 +1093,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    * Add an elements to a MediaPackage and keeps track of the progress of the upload. Returns an HTML that triggers the
    * host sites UploadListener.uploadComplete javascript event Returns an HTML that triggers the host sites
    * UploadListener.uplaodFailed javascript event in case of error
-   * 
+   *
    * @param jobId
    *          of the upload job
    * @param request
@@ -1050,7 +1181,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Builds a Response containing an HTML that calls the UploadListener.uploadFailed javascript handler.
-   * 
+   *
    * @return HTML that calls the UploadListener.uploadFailed js function
    */
   private Response buildUploadFailedRepsonse(UploadJob job) {
@@ -1071,7 +1202,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   /**
    * Adds a dublinCore metadata catalog to the MediaPackage and returns the grown mediaPackage. JQuery Ajax functions
    * doesn't support multipart/form-data encoding.
-   * 
+   *
    * @param mp
    *          MediaPackage
    * @param dc
@@ -1098,30 +1229,47 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         logger.warn("Unable to set dublin core flavor to {}, using {} instead", flavor, MediaPackageElements.EPISODE);
       }
     }
+    MediaPackage mediaPackage;
+    /* Check if we got a proper mediapackage and try to parse it */
     try {
-      MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(mp); // @FormParam("mediaPackage")
-      if (MediaPackageSupport.sanityCheck(mediaPackage).isSome())
-        return Response.serverError().status(Status.BAD_REQUEST).build();
-      // MediaPackage
-      // mp
-      // yields
-      // Exception
-      mediaPackage = ingestService.addCatalog(IOUtils.toInputStream(dc, "UTF-8"), "dublincore.xml", dcFlavor,
-              mediaPackage);
-      return Response.ok(mediaPackage).build();
+      mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(mp);
+    } catch (MediaPackageException e) {
+      return Response.serverError().status(Status.BAD_REQUEST).build();
+    }
+    if (MediaPackageSupport.sanityCheck(mediaPackage).isSome()) {
+      return Response.serverError().status(Status.BAD_REQUEST).build();
+    }
+
+    /* Check if we got a proper catalog */
+    if (StringUtils.isBlank(dc)) {
+      return Response.serverError().status(Status.BAD_REQUEST).build();
+    }
+
+    InputStream in = null;
+    try {
+      in = IOUtils.toInputStream(dc, "UTF-8");
+      mediaPackage = ingestService.addCatalog(in, "dublincore.xml", dcFlavor, mediaPackage);
+    } catch (MediaPackageException e) {
+      return Response.serverError().status(Status.BAD_REQUEST).build();
+    } catch (IOException e) {
+      /* Return an internal server error if we could not write to disk */
+      logger.error("Could not write catalog to disk: {}", e.getMessage());
+      return Response.serverError().build();
     } catch (Exception e) {
       logger.error(e.getMessage());
-      e.printStackTrace();
       return Response.serverError().build();
+    } finally {
+      IOUtils.closeQuietly(in);
     }
+    return Response.ok(mediaPackage).build();
   }
 
   /**
    * Returns information about the progress of a file upload as a JSON string. Returns 404 if upload job id doesn't
    * exists Returns 500 if something goes wrong unexpectedly
-   * 
+   *
    * TODO cache UploadJobs because endpoint is asked periodically so that not each request yields a DB query operation
-   * 
+   *
    * @param jobId
    * @return progress JSON string
    */
@@ -1160,7 +1308,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGi Declarative Services callback to set the reference to the ingest service.
-   * 
+   *
    * @param ingestService
    *          the ingest service
    */
@@ -1170,7 +1318,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGi Declarative Services callback to set the reference to the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -1180,7 +1328,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGi Declarative Services callback to set the reference to the dublin core service.
-   * 
+   *
    * @param dcService
    *          the dublin core service
    */
@@ -1190,7 +1338,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGi Declarative Services callback to set the reference to the persistence provider.
-   * 
+   *
    * @param persistenceProvider
    *          the persistence provider
    */
@@ -1200,12 +1348,22 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGi Declarative Services callback to set the reference to the persistence properties.
-   * 
+   *
    * @param persistenceProperties
    *          the persistence properties
    */
   void setPersistenceProperties(Map<String, Object> persistenceProperties) {
     this.persistenceProperties = persistenceProperties;
+  }
+
+  /**
+   * Sets the trusted http client
+   *
+   * @param httpClient
+   *          the http client
+   */
+  public void setHttpClient(TrustedHttpClient httpClient) {
+    this.httpClient = httpClient;
   }
 
 }

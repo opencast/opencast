@@ -55,7 +55,10 @@ ocSeries.init = function(){
     }
   });
 
-  ocSeries.roles = ocSecurity.loadRoles();
+  
+  ocSeries.roles = $.map(ocUtils.ensureArray(ocSecurity.loadRoles().roles.role), function(role) {
+      return role.name;
+  });
   
   //Add folding action for hidden sections.
   $('.oc-ui-collapsible-widget .form-box-head').click(
@@ -91,7 +94,6 @@ ocSeries.init = function(){
   privilegeRow += '<td><input type="text" class="role_search"/></td>';
   privilegeRow += '<td class="privilege_edit"><input type="checkbox" name="priv_view" class="privilege_edit" /></td>';
   privilegeRow += '<td class="privilege_edit"><input type="checkbox" name="priv_edit" class="privilege_edit" /></td>';
-  privilegeRow += '<td class="privilege_edit"><input type="checkbox" name="priv_analyze" class="privilege_edit" /></td>';
   privilegeRow += '<td class="privilege_edit"><img src="/admin/img/icons/delete.png" alt="delete" title="Delete Role"></td>';
   privilegeRow += '</tr>';
   var $row;
@@ -99,7 +101,7 @@ ocSeries.init = function(){
   var sourceFunction = function(request, response) {
     var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
     var matched = $.grep( ocSeries.roles, function(value) {
-      return matcher.test( value.label || value.value || value );
+      return matcher.test(value);
     });
     if($(matched).size() != 0) {
       response(matched);
@@ -182,11 +184,11 @@ ocSeries.init = function(){
         }
         $.each(roles.acl.ace, function () {
           if(ocSeries.seriesRolesList[this.role] !== undefined) {
-            ocSeries.seriesRolesList[this.role][this.action] = true;
+            ocSeries.seriesRolesList[this.role][this.action] = this.allow;
           }
           else {
             ocSeries.seriesRolesList[this.role] = new Object();
-            ocSeries.seriesRolesList[this.role][this.action] = true;
+            ocSeries.seriesRolesList[this.role][this.action] = this.allow;
           }
         });
       },
@@ -375,38 +377,35 @@ ocSeries.createACLDocument = function() {
   var out = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="http://org.opencastproject.security">';
   $('.role_search').each(function () {
     var $field = $(this);
+
     //check whether there is a value and entered value is a valid role
     if ($field.attr('value') != "") {
-      if($field.parent().parent().children().find('[name|="priv_view"]').attr('checked')) {
         out += '<ace>';
         out += '<role>' + $field.attr('value') + '</role>';
         out += '<action>read</action>';
-        out += '<allow>true</allow>';
+        out += '<allow>' + $field.parent().parent().children().find('[name|="priv_view"]').is(':checked') + '</allow>';
         out += '</ace>';
-      }
-      if($field.parent().parent().children().find('[name|="priv_edit"]').attr('checked')) {
+
         out += '<ace>';
         out += '<role>' + $field.attr('value') + '</role>';
         out += '<action>write</action>';
-        out += '<allow>true</allow>';
+        out += '<allow>' + $field.parent().parent().children().find('[name|="priv_edit"]').is(':checked') + '</allow>';
         out += '</ace>';
-      }
-      if($field.parent().parent().children().find('[name|="priv_analyze"]').attr('checked')) {
-          out += '<ace>';
-          out += '<role>' + $field.attr('value') + '</role>';
-          out += '<action>analyze</action>';
-          out += '<allow>true</allow>';
-          out += '</ace>';
-        }
+
+        out += '<ace>';
+        out += '<role>' + $field.attr('value') + '</role>';
+        out += '<action>analyze</action>';
+        out += '<allow>' + $field.parent().parent().children().find('[name|="priv_analyze"]').is(':checked') + '</allow>';
+        out += '</ace>';
     }
   });
-  if($('#anonymous_view').attr('checked')) {
-    out += '<ace>';
-    out += '<role>' + ocSeries.anonymous_role + '</role>';
-    out += '<action>read</action>';
-    out += '<allow>true</allow>';
-    out += '</ace>';
-  }
+
+  out += '<ace>';
+  out += '<role>' + ocSeries.anonymous_role + '</role>';
+  out += '<action>read</action>';
+  out += '<allow>' + $('#anonymous_view').is(':checked') + '</allow>';
+  out += '</ace>';
+
   out += '</acl>';
   return out;
 }

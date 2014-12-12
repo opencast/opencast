@@ -32,7 +32,7 @@ public final class DateTimeSupport {
 
   /**
    * This methods reads a utc date string and returns it's unix time equivalent in milliseconds.
-   * 
+   *
    * @param s
    *          the utc string
    * @return the date/time in milliseconds
@@ -66,7 +66,7 @@ public final class DateTimeSupport {
 
   /**
    * Returns the date and time in milliseconds as a utc formatted string.
-   * 
+   *
    * @param time
    *          the utc time string
    * @return the local time

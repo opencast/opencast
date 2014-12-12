@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workflow.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.opencastproject.workflow.api.WorkflowOperationResult.Action.CONTINUE;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
@@ -26,14 +27,17 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -70,7 +74,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -156,11 +159,13 @@ public class WorkflowServiceImplTest {
     service.setUserDirectoryService(userDirectoryService);
 
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authzService.getAccessControlList((MediaPackage) EasyMock.anyObject())).andReturn(acl).anyTimes();
+    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
+            .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
-    List<Organization> organizationList = Arrays.asList(new Organization[] { organization });
+    List<Organization> organizationList = new ArrayList<Organization>();
+    organizationList.add(organization);
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
             .andReturn(securityService.getOrganization()).anyTimes();
@@ -176,10 +181,14 @@ public class WorkflowServiceImplTest {
     EasyMock.expect(workspace.getCollectionContents((String) EasyMock.anyObject())).andReturn(new URI[0]);
     EasyMock.replay(workspace);
 
+    IncidentService incidentService = EasyMock.createNiceMock(IncidentService.class);
+    EasyMock.replay(incidentService);
+
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, incidentService);
 
     serviceRegistry.registerService(REMOTE_SERVICE, REMOTE_HOST, "/path", true);
+    service.setWorkspace(workspace);
 
     dao = new WorkflowServiceSolrIndex();
     dao.setServiceRegistry(serviceRegistry);
@@ -658,7 +667,7 @@ public class WorkflowServiceImplTest {
 
   /**
    * Starts many concurrent workflows to test DB deadlock.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -684,6 +693,55 @@ public class WorkflowServiceImplTest {
 
     Assert.assertEquals(count, service.countWorkflowInstances());
     Assert.assertEquals(count, stateListener.countStateChanges(WorkflowState.SUCCEEDED));
+  }
+
+  /**
+   * Test for {@link WorkflowServiceImpl#remove(long)}
+   * 
+   * @throws Exception
+   *           if anything fails
+   */
+  @Test
+  public void testRemove() throws Exception {
+    WorkflowInstance wi1 = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
+    WorkflowInstance wi2 = startAndWait(workingDefinition, mediapackage2, WorkflowState.SUCCEEDED);
+
+    // reload instances, because operations have no id before
+    wi1 = service.getWorkflowById(wi1.getId());
+    wi2 = service.getWorkflowById(wi2.getId());
+
+    service.remove(wi1.getId());
+    assertEquals(1, service.getWorkflowInstances(new WorkflowQuery()).size());
+    for (WorkflowOperationInstance op : wi1.getOperations()) {
+      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+    }
+
+    service.remove(wi2.getId());
+    assertEquals(0, service.getWorkflowInstances(new WorkflowQuery()).size());
+  }
+
+  /**
+   * Test for {@link WorkflowServiceImpl#cleanupWorkflowInstances(int, WorkflowState)}
+   * 
+   * @throws Exception
+   *           if anything fails
+   */
+  @Test
+  public void testCleanupWorkflowInstances() throws Exception {
+    WorkflowInstance wi1 = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
+    startAndWait(workingDefinition, mediapackage2, WorkflowState.SUCCEEDED);
+
+    // reload instances, because operations have no id before
+    wi1 = service.getWorkflowById(wi1.getId());
+
+    service.cleanupWorkflowInstances(0, WorkflowState.FAILED);
+    assertEquals(2, service.getWorkflowInstances(new WorkflowQuery()).size());
+
+    service.cleanupWorkflowInstances(0, WorkflowState.SUCCEEDED);
+    assertEquals(0, service.getWorkflowInstances(new WorkflowQuery()).size());
+    for (WorkflowOperationInstance op : wi1.getOperations()) {
+      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+    }
   }
 
   class SucceedingWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
@@ -739,7 +797,7 @@ public class WorkflowServiceImplTest {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
      *      org.opencastproject.job.api.JobContext)
      */
@@ -760,7 +818,7 @@ public class WorkflowServiceImplTest {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
      *      org.opencastproject.job.api.JobContext)
      */

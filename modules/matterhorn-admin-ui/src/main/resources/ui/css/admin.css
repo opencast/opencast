@@ -11,12 +11,30 @@ table tr:hover td { background: silver!important; color: black!important; }
 table tr:hover a { color: black!important; }
 table tr:hover a:hover { text-decoration: underline!important; }
 
+table tr:nth-child(even) td {
+  background: #E0E0E0 !important;
+  background-color: #E0E0E0 !important;
+}
+
+table tr:nth-child(odd) td {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+}
+
+table tr:nth-child(even):hover td {
+  background-color: silver !important;
+}
+
+table tr:nth-child(odd):hover td {
+  background-color: silver !important;
+}
+
 .layout-centered { margin-left: auto; margin-right: auto}
 .layout-inline { display: inline-block; }
 .layout-float-left { float: left; }
 .clear {clear:both; height: 0px; width: 0px;}
 .center { text-align: center;}
-.recordings-page {margin-left: 30px; margin-right: 30px;}
+.recordings-page {margin-left: 5px; margin-right: 5px;}
 
 .instruction-text { font-style: italic; color: #999; font-size: 0.85em}
 .instruction-text:hover { font-style: italic; color: #000; font-size: 0.85em}
@@ -68,6 +86,7 @@ li#titleNote {padding:0 0 4px 0;}
 /* page: recordings */
 #recordingsTable th div { position: relative; padding: 2px;}
 #recordingsTable th div.sort-icon {position: absolute; right: 5px; top: 0.1em; padding: 0px;}
+#recordingsTable th div.column-title {padding-right: 30px;}
 #recordingsTable tr {height:30px;}
 #recordingsTable tr td, #seriesTable tr td, #captureTable tr td, #statsTable tr td {color: black;}
 #bulkHeader {height:13px !important;}
@@ -135,8 +154,8 @@ ul.itemnav li span.dev-prop-val { text-align:left; width:70%;}
 .operation-property-key {font-weight: bold;margin-top:2px;}
 .configRow span {float: left;}
 .configRow div {float: right;}
-#holdActionStage {margin:20px; padding:0 0 20px;}
-#holdActionUI {border:none; width:100%;}
+#holdActionStage {margin:20px; padding:0 0 20px;min-width:815px;}
+#holdActionUI {border:none; width:100%; overflow: auto;}
 
 /* missing field container */
 #missingFieldsContainer {
@@ -188,6 +207,7 @@ table#agentsTable th, table#seriesTable th, table#recordingsTable th, table#stat
 .scheduler-day-table td, .scheduler-day-table th { padding: 4px; border: 1px solid #AAAAAA;}
 #recordingType { width: 140px; text-align: left; }
 .scheduler-radio-list { display: inline-block; width: 200px; }
+.scheduler-required-text { color: red;}
 
 /*Statistics*/
 #tableContainer h2 { color: #000; margin: 16px 3px 3px}
@@ -253,6 +273,71 @@ a.secondaryButton:hover, a.secondaryButton:focus {
   text-decoration: underline;
 }
 
+/* Episode scheduler */
+table#episodesTable .toggle-scheduler{cursor: pointer;}
+table#episodesTable tr td.episode-scheduler-header{background: #98BBBA !important; color: white; text-align: right;}
+table#episodesTable tr td.episode-scheduler-header h2{color: white;}
+table#episodesTable tr td.episode-scheduler-content div.episode-schedule > span{float: left; width: 20%; white-space: nowrap;}
+table#episodesTable tr td.episode-scheduler-content input,table#episodesTable tr td.episode-scheduler-content select{max-width: 95%;}
+table#episodesTable tr td.episode-scheduler-content div.episode-schedule{float: left; width: 96%;padding: 5px;display: block; margin-left: 10px;}
+table#episodesTable tr td.episode-scheduler-content div.toSave{background-color: #98BBBA;border-radius: 3px;border-right: 15px solid #187E86;}
+table#episodesTable tr td.episode-scheduler-content div.episode-schedule .fromSeries{font-weight: bold; display: none;}
+table#episodesTable tr td.episode-scheduler-content div.episode-schedule .currentText{display: none;}
+table#episodesTable tr td.episode-scheduler-content div.episode-schedule .workflowsLabel,
+table#episodesTable tr td.episode-scheduler-content div.episode-schedule .aclLabel{display: none;}
+table#episodesTable tr td.episode-scheduler-content div.episode-schedule .error{font-weight: bold; color:red}
+table#episodesTable tr td.episode-scheduler-content div.current .currentText{display: inline; font-weight: bold}
+table#episodesTable tr td.episode-scheduler-content div.current{border-left: 10px solid grey; margin-left: 0px; background-color: silver; border-radius: 3px;}
+table#episodesTable tr td.episode-scheduler-content div.current .from,
+table#episodesTable tr td.episode-scheduler-content div.current .ui-datepicker-trigger{
+  visibility: hidden;;
+}
+table#episodesTable tr td.episode-scheduler-content .loading-spinner{display: none}
+table#episodesTable tr td.episode-scheduler-content div.seriesSchedule .actions, 
+table#episodesTable tr td.episode-scheduler-content div.seriesSchedule select, 
+table#episodesTable tr td.episode-scheduler-content div.seriesSchedule button{display: none}
+table#episodesTable tr td.episode-scheduler-content div.seriesSchedule .fromSeries{display: block}
+table#episodesTable tr td.episode-scheduler-content div.seriesSchedule .workflowsLabel,
+table#episodesTable tr td.episode-scheduler-content div.seriesSchedule .aclLabel{display: inline;}
+table#episodesTable tr td.episode-scheduler-content div.toSave .save div{float:left;}
+table#episodesTable tr td.episode-scheduler-content div.toSave .save:hover{cursor:pointer;}
+table#episodesTable tr td.episode-scheduler-content div.toSave .cancel div{float:left;}
+table#episodesTable tr td.episode-scheduler-content div.toSave .cancel:hover{cursor:pointer;}
+table#episodesTable tr td.episode-scheduler-content div.loading-acl .loading-spinner{display: inline; margin-top: 5px;}
+table#episodesTable tr td.episode-scheduler-content span > div{float: left; width:none;}
+table#episodesTable tr td.episode-scheduler-content button.ui-datepicker-trigger{background: none; border: none;}
+table#episodesTable tr.episode-scheduler:hover td{background: none !important;}
+table#episodesTable tr.episode-scheduler:hover .episode-scheduler-header{background: #98BBBA !important;}
+
+
+/* Series scheduler */
+table#seriesTable .toggle-scheduler{cursor: pointer;}
+table#seriesTable tr td.series-scheduler-header{background: #98BBBA !important; color: white; text-align: right;}
+table#seriesTable tr td.series-scheduler-header h2{color: white;}
+table#seriesTable tr td.series-scheduler-content div.series-schedule > span{float: left; width: 20%; white-space: nowrap;}
+table#seriesTable tr td.series-scheduler-content input,table#seriesTable tr td.series-scheduler-content select{max-width: 95%;}
+table#seriesTable tr td.series-scheduler-content div.series-schedule{float: left; width: 96%;padding: 5px;display: block; margin-left: 10px;}
+table#seriesTable tr td.series-scheduler-content div.toSave{background-color: #98BBBA;border-radius: 3px;border-right: 15px solid #187E86;}
+table#seriesTable tr td.series-scheduler-content div.series-schedule .currentText{display: none;}
+table#seriesTable tr td.series-scheduler-content div.current .currentText{display: inline; font-weight: bold}
+table#seriesTable tr td.series-scheduler-content div.series-schedule .error{font-weight: bold; color:red}
+table#seriesTable tr td.series-scheduler-content div.current{border-left: 10px solid grey; margin-left: 0px; background-color: silver; border-radius: 3px;}
+table#seriesTable tr td.series-scheduler-content div.current .from,
+table#seriesTable tr td.series-scheduler-content div.current .ui-datepicker-trigger{
+  visibility: hidden;;
+}
+table#seriesTable tr td.series-scheduler-content .loading-spinner{display: none}
+table#seriesTable tr td.series-scheduler-content div.toSave .save div{float:left;}
+table#seriesTable tr td.series-scheduler-content div.toSave .save:hover{cursor:pointer;}
+table#seriesTable tr td.series-scheduler-content div.toSave .cancel div{float:left;}
+table#seriesTable tr td.series-scheduler-content div.toSave .cancel:hover{cursor:pointer;}
+table#seriesTable tr td.series-scheduler-content div.loading-acl .loading-spinner{display: inline; margin-top: 5px;}
+table#seriesTable tr td.series-scheduler-content span > div{float: left; width:none;}
+table#seriesTable tr td.series-scheduler-content button.ui-datepicker-trigger{background: none; border: none;}
+table#seriesTable tr.series-scheduler:hover td{background: none !important;}
+table#seriesTable tr.series-scheduler:hover .series-scheduler-header{background: #98BBBA !important;}
+
+
 /* Fix for correctly displaying Highcharts on hidden tabs */
 .ui-tabs .ui-tabs-hide {
   position: absolute;
@@ -260,9 +345,55 @@ a.secondaryButton:hover, a.secondaryButton:focus {
   display: block !important;  
 }
 
+/* Security */
+#controlsTopSecurity {
+    margin: 10px 0;
+}
+
+/* Security - Group */
+#addGroup img.ui-icon-circle-plus { cursor: pointer; }
+#groups-form label, #groups-form input { display:block; }
+#groups-form select { margin-bottom:12px; width:95%; padding: .4em; }
+#groups-form input[type=text] { width:95%; }
+#groups-form fieldset { padding:0; border:0; margin-top:25px; }
+#groups-form .ui-dialog .ui-state-error { padding: .3em; }
+#groups-form .validateTips { border: 1px solid transparent; padding: 0.3em; display: none; }
+
+#groupsTable .toggle-scheduler{cursor: pointer;}
+#groupsTable tr td.security-group-header{background: #98BBBA !important; color: white; text-align: right;}
+#groupsTable {margin-top: 15px}
+#groupsTable th div {position: relative; padding: 2px;}
+#groupsTable th div.sort-icon {position: absolute; right: 5px; top: 0.1em; padding: 0px;}
+#groupsTable tr {height: 30px;}
+#groupsTable tr td {color: black;}
+#groupsTable .sortable {cursor: pointer;}
+
+#groupsTable div.form-box label, #groupsTable div.form-box input { display:block; }
+#groupsTable div.form-box select { margin-bottom:12px; width:95%; padding: .4em; }
+#groupsTable div.form-box input[type=text] { width:95%; }
+#groupsTable div.form-box { margin-bottom: 10px; }
+#groupsTable .validateTips { border: 1px solid transparent; padding: 0.3em; display: none; }
+
+table#groupsTable tr:hover td.security-group-content {
+    background: none !important;
+}
+
+/* Security - ACL */
+#addAcl { margin-bottom: 20px; }
+#addAcl img.ui-icon-circle-plus { cursor: pointer; }
+table#aclTable { margin-bottom: 20px; margin-top: 3px; }
+table#aclTable th { height: 24px; }
+#aclContainer h2 { display: inline; margin-right: 5px; }
+#aclContainer img.deleteAcl { position: relative; top: 2px; }
+#aclContainer img { cursor: pointer; }
+
+#acl-form label, #groups-form input { display:block; }
+#acl-form input[type=text] { width:95%; }
+#acl-form fieldset { padding:0; border:0; margin-top:25px; }
+#acl-form .ui-dialog .ui-state-error { padding: .3em; }
+#acl-form .validateTips { border: 1px solid transparent; padding: 0.3em; display: none; }
+
 /* Badges */
-
-
 .badge {
  display: inline-block;
  padding: 2px 4px;

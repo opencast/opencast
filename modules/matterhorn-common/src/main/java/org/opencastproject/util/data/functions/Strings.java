@@ -16,20 +16,22 @@
 
 package org.opencastproject.util.data.functions;
 
-import org.apache.commons.lang.StringUtils;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.nil;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
+import org.opencastproject.util.data.Arrays;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.text.Format;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.nil;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /** Functions for strings. */
 public final class Strings {
@@ -41,8 +43,7 @@ public final class Strings {
   private static final Option<String> NONE = none();
 
   /**
-   * Trim a string and return either <code>some</code> or <code>none</code> if it's empty.
-   * The string may be null.
+   * Trim a string and return either <code>some</code> or <code>none</code> if it's empty. The string may be null.
    */
   public static final Function<String, Option<String>> trimToNone = new Function<String, Option<String>>() {
     @Override
@@ -52,8 +53,7 @@ public final class Strings {
   };
 
   /**
-   * Trim a string and return either <code>some</code> or <code>none</code> if it's empty.
-   * The string may be null.
+   * Trim a string and return either <code>some</code> or <code>none</code> if it's empty. The string may be null.
    */
   public static Option<String> trimToNone(String a) {
     if (a != null) {
@@ -79,7 +79,7 @@ public final class Strings {
     };
   }
 
-  /** Return <code>a.toString()</code> or <code>&lt;null&gt;</code> if argument is null.  */
+  /** Return <code>a.toString()</code> or <code>&lt;null&gt;</code> if argument is null. */
   public static <A> Function<A, String> asStringNull() {
     return new Function<A, String>() {
       @Override
@@ -95,6 +95,18 @@ public final class Strings {
     public Option<Long> apply(String s) {
       try {
         return some(Long.parseLong(s));
+      } catch (NumberFormatException e) {
+        return none();
+      }
+    }
+  };
+
+  /** Convert a string into a long if possible. */
+  public static final Function<String, Option<Double>> toDouble = new Function<String, Option<Double>>() {
+    @Override
+    public Option<Double> apply(String s) {
+      try {
+        return some(Double.parseDouble(s));
       } catch (NumberFormatException e) {
         return none();
       }
@@ -153,20 +165,23 @@ public final class Strings {
 
   public static <A> Function<A, String> format(final Format f) {
     return new Function<A, String>() {
-      @Override public String apply(A a) {
+      @Override
+      public String apply(A a) {
         return f.format(a);
       }
     };
   }
 
   public static final Predicate<String> notBlank = new Predicate<String>() {
-    @Override public Boolean apply(String a) {
-      return StringUtils.isBlank(a);
+    @Override
+    public Boolean apply(String a) {
+      return StringUtils.isNotBlank(a);
     }
   };
 
   public static final Function<String, List<String>> trimToNil = new Function<String, List<String>>() {
-    @Override public List<String> apply(String a) {
+    @Override
+    public List<String> apply(String a) {
       if (a != null) {
         final String trimmed = a.trim();
         return trimmed.length() > 0 ? list(trimmed) : NIL;
@@ -178,15 +193,16 @@ public final class Strings {
 
   public static Predicate<String> eqIgnoreCase(final String other) {
     return new Predicate<String>() {
-      @Override public Boolean apply(String s) {
+      @Override
+      public Boolean apply(String s) {
         return s.equalsIgnoreCase(other);
       }
     };
   }
 
   /**
-   * Return a function that replaces all occurrences of <code>regex</code> in the argument
-   * with <code>replacement</code>.
+   * Return a function that replaces all occurrences of <code>regex</code> in the argument with <code>replacement</code>
+   * .
    *
    * @see String#replaceAll(String, String)
    */
@@ -199,10 +215,11 @@ public final class Strings {
     };
   }
 
-  /** Create a split function from a regex pattern. */
+  /** Create a {@linkplain Pattern#split(CharSequence) split} function from a regex pattern. */
   public static Function<String, String[]> split(final Pattern splitter) {
     return new Function<String, String[]>() {
-      @Override public String[] apply(String s) {
+      @Override
+      public String[] apply(String s) {
         return splitter.split(s);
       }
     };
@@ -213,10 +230,16 @@ public final class Strings {
    */
   public static final Function<String, String[]> csvSplit = split(Pattern.compile("\\s*,\\s*"));
 
+  /**
+   * Split function to split comma separated values. Regex = <code>\s*,\s*</code>.
+   */
+  public static final Function<String, List<String>> csvSplitList = Arrays.<String> toList().o(csvSplit);
+
   /** A function to prepend the argument string with a prefix. */
   public static Function<String, String> prepend(final String prefix) {
     return new Function<String, String>() {
-      @Override public String apply(String s) {
+      @Override
+      public String apply(String s) {
         return prefix + s;
       }
     };
@@ -225,8 +248,55 @@ public final class Strings {
   /** A function to append a suffix to the argument string. */
   public static Function<String, String> append(final String suffix) {
     return new Function<String, String>() {
-      @Override public String apply(String s) {
+      @Override
+      public String apply(String s) {
         return s + suffix;
+      }
+    };
+  }
+
+  /**
+   * A function to convert all of the characters in this String to lower case using the rules of the default locale.
+   */
+  public static final Function<String, String> lowerCase = new Function<String, String>() {
+    @Override
+    public String apply(String s) {
+      return s.toLowerCase();
+    }
+  };
+
+  /**
+   * A predicate function to match a regular expression.
+   */
+  public static Predicate<String> matches(final String pattern) {
+    return new Predicate<String>() {
+      @Override
+      public Boolean apply(String s) {
+        return s.matches(pattern);
+      }
+    };
+  }
+
+  /**
+   * A predicate function to check if a string contains a specified sequence.
+   */
+  public static Predicate<String> contains(final String seq) {
+    return new Predicate<String>() {
+      @Override
+      public Boolean apply(String s) {
+        return s.contains(seq);
+      }
+    };
+  }
+
+  /**
+   * Return a string concatenation function.
+   */
+  public static Function2<String, String, String> concat(final String sep) {
+    return new Function2<String, String, String>() {
+      @Override
+      public String apply(String a, String b) {
+        return a + sep + b;
       }
     };
   }

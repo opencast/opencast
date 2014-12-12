@@ -48,7 +48,7 @@ public class TextualImpl implements Textual {
 
   /**
    * Creates a new textual base element.
-   * 
+   *
    * @param text
    *          the text
    * @throws IllegalArgumentException
@@ -60,7 +60,7 @@ public class TextualImpl implements Textual {
 
   /**
    * Creates a new Textual element from a number of words.
-   * 
+   *
    * @param words
    *          the words
    */
@@ -70,7 +70,7 @@ public class TextualImpl implements Textual {
 
   /**
    * Creates a new textual base element.
-   * 
+   *
    * @param text
    *          the text
    * @throws IllegalArgumentException
@@ -85,7 +85,7 @@ public class TextualImpl implements Textual {
 
   /**
    * Creates a new textual base element.
-   * 
+   *
    * @param words
    *          the words
    * @throws IllegalArgumentException
@@ -97,7 +97,7 @@ public class TextualImpl implements Textual {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.Textual#getLanguage()
    */
   @Override
@@ -107,7 +107,7 @@ public class TextualImpl implements Textual {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.Textual#getPhoneticAlphabet()
    */
   @Override
@@ -117,7 +117,7 @@ public class TextualImpl implements Textual {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.Textual#getPhoneticTranscription()
    */
   @Override
@@ -127,17 +127,21 @@ public class TextualImpl implements Textual {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.Textual#setText(java.lang.String)
    */
   @Override
   public void setText(String text) {
-    this.text = text;
+    if (StringUtils.trimToNull(text) == null) {
+      throw new IllegalArgumentException("The text cannot be empty");
+    } else {
+      this.text = text;
+    }
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.Textual#getText()
    */
   @Override
@@ -147,7 +151,7 @@ public class TextualImpl implements Textual {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.Textual#setLanguage(java.lang.String)
    */
   @Override
@@ -157,7 +161,7 @@ public class TextualImpl implements Textual {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.metadata.mpeg7.Textual#setPhoneticTranscription(java.lang.String, java.lang.String)
    */
   @Override
@@ -170,7 +174,7 @@ public class TextualImpl implements Textual {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.mediapackage.XmlElement#toXml(org.w3c.dom.Document)
    */
   @Override

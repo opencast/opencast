@@ -47,8 +47,8 @@ public abstract class CmdlineMediaAnalyzerSupport implements MediaAnalyzer {
   protected String commandline = null;
 
   /**
-   * 
-   * 
+   *
+   *
    * @param binary
    */
   protected CmdlineMediaAnalyzerSupport(String binary) {
@@ -57,7 +57,7 @@ public abstract class CmdlineMediaAnalyzerSupport implements MediaAnalyzer {
 
   /**
    * Returns the binary used to provide media inspection functionality.
-   * 
+   *
    * @return the binary
    */
   protected String getBinary() {
@@ -79,17 +79,19 @@ public abstract class CmdlineMediaAnalyzerSupport implements MediaAnalyzer {
 
     logger.debug("Running {}", commandline);
     // Analyze
-    final ProcessExecutor<MediaAnalyzerException> mediaAnalyzer = new ProcessExecutor<MediaAnalyzerException>(binary, cmdOptions) {
+    final ProcessExecutor<MediaAnalyzerException> mediaAnalyzer = new ProcessExecutor<MediaAnalyzerException>(binary,
+            cmdOptions) {
+
       @Override
-      protected boolean onStdout(String line) {
+      protected void onStdout(String line) {
         onAnalysis(line);
-        return true;
+        return;
       }
 
       @Override
-      protected boolean onStderr(String line) {
+      protected void onStderr(String line) {
         onAnalysis(line);
-        return true;
+        return;
       }
 
       @Override
@@ -121,7 +123,7 @@ public abstract class CmdlineMediaAnalyzerSupport implements MediaAnalyzer {
 
   /**
    * Returns the command line options that need to be passed to the media analyzer.
-   * 
+   *
    * @param media
    *          the input media
    * @return the options for the call to the analyzer
@@ -131,7 +133,7 @@ public abstract class CmdlineMediaAnalyzerSupport implements MediaAnalyzer {
   /**
    * This method will be called for every single line of output that the analysis tool returns. Like this, subclasses
    * are able to process the output returned by the tool and build up the resulting metadata.
-   * 
+   *
    * @param line
    *          the line of output
    */
@@ -139,7 +141,7 @@ public abstract class CmdlineMediaAnalyzerSupport implements MediaAnalyzer {
 
   /**
    * Returns the options that are need to check for required versions of a certain tool.
-   * 
+   *
    * @return the options for version checks
    */
   protected String getVersionCheckOptions() {
@@ -149,7 +151,7 @@ public abstract class CmdlineMediaAnalyzerSupport implements MediaAnalyzer {
   /**
    * This method will be called once the process returned. This implementation will check for exit codes different from
    * <code>-1</code>, <code>0</code> and <code>255</code> and throw an exception.
-   * 
+   *
    * @param exitCode
    *          the processe's exit code
    * @throws MediaAnalyzerException

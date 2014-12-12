@@ -21,22 +21,32 @@ import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.data.Predicate;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
-
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import static org.opencastproject.mediapackage.MediaPackageElementFlavor.flavor;
+import static org.opencastproject.mediapackage.MediaPackageElementFlavor.parseFlavor;
+import static org.opencastproject.util.EqualsUtil.eq;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.functions.Misc.error;
 
 /**
  * Simple implementation that holds for user-entered trim points.
@@ -85,7 +95,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -102,7 +112,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -114,9 +124,15 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
     return createResult(Action.PAUSE);
   }
 
+  private static final Function0<WorkflowOperationException> noSourceFlavor =
+          error(WorkflowOperationException.class, SOURCE_FLAVOR_PROPERTY + " missing");
+
+  private static final Function0<WorkflowOperationException> noTargetFlavorSubtype =
+          error(WorkflowOperationException.class, TARGET_FLAVOR_SUBTYPE_PROPERTY + " missing");
+
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -124,27 +140,48 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
   public WorkflowOperationResult skip(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     // If we do not hold for trim, we still need to put tracks in the mediapackage with the right flavor
-    MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-    WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
-    String configuredSourceFlavor = currentOperation.getConfiguration(SOURCE_FLAVOR_PROPERTY);
-    String configuredTargetFlavorSubtype = currentOperation.getConfiguration(TARGET_FLAVOR_SUBTYPE_PROPERTY);
-    MediaPackageElementFlavor matchingFlavor = MediaPackageElementFlavor.parseFlavor(configuredSourceFlavor);
-    for (Track t : workflowInstance.getMediaPackage().getTracks()) {
-      MediaPackageElementFlavor trackFlavor = t.getFlavor();
-      if (trackFlavor != null && trackFlavor.matches(matchingFlavor)) {
-        Track clonedTrack = (Track) t.clone();
-        clonedTrack.setIdentifier(null);
-        clonedTrack.setURI(t.getURI()); // use the same URI as the original
-        clonedTrack.setFlavor(new MediaPackageElementFlavor(trackFlavor.getType(), configuredTargetFlavorSubtype));
-        mediaPackage.addDerived(clonedTrack, t);
+    final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
+    final WorkflowOperationInstance op = workflowInstance.getCurrentOperation();
+    final MediaPackageElementFlavor sourceFlavor =
+            option(op.getConfiguration(SOURCE_FLAVOR_PROPERTY)).map(parseFlavor).orError(noSourceFlavor).get();
+    final String targetFlavorSubtype =
+            option(op.getConfiguration(TARGET_FLAVOR_SUBTYPE_PROPERTY)).orError(noTargetFlavorSubtype).get();
+    // iterate tracks
+    for (final Track t : workflowInstance.getMediaPackage().getTracks()) {
+      for (final MediaPackageElementFlavor trackFlavor : option(t.getFlavor())) {
+        // only create trimmed track if none exists
+        if (trackFlavor.matches(sourceFlavor) && findDerived(mediaPackage, targetFlavorSubtype, t).isEmpty()) {
+          Track clonedTrack = (Track) t.clone();
+          clonedTrack.setIdentifier(null);
+          clonedTrack.setURI(t.getURI()); // use the same URI as the original
+          clonedTrack.setFlavor(new MediaPackageElementFlavor(trackFlavor.getType(), targetFlavorSubtype));
+          mediaPackage.addDerived(clonedTrack, t);
+        }
       }
     }
     return createResult(mediaPackage, Action.SKIP);
   }
 
+  private List<Track> findDerived(final MediaPackage mp, final String targetFlavorSubtype, final Track source) {
+    return mlist(mp.getTracks()).filter(new Predicate<Track>() {
+      @Override public Boolean apply(Track t) {
+        for (final MediaPackageReference ref : option(t.getReference())) {
+          for (final MediaPackageElementFlavor flavor : option(t.getFlavor())) {
+            if (eq(MediaPackageReference.TYPE_TRACK, ref.getType())
+                    && eq(source.getIdentifier(), ref.getIdentifier())
+                    && flavor.matches(flavor("*", targetFlavorSubtype))) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+    }).value();
+  }
+
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext, java.util.Map)
    */
@@ -164,8 +201,6 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
       throw new WorkflowOperationException("Trimming duration must be a positive integer");
     else if (trimStart > recordingDuration)
       throw new WorkflowOperationException("Trimming start is outside of recording");
-    else if (trimStart + initialTrimDuration > recordingDuration)
-      throw new WorkflowOperationException("Trimming end is outside of recording");
 
     // Get the source flavor to match
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
@@ -182,22 +217,22 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
     long trimEnd = trimStart + initialTrimDuration;
 
-    for (Track t : workflowInstance.getMediaPackage().getTracks()) {
+    for (Track source : workflowInstance.getMediaPackage().getTracks()) {
       // By default we should trim at the indicated point
       long trimDuration = initialTrimDuration;
-      
-      if (strThreshold != null) { 
+
+      if (strThreshold != null) {
         // Check track duration and adjust trim point accordingly
-        if (t.getDuration() < trimEnd) {
+        if (source.getDuration() < trimEnd) {
           // The track duration is shorter than the trim point
           String notice = String.format(
                   "Trim point (%1$d) exceeds track %2$s duration (%3$d ms.)",
                   trimEnd,
-                  t.getIdentifier(),
-                  t.getDuration());
-          if (t.getDuration() >= trimEnd - durationThreshold) {
-            // The track duration is, however, within the specified threshold interval 
-            trimDuration = t.getDuration() - trimStart;
+                  source.getIdentifier(),
+                  source.getDuration());
+          if (source.getDuration() >= trimEnd - durationThreshold) {
+            // The track duration is, however, within the specified threshold interval
+            trimDuration = source.getDuration() - trimStart;
             logger.warn(String.format(
                     "%1$s, but is within the %2$d ms. threshold. "
                             + "Adjusting trim point to track duration...",
@@ -216,19 +251,19 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
         }
       }
 
-      MediaPackageElementFlavor trackFlavor = t.getFlavor();
+      MediaPackageElementFlavor trackFlavor = source.getFlavor();
       if (trackFlavor != null && matchingFlavor.matches(trackFlavor)) {
         String profileId = currentOperation.getConfiguration(ENCODING_PROFILE_PROPERTY);
 
         logger.info("Trimming {} to ({}, {})",
-                new String[] { t.toString(), properties.get("trimin"), Long.toString(trimStart + trimDuration) });
+                new String[] { source.toString(), properties.get("trimin"), Long.toString(trimStart + trimDuration) });
 
         Track trimmedTrack = null;
         try {
           // Trim the track
-          Job job = composerService.trim(t, profileId, trimStart, trimDuration);
+          Job job = composerService.trim(source, profileId, trimStart, trimDuration);
           if (!waitForStatus(job).isSuccess()) {
-            throw new WorkflowOperationException("Trimming of " + t + " failed");
+            throw new WorkflowOperationException("Trimming of " + source + " failed");
           }
 
           trimmedTrack = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
@@ -236,19 +271,26 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
             throw new WorkflowOperationException("Trimming failed to produce a track");
           }
 
+          // remove all existing trimmed versions of the source
+          for (Track t : findDerived(workflowInstance.getMediaPackage(),
+                                     configuredTargetFlavorSubtype,
+                                     source)) {
+            workflowInstance.getMediaPackage().remove(t);
+          }
+
           // Put the new track in the mediapackage area of the workspace
-          String fileName = getFileNameFromElements(t, trimmedTrack);
+          String fileName = getFileNameFromElements(source, trimmedTrack);
           URI uri = workspace.moveTo(trimmedTrack.getURI(), workflowInstance.getMediaPackage().getIdentifier()
                   .compact(), trimmedTrack.getIdentifier(), fileName);
           trimmedTrack.setURI(uri);
 
           // Fix the flavor
-          MediaPackageElementFlavor trimmedFlavor = new MediaPackageElementFlavor(t.getFlavor().getType(),
+          MediaPackageElementFlavor trimmedFlavor = new MediaPackageElementFlavor(source.getFlavor().getType(),
                   configuredTargetFlavorSubtype);
           trimmedTrack.setFlavor(trimmedFlavor);
 
           // Add the trimmed track to the mediapackage
-          workflowInstance.getMediaPackage().addDerived(trimmedTrack, t);
+          workflowInstance.getMediaPackage().addDerived(trimmedTrack, source);
         } catch (Exception e) {
           logger.warn("Unable to trim: {}", e);
           throw new WorkflowOperationException(e);
@@ -260,7 +302,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
   /**
    * Sets the composer service.
-   * 
+   *
    * @param composerService
    *          the composer service
    */
@@ -270,7 +312,7 @@ public class TrimWorkflowOperationHandler extends ResumableWorkflowOperationHand
 
   /**
    * Sets the workspace
-   * 
+   *
    * @param workspace
    *          the workspace
    */

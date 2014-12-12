@@ -17,6 +17,7 @@ package org.opencastproject.series.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -41,6 +42,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.UrlSupport;
@@ -73,7 +75,7 @@ import javax.ws.rs.core.Response;
 
 /**
  * REST endpoint for Series Service.
- * 
+ *
  */
 @Path("/")
 @RestService(name = "seriesservice", title = "Series Service", abstractText = "This service creates, edits and retrieves and helps managing series.", notes = {
@@ -108,7 +110,7 @@ public class SeriesRestService {
 
   /**
    * OSGi callback for setting series service.
-   * 
+   *
    * @param seriesService
    */
   public void setService(SeriesService seriesService) {
@@ -117,7 +119,7 @@ public class SeriesRestService {
 
   /**
    * OSGi callback for setting Dublin Core Catalog service.
-   * 
+   *
    * @param dcService
    */
   public void setDublinCoreService(DublinCoreCatalogService dcService) {
@@ -126,7 +128,7 @@ public class SeriesRestService {
 
   /**
    * Activates REST service.
-   * 
+   *
    * @param cc
    *          ComponentContext
    */
@@ -134,7 +136,7 @@ public class SeriesRestService {
     if (cc == null) {
       this.serverUrl = "http://localhost:8080";
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
       logger.debug("Configured server url is {}", ccServerUrl);
       if (ccServerUrl == null)
         this.serverUrl = "http://localhost:8080";
@@ -159,6 +161,7 @@ public class SeriesRestService {
   @RestQuery(name = "getAsXml", description = "Returns the series with the given identifier", returnDescription = "Returns the series dublin core XML document", pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "The series dublin core."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "You do not have permission to view this series."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to view this series. Maybe you need to authenticate.") })
   public Response getSeriesXml(@PathParam("seriesID") String seriesID) {
     logger.debug("Series Lookup: {}", seriesID);
@@ -223,7 +226,7 @@ public class SeriesRestService {
 
   /**
    * Retrieves ACL associated with series.
-   * 
+   *
    * @param seriesID
    *          series of which ACL should be retrieved
    * @return
@@ -564,16 +567,16 @@ public class SeriesRestService {
 
   /**
    * Generates sample Dublin core.
-   * 
+   *
    * @return sample Dublin core
    */
   public String getSampleDublinCore() {
-    return "<?xml version=\"1.0\"?>\n<dublincore xmlns=\"http://www.opencastproject.org/xsd/1.0/dublincore/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance/\"\n  xsi:schemaLocation=\"http://www.opencastproject.org http://www.opencastproject.org/schema.xsd\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n  xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:oc=\"http://www.opencastproject.org/matterhorn\">\n\n  <dcterms:title xml:lang=\"en\">\n    Land and Vegetation: Key players on the Climate Scene\n    </dcterms:title>\n  <dcterms:subject>\n    climate, land, vegetation\n    </dcterms:subject>\n  <dcterms:description xml:lang=\"en\">\n    Introduction lecture from the Institute for\n    Atmospheric and Climate Science.\n    </dcterms:description>\n  <dcterms:publisher>\n    ETH Zurich, Switzerland\n    </dcterms:publisher>\n  <dcterms:identifier>\n    10.0000/5819\n    </dcterms:identifier>\n  <dcterms:modified xsi:type=\"dcterms:W3CDTF\">\n    2007-12-05\n    </dcterms:modified>\n  <dcterms:format xsi:type=\"dcterms:IMT\">\n    video/x-dv\n    </dcterms:format>\n  <oc:promoted>\n    true\n  </oc:promoted>\n</dublincore>";
+    return "<?xml version=\"1.0\"?>\n<dublincore xmlns=\"http://www.opencastproject.org/xsd/1.0/dublincore/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n  xsi:schemaLocation=\"http://www.opencastproject.org http://www.opencastproject.org/schema.xsd\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n  xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:oc=\"http://www.opencastproject.org/matterhorn/\">\n\n  <dcterms:title xml:lang=\"en\">\n    Land and Vegetation: Key players on the Climate Scene\n    </dcterms:title>\n  <dcterms:subject>\n    climate, land, vegetation\n    </dcterms:subject>\n  <dcterms:description xml:lang=\"en\">\n    Introduction lecture from the Institute for\n    Atmospheric and Climate Science.\n    </dcterms:description>\n  <dcterms:publisher>\n    ETH Zurich, Switzerland\n    </dcterms:publisher>\n  <dcterms:identifier>\n    10.0000/5819\n    </dcterms:identifier>\n  <dcterms:modified xsi:type=\"dcterms:W3CDTF\">\n    2007-12-05\n    </dcterms:modified>\n  <dcterms:format xsi:type=\"dcterms:IMT\">\n    video/x-dv\n    </dcterms:format>\n  <oc:promoted>\n    true\n  </oc:promoted>\n</dublincore>";
   }
 
   /**
    * Generates sample access control list.
-   * 
+   *
    * @return sample ACL
    */
   public String getSampleAccessControlList() {

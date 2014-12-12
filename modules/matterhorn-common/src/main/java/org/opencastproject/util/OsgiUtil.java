@@ -50,6 +50,16 @@ public final class OsgiUtil {
   }
 
   /**
+   * Get an optional, non-blank value from the <em>bundle</em> context.
+   *
+   * @throws RuntimeException
+   *         key does not exist or its value is blank
+   */
+  public static Option<String> getOptContextProperty(ComponentContext cc, String key) {
+    return option(cc.getBundleContext().getProperty(key)).bind(Strings.trimToNone);
+  }
+
+  /**
    * Get a mandatory, non-blank value from the <em>component</em> context.
    *
    * @throws RuntimeException
@@ -94,6 +104,17 @@ public final class OsgiUtil {
       return Integer.parseInt(getCfg(d, key));
     } catch (NumberFormatException e) {
       throw new ConfigurationException(key, "not an integer");
+    }
+  }
+
+  /**
+   * Check the existence of the given dictionary. Throw an exception if null.
+   */
+  public static void checkDictionary(Dictionary properties,
+                                     ComponentContext componentContext) throws ConfigurationException {
+    if (properties == null) {
+      String dicName = componentContext.getProperties().get("service.pid").toString();
+      throw new ConfigurationException("*", "Dictionary for " + dicName + " does not exist");
     }
   }
 

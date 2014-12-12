@@ -26,7 +26,7 @@ public interface EncoderListener {
   /**
    * Tells the listener that the given file has been encoded into the
    * {@link EncodingProfile} <code>profile</code>.
-   * 
+   *
    * @param engine
    *          the encoding engine
    * @param sourceFiles
@@ -39,7 +39,7 @@ public interface EncoderListener {
   /**
    * Tells the listener that the given file could not be encoded into
    * {@link EncodingProfile} <code>profile</code>.
-   * 
+   *
    * @param engine
    *          the encoding engine
    * @param sourceFiles
@@ -55,7 +55,7 @@ public interface EncoderListener {
    * Tells the listener about encoding progress while the file is being encoded into
    * {@link EncodingProfile} <code>profile</code>. The value ranges
    * between <code>0</code> (started) and <code>100</code> (finished).
-   * 
+   *
    * @param engine
    *          the encoding engine
    * @param sourceFile

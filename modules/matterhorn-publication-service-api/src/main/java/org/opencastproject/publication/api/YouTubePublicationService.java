@@ -31,7 +31,7 @@ public interface YouTubePublicationService {
 
   /**
    * Publishes a media package element.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param track
@@ -44,7 +44,7 @@ public interface YouTubePublicationService {
 
   /**
    * Retract a media package element from the distribution channel.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @throws PublicationException

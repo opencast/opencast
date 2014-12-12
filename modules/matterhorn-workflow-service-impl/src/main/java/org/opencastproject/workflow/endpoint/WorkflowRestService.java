@@ -15,11 +15,14 @@
  */
 package org.opencastproject.workflow.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_PRECONDITION_FAILED;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
@@ -34,11 +37,13 @@ import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
+import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
@@ -131,7 +136,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -141,7 +146,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the workflow service
-   * 
+   *
    * @param service
    *          the workflow service instance
    */
@@ -151,7 +156,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Callback from the OSGi declarative services to set the workspace.
-   * 
+   *
    * @param workspace
    *          the workspace
    */
@@ -161,7 +166,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * OSGI callback for component activation
-   * 
+   *
    * @param cc
    *          the OSGI declarative services component context
    */
@@ -170,7 +175,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     if (cc == null) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty("org.opencastproject.server.url");
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
       logger.info("configured server url is {}", ccServerUrl);
       if (ccServerUrl == null) {
         serverUrl = UrlSupport.DEFAULT_BASE_URL;
@@ -314,7 +319,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Returns the workflow configuration panel HTML snippet for the workflow definition specified by
-   * 
+   *
    * @param definitionId
    * @return config panel HTML snippet
    */
@@ -612,9 +617,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @DELETE
   @Path("remove/{id}")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "remove", description = "Danger! Permenantly removes a workflow instance. This does not remove associated jobs, and there are potential harmful effects by removing a workflow. In most circumstances, /stop is what you should use.", returnDescription = "HTTP 204 No Content", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No Conent."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier exists.") })
+  @RestQuery(name = "remove", description = "Danger! Permenantly removes a workflow instance including all its child jobs. In most circumstances, /stop is what you should use.", returnDescription = "HTTP 204 No Content", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "If workflow instance could be removed successfully, no content is returned"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.") })
   public Response remove(@PathParam("id") long workflowInstanceId) throws WorkflowException, NotFoundException,
           UnauthorizedException {
     service.remove(workflowInstanceId);
@@ -781,9 +786,40 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       service.unregisterWorkflowDefinition(workflowDefinitionId);
       return Response.status(Status.NO_CONTENT).build();
     } catch (NotFoundException e) {
-      return Response.status(Status.NOT_FOUND).build();  
+      return Response.status(Status.NOT_FOUND).build();
     } catch (WorkflowDatabaseException e) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @POST
+  @Path("/cleanup")
+  @RestQuery(name = "cleanup", description = "Cleans up workflow instances", returnDescription = "No return value", reponses = {
+          @RestResponse(responseCode = SC_OK, description = "Cleanup OK"),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Couldn't parse given state"),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to cleanup. Maybe you need to authenticate."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "It's not allowed to delete other workflow instance statues than STOPPED, SUCCEEDED and FAILED") }, restParameters = {
+          @RestParameter(name = "lifetime", type = Type.INTEGER, defaultValue = "30", isRequired = true, description = "Lifetime in days a workflow instance should live"),
+          @RestParameter(name = "state", type = Type.STRING, isRequired = true, description = "Workflow instance state, only STOPPED, SUCCEEDED and FAILED are allowed values here") })
+  public Response cleanup(@FormParam("lifetime") int lifetime, @FormParam("state") String stateParam)
+          throws UnauthorizedException {
+
+    WorkflowInstance.WorkflowState state;
+    try {
+      state = WorkflowInstance.WorkflowState.valueOf(stateParam);
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    if (state != WorkflowInstance.WorkflowState.SUCCEEDED && state != WorkflowInstance.WorkflowState.FAILED
+            && state != WorkflowInstance.WorkflowState.STOPPED)
+      return Response.status(Status.FORBIDDEN).build();
+
+    try {
+      service.cleanupWorkflowInstances(lifetime, state);
+      return Response.ok().build();
+    } catch (WorkflowDatabaseException e) {
+      throw new WebApplicationException(e);
     }
   }
 
@@ -817,7 +853,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -831,7 +867,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

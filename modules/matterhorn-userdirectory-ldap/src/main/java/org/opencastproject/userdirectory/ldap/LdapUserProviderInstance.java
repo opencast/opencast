@@ -16,6 +16,10 @@
 package org.opencastproject.userdirectory.ldap;
 
 import org.opencastproject.security.api.CachingUserProviderMXBean;
+import org.opencastproject.security.api.JaxbOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 
@@ -35,6 +39,10 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 
 import java.lang.management.ManagementFactory;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -55,7 +63,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   private LdapUserDetailsService delegate = null;
 
   /** The organization id */
-  private String organization = null;
+  private Organization organization = null;
 
   /** Total number of requests made to load users */
   private AtomicLong requests = null;
@@ -71,7 +79,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
   /**
    * Constructs an ldap user provider with the needed settings.
-   * 
+   *
    * @param pid
    *          the pid of this service
    * @param organization
@@ -94,23 +102,24 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    *          the number of minutes to cache users
    */
   // CHECKSTYLE:OFF
-  LdapUserProviderInstance(String pid, String organization, String searchBase, String searchFilter, String url,
+  LdapUserProviderInstance(String pid, Organization organization, String searchBase, String searchFilter, String url,
           String userDn, String password, String roleAttributesGlob, int cacheSize, int cacheExpiration) {
     // CHECKSTYLE:ON
     this.organization = organization;
-    logger.debug("Creating LdapUserProvider instance with pid=" + pid + ", and organization=" + organization + ", to LDAP server at url:  " + url);
+    logger.debug("Creating LdapUserProvider instance with pid=" + pid + ", and organization=" + organization
+            + ", to LDAP server at url:  " + url);
 
     DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(url);
     if (StringUtils.isNotBlank(userDn)) {
       contextSource.setPassword(password);
       contextSource.setUserDn(userDn);
       // Required so that authentication will actually be used
-      contextSource.setAnonymousReadOnly(false);      
+      contextSource.setAnonymousReadOnly(false);
     } else {
-      // No password set so try to connect anonymously. 
-      contextSource.setAnonymousReadOnly(true);  
+      // No password set so try to connect anonymously.
+      contextSource.setAnonymousReadOnly(true);
     }
-    
+
     try {
       contextSource.afterPropertiesSet();
     } catch (Exception e) {
@@ -163,17 +172,17 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#getOrganization()
    */
   @Override
   public String getOrganization() {
-    return organization;
+    return organization.getId();
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#loadUser(java.lang.String)
    */
   @Override
@@ -185,7 +194,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       if (user == nullToken) {
         return null;
       } else {
-        return (User) user;
+        return (JaxbUser) user;
       }
     } catch (NullPointerException e) {
       logger.debug("This map throws NPE rather than returning null.  Swallowing that exception here.");
@@ -195,7 +204,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
   /**
    * Loads a user from LDAP.
-   * 
+   *
    * @param userName
    *          the username
    * @return the user
@@ -218,18 +227,16 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
         return null;
       }
 
+      JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
       Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-      String[] roles = null;
+      Set<JaxbRole> roles = new HashSet<JaxbRole>();
       if (authorities != null) {
-        int i = 0;
-        roles = new String[authorities.size()];
         for (GrantedAuthority authority : authorities) {
-          String role = authority.getAuthority();
-          roles[i++] = role;
+          roles.add(new JaxbRole(authority.getAuthority(), jaxbOrganization));
         }
       }
-      User user =  new User(userDetails.getUsername(), getOrganization(), roles);
-      cache.put(userName , user);
+      User user = new JaxbUser(userDetails.getUsername(), jaxbOrganization, roles);
+      cache.put(userName, user);
       return user;
     } finally {
       currentThread.setContextClassLoader(originalClassloader);
@@ -238,7 +245,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.CachingUserProviderMXBean#getCacheHitRatio()
    */
   public float getCacheHitRatio() {
@@ -246,6 +253,20 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       return 0;
     }
     return (float) (requests.get() - ldapLoads.get()) / requests.get();
+  }
+
+  @Override
+  public Iterator<User> findUsers(String query, int offset, int limit) {
+    if (query == null)
+      throw new IllegalArgumentException("Query must be set");
+    // TODO implement a LDAP wildcard search
+    return Collections.<User> emptyList().iterator();
+  }
+
+  @Override
+  public Iterator<User> getUsers() {
+    // TODO implement LDAP get all users
+    return Collections.<User> emptyList().iterator();
   }
 
 }

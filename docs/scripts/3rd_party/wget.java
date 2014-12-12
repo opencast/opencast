@@ -24,9 +24,9 @@ public class wget
       huc.setConnectTimeout(30000);
       huc.setReadTimeout(30000);
       huc.setRequestProperty("User-Agent",
-        "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)");
+        "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0)");
 //    huc.setRequestProperty("User-Agent",
-//      "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.9) Gecko/20100824 Firefox/3.6.9");
+//      "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0");
       huc.setRequestProperty("Connection", "close");
 
       rcm.rc = huc.getResponseCode();

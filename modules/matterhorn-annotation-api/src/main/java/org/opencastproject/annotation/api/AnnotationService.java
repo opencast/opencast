@@ -24,7 +24,7 @@ public interface AnnotationService {
   /**
    * Adds a new annotation to the database and returns the event with an updated annotationId, to make sure the
    * annotationId stays unique
-   * 
+   *
    * @param a
    *          The Annotation that will be added to the database
    * @return the updated annotation, with a new ID. NULL if there are errors while adding the annotation.
@@ -33,7 +33,7 @@ public interface AnnotationService {
 
   /**
    * Changes an annotation in the database it uses the annotationId to overwrite the value. It returns the event with an updated annotation.
-   * 
+   *
    * @param a
    *          The Annotation that will be changed in the database
    * @return the updated annotation. NULL if there are errors while changing the annotation.
@@ -42,16 +42,16 @@ public interface AnnotationService {
 
   /**
    * Remove a given annotation from database
-   * 
+   *
    * @param a
    *          The Annotation that will be removed from the database
    * @return true if successfull removed, false else.
    */
   boolean removeAnnotation(Annotation a);
 
-  /**  
+  /**
    * Gets an annotation by its identifier.
-   * 
+   *
    * @param id
    *          the annotation identifier
    * @return the annotation
@@ -61,7 +61,7 @@ public interface AnnotationService {
 
   /**
    * Returns annotations
-   * 
+   *
    * @param offset
    *          the offset
    * @param limit
@@ -86,7 +86,7 @@ public interface AnnotationService {
 
   /**
    * Returns annotations of a given type
-   * 
+   *
    * @param type
    *          The annotation type
    * @param offset
@@ -99,7 +99,7 @@ public interface AnnotationService {
 
   /**
    * Returns annotations of a given day (YYYYMMDD)
-   * 
+   *
    * @param day
    *          The day in the format of YYYYMMDD
    * @param offset
@@ -112,7 +112,7 @@ public interface AnnotationService {
 
   /**
    * Returns annotations of a given type and day
-   * 
+   *
    * @param type
    *          the annotation type
    * @param day
@@ -127,7 +127,7 @@ public interface AnnotationService {
 
   /**
    * Returns annotations of a given type and mediapackage id
-   * 
+   *
    * @param type
    *          the annotation type
    * @param mediapackageId

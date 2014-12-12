@@ -17,12 +17,10 @@ package org.opencastproject.workflow.handler;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -51,7 +49,7 @@ public class ApplyAclWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param authorizationService
    *          the authorization service
    */
@@ -61,7 +59,7 @@ public class ApplyAclWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param seriesService
    *          the series service
    */
@@ -71,7 +69,7 @@ public class ApplyAclWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -81,7 +79,7 @@ public class ApplyAclWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -97,14 +95,10 @@ public class ApplyAclWorkflowOperationHandler extends AbstractWorkflowOperationH
     try {
       AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
       if (acl != null) {
-        authorizationService.setAccessControl(mediaPackage, acl);
+        authorizationService.setAcl(mediaPackage, AclScope.Series, acl);
       }
       return createResult(mediaPackage, Action.CONTINUE);
-    } catch (SeriesException e) {
-      throw new WorkflowOperationException(e);
-    } catch (MediaPackageException e) {
-      throw new WorkflowOperationException(e);
-    } catch (NotFoundException e) {
+    } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
   }

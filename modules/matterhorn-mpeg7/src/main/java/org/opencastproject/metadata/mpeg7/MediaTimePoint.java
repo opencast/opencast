@@ -25,63 +25,63 @@ public interface MediaTimePoint extends XmlElement {
 
   /**
    * Returns the day of month.
-   * 
+   *
    * @return the day of month
    */
   int getDay();
 
   /**
    * Returns the hour of day (in 24-hour representation).
-   * 
+   *
    * @return the hour
    */
   int getHour();
 
   /**
    * Returns the number of minutes.
-   * 
+   *
    * @return the minutes
    */
   int getMinutes();
 
   /**
    * Returns the month.
-   * 
+   *
    * @return the month
    */
   int getMonth();
 
   /**
    * Returns the fractions.
-   * 
+   *
    * @return the fractions
    */
   int getNFractions();
 
   /**
    * Returns the seconds.
-   * 
+   *
    * @return the seconds
    */
   int getSeconds();
 
   /**
    * Returns the year.
-   * 
+   *
    * @return the year
    */
   int getYear();
 
   /**
    * The fractions per second.
-   * 
+   *
    * @return the fractions per second
    */
   int getFractionsPerSecond();
 
   /**
    * Returns the media time point in milliseconds.
-   * 
+   *
    * @return the media time point
    */
   long getTimeInMilliseconds();
@@ -89,7 +89,7 @@ public interface MediaTimePoint extends XmlElement {
   /**
    * Returns <code>true</code> if this time point is relative to another time point, e. g. the starting time point of a
    * temporal segment's track.
-   * 
+   *
    * @return <code>true</code> if this time point is relative
    */
   boolean isRelative();

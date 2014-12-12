@@ -37,7 +37,7 @@ public interface EncodingProfile {
     /**
      * Try to parse the argument <code>type</code> and produce a
      * {@link MediaType} out of it.
-     * 
+     *
      * @param type
      *          the type string representation
      * @return a track type
@@ -63,30 +63,30 @@ public interface EncodingProfile {
 
   /**
    * Returns the unique format identifier.
-   * 
+   *
    * @return the format identifier
    */
   String getIdentifier();
 
   /**
    * Returns the encoding format's name.
-   * 
+   *
    * @return the format name
    */
   String getName();
 
-  
+
   /**
    * Returns the source object that provided this encoding profile
-   * 
+   *
    * @return the source object that provided this profile
    */
   Object getSource();
-  
+
   /**
    * Returns the encoding format's media type, which is either video (plus
    * audio) or audio only.
-   * 
+   *
    * @return the format type
    */
   MediaType getOutputType();
@@ -114,14 +114,14 @@ public interface EncodingProfile {
 
   /**
    * Returns the media type's mime type.
-   * 
+   *
    * @return the mime type
    */
   String getMimeType();
 
   /**
    * Returns the media format that can be used with this encoding profile.
-   * 
+   *
    * @return the applicable input format
    */
   MediaType getApplicableMediaType();
@@ -129,7 +129,7 @@ public interface EncodingProfile {
   /**
    * Returns <code>true</code> if the profile is applicable for the given track
    * type.
-   * 
+   *
    * @param type
    *          the track type
    * @return <code>true</code> if the profile is applicable
@@ -138,7 +138,7 @@ public interface EncodingProfile {
 
   /**
    * Returns <code>true</code> if additional properties have been specified.
-   * 
+   *
    * @return <code>true</code> if there are additional properties
    */
   boolean hasExtensions();
@@ -151,7 +151,7 @@ public interface EncodingProfile {
    * the configured entry was <tt>mediaformat.format.xyz.test</tt>, then the key
    * to access the value must simply be <code>test</code>.
    * </p>
-   * 
+   *
    * @param key
    *          the extension key
    * @return the value or <code>null</code>
@@ -161,7 +161,7 @@ public interface EncodingProfile {
   /**
    * Returns a map containing the additional properties or an empty map if no
    * additional properties were found.
-   * 
+   *
    * @return the additional properties
    */
   Map<String, String> getExtensions();

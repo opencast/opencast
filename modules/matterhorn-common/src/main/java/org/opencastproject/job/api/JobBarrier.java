@@ -65,10 +65,10 @@ public final class JobBarrier {
    * the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. Use {@link #addJob(Job)} to add jobs to monitor.
    *
    * @param registry
-   *         the registry
+   *          the registry
    */
   public JobBarrier(ServiceRegistry registry) {
-    this(registry, DEFAULT_POLLING_INTERVAL, new Job[]{});
+    this(registry, DEFAULT_POLLING_INTERVAL, new Job[] {});
   }
 
   /**
@@ -76,9 +76,9 @@ public final class JobBarrier {
    * using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}.
    *
    * @param registry
-   *         the registry
+   *          the registry
    * @param jobs
-   *         the jobs to monitor
+   *          the jobs to monitor
    */
   public JobBarrier(ServiceRegistry registry, Job... jobs) {
     this(registry, DEFAULT_POLLING_INTERVAL, jobs);
@@ -88,23 +88,23 @@ public final class JobBarrier {
    * Creates a wrapper for <code>job</code>, using <code>registry</code> to poll for the job outcome.
    *
    * @param registry
-   *         the registry
+   *          the registry
    * @param pollingInterval
-   *         the time in miliseconds between two polling operations
+   *          the time in miliseconds between two polling operations
    */
   public JobBarrier(ServiceRegistry registry, long pollingInterval) {
-    this(registry, pollingInterval, new Job[]{});
+    this(registry, pollingInterval, new Job[] {});
   }
 
   /**
    * Creates a wrapper for <code>job</code>, using <code>registry</code> to poll for the job outcome.
    *
    * @param jobs
-   *         the job to poll
+   *          the job to poll
    * @param registry
-   *         the registry
+   *          the registry
    * @param pollingInterval
-   *         the time in miliseconds between two polling operations
+   *          the time in miliseconds between two polling operations
    */
   public JobBarrier(ServiceRegistry registry, long pollingInterval, Job... jobs) {
     if (registry == null)
@@ -133,11 +133,13 @@ public final class JobBarrier {
    * gets stopped or deleted.
    *
    * @param timeout
-   *         the maximum amount of time to wait
+   *          the maximum amount of time to wait
    * @throws IllegalStateException
-   *         if there are no jobs to wait for
+   *           if there are no jobs to wait for
+   * @throws JobCanceledException
+   *           if one of the jobs was canceled
    */
-  public Result waitForJobs(long timeout) throws IllegalStateException {
+  public Result waitForJobs(long timeout) throws JobCanceledException, IllegalStateException {
     if (jobs.size() == 0)
       return new Result(new HashMap<Job, Status>());
     synchronized (this) {
@@ -149,8 +151,11 @@ public final class JobBarrier {
         logger.debug("Interrupted while waiting for job");
       }
     }
-    if (pollingException != null)
+    if (pollingException != null) {
+      if (pollingException instanceof JobCanceledException)
+        throw (JobCanceledException) pollingException;
       throw new IllegalStateException(pollingException);
+    }
     return getStatus();
   }
 
@@ -159,9 +164,9 @@ public final class JobBarrier {
    * been asked to wait for jobs by calling {@link #waitForJobs()}.
    *
    * @param job
-   *         the job
+   *          the job
    * @throws IllegalStateException
-   *         if the barrier already started waiting
+   *           if the barrier already started waiting
    */
   public void addJob(Job job) throws IllegalStateException {
     if (job == null)
@@ -173,7 +178,7 @@ public final class JobBarrier {
    * Sets the outcome of the various jobs that were monitored.
    *
    * @param status
-   *         the status
+   *          the status
    */
   void setStatus(Result status) {
     this.status = status;
@@ -198,7 +203,7 @@ public final class JobBarrier {
      * the updater will wait as long as it takes. Otherwise, it will stop after the indicated amount of time has passed.
      *
      * @param workTime
-     *         the work time
+     *          the work time
      */
     JobStatusUpdater(long workTime) {
       this.workTime = workTime;
@@ -222,7 +227,6 @@ public final class JobBarrier {
         for (final Job job : jobs) {
           // Don't ask if we already know
           if (!finishedJobs.containsKey(job)) {
-            boolean jobFinished = false;
             // Get the job status from the service registry
             try {
               final Job processedJob = serviceRegistry.getJob(job.getId());
@@ -250,10 +254,16 @@ public final class JobBarrier {
                   break;
               }
             } catch (NotFoundException e) {
+              logger.warn("Error polling job {}: Not found!");
               pollingException = e;
               break;
             } catch (ServiceRegistryException e) {
               logger.warn("Error polling service registry for the status of {}: {}", job, e.getMessage());
+            } catch (JobCanceledException e) {
+              logger.warn("Job {} got canceled", job);
+              pollingException = e;
+              updateAndNotify(finishedJobs);
+              return;
             } catch (Throwable t) {
               logger.error("An unexpected error occured while waiting for jobs", t);
               pollingException = t;
@@ -279,7 +289,7 @@ public final class JobBarrier {
      * Notifies listeners about the status change.
      *
      * @param status
-     *         the status
+     *          the status
      */
     private void updateAndNotify(Map<Job, Job.Status> status) {
       JobBarrier.this.setStatus(new Result(status));
@@ -299,7 +309,7 @@ public final class JobBarrier {
      * Creates a new job barrier result.
      *
      * @param status
-     *         the barrier outcome
+     *          the barrier outcome
      */
     public Result(Map<Job, Job.Status> status) {
       this.status = status;

@@ -22,7 +22,7 @@ import java.net.URI;
 
 /**
  * The media locator tells where the audio/video track is located.
- * 
+ *
  * <pre>
  * &lt;complexType name=&quot;MediaLocatorType&quot;&gt;
  *   &lt;sequence&gt;
@@ -39,7 +39,7 @@ public interface MediaLocator extends XmlElement {
 
   /**
    * Returns the media uri of the track.
-   * 
+   *
    * @return the media uri
    */
   URI getMediaURI();

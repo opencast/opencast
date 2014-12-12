@@ -100,7 +100,7 @@ public class TrackTest {
   /**
    * Test method for
    * {@link PresenterTrackBuilderPlugin#accept(URI, org.opencastproject.mediapackage.MediaPackageElement.Type, org.opencastproject.mediapackage.MediaPackageElementFlavor)}
-   * 
+   *
    * @throws Exception
    */
   @Test

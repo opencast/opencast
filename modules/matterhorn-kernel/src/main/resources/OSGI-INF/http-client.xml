@@ -8,7 +8,7 @@
     <provide interface="org.opencastproject.security.api.TrustedHttpClient" />
   </service>
    <reference name="service-impl" interface="org.opencastproject.kernel.http.impl.HttpClientFactory"
-    cardinality="1..1" policy="static" bind="setHttpClientFactory" unbind="unsetHttpClientFactory" />
+    cardinality="1..1" policy="static" bind="setHttpClientFactory" />
    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
     cardinality="0..1" policy="dynamic" bind="setServiceRegistry" />
    <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"

@@ -25,7 +25,7 @@ import java.util.ListIterator;
 
 /**
  * Non empty list. Also immutable.
- * 
+ *
  * @param <A>
  *          content type
  */
@@ -33,7 +33,7 @@ public final class NonEmptyList<A> implements List<A> {
   private final List<A> lst;
 
   public NonEmptyList(A a, A... as) {
-    lst = new ArrayList<A>();
+    lst = new ArrayList<A>(as.length + 1);
     lst.add(a);
     lst.addAll(Arrays.asList(as));
   }

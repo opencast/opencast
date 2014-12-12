@@ -312,7 +312,7 @@
       <property name="severity" value="error" />
     </module>
     <module name="Regexp">
-      <property name="format" value="\s+\\n" />
+      <property name="format" value="[ \t]+$" />
       <property name="message" value="Line has trailing spaces." />
       <property name="illegalPattern" value="true" />
       <property name="ignoreComments" value="true" />
@@ -322,6 +322,12 @@
       <property name="severity" value="error" />
     </module>
 
+  </module>
+
+  <!-- Check for newline character at eof -->
+  <module name="NewlineAtEndOfFile">
+    <property name="lineSeparator" value="lf"/>
+    <property name="severity" value="error" />
   </module>
 
 </module>

@@ -30,6 +30,16 @@
     <Extensions>mj2</Extensions>
   </MimeType>
   <MimeType>
+    <Type>audio/flac</Type>
+    <Description>FLAC audio</Description>
+    <Extensions>flac</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>audio/x-flac</Type>
+    <Description>FLAC audio</Description>
+    <Extensions>flac</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>audio/x-mp3</Type>
     <Description>MP3 audio</Description>
     <Extensions>mp3,swa</Extensions>

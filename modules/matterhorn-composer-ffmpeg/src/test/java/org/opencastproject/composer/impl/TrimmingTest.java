@@ -15,25 +15,26 @@
  */
 package org.opencastproject.composer.impl;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.impl.ffmpeg.FFmpegEncoderEngine;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.StreamHelper;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test trimming using ffmpeg.
@@ -59,15 +60,17 @@ public class TrimmingTest {
   public static void testOcropus() {
     StreamHelper stdout = null;
     StreamHelper stderr = null;
+    StringBuffer errorBuffer = new StringBuffer();
     Process p = null;
     try {
       p = new ProcessBuilder(FFmpegEncoderEngine.FFMPEG_BINARY_DEFAULT, "-version").start();
       stdout = new StreamHelper(p.getInputStream());
-      stderr = new StreamHelper(p.getErrorStream());
+      stderr = new StreamHelper(p.getErrorStream(), errorBuffer);
       if (p.waitFor() != 0)
         throw new IllegalStateException();
     } catch (Throwable t) {
       logger.warn("Skipping trimming tests due to unsatisifed ffmpeg installation");
+      logger.warn(errorBuffer.toString());
       ffmpegInstalled = false;
     } finally {
       IoSupport.closeQuietly(stdout);
@@ -111,15 +114,15 @@ public class TrimmingTest {
     File sourceFile = new File(workingDirectory, "slidechanges.mov");
     FileUtils.copyURLToFile(sourceUrl, sourceFile);
     EncodingProfile trimProfile = profiles.get("trim.work");
-    File trimmedMovie = engine.trim(sourceFile, trimProfile, 5000, 10000, null).get();
+    File trimmedMovie = engine.trim(sourceFile, trimProfile, 5123, 10321, null).get();
 
     // These are weak assertions, but anything else would require either integration with another 3rd party tool
     // or manual parsing of ffmpeg output. Instead, we keep this test generic (but weak).
     assertTrue(trimmedMovie.exists());
     assertTrue(trimmedMovie.length() < sourceFile.length());
 
-    assertEquals("00:00:05", engine.getCommandlineParameters().get(FFmpegEncoderEngine.PROP_TRIMMING_START_TIME));
-    assertEquals("00:00:10", engine.getCommandlineParameters().get(FFmpegEncoderEngine.PROP_TRIMMING_DURATION));
+    assertEquals("00:00:05.123", engine.getCommandlineParameters().get(FFmpegEncoderEngine.PROP_TRIMMING_START_TIME));
+    assertEquals("00:00:10.321", engine.getCommandlineParameters().get(FFmpegEncoderEngine.PROP_TRIMMING_DURATION));
 
   }
 

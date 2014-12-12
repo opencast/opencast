@@ -64,7 +64,7 @@ public class DefaultOrganization extends JaxbOrganization {
 
   /**
    * Creates a default organization for the given servers.
-   * 
+   *
    * @param servers
    *          the server names and ports
    */

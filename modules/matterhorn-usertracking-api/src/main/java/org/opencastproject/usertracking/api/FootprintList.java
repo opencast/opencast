@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * A List of {@link Footprint}s
- * 
+ *
  */
 public interface FootprintList {
 

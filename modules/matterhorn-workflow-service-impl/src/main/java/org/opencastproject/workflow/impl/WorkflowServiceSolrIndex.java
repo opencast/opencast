@@ -23,12 +23,12 @@ import static org.opencastproject.workflow.api.WorkflowService.WRITE_PERMISSION;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
@@ -40,6 +40,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
+import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -85,6 +86,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -196,7 +198,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * Callback from the OSGi environment on component registration. The indexing behavior can be set using component
    * context properties. <code>synchronousIndexing=true|false</code> determines whether threads performing workflow
    * updates block on adding the workflow instances to the search index.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -330,7 +332,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Prepares the embedded solr environment.
-   * 
+   *
    * @param solrRoot
    *          the solr root directory
    */
@@ -428,7 +430,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Adds the workflow instance to the search index.
-   * 
+   *
    * @param instance
    *          the instance
    * @return the solr input document
@@ -500,22 +502,24 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     }
 
     User workflowCreator = instance.getCreator();
-    doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUserName());
+    doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUsername());
     doc.addField(ORG_KEY, instance.getOrganization().getId());
 
+    AccessControlList acl;
     try {
-      AccessControlList acl = authorizationService.getAccessControlList(mp);
-      addAuthorization(doc, acl);
-    } catch (MediaPackageException e) {
-      throw new WorkflowDatabaseException(e);
+      acl = authorizationService.getActiveAcl(mp).getA();
+    } catch (Error e) {
+      logger.error("No security xacml found on media package {}", mp);
+      throw new WorkflowException(e);
     }
+    addAuthorization(doc, acl);
 
     return doc;
   }
 
   /**
    * Adds authorization fields to the solr document.
-   * 
+   *
    * @param doc
    *          the solr document
    * @param acl
@@ -561,7 +565,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.impl.WorkflowServiceIndex#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState,
    *      java.lang.String)
    */
@@ -599,7 +603,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.impl.WorkflowServiceIndex#getStatistics()
    */
   @Override
@@ -759,7 +763,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Appends query parameters to a solr query
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -789,7 +793,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   /**
    * Appends query parameters to a solr query in a way that they are found even though they are not treated as a full
    * word in solr.
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -815,7 +819,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Appends query parameters to a solr query
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -841,7 +845,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Builds a solr search query from a {@link WorkflowQuery}.
-   * 
+   *
    * @param query
    *          the workflow query
    * @param action
@@ -864,8 +868,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     append(sb, CREATED_KEY, query.getFromDate(), query.getToDate());
     appendFuzzy(sb, CREATOR_KEY, query.getCreator());
     appendFuzzy(sb, CONTRIBUTOR_KEY, query.getContributor());
-    append(sb, LANGUAGE_KEY, query.getLanguage(), true);
-    append(sb, LICENSE_KEY, query.getLicense(), true);
+    appendFuzzy(sb, LANGUAGE_KEY, query.getLanguage());
+    appendFuzzy(sb, LICENSE_KEY, query.getLicense());
     appendFuzzy(sb, TITLE_KEY, query.getTitle());
     appendFuzzy(sb, SUBJECT_KEY, query.getSubject());
     appendMap(sb, OPERATION_KEY, query.getCurrentOperations());
@@ -884,21 +888,15 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   protected void appendSolrAuthFragment(StringBuilder sb, String action) throws WorkflowDatabaseException {
     User user = securityService.getUser();
-    Organization organization;
-    try {
-      organization = orgDirectory.getOrganization(user.getOrganization());
-    } catch (NotFoundException e) {
-      throw new WorkflowDatabaseException(e);
-    }
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(organization.getAdminRole())) {
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
       sb.append(" AND ").append(ORG_KEY).append(":")
               .append(escapeQueryChars(securityService.getOrganization().getId()));
-      String[] roles = user.getRoles();
-      if (roles.length > 0) {
-        sb.append(" AND (").append(WORKFLOW_CREATOR_KEY).append(":").append(escapeQueryChars(user.getUserName()));
-        for (String role : roles) {
+      Set<Role> roles = user.getRoles();
+      if (roles.size() > 0) {
+        sb.append(" AND (").append(WORKFLOW_CREATOR_KEY).append(":").append(escapeQueryChars(user.getUsername()));
+        for (Role role : roles) {
           sb.append(" OR ");
-          sb.append(ACL_KEY_PREFIX).append(action).append(":").append(escapeQueryChars(role));
+          sb.append(ACL_KEY_PREFIX).append(action).append(":").append(escapeQueryChars(role.getName()));
         }
         sb.append(")");
       }
@@ -907,7 +905,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Returns the search index' field name that corresponds to the sort field.
-   * 
+   *
    * @param sort
    *          the sort field
    * @return the field name in the search index
@@ -943,7 +941,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Appends query parameters from a {@link java.util.Map} to a solr query. The map
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -989,7 +987,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.impl.WorkflowServiceIndex#getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery,
    *      String, boolean)
    */
@@ -1049,7 +1047,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.impl.WorkflowServiceIndex#remove(long)
    */
   @Override
@@ -1066,7 +1064,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.impl.WorkflowServiceIndex#update(org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
@@ -1090,7 +1088,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Callback for the OSGi environment to register with the <code>ServiceRegistry</code>.
-   * 
+   *
    * @param registry
    *          the service registry
    */
@@ -1100,7 +1098,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Callback for setting the organization directory service.
-   * 
+   *
    * @param orgDirectory
    *          the organization directory service
    */
@@ -1110,7 +1108,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Callback for setting the authorization service.
-   * 
+   *
    * @param authorizationService
    *          the authorizationService to set
    */
@@ -1120,7 +1118,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */

@@ -33,7 +33,7 @@ public interface Content {
    * Returns the content type.
    * <p>
    * When used for the description of an entry, if <b>null</b> 'text/plain' must be assumed.
-   * 
+   *
    * @return the content type, <b>null</b> if none.
    */
   String getType();
@@ -42,7 +42,7 @@ public interface Content {
    * Sets the content type.
    * <p>
    * When used for the description of an entry, if <b>null</b> 'text/plain' must be assumed.
-   * 
+   *
    * @param type
    *          the content type to set, <b>null</b> if none.
    */
@@ -50,14 +50,14 @@ public interface Content {
 
   /**
    * Gets the content mode (needed for Atom 0.3 support).
-   * 
+   *
    * @return type the content, <b>null</b> if none.
    */
   Mode getMode();
 
   /**
    * Sets the content mode (needed for Atom 0.3 support).
-   * 
+   *
    * @param mode
    *          the content mode to set, <b>null</b> if none.
    */
@@ -65,14 +65,14 @@ public interface Content {
 
   /**
    * Returns the content value.
-   * 
+   *
    * @return the content value, <b>null</b> if none.
    */
   String getValue();
 
   /**
    * Sets the content value.
-   * 
+   *
    * @param value
    *          the content value to set, <b>null</b> if none.
    */

@@ -15,7 +15,12 @@
  */
 package org.opencastproject.util;
 
-import org.apache.http.HttpResponse;
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Collections.toArray;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobParser;
@@ -25,16 +30,12 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+
+import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 /** Job related utility functions. */
 public final class JobUtil {
@@ -64,9 +65,26 @@ public final class JobUtil {
     return barrier.waitForJobs();
   }
 
+  /** Check if <code>job</code> is not done yet and wait in case. */
+  public static JobBarrier.Result waitForJob(ServiceRegistry reg, Option<Long> timeout, Job job) {
+    final Job.Status status = job.getStatus();
+    // only create a barrier if the job is not done yet
+    switch (status) {
+      case CANCELED:
+      case DELETED:
+      case FAILED:
+      case FINISHED:
+        return new JobBarrier.Result(map(tuple(job, status)));
+      default:
+        for (Long t : timeout)
+          return waitForJobs(reg, t, job);
+        return waitForJobs(reg, job);
+    }
+  }
+
   /**
    * Returns <code>true</code> if the job is ready to be dispatched.
-   * 
+   *
    * @param job
    *          the job
    * @return <code>true</code> whether the job is ready to be dispatched
@@ -92,21 +110,64 @@ public final class JobUtil {
     }
   }
 
-  /** Check if <code>job</code> is not done yet and wait in case. */
-  public static JobBarrier.Result waitForJob(ServiceRegistry reg, Option<Long> timeout, Job job) {
-    final Job.Status status = job.getStatus();
-    // only create a barrier if the job is not done yet
-    switch (status) {
-      case CANCELED:
-      case DELETED:
-      case FAILED:
-      case FINISHED:
-        return new JobBarrier.Result(map(tuple(job, status)));
-      default:
-        for (Long t : timeout)
-          return waitForJobs(reg, t, job);
-        return waitForJobs(reg, job);
-    }
+  public static JobBarrier.Result waitForJob(ServiceRegistry reg, Job job) {
+    return waitForJob(reg, none(0L), job);
+  }
+
+  public interface JobEnv {
+    JobBarrier.Result waitForJobs(long timeout, Job... jobs);
+
+    JobBarrier.Result waitForJobs(Job... jobs);
+
+    JobBarrier.Result waitForJobs(long tomeout, List<Job> jobs);
+
+    JobBarrier.Result waitForJobs(List<Job> jobs);
+
+    JobBarrier.Result waitForJob(Option<Long> timeout, Job job);
+
+    JobBarrier.Result waitForJob(long timeout, Job job);
+
+    JobBarrier.Result waitForJob(Job job);
+  }
+
+  /** Create a job environment which encapsulates the needed service registry. */
+  public static JobEnv jobEnv(final ServiceRegistry reg) {
+    return new JobEnv() {
+      @Override
+      public JobBarrier.Result waitForJobs(long timeout, Job... jobs) {
+        return JobUtil.waitForJobs(reg, timeout, jobs);
+      }
+
+      @Override
+      public JobBarrier.Result waitForJobs(Job... jobs) {
+        return JobUtil.waitForJobs(reg, jobs);
+      }
+
+      @Override
+      public JobBarrier.Result waitForJobs(long timeout, List<Job> jobs) {
+        return JobUtil.waitForJobs(reg, timeout, jobs);
+      }
+
+      @Override
+      public JobBarrier.Result waitForJobs(List<Job> jobs) {
+        return JobUtil.waitForJobs(reg, jobs);
+      }
+
+      @Override
+      public JobBarrier.Result waitForJob(Option<Long> timeout, Job job) {
+        return JobUtil.waitForJob(reg, timeout, job);
+      }
+
+      @Override
+      public JobBarrier.Result waitForJob(long timeout, Job job) {
+        return JobUtil.waitForJob(reg, some(timeout), job);
+      }
+
+      @Override
+      public JobBarrier.Result waitForJob(Job job) {
+        return JobUtil.waitForJob(reg, job);
+      }
+    };
   }
 
   /**
@@ -115,7 +176,8 @@ public final class JobUtil {
    */
   public static Function<Job, JobBarrier.Result> waitForJob(final ServiceRegistry reg, final Option<Long> timeout) {
     return new Function<Job, JobBarrier.Result>() {
-      @Override public JobBarrier.Result apply(Job job) {
+      @Override
+      public JobBarrier.Result apply(Job job) {
         return waitForJob(reg, timeout, job);
       }
     };
@@ -124,16 +186,19 @@ public final class JobUtil {
   /** Wait for the job to complete and return the success value. */
   public static Function<Job, Boolean> waitForJobSuccess(final ServiceRegistry reg, final Option<Long> timeout) {
     return new Function<Job, Boolean>() {
-      @Override public Boolean apply(Job job) {
+      @Override
+      public Boolean apply(Job job) {
         return waitForJob(reg, timeout, job).isSuccess();
       }
     };
   }
 
   /**
-   * Interpret the payload of a completed {@link Job} as a {@link MediaPackageElement}. Wait for the job to complete if necessary.
+   * Interpret the payload of a completed {@link Job} as a {@link MediaPackageElement}. Wait for the job to complete if
+   * necessary.
    *
-   * @throws MediaPackageException in case the payload is not a mediapackage element
+   * @throws MediaPackageException
+   *           in case the payload is not a mediapackage element
    */
   public static Function<Job, MediaPackageElement> payloadAsMediaPackageElement(final ServiceRegistry reg) {
     return new Function.X<Job, MediaPackageElement>() {
@@ -145,15 +210,15 @@ public final class JobUtil {
     };
   }
 
-  public static final Function<HttpResponse, Option<Job>> jobFromHttpResponse =
-          new Function<HttpResponse, Option<Job>>() {
-            @Override public Option<Job> apply(HttpResponse response) {
-              try {
-                return some(JobParser.parseJob(response.getEntity().getContent()));
-              } catch (Exception e) {
-                logger.error("Error parsing Job from HTTP response", e);
-                return none();
-              }
-            }
-          };
+  public static final Function<HttpResponse, Option<Job>> jobFromHttpResponse = new Function<HttpResponse, Option<Job>>() {
+    @Override
+    public Option<Job> apply(HttpResponse response) {
+      try {
+        return some(JobParser.parseJob(response.getEntity().getContent()));
+      } catch (Exception e) {
+        logger.error("Error parsing Job from HTTP response", e);
+        return none();
+      }
+    }
+  };
 }

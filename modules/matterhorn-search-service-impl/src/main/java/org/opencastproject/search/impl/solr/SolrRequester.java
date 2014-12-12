@@ -33,6 +33,7 @@ import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchResultItem.SearchResultItemType;
 import org.opencastproject.search.api.SearchResultItemImpl;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.SolrUtils;
@@ -58,6 +59,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,7 +85,7 @@ public class SolrRequester {
 
   /**
    * Creates a new requester for solr that will be using the given connection object to query the search index.
-   * 
+   *
    * @param connection
    *          the solr connection
    */
@@ -96,7 +98,7 @@ public class SolrRequester {
 
   /**
    * Returns the search results for a solr query string with read access for the current user.
-   * 
+   *
    * @param q
    *          the query
    * @param limit
@@ -114,7 +116,7 @@ public class SolrRequester {
 
   /**
    * Creates a search result from a given solr response.
-   * 
+   *
    * @param query
    *          The solr query.
    * @return The search result.
@@ -150,7 +152,7 @@ public class SolrRequester {
 
         /**
          * {@inheritDoc}
-         * 
+         *
          * @see org.opencastproject.search.api.SearchResultItem#getOrganization()
          */
         @Override
@@ -348,7 +350,7 @@ public class SolrRequester {
 
   /**
    * Creates a list of <code>MediaSegment</code>s from the given result document.
-   * 
+   *
    * @param doc
    *          the result document
    * @param query
@@ -449,7 +451,7 @@ public class SolrRequester {
 
   /**
    * Modifies the query such that certain fields are being boosted (meaning they gain some weight).
-   * 
+   *
    * @param query
    *          The user query.
    * @return The boosted query
@@ -529,7 +531,7 @@ public class SolrRequester {
 
   /**
    * Simple helper method to avoid null strings.
-   * 
+   *
    * @param f
    *          object which implements <code>toString()</code> method.
    * @return The input object or empty string.
@@ -543,7 +545,7 @@ public class SolrRequester {
 
   /**
    * Converts the query object into a solr query and returns the results.
-   * 
+   *
    * @param q
    *          the query
    * @param action
@@ -666,16 +668,16 @@ public class SolrRequester {
       sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":")
               .append(SolrUtils.clean(securityService.getOrganization().getId()));
       User user = securityService.getUser();
-      String[] roles = user.getRoles();
+      Set<Role> roles = user.getRoles();
       boolean userHasAnonymousRole = false;
-      if (roles.length > 0) {
+      if (roles.size() > 0) {
         sb.append(" AND (");
         StringBuilder roleList = new StringBuilder();
-        for (String role : roles) {
+        for (Role role : roles) {
           if (roleList.length() > 0)
             roleList.append(" OR ");
-          roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(SolrUtils.clean(role));
-          if (role.equalsIgnoreCase(securityService.getOrganization().getAnonymousRole())) {
+          roleList.append(Schema.OC_ACL_PREFIX).append(action).append(":").append(SolrUtils.clean(role.getName()));
+          if (role.getName().equalsIgnoreCase(securityService.getOrganization().getAnonymousRole())) {
             userHasAnonymousRole = true;
           }
         }
@@ -720,12 +722,13 @@ public class SolrRequester {
     if (q.getOffset() > 0)
       query.setStart(q.getOffset());
 
-    if (q.isSortByPublicationDate()) {
-      query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
-    } else if (q.isSortByCreationDate()) {
-      query.addSortField(Schema.DC_CREATED, ORDER.desc);
-      // If the dublin core field dc:created has not been filled in...
-      query.addSortField(Schema.OC_MODIFIED, ORDER.desc);
+    if (q.getSort() != null) {
+      ORDER order = q.isSortAscending() ? ORDER.asc : ORDER.desc;
+      query.addSortField(getSortField(q.getSort()), order);
+    }
+
+    if (!SearchQuery.Sort.DATE_CREATED.equals(q.getSort())) {
+      query.addSortField(getSortField(SearchQuery.Sort.DATE_CREATED), ORDER.desc);
     }
 
     query.setFields("* score");
@@ -734,7 +737,7 @@ public class SolrRequester {
 
   /**
    * Returns the search results, regardless of permissions. This should be used for maintenance purposes only.
-   * 
+   *
    * @param q
    *          the search query
    * @return the readable search result
@@ -747,7 +750,7 @@ public class SolrRequester {
 
   /**
    * Returns the search results that are accessible for read by the current user.
-   * 
+   *
    * @param q
    *          the search query
    * @return the readable search result
@@ -760,7 +763,7 @@ public class SolrRequester {
 
   /**
    * Returns the search results that are accessible for write by the current user.
-   * 
+   *
    * @param q
    *          the search query
    * @return the writable search result
@@ -773,12 +776,50 @@ public class SolrRequester {
 
   /**
    * Sets the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Returns the search index' field name that corresponds to the sort field.
+   *
+   * @param sort
+   *          the sort field
+   * @return the field name in the search index
+   */
+  protected String getSortField(SearchQuery.Sort sort) {
+    switch (sort) {
+      case TITLE:
+        return Schema.DC_TITLE_SORT;
+      case CONTRIBUTOR:
+        return Schema.DC_CONTRIBUTOR_SORT;
+      case DATE_CREATED:
+        return Schema.DC_CREATED;
+      case DATE_PUBLISHED:
+        return Schema.OC_MODIFIED;
+      case CREATOR:
+        return Schema.DC_CREATOR_SORT;
+      case LANGUAGE:
+        return Schema.DC_LANGUAGE;
+      case LICENSE:
+        return Schema.DC_LICENSE_SORT;
+      case MEDIA_PACKAGE_ID:
+        return Schema.ID;
+      case SERIES_ID:
+        return Schema.DC_IS_PART_OF;
+      case SUBJECT:
+        return Schema.DC_SUBJECT_SORT;
+      case DESCRIPTION:
+        return Schema.DC_DESCRIPTION_SORT;
+      case PUBLISHER:
+        return Schema.DC_PUBLISHER_SORT;
+      default:
+        throw new IllegalArgumentException("No mapping found between sort field and index");
+    }
   }
 
 }

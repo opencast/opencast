@@ -35,11 +35,14 @@ import org.opencastproject.metadata.mpeg7.MultimediaContentType;
 import org.opencastproject.metadata.mpeg7.Segment;
 import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.MimeTypes;
@@ -94,7 +97,7 @@ public class VideoSegmenterTest {
   /**
    * Copies test files to the local file system, since jmf is not able to access movies from the resource section of a
    * bundle.
-   * 
+   *
    * @throws Exception
    *           if setup fails
    */
@@ -111,7 +114,7 @@ public class VideoSegmenterTest {
 
   /**
    * Setup for the video segmenter service, including creation of a mock workspace.
-   * 
+   *
    * @throws Exception
    *           if setup fails
    */
@@ -132,8 +135,8 @@ public class VideoSegmenterTest {
     });
     EasyMock.replay(workspace);
 
-    User anonymous = new User("anonymous", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
-            new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS });
+    User anonymous = new JaxbUser("anonymous", new DefaultOrganization(), new JaxbRole(
+            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, new DefaultOrganization()));
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
@@ -151,7 +154,7 @@ public class VideoSegmenterTest {
 
     vsegmenter = new VideoSegmenterServiceImpl();
     serviceRegistry = new ServiceRegistryInMemoryImpl(vsegmenter, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     vsegmenter.setServiceRegistry(serviceRegistry);
     vsegmenter.setMpeg7CatalogService(mpeg7Service);
     vsegmenter.setWorkspace(workspace);

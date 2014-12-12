@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.dictionary.none.DictionaryServiceImpl"
+  immediate="true"
+  activate="activate">
+
+  <implementation
+    class="org.opencastproject.dictionary.none.DictionaryServiceImpl" />
+  <property name="service.description" value="Dictionary Service" />
+  <service>
+    <provide interface="org.opencastproject.dictionary.api.DictionaryService" />
+  </service>
+</scr:component>

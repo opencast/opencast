@@ -57,7 +57,7 @@ public class SolrRequester {
 
   /**
    * Creates a new requester for solr that will be using the given connection object to query the search index.
-   * 
+   *
    * @param connection
    *          the solr connection
    */
@@ -69,7 +69,7 @@ public class SolrRequester {
 
   /**
    * Creates a search result from a given solr response.
-   * 
+   *
    * @param query
    *          The solr query.
    * @return The search result.
@@ -111,7 +111,7 @@ public class SolrRequester {
 
   /**
    * Modifies the query such that certain fields are being boosted (meaning they gain some weight).
-   * 
+   *
    * @param query
    *          The user query.
    * @return The boosted query
@@ -126,7 +126,7 @@ public class SolrRequester {
 
   /**
    * Simple helper method to avoid null strings.
-   * 
+   *
    * @param f
    *          object which implements <code>toString()</code> method.
    * @return The input object or empty string.
@@ -140,7 +140,7 @@ public class SolrRequester {
 
   /**
    * Converts the query object into a solr query and returns the results.
-   * 
+   *
    * @param q
    *          the query
    * @return the search results
@@ -271,7 +271,7 @@ public class SolrRequester {
 
   /**
    * Appends query parameters to a solr query
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -292,7 +292,7 @@ public class SolrRequester {
   /**
    * Appends query parameters to a solr query in a way that they are found even though they are not treated as a full
    * word in solr.
-   * 
+   *
    * @param sb
    *          The {@link StringBuilder} containing the query
    * @param key
@@ -330,7 +330,7 @@ public class SolrRequester {
 
   /**
    * Query the Solr index.
-   * 
+   *
    * @param q
    *          the search query
    */

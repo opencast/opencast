@@ -19,11 +19,10 @@
       <legend>Holds</legend>
       <span>Processing should be paused to allow for:</span>
       <ul class="oc-ui-checkbox-list-upload">
-          <input id="videoPreview" name="videoPreview" type="checkbox" class="configField holdCheckbox" style="visibility:hidden" value="true"/>
         <li class="ui-helper-clearfix">
           <span id="trimholdconfig">
             <input id="trimHold" name="trimHold" type="checkbox" class="configField holdCheckbox" value="true" />
-            <span id="i18n_hold_for_trim">&nbsp;Review / Trim before encoding (with option to edit info)</span>
+            <span id="i18n_hold_for_trim">&nbsp;Videoeditor (with option to edit info)</span>
           </span>
         </li>
         <li class="ui-helper-clearfix">
@@ -44,7 +43,7 @@
       </span>
     </li>
       </ul>
-    </fieldset>  
+    </fieldset>
     <fieldset>
       <legend>Distribution</legend>
       <ul class="oc-ui-form-list">
@@ -63,19 +62,10 @@
 
       var trimHold = $('input#trimHold');
       var captionHold = $('input#captionHold');
-      var videoPreview = $('input#videoPreview');
-      
-      // Make sure video preview are created if one of caption hold, trim hold, is selected
-      var checkVideoPreview = function() {
-        var checkValue = trimHold.is(':checked') || captionHold.is(':checked');
-        videoPreview.attr('checked', checkValue);
-      }
-      trimHold.click(checkVideoPreview);
-      captionHold.click(checkVideoPreview);
-      
+
       ocWorkflowPanel.registerComponents = function(components){
         /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
-         * into the workflow. The component's nodeKey must match the components array key.
+         * into the workflow. The new ocAdmin.Component key must match the components array key.
          *
          * Example:'org.opencastproject.workflow.config.myProperty' will be availible at ${my.property}
          */
@@ -84,36 +74,27 @@
           {key: 'org.opencastproject.workflow.config.trimHold'},
           {getValue: function(){ return this.fields.trimHold.is(":checked"); }
           });
-          
+
         components['org.opencastproject.workflow.config.archiveOp'] = new ocAdmin.Component(
           ['archiveOp'],
           {key: 'org.opencastproject.workflow.config.archiveOp'},
           {getValue: function(){ return this.fields.archiveOp.is(":checked");}
           });
-          
+
         components['org.opencastproject.workflow.config.captionHold'] = new ocAdmin.Component(
           ['captionHold'],
           {key: 'org.opencastproject.workflow.config.captionHold'},
           {getValue: function(){ return this.fields.captionHold.is(":checked");}
           });
-          
-        components['org.opencastproject.workflow.config.videoPreview'] = new ocAdmin.Component(
-          ['videoPreview'],
-          {key: 'org.opencastproject.workflow.config.videoPreview'},
-          {getValue: function(){ return this.fields.videoPreview.is(":checked");}
-          });
-          
+
         ocScheduler.dublinCore.components['license'] = new ocAdmin.Component(
           ['license'],
           {label: 'licenseLabel', key: 'license'}
           );
-          
-          //etc...
       }
       ocWorkflowPanel.setComponentValues = function(values, components){
         components['org.opencastproject.workflow.config.captionHold'].setValue(values['org.opencastproject.workflow.config.captionHold']);
         components['org.opencastproject.workflow.config.trimHold'].setValue(values['org.opencastproject.workflow.config.trimHold']);
-        components['org.opencastproject.workflow.config.videoPreview'].setValue(values['org.opencastproject.workflow.config.videoPreview']);
         components['org.opencastproject.workflow.config.archiveOp'].setValue(values['org.opencastproject.workflow.config.archiveOp']);
         components['license'].setValue(values['license']);
       }
@@ -129,7 +110,7 @@
     <!-- Download from external ingest nodes, tag, inspect and and prepare -->
     <!-- source recording and metadata catalogs.                           -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-  
+
     <!-- Ingest elements from external working file repositories and file servers -->
 
     <operation
@@ -139,7 +120,7 @@
         <configuration key="delete-external">true</configuration>
       </configurations>
     </operation>
-  
+
     <!-- Apply ACL from series to the mediapackage -->
 
     <operation
@@ -148,7 +129,7 @@
       exception-handler-workflow="error"
       description="Applying access control entries">
     </operation>
-    
+
     <!-- Tag the incoming source material for archival -->
 
     <operation
@@ -172,7 +153,7 @@
     </operation>
 
     <!-- Inspect the media -->
-    
+
     <operation
       id="inspect"
       fail-on-error="true"
@@ -214,41 +195,73 @@
       </configurations>
     </operation>
 
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Preview, trimming and captions                                    -->
-    <!--                                                                   -->
-    <!-- Encode audio and video formats necessary for review and trimming. -->
-    <!-- Finally, allow for uploading of captions.                         -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-    <!-- encode to hold preview player formats -->
-
+    <!-- encode preview and editor base file as H.264 -->
     <operation
       id="compose"
-      if="${videoPreview}"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Encoding presenter (camera) video for preview">
+      description="Encoding videos for videoeditor preview">
       <configurations>
         <configuration key="source-flavor">*/work</configuration>
         <configuration key="target-flavor">*/preview</configuration>
-        <configuration key="encoding-profile">flash-preview.http</configuration>
+        <configuration key="encoding-profile">editor.work</configuration>
       </configurations>
     </operation>
 
-    <!-- hold for review and trimming --> 
+    <!-- extract audio from video in wave format for waveform -->
+    <operation
+      id="compose"
+      if="${trimHold}"
+      fail-on-error="false"
+      description="Extracting audio for waveform generation">
+      <configurations>
+        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="target-flavor">*/audio</configuration>
+        <configuration key="encoding-profile">audio.wav</configuration>
+      </configurations>
+    </operation>
+
+    <!-- generate waveform from wav file -->
+    <operation
+      id="waveform"
+      if="${trimHold}"
+      fail-on-error="false"
+      description="Generating waveform">
+      <configurations>
+        <configuration key="source-flavor">*/audio</configuration>
+        <configuration key="target-flavor">*/waveform</configuration>
+      </configurations>
+    </operation>
+
+    <!-- let SilenceDetection detect some silence -->
+    <operation
+      id="silence"
+      if="${trimHold}"
+      fail-on-error="false"
+      description="Executing silence detection">
+      <configurations>
+        <configuration key="source-flavors">*/audio</configuration>
+        <configuration key="smil-flavor-subtype">smil</configuration>
+        <configuration key="reference-tracks-flavor">*/preview</configuration>
+      </configurations>
+    </operation>
+
+    <!-- hold to edit media-->
+    <!-- produce trimmed and muxed videos -->
 
     <operation
-      id="trim"
+      id="editor"
       if="${trimHold}"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Waiting for user to review and trim">
+      description="Waiting for user to review / video edit recording">
       <configurations>
-        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="source-flavors">*/preview</configuration>
+        <configuration key="preview-flavors">*/preview</configuration>
+        <configuration key="skipped-flavors">*/work</configuration>
+        <configuration key="smil-flavors">*/smil</configuration>
+        <configuration key="target-smil-flavor">episode/smil</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
-        <configuration key="encoding-profile">trim.work</configuration>
-        <!-- configuration key="duration-threshold">1000</configuration -->
       </configurations>
     </operation>
 
@@ -371,8 +384,8 @@
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
         <configuration key="encoding-profile">flash-audio.http</configuration>
       </configurations>
-    </operation>   
-    
+    </operation>
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Encode for publication to feeds                                   -->
     <!--                                                                   -->
@@ -419,7 +432,7 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <!-- run the videosegmentation -->
-    
+
     <operation
       id="segment-video"
       fail-on-error="false"
@@ -432,7 +445,7 @@
     </operation>
 
     <!-- Generate segment preview images -->
-    
+
     <operation
       id="segmentpreviews"
       fail-on-error="false"
@@ -501,7 +514,7 @@
         <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
- 
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Cleanup                                                           -->
     <!--                                                                   -->

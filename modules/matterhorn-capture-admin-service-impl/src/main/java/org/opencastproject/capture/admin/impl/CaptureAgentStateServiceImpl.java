@@ -24,12 +24,13 @@ import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.capture.admin.api.Recording;
 import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Tuple;
+import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -118,7 +119,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Sets the workflow service
-   * 
+   *
    * @param workflowService
    *          the workflowService to set
    */
@@ -161,7 +162,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         } catch (NotFoundException e) {
           return nullToken;
         }
-        return agent == null ? nullToken : Tuple.tuple(agent.getState(), agent.getConfiguration());
+        return Tuple3.tuple3(agent.getState(), agent.getConfiguration(), agent.getLastHeardFrom());
       }
     });
   }
@@ -174,17 +175,19 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getAgent(java.lang.String)
    */
   @Override
   public Agent getAgent(String name) throws NotFoundException {
-    return getAgent(name, securityService.getOrganization().getId());
+    String org = securityService.getOrganization().getId();
+    Agent agent = getAgent(name, org);
+    return updateCachedLastHeardFrom(agent, org);
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#updateAgent(Agent)
    */
   @Override
@@ -194,7 +197,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Gets an agent by name and organization.
-   * 
+   *
    * @param name
    *          the unique agent name
    * @param org
@@ -217,7 +220,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Gets an agent by name and organization, using an open entitymanager.
-   * 
+   *
    * @param name
    *          the unique agent name
    * @param org
@@ -238,19 +241,37 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   }
 
   /**
+   * Mix in the last-seen timestamp from the agent cache
+   *
+   * @param agent
+   *          The Agent you wish to update
+   * @param org
+   *          the organization
+   * @return the agent
+   */
+  protected Agent updateCachedLastHeardFrom(Agent agent, String org) {
+    String agentKey = agent.getName().concat(DELIMITER).concat(org);
+    Tuple3<String, Properties, Long> cachedAgent = (Tuple3) agentCache.get(agentKey);
+    if (cachedAgent != null) {
+      agent.setLastHeardFrom(cachedAgent.getC());
+    }
+    return agent;
+  }
+
+  /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getAgentState(java.lang.String)
    */
   public String getAgentState(String agentName) throws NotFoundException {
     String orgId = securityService.getOrganization().getId();
-    Tuple<String, Properties> agent = getAgentFromCache(agentName, orgId);
+    Tuple3<String, Properties, Long> agent = getAgentFromCache(agentName, orgId);
     return agent.getA();
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#setAgentState(java.lang.String,
    *      java.lang.String)
    */
@@ -267,8 +288,12 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     String orgId = securityService.getOrganization().getId();
     try {
       String agentState = getAgentFromCache(agentName, orgId).getA();
-      if (agentState.equals(state))
+      if (agentState.equals(state)) {
+        Properties config = getAgentConfiguration(agentName);
+        agentCache.put(agentName.concat(DELIMITER).concat(orgId),
+                Tuple3.tuple3(getAgentState(agentName), config, Long.valueOf(System.currentTimeMillis())));
         return false;
+      }
 
       agent = (AgentImpl) getAgent(agentName);
 
@@ -286,7 +311,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#setAgentUrl(String, String)
    */
   public boolean setAgentUrl(String agentName, String agentUrl) throws NotFoundException {
@@ -300,7 +325,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#removeAgent(java.lang.String)
    */
   public void removeAgent(String agentName) throws NotFoundException {
@@ -309,7 +334,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getKnownAgents()
    */
   public Map<String, Agent> getKnownAgents() {
@@ -317,7 +342,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     User user = securityService.getUser();
     Organization org = securityService.getOrganization();
     String orgAdmin = org.getAdminRole();
-    String[] roles = user.getRoles();
+    Set<Role> roles = user.getRoles();
     try {
       em = emf.createEntityManager();
       Query q = em.createNamedQuery("Agent.byOrganization");
@@ -335,8 +360,8 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
             continue;
           }
           boolean hasSchedulerRole = false;
-          for (String role : roles) {
-            if (schedulerRoles.contains(role)) {
+          for (Role role : roles) {
+            if (schedulerRoles.contains(role.getName())) {
               hasSchedulerRole = true;
               break;
             }
@@ -350,7 +375,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       // Build the map that the API defines as agent name->agent
       Map<String, Agent> map = new TreeMap<String, Agent>();
       for (AgentImpl agent : agents) {
-        map.put(agent.getName(), agent);
+        map.put(agent.getName(), updateCachedLastHeardFrom(agent, org.getId()));
       }
       return map;
     } finally {
@@ -361,7 +386,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getAgentCapabilities(java.lang.String)
    */
   public Properties getAgentCapabilities(String agentName) throws NotFoundException {
@@ -370,28 +395,28 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getAgentConfiguration(java.lang.String)
    */
   public Properties getAgentConfiguration(String agentName) throws NotFoundException {
     String orgId = securityService.getOrganization().getId();
-    Tuple<String, Properties> agent = getAgentFromCache(agentName, orgId);
+    Tuple3<String, Properties, Long> agent = getAgentFromCache(agentName, orgId);
     return agent.getB();
   }
 
   @SuppressWarnings("unchecked")
-  private Tuple<String, Properties> getAgentFromCache(String agentName, String orgId) throws NotFoundException {
+  private Tuple3<String, Properties, Long> getAgentFromCache(String agentName, String orgId) throws NotFoundException {
     Object agent = agentCache.get(agentName.concat(DELIMITER).concat(orgId));
     if (agent == nullToken) {
       throw new NotFoundException();
     } else {
-      return (Tuple<String, Properties>) agent;
+      return (Tuple3<String, Properties, Long>) agent;
     }
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#setAgentConfiguration
    */
   public boolean setAgentConfiguration(String agentName, Properties configuration) {
@@ -402,8 +427,11 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     AgentImpl agent;
     try {
       Properties agentConfig = getAgentFromCache(agentName, orgId).getB();
-      if (agentConfig.equals(configuration))
+      if (agentConfig.equals(configuration)) {
+        agentCache.put(agentName.concat(DELIMITER).concat(orgId),
+                Tuple3.tuple3(getAgentState(agentName), agentConfig, Long.valueOf(System.currentTimeMillis())));
         return false;
+      }
 
       agent = (AgentImpl) getAgent(agentName);
       logger.debug("Setting Agent {}'s capabilities", agentName);
@@ -413,13 +441,14 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       logger.debug("Creating Agent {} with state {}.", agentName, UNKNOWN);
       agent = new AgentImpl(agentName, orgId, UNKNOWN, "", configuration);
     }
+
     updateAgentInDatabase(agent);
     return true;
   }
 
   /**
    * Updates or adds an agent to the database.
-   * 
+   *
    * @param agent
    *          The Agent you wish to modify or add in the database.
    */
@@ -431,6 +460,20 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       tx = em.getTransaction();
       tx.begin();
       AgentImpl existing = getAgentEntity(agent.getName(), agent.getOrganization(), em);
+
+      // Update the last seen property from the agent cache
+      if (existing != null) {
+        try {
+          Tuple3<String, Properties, Long> cachedAgent = getAgentFromCache(existing.getName(),
+                  existing.getOrganization());
+          if (agent != null && cachedAgent != null) {
+            agent.setLastHeardFrom(cachedAgent.getC());
+          }
+        } catch (NotFoundException e) {
+          // That's fine
+        }
+      }
+
       if (existing == null) {
         em.persist(agent);
       } else {
@@ -443,7 +486,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       }
       tx.commit();
       agentCache.put(agent.getName().concat(DELIMITER).concat(agent.getOrganization()),
-              Tuple.tuple(agent.getState(), agent.getConfiguration()));
+              Tuple3.tuple3(agent.getState(), agent.getConfiguration(), Long.valueOf(System.currentTimeMillis())));
     } catch (RollbackException e) {
       logger.warn("Unable to commit to DB in updateAgent.");
       throw e;
@@ -455,7 +498,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Removes an agent from the database.
-   * 
+   *
    * @param agentName
    *          The name of the agent you wish to remove.
    */
@@ -483,7 +526,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getRecordingState(java.lang.String)
    */
   public Recording getRecordingState(String id) throws NotFoundException {
@@ -500,7 +543,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#setRecordingState(java.lang.String,
    *      java.lang.String)
    * @throws IllegalArgumentException
@@ -540,7 +583,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * Resumes a workflow instance associated with this capture, if one exists.
-   * 
+   *
    * @param recordingId
    *          the recording id, which is assumed to correspond to the scheduled event id
    * @param state
@@ -605,7 +648,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#removeRecording(java.lang.String)
    */
   public void removeRecording(String id) throws NotFoundException {
@@ -617,7 +660,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getKnownRecordings()
    */
   public Map<String, Recording> getKnownRecordings() {
@@ -636,7 +679,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#getName()
    */
   @Override
@@ -646,7 +689,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#updated(java.lang.String, java.util.Dictionary)
    */
   @Override
@@ -699,7 +742,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedServiceFactory#deleted(java.lang.String)
    */
   @Override

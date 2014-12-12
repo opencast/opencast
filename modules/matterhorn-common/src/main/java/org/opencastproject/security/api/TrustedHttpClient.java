@@ -18,15 +18,25 @@ package org.opencastproject.security.api;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.opencastproject.util.data.Either;
+import org.opencastproject.util.data.Function;
 
 /**
  * Provides secured http client components to access to protected resources.
  */
 public interface TrustedHttpClient {
+  /**
+   * Create a function that takes a function to handle the response of the given request returning
+   * either a result or any occurred exception.
+   * @param httpUriRequest
+   *          The http request
+   * @return <code>HttpUriRequest -> (HttpResponse -> A) -> Either Exception A</code>
+   */
+  <A> Function<Function<HttpResponse, A>, Either<Exception, A>> run(HttpUriRequest httpUriRequest);
 
   /**
    * Executes an HttpRequest using a secure, but not necessarily encrypted, http connection.
-   * 
+   *
    * @param httpUriRequest
    *          The http request
    * @return the http response returned by the server
@@ -36,7 +46,7 @@ public interface TrustedHttpClient {
   /**
    * Executes an HttpRequest using a secure, but not necessarily encrypted, http connection, waiting for the specified
    * timeouts.
-   * 
+   *
    * @param httpUriRequest
    *          The http request
    * @param connectionTimeout
@@ -50,7 +60,7 @@ public interface TrustedHttpClient {
 
   /**
    * Executes an HttpRequest using a secure, but not necessarily encrypted, http connection.
-   * 
+   *
    * @param httpUriRequest
    *          The http request
    * @return the http response returned by the server
@@ -60,7 +70,7 @@ public interface TrustedHttpClient {
   /**
    * Executes an HttpRequest using a secure, but not necessarily encrypted, http connection, waiting for the specified
    * timeouts.
-   * 
+   *
    * @param httpUriRequest
    *          The http request
    * @param responseHandler
@@ -69,7 +79,7 @@ public interface TrustedHttpClient {
    *          the wait time in milliseconds at which a connection attempt will throw
    * @param socketTimeout
    *          the maximum time in milliseconds allowed between packets before this method will throw
-   * 
+   *
    * @return the http response returned by the server
    */
   <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<T> responseHandler, int connectionTimeout,
@@ -77,7 +87,7 @@ public interface TrustedHttpClient {
 
   /**
    * Closes this response. The caller must call close() once finished reading the response.
-   * 
+   *
    * @param response
    *          The response to close
    */

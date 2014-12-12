@@ -26,6 +26,9 @@ public interface RestConstants {
   /** The service property indicating the URL path that the service is attempting to claim */
   String SERVICE_PATH_PROPERTY = "opencast.service.path";
 
+  /** The service property indicating whether the service should be published in the service registry */
+  String SERVICE_PUBLISH_PROPERTY = "opencast.service.publish";
+
   /** The service property indicating that this service should be registered in the remote service registry */
   String SERVICE_JOBPRODUCER_PROPERTY = "opencast.service.jobproducer";
 
@@ -33,8 +36,7 @@ public interface RestConstants {
   String HTTP_CONTEXT_ID = "opencast.httpcontext";
 
   /** The OSGI service filter that returns all registered services published as REST endpoints */
-  String SERVICES_FILTER = "(&(!(objectClass=javax.servlet.Servlet))(" + RestConstants.SERVICE_PATH_PROPERTY
-          + "=*))";
+  String SERVICES_FILTER = "(&(!(objectClass=javax.servlet.Servlet))(" + RestConstants.SERVICE_PATH_PROPERTY + "=*))";
 
   /** The bundle header used to find the static resource URL alias */
   String HTTP_ALIAS = "Http-Alias";
@@ -44,7 +46,7 @@ public interface RestConstants {
 
   /** The bundle header used to find the static resource welcome file */
   String HTTP_WELCOME = "Http-Welcome";
-  
+
   /**
    * The amount of time in seconds to wait for a session to be inactive before deallocating it. Applied to all sessions
    * with the last filter in the chain.

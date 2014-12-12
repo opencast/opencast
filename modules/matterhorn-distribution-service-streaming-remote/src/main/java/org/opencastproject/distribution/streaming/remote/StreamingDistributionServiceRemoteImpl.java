@@ -64,7 +64,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.distribution.api.DistributionService#distribute(String, org.opencastproject.mediapackage.MediaPackage, String)
    *      java.lang.String)
    */
@@ -99,7 +99,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.distribution.api.DistributionService#retract(String, org.opencastproject.mediapackage.MediaPackage, String)
    */
   @Override

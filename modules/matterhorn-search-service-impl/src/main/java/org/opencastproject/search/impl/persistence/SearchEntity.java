@@ -75,7 +75,7 @@ public class SearchEntity {
 
   /**
    * Returns media package id.
-   * 
+   *
    * @return media package id
    */
   public String getMediaPackageId() {
@@ -84,7 +84,7 @@ public class SearchEntity {
 
   /**
    * Sets media package id. Id length limit is 128 charachters.
-   * 
+   *
    * @param mediaPackageId
    */
   public void setMediaPackageId(String mediaPackageId) {
@@ -93,7 +93,7 @@ public class SearchEntity {
 
   /**
    * Returns serialized media package.
-   * 
+   *
    * @return serialized media package
    */
   public String getMediaPackageXML() {
@@ -102,7 +102,7 @@ public class SearchEntity {
 
   /**
    * Sets serialized media package
-   * 
+   *
    * @param mediaPackageXML
    */
   public void setMediaPackageXML(String mediaPackageXML) {
@@ -111,7 +111,7 @@ public class SearchEntity {
 
   /**
    * Returns serialized access control
-   * 
+   *
    * @return serialized access control
    */
   public String getAccessControl() {
@@ -120,7 +120,7 @@ public class SearchEntity {
 
   /**
    * Sets serialized access control.
-   * 
+   *
    * @param accessControl
    *          serialized access control
    */
@@ -152,7 +152,7 @@ public class SearchEntity {
 
   /**
    * Sets the deletion date
-   * 
+   *
    * @param deletionDate
    *          the deletion date
    */
@@ -169,7 +169,7 @@ public class SearchEntity {
 
   /**
    * Sets the modification date
-   * 
+   *
    * @param modificationDate
    *          the modification date
    */

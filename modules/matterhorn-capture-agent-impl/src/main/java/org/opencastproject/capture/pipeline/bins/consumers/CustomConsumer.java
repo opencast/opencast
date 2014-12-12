@@ -57,7 +57,7 @@ public class CustomConsumer extends ConsumerBin {
   /**
    * CustomConsumer allows the user to specify at run time a custom gstreamer pipeline that will act as the consumer for
    * the Capture Device.
-   * 
+   *
    * @throws UnableToLinkGStreamerElementsException
    *           Not actually thrown by this class, just inherited.
    * @throws UnableToCreateGhostPadsForBinException
@@ -80,7 +80,7 @@ public class CustomConsumer extends ConsumerBin {
 
   /**
    * Adds the friendly name, output path, location of the capture device and type to the properties collection.
-   * 
+   *
    * @return Returns an XProperties that contains all of the XProperties from ConfigurationManager and the mentioned
    *         properties above.
    **/
@@ -102,7 +102,7 @@ public class CustomConsumer extends ConsumerBin {
   /**
    * Creates the Bin for this class using the GStreamer Java Bin.launch command. Users can specify an Consumer in this
    * way using a gst-launch like syntax (e.g. "fakesrc ! fakesink")
-   * 
+   *
    * @throws UnableToCreateElementException
    **/
   @Override

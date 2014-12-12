@@ -84,7 +84,7 @@ public class EncodingProfileImpl implements EncodingProfile {
   
   /**
    * Private, since the profile should be created using the static factory method.
-   * 
+   *
    * @param identifier
    *          the profile identifier
    * @param name
@@ -102,7 +102,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncodingProfile#getIdentifier()
    */
   @Override
@@ -112,7 +112,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * Sets the identifier
-   * 
+   *
    * @param id
    *          the identifier
    */
@@ -122,7 +122,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncodingProfile#getName()
    */
   @Override
@@ -132,7 +132,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * Sets the profile name
-   * 
+   *
    * @param name
    *          the profile name
    */
@@ -142,7 +142,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncodingProfile#getSource()
    */
   @Override
@@ -152,7 +152,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncodingProfile#getOutputType()
    */
   @Override
@@ -162,7 +162,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * Sets the output type.
-   * 
+   *
    * @param type
    *          the output type
    */
@@ -172,7 +172,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncodingProfile#getSuffix()
    */
   @Override
@@ -187,7 +187,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * Sets the suffix for encoded file names.
-   * 
+   *
    * @param suffix
    *          the file suffix
    */
@@ -207,7 +207,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncodingProfile#getMimeType()
    */
   @Override
@@ -217,7 +217,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * Sets the Mimetype.
-   * 
+   *
    * @param mimeType
    *          the Mimetype
    */
@@ -227,7 +227,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncodingProfile#getApplicableMediaType()
    */
   @Override
@@ -237,7 +237,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * Sets the applicable type.
-   * 
+   *
    * @param applicableType
    *          the applicableType to set
    */
@@ -247,7 +247,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncodingProfile#isApplicableTo(org.opencastproject.composer.api.EncodingProfile.MediaType)
    */
   @Override
@@ -259,7 +259,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncodingProfile#getExtension(java.lang.String)
    */
   @Override
@@ -269,7 +269,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * Adds the given key-value pair to the extended configuration space of this media profile.
-   * 
+   *
    * @param key
    *          the property key
    * @param value
@@ -286,7 +286,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncodingProfile#getExtensions()
    */
   @Override
@@ -300,7 +300,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * Sets the extension properties for that profile. These properties may be intepreted by the encoder engine.
-   * 
+   *
    * @param extension
    *          the extension properties
    */
@@ -314,7 +314,7 @@ public class EncodingProfileImpl implements EncodingProfile {
   /**
    * Removes the specified property from the extended configuation space and returns either the property value or
    * <code>null</code> if no property was found.
-   * 
+   *
    * @param key
    *          the property key
    * @return the property value or <code>null</code>
@@ -334,7 +334,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.EncodingProfile#hasExtensions()
    */
   @Override
@@ -344,7 +344,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -354,7 +354,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -368,7 +368,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -410,7 +410,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
     /**
      * Constructs an extension property with a key and a value.
-     * 
+     *
      * @param key
      *          the key
      * @param value
@@ -423,7 +423,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
     /**
      * Constructs an extension property with a map entry.
-     * 
+     *
      * @param key
      *          the key
      * @param value

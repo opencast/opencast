@@ -33,7 +33,7 @@ public interface MediaPackageElementBuilder {
    * require additional contraints, e. g. a matching filename. Be sure to check the documentation of the corresponding
    * plugin for details.
    * </p>
-   * 
+   *
    * @param uri
    *          the element location
    * @return the new media package element
@@ -50,7 +50,7 @@ public interface MediaPackageElementBuilder {
    * may require additional contraints, e. g. a matching filename. Be sure to check the documentation of the
    * corresponding builder plugin for details.
    * </p>
-   * 
+   *
    * @param uri
    *          the element location
    * @param type
@@ -66,7 +66,7 @@ public interface MediaPackageElementBuilder {
 
   /**
    * Creates a media package element from the DOM element.
-   * 
+   *
    * @param elementNode
    *          the DOM node
    * @param serializer
@@ -80,7 +80,7 @@ public interface MediaPackageElementBuilder {
 
   /**
    * Creates a new media package elment of the specified type.
-   * 
+   *
    * @param type
    *          the element type
    * @param flavor

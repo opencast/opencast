@@ -16,6 +16,8 @@
 package org.opencastproject.serviceregistry.impl;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
 
 import org.easymock.EasyMock;
@@ -121,7 +123,7 @@ public class ServiceRegistryJpaImplTest {
 
   private void setupBundleContext() throws InvalidSyntaxException {
     bundleContext = EasyMock.createNiceMock(BundleContext.class);
-    EasyMock.expect(bundleContext.getProperty("org.opencastproject.server.url")).andReturn("");
+    EasyMock.expect(bundleContext.getProperty(MatterhornConstans.SERVER_URL_PROPERTY)).andReturn("");
     EasyMock.expect(bundleContext.getProperty("org.opencastproject.jobs.url")).andReturn("");
     EasyMock.expect(bundleContext.getProperty(ServiceRegistryJpaImpl.OPT_MAXLOAD)).andReturn("");
     EasyMock.expect(bundleContext.createFilter((String) EasyMock.anyObject())).andReturn(
@@ -138,6 +140,11 @@ public class ServiceRegistryJpaImplTest {
   @Test
   public void nullContextActivatesOkay() throws ServiceRegistryException {
     serviceRegistryJpaImpl.activate(null);
+  }
+
+  @Test(expected = NotFoundException.class)
+  public void testDeleteJobInvalidJobId() throws Exception {
+    serviceRegistryJpaImpl.removeJob(-1L);
   }
 
 }

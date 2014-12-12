@@ -42,7 +42,7 @@ public final class SolrServerFactory {
 
   /**
    * Constructor. Prepares solr connection.
-   * 
+   *
    * @param solrDir
    *          The directory of the solr instance.
    * @param dataDir
@@ -63,7 +63,7 @@ public final class SolrServerFactory {
 
   /**
    * Constructor. Prepares solr connection.
-   * 
+   *
    * @param url
    *          the connection url to the solr server
    */
@@ -86,7 +86,7 @@ public final class SolrServerFactory {
 
   /**
    * Shuts down a solr server or, in the case of a connection to a remote server, closes the connection.
-   * 
+   *
    * @param solrServer
    *          the solr server instance
    */

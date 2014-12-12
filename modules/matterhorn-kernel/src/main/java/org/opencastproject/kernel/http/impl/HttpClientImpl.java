@@ -79,7 +79,7 @@ public class HttpClientImpl implements HttpClient {
 
   /**
    * Creates a new client that can deal with all kinds of oddities with regards to http/https connections.
-   * 
+   *
    * @return the client
    */
   private DefaultHttpClient makeHttpClient() {
@@ -107,7 +107,7 @@ public class HttpClientImpl implements HttpClient {
   /**
    * Returns a new trust manager which will be in charge of checking the SSL certificates that are being presented by
    * SSL enabled hosts.
-   * 
+   *
    * @return the trust manager
    */
   private X509TrustManager createTrustManager() {
@@ -115,7 +115,7 @@ public class HttpClientImpl implements HttpClient {
 
       /**
        * {@InheritDoc}
-       * 
+       *
        * @see javax.net.ssl.X509TrustManager#checkClientTrusted(java.security.cert.X509Certificate[], java.lang.String)
        */
       public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {
@@ -124,7 +124,7 @@ public class HttpClientImpl implements HttpClient {
 
       /**
        * {@InheritDoc}
-       * 
+       *
        * @see javax.net.ssl.X509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[], java.lang.String)
        */
       public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
@@ -133,7 +133,7 @@ public class HttpClientImpl implements HttpClient {
 
       /**
        * {@InheritDoc}
-       * 
+       *
        * @see javax.net.ssl.X509TrustManager#getAcceptedIssuers()
        */
       public X509Certificate[] getAcceptedIssuers() {
@@ -148,7 +148,7 @@ public class HttpClientImpl implements HttpClient {
 
   /**
    * Creates a host name verifier that will make sure the SSL host's name matches the name in the SSL certificate.
-   * 
+   *
    * @return the host name verifier
    */
   private X509HostnameVerifier createHostNameVerifier() {
@@ -156,7 +156,7 @@ public class HttpClientImpl implements HttpClient {
 
       /**
        * {@InheritDoc}
-       * 
+       *
        * @see org.apache.http.conn.ssl.X509HostnameVerifier#verify(java.lang.String, javax.net.ssl.SSLSocket)
        */
       public void verify(String host, SSLSocket ssl) throws IOException {
@@ -165,7 +165,7 @@ public class HttpClientImpl implements HttpClient {
 
       /**
        * {@InheritDoc}
-       * 
+       *
        * @see org.apache.http.conn.ssl.X509HostnameVerifier#verify(java.lang.String, java.security.cert.X509Certificate)
        */
       public void verify(String host, X509Certificate xc) throws SSLException {
@@ -174,7 +174,7 @@ public class HttpClientImpl implements HttpClient {
 
       /**
        * {@InheritDoc}
-       * 
+       *
        * @see org.apache.http.conn.ssl.X509HostnameVerifier#verify(java.lang.String, java.lang.String[],
        *      java.lang.String[])
        */
@@ -184,7 +184,7 @@ public class HttpClientImpl implements HttpClient {
 
       /**
        * {@InheritDoc}
-       * 
+       *
        * @see javax.net.ssl.HostnameVerifier#verify(java.lang.String, javax.net.ssl.SSLSession)
        */
       public boolean verify(String host, SSLSession ssl) {

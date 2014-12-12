@@ -5,6 +5,7 @@
 
     var SERIES_SEARCH_URL = '/series/series.json',
         SERIES_URL = '/series',
+        ANOYMOUS_URL = '/info/me.json',
         BASE_URL = window.location.protocol + '//' + window.location.hostname,
         // Default properties
         defProperties = {
@@ -64,7 +65,7 @@
 
             // Remove additional values
             if(inMemoryMediaPackage.episodeCatalog.disable) {
-                self.find('#dublincore_episode_tab :input').not('#enable_button').each(function(i,element){
+                self.find('#dublincore_episode_tab :input').not('.disable_button').each(function(i,element){
                     var key = $(element).attr('name');
                     inMemoryMediaPackage.episodeCatalog.deleteValue(key);
                 });
@@ -243,10 +244,10 @@
         this.validateTab = function (element) {
            var errorField = 0;
 
-           if($(element).find('input#enable_button').attr('checked') == 'checked') return true;
+           if($(element).find('input.disable_button').attr('checked') == 'checked') return true;
 
            // Go through each input elements of the tabs to check them
-           $(element).find(':input').not('#enable_button').each(function(index,value){
+           $(element).find(':input').not('.disable_button').each(function(index,value){
                if(!$(this).valid())
                    errorField ++;
            });
@@ -291,14 +292,29 @@
 
         this.createSeries = function (name) {
             var id = false;
-            var seriesXml = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn"><dcterms:title xmlns="">' + name + '</dcterms:title></dublincore>'
+            var anonymous_role = 'ROLE_ANONYMOUS';
+            var seriesXml = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + name + '</dcterms:title></dublincore>'
+            $.ajax({
+                url: ANOYMOUS_URL,
+                type: 'GET',
+                dataType: 'json',
+                async: false,
+                error: function () {
+                    if (ocUtils !== undefined) {
+                        ocUtils.log("Could not retrieve anonymous role " + ANOYMOUS_URL);
+                    }
+                },
+                success: function(data) {
+                    anonymous_role = data.org.anonymousRole;
+                }
+            });
             $.ajax({
               async: false,
               type: 'POST',
               url: SERIES_URL,
               data: {
                 series: seriesXml,
-                acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="http://org.opencastproject.security"><ace><role>anonymous</role><action>read</action><allow>true</allow></ace></acl>'
+                acl: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><acl xmlns="http://org.opencastproject.security"><ace><role>' + anonymous_role + '</role><action>read</action><allow>true</allow></ace></acl>'
               },
               dataType : 'xml',
               success: function(data){
@@ -429,7 +445,7 @@
                 });
             });
 
-            self.find('.oc-ui-collapsible-widget :input').not('#enable_button').bind('keyup change', function(){
+            self.find('.oc-ui-collapsible-widget :input').not('.disable_button').bind('keyup change', function(){
                 var tab = $(this).parents('div.oc-ui-collapsible-widget');
                 var catalog;
                 if(tab.attr('id') == 'dublincore_episode_tab') {

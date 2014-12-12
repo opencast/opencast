@@ -87,7 +87,7 @@ public interface Job {
    * Sets the job identifier.
    *
    * @param id
-   *         the job identifier
+   *          the job identifier
    */
   void setId(long id);
 
@@ -110,7 +110,7 @@ public interface Job {
    * Sets the operation name.
    *
    * @param operation
-   *         the operation
+   *          the operation
    */
   void setOperation(String operation);
 
@@ -125,7 +125,7 @@ public interface Job {
    * Sets the argument list.
    *
    * @param arguments
-   *         the list of arguments
+   *          the list of arguments
    */
   void setArguments(List<String> arguments);
 
@@ -139,7 +139,7 @@ public interface Job {
   /**
    * In the case of failure, returns whether the failure had to do with data or with processing. Depending on the
    * reason, processing services might be marked not to accept new jobs.
-   * 
+   *
    * @return the failure reason
    */
   FailureReason getFailureReason();
@@ -148,14 +148,14 @@ public interface Job {
    * Sets the receipt's current {@link Status}.
    *
    * @param status
-   *         the status to set
+   *          the status to set
    */
   void setStatus(Status status);
 
   /**
    * Sets the receipt's current {@link Status} along with the {@link FailureReason} to indicate why - in the case of
    * failure - the job failed.
-   * 
+   *
    * @param status
    *          the status to set
    * @param the
@@ -226,7 +226,7 @@ public interface Job {
    * Sets the payload produced by this job.
    *
    * @param payload
-   *         the result of the job to store in the job
+   *          the result of the job to store in the job
    */
   void setPayload(String payload);
 
@@ -262,7 +262,7 @@ public interface Job {
    * Sets whether this job can be dispatched.
    *
    * @param dispatchable
-   *         whether the job should be queueable for dispatch.
+   *          whether the job should be queueable for dispatch.
    */
   void setDispatchable(boolean dispatchable);
 

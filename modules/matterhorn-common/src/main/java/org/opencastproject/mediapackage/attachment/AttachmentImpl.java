@@ -45,7 +45,7 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
 
   /**
    * Creates an attachment.
-   * 
+   *
    * @param identifier
    *          the attachment identifier
    * @param flavor
@@ -66,7 +66,7 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
 
   /**
    * Creates an attachment.
-   * 
+   *
    * @param flavor
    *          the attachment type
    * @param uri
@@ -84,7 +84,7 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
 
   /**
    * Creates an attachment.
-   * 
+   *
    * @param identifier
    *          the attachment identifier
    * @param uri
@@ -96,7 +96,7 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
 
   /**
    * Creates an attachment.
-   * 
+   *
    * @param uri
    *          the attachments location
    */
@@ -106,7 +106,7 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
 
   /**
    * Creates a new attachment from the url.
-   * 
+   *
    * @param uri
    *          the attachment location
    * @return the attachment

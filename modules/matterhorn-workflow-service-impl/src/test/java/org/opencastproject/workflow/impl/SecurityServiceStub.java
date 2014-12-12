@@ -16,19 +16,20 @@
 package org.opencastproject.workflow.impl;
 
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+
+import java.util.HashSet;
 
 /**
  * A security service useful for testing.
  */
 public class SecurityServiceStub implements SecurityService {
 
-  // private User user = new User("admin", DEFAULT_ORGANIZATION_ID, new String[] { DEFAULT_ORGANIZATION_ADMIN });
-  //
-  public static final User DEFAULT_ORG_ADMIN = new User("admin", DefaultOrganization.DEFAULT_ORGANIZATION_ID,
-          new String[] { DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN });
+  public static final User DEFAULT_ORG_ADMIN;
 
   /** Holds delegates users for new threads that have been spawned from authenticated threads */
   private static final ThreadLocal<User> user = new ThreadLocal<User>();
@@ -36,8 +37,14 @@ public class SecurityServiceStub implements SecurityService {
   /** Holds organization responsible for the current thread */
   private static final ThreadLocal<Organization> organization = new ThreadLocal<Organization>();
 
+  static {
+    HashSet<JaxbRole> roles = new HashSet<JaxbRole>();
+    roles.add(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, new DefaultOrganization(), ""));
+    DEFAULT_ORG_ADMIN = new JaxbUser("admin", new DefaultOrganization(), roles);
+  }
+
   /**
-   * 
+   *
    */
   public SecurityServiceStub() {
     setUser(DEFAULT_ORG_ADMIN);
@@ -56,7 +63,7 @@ public class SecurityServiceStub implements SecurityService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.SecurityService#getOrganization()
    */
   @Override
@@ -66,8 +73,8 @@ public class SecurityServiceStub implements SecurityService {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see org.opencastproject.security.api.SecurityService#setOrganization(org.opencastproject.security.api.Organization)
+   *
+   * @see org.opencastproject.security.api.SecurityService#setOrganization(Organization)
    */
   @Override
   public void setOrganization(Organization organization) {

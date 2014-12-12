@@ -15,6 +15,13 @@
  */
 package org.opencastproject.security.api;
 
+import static org.opencastproject.util.data.Either.left;
+import static org.opencastproject.util.data.Either.right;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
+import org.opencastproject.util.data.Either;
+import org.opencastproject.util.data.Function;
+
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -74,7 +81,7 @@ public final class AccessControlParser {
 
   /**
    * Parses a string into an ACL.
-   * 
+   *
    * @param serializedForm
    *          the string containing the xml or json formatted access control list.
    * @return the access control list
@@ -92,9 +99,38 @@ public final class AccessControlParser {
     }
   }
 
+  /** Same like {@link #parseAcl(String)} but throws runtime exceptions in case of an error. */
+  public static AccessControlList parseAclSilent(String serializedForm) {
+    try {
+      return parseAcl(serializedForm);
+    } catch (Exception e) {
+      return chuck(e);
+    }
+  }
+
+  /** {@link #parseAclSilent(String)} as a function. */
+  public static final Function<String, AccessControlList> parseAclSilent = new Function<String, AccessControlList>() {
+    @Override
+    public AccessControlList apply(String s) {
+      return parseAclSilent(s);
+    }
+  };
+
+  /** Functional version of {@link #parseAcl(String)}. */
+  public static final Function<String, Either<Exception, AccessControlList>> parseAcl = new Function<String, Either<Exception, AccessControlList>>() {
+    @Override
+    public Either<Exception, AccessControlList> apply(String s) {
+      try {
+        return right(parseAcl(s));
+      } catch (Exception e) {
+        return left(e);
+      }
+    }
+  };
+
   /**
    * Unmarshals an ACL from an xml input stream.
-   * 
+   *
    * @param in
    *          the xml input stream
    * @return the acl
@@ -109,7 +145,7 @@ public final class AccessControlParser {
 
   /**
    * Parses a JSON stream to an ACL.
-   * 
+   *
    * @param content
    *          the JSON stream
    * @return the access control list
@@ -123,6 +159,9 @@ public final class AccessControlParser {
       Object jsonAceObj = jsonAcl.get(ACE);
 
       AccessControlList acl = new AccessControlList();
+      if (jsonAceObj == null)
+        return acl;
+
       if (jsonAceObj instanceof JSONObject) {
         JSONObject jsonAce = (JSONObject) jsonAceObj;
         acl.getEntries().add(getAce(jsonAce));
@@ -141,7 +180,7 @@ public final class AccessControlParser {
 
   /**
    * Converts a JSON representation of an access control entry to an {@link AccessControlEntry}.
-   * 
+   *
    * @param jsonAce
    *          the json object
    * @return the access control entry
@@ -155,8 +194,8 @@ public final class AccessControlParser {
 
   /**
    * Parses an XML stream to an ACL.
-   * 
-   * @param inputStream
+   *
+   * @param in
    *          the XML stream
    * @throws IOException
    *           if there is a problem unmarshaling the stream
@@ -179,7 +218,7 @@ public final class AccessControlParser {
 
   /**
    * Serializes an AccessControlList to its XML form.
-   * 
+   *
    * @param acl
    *          the access control list
    * @return the xml as a string
@@ -228,4 +267,19 @@ public final class AccessControlParser {
     json.put(ACL, jsonAcl);
     return json.toJSONString();
   }
+
+  public static String toJsonSilent(AccessControlList acl) {
+    try {
+      return toJson(acl);
+    } catch (IOException e) {
+      return chuck(e);
+    }
+  }
+
+  public static final Function<AccessControlList, String> toJsonSilent = new Function<AccessControlList, String>() {
+    @Override
+    public String apply(AccessControlList acl) {
+      return toJsonSilent(acl);
+    }
+  };
 }

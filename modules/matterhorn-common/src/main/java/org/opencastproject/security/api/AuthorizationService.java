@@ -15,8 +15,12 @@
  */
 package org.opencastproject.security.api;
 
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
+
+import java.util.List;
 
 /**
  * Provides generation and interpretation of policy documents in media packages
@@ -24,71 +28,97 @@ import org.opencastproject.mediapackage.MediaPackageException;
 public interface AuthorizationService {
 
   /**
-   * Determines whether the current mediapackage contains a security policy.
-   * 
-   * @param mediapackage
-   *          the mediapackage
-   * @return whether the current mediapackage contains a security policy
-   * @throws MediaPackageException
-   *           if the mediapackage can not be read
+   * Determines whether the current media package contains a security policy.
+   *
+   * @param mp
+   *          the media package
+   * @return whether the current media package contains a security policy
    */
-  boolean hasPolicy(MediaPackage mediapackage) throws MediaPackageException;
+  boolean hasPolicy(MediaPackage mp);
 
   /**
-   * Determines whether the current user can take the specified action on the mediapackage.
-   * 
-   * @param mediapackage
-   *          the mediapackage
+   * Determines whether the current user can take the specified action on the media package.
+   *
+   * @param mp
+   *          the media package
    * @param action
    *          the action (e.g. read, modify, delete)
    * @return whether the current user has the correct privileges to take this action
-   * @throws MediaPackageException
-   *           if the policy can not be read from the mediapackage
    */
-  boolean hasPermission(MediaPackage mediapackage, String action) throws MediaPackageException;
+  boolean hasPermission(MediaPackage mp, String action);
 
   /**
-   * Gets the permissions associated with this mediapackage, as specified by its XACML attachment. The following rules
-   * are used to determine the access control:
+   * Gets the active permissions associated with this media package, as specified by its XACML attachment. The following
+   * rules are used to determine the access control in descending order:
    * <ol>
-   * <li>If exactly zero {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY} attachments are
-   * present, the returned ACL will be empty.</li>
-   * <li>If exactly one {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY} is attached to the
-   * mediapackage, this is the source of authority</li>
-   * <li>If more than one {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY} attachments are
-   * present, and one of them has no reference (
-   * {@link org.opencastproject.mediapackage.MediaPackageElement#getReference()} returns null), that attachment is
-   * presumed to be the source of authority</li>
-   * <li>If more than one {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY} attachments are
-   * present, and more than one of them has no reference (
-   * {@link org.opencastproject.mediapackage.MediaPackageElement#getReference()} returns null), the returned ACL will be
-   * empty.</li>
-   * <li>If more than one {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY} attachments are
-   * present, and all of them have references (
-   * {@link org.opencastproject.mediapackage.MediaPackageElement#getReference()} returns a non-null reference), the
+   * <li>If exactly zero {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY_EPISODE} and
+   * {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY_SERIES} attachments are present, the
    * returned ACL will be empty.</li>
+   * <li>If exactly one {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY_EPISODE} is attached
+   * to the media package, this is the source of authority</li>
+   * <li>If exactly one {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY_SERIES} is attached to
+   * the media package, this is the source of authority</li>
+   * <li>If more than one XACML attachments are present, and one of them has no reference (
+   * {@link org.opencastproject.mediapackage.MediaPackageElement#getReference()} returns null), that attachment is
+   * presumed to be the source of authority. Episode XACMLs are considered before series XACMLs.</li>
+   * <li>If more than one XACML attachments are present, and more than one of them has no reference (
+   * {@link org.opencastproject.mediapackage.MediaPackageElement#getReference()} returns null), the returned ACL will be
+   * empty. Episode XACMLs are considered before series XACMLs.</li>
+   * <li>If more than one XACML attachments are present, and all of them have references (
+   * {@link org.opencastproject.mediapackage.MediaPackageElement#getReference()} returns a non-null reference), the
+   * returned ACL will be empty. Episode XACMLs are considered before series XACMLs.</li>
    * </ol>
-   * 
-   * @param mediapackage
-   *          the mediapackage
+   *
+   * @param mp
+   *          the media package
    * @return the set of permissions and explicit denials
-   * @throws MediaPackageException
-   *           if the policy can not be read from the mediapackage
    */
-  AccessControlList getAccessControlList(MediaPackage mediapackage) throws MediaPackageException;
+  Tuple<AccessControlList, AclScope> getActiveAcl(MediaPackage mp);
 
   /**
-   * Attaches the provided policies to a mediapackage as a XACML attachment, replacing any previous policy element.
-   * 
-   * @param mediapackage
-   *          the mediapackage
-   * @param accessControlList
-   *          the tuples of roles to actions
-   * @return the mediapackage with attached XACML policy
-   * @throws MediaPackageException
-   *           if the policy can not be attached to the mediapackage
+   * Gets the permissions by its scope associated with this media package, as specified by its XACML attachment.
+   *
+   * @param mp
+   *          the media package
+   * @param scope
+   *          the acl scope
+   * @return the set of permissions and explicit denials
    */
-  MediaPackage setAccessControl(MediaPackage mediapackage, AccessControlList accessControlList)
-          throws MediaPackageException;
+  Option<AccessControlList> getAcl(MediaPackage mp, AclScope scope);
 
+  /**
+   * Return access control attachments of a certain scope or all.
+   *
+   * @param mp
+   *          the media package
+   * @param scope
+   *          the scope or none to get all ACL attachments
+   * @return a list of attachments that fit the given criteria
+   */
+  List<Attachment> getAclAttachments(MediaPackage mp, Option<AclScope> scope);
+
+  /**
+   * Attaches the provided policies to a media package as a XACML attachment, replacing any previous policy element of
+   * the same scope.
+   *
+   * @param mp
+   *          the media package
+   * @param scope
+   *          scope of the ACL
+   * @param acl
+   *          the tuples of roles to actions
+   * @return the mutated (!) media package with attached XACML policy and the XACML attachment
+   */
+  Tuple<MediaPackage, Attachment> setAcl(MediaPackage mp, AclScope scope, AccessControlList acl);
+
+  /**
+   * Remove the XACML of the given scope.
+   *
+   * @param mp
+   *          the media package
+   * @param scope
+   *          scope of the ACL
+   * @return the mutated (!) media package with removed XACML policy
+   */
+  MediaPackage removeAcl(MediaPackage mp, AclScope scope);
 }

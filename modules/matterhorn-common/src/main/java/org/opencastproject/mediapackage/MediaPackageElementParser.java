@@ -19,12 +19,13 @@ import org.apache.commons.io.IOUtils;
 import org.opencastproject.util.data.Function;
 import org.w3c.dom.Document;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * Convenience implementation that supports serializing and deserializing media package elements.
@@ -40,7 +41,7 @@ public final class MediaPackageElementParser {
 
   /**
    * Serializes the media package element to a string.
-   * 
+   *
    * @param element
    *          the element
    * @return the serialized media package element
@@ -73,7 +74,7 @@ public final class MediaPackageElementParser {
 
   /**
    * Parses the serialized media package element and returns its object representation.
-   * 
+   *
    * @param xml
    *          the serialized element
    * @return the media package element instance
@@ -101,7 +102,7 @@ public final class MediaPackageElementParser {
 
   /**
    * Serializes media package element list to a string.
-   * 
+   *
    * @param elements
    *          element list to be serialized
    * @return serialized media package element list
@@ -129,7 +130,7 @@ public final class MediaPackageElementParser {
 
   /**
    * Parses the serialized media package element list.
-   * 
+   *
    * @param xml
    *          String to be parsed
    * @return parsed media package element list

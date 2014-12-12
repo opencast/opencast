@@ -137,7 +137,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Creates a new abstract feed generator.
-   * 
+   *
    * @param uri
    *          the feed identifier
    * @param feedHome
@@ -167,7 +167,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.api.FeedGenerator#getIdentifier()
    */
   public String getIdentifier() {
@@ -176,7 +176,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Sets the feed name.
-   * 
+   *
    * @param name
    *          the feed name
    */
@@ -186,7 +186,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.api.FeedGenerator#getName()
    */
   public String getName() {
@@ -195,7 +195,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Sets the feed description.
-   * 
+   *
    * @param description
    *          the feed description
    */
@@ -205,7 +205,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.api.FeedGenerator#getDescription()
    */
   public String getDescription() {
@@ -214,7 +214,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Sets the copyright notice.
-   * 
+   *
    * @param copyright
    *          the copyright notice
    */
@@ -224,7 +224,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.api.FeedGenerator#getCopyright()
    */
   @Override
@@ -234,7 +234,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Sets the url to the cover url.
-   * 
+   *
    * @param cover
    *          the cover url
    */
@@ -244,7 +244,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.api.FeedGenerator#getCover()
    */
   @Override
@@ -254,7 +254,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Loads and returns the feed data.
-   * 
+   *
    * @param type
    *          the requested feed type
    * @param query
@@ -270,7 +270,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /**
    * Creates a search query that is taking into account the flavors and tags as configured in the feed definition as
    * well as limit and offset passed into this method.
-   * 
+   *
    * @param type
    *          the requested feed type
    * @param limit
@@ -283,7 +283,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     SearchQuery searchQuery = new SearchQuery();
     searchQuery.withLimit(limit);
     searchQuery.withOffset(offset);
-    searchQuery.withCreationDateSort(true);
+    searchQuery.withSort(SearchQuery.Sort.DATE_CREATED);
     switch (type) {
       case Atom:
         if (atomTags != null && atomTags.size() > 0)
@@ -301,7 +301,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Creates a new feed.
-   * 
+   *
    * @param type
    *          the feed type
    * @param uri
@@ -320,7 +320,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.feed.api.FeedGenerator#createFeed(org.opencastproject.feed.api.Feed.Type,
    *      java.lang.String[], int)
    */
@@ -356,6 +356,12 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     // Create the feed
     Feed f = createFeed(type, getIdentifier(), new ContentImpl(getName()), new ContentImpl(getDescription()),
             getFeedLink());
+
+    // Set the copyright
+    if (StringUtils.isNotBlank(getCopyright()))
+      f.setCopyright(getCopyright());
+
+    // Adjust the feed encoding
     f.setEncoding(ENCODING);
 
     // Set iTunes tags
@@ -390,7 +396,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Adds series information to the feed.
-   * 
+   *
    * @param feed
    *          the feed
    * @param query
@@ -462,7 +468,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Adds episode information to the feed.
-   * 
+   *
    * @param feed
    *          the feed
    * @param query
@@ -525,7 +531,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Populates the feed entry with metadata and the enclosures.
-   * 
+   *
    * @param entry
    *          the entry to enrich
    * @param metadata
@@ -644,12 +650,16 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         trackLength = 0;
         if (((TrackImpl) element).hasVideo()) {
           List<VideoStream> video = ((TrackImpl) element).getVideo();
-          trackLength += metadata.getDcExtent() / 1000 * video.get(0).getBitRate() / 8;
+          if (video != null && video.get(0) != null && video.get(0).getBitRate() != null) {
+            trackLength += metadata.getDcExtent() / 1000 * video.get(0).getBitRate() / 8;
+          }
         }
 
         if (((TrackImpl) element).hasAudio()) {
           List<AudioStream> audio = ((TrackImpl) element).getAudio();
-          trackLength += metadata.getDcExtent() / 1000 * audio.get(0).getBitRate() / 8;
+          if (audio != null && audio.get(0) != null && audio.get(0).getBitRate() != null) {
+            trackLength += metadata.getDcExtent() / 1000 * audio.get(0).getBitRate() / 8;
+          }
         }
       }
 
@@ -677,7 +687,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Creates a new feed entry that can be added to the feed.
-   * 
+   *
    * @param feed
    *          the feed that is being created
    * @param title
@@ -694,7 +704,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Creates a new feed entry that can be added to the feed.
-   * 
+   *
    * @param feed
    *          the feed that is being created
    * @param title
@@ -716,7 +726,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Adds the image as a content element to the feed entry.
-   * 
+   *
    * @param entry
    *          the feed entry
    * @param imageUrl
@@ -736,7 +746,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Sets the rss media types.
-   * 
+   *
    * @param mediaTypes
    *          The ordered array of media types to choose for RSS feeds.
    */
@@ -751,7 +761,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /**
    * Returns an ordered list of media types for the RSS feed. The feed will select the first media type where a track is
    * available.
-   * 
+   *
    * @return The rss media types
    */
   protected List<String> getRssMediaTypes() {
@@ -760,7 +770,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Adds the flavor to the set of flavors of tracks that are to be included in rss feeds.
-   * 
+   *
    * @param flavor
    *          the flavor to add
    */
@@ -770,7 +780,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Removes the flavor from the set of flavors of tracks that are to be included in rss feeds.
-   * 
+   *
    * @param flavor
    *          the flavor to add
    */
@@ -781,7 +791,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /**
    * Returns the ordered list of flavors of the tracks to be included in rss feeds. If the first flavor specified in
    * this list is not available, we try to use the next flavor, until a track is found or no more flavors are available.
-   * 
+   *
    * @return the flavors for rss feed tracks
    */
   protected List<MediaPackageElementFlavor> getRssTrackFlavors() {
@@ -790,7 +800,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Adds the flavor to the set of flavors of tracks that are to be included in atom feeds.
-   * 
+   *
    * @param flavor
    *          the flavor to add
    */
@@ -800,7 +810,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Removes the flavor from the set of flavors of tracks that are to be included in atom feeds.
-   * 
+   *
    * @param flavor
    *          the flavor to add
    */
@@ -810,7 +820,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Returns the flavors of the tracks to be included in atom feeds.
-   * 
+   *
    * @return the flavors for atom feed tracks
    */
   protected Set<MediaPackageElementFlavor> getAtomTrackFlavors() {
@@ -819,7 +829,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Adds the tag to the set of tags that identify the tracks that are to be included in atom feeds.
-   * 
+   *
    * @param tag
    *          the tag to add
    */
@@ -829,7 +839,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Removes the tag from the set of tags that identify the tracks that are to be included in atom feeds.
-   * 
+   *
    * @param tag
    *          the tag to add
    */
@@ -839,7 +849,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Returns the tags of the tracks to be included in atom feeds.
-   * 
+   *
    * @return the tags for atom feed tracks
    */
   protected Set<String> getAtomTags() {
@@ -848,7 +858,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Adds the tag to the set of tags that identify the tracks that are to be included in rss feeds.
-   * 
+   *
    * @param tag
    *          the tag to add
    */
@@ -858,7 +868,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Removes the tag from the set of tags that identify the tracks that are to be included in rss feeds.
-   * 
+   *
    * @param tag
    *          the tag to add
    */
@@ -868,7 +878,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Returns the tags of the tracks to be included in rss feeds.
-   * 
+   *
    * @return the tags for rss feed tracks
    */
   protected Set<String> getRSSTags() {
@@ -881,7 +891,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    * <p>
    * This default implementation will include the track identified by the flavor as specified in the constructor for rss
    * feeds and every distribution track for atom feeds.
-   * 
+   *
    * @param feed
    *          the feed
    * @param resultItem
@@ -927,7 +937,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Sets the url to the feed's homepage.
-   * 
+   *
    * @param url
    *          the homepage
    */
@@ -937,7 +947,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Returns the url to the feed's homepage.
-   * 
+   *
    * @return the feed home
    */
   public String getFeedLink() {
@@ -947,7 +957,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /**
    * Sets the entry's base url that will be used to form the episode link in the feeds. If the url contains a
    * placeholder in the form <code>{0}</code>, it will be replaced by the episode id.
-   * 
+   *
    * @param url
    *          the url
    */
@@ -957,7 +967,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Returns the link template to the default user interface.
-   * 
+   *
    * @return the link to the ui
    */
   public String getLinkTemplate() {
@@ -967,7 +977,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /**
    * Sets the entry's base url that will be used to form the alternate episode link in the feeds. If the url contains a
    * placeholder in the form <code>{0}</code>, it will be replaced by the episode id.
-   * 
+   *
    * @param url
    *          the url
    */
@@ -977,7 +987,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Returns the self link template to the default user interface.
-   * 
+   *
    * @return the link to the ui
    */
   public String getLinkSelf() {
@@ -988,7 +998,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    * Generates a link for the current feed entry by using the entry identifier and the result of
    * {@link #getLinkTemplate()} to create the url. Overwrite this method to provide your own way of generating links to
    * feed entries.
-   * 
+   *
    * @param feed
    *          the feed
    * @param solrResultItem
@@ -1004,7 +1014,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /**
    * Generates a link for the current feed entry by using the entry identifier and the result of {@link #getLinkSelf()}
    * to create the url. Overwrite this method to provide your own way of generating links to feed entries.
-   * 
+   *
    * @param feed
    *          the feed
    * @param solrResultItem
@@ -1019,7 +1029,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -1029,7 +1039,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -1042,7 +1052,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

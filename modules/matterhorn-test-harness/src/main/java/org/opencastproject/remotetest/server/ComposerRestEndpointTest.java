@@ -226,7 +226,7 @@ public class ComposerRestEndpointTest {
 
   /**
    * Gets the mediapackage element from a job polling response
-   * 
+   *
    * @param jobXml
    *          the job as xml
    * @return the mediapackage elemet as an xml string
