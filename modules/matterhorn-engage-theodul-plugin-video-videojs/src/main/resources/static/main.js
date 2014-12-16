@@ -205,11 +205,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         return string.replace(new RegExp(escapeRegExp(find), "g"), replace);
     }
 
-    function preferedFormat() {
-        if (Basil.get("preferedFormat") == null) {
-            return null;
-        }
-        switch (Basil.get("preferedFormat")) {
+    function preferredFormat() {
+        switch (Basil.get("preferredFormat")) {
             case "hls":
                 return "application/x-mpegURL";
             case "dash":
@@ -228,14 +225,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     }
 
     function acceptFormat(track) {
-        if (preferedFormat() == 0 || mimetypes.indexOf(preferedFormat()) == -1) {
-            return true; //prefered format is not available, accept all
+        if ((preferredFormat() == null) || (mimetypes.indexOf(preferredFormat()) == -1)) {
+            return true; // preferred format is not available, accept all
         }
-        if (track.mimetype == preferedFormat()) {
-            return true;
-        } else {
-            return false;
-        }
+        return track.mimetype == preferredFormat();
     }
 
     function parseVideoResolution(resolution) {
@@ -264,7 +257,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     });
 
     function prepareRenderingVideoDisplay(videoDataView) {
-
         if (loadHls) {
             require([relative_plugin_path + mediaSourcesPath], function(videojsmedia) {
                 Engage.log("Video: Lib videojs media sources loaded");
@@ -280,7 +272,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
     function renderVideoDisplay(videoDataView) {
         Engage.log("Rendering video displays");
-
         var src = (videoDataView.model.get("videoSources") && videoDataView.model.get("videoSources")["audio"]) ? videoDataView.model.get("videoSources")["audio"] : [];
         var tempVars = {
             ids: videoDataView.model.get("ids"),
