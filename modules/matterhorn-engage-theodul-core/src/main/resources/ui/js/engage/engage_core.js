@@ -90,10 +90,14 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     function browserSupported() {
         if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
-            console.log("Override Browser " + Basil.get("overrideBrowser"));
+            console.log("User setting: Support unsupported browser: " + Basil.get("overrideBrowser"));
             return true;
         }
-        return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) || (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) || (Bowser.opera && Bowser.version >= browser_minVersion_opera) || (Bowser.safari && Bowser.version >= browser_minVersion_safari) || (Bowser.msie && Bowser.version >= browser_minVersion_msie);
+        return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) ||
+	    (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) ||
+	    (Bowser.opera && Bowser.version >= browser_minVersion_opera) ||
+	    (Bowser.safari && Bowser.version >= browser_minVersion_safari) ||
+	    (Bowser.msie && Bowser.version >= browser_minVersion_msie);
     }
 
     function detectLanguage() {
@@ -474,7 +478,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     // BEGIN Private core functions
 
-    //binds configured hotkeys(see MH org config) to corresponding theodul events
+    // binds configured hotkeys(see MH org config) to corresponding theodul events
     function bindHotkeysToEvents() {
         // process hardcoded keys
         $.each(engageCore.model.get("meInfo").get("hotkeys"), function(i, val) {
