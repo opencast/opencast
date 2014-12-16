@@ -48,8 +48,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         bufferedButNotAutoplaying: new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler"),
-        audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "handler"),
-        translate: new Engage.Event("Core:translate", "", "handler")
+        audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "handler")
     };
 
     var isDesktopMode = false;
@@ -113,6 +112,46 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var locale = "en";
     var dateFormat = "MMMM Do YYYY, h:mm:ss a";
 
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function initTranslate(language, funcSuccess, funcError) {
+	var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path +  "language/theodul_language_en.json"; // this solution is really bad, fix it...
+
+        if (language == "de") {
+            Engage.log("Notifications: Chosing german translations");
+            jsonstr = window.location.origin + "/engage/theodul/" + path +  "language/theodul_language_de.json"; // this solution is really bad, fix it...
+        } else { // No other languages supported, yet
+            Engage.log("Notifications: Chosing english translations");
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translations = data;
+		    console.log(translations);
+                    if (funcSuccess) {
+                        funcSuccess(translations);
+                    }
+                } else {
+                    if (funcError) {
+                        funcError();
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (funcError) {
+                    funcError();
+                }
+            }
+        });
+    }
+
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
@@ -146,6 +185,16 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
      * Initialize the plugin
      */
     function initPlugin() {
+        initTranslate(detectLanguage(), function() {
+	    Engage.log("Notifications: Successfully translated.");
+	    locale = translate("value_locale", locale);
+	    dateFormat = translate("value_dateFormatFull", dateFormat);
+            Moment.locale(locale, {
+		// customizations
+            });
+        }, function() {
+            Engage.log("Notifications: Error translating...");
+        });
         Moment.locale(locale, {
             // customizations
         });
@@ -165,23 +214,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                 }
             }
         }, alertifyVideoLoadMessageThreshold);
-
-        Engage.on(plugin.events.translate.getName(), function(data) {
-            var key = Object.keys(data);
-            for (var i = 0; i < key.length; i++) {
-                var lang_value = key[i];
-                translations[lang_value] = data[lang_value];
-            }
-	    if(data.value_locale != "undefined") {
-		locale = data.value_locale;
-	    }
-	    if(data.value_dateFormatFull != "undefined") {
-		dateFormat = data.value_dateFormatFull;
-	    }
-            Moment.locale(locale, {
-		// customizations
-            });
-        });
         Engage.on(plugin.events.isAudioOnly.getName(), function(audio) {
             isAudioOnly = audio;
         });
