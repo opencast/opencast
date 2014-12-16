@@ -34,7 +34,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "en
     var class_engage_timeline_expand_btn_rotate180 = "engage_timeline_expand_btn_rotate180";
     var class_tab_pane = "tab-pane";
 
-    /* don"t change these variables */
+    /* don't change these variables */
     var timelineplugin_opened = "Engage:timelineplugin_opened";
     var timelineplugin_closed = "Engage:timelineplugin_closed";
 
