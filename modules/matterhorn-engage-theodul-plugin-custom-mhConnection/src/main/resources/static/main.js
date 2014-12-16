@@ -101,14 +101,15 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     }
 
     function initTranslate(language, funcSuccess, funcError) {
-	var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
-        var jsonstr = window.location.origin + "/engage/theodul/" + path +  "language/theodul_language_en.json"; // this solution is really bad, fix it...
+        var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
         if (language == "de") {
             Engage.log("MHConnection: Chosing german translations");
-            jsonstr = window.location.origin + "/engage/theodul/" + path +  "language/theodul_language_de.json"; // this solution is really bad, fix it...
+            jsonstr += "language/theodul_language_de.json";
         } else { // No other languages supported, yet
             Engage.log("MHConnection: Chosing english translations");
+            jsonstr += "language/theodul_language_en.json";
         }
         $.ajax({
             url: jsonstr,
@@ -118,7 +119,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 if (data) {
                     data.value_locale = language;
                     translations = data;
-		    console.log(translations);
+                    console.log(translations);
                     if (funcSuccess) {
                         funcSuccess(translations);
                     }
@@ -152,34 +153,34 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             this.fetch({
                 data: {},
                 success: function(model) {
-		    model.loggedIn = false;
-		    model.username = "Anonymous";
-		    model.roles = [];
-		    var attr = model.attributes;
-		    if(attr.username) {
-			Engage.log("Username found: " + attr.username);
-			model.username = attr.username;
-		    } else {
-			Engage.log("No username found.");
-		    }
-		    if(attr.roles && (attr.roles.length > 0)) {
-			model.roles = attr.roles;
-			var notAnonymous = false;
-			for(var i = 0; i < attr.roles.length; ++i) {
-			    if(attr.roles[i] != "ROLE_ANONYMOUS") {
-				notAnonymous = true;
-			    }
-			}
-			model.loggedIn = notAnonymous;
-			if(notAnonymous) {
-			    Engage.log("User has one or more roles.");
-			} else {
-			    Engage.log("User has no role.");
-			}
-		    } else {
-			Engage.log("Error: No roles found.");
-		    }
-		    model.trigger("change");
+                    model.loggedIn = false;
+                    model.username = "Anonymous";
+                    model.roles = [];
+                    var attr = model.attributes;
+                    if (attr.username) {
+                        Engage.log("Username found: " + attr.username);
+                        model.username = attr.username;
+                    } else {
+                        Engage.log("No username found.");
+                    }
+                    if (attr.roles && (attr.roles.length > 0)) {
+                        model.roles = attr.roles;
+                        var notAnonymous = false;
+                        for (var i = 0; i < attr.roles.length; ++i) {
+                            if (attr.roles[i] != "ROLE_ANONYMOUS") {
+                                notAnonymous = true;
+                            }
+                        }
+                        model.loggedIn = notAnonymous;
+                        if (notAnonymous) {
+                            Engage.log("User has one or more roles.");
+                        } else {
+                            Engage.log("User has no role.");
+                        }
+                    } else {
+                        Engage.log("Error: No roles found.");
+                    }
+                    model.trigger("change");
                 }
             });
         },

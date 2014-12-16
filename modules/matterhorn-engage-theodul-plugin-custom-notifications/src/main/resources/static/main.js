@@ -117,14 +117,15 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     }
 
     function initTranslate(language, funcSuccess, funcError) {
-	var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
-        var jsonstr = window.location.origin + "/engage/theodul/" + path +  "language/theodul_language_en.json"; // this solution is really bad, fix it...
+        var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
         if (language == "de") {
             Engage.log("Notifications: Chosing german translations");
-            jsonstr = window.location.origin + "/engage/theodul/" + path +  "language/theodul_language_de.json"; // this solution is really bad, fix it...
+            jsonstr += "language/theodul_language_de.json";
         } else { // No other languages supported, yet
             Engage.log("Notifications: Chosing english translations");
+            jsonstr += "language/theodul_language_en.json";
         }
         $.ajax({
             url: jsonstr,
@@ -134,7 +135,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                 if (data) {
                     data.value_locale = language;
                     translations = data;
-		    console.log(translations);
                     if (funcSuccess) {
                         funcSuccess(translations);
                     }
@@ -186,11 +186,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
      */
     function initPlugin() {
         initTranslate(detectLanguage(), function() {
-	    Engage.log("Notifications: Successfully translated.");
-	    locale = translate("value_locale", locale);
-	    dateFormat = translate("value_dateFormatFull", dateFormat);
+    	    Engage.log("Notifications: Successfully translated.");
+    	    locale = translate("value_locale", locale);
+    	    dateFormat = translate("value_dateFormatFull", dateFormat);
             Moment.locale(locale, {
-		// customizations
+		        // customizations
             });
         }, function() {
             Engage.log("Notifications: Error translating...");

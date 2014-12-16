@@ -215,14 +215,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     }
 
     function initTranslate(language, funcSuccess, funcError) {
-	var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
-        var jsonstr = window.location.origin + "/engage/theodul/" + path +  "language/theodul_language_en.json"; // this solution is really bad, fix it...
+        var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
         if (language == "de") {
-            Engage.log("Connection: Chosing german translations");
-            jsonstr = window.location.origin + "/engage/theodul/" + path +  "language/theodul_language_de.json"; // this solution is really bad, fix it...
+            Engage.log("Controls: Chosing german translations");
+            jsonstr += "language/theodul_language_de.json";
         } else { // No other languages supported, yet
-            Engage.log("Connection: Chosing english translations");
+            Engage.log("Controls: Chosing english translations");
+            jsonstr += "language/theodul_language_en.json";
         }
         $.ajax({
             url: jsonstr,
@@ -232,7 +233,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 if (data) {
                     data.value_locale = language;
                     translations = data;
-		    console.log(translations);
+                    console.log(translations);
                     if (funcSuccess) {
                         funcSuccess(translations);
                     }
@@ -867,7 +868,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         if ((isDesktopMode || isMobileMode) && plugin.inserted) {
             var controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
             initTranslate(detectLanguage(), function() {
-		Engage.log("Controls: Successfully translated.");
+                Engage.log("Controls: Successfully translated.");
                 controlsView.render();
             }, function() {
                 Engage.log("Controls: Error translating...");
