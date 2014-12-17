@@ -35,8 +35,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var plugin;
     var events = {
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
-        translate: new Engage.Event("Core:translate", "", "handler")
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -87,11 +86,55 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     /* don't change these variables */
     var viewsModelChange = "change:views";
     var mediapackageChange = "change:mediaPackage";
-    var initCount = 3;
+    var initCount = 4;
     var mediapackageError = false;
     var translations = new Array();
     var locale = "en";
     var dateFormat = "MMMM Do YYYY, h:mm:ss a";
+
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function initTranslate(language, funcSuccess, funcError) {
+        var path = Engage.getPluginPath("EngagePluginTabDescription").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+
+        if (language == "de") {
+            Engage.log("Tab:Description: Chosing german translations");
+            jsonstr += "language/theodul_language_de.json";
+        } else { // No other languages supported, yet
+            Engage.log("Tab:Description: Chosing english translations");
+            jsonstr += "language/theodul_language_en.json";
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translations = data;
+                    if (funcSuccess) {
+                        funcSuccess(translations);
+                    }
+                } else {
+                    if (funcError) {
+                        funcError();
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (funcError) {
+                    funcError();
+                }
+            }
+        });
+    }
+
+    function translate(str, strIfNotFound) {
+        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
 
     var DescriptionTabView = Backbone.View.extend({
         initialize: function(mediaPackageModel, template) {
@@ -154,39 +197,21 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
                 /*
-	      $(".description-item").mouseover(function() {
-	      $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
-	      }).mouseout(function() {
-	      $(this).removeClass("description-itemColor-hover").addClass("description-itemColor");
-	      });
-	    */
+        	    $(".description-item").mouseover(function() {
+        	        $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
+        	    }).mouseout(function() {
+        	        $(this).removeClass("description-itemColor-hover").addClass("description-itemColor");
+        	    });
+        	    */
             }
         }
     });
-
-    function translate(str, strIfNotFound) {
-        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
-    }
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
             // create a new view with the media package model and the template
             var descriptionTabView = new DescriptionTabView(Engage.model.get("mediaPackage"), plugin.template);
-            Engage.on(plugin.events.translate.getName(), function(data) {
-                var key = Object.keys(data);
-                for (var i = 0; i < key.length; i++) {
-                    var lang_value = key[i];
-                    translations[lang_value] = data[lang_value];
-                }
-                if (data.value_locale != "undefined") {
-                    locale = data.value_locale;
-                }
-                if (data.value_dateFormat != "undefined") {
-                    dateFormat = data.value_dateFormat;
-                }
-                descriptionTabView.render();
-            });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
             });
@@ -200,6 +225,22 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         // init event
         Engage.log("Tab:Description: Init");
         var relative_plugin_path = Engage.getPluginPath("EngagePluginTabDescription");
+
+        initTranslate(detectLanguage(), function() {
+            Engage.log("Tab:Description: Successfully translated.");
+            locale = translate("value_locale", locale);
+            dateFormat = translate("value_dateFormatFull", dateFormat);
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        }, function() {
+            Engage.log("Tab:Description: Error translating...");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
 
         Engage.model.on(viewsModelChange, function() {
             initCount -= 1;

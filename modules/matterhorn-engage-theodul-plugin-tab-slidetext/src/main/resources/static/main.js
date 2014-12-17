@@ -38,8 +38,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         segmentMouseout: new Engage.Event("Segment:mouseOut", "the mouse is off a segment", "both"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
-        translate: new Engage.Event("Core:translate", "", "handler")
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -94,9 +93,53 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var html_snippet_id = "engage_slidetext_tab_content";
     var id_segmentNo = "tab_slidetext_segment_";
     var mediapackageChange = "change:mediaPackage";
-    var initCount = 2;
+    var initCount = 3;
     var mediapackageError = false;
     var translations = new Array();
+
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function initTranslate(language, funcSuccess, funcError) {
+        var path = Engage.getPluginPath("EngagePluginTabSlidetext").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+
+        if (language == "de") {
+            Engage.log("Tab:Slidetext: Chosing german translations");
+            jsonstr += "language/theodul_language_de.json";
+        } else { // No other languages supported, yet
+            Engage.log("Tab:Slidetext: Chosing english translations");
+            jsonstr += "language/theodul_language_en.json";
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translations = data;
+                    if (funcSuccess) {
+                        funcSuccess(translations);
+                    }
+                } else {
+                    if (funcError) {
+                        funcError();
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (funcError) {
+                    funcError();
+                }
+            }
+        });
+    }
+
+    function translate(str, strIfNotFound) {
+        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
 
     /**
      * Segment
@@ -109,10 +152,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         this.image_url = image_url;
         this.text = text;
     };
-
-    function translate(str, strIfNotFound) {
-        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
-    }
 
     /**
      * Returns the input time in milliseconds
@@ -239,20 +278,26 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
             });
-            Engage.on(plugin.events.translate.getName(), function(data) {
-                var key = Object.keys(data);
-                for (var i = 0; i < key.length; i++) {
-                    var lang_value = key[i];
-                    translations[lang_value] = data[lang_value];
-                }
-                slidetextTabView.render();
-            });
         }
     }
 
     // init event
     Engage.log("Tab:Slidetext: Init");
-    var relative_plugin_path = Engage.getPluginPath("EngagePluginTabSlidetext");
+    // var relative_plugin_path = Engage.getPluginPath("EngagePluginTabSlidetext");
+
+    initTranslate(detectLanguage(), function() {
+        Engage.log("Tab:Slidetext: Successfully translated.");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    }, function() {
+        Engage.log("Notifications: Error translating...");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
 
     // listen on a change/set of the mediaPackage model
     Engage.model.on(mediapackageChange, function() {

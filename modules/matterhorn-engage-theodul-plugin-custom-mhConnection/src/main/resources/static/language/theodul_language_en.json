@@ -1,0 +1,6 @@
+{
+    "value_locale": "en",
+    "error_mediaPackageInformationNotLoaded": "There are two possible reasons for this error:<ul><li>The media is not available any more</li><li>The media is protected and you need to log in</li></ul>",
+    "error_noMediaInformationAvailable": "No media information are available.",
+    "error_endpointNotAvailable": "A requested search endpoint is currently not available."
+}
