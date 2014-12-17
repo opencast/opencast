@@ -104,7 +104,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var alertify;
     var mediapackageError = false;
     var codecError = false;
-    var initCount = 2;
+    var initCount = 3;
     var videoLoaded = false;
     var videoLoadMsgDisplayed = false;
     var videoBuffering = false;
@@ -185,16 +185,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
      * Initialize the plugin
      */
     function initPlugin() {
-        initTranslate(detectLanguage(), function() {
-    	    Engage.log("Notifications: Successfully translated.");
-    	    locale = translate("value_locale", locale);
-    	    dateFormat = translate("value_dateFormatFull", dateFormat);
-            Moment.locale(locale, {
-		        // customizations
-            });
-        }, function() {
-            Engage.log("Notifications: Error translating...");
-        });
         Moment.locale(locale, {
             // customizations
         });
@@ -271,6 +261,22 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     Engage.log("Notifications: Init");
     var relative_plugin_path = Engage.getPluginPath("EngagePluginCustomNotifications");
 
+    initTranslate(detectLanguage(), function() {
+        Engage.log("Notifications: Successfully translated.");
+        locale = translate("value_locale", locale);
+        dateFormat = translate("value_dateFormatFull", dateFormat);
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    }, function() {
+        Engage.log("Notifications: Error translating...");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
+
     // load alertify lib
     require([relative_plugin_path + alertifyPath], function(_alertify) {
         Engage.log("Notifications: Lib alertify loaded");
@@ -292,3 +298,4 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
 
     return plugin;
 });
+

@@ -165,8 +165,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_str_loginlogout = "str_loginlogout";
     var id_dropdownMenuLoginInfo = "dropdownMenuLoginInfo";
     var class_dropdown = "dropdown-toggle";
-
-    /* don't change these variables */
     var videosReady = false;
     var enableFullscreenButton = false;
     var currentTime = 0;
@@ -176,7 +174,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var event_slidestart = "slidestart";
     var event_slidestop = "slidestop";
     var plugin_path = "";
-    var initCount = 6;
+    var initCount = 7;
     var isPlaying = false;
     var isSliding = false;
     var isMute = false;
@@ -215,7 +213,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     }
 
     function initTranslate(language, funcSuccess, funcError) {
-        var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
+        var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
         if (language == "de") {
@@ -233,7 +231,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 if (data) {
                     data.value_locale = language;
                     translations = data;
-                    console.log(translations);
                     if (funcSuccess) {
                         funcSuccess(translations);
                     }
@@ -867,12 +864,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         // only init if plugin template was inserted into the DOM
         if ((isDesktopMode || isMobileMode) && plugin.inserted) {
             var controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
-            initTranslate(detectLanguage(), function() {
-                Engage.log("Controls: Successfully translated.");
-                controlsView.render();
-            }, function() {
-                Engage.log("Controls: Error translating...");
-            });
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
                 if (as) {
                     aspectRatioWidth = as[0] || 0;
@@ -971,6 +962,21 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         // load bootstrap lib
         require([relative_plugin_path + bootstrapPath], function() {
             Engage.log("Controls: Lib bootstrap loaded");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+
+        // init translation
+        initTranslate(detectLanguage(), function() {
+            Engage.log("Controls: Successfully translated.");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        }, function() {
+            Engage.log("Controls: Error translating...");
             initCount -= 1;
             if (initCount <= 0) {
                 initPlugin();

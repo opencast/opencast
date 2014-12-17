@@ -126,7 +126,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var isAudioOnly = false;
     var isUsingFlash = false;
     var aspectRatio = "";
-    var initCount = 4;
+    var initCount = 5;
     var mediapackageError = false;
     var videoDisplayNamePrefix = "videojs_videodisplay_";
     var id_engage_video = "engage_video";
@@ -192,7 +192,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     }
 
     function initTranslate(language, funcSuccess, funcError) {
-        var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
+        var path = Engage.getPluginPath("EngagePluginVideoVideoJS").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
         if (language == "de") {
@@ -245,7 +245,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     }
 
     function preferredFormat() {
-        switch (Basil.get("preferredFormat")) {
+        /*
+	var pf = Basil.get("preferredFormat");
+	if(pf == null) {
+	    return null;
+	}
+        switch (pf) {
             case "hls":
                 return "application/x-mpegURL";
             case "dash":
@@ -261,6 +266,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             default:
                 return null;
         }
+	*/
+        return null;
     }
 
     function acceptFormat(track) {
@@ -759,9 +766,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             var footerHeight = $('#mobile-footer').height();
 
             var total = headerHeight + footerHeight;
-            console.log("Calculating: " + headerHeight);
-            console.log("And: " + footerHeight);
-
             if (Engage.model.get("orientation") == "portrait") {
                 $("#" + id_engageContent).css("height", ($(window).height() - total) * 0.9);
                 $("#" + id_engageContent).css("width", $(window).width() * 0.9);
@@ -1187,17 +1191,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             Engage.model.get("mediaPackage").on("change", function() {
                 setupStreams(this.get("tracks"), this.get("attachments"));
             });
-            initTranslate(detectLanguage(), function() {
-                Engage.log("Videodisplay: Successfully translated.");
-                slidetextTabView.render();
-                /*
-        		if(videoDataView) {
-                    videoDataView.render(); // TODO: Does not work as is, find workaround
-        		}
-                */
-            }, function() {
-                Engage.log("Notifications: Error translating...");
-            });
             if (Engage.model.get("mediaPackage").get("tracks")) {
                 Engage.log("Mediapackage already available.")
                 setupStreams(Engage.model.get("mediaPackage").get("tracks"), Engage.model.get("mediaPackage").get("attachments"));
@@ -1208,6 +1201,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     // init Event
     Engage.log("Video: Init");
     var relative_plugin_path = Engage.getPluginPath("EngagePluginVideoVideoJS");
+
+    initTranslate(detectLanguage(), function() {
+        Engage.log("Videodisplay: Successfully translated.");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    }, function() {
+        Engage.log("Videodisplay: Error translating...");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
 
     // load video.js lib
     require([relative_plugin_path + videoPath], function(videojs) {

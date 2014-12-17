@@ -93,7 +93,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var html_snippet_id = "engage_slidetext_tab_content";
     var id_segmentNo = "tab_slidetext_segment_";
     var mediapackageChange = "change:mediaPackage";
-    var initCount = 2;
+    var initCount = 3;
     var mediapackageError = false;
     var translations = new Array();
 
@@ -102,7 +102,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     }
 
     function initTranslate(language, funcSuccess, funcError) {
-        var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
+        var path = Engage.getPluginPath("EngagePluginTabSlidetext").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
         if (language == "de") {
@@ -275,12 +275,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         if (plugin.inserted) {
             // create a new view with the media package model and the template
             var slidetextTabView = new SlidetextTabView(Engage.model.get("mediaPackage"), plugin.template);
-            initTranslate(detectLanguage(), function() {
-                Engage.log("Tab:Slidetext: Successfully translated.");
-                slidetextTabView.render();
-            }, function() {
-                Engage.log("Notifications: Error translating...");
-            });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
             });
@@ -290,6 +284,20 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     // init event
     Engage.log("Tab:Slidetext: Init");
     // var relative_plugin_path = Engage.getPluginPath("EngagePluginTabSlidetext");
+
+    initTranslate(detectLanguage(), function() {
+        Engage.log("Tab:Slidetext: Successfully translated.");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    }, function() {
+        Engage.log("Notifications: Error translating...");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
 
     // listen on a change/set of the mediaPackage model
     Engage.model.on(mediapackageChange, function() {

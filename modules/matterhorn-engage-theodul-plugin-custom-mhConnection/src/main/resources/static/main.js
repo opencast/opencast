@@ -91,7 +91,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
     /* don't change these variables */
     var mediaPackageID = "";
-    var initCount = 1;
+    var initCount = 2;
     var mediaPackage; // mediaPackage data
     var mediaInfo; // media info like video tracks and attachments
     var translations = new Array();
@@ -101,7 +101,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     }
 
     function initTranslate(language, funcSuccess, funcError) {
-        var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
+        var path = Engage.getPluginPath("EngagePluginCustomMhConnection").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
         if (language == "de") {
@@ -119,7 +119,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                 if (data) {
                     data.value_locale = language;
                     translations = data;
-                    console.log(translations);
                     if (funcSuccess) {
                         funcSuccess(translations);
                     }
@@ -407,11 +406,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         Engage.model.set("mediaPackage", new MediaPackageModel());
         Engage.model.set("views", new ViewsModel());
         Engage.model.set("footprints", new FootprintCollection());
-        initTranslate(detectLanguage(), function() {
-            Engage.log("MHConnection: Successfully translated.");
-        }, function() {
-            Engage.log("MHConnection: Error translating...");
-        });
     }
 
     // init event
@@ -423,6 +417,21 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     if (!mediaPackageID) {
         mediaPackageID = "";
     }
+
+    // init translation
+    initTranslate(detectLanguage(), function() {
+        Engage.log("MHConnection: Successfully translated.");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    }, function() {
+        Engage.log("MHConnection: Error translating...");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
 
     Engage.on(plugin.events.getMediaInfo.getName(), function(callback) {
         // check if data is already loaded

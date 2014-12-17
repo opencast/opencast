@@ -86,7 +86,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     /* don't change these variables */
     var viewsModelChange = "change:views";
     var mediapackageChange = "change:mediaPackage";
-    var initCount = 3;
+    var initCount = 4;
     var mediapackageError = false;
     var translations = new Array();
     var locale = "en";
@@ -97,7 +97,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     }
 
     function initTranslate(language, funcSuccess, funcError) {
-        var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
+        var path = Engage.getPluginPath("EngagePluginTabDescription").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
         if (language == "de") {
@@ -115,7 +115,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                 if (data) {
                     data.value_locale = language;
                     translations = data;
-                    console.log(translations);
                     if (funcSuccess) {
                         funcSuccess(translations);
                     }
@@ -213,14 +212,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         if (isDesktopMode && plugin.inserted) {
             // create a new view with the media package model and the template
             var descriptionTabView = new DescriptionTabView(Engage.model.get("mediaPackage"), plugin.template);
-            initTranslate(detectLanguage(), function() {
-                Engage.log("Tab:Description: Successfully translated.");
-                locale = translate("value_locale", locale);
-                dateFormat = translate("value_dateFormatFull", dateFormat);
-                descriptionTabView.render();
-            }, function() {
-                Engage.log("Tab:Description: Error translating...");
-            });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
             });
@@ -234,6 +225,22 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         // init event
         Engage.log("Tab:Description: Init");
         var relative_plugin_path = Engage.getPluginPath("EngagePluginTabDescription");
+
+        initTranslate(detectLanguage(), function() {
+            Engage.log("Tab:Description: Successfully translated.");
+            locale = translate("value_locale", locale);
+            dateFormat = translate("value_dateFormatFull", dateFormat);
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        }, function() {
+            Engage.log("Tab:Description: Error translating...");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
 
         Engage.model.on(viewsModelChange, function() {
             initCount -= 1;
