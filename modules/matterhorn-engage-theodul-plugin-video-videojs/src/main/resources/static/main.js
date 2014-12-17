@@ -64,8 +64,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         sliderStop: new Engage.Event("Slider:stop", "slider stopped", "handler"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "handler"),
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
-        translate: new Engage.Event("Core:translate", "", "handler")
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -127,7 +126,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var isAudioOnly = false;
     var isUsingFlash = false;
     var aspectRatio = "";
-    var initCount = 4;
+    var initCount = 5;
     var mediapackageError = false;
     var videoDisplayNamePrefix = "videojs_videodisplay_";
     var id_engage_video = "engage_video";
@@ -188,14 +187,54 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var translations = new Array();
     var videoDataView = undefined;
 
-    var basilOptions = {
-        namespace: "mhStorage"
-    };
-    Basil = new window.Basil(basilOptions);
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function initTranslate(language, funcSuccess, funcError) {
+        var path = Engage.getPluginPath("EngagePluginVideoVideoJS").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+
+        if (language == "de") {
+            Engage.log("Videodisplay: Chosing german translations");
+            jsonstr += "language/theodul_language_de.json";
+        } else { // No other languages supported, yet
+            Engage.log("Videodisplay: Chosing english translations");
+            jsonstr += "language/theodul_language_en.json";
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translations = data;
+                    if (funcSuccess) {
+                        funcSuccess(translations);
+                    }
+                } else {
+                    if (funcError) {
+                        funcError();
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (funcError) {
+                    funcError();
+                }
+            }
+        });
+    }
 
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
+
+    var basilOptions = {
+        namespace: "mhStorage"
+    };
+    Basil = new window.Basil(basilOptions);
 
     function escapeRegExp(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -206,7 +245,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     }
 
     function preferredFormat() {
-        switch (Basil.get("preferredFormat")) {
+        /*
+	var pf = Basil.get("preferredFormat");
+	if(pf == null) {
+	    return null;
+	}
+        switch (pf) {
             case "hls":
                 return "application/x-mpegURL";
             case "dash":
@@ -222,6 +266,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             default:
                 return null;
         }
+	*/
+        return null;
     }
 
     function acceptFormat(track) {
@@ -720,9 +766,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             var footerHeight = $('#mobile-footer').height();
 
             var total = headerHeight + footerHeight;
-            console.log("Calculating: " + headerHeight);
-            console.log("And: " + footerHeight);
-
             if (Engage.model.get("orientation") == "portrait") {
                 $("#" + id_engageContent).css("height", ($(window).height() - total) * 0.9);
                 $("#" + id_engageContent).css("width", $(window).width() * 0.9);
@@ -1148,18 +1191,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             Engage.model.get("mediaPackage").on("change", function() {
                 setupStreams(this.get("tracks"), this.get("attachments"));
             });
-            Engage.on(plugin.events.translate.getName(), function(data) {
-                var key = Object.keys(data);
-                for (var i = 0; i < key.length; i++) {
-                    var lang_value = key[i];
-                    translations[lang_value] = data[lang_value];
-                }
-                /*
-		if(videoDataView) {
-                    videoDataView.render(); // TODO: Does not work as is, find workaround
-		}
-		*/
-            });
             if (Engage.model.get("mediaPackage").get("tracks")) {
                 Engage.log("Mediapackage already available.")
                 setupStreams(Engage.model.get("mediaPackage").get("tracks"), Engage.model.get("mediaPackage").get("attachments"));
@@ -1170,6 +1201,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     // init Event
     Engage.log("Video: Init");
     var relative_plugin_path = Engage.getPluginPath("EngagePluginVideoVideoJS");
+
+    initTranslate(detectLanguage(), function() {
+        Engage.log("Videodisplay: Successfully translated.");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    }, function() {
+        Engage.log("Videodisplay: Error translating...");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
 
     // load video.js lib
     require([relative_plugin_path + videoPath], function(videojs) {

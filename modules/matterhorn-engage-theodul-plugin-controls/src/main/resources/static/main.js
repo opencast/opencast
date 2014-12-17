@@ -68,8 +68,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "handler"),
-        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler"),
-        translate: new Engage.Event("Core:translate", "", "handler")
+        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler")
     };
 
     var isDesktopMode = false;
@@ -166,8 +165,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_str_loginlogout = "str_loginlogout";
     var id_dropdownMenuLoginInfo = "dropdownMenuLoginInfo";
     var class_dropdown = "dropdown-toggle";
-
-    /* don't change these variables */
     var videosReady = false;
     var enableFullscreenButton = false;
     var currentTime = 0;
@@ -177,7 +174,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var event_slidestart = "slidestart";
     var event_slidestop = "slidestop";
     var plugin_path = "";
-    var initCount = 6;
+    var initCount = 7;
     var isPlaying = false;
     var isSliding = false;
     var isMute = false;
@@ -210,6 +207,46 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         "'": '&#39;',
         "/": '&#x2F;'
     };
+
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function initTranslate(language, funcSuccess, funcError) {
+        var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+
+        if (language == "de") {
+            Engage.log("Controls: Chosing german translations");
+            jsonstr += "language/theodul_language_de.json";
+        } else { // No other languages supported, yet
+            Engage.log("Controls: Chosing english translations");
+            jsonstr += "language/theodul_language_en.json";
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translations = data;
+                    if (funcSuccess) {
+                        funcSuccess(translations);
+                    }
+                } else {
+                    if (funcError) {
+                        funcError();
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (funcError) {
+                    funcError();
+                }
+            }
+        });
+    }
 
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
@@ -904,14 +941,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     $("#" + id_segmentNo + no).removeClass("segmentHover");
                 }
             });
-            Engage.on(plugin.events.translate.getName(), function(data) {
-                var key = Object.keys(data);
-                for (var i = 0; i < key.length; i++) {
-                    var lang_value = key[i];
-                    translations[lang_value] = data[lang_value];
-                }
-                controlsView.render();
-            });
             loadStoredInitialValues();
         }
     }
@@ -933,6 +962,21 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         // load bootstrap lib
         require([relative_plugin_path + bootstrapPath], function() {
             Engage.log("Controls: Lib bootstrap loaded");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+
+        // init translation
+        initTranslate(detectLanguage(), function() {
+            Engage.log("Controls: Successfully translated.");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        }, function() {
+            Engage.log("Controls: Error translating...");
             initCount -= 1;
             if (initCount <= 0) {
                 initPlugin();

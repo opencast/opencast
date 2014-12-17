@@ -32,7 +32,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         nextEpisode: new EngageEvent("Core:nextEpisode", "", "trigger"),
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
         volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
-        translate: new EngageEvent("Core:translate", "", "trigger"),
         customSuccess: new EngageEvent("Notification:customSuccess", "a custom success message", "trigger"),
         customError: new EngageEvent("Notification:customError", "an error occurred", "trigger"),
         mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler")
@@ -94,10 +93,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             return true;
         }
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) ||
-	    (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) ||
-	    (Bowser.opera && Bowser.version >= browser_minVersion_opera) ||
-	    (Bowser.safari && Bowser.version >= browser_minVersion_safari) ||
-	    (Bowser.msie && Bowser.version >= browser_minVersion_msie);
+            (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) ||
+            (Bowser.opera && Bowser.version >= browser_minVersion_opera) ||
+            (Bowser.safari && Bowser.version >= browser_minVersion_safari) ||
+            (Bowser.msie && Bowser.version >= browser_minVersion_msie);
     }
 
     function detectLanguage() {
@@ -127,14 +126,14 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     }
 
     function translateCoreHTML() {
-	$("#str_error").html(translate("error", "Error"));
-	$("#customError_str").html(translate("error_unknown", "An error occurred. Please reload the page."));
-	$("#str_reloadPage").html(translate("reloadPage", "Reload page"));
-	$("#str_login").html(translate("login", "Log in"));
+        $("#str_error").html(translate("error", "Error"));
+        $("#customError_str").html(translate("error_unknown", "An error occurred. Please reload the page."));
+        $("#str_reloadPage").html(translate("reloadPage", "Reload page"));
+        $("#str_login").html(translate("login", "Log in"));
     }
 
-    function triggerTranslated() {
-        engageCore.trigger(events.translate.getName(), translationData);
+    function translate(str, strIfNotFound) {
+        return ((translationData != null) && (translationData[str] != undefined)) ? translationData[str] : strIfNotFound;
     }
 
     // theodul core init
@@ -165,82 +164,78 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         });
     }
 
-    function translate(str, strIfNotFound) {
-        return ((translationData != null) && (translationData[str] != undefined)) ? translationData[str] : strIfNotFound;
-    }
-
     function login() {
-	if(!askedForLogin) {
-	    askedForLogin = true;
+        if (!askedForLogin) {
+            askedForLogin = true;
             var username = "User";
             var password = "Password";
 
-	    Bootbox.dialog({
-		title: translate("login", "Log in"),
-		message: '<form class="form-signin">' +
-		    '<h2 class="form-signin-heading">' + translate("enterUsernamePassword", "Please enter your username and password") + '</h2>' +
-		    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate("username", "Username") + '" required="true" autofocus="" />' +
-		    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + translate("password", "Password") + '" required="true" />' +
-		    '<label class="checkbox">' +
-		    '<input type="checkbox" value="' + translate("rememberMe", "Remember me") + '" id="rememberMe" name="rememberMe" checked> ' + translate("rememberMe", "Remember me") +
-		    '</label>' +
-		    '</form>',
-		buttons: {
-		    cancel: {
-			label: translate("cancel", "Cancel"),
-			className: "btn-default",
-			callback: function () {
-			    askedForLogin = false;
-			}
-		    },
-		    login: {
-			label: translate("login", "Log in"),
-			className: "btn-success",
-			callback: function () {
-			    var username = $("#username").val().trim();
-			    var password = $("#password").val().trim();
-			    if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
-				$.ajax({
+            Bootbox.dialog({
+                title: translate("login", "Log in"),
+                message: '<form class="form-signin">' +
+                    '<h2 class="form-signin-heading">' + translate("enterUsernamePassword", "Please enter your username and password") + '</h2>' +
+                    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate("username", "Username") + '" required="true" autofocus="" />' +
+                    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + translate("password", "Password") + '" required="true" />' +
+                    '<label class="checkbox">' +
+                    '<input type="checkbox" value="' + translate("rememberMe", "Remember me") + '" id="rememberMe" name="rememberMe" checked> ' + translate("rememberMe", "Remember me") +
+                    '</label>' +
+                    '</form>',
+                buttons: {
+                    cancel: {
+                        label: translate("cancel", "Cancel"),
+                        className: "btn-default",
+                        callback: function() {
+                            askedForLogin = false;
+                        }
+                    },
+                    login: {
+                        label: translate("login", "Log in"),
+                        className: "btn-success",
+                        callback: function() {
+                            var username = $("#username").val().trim();
+                            var password = $("#password").val().trim();
+                            if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
+                                $.ajax({
                                     type: "POST",
                                     url: springSecurityLoginURL,
                                     data: {
-					"j_username": username,
-					"j_password": password,
-					"_spring_security_remember_me": $("#rememberMe").is(":checked")
+                                        "j_username": username,
+                                        "j_password": password,
+                                        "_spring_security_remember_me": $("#rememberMe").is(":checked")
                                     }
-				}).done(function(msg) {
+                                }).done(function(msg) {
                                     password = "";
                                     if (msg.indexOf(springLoggedInStrCheck) == -1) {
-					engageCore.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Successfully logged in. Please reload the page if the page does not reload automatically."));
-					$("#" + id_btn_login).hide();
-					$("#" + id_btn_reloadPage).click(function(e) {
+                                        engageCore.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Successfully logged in. Please reload the page if the page does not reload automatically."));
+                                        $("#" + id_btn_login).hide();
+                                        $("#" + id_btn_reloadPage).click(function(e) {
                                             e.preventDefault();
                                             location.reload();
-					});
-					$("#" + id_btn_reloadPage).show();
-					location.reload();
+                                        });
+                                        $("#" + id_btn_reloadPage).show();
+                                        location.reload();
                                     } else {
-					engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
+                                        engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
                                     }
-				    askedForLogin = false;
-				}).fail(function(msg) {
+                                    askedForLogin = false;
+                                }).fail(function(msg) {
                                     password = "";
                                     engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
-				    askedForLogin = false;
-				});
-			    } else {
-				askedForLogin = false;
-			    }
-			}
-		    }
-		},
-		className: "usernamePassword-modal",
-		onEscape: function() {
-		    askedForLogin = false;
-		},
-		closeButton: false
-	    });
-	}
+                                    askedForLogin = false;
+                                });
+                            } else {
+                                askedForLogin = false;
+                            }
+                        }
+                    }
+                },
+                className: "usernamePassword-modal",
+                onEscape: function() {
+                    askedForLogin = false;
+                },
+                closeButton: false
+            });
+        }
     }
 
     function getLoginStatus() {
@@ -391,8 +386,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         if (engageCore.model.browserSupported) {
                             $("#" + id_browserWarning).hide().detach();
                             $("#" + id_engage_view).show();
-                            triggerTranslated();
-			    translateCoreHTML();
+                            translateCoreHTML();
                             if (engageCore.model.desktop) {
                                 window.setTimeout(function() {
                                     if ($("#" + id_volume).html() === undefined) {

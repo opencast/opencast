@@ -37,8 +37,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "A mediapackage model error occured", "trigger"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "when the core loaded the event successfully", "handler"),
         getMediaInfo: new Engage.Event("MhConnection:getMediaInfo", "", "handler"),
-        getMediaPackage: new Engage.Event("MhConnection:getMediaPackage", "", "handler"),
-        translate: new Engage.Event("Core:translate", "", "handler")
+        getMediaPackage: new Engage.Event("MhConnection:getMediaPackage", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -97,6 +96,46 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     var mediaInfo; // media info like video tracks and attachments
     var translations = new Array();
 
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function initTranslate(language, funcSuccess, funcError) {
+        var path = Engage.getPluginPath("EngagePluginCustomMhConnection").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+
+        if (language == "de") {
+            Engage.log("MHConnection: Chosing german translations");
+            jsonstr += "language/theodul_language_de.json";
+        } else { // No other languages supported, yet
+            Engage.log("MHConnection: Chosing english translations");
+            jsonstr += "language/theodul_language_en.json";
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translations = data;
+                    if (funcSuccess) {
+                        funcSuccess(translations);
+                    }
+                } else {
+                    if (funcError) {
+                        funcError();
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (funcError) {
+                    funcError();
+                }
+            }
+        });
+    }
+
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
@@ -113,34 +152,34 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             this.fetch({
                 data: {},
                 success: function(model) {
-		    model.loggedIn = false;
-		    model.username = "Anonymous";
-		    model.roles = [];
-		    var attr = model.attributes;
-		    if(attr.username) {
-			Engage.log("Username found: " + attr.username);
-			model.username = attr.username;
-		    } else {
-			Engage.log("No username found.");
-		    }
-		    if(attr.roles && (attr.roles.length > 0)) {
-			model.roles = attr.roles;
-			var notAnonymous = false;
-			for(var i = 0; i < attr.roles.length; ++i) {
-			    if(attr.roles[i] != "ROLE_ANONYMOUS") {
-				notAnonymous = true;
-			    }
-			}
-			model.loggedIn = notAnonymous;
-			if(notAnonymous) {
-			    Engage.log("User has one or more roles.");
-			} else {
-			    Engage.log("User has no role.");
-			}
-		    } else {
-			Engage.log("Error: No roles found.");
-		    }
-		    model.trigger("change");
+                    model.loggedIn = false;
+                    model.username = "Anonymous";
+                    model.roles = [];
+                    var attr = model.attributes;
+                    if (attr.username) {
+                        Engage.log("Username found: " + attr.username);
+                        model.username = attr.username;
+                    } else {
+                        Engage.log("No username found.");
+                    }
+                    if (attr.roles && (attr.roles.length > 0)) {
+                        model.roles = attr.roles;
+                        var notAnonymous = false;
+                        for (var i = 0; i < attr.roles.length; ++i) {
+                            if (attr.roles[i] != "ROLE_ANONYMOUS") {
+                                notAnonymous = true;
+                            }
+                        }
+                        model.loggedIn = notAnonymous;
+                        if (notAnonymous) {
+                            Engage.log("User has one or more roles.");
+                        } else {
+                            Engage.log("User has no role.");
+                        }
+                    } else {
+                        Engage.log("Error: No roles found.");
+                    }
+                    model.trigger("change");
                 }
             });
         },
@@ -379,6 +418,21 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
         mediaPackageID = "";
     }
 
+    // init translation
+    initTranslate(detectLanguage(), function() {
+        Engage.log("MHConnection: Successfully translated.");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    }, function() {
+        Engage.log("MHConnection: Error translating...");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
+
     Engage.on(plugin.events.getMediaInfo.getName(), function(callback) {
         // check if data is already loaded
         if (!mediaPackage && !mediaInfo) {
@@ -410,19 +464,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     // all plugins loaded
     Engage.on(plugin.events.plugin_load_done.getName(), function() {
         Engage.log("MhConnection: Plugin load done");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
-
-    Engage.on(plugin.events.translate.getName(), function(data) {
-        Engage.log("MhConnection: Translation load done");
-        var key = Object.keys(data);
-        for (var i = 0; i < key.length; i++) {
-            var lang_value = key[i];
-            translations[lang_value] = data[lang_value];
-        }
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
