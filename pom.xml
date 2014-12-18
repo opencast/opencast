@@ -555,6 +555,7 @@
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
+	<module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-serviceregistry</module>
       </modules>
     </profile>
@@ -725,6 +726,9 @@
         <module>modules/matterhorn-dictionary-none</module>
         <module>modules/matterhorn-dictionary-hunspell</module>
         <module>modules/matterhorn-videosegmenter-ffmpeg</module>
+        <module>modules/matterhorn-gstreamer-service-api</module>
+        <module>modules/matterhorn-gstreamer-service-impl</module>
+        <module>modules/matterhorn-gstreamer-service-remote</module>
       </modules>
     </profile>
 
@@ -2167,11 +2171,6 @@
       <!-- <url>scp://www.mycompany.com/www/docs/project/</url> -->
     </site>
   </distributionManagement>
-
-  <ciManagement>
-    <system>Bamboo</system>
-    <url>http://build.opencastproject.org/bamboo/browse/MH-TRUNK</url>
-  </ciManagement>
 
   <!-- Site Report generation settings -->
   <reporting>

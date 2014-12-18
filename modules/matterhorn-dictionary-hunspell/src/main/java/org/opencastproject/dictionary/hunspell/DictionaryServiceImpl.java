@@ -55,7 +55,7 @@ public class DictionaryServiceImpl implements DictionaryService {
   private String binary = "hunspell";
 
   /* The regular command line options for filtering */
-  private String command = "-d de_DE,en_GB,en_US -G";
+  private String command = " -i utf-8 -d de_DE,en_GB,en_US -G";
 
   public void setBinary(String b) {
     binary = b;
@@ -134,7 +134,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     /* Get output of hunspell */
     String line;
-    bufr = new BufferedReader(new InputStreamReader(stdout));
+    bufr = new BufferedReader(new InputStreamReader(stdout, "UTF-8"));
     while ((line = bufr.readLine()) != null) {
       words.add(line);
     }

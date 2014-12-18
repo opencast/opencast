@@ -32,106 +32,95 @@ Opencast.pager = (function ()
         var NEXT_TEXT = "Next";
         var OFFSET = 2;
         // variables
-        var LINK_PREFIX;
-        var text;
-        var link;
-        var currentPageId;
-        var maxPageId;
+        var LINK_PREFIX = window.location.origin + window.location.pathname;
+        var currentPageId, lowPageId, highPageId, maxPageId;
         var li;
-        var spanBeforeSet = false;
-        var spanAfterSet = false;
+	var pages = [];
+
         $('.navigation').empty();
-        if (getCurrentSearchQuery() != null) LINK_PREFIX = "index.html?q=" + getCurrentSearchQuery() + "&page=";
-        else
-        LINK_PREFIX = "index.html?page=";
-        // get the current page id
-        currentPageId = getCurrentPageID();
-        // get the max page id
-        maxPageId = getMaxPageID();
-        // take care for the previous page button
-        if (currentPageId <= 1)
-        {
-            text = '<span style="color:#CCCCCC">' + PREVIOUS_TEXT + "</span>";
-        }
-        else
-        {
-            link = LINK_PREFIX + (currentPageId - 1);
-            text = "<a href='" + link + "'>" + PREVIOUS_TEXT + "</a>";
-        }
-        li = document.createElement('li');
-        li.innerHTML = text;
-        $('.navigation').append(li);
+
         // display the pager only if necessary
         if ($('#oc-episodes-total').html() < 10)
         {
             $('ul.navigation').css('visibility', 'hidden');
+	    return;
         }
+
+	var query = $.parseURL();
+
+	// get the current page id
+	if ((query.hasOwnProperty('page')) && (parseInt(query['page']))) {
+	    currentPageId = parseInt(query['page']);
+	} else {
+	    currentPageId = 1;
+	}
+
+        // get the max page id
+        maxPageId = getMaxPageID();
+
+        // take care for the previous page button
+        if (currentPageId <= 1) {
+            pages.push('<span style="color:#CCCCCC">' + PREVIOUS_TEXT + "</span>");
+        } else {
+	    query['page'] = currentPageId - 1;
+            pages.push("<a href='" + LINK_PREFIX + $.urlMapToString(query) + "'>" + PREVIOUS_TEXT + "</a>");
+        }
+
         // Pipe before page numbers
-        li = document.createElement('li');
-        li.innerHTML = "<span>" + "|" + "</span>";
-        $('.navigation').append(li);
-        // "Page:
-        li = document.createElement('li');
-        li.innerHTML = "<span id='currentPage'>" + "Page:" + "</span>";
-        $('.navigation').append(li);
+	pages.push("<span>|</span>");
+
+        // "Page:"
+        pages.push("<span id='currentPage'>Page:</span>");
+
         // take care for the page buttons
-        for (var i = 1; i <= maxPageId; i++)
-        {
-            li = document.createElement('li');
-            /* if the span "..." before the current page is not set
-             *   and current page id is equal or greater than 5
-             *   and the running index is greater than 1
-             * then insert a span containing "..."
-             * 
-             * otherwise if span "..." after the current page is not set
-             *   and the running index - 1 is greater the the current page
-             *   and the running index is greater than 4
-             * then insert a span containing "..."
-             */
-            if (!spanBeforeSet && currentPageId >= 5 && i > 1 && (currentPageId - (OFFSET + 2) != 1))
-            {
-                text = "<span>" + "..." + "</span>";
-                i = currentPageId - (OFFSET + 1);
-                spanBeforeSet = true;
-            }
-            else if (!spanAfterSet && (i - OFFSET) > currentPageId && maxPageId - 1 > i && i > 4)
-            {
-                text = "<span>" + "..." + "</span>";
-                i = maxPageId - 1;
-                spanAfterSet = true;
-            }
-            else
-            {
-                link = LINK_PREFIX + i;
-                if (i == currentPageId)
-                {
-                    text = '<span id="currentPage">' + i + '</span>';
-                }
-                else
-                {
-                    text = "<a href='" + link + "'>" + i + "</a>";
-                }
-            }
-            li.innerHTML = text;
-            $('.navigation').append(li);
-        }
+	lowPageId = currentPageId - OFFSET;
+	highPageId = currentPageId + OFFSET;
+	for (query['page'] = 1; query['page'] <= maxPageId; query['page']++) {
+	    if (query['page'] == currentPageId) {
+		// Insert the current page number (no link)
+		pages.push('<span id="currentPage">' + query['page'] + '</span>');
+	    } else {
+		// Insert a link to a page within the range [currentPageId-OFFSET, currentPageId+OFFSET]
+		pages.push("<a href='"+LINK_PREFIX+$.urlMapToString(query)+"'>"+query['page']+"</a>");
+	    }
+
+	    if ((query['page'] == 1) && (lowPageId > 2)) {
+		// Insert a '...' span if the first page was included in this iteration and 
+		// currentPageId-OFFSET is greater than two (otherwise no pages would be skipped and
+		// the ellipsis "..." is unnecesary). Then jump to the page currentPageId-OFFSET
+		// (i.e. modify the index so that the next iteration will be currentPageId-OFFSET)
+                pages.push("<span>...</span>");
+                query['page'] = lowPageId - 1;
+		continue;
+	    }
+
+	    if ((query['page'] == highPageId) && (highPageId < maxPageId - 1)) {
+		// Insert a '...' span if the page currentPage+OFFSET was included in this iteration
+		// and such page is not the second-last page (otherwise no pages would be skipped and
+		// the ellipsis "..." is unnecessary). Then jump to the last page (i.e. modify the
+		// index so that the next interation will be maxPageId)
+                pages.push("<span>...</span>");
+                query['page'] = maxPageId - 1;
+		continue;
+	    }
+	}
+
         // Pipe after page numbers
-        li = document.createElement('li');
-        li.innerHTML = "<span>" + "|" + "</span>";
-        $('.navigation').append(li);
+	pages.push("<span>|</span>");
+
         // take care for the next page button
-        if (parseInt(currentPageId) >= parseInt(maxPageId))
-        {
-            text = "<span style='color:#CCCCCC'>" + NEXT_TEXT + "</span>";
+        if (currentPageId >= maxPageId) {
+            pages.push("<span style='color:#CCCCCC'>" + NEXT_TEXT + "</span>");
+        } else {
+	    query['page'] = currentPageId + 1;
+	    pages.push("<a href='" + LINK_PREFIX + $.urlMapToString(query) + "'>" + NEXT_TEXT + "</a>");
         }
-        else
-        {
-            link = LINK_PREFIX + (++currentPageId);
-            text = "<a href='" + link + "'>" + NEXT_TEXT + "</a>";
-        }
-        li = document.createElement('li');
-        li.innerHTML = text;
-        $('.navigation').append(li);
+
+	for (var i = 0; i < pages.length; i++) {
+	    li = document.createElement('li');
+	    li.innerHTML = pages[i];
+	    $('.navigation').append(li);
+	}
     }
     
     /**
@@ -173,6 +162,17 @@ Opencast.pager = (function ()
     
     /**
      * @memberOf Opencast.pager
+     * @description Gets the current series query
+     * @return The current series query
+     */
+    function getCurrentSeriesQuery()
+    {
+        var value = $.getURLParameter("seriesId");
+        return value;
+    }
+
+    /**
+     * @memberOf Opencast.pager
      * @description Gets the current sorting
      * @return The current sorting
      */
@@ -180,8 +180,8 @@ Opencast.pager = (function ()
     {
         var value = $.getURLParameter("sort");
         return value;
-    }    
-    
+    }
+
     /**
      * @memberOf Opencast.pager
      * @description Gets the max page ID
@@ -194,11 +194,12 @@ Opencast.pager = (function ()
         if (total % 10 != 0) maxPage += 1;
         return Math.max(1, maxPage);
     }
-    
+
     return {
         testGetCurrentPage: testGetCurrentPage,
         getCurrentPageID: getCurrentPageID,
         getCurrentSearchQuery: getCurrentSearchQuery,
+        getCurrentSeriesQuery: getCurrentSeriesQuery,
         getCurrentSorting: getCurrentSorting,
         renderPager: renderPager
     };
