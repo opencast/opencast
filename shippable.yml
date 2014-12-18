@@ -19,8 +19,3 @@ before_install:
 install: mvn --batch-mode install -DskipTests=true -Dall
 
 script:  mvn --batch-mode test -Dall
-
-notifications:
-  email:
-      recipients:
-         - lkiesow@uos.de
