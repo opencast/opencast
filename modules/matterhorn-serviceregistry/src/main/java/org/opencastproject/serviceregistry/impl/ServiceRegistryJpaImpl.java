@@ -1717,7 +1717,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         Object[] oa = (Object[]) result;
         Number serviceRegistrationId = ((Number) oa[0]);
         if (serviceRegistrationId == null || serviceRegistrationId.longValue() == 0)
-          break;
+          continue;
         Status status = (Status) oa[1];
         Number count = (Number) oa[2];
         Number meanQueueTime = (Number) oa[3];
@@ -2028,6 +2028,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** OSGi DI. */
   public void setIncidentService(IncidentService incidentService) {
+    // Manually resolve the cyclic dependency between the incident service and the service registry
+    ((OsgiIncidentService)incidentService).setServiceRegistry(this);
     this.incidents = new Incidents(this, incidentService);
   }
 
