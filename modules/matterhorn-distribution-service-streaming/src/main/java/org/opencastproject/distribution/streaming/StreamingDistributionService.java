@@ -92,6 +92,9 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   /** The base URL for streaming */
   protected String streamingUrl = null;
 
+  /** Compatibility mode for nginx and maybe other streaming servers*/
+  protected boolean flvCompatibilityMode = false;
+
   /**
    * Creates a new instance of the streaming distribution service.
    */
@@ -121,6 +124,13 @@ public class StreamingDistributionService extends AbstractJobProducer implements
             throw new IllegalStateException("Distribution directory does not exist and can't be created", e);
           }
         }
+      }
+
+      String compatibility = StringUtils.trimToNull(cc.getBundleContext().getProperty(
+              "org.opencastproject.streaming.flvcompatibility"));
+      if (compatibility != null) {
+        flvCompatibilityMode = Boolean.parseBoolean(compatibility);
+        logger.info("Streaming distribution is using FLV compatibility mode");
       }
 
       logger.info("Streaming distribution directory is {}", distributionDirectory);
@@ -331,7 +341,15 @@ public class StreamingDistributionService extends AbstractJobProducer implements
         if (uriString.contains("mp4:")) {
           uriString += ".mp4";
           uriString = uriString.replace("mp4:", "");
-        } else uriString += ".flv";
+        } else if (uriString.contains("flv:")) {
+          uriString += ".flv";
+          uriString = uriString.replace("flv:", "");
+        } else if (uriString.contains("mp3:")) {
+          uriString += ".mp3";
+          uriString = uriString.replace("mp3:", "");
+        } else {
+          uriString += ".flv";
+        }
       }
       String[] splitUrl = uriString.substring(streamingUrl.length() + 1).split("/");
       if (splitUrl.length < 4) {
@@ -370,8 +388,8 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     String tag = FilenameUtils.getExtension(element.getURI().toString()) + ":";
 
     // removes the tag for flv files, but keeps it for all others (mp4 needs it)
-    if ("flv:".equals(tag))
-      tag = "";
+    if (flvCompatibilityMode && "flv:".equals(tag))
+    tag = "";
 
     return new URI(UrlSupport.concat(streamingUrl, tag + channelId, mp.getIdentifier().compact(), elementId, fileName));
   }
