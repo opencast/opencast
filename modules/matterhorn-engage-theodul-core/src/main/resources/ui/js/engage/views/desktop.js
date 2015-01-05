@@ -15,7 +15,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, EngageCore, EngageModel, EngageTabLogic) {
+define(["jquery", "engage/core", "engage/models/engage", "engage/tab_logic"], function($, EngageCore, EngageModel, EngageTabLogic) {
     "use strict";
 
     /* change these variables */
@@ -127,3 +127,4 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "en
         allPluginsLoaded: allPluginsLoadedEvent
     }
 });
+

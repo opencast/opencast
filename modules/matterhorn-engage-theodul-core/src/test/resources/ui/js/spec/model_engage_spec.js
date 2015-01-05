@@ -1,4 +1,4 @@
-define(['engage/engage_model'], function (EngageModel) {
+define(['engage/models/engage'], function (EngageModel) {
   describe("EngageModel", function () {
     var engageModel;
 

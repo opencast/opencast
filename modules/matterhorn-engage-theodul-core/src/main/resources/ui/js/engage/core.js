@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "engage/engage_model", "engage/engage_tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, EngageModel, EngageTabLogic) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "engage/models/engage", "engage/tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, EngageModel, EngageTabLogic) {
     "use strict";
 
     var events = {
@@ -290,27 +290,27 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     case "mobile":
                         cssAttr.href = "css/core_mobile_style.css";
                         core_template = "templates/core_mobile.html";
-                        view_logic_path = "engage/engage_mobile_view";
+                        view_logic_path = "engage/views/mobile";
                         engageCore.model.mobile = true;
                         break;
                     case "embed":
                         cssAttr.href = "css/core_embed_style.css";
                         core_template = "templates/core_embed.html";
-                        view_logic_path = "engage/engage_embed_view";
+                        view_logic_path = "engage/views/embed";
                         engageCore.model.embed = true;
                         break;
                     case "desktop":
                     default:
                         cssAttr.href = "css/core_desktop_style.css";
                         core_template = "templates/core_desktop.html";
-                        view_logic_path = "engage/engage_desktop_view";
+                        view_logic_path = "engage/views/desktop";
                         engageCore.model.desktop = true;
                         break;
                 }
                 cssLinkTag.attr(cssAttr);
                 // add css to DOM
                 $("head").append(cssLinkTag);
-                // load js view logic via require, see files engage_<mode>_view.js
+                // load js view logic via require, see files in views/
                 require([view_logic_path], function(pluginView) {
                     // link view logic to the core
                     engageCore.pluginView = pluginView;

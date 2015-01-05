@@ -278,3 +278,4 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
 
     return bootstrapTabLogic;
 });
+

@@ -1,4 +1,4 @@
-define(['engage/engage_embed_view'], function (EngageEmbedView) {
+define(['engage/views/embed'], function (EngageEmbedView) {
   describe("EngageEmbedView", function () {
     var engageEmbedView;
 
