@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
+define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Slide text";
     var PLUGIN_TYPE = "engage_tab";

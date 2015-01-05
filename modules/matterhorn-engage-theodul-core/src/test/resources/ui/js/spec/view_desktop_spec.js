@@ -1,4 +1,4 @@
-define(['engage/engage_desktop_view'], function (EngageDesktopView) {
+define(['engage/views/desktop'], function (EngageDesktopView) {
   describe("EngageDesktopView", function () {
     var engageDesktopView;
 

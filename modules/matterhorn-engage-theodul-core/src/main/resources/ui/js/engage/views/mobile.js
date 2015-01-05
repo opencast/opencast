@@ -15,8 +15,8 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'engage/engage_model', 'jquery.mobile'], function(require, $, _, Backbone, EngageCore, EngageModel) {
-    'use strict'; // strict mode in all our application
+define(['jquery', 'backbone', "engage/core", "engage/models/engage", 'jquery.mobile'], function($, Backbone, EngageCore, EngageModel) {
+    'use strict';
 
     /*
      * Init logic function
@@ -81,8 +81,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
     /*
      * Logic to insert a plugin with name and type to the player in mobile mode
      */
-    var insertPluginToDOM = function(plugin) {
-
+    var insertPluginIntoDOM = function(plugin) {
         switch (plugin.type) {
             case "engage_controls":
                 $("#engage_controls").html(plugin.templateProcessed);
@@ -123,7 +122,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
     // public functions fo the module
     return {
         initView: initMobileView,
-        insertPlugin: insertPluginToDOM,
+        insertPlugin: insertPluginIntoDOM,
         allPluginsLoaded: allPluginsLoadedEvent
     }
 });
+

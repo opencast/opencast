@@ -1,5 +1,5 @@
 /*global define, describe, beforeEach, it, expect*/
-define(['engage/engage_core'], function (EngageCore) {
+define(['engage/core'], function (EngageCore) {
   describe("EngageCore", function () {
     var engageCore;
 

@@ -37,4 +37,5 @@ requirejs.config({
 var PLUGIN_MANAGER_PATH = "/engage/theodul/manager/list.json";
 var PLUGIN_PATH = "/engage/theodul/plugin/";
 // start core logic
-require(["engage/engage_core"]);
+require(["engage/core"]);
+

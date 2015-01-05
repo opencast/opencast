@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "moment"], function(require, $, _, Backbone, Engage, Moment) {
+define(["require", "jquery", "backbone", "engage/core", "moment"], function(require, $, Backbone, Engage, Moment) {
     "use strict";
     var PLUGIN_NAME = "Engage Custom Notifications";
     var PLUGIN_TYPE = "engage_custom";
