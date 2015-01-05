@@ -1,4 +1,4 @@
-define(['engage/engage_mobile_view'], function (EngageMobileView) {
+define(['engage/views/mobile'], function (EngageMobileView) {
   describe("EngageMobileView", function () {
     var engageMobileView;
 

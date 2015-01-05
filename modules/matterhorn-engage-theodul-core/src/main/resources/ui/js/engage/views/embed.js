@@ -15,7 +15,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'engage/engage_model'], function(require, $, _, Backbone, EngageCore, EngageModel) {
+define(['jquery', 'backbone', "engage/core", "engage/models/engage"], function($, Backbone, EngageCore, EngageModel) {
     'use strict';
 
     var id_engage_controls = "engage_controls";
@@ -84,3 +84,4 @@ define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core', 'en
         allPluginsLoaded: allPluginsLoadedEvent
     }
 });
+
