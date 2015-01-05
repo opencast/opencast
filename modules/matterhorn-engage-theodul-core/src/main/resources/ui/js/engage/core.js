@@ -252,6 +252,158 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         return -1;
     }
 
+    // binds configured hotkeys(see MH org config) to corresponding theodul events
+    function bindHotkeysToEvents() {
+        // process hardcoded keys
+        $.each(engageCore.model.get("meInfo").get("hotkeys"), function(i, val) {
+            switch (val.name) {
+                case hotkey_jumpToX:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.jumpToX.getName());
+                    });
+                    break;
+                case hotkey_nextChapter:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.nextChapter.getName());
+                    });
+                    break;
+                case hotkey_fullscreen:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.fullscreenEnable.getName());
+                    });
+                    break;
+                case hotkey_jumpToBegin:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.jumpToBegin.getName());
+                    });
+                    break;
+                case hotkey_prevEpisode:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.previousEpisode.getName());
+                    });
+                    break;
+                case hotkey_prevChapter:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.previousChapter.getName());
+                    });
+                    break;
+                case hotkey_play:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.play.getName(), false);
+                    });
+                    break;
+                case hotkey_pause:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.pause.getName(), false);
+                    });
+                    break;
+                case hotkey_mute:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.mute.getName());
+                    });
+                    break;
+                case hotkey_nextEpisode:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.nextEpisode.getName());
+                    });
+                    break;
+                case hotkey_volDown:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.volumeDown.getName());
+                    });
+                    break;
+                case hotkey_volUp:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.volumeUp.getName());
+                    });
+                    break;
+                default:
+                    break;
+            }
+        });
+        //process custom hotkeys
+        $.each(engageCore.model.get("meInfo").get("hotkeysCustom"), function(i, val) {
+            Mousetrap.bind(val.key, function() {
+                engageCore.trigger(val.app + ":" + val.func); // trigger custom event
+            });
+        });
+    }
+
+    function checkAllPluginsloaded() {
+        var all_plugins_loaded = true;
+        $.each(plugins_loaded, function(plugin_index, plugin_value) {
+            if (plugin_value === false) {
+                all_plugins_loaded = false;
+            }
+        });
+        return all_plugins_loaded;
+    }
+
+    function loadPlugin(plugin_path, plugin_name) {
+        require([plugin_path + "main"], function(plugin) {
+            // load styles in link tags via jquery
+            if ($.isArray(plugin.styles)) {
+                $.each(plugin.styles, function(style_index, style_path) {
+                    if (style_path !== "") {
+                        var link = $("<link>");
+                        link.attr({
+                            type: "text/css",
+                            rel: "stylesheet",
+                            href: "engage/theodul/" + plugin_path + style_path
+                        });
+                        $("head").append(link);
+                    }
+                });
+            } else {
+                if (plugin.styles !== "") {
+                    var link = $("<link>");
+                    link.attr({
+                        type: "text/css",
+                        rel: "stylesheet",
+                        href: "engage/theodul/" + plugin_path + plugin.styles
+                    });
+                    $("head").append(link);
+                }
+            }
+
+            if (plugin.template !== "none") {
+                // load template asynchronously
+                $.get("engage/theodul/" + plugin_path + plugin.template, function(template) {
+                    // empty data object
+                    var template_data = {};
+                    // add template if not undefined
+                    if (plugin.template_data !== undefined) {
+                        template_data = plugin.template_data;
+                    }
+                    // add full plugin path to the tmeplate data
+                    template_data.plugin_path = "engage/theodul/" + plugin_path;
+                    // process the template using underscore and set it in the plugin obj
+                    plugin.templateProcessed = _.template(template, template_data);
+                    plugin.template = template;
+                    plugin.pluginPath = "engage/theodul/" + plugin_path;
+                    // load the compiled HTML into the component
+                    engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
+                    // plugin load done counter
+                    plugins_loaded[plugin_name] = true;
+                    // check if all plugins are ready
+                    if (checkAllPluginsloaded() === true) {
+                        engageCore.pluginView.allPluginsLoaded();
+                        // trigger done event
+                        engageCore.trigger(events.plugin_load_done.getName());
+                    }
+                });
+            } else {
+                plugins_loaded[plugin_name] = true;
+                // check if all plugins are ready
+                if (checkAllPluginsloaded() === true) {
+                    engageCore.pluginView.allPluginsLoaded();
+                    // trigger done event
+                    engageCore.trigger(events.plugin_load_done.getName());
+                }
+            }
+        });
+    }
+
     // core main
     var EngageCore = Backbone.View.extend({
         el: $("#" + id_engage_view),
@@ -465,164 +617,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         }
     });
 
-    // create an engage view once the document has loaded
     var engageCore = new EngageCore();
-    // fire init event
     engageCore.trigger(events.coreInit.getName());
-
-    // BEGIN Private core functions
-
-    // binds configured hotkeys(see MH org config) to corresponding theodul events
-    function bindHotkeysToEvents() {
-        // process hardcoded keys
-        $.each(engageCore.model.get("meInfo").get("hotkeys"), function(i, val) {
-            switch (val.name) {
-                case hotkey_jumpToX:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.jumpToX.getName());
-                    });
-                    break;
-                case hotkey_nextChapter:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.nextChapter.getName());
-                    });
-                    break;
-                case hotkey_fullscreen:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.fullscreenEnable.getName());
-                    });
-                    break;
-                case hotkey_jumpToBegin:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.jumpToBegin.getName());
-                    });
-                    break;
-                case hotkey_prevEpisode:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.previousEpisode.getName());
-                    });
-                    break;
-                case hotkey_prevChapter:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.previousChapter.getName());
-                    });
-                    break;
-                case hotkey_play:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.play.getName(), false);
-                    });
-                    break;
-                case hotkey_pause:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.pause.getName(), false);
-                    });
-                    break;
-                case hotkey_mute:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.mute.getName());
-                    });
-                    break;
-                case hotkey_nextEpisode:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.nextEpisode.getName());
-                    });
-                    break;
-                case hotkey_volDown:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.volumeDown.getName());
-                    });
-                    break;
-                case hotkey_volUp:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.volumeUp.getName());
-                    });
-                    break;
-                default:
-                    break;
-            }
-        });
-        //process custom hotkeys
-        $.each(engageCore.model.get("meInfo").get("hotkeysCustom"), function(i, val) {
-            Mousetrap.bind(val.key, function() {
-                engageCore.trigger(val.app + ":" + val.func); // trigger custom event
-            });
-        });
-    }
-
-    function checkAllPluginsloaded() {
-        var all_plugins_loaded = true;
-        $.each(plugins_loaded, function(plugin_index, plugin_value) {
-            if (plugin_value === false) {
-                all_plugins_loaded = false;
-            }
-        });
-        return all_plugins_loaded;
-    }
-
-    function loadPlugin(plugin_path, plugin_name) {
-            require([plugin_path + "main"], function(plugin) {
-                // load styles in link tags via jquery
-                if ($.isArray(plugin.styles)) {
-                    $.each(plugin.styles, function(style_index, style_path) {
-                        if (style_path !== "") {
-                            var link = $("<link>");
-                            link.attr({
-                                type: "text/css",
-                                rel: "stylesheet",
-                                href: "engage/theodul/" + plugin_path + style_path
-                            });
-                            $("head").append(link);
-                        }
-                    });
-                } else {
-                    if (plugin.styles !== "") {
-                        var link = $("<link>");
-                        link.attr({
-                            type: "text/css",
-                            rel: "stylesheet",
-                            href: "engage/theodul/" + plugin_path + plugin.styles
-                        });
-                        $("head").append(link);
-                    }
-                }
-
-                if (plugin.template !== "none") {
-                    // load template asynchronously
-                    $.get("engage/theodul/" + plugin_path + plugin.template, function(template) {
-                        // empty data object
-                        var template_data = {};
-                        // add template if not undefined
-                        if (plugin.template_data !== undefined) {
-                            template_data = plugin.template_data;
-                        }
-                        // add full plugin path to the tmeplate data
-                        template_data.plugin_path = "engage/theodul/" + plugin_path;
-                        // process the template using underscore and set it in the plugin obj
-                        plugin.templateProcessed = _.template(template, template_data);
-                        plugin.template = template;
-                        plugin.pluginPath = "engage/theodul/" + plugin_path;
-                        // load the compiled HTML into the component
-                        engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
-                        // plugin load done counter
-                        plugins_loaded[plugin_name] = true;
-                        // check if all plugins are ready
-                        if (checkAllPluginsloaded() === true) {
-                            engageCore.pluginView.allPluginsLoaded();
-                            // trigger done event
-                            engageCore.trigger(events.plugin_load_done.getName());
-                        }
-                    });
-                } else {
-                    plugins_loaded[plugin_name] = true;
-                    // check if all plugins are ready
-                    if (checkAllPluginsloaded() === true) {
-                        engageCore.pluginView.allPluginsLoaded();
-                        // trigger done event
-                        engageCore.trigger(events.plugin_load_done.getName());
-                    }
-                }
-            });
-        } // END Private core functions
-
     return engageCore;
 });
