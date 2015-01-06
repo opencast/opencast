@@ -24,8 +24,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
     var PLUGIN_STYLES_DESKTOP = [
         "styles/desktop.css",
-        "js/bootstrap/css/bootstrap.css",
-        "js/jqueryui/themes/base/jquery-ui.css"
+        "lib/bootstrap/css/bootstrap.css",
+        "lib/jqueryui/themes/base/jquery-ui.css"
     ];
     var PLUGIN_STYLES_EMBED = [
         "styles/embed.css"
@@ -125,8 +125,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var storage_playbackRate = "playbackRate";
     var storage_volume = "volume";
     var storage_muted = "muted";
-    var bootstrapPath = "js/bootstrap/js/bootstrap";
-    var jQueryUIPath = "js/jqueryui/jquery-ui";
+    var bootstrapPath = "lib/bootstrap/js/bootstrap";
+    var jQueryUIPath = "lib/jqueryui/jquery-ui";
     var id_engage_controls = "engage_controls";
     var id_slider = "slider";
     var id_volume = "volume";

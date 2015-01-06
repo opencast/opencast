@@ -83,7 +83,7 @@
     border-radius: 25px;
     height: 4px;
     background-color: #8e8d8d;
-    background: url('images/bg-track.png') repeat top left;
+    background: url('../images/bg-track.png') repeat top left;
     box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px
     rgba(250, 250, 250, .5);
 }
@@ -102,7 +102,7 @@
     border-radius: 25px;
     height: 4px;
     background-color: #8e8d8d;
-    background: url('images/bg-track.png') repeat top left;
+    background: url('../images/bg-track.png') repeat top left;
     box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px
     rgba(250, 250, 250, .5);
 }
@@ -113,7 +113,7 @@
     width: 25px !important;
     height: 25px !important;
     cursor: pointer !important;
-    background: url('images/handle.png') no-repeat 50% 50% !important;
+    background: url('../images/handle.png') no-repeat 50% 50% !important;
     font-weight: bold;
     color: #1C94C4;
     outline: none;
