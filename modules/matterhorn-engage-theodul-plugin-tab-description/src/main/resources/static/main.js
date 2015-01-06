@@ -19,17 +19,17 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     var PLUGIN_NAME = "Description";
     var PLUGIN_TYPE = "engage_tab";
     var PLUGIN_VERSION = "1.0";
-    var PLUGIN_TEMPLATE = "template.html";
-    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
-    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
-    var PLUGIN_STYLES = [
-        "style.css"
+    var PLUGIN_TEMPLATE_DESKTOP = "templates/desktop.html";
+    var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "templates/embed.html";
+    var PLUGIN_STYLES_DESKTOP = [
+        "styles/desktop.css"
     ];
     var PLUGIN_STYLES_MOBILE = [
-        "style_mobile.css"
+        "styles/mobile.css"
     ];
     var PLUGIN_STYLES_EMBED = [
-        "style_embed.css"
+        "styles/embed.css"
     ];
 
     var plugin;
@@ -72,8 +72,8 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES,
-                template: PLUGIN_TEMPLATE,
+                styles: PLUGIN_STYLES_DESKTOP,
+                template: PLUGIN_TEMPLATE_DESKTOP,
                 events: events
             };
             isDesktopMode = true;
@@ -102,10 +102,10 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
 
         if (language == "de") {
             Engage.log("Tab:Description: Chosing german translations");
-            jsonstr += "language/theodul_language_de.json";
+            jsonstr += "language/de.json";
         } else { // No other languages supported, yet
             Engage.log("Tab:Description: Chosing english translations");
-            jsonstr += "language/theodul_language_en.json";
+            jsonstr += "language/en.json";
         }
         $.ajax({
             url: jsonstr,
