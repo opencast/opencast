@@ -19,19 +19,19 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     var PLUGIN_NAME = "Engage VideoJS Videodisplay";
     var PLUGIN_TYPE = "engage_video";
     var PLUGIN_VERSION = "1.0";
-    var PLUGIN_TEMPLATE = "template.html";
-    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
-    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
-    var PLUGIN_STYLES = [
-        "style.css",
-        "lib/videojs/video-js.css"
-    ];
-    var PLUGIN_STYLES_MOBILE = [
-        "style_mobile.css",
+    var PLUGIN_TEMPLATE_DESKTOP = "templates/desktop.html";
+    var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "templates/embed.html";
+    var PLUGIN_STYLES_DESKTOP = [
+        "styles/desktop.css",
         "lib/videojs/video-js.css"
     ];
     var PLUGIN_STYLES_EMBED = [
-        "style_embed.css",
+        "styles/embed.css",
+        "lib/videojs/video-js.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "styles/mobile.css",
         "lib/videojs/video-js.css"
     ];
 
@@ -101,8 +101,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES,
-                template: PLUGIN_TEMPLATE,
+                styles: PLUGIN_STYLES_DESKTOP,
+                template: PLUGIN_TEMPLATE_DESKTOP,
                 events: events
             };
             isDesktopMode = true;
@@ -197,10 +197,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
 
         if (language == "de") {
             Engage.log("Videodisplay: Chosing german translations");
-            jsonstr += "language/theodul_language_de.json";
+            jsonstr += "language/de.json";
         } else { // No other languages supported, yet
             Engage.log("Videodisplay: Chosing english translations");
-            jsonstr += "language/theodul_language_en.json";
+            jsonstr += "language/en.json";
         }
         $.ajax({
             url: jsonstr,

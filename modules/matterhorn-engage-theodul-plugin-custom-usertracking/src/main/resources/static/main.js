@@ -150,3 +150,4 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
 
     return plugin;
 });
+

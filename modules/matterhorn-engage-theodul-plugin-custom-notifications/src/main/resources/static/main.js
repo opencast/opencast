@@ -122,10 +122,10 @@ define(["require", "jquery", "backbone", "engage/core", "moment"], function(requ
 
         if (language == "de") {
             Engage.log("Notifications: Chosing german translations");
-            jsonstr += "language/theodul_language_de.json";
+            jsonstr += "language/de.json";
         } else { // No other languages supported, yet
             Engage.log("Notifications: Chosing english translations");
-            jsonstr += "language/theodul_language_en.json";
+            jsonstr += "language/en.json";
         }
         $.ajax({
             url: jsonstr,
