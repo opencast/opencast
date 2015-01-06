@@ -106,10 +106,10 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
 
         if (language == "de") {
             Engage.log("MHConnection: Chosing german translations");
-            jsonstr += "language/theodul_language_de.json";
+            jsonstr += "language/de.json";
         } else { // No other languages supported, yet
             Engage.log("MHConnection: Chosing english translations");
-            jsonstr += "language/theodul_language_en.json";
+            jsonstr += "language/en.json";
         }
         $.ajax({
             url: jsonstr,

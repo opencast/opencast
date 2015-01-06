@@ -104,13 +104,14 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     }
 
     function initTranslate(language) {
-        var jsonstr = "language/theodul_language_en.json";
+        var jsonstr = "";
 
         if (language == "de") {
-            console.log("Chosing german translations");
-            var jsonstr = "language/theodul_language_de.json";
+            console.log("Controls: Chosing german translations");
+            jsonstr += "language/de.json";
         } else { // No other languages supported, yet
-            console.log("Chosing english translations");
+            console.log("Controls: Chosing english translations");
+            jsonstr += "language/en.json";
         }
         $.ajax({
             url: jsonstr,
