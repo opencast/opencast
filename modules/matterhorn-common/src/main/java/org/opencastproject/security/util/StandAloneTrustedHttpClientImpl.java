@@ -124,7 +124,31 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
         } catch (Exception e) {
           return left(e);
         } finally {
-          client.close(response);
+          if (response != null) {
+            client.close(response);
+          }
+        }
+      }
+    };
+  }
+
+  @Override public <A> RequestRunner<A> runner(HttpUriRequest req) {
+    return runner(this, req);
+  }
+
+  public static <A> RequestRunner<A> runner(final TrustedHttpClient client, final HttpUriRequest req) {
+    return new RequestRunner<A>() {
+      @Override public Either<Exception, A> run(Function<HttpResponse, A> f) {
+        HttpResponse response = null;
+        try {
+          response = client.execute(req);
+          return right(f.apply(response));
+        } catch (Exception e) {
+          return left(e);
+        } finally {
+          if (response != null) {
+            client.close(response);
+          }
         }
       }
     };
