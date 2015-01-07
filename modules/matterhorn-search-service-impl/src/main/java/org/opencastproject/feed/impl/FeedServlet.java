@@ -18,6 +18,8 @@ package org.opencastproject.feed.impl;
 
 import org.opencastproject.feed.api.Feed;
 import org.opencastproject.feed.api.FeedGenerator;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 
 import com.sun.syndication.io.SyndFeedOutput;
 import com.sun.syndication.io.WireFeedOutput;
@@ -73,6 +75,9 @@ public class FeedServlet extends HttpServlet {
   /** List of feed generators */
   private List<FeedGenerator> feeds = new ArrayList<FeedGenerator>();
 
+  /** The security service */
+  private SecurityService securityService = null;
+
   /**
    * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
@@ -106,6 +111,7 @@ public class FeedServlet extends HttpServlet {
           throws ServletException, IOException {
     logger.debug("Requesting RSS or Atom feed.");
     FeedInfo feedInfo = null;
+    Organization organization = securityService.getOrganization();
 
     // Try to extract requested feed type and content
     try {
@@ -125,7 +131,7 @@ public class FeedServlet extends HttpServlet {
     Feed feed = null;
     for (FeedGenerator generator : feeds) {
       if (generator.accept(feedInfo.getQuery())) {
-        feed = generator.createFeed(feedInfo.getType(), feedInfo.getQuery(), feedInfo.getSize());
+        feed = generator.createFeed(feedInfo.getType(), feedInfo.getQuery(), feedInfo.getSize(), organization);
         if (feed == null) {
           response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
           return;
@@ -255,6 +261,16 @@ public class FeedServlet extends HttpServlet {
   public void removeFeedGenerator(FeedGenerator generator) {
     logger.info("Removing '{}' feed", generator.getIdentifier());
     feeds.remove(generator);
+  }
+
+  /**
+   * OSGi callback to set the security service.
+   *
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
 }
