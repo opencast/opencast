@@ -1708,7 +1708,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       // Make sure we also include the services that have no processing history so far
       List<ServiceRegistrationJpaImpl> services = em.createNamedQuery("ServiceRegistration.getAll").getResultList();
       for (ServiceRegistrationJpaImpl s : services) {
-        statsMap.put(s.getId(), new JaxbServiceStatistics((ServiceRegistrationJpaImpl) s));
+        statsMap.put(s.getId(), new JaxbServiceStatistics(s));
       }
 
       Query query = em.createNamedQuery("ServiceRegistration.statistics");
@@ -2442,9 +2442,29 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     for (ServiceRegistration service : serviceRegistrations) {
 
-      // We are only interested in specific types of services
-      if (!jobType.equals(service.getServiceType()))
+      // Skip services that are not of the requested type
+      if (!jobType.equals(service.getServiceType())) {
+        logger.trace("Not considering {} because it is of the wrong job type", service);
         continue;
+      }
+
+      // Skip services that are in error state
+      if (service.getServiceState() == ERROR) {
+        logger.trace("Not considering {} because it is in error state", service);
+        continue;
+      }
+
+      // Skip services that are in maintenance mode
+      if (service.isInMaintenanceMode()) {
+        logger.trace("Not considering {} because it is in maintenance mode", service);
+        continue;
+      }
+
+      // Skip services that are marked as offline
+      if (!service.isOnline()) {
+        logger.trace("Not considering {} because it is currently offline", service);
+        continue;
+      }
 
       // Determine the maximum load for this host
       Integer hostLoadMax = null;
@@ -2454,6 +2474,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           break;
         }
       }
+
+      // Determine the maximum load for this host
       if (hostLoadMax == null)
         logger.warn("Unable to determine max load for host {}", service.getHost());
 
@@ -2462,15 +2484,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (hostLoad == null)
         logger.warn("Unable to determine current load for host {}", service.getHost());
 
-      boolean canAcceptJobs = service.isOnline() && !service.isInMaintenanceMode()
-              && service.getServiceState() != ERROR;
       boolean hasCapacity = hostLoad == null || hostLoadMax == null || hostLoad < hostLoadMax;
 
       // Is this host suited for processing?
-      if (canAcceptJobs && hasCapacity) {
-        logger.trace("Adding candidate service for processing of jobs of type '{}'", jobType);
+      if (hasCapacity) {
+        logger.debug("Adding candidate service {} for processing of jobs of type '{}'", service, jobType);
         filteredList.add(service);
       }
+
     }
 
     // Sort the list by capacity
@@ -2498,21 +2519,38 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
 
+    logger.debug("Finding services to dispatch job of type {}", jobType);
+
     for (ServiceRegistration service : serviceRegistrations) {
 
-      // We are only interested in specific types of services
-      if (!jobType.equals(service.getServiceType()))
+      // Skip services that are not of the requested type
+      if (!jobType.equals(service.getServiceType())) {
+        logger.trace("Not considering {} because it is of the wrong job type", service);
         continue;
+      }
 
-      boolean canAcceptJobs = service.isOnline() && !service.isInMaintenanceMode()
-              && service.getServiceState() != ERROR;
+      // Skip services that are in error state
+      if (service.getServiceState() == ERROR) {
+        logger.trace("Not considering {} because it is in error state", service);
+        continue;
+      }
 
-      // Is this host suited for processing?
-      if (canAcceptJobs) {
-        logger.trace("Adding candidate service for processing of jobs of type '{}'", jobType);
+      // Skip services that are in maintenance mode
+      if (service.isInMaintenanceMode()) {
+        logger.trace("Not considering {} because it is in maintenance mode", service);
+        continue;
+      }
+
+      // Skip services that are marked as offline
+      if (!service.isOnline()) {
+        logger.trace("Not considering {} because it is currently offline", service);
+        continue;
+      }
+
+      // We found a candidate service
+      logger.debug("Adding candidate service {} for processing of job of type '{}'", service, jobType);
         filteredList.add(service);
       }
-    }
 
     // Sort the list by capacity
     Collections.sort(filteredList, new LoadComparator(loadByHost));
@@ -2570,6 +2608,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         // Make sure dispatching is happening in an ideal order
         Collections.sort(jobsToDispatch, new DispatchableComparator());
 
+        // Initialize collections used to dispatch the current list of jobs
+        Map<String, Integer> hostLoads = getHostLoads(em, true);
+        List<ServiceRegistration> services = getServiceRegistrations(em);
+        List<HostRegistration> hosts = getHostRegistrations(em);
+
         for (Job job : jobsToDispatch) {
 
           // Remember the job type
@@ -2608,9 +2651,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           // Start dispatching
           try {
 
-            Map<String, Integer> hostLoads = getHostLoads(em, true);
-            List<ServiceRegistration> services = getServiceRegistrations(em);
-            List<HostRegistration> hosts = getHostRegistrations(em);
             List<ServiceRegistration> candidateServices = null;
 
             // Depending on whether this running job is trying to reach out to other services or whether this is an
@@ -2798,19 +2838,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public int compare(ServiceRegistration serviceA, ServiceRegistration serviceB) {
       String hostA = serviceA.getHost();
       String hostB = serviceB.getHost();
-      int compare = loadByHost.get(serviceA.getHost()) - loadByHost.get(hostB);
+      int compare = loadByHost.get(hostA) - loadByHost.get(hostB);
 
-      // If host loads are equal prefer NORMAL service state
-      if (compare == 0) {
-        // If the service state is the same, randomly swap the order to achieve evenly distributed load
-        if (serviceA.getServiceState() == serviceB.getServiceState())
-          return randomGenerator.nextInt(2);
-        else if (serviceA.getServiceState() == NORMAL)
-          return 1;
-        else
-          return -1;
-      }
-      return loadByHost.get(hostA) - loadByHost.get(hostB);
+      // If the host load is the same, randomly swap the order to achieve evenly distributed load
+      return compare != 0 ? compare : 1 - randomGenerator.nextInt(2);
     }
 
   }
