@@ -125,13 +125,15 @@ public class RepublishWorkflowOperationHandlerTest {
 
   @Test
   public void testMergeFull() throws Exception {
-    MediaPackage mp = operationHandler.merge(updatedMediaPackage, publishedMediaPackage);
+    MediaPackage mp = RepublishWorkflowOperationHandler.merge(updatedMediaPackage, publishedMediaPackage);
 
     // Check that there is the expected number of elements in the mediapackage
-    Assert.assertEquals("Found more elements than expected", 6, mp.getElements().length);
+    Assert.assertEquals("Found more elements than expected", 7, mp.getElements().length);
     Assert.assertEquals("Found more tracks than expected", 3, mp.getTracks().length);
     Assert.assertEquals("Found more catalogs than expected", 2, mp.getCatalogs().length);
     Assert.assertEquals("Found more attachments than expected", 1, mp.getAttachments().length);
+    Assert.assertEquals("Found more publications than expected", 1, mp.getPublications().length);
+    System.out.println(mp.getPublications().length);
 
     // Make sure that the merged mediapackage contains the updated catalog
     Assert.assertEquals("Merge picked the wrong catalog", "catalog-1",
@@ -144,13 +146,14 @@ public class RepublishWorkflowOperationHandlerTest {
     flavors.add(MediaPackageElements.EPISODE);
     List<String> tags = new ArrayList<String>();
     MediaPackage filteredMediaPackage = operationHandler.filterMediaPackage(updatedMediaPackage, flavors, tags);
-    MediaPackage mp = operationHandler.merge(filteredMediaPackage, publishedMediaPackage);
+    MediaPackage mp = RepublishWorkflowOperationHandler.merge(filteredMediaPackage, publishedMediaPackage);
 
     // Check that there is the expected number of elements in the mediapackage
-    Assert.assertEquals("Found more elements than expected", 5, mp.getElements().length);
+    Assert.assertEquals("Found more elements than expected", 6, mp.getElements().length);
     Assert.assertEquals("Found more tracks than expected", 2, mp.getTracks().length);
     Assert.assertEquals("Found more catalogs than expected", 2, mp.getCatalogs().length);
     Assert.assertEquals("Found more attachments than expected", 1, mp.getAttachments().length);
+    Assert.assertEquals("Found more publications than expected", 1, mp.getPublications().length);
 
     // Make sure that the merged mediapackage contains the published track
     Assert.assertEquals("Merge picked the wrong track", "track-1-published",
