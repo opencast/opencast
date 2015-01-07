@@ -1260,7 +1260,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       tx = em.getTransaction();
       tx.begin();
       Query query = em.createNamedQuery("Job.processinghost.status");
-      query.setParameter("status", Status.RUNNING);
+      List<Status> statuses = new ArrayList<Job.Status>();
+      statuses.add(Status.RUNNING);
+      statuses.add(Status.DISPATCHING);
+      query.setParameter("statuses", statuses);
       query.setParameter("host", baseUrl);
       query.setParameter("serviceType", serviceType);
       @SuppressWarnings("unchecked")
@@ -2148,7 +2151,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
     }
 
-    return null;
+    logger.debug("Unable to dispatch {}, no service is currently ready to accept the job", job);
+    throw new UndispatchableJobException("Job " + job.getId() + " is currently undispatchable");
   }
 
   /**
@@ -2655,7 +2659,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               hostAcceptingJob = dispatchJob(em, job, candidateServices);
             } catch (ServiceUnavailableException e) {
               logger.debug("Jobs of type {} currently cannot be dispatched", job.getOperation());
-              undispatchableJobTypes.add(jobSignature);
+              // Don't mark workflow jobs as undispatchable to not impact worklfow operations
+              if (!TYPE_WORKFLOW.equals(jobType))
+                undispatchableJobTypes.add(jobSignature);
               continue;
             } catch (UndispatchableJobException e) {
               logger.debug("Job {} currently cannot be dispatched", job.getId());
