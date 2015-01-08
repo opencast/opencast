@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "engage/models/engage", "engage/tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, EngageModel, EngageTabLogic) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "engage/models/engage", "engage/tab_logic", "engage/event.js"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, EngageModel, EngageTabLogic, EngageEvent) {
     "use strict";
 
     var events = {
@@ -43,6 +43,14 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var browser_minVersion_opera = 20;
     var browser_minVersion_safari = 7;
     var browser_minVersion_msie = 9;
+    var path_language_de = "language/de.json";
+    var path_language_en = "language/en.json";
+
+    /* don't change these variables */
+    var id_str_error = "str_error";
+    var id_customError_str = "customError_str";
+    var id_str_reloadPage = "str_reloadPage";
+    var id_str_login = "str_login";
     var id_engage_view = "engage_view";
     var id_loading1 = "loading1";
     var id_loading2 = "loading2";
@@ -55,8 +63,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var id_customError = "customError";
     var id_customError_str = "customError_str";
     var class_loading = "loading";
-
-    /* don't change these variables */
     var plugins_loaded = {};
     var loadingDelay1 = 500;
     var loadingDelay2 = 1000;
@@ -108,10 +114,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
         if (language == "de") {
             console.log("Controls: Chosing german translations");
-            jsonstr += "language/de.json";
+            jsonstr += path_language_de;
         } else { // No other languages supported, yet
             console.log("Controls: Chosing english translations");
-            jsonstr += "language/en.json";
+            jsonstr += path_language_en;
         }
         $.ajax({
             url: jsonstr,
@@ -127,42 +133,22 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     }
 
     function translateCoreHTML() {
-        $("#str_error").html(translate("error", "Error"));
-        $("#customError_str").html(translate("error_unknown", "An error occurred. Please reload the page."));
-        $("#str_reloadPage").html(translate("reloadPage", "Reload page"));
-        $("#str_login").html(translate("login", "Log in"));
+        $("#" + id_str_error).html(translate("error", "Error"));
+        $("#" + id_customError_str).html(translate("error_unknown", "An error occurred. Please reload the page."));
+        $("#" + id_str_reloadPage).html(translate("reloadPage", "Reload page"));
+        $("#" + id_str_login).html(translate("login", "Log in"));
     }
 
     function translate(str, strIfNotFound) {
+        if(!str || (str.length <= 0)) {
+            return strIfNotFound;
+        }
         return ((translationData != null) && (translationData[str] != undefined)) ? translationData[str] : strIfNotFound;
     }
 
     // theodul core init
     if (window.console) {
         console.log("Core: Init");
-    }
-
-    // event prototype
-    function EngageEvent(name, description, type) {
-        var name = name;
-        var description = description;
-        var type = type;
-
-        this.getName = (function() {
-            return name;
-        });
-
-        this.getDescription = (function() {
-            return description;
-        });
-
-        this.getType = (function() {
-            return type;
-        });
-
-        this.toString = (function() {
-            return name;
-        });
     }
 
     function login() {
@@ -408,6 +394,53 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     // core main
     var EngageCore = Backbone.View.extend({
         el: $("#" + id_engage_view),
+        Event: EngageEvent,
+        // bind a key event as a string to given theodul event
+        bindKeyToEvent: function(hotkey, event) {
+            // only for EngageEvent objects
+            if (event instanceof EngageEvent) {
+                Mousetrap.bind(hotkey, function() {
+                    engageCore.trigger(event);
+                });
+            }
+        },
+        on: function(event, handler, context) {
+            if (event instanceof EngageEvent) {
+                this.dispatcher.on(event.getName(), handler, context);
+            } else {
+                this.dispatcher.on(event, handler, context);
+            }
+        },
+        trigger: function(event, data) {
+            if (event instanceof EngageEvent) {
+                this.dispatcher.trigger(event.getName(), data);
+            } else {
+                this.dispatcher.trigger(event, data);
+            }
+        },
+        log: function(data) {
+            if (this.model.get("isDebug") && window.console) {
+                console.log(data);
+            }
+        },
+        getPluginPath: function(pluginName) {
+            var evaluated_plugin_path = "";
+            var pluginsInfos = engageCore.model.get("pluginsInfo");
+            var pluginList = pluginsInfos.get("pluginlist");
+            if (pluginList && pluginList.plugins !== undefined) {
+                var plugins = pluginList.plugins;
+                if ($.isArray(plugins)) {
+                    $.each(plugins, function(index, value) {
+                        if (value["name"] === pluginName) {
+                            evaluated_plugin_path = "../../../plugin/" + value["static-path"] + "/";
+                        }
+                    });
+                } else {
+                    evaluated_plugin_path = "../../../plugin/" + value["static-path"] + "/";
+                }
+            }
+            return evaluated_plugin_path;
+        },
         initialize: function() {
             $("." + class_loading).show();
             $("#" + id_loading1).show();
@@ -568,53 +601,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     }, loadingDelay2);
                 }, loadingDelay1);
             });
-        },
-        // bind a key event as a string to given theodul event
-        bindKeyToEvent: function(hotkey, event) {
-            // only for EngageEvent objects
-            if (event instanceof EngageEvent) {
-                Mousetrap.bind(hotkey, function() {
-                    engageCore.trigger(event);
-                });
-            }
-        },
-        on: function(event, handler, context) {
-            if (event instanceof EngageEvent) {
-                this.dispatcher.on(event.getName(), handler, context);
-            } else {
-                this.dispatcher.on(event, handler, context);
-            }
-        },
-        trigger: function(event, data) {
-            if (event instanceof EngageEvent) {
-                this.dispatcher.trigger(event.getName(), data);
-            } else {
-                this.dispatcher.trigger(event, data);
-            }
-        },
-        Event: EngageEvent,
-        log: function(data) {
-            if (this.model.get("isDebug") && window.console) {
-                console.log(data);
-            }
-        },
-        getPluginPath: function(pluginName) {
-            var evaluated_plugin_path = "";
-            var pluginsInfos = engageCore.model.get("pluginsInfo");
-            var pluginList = pluginsInfos.get("pluginlist");
-            if (pluginList && pluginList.plugins !== undefined) {
-                var plugins = pluginList.plugins;
-                if ($.isArray(plugins)) {
-                    $.each(plugins, function(index, value) {
-                        if (value["name"] === pluginName) {
-                            evaluated_plugin_path = "../../../plugin/" + value["static-path"] + "/";
-                        }
-                    });
-                } else {
-                    evaluated_plugin_path = "../../../plugin/" + value["static-path"] + "/";
-                }
-            }
-            return evaluated_plugin_path;
         }
     });
 
