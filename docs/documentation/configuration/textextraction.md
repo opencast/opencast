@@ -205,6 +205,7 @@ running:
 Now switch to the `modules/matterhorn-dictionary-hunspell` subdirectory of your Matterhorn source code and run:
 ```
    mvn clean install -Ddeplayto=/some/path/
+```
 
 This will build the curremt module only and will put the resulting JAR file in the target directory where all your other
 JARs already are.
