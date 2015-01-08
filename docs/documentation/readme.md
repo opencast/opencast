@@ -25,11 +25,12 @@ The Matterhorn Release Documentation is the official Matterhorn documentation
 for each release. It contains:
 
  - [Installation Guides](installation)
- - Configuration Guides
+ - [Configuration Guides](configuration)
     - Basic Configuration
     - Database Configuration
     - Workflow Configuration
     - Encoding Configuration
+    - [more...](configuration)
  - Module Documentation
 
 
