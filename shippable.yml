@@ -1,5 +1,7 @@
 build_image: shippableimages/ubuntu1204_java
 
+cache: true
+
 language: java
 
 jdk:
@@ -16,6 +18,6 @@ before_install:
   - tar -xf /tmp/ffmpeg.tar.xz
   - export PATH=$PATH:$PWD/ffmpeg-*-64bit-static/
 
-install: mvn --batch-mode install -DskipTests=true -Dall
+install: mvn --batch-mode clean install -DskipTests=true -Dall -P '!capture'
 
-script:  mvn --batch-mode test -Dall
+script: mvn --batch-mode test -Dall -P '!capture'
