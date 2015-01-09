@@ -14,8 +14,26 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "engage/models/engage", "engage/tab_logic", "engage/event.js"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, EngageModel, EngageTabLogic, EngageEvent) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "engage/models/engage", "engage/tab_logic"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, EngageModel, EngageTabLogic, EngageEvent) {
     "use strict";
+    
+    function EngageEvent(_name, _description, _type) {
+        this.name = (!_name || _name.length <= 0) ? "" : _name;
+        this.description = (!_description || _description.length <= 0) ? "" : _description;
+        this.type = (!_type || _type.length <= 0) ? "" : _type;
+        this.getName = function() {
+            return name;
+        };
+        this.getDescription = function() {
+            return description;
+        };
+        this.getType = function() {
+            return type;
+        };
+        this.toString = function() {
+            return name;
+        };
+    }
 
     var events = {
         plugin_load_done: new EngageEvent("Core:plugin_load_done", "when the core loaded the event successfully", "both"),
