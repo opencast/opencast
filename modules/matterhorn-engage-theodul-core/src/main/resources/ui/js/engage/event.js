@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define("EngageEvent", function() {
+define(function() {
     "use strict";
 
     function EngageEvent(_name, _description, _type) {
