@@ -52,7 +52,8 @@ ocStatistics = new (function() {
     "org_opencastproject_inspection"             : "Media inspection",
     "org_opencastproject_workflow"               : "Workflow",
     "org_opencastproject_ingest"                 : "Ingest",
-    "org_opencastproject_search"                 : "Engage"
+    "org_opencastproject_search"                 : "Engage",
+    "org_opencastproject_execute"                : "Execute Service"
   };
 
   this.labelName = function(serviceId) {
