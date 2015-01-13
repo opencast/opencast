@@ -18,8 +18,7 @@
       cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
   </scr:component>
 
-  <scr:component name="org.opencastproject.execute.impl.endpoint.ExecuteRestEndpoint" immediate="true"
-    activate="activate">
+  <scr:component name="org.opencastproject.execute.impl.endpoint.ExecuteRestEndpoint" immediate="true">
     <implementation class="org.opencastproject.execute.impl.endpoint.ExecuteRestEndpoint" />
     <property name="service.description" value="Execute REST Endpoint" />
 
