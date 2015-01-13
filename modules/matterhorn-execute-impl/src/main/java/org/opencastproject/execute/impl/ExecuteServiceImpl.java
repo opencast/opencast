@@ -303,7 +303,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * @throws ExecuteException
    *           if some internal error occurred
    */
-  public String doProcess(List<String> arguments, MediaPackage mp, String outFileName, Type expectedType)
+  protected String doProcess(List<String> arguments, MediaPackage mp, String outFileName, Type expectedType)
           throws ExecuteException {
 
     String params = arguments.remove(1);
@@ -385,7 +385,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * @throws ExecuteException
    *           if some internal error occurred
    */
-  public String doProcess(List<String> arguments, MediaPackageElement element, String outFileName, Type expectedType)
+  protected String doProcess(List<String> arguments, MediaPackageElement element, String outFileName, Type expectedType)
           throws ExecuteException {
 
     // arguments(1) contains a list of space-separated arguments for the command

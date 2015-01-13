@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencast.execute.impl;
+package org.opencastproject.execute.impl;
 
 import org.opencastproject.execute.api.ExecuteException;
 import org.opencastproject.execute.api.ExecuteService;
@@ -44,10 +44,10 @@ import java.util.Properties;
 /**
  * Test suite for the Execute Service
  */
-public class ExecuteServiceTest {
+public class ExecuteServiceImplTest {
 
   @SuppressWarnings("unused")
-  private static final Logger logger = LoggerFactory.getLogger(ExecuteServiceTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExecuteServiceImplTest.class);
 
   private static ExecuteServiceImpl executor;
   private static final String TEXT = "En un lugar de la Mancha de cuyo nombre no quiero acordarme...";
@@ -63,7 +63,7 @@ public class ExecuteServiceTest {
   @BeforeClass
   public static void prepareTest() throws URISyntaxException, NotFoundException, IOException {
     // Get the base directory
-    baseDirURI = ExecuteServiceTest.class.getResource("/").toURI();
+    baseDirURI = ExecuteServiceImplTest.class.getResource("/").toURI();
     baseDir = new File(baseDirURI);
 
     // Set up mock context
