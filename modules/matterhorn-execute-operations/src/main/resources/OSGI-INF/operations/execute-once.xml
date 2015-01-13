@@ -2,7 +2,7 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
  name="org.opencastproject.execute.operation.handler.ExecuteOnceWorkflowOperationHandler" immediate="true">
   <implementation class="org.opencastproject.execute.operation.handler.ExecuteOnceWorkflowOperationHandler" />
-  <property name="service.description" value="Execute Workflow Operation Handler" />
+  <property name="service.description" value="Execute Once Workflow Operation Handler" />
   <property name="workflow.operation" value="execute-once" />
   <service>
     <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
