@@ -17,10 +17,21 @@
 define(function() {
     "use strict";
 
+    function generateRandomID(length) {
+        var id = "";
+        var pool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < length; ++i) {
+            id += pool.charAt(Math.floor(Math.random() * pool.length));
+        }
+
+        return id;
+    }
+
     function EngageEvent(_name, _description, _type) {
-        this.name = (!_name || _name.length <= 0) ? "" : _name;
+        this.name = (!_name || _name.length <= 0) ? ("RandomEvent:" + generateRandomID(8)) : _name;
         this.description = (!_description || _description.length <= 0) ? "" : _description;
-        this.type = (!_type || _type.length <= 0) ? "" : _type;
+        this.type = (!_type || _type.length <= 0) ? "unknown" : _type;
     }
 
     EngageEvent.prototype.getName = function() {
