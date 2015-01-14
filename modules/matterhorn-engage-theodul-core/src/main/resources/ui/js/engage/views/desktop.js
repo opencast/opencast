@@ -127,4 +127,3 @@ define(["jquery", "engage/core", "engage/models/engage", "engage/tab_logic"], fu
         allPluginsLoaded: allPluginsLoadedEvent
     }
 });
-

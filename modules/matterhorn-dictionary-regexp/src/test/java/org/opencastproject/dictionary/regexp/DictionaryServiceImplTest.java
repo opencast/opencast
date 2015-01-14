@@ -52,11 +52,21 @@ public class DictionaryServiceImplTest {
   }
 
   @Test
-  public void testSpecialCharacters() throws Exception {
+  public void testSpecialCharactersDE() throws Exception {
     DictionaryServiceImpl service = new DictionaryServiceImpl();
-    String in = "Zwar weiß ich viel, doch möcht ich alles wissen.";
+    String in = "Zwölf Boxkämpfer jagten Victor quer über den großen Sylter Deich.";
     /* This will match German special characters and basic punctuation */
     service.setPattern("[\\wßäöüÄÖÜ,.!]+");
+    Assert.assertEquals(in, service.cleanUpText(in).getText());
+  }
+
+  @Test
+  public void testSpecialCharactersES() throws Exception {
+    DictionaryServiceImpl service = new DictionaryServiceImpl();
+    String in = "El veloz murciélago hindú comía feliz cardillo y kiwi. "
+      + "La cigüeña tocaba el saxofón detrás del palenque de paja.";
+    /* This will match Spanish special characters and basic punctuation */
+    service.setPattern("[¿¡(]*[\\wáéíóúÁÉÍÓÚüÜñÑ]+[)-.,:;!?]*");
     Assert.assertEquals(in, service.cleanUpText(in).getText());
   }
 

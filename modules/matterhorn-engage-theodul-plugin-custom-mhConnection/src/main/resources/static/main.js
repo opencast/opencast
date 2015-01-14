@@ -16,6 +16,7 @@
 /*global define*/
 define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     "use strict";
+
     var PLUGIN_NAME = "Engage Custom Matterhorn Endpoint Connection";
     var PLUGIN_TYPE = "engage_custom";
     var PLUGIN_VERSION = "1.0";
@@ -95,6 +96,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     var mediaPackage; // mediaPackage data
     var mediaInfo; // media info like video tracks and attachments
     var translations = new Array();
+    var initialized = false;
 
     function detectLanguage() {
         return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
@@ -380,32 +382,37 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
      * @param callback
      */
     function callSearchEndpoint(callback) {
-        $.ajax({
-            url: SEARCH_ENDPOINT,
-            data: {
-                id: mediaPackageID
-            },
-            cache: false
-        }).done(function(data) {
-            // split search results
-            if (data && data["search-results"] && data["search-results"].result) {
-                mediaPackage = data["search-results"].result;
-                extractMediaInfo();
-            } else {
-                Engage.trigger(plugin.events.mediaPackageModelError.getName(), translate("error_endpointNotAvailable", "A requested search endpoint is currently not available."));
-            }
-            callback();
-        });
+	if(callback === "function") {
+            $.ajax({
+		url: SEARCH_ENDPOINT,
+		data: {
+                    id: mediaPackageID
+		},
+		cache: false
+            }).done(function(data) {
+		// split search results
+		if (data && data["search-results"] && data["search-results"].result) {
+                    mediaPackage = data["search-results"].result;
+                    extractMediaInfo();
+		} else {
+                    Engage.trigger(plugin.events.mediaPackageModelError.getName(), translate("error_endpointNotAvailable", "A requested search endpoint is currently not available."));
+		}
+		callback();
+            });
+	}
     }
 
     /**
      * Initialize the plugin
      */
     function initPlugin() {
-        Engage.model.set("infoMe", new InfoMeModel());
-        Engage.model.set("mediaPackage", new MediaPackageModel());
-        Engage.model.set("views", new ViewsModel());
-        Engage.model.set("footprints", new FootprintCollection());
+	if(!initialized) {
+	    initialized = true;
+            Engage.model.set("infoMe", new InfoMeModel());
+            Engage.model.set("mediaPackage", new MediaPackageModel());
+            Engage.model.set("views", new ViewsModel());
+            Engage.model.set("footprints", new FootprintCollection());
+	}
     }
 
     // init event
@@ -417,6 +424,38 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     if (!mediaPackageID) {
         mediaPackageID = "";
     }
+
+    Engage.on(plugin.events.getMediaInfo.getName(), function(callback) {
+	if(callback === "function") {
+            // check if data is already loaded
+            if (!mediaPackage && !mediaInfo) {
+		// get info from search endpoint
+		callSearchEndpoint(function() {
+                    // trigger callback
+                    callback(mediaInfo);
+		});
+            } else {
+		// trigger callback
+		callback(mediaInfo);
+            }
+	}
+    });
+
+    Engage.on(plugin.events.getMediaPackage.getName(), function(callback) {
+	if(callback === "function") {
+            // check if data is already loaded
+            if (!mediaPackage) {
+		// get info from search endpoint
+		callSearchEndpoint(function() {
+                    // trigger callback
+                    callback(mediaPackage);
+		});
+            } else {
+		// trigger callback
+		callback(mediaPackage);
+            }
+	}
+    });
 
     // init translation
     initTranslate(detectLanguage(), function() {
@@ -430,34 +469,6 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
-        }
-    });
-
-    Engage.on(plugin.events.getMediaInfo.getName(), function(callback) {
-        // check if data is already loaded
-        if (!mediaPackage && !mediaInfo) {
-            // get info from search endpoint
-            callSearchEndpoint(function() {
-                // trigger callback
-                callback(mediaInfo);
-            });
-        } else {
-            // trigger callback
-            callback(mediaInfo);
-        }
-    });
-
-    Engage.on(plugin.events.getMediaPackage.getName(), function(callback) {
-        // check if data is already loaded
-        if (!mediaPackage) {
-            // get info from search endpoint
-            callSearchEndpoint(function() {
-                // trigger callback
-                callback(mediaPackage);
-            });
-        } else {
-            // trigger callback
-            callback(mediaPackage);
         }
     });
 

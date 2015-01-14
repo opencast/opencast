@@ -11,26 +11,33 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- *
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['jquery', 'backbone'], function($, Backbone) {
+define(function() {
     "use strict";
 
-    var PLUGIN_MANAGER_PATH = "/engage/theodul/manager/list.json";
+    function EngageEvent(_name, _description, _type) {
+        this.name = (!_name || _name.length <= 0) ? "" : _name;
+        this.description = (!_description || _description.length <= 0) ? "" : _description;
+        this.type = (!_type || _type.length <= 0) ? "" : _type;
+    }
 
-    var PluginInfoModel = Backbone.Model.extend({
-        // URL of the search enpoint
-        urlRoot: PLUGIN_MANAGER_PATH,
-        initialize: function() {
-        },
-        defaults: {
-            "pluginlist": {
-                "plugins": {}
-            }
-        }
-    });
+    EngageEvent.prototype.getName = function() {
+        return this.name;
+    };
 
-    return PluginInfoModel;
+    EngageEvent.prototype.getDescription = function() {
+        return this.description;
+    };
+
+    EngageEvent.prototype.getType = function() {
+        return this.type;
+    };
+
+    EngageEvent.prototype.toString = function() {
+        return this.name;
+    };
+
+    return EngageEvent;
 });
