@@ -463,7 +463,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 	    this.model.mobile = false;
 	    // core init event
 	    this.dispatcher.on(events.coreInit.getName(), function() {
-		console.log(events.coreInit.getName());
                 // switch view template and css rules for current player mode
                 // link tag for css file
                 var cssLinkTag = $("<link>");
@@ -535,7 +534,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 					    plugins_loaded[plugin_name] = false;
 					    engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/") + "'...");
 					    loadPlugin("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/", plugin_name);
-					    console.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/") + "'...");
                                         }
 				    }
                                 }
