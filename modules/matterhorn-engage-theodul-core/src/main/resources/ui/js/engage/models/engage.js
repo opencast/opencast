@@ -19,7 +19,7 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
     "use strict";
 
     var PluginModelCollection = Backbone.Collection.extend({});
-    
+
     var basilOptions = {
         namespace: 'mhStorage'
     };
@@ -66,21 +66,21 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
             } else if (this.get("urlParameters").mode == "mobile") {
                 this.set("mode", "mobile");
             } else {
-		this.set("mode", (Bowser.mobile || Bowser.tablet) ? "mobile" : "desktop");
-            }   
-            
+                this.set("mode", (Bowser.mobile || Bowser.tablet) ? "mobile" : "desktop");
+            }
+
             // Check for user setting "Support unsupported browser"
             Basil.set("overrideBrowser", this.get("urlParameters").browser == "all");
-            
+
             // Check for user setting "Preferred format"
             Basil.set("preferredFormat", this.get("urlParameters").format);
-            
+
             if (window.console) {
                 console.log("EngageModel: Player mode: " + this.get("mode"));
             }
         },
         defaults: {
-	    "pluginsInfo": new PluginInfoModel(),
+            "pluginsInfo": new PluginInfoModel(),
             "pluginModels": new PluginModelCollection(),
             "meInfo": new MeInfoModel(),
             "urlParameters": {}

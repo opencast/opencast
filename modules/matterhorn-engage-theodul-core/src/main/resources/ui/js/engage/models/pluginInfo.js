@@ -23,8 +23,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
     var PluginInfoModel = Backbone.Model.extend({
         // URL of the search enpoint
         urlRoot: PLUGIN_MANAGER_PATH,
-        initialize: function() {
-        },
+        initialize: function() {},
         defaults: {
             "pluginlist": {
                 "plugins": {}
