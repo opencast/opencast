@@ -16,6 +16,8 @@
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
 define(['jquery', 'backbone'], function($, Backbone) {
+    "use strict";
+
     /*
      * Model with information about the current user and the current MH configuration
      */

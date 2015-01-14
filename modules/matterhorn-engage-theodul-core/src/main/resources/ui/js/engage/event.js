@@ -24,19 +24,19 @@ define(function() {
     }
 
     EngageEvent.prototype.getName = function() {
-        return name;
+        return this.name;
     };
 
     EngageEvent.prototype.getDescription = function() {
-        return description;
+        return this.description;
     };
 
     EngageEvent.prototype.getType = function() {
-        return type;
+        return this.type;
     };
 
     EngageEvent.prototype.toString = function() {
-        return name;
+        return this.name;
     };
 
     return EngageEvent;

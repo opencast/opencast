@@ -16,6 +16,8 @@
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
 define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'engage/models/meInfo'], function($, Backbone, Bowser, Basil, PluginInfoModel, MeInfoModel) {
+    "use strict";
+
     var PluginModelCollection = Backbone.Collection.extend({});
     
     var basilOptions = {
@@ -78,7 +80,7 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
             }
         },
         defaults: {
-            "pluginsInfo": new PluginInfoModel(),
+	    "pluginsInfo": new PluginInfoModel(),
             "pluginModels": new PluginModelCollection(),
             "meInfo": new MeInfoModel(),
             "urlParameters": {}
@@ -87,4 +89,3 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
 
     return EngageModel;
 });
-
