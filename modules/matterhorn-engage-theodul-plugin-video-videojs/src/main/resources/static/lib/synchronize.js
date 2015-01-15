@@ -282,7 +282,7 @@
      * @return current time if id is not undefined
      */
     function getPlaybackRate(id) {
-        if (id && usingFlash) {
+        if (id) {
             if (!useVideoJs()) {
                 return getVideo(id).playbackRate;
             } else {
@@ -302,7 +302,7 @@
      * @return true if rate has been set if id is not undefined
      */
     function setPlaybackRate(id, rate) {
-        if (id && usingFlash) {
+        if (id) {
             if (!useVideoJs()) {
                 getVideo(id).playbackRate = rate;
             } else {

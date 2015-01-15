@@ -246,10 +246,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
 
     function preferredFormat() {
         /*
-	var pf = Basil.get("preferredFormat");
-	if(pf == null) {
-	    return null;
-	}
+    var pf = Basil.get("preferredFormat");
+    if(pf == null) {
+        return null;
+    }
         switch (pf) {
             case "hls":
                 return "application/x-mpegURL";
@@ -266,7 +266,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
             default:
                 return null;
         }
-	*/
+    */
         return null;
     }
 
@@ -583,8 +583,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     }
 
     function renderMobile(videoDataView, videoSources, videoDisplays, aspectRatio) {
-        console.group("Mobile Mode");
-
+        Engage.log("Video: Render mobile mode");
         checkVideoDisplaySize();
         initMobileEvents();
 
@@ -677,7 +676,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         // Set Displays to correct size
         orderVideoDisplays(videoDisplays);
         checkVideoDisplaySize();
-        console.groupEnd();
     }
 
     function initMobileEvents() {
@@ -788,7 +786,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         var videoHeight = 0;
 
         var ratio = 0;
-        console.group("Video: orderVideoDisplays()");
         Engage.log("Size of Displayarea (w/h): " + maxWidth + "/" + maxHeight);
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
@@ -810,10 +807,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
 
         if (Engage.model.get("orientation") == "landscape") {
             $('#videojs_wrapper').height(maxHeight - 120);
-        } else{
+        } else {
             $('#videojs_wrapper').height(maxHeight - 120);
         }
-        
+
 
         if (Engage.model.get("orientation") == "portrait") {
             if (videoDisplays.length > 1) {
@@ -822,27 +819,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                 $('.mobileVideoBox').height(videoHeight);
             }
         };
-        // Set to init size
-        //$('.mobileVideoBox').width(videoWidth);
-        //$('.mobileVideoBox').height(videoHeight);
-
 
         Engage.log("Set Videobox to (w/h): " + $('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
-
-        /*if (videoWidth > maxWidth) {
-            console.log("Nicht breit genug:");
-            $('.mobileVideoBox').width(maxWidth * 0.8);
-            $('.mobileVideoBox').height((maxWidth * 0.8) * ratio);
-            console.log("Set Videobox to (w/h): " + $('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
-        }*/
-        /*
-        if (videoHeight > maxHeight) {
-            console.log("Video Höhe zu groß");
-            var calcHeight = $('.mobileVideoBox').height((maxHeight * 0.8) * ratio).height();
-            $('.mobileVideoBox').width((maxHeight * 0.8) / ratio);
-            console.log("Set Videobox to (w/h): " + $('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
-        }*/
-        console.groupEnd();
     }
 
     function checkVideoDisplaySize() {
@@ -1268,9 +1246,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         Engage.log("init Plugin " + initCount);
         // only init if plugin template was inserted into the DOM
         if (plugin.inserted) {
+            Engage.log("Video Plugin inserted");
             // set path to swf player
             var videojs_swf = plugin.pluginPath + videojs_swf_path;
-
+            Engage.log('SWF Pfad: ' + videojs_swf_path);
             Engage.model.on(videoDataModelChange, function() {
                 videoDataView = new VideoDataView(this.get("videoDataModel"), plugin.template, videojs_swf);
             });
@@ -1279,18 +1258,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
             });
             Engage.model.get("mediaPackage").on("change", function() {
                 setupStreams(this.get("tracks"), this.get("attachments"));
-            });
-            Engage.on(plugin.events.translate.getName(), function(data) {
-                var key = Object.keys(data);
-                for (var i = 0; i < key.length; i++) {
-                    var lang_value = key[i];
-                    translations[lang_value] = data[lang_value];
-                }
-                /*
-        if(videoDataView) {
-                    videoDataView.render(); // TODO: Does not work as is, find workaround
-        }
-        */
             });
             if (Engage.model.get("mediaPackage").get("tracks")) {
                 Engage.log("Mediapackage already available.")
