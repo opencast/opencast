@@ -2,35 +2,25 @@
 #content-box {
 	padding-top: 2%
 }
-#engage_content {
-	margin-left: auto;
-	margin-right: auto;
-}
-#engage_video {
-	height: inherit;
-}
-.mobile_wrapper {
-	height: inherit;
-}
-.videoDisplay {
-	padding-bottom: 2%;
-	width: 100%;
-	height: 100%;
-}
-.videoDisplay:nth-child(even) {
-	float: right;
-}
-.videoDisplay:nth-child(odd) {
-	float: left;
-	padding-right: 2%;
-}
-.mobile_video_display {
+
+.displayWrapper {
 	height: 100%;
 }
 
-/* Styles for Sidebar */
-#video-displays {
-	height: inherit;
-	width: inherit;
+@media screen and (orientation:landscape) {
+	.mobileVideoBox {
+		float:left;
+		width: 49% !important;
+		height: 90% !important;
+	}
+	.mobileVideoBox:nth-child(2) {
+		float:right;
+	}
 }
 
+@media screen and (orientation:portrait) {
+	.mobileVideoBox {
+		width: 98% !important;
+		margin-bottom: 10px;
+	}
+}

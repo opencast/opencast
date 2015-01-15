@@ -414,7 +414,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
-                if (isDesktopMode || isMobileMode) {
+                if (isDesktopMode) {
                     initControlsEvents();
 
                     if (aspectRatioTriggered) {
@@ -426,14 +426,29 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     playPause();
                     mute();
                     timeUpdate();
-
                     // init dropdown menus
                     $("." + class_dropdown).dropdown();
 
                     addNonFlashEvents();
 
                     checkLoginStatus();
+                } else if (isMobileMode) {
+
+                    initControlsEvents();
+                    initMobileEvents();
+
+                    ready();
+                    playPause();
+                    mute();
+                    timeUpdate();
+                    // init dropdown menus
+                    //$("." + class_dropdown).dropdown();
+
+                    addNonFlashEvents();
+
+                    checkLoginStatus();
                 }
+
             }
         }
     });
@@ -759,7 +774,26 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             }
         }
     }
+    
+    function initMobileEvents() {
+        Engage.log("Init Mobile Events in Control");
+        events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
+        events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
+        events.swipeLeft = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
+        events.deactivate   = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
 
+        Engage.on(events.tapHold.getName(), function(display) {
+            Engage.log("Control: " + display);
+            Engage.trigger(plugin.events.deactivate.getName(), display);
+        });
+
+        Engage.on(events.swipeLeft.getName(), function(target){
+            Engage.log('Control: ' + target);
+        });
+    }
+    /**
+     * getVolume
+     */
     function getVolume() {
         if (isMute) {
             return 0;
@@ -870,8 +904,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     aspectRatioHeight = as[1] || 0;
                     aspectRatio = as[2] || 0;
                     aspectRatioTriggered = true;
-                    calculateEmbedAspectRatios();
-                    addEmbedRatioEvents();
+                    if(isDesktopMode) {
+                        calculateEmbedAspectRatios();
+                        addEmbedRatioEvents();
+                    }
                 }
             });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
