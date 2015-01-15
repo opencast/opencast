@@ -10,8 +10,8 @@
 @media screen and (orientation:landscape) {
 	.mobileVideoBox {
 		float:left;
-		width: 49% !important;
-		height: 90% !important;
+		width: 95% !important;
+		height: 95% !important;
 	}
 	.mobileVideoBox:nth-child(2) {
 		float:right;

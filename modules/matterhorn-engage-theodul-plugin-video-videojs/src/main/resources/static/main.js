@@ -291,6 +291,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
             this.model = videoDataModel;
             this.template = template;
             this.videojs_swf = videojs_swf;
+            Engage.log("Video: Initialze VideoJS: " + videojs_swf);
+
             // bind the render function always to the view
             _.bindAll(this, "render");
             // listen for changes of the model and bind the render function to this
@@ -363,8 +365,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
 
             $(window).on("orientationchange", function(event) {
                 Engage.log("Video: Device twisted");
-                checkVideoDisplaySize();
                 orderVideoDisplays(videoDisplays);
+                checkVideoDisplaySize();
             });
 
             isAudioOnly = videoDataView.model.get("type") == "audio";
@@ -587,12 +589,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         checkVideoDisplaySize();
         initMobileEvents();
 
+        var init = false;
         var i = 0;
         for (var v in videoSources) {
             if (videoSources[v].length > 0) {
-                Engage.log("Init Video Display: " + v);
-                initVideojsVideo(videoDisplays[i], videoSources[v], videoDataView.videojs_swf);
-                ++i;
+                if(!init) {
+                    init = true;
+                    Engage.log("Init Video Display: " + v);
+                    Engage.log(videoDataView.videojs_swf);
+                    initVideojsVideo(videoDisplays[i], videoSources[v], videoDataView.videojs_swf);
+                    Basil.set("preferredVideo", v);
+                    ++i;
+                }
             }
         }
 
@@ -609,70 +617,16 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         $("." + class_vjsposter).show();
 
         if (videoDisplays.length > 0) {
-            var nr = 0;
-            for (var v in videoSources) {
-                if (videoSources[v].length > 0) {
-                    ++nr;
-                }
-            }
 
             // first as masterdisplay
             registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
 
-            if (nr >= 2) {
-                // throw some important synchronize.js-events for other plugins
-                $(document).on(event_sjs_allPlayersReady, function(event) {
-                    videosReady = true;
-                    Engage.trigger(plugin.events.ready.getName());
-                });
-                $(document).on(event_sjs_playerLoaded, function(event) {
-                    Engage.trigger(plugin.events.playerLoaded.getName());
-                });
-                $(document).on(event_sjs_masterPlay, function(event) {
-                    Engage.trigger(plugin.events.play.getName(), true);
-                    pressedPlayOnce = true;
-                });
-                $(document).on(event_sjs_masterPause, function(event) {
-                    Engage.trigger(plugin.events.pause.getName(), true);
-                });
-                $(document).on(event_sjs_masterEnded, function(event) {
-                    Engage.trigger(plugin.events.ended.getName(), true);
-                });
-                $(document).on(event_sjs_masterTimeupdate, function(event, time) {
-                    Engage.trigger(plugin.events.timeupdate.getName(), time, true);
-                });
-                $(document).on(event_sjs_synchronizing, function(event) {
-                    Engage.trigger(plugin.events.synchronizing.getName());
-                });
-                $(document).on(event_sjs_buffering, function(event) {
-                    Engage.trigger(plugin.events.buffering.getName());
-                });
-                $(document).on(event_sjs_bufferedAndAutoplaying, function(event) {
-                    Engage.trigger(plugin.events.bufferedAndAutoplaying.getName());
-                });
-                $(document).on(event_sjs_bufferedButNotAutoplaying, function(event) {
-                    Engage.trigger(plugin.events.bufferedButNotAutoplaying.getName());
-                });
-                var i = 0;
-                for (var vd in videoDisplays) {
-                    if (i > 0) {
-                        // sync every other videodisplay with the master
-                        $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
-                        Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay");
-                    }
-                    ++i;
-                }
-                if (isUsingFlash) {
-                    $(document).trigger(event_sjs_isUsingFlash, []);
-                    $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
-                }
-            } else {
-                videosReady = true;
-                if (!isAudioOnly) {
-                    Engage.trigger(plugin.events.ready.getName());
-                }
+            videosReady = true;
+            if (!isAudioOnly) {
+                Engage.trigger(plugin.events.ready.getName());
             }
         }
+
         // Set Displays to correct size
         orderVideoDisplays(videoDisplays);
         checkVideoDisplaySize();
@@ -704,7 +658,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         initialize: function(ids, videoSources, duration) {
             Engage.log("Video: Init VideoDataModel");
             Engage.log(Engage.model.get("orientation"));
-
+            Engage.log("Video: ids: " + ids);
             this.attributes.ids = ids;
             this.attributes.type = videoSources.audio ? "audio" : "video";
             this.attributes.videoSources = videoSources;
@@ -769,7 +723,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     function orderVideoDisplays(videoDisplays) {
         // max size of display
         // minus footer and header
-
+        /*
         var maxHeight = window.screen.height - 120;
         var maxWidth = window.screen.width;
 
@@ -805,12 +759,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
 
         Engage.log("Videosize (w/h): " + videoWidth + "/" + videoHeight);
 
-        if (Engage.model.get("orientation") == "landscape") {
-            $('#videojs_wrapper').height(maxHeight - 120);
-        } else {
-            $('#videojs_wrapper').height(maxHeight - 120);
-        }
-
+        if (videoDisplays.length == 1) {
+            Engage.log("Video: Single Display");
+            if (Engage.model.get("orientation") == "landscape") {
+                $('#videojs_wrapper').height(maxHeight);
+            }
+        };
 
         if (Engage.model.get("orientation") == "portrait") {
             if (videoDisplays.length > 1) {
@@ -820,12 +774,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
             }
         };
 
-        Engage.log("Set Videobox to (w/h): " + $('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());
+        Engage.log("Set Videobox to (w/h): " + $('.mobileVideoBox').width() + "/" + $('.mobileVideoBox').height());*/
     }
 
     function checkVideoDisplaySize() {
         // make sure the video height is not greater than the window height
         if (Engage.model.get("mode") == "mobile") {
+            /*
             var headerHeight = $('#mobile-header').height();
             var footerHeight = $('#mobile-footer').height();
 
@@ -836,7 +791,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
             } else if (Engage.model.get("orientation") == "landscape") {
                 $("#" + id_engageContent).css("height", ($(window).height() - total) * 0.9);
                 $("#" + id_engageContent).css("width", $(window).width() * 0.9);
-            };
+            };*/
         } else {
             $("#" + id_engageContent).css("max-width", "");
             for (var i = 0; i < videoDisplaySizeTimesCheck; ++i) {
