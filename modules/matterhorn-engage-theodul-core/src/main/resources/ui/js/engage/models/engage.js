@@ -70,7 +70,9 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
             }
 
             // Check for user setting "Support unsupported browser"
-            Basil.set("overrideBrowser", this.get("urlParameters").browser == "all");
+            if (Basil.get("overrideBrowser") == null) {
+                Basil.set("overrideBrowser", this.get("urlParameters").browser == "all"); 
+            };
 
             // Check for user setting "Preferred format"
             Basil.set("preferredFormat", this.get("urlParameters").format);

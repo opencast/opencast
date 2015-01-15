@@ -597,7 +597,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             $("#" + id_browserWarning).show();
                             $("#" + id_btn_tryAnyway).click(function(e) {
                                 e.preventDefault();
-                                window.open(window.location.href + "&browser=all");
+                                Basil.set("overrideBrowser", true);
+                                window.open(window.location.href + "&browser=all", "_self");
                             });
                         }
                     }, loadingDelay2);
