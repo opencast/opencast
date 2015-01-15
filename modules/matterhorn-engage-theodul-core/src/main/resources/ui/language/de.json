@@ -1,0 +1,15 @@
+{
+    "error": "Fehler",
+    "error_unknown": "Ein Fehler ist aufgetreten. Bitte laden Sie diese Seite neu.",
+    "reloadPage": "Seite neu laden",
+    "login": "Einloggen",
+    "enterUsernamePassword": "Bitte geben Sie ihren Nutzernamen und ihr Passwort ein:",
+    "username": "Nutzername",
+    "password": "Passwort",
+    "rememberMe": "Speichern",
+    "cancel": "Abbrechen",
+    "loginSuccessful": "Sie wurden erfolgreich eingeloggt. Bitte laden Sie diese Seite neu, falls sie nicht autoamtisch neu geladen wird.",
+    "loginFailed": "Einloggen fehlgeschlagen.",
+    "description": "Beschreibung",
+    "slideText": "Folientext"
+}

@@ -14,24 +14,24 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "engage/engage_core"], function(require, $, _, Backbone, Basil, Bootbox, Engage) {
+define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "engage/core"], function(require, $, _, Backbone, Basil, Bootbox, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage Controls";
     var PLUGIN_TYPE = "engage_controls";
     var PLUGIN_VERSION = "1.0";
-    var PLUGIN_TEMPLATE = "template.html";
-    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
-    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
-    var PLUGIN_STYLES = [
-        "style.css",
-        "js/bootstrap/css/bootstrap.css",
-        "js/jqueryui/themes/base/jquery-ui.css"
-    ];
-    var PLUGIN_STYLES_MOBILE = [
-        "style_mobile.css"
+    var PLUGIN_TEMPLATE_DESKTOP = "templates/desktop.html";
+    var PLUGIN_TEMPLATE_EMBED = "templates/embed.html";
+    var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
+    var PLUGIN_STYLES_DESKTOP = [
+        "styles/desktop.css",
+        "lib/bootstrap/css/bootstrap.css",
+        "lib/jqueryui/themes/base/jquery-ui.css"
     ];
     var PLUGIN_STYLES_EMBED = [
-        "style_embed.css"
+        "styles/embed.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "styles/mobile.css"
     ];
 
     var basilOptions = {
@@ -51,6 +51,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "", "trigger"),
         sliderStart: new Engage.Event("Slider:start", "", "trigger"),
         sliderStop: new Engage.Event("Slider:stop", "", "trigger"),
+        sliderMousein: new Engage.Event("Slider:mouseIn", "the mouse entered the slider", "trigger"),
+        sliderMouseout: new Engage.Event("Slider:mouseOut", "the mouse is off the slider", "trigger"),
+        sliderMousemove: new Engage.Event("Slider:mouseMoved", "the mouse is moving over the slider", "trigger"),
         volumeSet: new Engage.Event("Video:volumeSet", "", "trigger"),
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "trigger"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
@@ -65,8 +68,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "handler"),
-        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler"),
-        translate: new Engage.Event("Core:translate", "", "handler")
+        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler")
     };
 
     var isDesktopMode = false;
@@ -103,8 +105,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES,
-                template: PLUGIN_TEMPLATE,
+                styles: PLUGIN_STYLES_DESKTOP,
+                template: PLUGIN_TEMPLATE_DESKTOP,
                 events: events
             };
             isDesktopMode = true;
@@ -123,8 +125,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var storage_playbackRate = "playbackRate";
     var storage_volume = "volume";
     var storage_muted = "muted";
-    var bootstrapPath = "js/bootstrap/js/bootstrap";
-    var jQueryUIPath = "js/jqueryui/jquery-ui";
+    var bootstrapPath = "lib/bootstrap/js/bootstrap";
+    var jQueryUIPath = "lib/jqueryui/jquery-ui";
     var id_engage_controls = "engage_controls";
     var id_slider = "slider";
     var id_volume = "volume";
@@ -163,8 +165,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_str_loginlogout = "str_loginlogout";
     var id_dropdownMenuLoginInfo = "dropdownMenuLoginInfo";
     var class_dropdown = "dropdown-toggle";
-
-    /* don't change these variables */
     var videosReady = false;
     var enableFullscreenButton = false;
     var currentTime = 0;
@@ -174,7 +174,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var event_slidestart = "slidestart";
     var event_slidestop = "slidestop";
     var plugin_path = "";
-    var initCount = 6;
+    var initCount = 7;
     var isPlaying = false;
     var isSliding = false;
     var isMute = false;
@@ -208,6 +208,46 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         "/": '&#x2F;'
     };
 
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function initTranslate(language, funcSuccess, funcError) {
+        var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+
+        if (language == "de") {
+            Engage.log("Controls: Chosing german translations");
+            jsonstr += "language/de.json";
+        } else { // No other languages supported, yet
+            Engage.log("Controls: Chosing english translations");
+            jsonstr += "language/en.json";
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translations = data;
+                    if (funcSuccess) {
+                        funcSuccess(translations);
+                    }
+                } else {
+                    if (funcError) {
+                        funcError();
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (funcError) {
+                    funcError();
+                }
+            }
+        });
+    }
+
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
@@ -233,66 +273,66 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             askedForLogin = true;
             var username = "User";
             var password = "Password";
-	    
-	    Bootbox.dialog({
-		title: translate("login", "Log in"),
-		message: '<form class="form-signin">' +
-		    '<h2 class="form-signin-heading">' + translate("enterUsernamePassword", "Please enter your username and password") + '</h2>' +
-		    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate("username", "Username") + '" required="true" autofocus="" />' +
-		    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + translate("password", "Password") + '" required="true" />' +
-		    '<label class="checkbox">' +
-		    '<input type="checkbox" value="' + translate("rememberMe", "Remember me") + '" id="rememberMe" name="rememberMe" checked> ' + translate("rememberMe", "Remember me") +
-		    '</label>' +
-		    '</form>',
-		buttons: {
-		    cancel: {
-			label: translate("cancel", "Cancel"),
-			className: "btn-default",
-			callback: function () {
-			    askedForLogin = false;
-			}
-		    },
-		    login: {
-			label: translate("login", "Log in"),
-			className: "btn-success",
-			callback: function () {
-			    var username = $("#username").val().trim();
-			    var password = $("#password").val().trim();
-			    if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
-				$.ajax({
+
+            Bootbox.dialog({
+                title: translate("login", "Log in"),
+                message: '<form class="form-signin">' +
+                    '<h2 class="form-signin-heading">' + translate("enterUsernamePassword", "Please enter your username and password") + '</h2>' +
+                    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate("username", "Username") + '" required="true" autofocus="" />' +
+                    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + translate("password", "Password") + '" required="true" />' +
+                    '<label class="checkbox">' +
+                    '<input type="checkbox" value="' + translate("rememberMe", "Remember me") + '" id="rememberMe" name="rememberMe" checked> ' + translate("rememberMe", "Remember me") +
+                    '</label>' +
+                    '</form>',
+                buttons: {
+                    cancel: {
+                        label: translate("cancel", "Cancel"),
+                        className: "btn-default",
+                        callback: function() {
+                            askedForLogin = false;
+                        }
+                    },
+                    login: {
+                        label: translate("login", "Log in"),
+                        className: "btn-success",
+                        callback: function() {
+                            var username = $("#username").val().trim();
+                            var password = $("#password").val().trim();
+                            if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
+                                $.ajax({
                                     type: "POST",
                                     url: springSecurityLoginURL,
                                     data: {
-					"j_username": username,
-					"j_password": password,
-					"_spring_security_remember_me": $("#rememberMe").is(":checked")
+                                        "j_username": username,
+                                        "j_password": password,
+                                        "_spring_security_remember_me": $("#rememberMe").is(":checked")
                                     }
-				}).done(function(msg) {
+                                }).done(function(msg) {
                                     password = "";
                                     if (msg.indexOf(springLoggedInStrCheck) == -1) {
-					Engage.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Successfully logged in. Please reload the page if the page does not reload automatically."));
-					location.reload();
+                                        Engage.trigger(events.customSuccess.getName(), translate("loginSuccessful", "Successfully logged in. Please reload the page if the page does not reload automatically."));
+                                        location.reload();
                                     } else {
-					Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
+                                        Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
                                     }
                                     askedForLogin = false;
-				}).fail(function(msg) {
+                                }).fail(function(msg) {
                                     password = "";
                                     Engage.trigger(events.customSuccess.getName(), translate("loginFailed", "Failed to log in."));
                                     askedForLogin = false;
-				});
-			    } else {
-				askedForLogin = false;
-			    }
-			}
-		    }
-		},
-		className: "usernamePassword-modal",
-		onEscape: function() {
-		    askedForLogin = false;
-		},
-		closeButton: false
-	    });
+                                });
+                            } else {
+                                askedForLogin = false;
+                            }
+                        }
+                    }
+                },
+                className: "usernamePassword-modal",
+                onEscape: function() {
+                    askedForLogin = false;
+                },
+                closeButton: false
+            });
         }
     }
 
@@ -695,6 +735,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 isSliding = false;
                 Engage.trigger(plugin.events.sliderStop.getName(), ui.value);
             });
+            $("#" + id_slider).mouseover(function(e) {
+                e.preventDefault();
+                Engage.trigger(plugin.events.sliderMousein.getName());
+            }).mouseout(function(e) {
+                e.preventDefault();
+                Engage.trigger(plugin.events.sliderMouseout.getName());
+            }).mousemove(function(e) {
+                e.preventDefault();
+                var currPos = e.clientX / ($("#" + id_slider).width() + $("#" + id_slider).offset().left);
+                var dur = (duration && (duration > 0)) ? duration : 1;
+                currPos = (currPos < 0) ? 0 : ((currPos > 1) ? 1 : currPos);
+                Engage.trigger(plugin.events.sliderMousemove.getName(), currPos * dur);
+            });
+            // volume event
             $("#" + id_volume).on(event_slidestop, function(event, ui) {
                 Engage.trigger(plugin.events.unmute.getName());
             });
@@ -923,14 +977,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     $("#" + id_segmentNo + no).removeClass("segmentHover");
                 }
             });
-            Engage.on(plugin.events.translate.getName(), function(data) {
-                var key = Object.keys(data);
-                for (var i = 0; i < key.length; i++) {
-                    var lang_value = key[i];
-                    translations[lang_value] = data[lang_value];
-                }
-                controlsView.render();
-            });
             loadStoredInitialValues();
         }
     }
@@ -952,6 +998,21 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         // load bootstrap lib
         require([relative_plugin_path + bootstrapPath], function() {
             Engage.log("Controls: Lib bootstrap loaded");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+
+        // init translation
+        initTranslate(detectLanguage(), function() {
+            Engage.log("Controls: Successfully translated.");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        }, function() {
+            Engage.log("Controls: Error translating...");
             initCount -= 1;
             if (initCount <= 0) {
                 initPlugin();

@@ -14,8 +14,9 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
+define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     "use strict";
+
     var PLUGIN_NAME = "Engage Custom Matterhorn Endpoint Connection";
     var PLUGIN_TYPE = "engage_custom";
     var PLUGIN_VERSION = "1.0";
@@ -91,9 +92,55 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
     /* don't change these variables */
     var mediaPackageID = "";
-    var initCount = 1;
+    var initCount = 2;
     var mediaPackage; // mediaPackage data
     var mediaInfo; // media info like video tracks and attachments
+    var translations = new Array();
+    var initialized = false;
+
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function initTranslate(language, funcSuccess, funcError) {
+        var path = Engage.getPluginPath("EngagePluginCustomMhConnection").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+
+        if (language == "de") {
+            Engage.log("MHConnection: Chosing german translations");
+            jsonstr += "language/de.json";
+        } else { // No other languages supported, yet
+            Engage.log("MHConnection: Chosing english translations");
+            jsonstr += "language/en.json";
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translations = data;
+                    if (funcSuccess) {
+                        funcSuccess(translations);
+                    }
+                } else {
+                    if (funcError) {
+                        funcError();
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (funcError) {
+                    funcError();
+                }
+            }
+        });
+    }
+
+    function translate(str, strIfNotFound) {
+        return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
 
     var InfoMeModel = Backbone.Model.extend({
         urlRoot: INFO_ME_ENDPOINT,
@@ -107,34 +154,34 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             this.fetch({
                 data: {},
                 success: function(model) {
-		    model.loggedIn = false;
-		    model.username = "Anonymous";
-		    model.roles = [];
-		    var attr = model.attributes;
-		    if(attr.username) {
-			Engage.log("Username found: " + attr.username);
-			model.username = attr.username;
-		    } else {
-			Engage.log("No username found.");
-		    }
-		    if(attr.roles && (attr.roles.length > 0)) {
-			model.roles = attr.roles;
-			var notAnonymous = false;
-			for(var i = 0; i < attr.roles.length; ++i) {
-			    if(attr.roles[i] != "ROLE_ANONYMOUS") {
-				notAnonymous = true;
-			    }
-			}
-			model.loggedIn = notAnonymous;
-			if(notAnonymous) {
-			    Engage.log("User has one or more roles.");
-			} else {
-			    Engage.log("User has no role.");
-			}
-		    } else {
-			Engage.log("Error: No roles found.");
-		    }
-		    model.trigger("change");
+                    model.loggedIn = false;
+                    model.username = "Anonymous";
+                    model.roles = [];
+                    var attr = model.attributes;
+                    if (attr.username) {
+                        Engage.log("Username found: " + attr.username);
+                        model.username = attr.username;
+                    } else {
+                        Engage.log("No username found.");
+                    }
+                    if (attr.roles && (attr.roles.length > 0)) {
+                        model.roles = attr.roles;
+                        var notAnonymous = false;
+                        for (var i = 0; i < attr.roles.length; ++i) {
+                            if (attr.roles[i] != "ROLE_ANONYMOUS") {
+                                notAnonymous = true;
+                            }
+                        }
+                        model.loggedIn = notAnonymous;
+                        if (notAnonymous) {
+                            Engage.log("User has one or more roles.");
+                        } else {
+                            Engage.log("User has no role.");
+                        }
+                    } else {
+                        Engage.log("Error: No roles found.");
+                    }
+                    model.trigger("change");
                 }
             });
         },
@@ -207,7 +254,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
                         Engage.log("Mediapackage Data change event thrown");
                     } else {
                         Engage.log("Mediapackage data not loaded successfully");
-                        Engage.trigger(plugin.events.mediaPackageModelError.getName(), "Media information could not be loaded successfully.");
+                        Engage.trigger(plugin.events.mediaPackageModelError.getName(), translate("error_mediaPackageInformationNotLoaded", "There are two possible reasons for this error:<ul><li>The media is not available any more</li><li>The media is protected and you need to log in</li></ul>"));
                     }
                 }
             });
@@ -325,7 +372,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
             mediaInfo.creator = mediaPackage.dcCreator;
             mediaInfo.date = mediaPackage.dcCreated;
         } else {
-            Engage.trigger(plugin.events.mediaPackageModelError.getName(), "No media information are available.");
+            Engage.trigger(plugin.events.mediaPackageModelError.getName(), translate("error_noMediaInformationAvailable", "No media information are available."));
         }
     }
 
@@ -335,32 +382,37 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
      * @param callback
      */
     function callSearchEndpoint(callback) {
-        $.ajax({
-            url: SEARCH_ENDPOINT,
-            data: {
-                id: mediaPackageID
-            },
-            cache: false
-        }).done(function(data) {
-            // split search results
-            if (data && data["search-results"] && data["search-results"].result) {
-                mediaPackage = data["search-results"].result;
-                extractMediaInfo();
-            } else {
-                Engage.trigger(plugin.events.mediaPackageModelError.getName(), "A requested search endpoint is currently not available.");
-            }
-            callback();
-        });
+	if(callback === "function") {
+            $.ajax({
+		url: SEARCH_ENDPOINT,
+		data: {
+                    id: mediaPackageID
+		},
+		cache: false
+            }).done(function(data) {
+		// split search results
+		if (data && data["search-results"] && data["search-results"].result) {
+                    mediaPackage = data["search-results"].result;
+                    extractMediaInfo();
+		} else {
+                    Engage.trigger(plugin.events.mediaPackageModelError.getName(), translate("error_endpointNotAvailable", "A requested search endpoint is currently not available."));
+		}
+		callback();
+            });
+	}
     }
 
     /**
      * Initialize the plugin
      */
     function initPlugin() {
-        Engage.model.set("infoMe", new InfoMeModel());
-        Engage.model.set("mediaPackage", new MediaPackageModel());
-        Engage.model.set("views", new ViewsModel());
-        Engage.model.set("footprints", new FootprintCollection());
+	if(!initialized) {
+	    initialized = true;
+            Engage.model.set("infoMe", new InfoMeModel());
+            Engage.model.set("mediaPackage", new MediaPackageModel());
+            Engage.model.set("views", new ViewsModel());
+            Engage.model.set("footprints", new FootprintCollection());
+	}
     }
 
     // init event
@@ -374,30 +426,49 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
     }
 
     Engage.on(plugin.events.getMediaInfo.getName(), function(callback) {
-        // check if data is already loaded
-        if (!mediaPackage && !mediaInfo) {
-            // get info from search endpoint
-            callSearchEndpoint(function() {
-                // trigger callback
-                callback(mediaInfo);
-            });
-        } else {
-            // trigger callback
-            callback(mediaInfo);
-        }
+	if(callback === "function") {
+            // check if data is already loaded
+            if (!mediaPackage && !mediaInfo) {
+		// get info from search endpoint
+		callSearchEndpoint(function() {
+                    // trigger callback
+                    callback(mediaInfo);
+		});
+            } else {
+		// trigger callback
+		callback(mediaInfo);
+            }
+	}
     });
 
     Engage.on(plugin.events.getMediaPackage.getName(), function(callback) {
-        // check if data is already loaded
-        if (!mediaPackage) {
-            // get info from search endpoint
-            callSearchEndpoint(function() {
-                // trigger callback
-                callback(mediaPackage);
-            });
-        } else {
-            // trigger callback
-            callback(mediaPackage);
+	if(callback === "function") {
+            // check if data is already loaded
+            if (!mediaPackage) {
+		// get info from search endpoint
+		callSearchEndpoint(function() {
+                    // trigger callback
+                    callback(mediaPackage);
+		});
+            } else {
+		// trigger callback
+		callback(mediaPackage);
+            }
+	}
+    });
+
+    // init translation
+    initTranslate(detectLanguage(), function() {
+        Engage.log("MHConnection: Successfully translated.");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    }, function() {
+        Engage.log("MHConnection: Error translating...");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
         }
     });
 

@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], function(require, $, _, Backbone, Engage) {
+define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage Plugin Custom Usertracking";
     var PLUGIN_TYPE = "engage_custom";
@@ -150,3 +150,4 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core"], fu
 
     return plugin;
 });
+

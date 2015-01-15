@@ -14,29 +14,28 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "moment"], function(require, $, _, Backbone, Engage, Moment) {
+define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($, _, Backbone, Engage, Moment) {
     "use strict";
     var PLUGIN_NAME = "Basic Engage Description";
     var PLUGIN_TYPE = "engage_description";
     var PLUGIN_VERSION = "1.0";
-    var PLUGIN_TEMPLATE = "template.html";
-    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
-    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
-    var PLUGIN_STYLES = [
-        "style.css"
-    ];
-    var PLUGIN_STYLES_MOBILE = [
-        "style_mobile.css"
+    var PLUGIN_TEMPLATE_DESKTOP = "templates/desktop.html";
+    var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "templates/embed.html";
+    var PLUGIN_STYLES_DESKTOP = [
+        "styles/desktop.css"
     ];
     var PLUGIN_STYLES_EMBED = [
-        "style_embed.css"
+        "styles/embed.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "styles/mobile.css"
     ];
 
     var plugin;
     var events = {
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
-        translate: new Engage.Event("Core:translate", "", "handler")
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -73,8 +72,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES,
-                template: PLUGIN_TEMPLATE,
+                styles: PLUGIN_STYLES_DESKTOP,
+                template: PLUGIN_TEMPLATE_DESKTOP,
                 events: events
             };
             isDesktopMode = true;
@@ -85,13 +84,53 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     // nothing to see here...
 
     /* don't change these variables */
-    var initCount = 2;
+    var initCount = 3;
     var id_engage_description = "engage_description";
     var mediapackageChange = "change:mediaPackage";
     var mediapackageError = false;
     var translations = new Array();
     var locale = "en";
     var dateFormat = "MMMM Do YYYY";
+
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function initTranslate(language, funcSuccess, funcError) {
+        var path = Engage.getPluginPath("EngagePluginDescription").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+
+        if (language == "de") {
+            Engage.log("Description: Chosing german translations");
+            jsonstr += "language/de.json";
+        } else { // No other languages supported, yet
+            Engage.log("Description: Chosing english translations");
+            jsonstr += "language/en.json";
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translations = data;
+                    if (funcSuccess) {
+                        funcSuccess(translations);
+                    }
+                } else {
+                    if (funcError) {
+                        funcError();
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (funcError) {
+                    funcError();
+                }
+            }
+        });
+    }
 
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
@@ -115,13 +154,13 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                     title: this.model.get("title"),
                     creator: this.model.get("creator"),
                     date: this.model.get("date"),
-		    str_videoTitle: translate("videoTitle", "Video title"),
-		    str_creator: translate("creator", "Creator"),
-		    str_date: translate("date", "Date")
+                    str_videoTitle: translate("videoTitle", "Video title"),
+                    str_creator: translate("creator", "Creator"),
+                    str_date: translate("date", "Date")
                 };
-		Moment.locale(locale, {
+                Moment.locale(locale, {
                     // customizations
-		});
+                });
                 // try to format the date
                 if (Moment(tempVars.date) != null) {
                     tempVars.date = Moment(tempVars.date).format(dateFormat);
@@ -137,20 +176,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         if ((isDesktopMode || isMobileMode) && plugin.inserted) {
             // create a new view with the media package model and the template
             var descriptionView = new DescriptionView(Engage.model.get("mediaPackage"), plugin.template);
-            Engage.on(plugin.events.translate.getName(), function(data) {
-                var key = Object.keys(data);
-                for (var i = 0; i < key.length; i++) {
-                    var lang_value = key[i];
-                    translations[lang_value] = data[lang_value];
-                }
-		if(data.value_locale != "undefined") {
-		    locale = data.value_locale;
-		}
-		if(data.value_dateFormat != "undefined") {
-		    dateFormat = data.value_dateFormat;
-		}
-                descriptionView.render();
-            });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
             });
@@ -160,6 +185,22 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     if (isDesktopMode || isMobileMode) {
         // init event
         var relative_plugin_path = Engage.getPluginPath("EngagePluginDescription");
+
+        initTranslate(detectLanguage(), function() {
+            Engage.log("Description: Successfully translated.");
+            locale = translate("value_locale", locale);
+            dateFormat = translate("value_dateFormatFull", dateFormat);
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        }, function() {
+            Engage.log("Description: Error translating...");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
 
         // listen on a change/set of the mediaPackage model
         Engage.model.on(mediapackageChange, function() {

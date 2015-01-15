@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "moment"], function(require, $, _, Backbone, Engage, Moment) {
+define(["require", "jquery", "backbone", "engage/core", "moment"], function(require, $, Backbone, Engage, Moment) {
     "use strict";
     var PLUGIN_NAME = "Engage Custom Notifications";
     var PLUGIN_TYPE = "engage_custom";
@@ -48,8 +48,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
         bufferedButNotAutoplaying: new Engage.Event("Video:bufferedButNotAutoplaying", "buffering successful, was not playing, not autoplaying now", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler"),
-        audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "handler"),
-        translate: new Engage.Event("Core:translate", "", "handler")
+        audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "handler")
     };
 
     var isDesktopMode = false;
@@ -105,13 +104,53 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     var alertify;
     var mediapackageError = false;
     var codecError = false;
-    var initCount = 2;
+    var initCount = 3;
     var videoLoaded = false;
     var videoLoadMsgDisplayed = false;
     var videoBuffering = false;
     var translations = new Array();
     var locale = "en";
     var dateFormat = "MMMM Do YYYY, h:mm:ss a";
+
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function initTranslate(language, funcSuccess, funcError) {
+        var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+
+        if (language == "de") {
+            Engage.log("Notifications: Chosing german translations");
+            jsonstr += "language/de.json";
+        } else { // No other languages supported, yet
+            Engage.log("Notifications: Chosing english translations");
+            jsonstr += "language/en.json";
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translations = data;
+                    if (funcSuccess) {
+                        funcSuccess(translations);
+                    }
+                } else {
+                    if (funcError) {
+                        funcError();
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (funcError) {
+                    funcError();
+                }
+            }
+        });
+    }
 
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
@@ -165,23 +204,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
                 }
             }
         }, alertifyVideoLoadMessageThreshold);
-
-        Engage.on(plugin.events.translate.getName(), function(data) {
-            var key = Object.keys(data);
-            for (var i = 0; i < key.length; i++) {
-                var lang_value = key[i];
-                translations[lang_value] = data[lang_value];
-            }
-	    if(data.value_locale != "undefined") {
-		locale = data.value_locale;
-	    }
-	    if(data.value_dateFormatFull != "undefined") {
-		dateFormat = data.value_dateFormatFull;
-	    }
-            Moment.locale(locale, {
-		// customizations
-            });
-        });
         Engage.on(plugin.events.isAudioOnly.getName(), function(audio) {
             isAudioOnly = audio;
         });
@@ -239,6 +261,22 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
     Engage.log("Notifications: Init");
     var relative_plugin_path = Engage.getPluginPath("EngagePluginCustomNotifications");
 
+    initTranslate(detectLanguage(), function() {
+        Engage.log("Notifications: Successfully translated.");
+        locale = translate("value_locale", locale);
+        dateFormat = translate("value_dateFormatFull", dateFormat);
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    }, function() {
+        Engage.log("Notifications: Error translating...");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
+
     // load alertify lib
     require([relative_plugin_path + alertifyPath], function(_alertify) {
         Engage.log("Notifications: Lib alertify loaded");
@@ -260,3 +298,4 @@ define(["require", "jquery", "underscore", "backbone", "engage/engage_core", "mo
 
     return plugin;
 });
+

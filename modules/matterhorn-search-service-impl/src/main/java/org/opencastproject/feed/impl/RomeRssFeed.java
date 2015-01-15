@@ -103,6 +103,7 @@ public class RomeRssFeed extends SyndFeedImpl {
     setLinks(toRomeLinks(originalFeed.getLinks()));
     setPublishedDate(originalFeed.getPublishedDate());
     setTitleEx(toRomeContent(originalFeed.getTitle()));
+    setCopyright(originalFeed.getCopyright());
     setUri(originalFeed.getUri());
     setLink(originalFeed.getLink());
 

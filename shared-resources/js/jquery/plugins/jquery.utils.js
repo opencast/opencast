@@ -236,22 +236,26 @@
 
     /**
      * @description Returns a map of URL Arguments
+     * @param url (optional) a string representing the url. 
+     *        If not provided, defaults to window.location.href
      * @return a map of URL Arguments if successful, {} else
      */
-    $.parseURL = function()
-    {
+    $.parseURL = function(url) {
         var vars = {}; // Use object to avoid issues with associative arrays
         var hash, hashes;
-        var argsIndex = window.location.href.indexOf('?');
-        if (argsIndex >= 0)
-        {
-            hashes = window.location.href.slice(argsIndex + 1).split('&');
-            if ($.isArray(hashes))
-            {
-                for (var i = 0; i < hashes.length; i++)
-                {
+
+	// Default URL
+	url = url || window.location.href
+
+        var argsIndex = url.indexOf('?');
+        if (argsIndex >= 0) {
+            hashes = url.slice(argsIndex + 1).split('&');
+            if ($.isArray(hashes)) {
+                for (var i = 0; i < hashes.length; i++) {
                     hash = hashes[i].split('=');
-                    vars[hash[0]] = hash[1];
+		    if (hash[0]) {
+			vars[hash[0]] = hash[1];
+		    }
                 }
             }
         }
@@ -266,30 +270,18 @@
      * @param link2 third link, connects the first and the second value of an URL parameter (e.g. =)
      * @return the url array to string, connected via links, if map is a valid Object, '' else
      */
-    $.urlMapToString = function(map, link11, link12, link2)
-    {
+    $.urlMapToString = function(map, link11, link12, link2) {
         var str = '';
         // check whether map is an Object
-        if ($.isPlainObject(map))
-        {
-            i = 0;
+        if ($.isPlainObject(map)) {
             // Set default values if nothings given
             link11 = link11 || '?';
             link12 = link12 || '&';
             link2 = link2 || '=';
 
-            for (var value in map)
-            {
-                if(map.hasOwnProperty(value))
-                {
-                    var parsedUrlAt = $.getURLParameter(value);
-                    if ((parsedUrlAt !== undefined) && (parsedUrlAt !== null))
-                    {
-                        var l = (i == 0) ? link11 : link12;
-                        str += l + value + link2 + $.parseURL()[value];
-                    }
-                    i++;
-                }
+            for (var item in map) {
+		str += (str.length == 0) ? link11 : link12;
+		str += item + link2 + map[item];
             }
         }
         return str;
@@ -297,14 +289,14 @@
 
     /**
      * @description Removes the duplicate URL parameters, e.g. url?a=b&a=c&a=d => url?a=d
+     * @param url a string representing a URL. If not provided, defaults to window.location.href
      * @return a cleaned URL
      */
-    $.getCleanedURL = function()
-    {
-        var urlArr = $.parseURL();
-        var windLoc = window.location.href;
-        windLoc = (windLoc.indexOf('?') != -1) ? window.location.href.substring(0, window.location.href.indexOf('?')) : windLoc;
-        return windLoc + $.urlMapToString(urlArr, "?", "&", "=");
+    $.getCleanedURL = function(url) {
+        var parts = $.parseURL(url);
+        var windLoc = url || window.location.href;
+        windLoc = windLoc.substring(0, windLoc.indexOf('?'));
+        return windLoc + $.urlMapToString(parts);
     };
 
     /**

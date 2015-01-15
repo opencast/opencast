@@ -14,24 +14,24 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_core"], function(require, $, _, Backbone, Basil, Engage) {
+define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], function(require, $, _, Backbone, Basil, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage VideoJS Videodisplay";
     var PLUGIN_TYPE = "engage_video";
     var PLUGIN_VERSION = "1.0";
-    var PLUGIN_TEMPLATE = "template.html";
-    var PLUGIN_TEMPLATE_MOBILE = "template_mobile.html";
-    var PLUGIN_TEMPLATE_EMBED = "template_embed.html";
-    var PLUGIN_STYLES = [
-        "style.css",
-        "lib/videojs/video-js.css"
-    ];
-    var PLUGIN_STYLES_MOBILE = [
-        "style_mobile.css",
+    var PLUGIN_TEMPLATE_DESKTOP = "templates/desktop.html";
+    var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "templates/embed.html";
+    var PLUGIN_STYLES_DESKTOP = [
+        "styles/desktop.css",
         "lib/videojs/video-js.css"
     ];
     var PLUGIN_STYLES_EMBED = [
-        "style_embed.css",
+        "styles/embed.css",
+        "lib/videojs/video-js.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "styles/mobile.css",
         "lib/videojs/video-js.css"
     ];
 
@@ -64,8 +64,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         sliderStop: new Engage.Event("Slider:stop", "slider stopped", "handler"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "handler"),
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
-        translate: new Engage.Event("Core:translate", "", "handler")
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -102,8 +101,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES,
-                template: PLUGIN_TEMPLATE,
+                styles: PLUGIN_STYLES_DESKTOP,
+                template: PLUGIN_TEMPLATE_DESKTOP,
                 events: events
             };
             isDesktopMode = true;
@@ -127,7 +126,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var isAudioOnly = false;
     var isUsingFlash = false;
     var aspectRatio = "";
-    var initCount = 4;
+    var initCount = 5;
     var mediapackageError = false;
     var videoDisplayNamePrefix = "videojs_videodisplay_";
     var id_engage_video = "engage_video";
@@ -188,14 +187,54 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     var translations = new Array();
     var videoDataView = undefined;
 
-    var basilOptions = {
-        namespace: "mhStorage"
-    };
-    Basil = new window.Basil(basilOptions);
+    function detectLanguage() {
+        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+    }
+
+    function initTranslate(language, funcSuccess, funcError) {
+        var path = Engage.getPluginPath("EngagePluginVideoVideoJS").replace(/(\.\.\/)/g, "");
+        var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
+
+        if (language == "de") {
+            Engage.log("Videodisplay: Chosing german translations");
+            jsonstr += "language/de.json";
+        } else { // No other languages supported, yet
+            Engage.log("Videodisplay: Chosing english translations");
+            jsonstr += "language/en.json";
+        }
+        $.ajax({
+            url: jsonstr,
+            dataType: "json",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    data.value_locale = language;
+                    translations = data;
+                    if (funcSuccess) {
+                        funcSuccess(translations);
+                    }
+                } else {
+                    if (funcError) {
+                        funcError();
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (funcError) {
+                    funcError();
+                }
+            }
+        });
+    }
 
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
+
+    var basilOptions = {
+        namespace: "mhStorage"
+    };
+    Basil = new window.Basil(basilOptions);
 
     function escapeRegExp(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -205,11 +244,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
         return string.replace(new RegExp(escapeRegExp(find), "g"), replace);
     }
 
-    function preferedFormat() {
-        if (Basil.get("preferedFormat") == null) {
-            return null;
-        }
-        switch (Basil.get("preferedFormat")) {
+    function preferredFormat() {
+        /*
+	var pf = Basil.get("preferredFormat");
+	if(pf == null) {
+	    return null;
+	}
+        switch (pf) {
             case "hls":
                 return "application/x-mpegURL";
             case "dash":
@@ -225,17 +266,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
             default:
                 return null;
         }
+	*/
+        return null;
     }
 
     function acceptFormat(track) {
-        if (preferedFormat() == 0 || mimetypes.indexOf(preferedFormat()) == -1) {
-            return true; //prefered format is not available, accept all
+        if ((preferredFormat() == null) || (mimetypes.indexOf(preferredFormat()) == -1)) {
+            return true; // preferred format is not available, accept all
         }
-        if (track.mimetype == preferedFormat()) {
-            return true;
-        } else {
-            return false;
-        }
+        return track.mimetype == preferredFormat();
     }
 
     function parseVideoResolution(resolution) {
@@ -264,7 +303,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     });
 
     function prepareRenderingVideoDisplay(videoDataView) {
-
         if (loadHls) {
             require([relative_plugin_path + mediaSourcesPath], function(videojsmedia) {
                 Engage.log("Video: Lib videojs media sources loaded");
@@ -280,7 +318,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
 
     function renderVideoDisplay(videoDataView) {
         Engage.log("Rendering video displays");
-
         var src = (videoDataView.model.get("videoSources") && videoDataView.model.get("videoSources")["audio"]) ? videoDataView.model.get("videoSources")["audio"] : [];
         var tempVars = {
             ids: videoDataView.model.get("ids"),
@@ -811,7 +848,17 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     function checkVideoDisplaySize() {
         // make sure the video height is not greater than the window height
         if (Engage.model.get("mode") == "mobile") {
+            var headerHeight = $('#mobile-header').height();
+            var footerHeight = $('#mobile-footer').height();
 
+            var total = headerHeight + footerHeight;
+            if (Engage.model.get("orientation") == "portrait") {
+                $("#" + id_engageContent).css("height", ($(window).height() - total) * 0.9);
+                $("#" + id_engageContent).css("width", $(window).width() * 0.9);
+            } else if (Engage.model.get("orientation") == "landscape") {
+                $("#" + id_engageContent).css("height", ($(window).height() - total) * 0.9);
+                $("#" + id_engageContent).css("width", $(window).width() * 0.9);
+            };
         } else {
             $("#" + id_engageContent).css("max-width", "");
             for (var i = 0; i < videoDisplaySizeTimesCheck; ++i) {
@@ -1255,6 +1302,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/engage_c
     // init Event
     Engage.log("Video: Init");
     var relative_plugin_path = Engage.getPluginPath("EngagePluginVideoVideoJS");
+
+    initTranslate(detectLanguage(), function() {
+        Engage.log("Videodisplay: Successfully translated.");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    }, function() {
+        Engage.log("Videodisplay: Error translating...");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
 
     // load video.js lib
     require([relative_plugin_path + videoPath], function(videojs) {

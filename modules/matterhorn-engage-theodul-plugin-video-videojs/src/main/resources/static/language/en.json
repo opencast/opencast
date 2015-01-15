@@ -1,0 +1,15 @@
+{
+    "value_locale": "en",
+    "error_AudioCodecNotSupported": "Error: The audio codec is not supported by this browser",
+    "error_AudioElementNotSupported": "Error: Your browser does not support the audio element.",
+    "switchPlayer": "Switch player",
+    "video": "Video",
+    "video_short": "Vid.",
+    "openInPlayer": "Open in player",
+    "givenTime": "The given time",
+    "hasToBeSmallerThanDuration": "has to be smaller than the duration",
+    "msg_waitToSetTime": "Please wait until the video has been loaded to set a time.",
+    "msg_startPlayingToSetTime": "Please start playing the video once to set a time.",
+    "msg_waitToSeek": "Please wait until the video has been loaded to seek.",
+    "msg_startPlayingToSeek": "Please start playing the video once to seek."
+}

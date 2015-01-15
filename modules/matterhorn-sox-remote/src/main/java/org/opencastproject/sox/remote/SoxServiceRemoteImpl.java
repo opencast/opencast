@@ -50,7 +50,7 @@ public class SoxServiceRemoteImpl extends RemoteBase implements SoxService {
    */
   @Override
   public Job analyze(Track sourceAudioTrack) throws MediaPackageException, SoxException {
-    HttpPost post = new HttpPost();
+    HttpPost post = new HttpPost("/analyze");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceAudioTrack", MediaPackageElementParser.getAsXml(sourceAudioTrack)));
@@ -85,7 +85,7 @@ public class SoxServiceRemoteImpl extends RemoteBase implements SoxService {
    */
   @Override
   public Job normalize(Track sourceAudioTrack, Float targetRmsLevDb) throws MediaPackageException, SoxException {
-    HttpPost post = new HttpPost();
+    HttpPost post = new HttpPost("/normalize");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceAudioTrack", MediaPackageElementParser.getAsXml(sourceAudioTrack)));

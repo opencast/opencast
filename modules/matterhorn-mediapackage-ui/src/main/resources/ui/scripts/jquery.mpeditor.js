@@ -65,7 +65,7 @@
 
             // Remove additional values
             if(inMemoryMediaPackage.episodeCatalog.disable) {
-                self.find('#dublincore_episode_tab :input').not('#enable_button').each(function(i,element){
+                self.find('#dublincore_episode_tab :input').not('.disable_button').each(function(i,element){
                     var key = $(element).attr('name');
                     inMemoryMediaPackage.episodeCatalog.deleteValue(key);
                 });
@@ -244,10 +244,10 @@
         this.validateTab = function (element) {
            var errorField = 0;
 
-           if($(element).find('input#enable_button').attr('checked') == 'checked') return true;
+           if($(element).find('input.disable_button').attr('checked') == 'checked') return true;
 
            // Go through each input elements of the tabs to check them
-           $(element).find(':input').not('#enable_button').each(function(index,value){
+           $(element).find(':input').not('.disable_button').each(function(index,value){
                if(!$(this).valid())
                    errorField ++;
            });
@@ -445,7 +445,7 @@
                 });
             });
 
-            self.find('.oc-ui-collapsible-widget :input').not('#enable_button').bind('keyup change', function(){
+            self.find('.oc-ui-collapsible-widget :input').not('.disable_button').bind('keyup change', function(){
                 var tab = $(this).parents('div.oc-ui-collapsible-widget');
                 var catalog;
                 if(tab.attr('id') == 'dublincore_episode_tab') {

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<smil xmlns="http://www.w3.org/ns/SMIL" baseProfile="Language" version="3.0" xml:id="s-a6fcca20-7969-4c37-b131-ddadfd1bc986">
+  <head xml:id="h-b3909634-b34e-4530-93d3-b75f35b818e5">
+    <meta name="media-package-id" content="eb18ea5d-d948-4c18-9566-1cf929563493" xml:id="meta-d5d8cb70-6205-4a9d-93c1-2be09d223ab0"/>
+    <meta name="track-duration" content="217751ms" xml:id="meta-0144f4d8-dd45-4cd7-9706-8c9d1fe62222"/>
+    <paramGroup xml:id="pg-1b1dc672-b2ad-4137-8554-b6babdd38191">
+      <param value="93864247-489c-44bc-a185-07cd1a9d7006" name="track-id" valuetype="data" xml:id="param-7371934d-b2e8-4faf-98d8-ff76a20fd223"/>
+      <param value="http://localhost:8080/files/mediapackage/eb18ea5d-d948-4c18-9566-1cf929563493/93864247-489c-44bc-a185-07cd1a9d7006/mh720p.mp4"
+        name="track-src" valuetype="data" xml:id="param-0587ba3c-03f5-460a-b346-821b4f44d447"/>
+      <param value="presenter/preview" name="track-flavor" valuetype="data" xml:id="param-7827a104-dd1e-4dd1-9655-22bb698d0fa2"/>
+    </paramGroup>
+  </head>
+  <body xml:id="b-7df6b72d-7189-486f-b8b4-406317e01ddc">
+    <par xml:id="par-381c9aa5-1658-491b-abe0-92f74e26df7c">
+      <video src="http://localhost:8080/files/mediapackage/eb18ea5d-d948-4c18-9566-1cf929563493/93864247-489c-44bc-a185-07cd1a9d7006/mh720p.mp4"
+        paramGroup="pg-1b1dc672-b2ad-4137-8554-b6babdd38191"
+        clipEnd="217751ms" clipBegin="0ms"
+        xml:id="v-4ae3a730-ae82-402b-a44a-99cc348be5ca"/>
+    </par>
+  </body>
+</smil>

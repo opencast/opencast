@@ -21,6 +21,7 @@ h1, h2, h3 {
     margin-bottom: 20px;
     border: 1px solid #ddd;
     min-width: 840px;
+    background-color: #FFFFFF;
 }
 
 #engage_content {
@@ -34,7 +35,7 @@ h1, h2, h3 {
 #engage_controls {
     width: 100%;
     height: 97px;
-    background-color: #ffffff;
+    background-color: #FFFFFF;
 }
 
 #engage_description {
@@ -45,7 +46,7 @@ h1, h2, h3 {
     width: 100%;
     height: 90px;
     position: fixed;
-    background-color: #ffffff;
+    background-color: #FFFFFF;
     z-index: 1;
 }
 

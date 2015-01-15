@@ -87,6 +87,12 @@
     width: 350px;
 }
 
+.alertify-log>ul, #customError_str>ul {
+    margin-left: 40px;
+    margin-right: 5px;
+    margin-top: 10px;
+}
+
 #customError_btn-container {
     margin: 0 auto;
     margin-top: 10px;

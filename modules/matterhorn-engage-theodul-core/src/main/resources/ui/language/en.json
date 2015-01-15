@@ -1,0 +1,15 @@
+{
+    "error": "Error",
+    "error_unknown": "An error occurred. Please reload the page.",
+    "reloadPage": "Reload page",
+    "login": "Log in",
+    "enterUsernamePassword": "Please enter your username and password:",
+    "username": "Username",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "cancel": "Cancel",
+    "logoutSuccessful": "Successfully logged out. Please reload the page if the page does not reload automatically.",
+    "loginFailed": "Failed to log in.",
+    "description": "Description",
+    "slideText": "Slide text"
+}
