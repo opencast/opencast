@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "backbone", "engage/core", "moment"], function(require, $, Backbone, Engage, Moment) {
+define(["require", "jquery", "backbone", "engage/core"], function(require, $, Backbone, Engage) {
     "use strict";
     var PLUGIN_NAME = "Engage Custom Notifications";
     var PLUGIN_TYPE = "engage_custom";
@@ -100,6 +100,7 @@ define(["require", "jquery", "backbone", "engage/core", "moment"], function(requ
     var alertifyPath = "lib/alertify/alertify";
 
     /* don't change these variables */
+    var Utils;
     var isAudioOnly = false;
     var alertify;
     var mediapackageError = false;
@@ -111,10 +112,6 @@ define(["require", "jquery", "backbone", "engage/core", "moment"], function(requ
     var translations = new Array();
     var locale = "en";
     var dateFormat = "MMMM Do YYYY, h:mm:ss a";
-
-    function detectLanguage() {
-        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-    }
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginCustomNotifications").replace(/(\.\.\/)/g, "");
@@ -157,38 +154,19 @@ define(["require", "jquery", "backbone", "engage/core", "moment"], function(requ
     }
 
     /**
-     * Format the current date and time
-     *
-     * @return a formatted current date and time string
-     */
-    function getCurrentDateTime() {
-        var date = new Date();
-
-        // try to format the date
-        if (Moment(date) != null) {
-            date = Moment(new Date()).format(dateFormat);
-        }
-        return date;
-    }
-
-    /**
      * Format a message for alertify
      *
      * @param msg message to format
      * @return the formatted message
      */
     function getAlertifyMessage(msg) {
-        return (alertifyDisplayDatetime ? (getCurrentDateTime() + ": ") : "") + msg;
+        return (alertifyDisplayDatetime ? (Utils.getCurrentDateTime(locale) + ": ") : "") + msg;
     }
 
     /**
      * Initialize the plugin
      */
     function initPlugin() {
-        Moment.locale(locale, {
-            // customizations
-        });
-
         alertify.init();
         alertify.set({
             delay: alertifyMessageDelay
@@ -261,20 +239,34 @@ define(["require", "jquery", "backbone", "engage/core", "moment"], function(requ
     Engage.log("Notifications: Init");
     var relative_plugin_path = Engage.getPluginPath("EngagePluginCustomNotifications");
 
-    initTranslate(detectLanguage(), function() {
-        Engage.log("Notifications: Successfully translated.");
-        locale = translate("value_locale", locale);
-        dateFormat = translate("value_dateFormatFull", dateFormat);
+    // all plugins loaded
+    Engage.on(plugin.events.plugin_load_done.getName(), function() {
+        Engage.log("Notifications: Plugin load done");
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
         }
-    }, function() {
-        Engage.log("Notifications: Error translating...");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
+    });
+
+    // load utils class
+    require([relative_plugin_path + "utils"], function(utils) {
+        Engage.log("Notifications: Utils class loaded");
+        Utils = new utils();
+        initTranslate(Utils.detectLanguage(), function() {
+            Engage.log("Notifications: Successfully translated.");
+            locale = translate("value_locale", locale);
+            dateFormat = translate("value_dateFormatFull", dateFormat);
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        }, function() {
+            Engage.log("Notifications: Error translating...");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
     });
 
     // load alertify lib
@@ -287,15 +279,5 @@ define(["require", "jquery", "backbone", "engage/core", "moment"], function(requ
         }
     });
 
-    // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function() {
-        Engage.log("Notifications: Plugin load done");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
-
     return plugin;
 });
-

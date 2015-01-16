@@ -75,27 +75,25 @@ define(["jquery"], function($) {
 
     // parameter from Basil.get("preferredFormat")
     Utils.prototype.preferredFormat = function(preferredFormat) {
-        /*
-	  if(preferredFormat == null) {
-          return null;
-	  }
-          switch (preferredFormat) {
-          case "hls":
-          return "application/x-mpegURL";
-          case "dash":
-          return "application/dash+xml";
-          case "rtmp":
-          return "rtmp/mp4";
-          case "mp4":
-          return "video/mp4";
-          case "webm":
-          return "video/webm";
-          case "audio":
-          return "audio/";
-          default:
-          return null;
-          }
-	*/
+	if(preferredFormat == null) {
+            return null;
+	}
+        switch (preferredFormat) {
+        case "hls":
+            return "application/x-mpegURL";
+        case "dash":
+            return "application/dash+xml";
+        case "rtmp":
+            return "rtmp/mp4";
+        case "mp4":
+            return "video/mp4";
+        case "webm":
+            return "video/webm";
+        case "audio":
+            return "audio/";
+        default:
+            return null;
+        }
         return null;
     }
 
