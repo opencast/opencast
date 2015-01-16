@@ -16,6 +16,7 @@
 /*global define*/
 define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($, _, Backbone, Engage, Moment) {
     "use strict";
+
     var PLUGIN_NAME = "Basic Engage Description";
     var PLUGIN_TYPE = "engage_description";
     var PLUGIN_VERSION = "1.0";
@@ -42,7 +43,6 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     var isEmbedMode = false;
     var isMobileMode = false;
 
-    // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
@@ -79,9 +79,6 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
             isDesktopMode = true;
             break;
     }
-
-    /* change these variables */
-    // nothing to see here...
 
     /* don't change these variables */
     var initCount = 3;
@@ -136,16 +133,12 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
 
-    // view //
-
     var DescriptionView = Backbone.View.extend({
-        el: $("#" + id_engage_description), // every view has a element associated with it
+        el: $("#" + id_engage_description),
         initialize: function(mediaPackageModel, template) {
             this.model = mediaPackageModel;
             this.template = template;
-            // bind the render function always to the view
             _.bindAll(this, "render");
-            // listen for changes of the model and bind the render function to this
             this.model.bind("change", this.render);
         },
         render: function() {
@@ -172,9 +165,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     });
 
     function initPlugin() {
-        // only init if plugin template was inserted into the DOM
         if ((isDesktopMode || isMobileMode) && plugin.inserted) {
-            // create a new view with the media package model and the template
             var descriptionView = new DescriptionView(Engage.model.get("mediaPackage"), plugin.template);
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;

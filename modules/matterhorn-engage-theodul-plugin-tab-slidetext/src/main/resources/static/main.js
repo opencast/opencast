@@ -14,8 +14,9 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backbone, Engage) {
+define(["require", "jquery", "underscore", "backbone", "engage/core"], function(require, $, _, Backbone, Engage) {
     "use strict";
+
     var PLUGIN_NAME = "Slide text";
     var PLUGIN_TYPE = "engage_tab";
     var PLUGIN_VERSION = "1.0";
@@ -86,16 +87,15 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
             break;
     }
 
-    /* change these variables */
-
-    /* don"t change these variables */
+    /* don't change these variables */
     var TEMPLATE_TAB_CONTENT_ID = "engage_slidetext_tab_content";
     var html_snippet_id = "engage_slidetext_tab_content";
     var id_segmentNo = "tab_slidetext_segment_";
     var mediapackageChange = "change:mediaPackage";
-    var initCount = 3;
+    var initCount = 4;
     var mediapackageError = false;
     var translations = new Array();
+    var Segment;
 
     function detectLanguage() {
         return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
@@ -140,18 +140,6 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
-
-    /**
-     * Segment
-     *
-     * @param time
-     * @param image_url
-     */
-    var Segment = function(time, image_url, text) {
-        this.time = time;
-        this.image_url = image_url;
-        this.text = text;
-    };
 
     /**
      * Returns the input time in milliseconds
@@ -283,7 +271,7 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
 
     // init event
     Engage.log("Tab:Slidetext: Init");
-    // var relative_plugin_path = Engage.getPluginPath("EngagePluginTabSlidetext");
+    var relative_plugin_path = Engage.getPluginPath("EngagePluginTabSlidetext");
 
     initTranslate(detectLanguage(), function() {
         Engage.log("Tab:Slidetext: Successfully translated.");
@@ -310,6 +298,16 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
     // all plugins loaded
     Engage.on(plugin.events.plugin_load_done.getName(), function() {
         Engage.log("Tab:Slidetext: Plugin load done");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
+
+    // load segment class
+    require([relative_plugin_path + "segment"], function(segment) {
+        Engage.log("Tab:Slidetext: Segment class loaded");
+        Segment = segment;
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
