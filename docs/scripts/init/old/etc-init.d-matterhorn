@@ -62,7 +62,7 @@ PAX_CONFMAN_OPTS="-Dbundles.configuration.location=$FELIX_CONFIG_DIR"
 
 PAX_LOGGING_OPTS="-Dorg.ops4j.pax.logging.DefaultServiceLog.level=WARN"
 MATTERHORN_LOGGING_OPTS="-Dopencast.logdir=$LOGDIR"
-ECLIPSELINK_LOGGING_OPTS="-Declipselink.logging.level=SEVERE"
+ECLIPSELINK_LOGGING_OPTS="-Declipselink.logging.level=CONFIG"
 UTIL_LOGGING_OPTS="-Djava.util.logging.config.file=$FELIX_CONFIG_DIR/services/java.util.logging.properties"
 
 LOG_OPTS="$PAX_LOGGING_OPTS $MATTERHORN_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS $UTIL_LOGGING_OPTS"
