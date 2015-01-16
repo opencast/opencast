@@ -16,24 +16,40 @@
 /*jslint browser: true, nomen: true*/
 /*global define*/
 define(['require', 'jquery', 'underscore', 'backbone', 'engage/engage_core'], function(require, $ , _, Backbone, Engage) {
-    "use strict"; // strict mode in all our application
+    "use strict";
+
     var PLUGIN_NAME = "${plugin_name}";
     var PLUGIN_TYPE = "engage_${plugin_type}";
     var PLUGIN_VERSION = "${plugin_version}";
-    var PLUGIN_TEMPLATE = "template.html";
-    var PLUGIN_STYLES = ["style.css"];
-    var plugin = {
-        name: PLUGIN_NAME,
-        type: PLUGIN_TYPE,
-        version: PLUGIN_VERSION,
-        styles: PLUGIN_STYLES,
-        template: PLUGIN_TEMPLATE,
-        pluginPath: "", //filled after core procession, see core reference
-        container: "", //filled after core procession, see core reference
-        events : {
-          //put here your events
-        }
-    };
+    var PLUGIN_TEMPLATE_DESKTOP = "templates/desktop.html";
+    var PLUGIN_STYLES_DESKTOP = [
+	"styles/desktop.css"
+    ];
+    var plugin;
+    var events = {
+        plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler")
+        // put your events here
+    }
+
+    var isDesktopMode = false;
+    var isEmbedMode = false;
+    var isMobileMode = false;
+
+    // desktop, embed and mobile logic
+    switch (Engage.model.get("mode")) {
+        case "desktop":
+        default:
+            plugin = {
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_DESKTOP,
+                template: PLUGIN_TEMPLATE_DESKTOP,
+                events: events
+            };
+            isDesktopMode = true;
+            break;
+    }
     
 #if( $plugin_type == "custom" )
 #include("templates/customPlugin.vtl")

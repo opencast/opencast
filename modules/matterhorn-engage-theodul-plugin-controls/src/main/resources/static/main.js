@@ -16,6 +16,7 @@
 /*global define*/
 define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "engage/core"], function(require, $, _, Backbone, Basil, Bootbox, Engage) {
     "use strict";
+
     var PLUGIN_NAME = "Engage Controls";
     var PLUGIN_TYPE = "engage_controls";
     var PLUGIN_VERSION = "1.0";
