@@ -88,6 +88,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     var SEARCH_ENDPOINT = "/search/episode.json";
 
     /* don't change these variables */
+    var Utils;
     var initCount = 6;
     var InfoMeModel;
     var MediaPackageModel;
@@ -98,10 +99,6 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     var mediaInfo; // media info like video tracks and attachments
     var translations = new Array();
     var initialized = false;
-
-    function detectLanguage() {
-        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-    }
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginCustomMhConnection").replace(/(\.\.\/)/g, "");
@@ -208,21 +205,6 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
         mediaPackageID = "";
     }
 
-    // init translation
-    initTranslate(detectLanguage(), function() {
-        Engage.log("MHConnection: Successfully translated.");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    }, function() {
-        Engage.log("MHConnection: Error translating...");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
-
     Engage.on(plugin.events.mediaPackageModelInternalError.getName(), function() {
         Engage.trigger(events.mediaPackageModelError.getName(), translate("error_mediaPackageInformationNotLoaded", "There are two possible reasons for this error:<ul><li>The media is not available any more</li><li>The media is protected and you need to log in</li></ul>"));
     });
@@ -250,6 +232,15 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
             } else {
                 callback(mediaPackage);
             }
+        }
+    });
+
+    // all plugins loaded
+    Engage.on(plugin.events.plugin_load_done.getName(), function() {
+        Engage.log("MhConnection: Plugin load done");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
         }
     });
 
@@ -293,13 +284,23 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
         }
     });
 
-    // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function() {
-        Engage.log("MhConnection: Plugin load done");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
+    // load utils class
+    require([relative_plugin_path + "utils"], function(utils) {
+        Engage.log("MhConnection: Utils class loaded");
+        Utils = new utils();
+        initTranslate(Utils.detectLanguage(), function() {
+            Engage.log("MHConnection: Successfully translated.");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        }, function() {
+            Engage.log("MHConnection: Error translating...");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
     });
 
     return plugin;

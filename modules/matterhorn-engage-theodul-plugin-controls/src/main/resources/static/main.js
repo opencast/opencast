@@ -122,6 +122,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
 
     /* don't change these variables */
+    var Utils;
     var storage_playbackRate = "playbackRate";
     var storage_volume = "volume";
     var storage_muted = "muted";
@@ -208,10 +209,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         "/": '&#x2F;'
     };
 
-    function detectLanguage() {
-        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-    }
-
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
@@ -250,22 +247,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
-    }
-
-    function escapeHtml(string) {
-        return String(string).replace(/[&<>"'\/]/g, function(s) {
-            return entityMap[s];
-        });
-    }
-
-    function getAspectRatioWidth(originalWidth, originalHeight, height) {
-        var width = Math.round(height * originalWidth / originalHeight);
-        return width;
-    }
-
-    function getAspectRatioHeight(originalWidth, originalHeight, width) {
-        var height = Math.round(originalHeight / originalWidth * width);
-        return height;
     }
 
     function login() {
@@ -387,9 +368,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
                 var tempVars = {
                     plugin_path: this.pluginPath,
-                    startTime: formatSeconds(0),
+                    startTime: Utils.formatSeconds(0),
                     durationMS: (duration && (duration > 0)) ? duration : 1, // duration in ms
-                    duration: (duration ? formatSeconds(duration / 1000) : formatSeconds(0)), // formatted duration
+                    duration: (duration ? Utils.formatSeconds(duration / 1000) : Utils.formatSeconds(0)), // formatted duration
                     logoLink: logoLink,
                     segments: segments,
                     str_prevChapter: translate("prevChapter", "Go to previous chapter"),
@@ -453,114 +434,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         }
     });
 
-    function escapeRegExp(string) {
-        return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-    }
-
-    function replaceAll(string, find, replace) {
-        return string.replace(new RegExp(escapeRegExp(find), "g"), replace);
-    }
-
-    /**
-     * Returns the input time in milliseconds
-     *
-     * @param data data in the format ab:cd:ef
-     * @return time from the data in milliseconds
-     */
-    function getTimeInMilliseconds(data) {
-        if ((data != undefined) && (data != null) && (data != 0) && (data.length) && (data.indexOf(":") != -1)) {
-            var values = data.split(":");
-            // when the format is correct
-            if (values.length == 3) {
-                // try to convert to numbers
-                var val0 = values[0] * 1;
-                var val1 = values[1] * 1;
-                var val2 = values[2] * 1;
-                // check and parse the seconds
-                if (!isNaN(val0) && !isNaN(val1) && !isNaN(val2)) {
-                    // convert hours, minutes and seconds to milliseconds
-                    val0 *= 60 * 60 * 1000; // 1 hour = 60 minutes = 60 * 60 Seconds = 60 * 60 * 1000 milliseconds
-                    val1 *= 60 * 1000; // 1 minute = 60 seconds = 60 * 1000 milliseconds
-                    val2 *= 1000; // 1 second = 1000 milliseconds
-                    return val0 + val1 + val2;
-                }
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * Returns the formatted seconds
-     *
-     * @param seconds seconds to format
-     * @return formatted seconds
-     */
-    function formatSeconds(seconds) {
-        if (!seconds) {
-            seconds = 0;
-        }
-        seconds = (seconds < 0) ? 0 : seconds;
-        var result = "";
-        if (parseInt(seconds / 3600) < 10) {
-            result += "0";
-        }
-        result += parseInt(seconds / 3600);
-        result += ":";
-        if ((parseInt(seconds / 60) - parseInt(seconds / 3600) * 60) < 10) {
-            result += "0";
-        }
-        result += parseInt(seconds / 60) - parseInt(seconds / 3600) * 60;
-        result += ":";
-        if (seconds % 60 < 10) {
-            result += "0";
-        }
-        result += seconds % 60;
-        if (result.indexOf(".") != -1) {
-            result = result.substring(0, result.lastIndexOf(".")); // get rid of the .ms
-        }
-        return result;
-    }
-
-    /**
-     * enable
-     *
-     * @param id
-     */
-    function enable(id) {
-        $("#" + id).removeAttr("disabled");
-    }
-
-    /**
-     * disable
-     *
-     * @param id
-     */
-    function disable(id) {
-        $("#" + id).attr("disabled", "disabled");
-    }
-
-    /**
-     * greyIn
-     *
-     * @param id
-     */
-    function greyIn(id) {
-        $("#" + id).animate({
-            opacity: 1.0
-        });
-    }
-
-    /**
-     * greyOut
-     *
-     * @param id
-     */
-    function greyOut(id) {
-        $("#" + id).animate({
-            opacity: 0.5
-        });
-    }
-
     function addNonFlashEvents() {
         if (!mediapackageError && !usingFlash && !isAudioOnly) {
             // setup listeners for the playback rate
@@ -602,10 +475,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         if (str.indexOf("mode=desktop") == -1) {
             str += "&mode=embed";
         } else {
-            str = replaceAll(str, "mode=desktop", "mode=embed");
+            str = Utils.replaceAll(str, "mode=desktop", "mode=embed");
         }
         var code = "<iframe src=\"" + str + "\" style=\"border:0px #FFFFFF none;\" name=\"Opencast Matterhorn - Theodul Pass Player\" scrolling=\"no\" frameborder=\"0\" marginheight=\"0px\" marginwidth=\"0px\" width=\"" + ratioWidth + "\" height=\"" + ratioHeight + "\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\"></iframe>";
-        code = escapeHtml(code);
+        code = Utils.escapeHtml(code);
         Engage.trigger(plugin.events.customOKMessage.getName(), "Copy the following code and paste it to the body of your html page: <div class=\"well well-sm well-alert\">" + code + "</div>");
     }
 
@@ -657,20 +530,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     function initControlsEvents() {
         if (!mediapackageError) {
             // disable not used buttons
-            disable(id_backward_button);
-            disable(id_forward_button);
-            disable(id_play_button);
-            greyOut(id_backward_button);
-            greyOut(id_forward_button);
-            greyOut(id_play_button);
-            disable(id_navigation_time);
+            Utils.disable(id_backward_button);
+            Utils.disable(id_forward_button);
+            Utils.disable(id_play_button);
+            Utils.greyOut(id_backward_button);
+            Utils.greyOut(id_forward_button);
+            Utils.greyOut(id_play_button);
+            Utils.disable(id_navigation_time);
             $("#" + id_navigation_time_current).keyup(function(e) {
                 e.preventDefault();
                 // pressed enter
                 if (e.keyCode == 13) {
                     $(this).blur();
                     try {
-                        var time = getTimeInMilliseconds($(this).val());
+                        var time = Utils.getTimeInMilliseconds($(this).val());
                         if (!isNaN(time)) {
                             Engage.trigger(plugin.events.seek.getName(), time / 1000);
                         }
@@ -774,26 +647,26 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             }
         }
     }
-    
+
     function initMobileEvents() {
-        Engage.log("Init Mobile Events in Control");
-        events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
-        events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
-        events.swipeLeft = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
-        events.deactivate   = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
+            Engage.log("Init Mobile Events in Control");
+            events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
+            events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
+            events.swipeLeft = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
+            events.deactivate = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
 
-        Engage.on(events.tapHold.getName(), function(display) {
-            Engage.log("Control: " + display);
-            Engage.trigger(plugin.events.deactivate.getName(), display);
-        });
+            Engage.on(events.tapHold.getName(), function(display) {
+                Engage.log("Control: " + display);
+                Engage.trigger(plugin.events.deactivate.getName(), display);
+            });
 
-        Engage.on(events.swipeLeft.getName(), function(target){
-            Engage.log('Control: ' + target);
-        });
-    }
-    /**
-     * getVolume
-     */
+            Engage.on(events.swipeLeft.getName(), function(target) {
+                Engage.log('Control: ' + target);
+            });
+        }
+        /**
+         * getVolume
+         */
     function getVolume() {
         if (isMute) {
             return 0;
@@ -805,11 +678,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function calculateEmbedAspectRatios() {
         if ((aspectRatioWidth > 0) && (aspectRatioHeight > 0)) {
-            embedWidthOne = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightOne);
-            embedWidthTwo = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightTwo);
-            embedWidthThree = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightThree);
-            embedWidthFour = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFour);
-            embedWidthFive = getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFive);
+            embedWidthOne = Utils.getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightOne);
+            embedWidthTwo = Utils.getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightTwo);
+            embedWidthThree = Utils.getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightThree);
+            embedWidthFour = Utils.getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFour);
+            embedWidthFive = Utils.getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFive);
 
             $("#" + id_embed0).html("Embed " + embedWidthOne + "x" + embedHeightOne);
             $("#" + id_embed1).html("Embed " + embedWidthTwo + "x" + embedHeightTwo);
@@ -829,8 +702,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function ready() {
         if (videosReady) {
-            greyIn(id_play_button);
-            enable(id_play_button);
+            Utils.greyIn(id_play_button);
+            Utils.enable(id_play_button);
             if (!isAudioOnly) {
                 enableFullscreenButton = true;
                 $("#" + id_fullscreen_button).removeClass("disabled");
@@ -876,16 +749,16 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 var normTime = (currentTime / (duration / 1000)) * 1000;
                 $("#" + id_slider).slider("option", "value", normTime);
                 if (!$("#" + id_navigation_time_current).is(":focus")) {
-                    $("#" + id_navigation_time_current).val(formatSeconds(currentTime));
+                    $("#" + id_navigation_time_current).val(Utils.formatSeconds(currentTime));
                 }
             }
             var val = Math.round((duration / 1000) - currentTime);
             val = ((val >= 0) && (val <= (duration / 1000))) ? val : "-";
-            $("#" + id_playbackRemTime050).html(formatSeconds(!isNaN(val) ? (val / 0.5) : val));
-            $("#" + id_playbackRemTime075).html(formatSeconds(!isNaN(val) ? (val / 0.75) : val));
-            $("#" + id_playbackRemTime100).html(formatSeconds(!isNaN(val) ? (val) : val));
-            $("#" + id_playbackRemTime125).html(formatSeconds(!isNaN(val) ? (val / 1.25) : val));
-            $("#" + id_playbackRemTime150).html(formatSeconds(!isNaN(val) ? (val / 1.5) : val));
+            $("#" + id_playbackRemTime050).html(Utils.formatSeconds(!isNaN(val) ? (val / 0.5) : val));
+            $("#" + id_playbackRemTime075).html(Utils.formatSeconds(!isNaN(val) ? (val / 0.75) : val));
+            $("#" + id_playbackRemTime100).html(Utils.formatSeconds(!isNaN(val) ? (val) : val));
+            $("#" + id_playbackRemTime125).html(Utils.formatSeconds(!isNaN(val) ? (val / 1.25) : val));
+            $("#" + id_playbackRemTime150).html(Utils.formatSeconds(!isNaN(val) ? (val / 1.5) : val));
         } else {
             $("#" + id_slider).slider("option", "value", 0);
         }
@@ -904,7 +777,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     aspectRatioHeight = as[1] || 0;
                     aspectRatio = as[2] || 0;
                     aspectRatioTriggered = true;
-                    if(isDesktopMode) {
+                    if (isDesktopMode) {
                         calculateEmbedAspectRatios();
                         addEmbedRatioEvents();
                     }
@@ -986,39 +859,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         Engage.log("Controls: Init");
         var relative_plugin_path = Engage.getPluginPath("EngagePluginControls");
 
-        // load jquery-ui lib
-        require([relative_plugin_path + jQueryUIPath], function() {
-            Engage.log("Controls: Lib jQuery UI loaded");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        });
-
-        // load bootstrap lib
-        require([relative_plugin_path + bootstrapPath], function() {
-            Engage.log("Controls: Lib bootstrap loaded");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        });
-
-        // init translation
-        initTranslate(detectLanguage(), function() {
-            Engage.log("Controls: Successfully translated.");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        }, function() {
-            Engage.log("Controls: Error translating...");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        });
-
         // listen on a change/set of the video data model
         Engage.model.on(videoDataModelChange, function() {
             initCount -= 1;
@@ -1050,6 +890,43 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             if (initCount <= 0) {
                 initPlugin();
             }
+        });
+
+        // load jquery-ui lib
+        require([relative_plugin_path + jQueryUIPath], function() {
+            Engage.log("Controls: Lib jQuery UI loaded");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+
+        // load bootstrap lib
+        require([relative_plugin_path + bootstrapPath], function() {
+            Engage.log("Controls: Lib bootstrap loaded");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+
+        // load utils class
+        require([relative_plugin_path + "utils"], function(utils) {
+            Engage.log("Controls: Utils class loaded");
+            Utils = new utils();
+            initTranslate(Utils.detectLanguage(), function() {
+                Engage.log("Controls: Successfully translated.");
+                initCount -= 1;
+                if (initCount <= 0) {
+                    initPlugin();
+                }
+            }, function() {
+                Engage.log("Controls: Error translating...");
+                initCount -= 1;
+                if (initCount <= 0) {
+                    initPlugin();
+                }
+            });
         });
     }
 

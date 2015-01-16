@@ -123,8 +123,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     var audioLoadTimeoutCheckDelay = 5000;
 
     /* don't change these variables */
-    var VideoDataModel;
     var Utils;
+    var VideoDataModel;
     var isAudioOnly = false;
     var isUsingFlash = false;
     var aspectRatio = "";
