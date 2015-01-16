@@ -1,35 +1,23 @@
-    //privates //
-
-    var initCount = 3; //wait for three inits, example lib, plugin load done and mediapackage
+    var initCount = 2;
 
     function initPlugin() {
-        //all inits are done, do some stuff
+	// initialize the plugin in here
     }
 
-    //inits
-    Engage.log(PLUGIN_NAME+": init");
+    Engage.log(PLUGIN_NAME + ": Init");
     var relative_plugin_path = Engage.getPluginPath(PLUGIN_NAME);
-    Engage.log(PLUGIN_NAME+":path: " + relative_plugin_path);
-
-    // Wait for a mediapackage model
-    Engage.model.on("change:mediaPackage", function() { // listen on a change/set of the mediaPackage model
-        initCount -= 1;
-        if (initCount === 0) {
-            initPlugin();
-        }
-    });
     
-    // Load example lib
-    require([relative_plugin_path + 'lib/example.lib.js'], function() {
-        Engage.log(PLUGIN_NAME+": load example.lib.js done");
+    // load example lib
+    require([relative_plugin_path + "lib/example.lib.js"], function() {
+        Engage.log(PLUGIN_NAME + ": Example lig load done");
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
         }
     });
         
-    //Wait for the all plugins loaded core event
-    Engage.on("Core:plugin_load_done", function() {
+    // all plugins loaded
+    Engage.on(plugin.events.plugin_load_done.getName(), function() {
         initCount -= 1;
         if (initCount === 0) {
             initPlugin();
