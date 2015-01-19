@@ -192,14 +192,6 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
       throw new IllegalStateException("Target flavor must be specified");
     MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetTrackFlavorName);
 
-    if (encodingProfileName == null)
-      encodingProfileName = MUX_AV_PROFILE;
-
-    // Find the encoding profile
-    EncodingProfile profile = composerService.getProfile(encodingProfileName);
-    if (profile == null)
-      throw new IllegalStateException("Encoding profile '" + encodingProfileName + "' was not found");
-
     // Reencode when there is no need for muxing?
     boolean rewrite = true;
     if (StringUtils.trimToNull(operation.getConfiguration(OPT_REWRITE)) != null) {
@@ -266,7 +258,13 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     } else if (audioTrack == videoTrack) {
       if (rewrite) {
         logger.info("Encoding audiovisual track {} to work version", videoTrack);
-        composedTrack = prepare(videoTrack, mediaPackage, PREPARE_AV_PROFILE);
+        if (encodingProfileName == null)
+          encodingProfileName = PREPARE_AV_PROFILE;
+        // Find the encoding profile to make sure the given profile exists
+        EncodingProfile profile = composerService.getProfile(encodingProfileName);
+        if (profile == null)
+        throw new IllegalStateException("Encoding profile '" + encodingProfileName + "' was not found");
+        composedTrack = prepare(videoTrack, mediaPackage, encodingProfileName);
       } else {
         composedTrack = (Track) videoTrack.clone();
         composedTrack.setIdentifier(null);
@@ -279,6 +277,14 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
         logger.info("Stripping audio from track {}", audioTrack);
         audioTrack = prepare(audioTrack, null, PREPARE_AONLY_PROFILE);
       }
+
+      if (encodingProfileName == null)
+        encodingProfileName = MUX_AV_PROFILE;
+
+      // Find the encoding profile
+      EncodingProfile profile = composerService.getProfile(encodingProfileName);
+      if (profile == null)
+      throw new IllegalStateException("Encoding profile '" + encodingProfileName + "' was not found");
 
       job = composerService.mux(videoTrack, audioTrack, profile.getIdentifier());
       if (!waitForStatus(job).isSuccess()) {
