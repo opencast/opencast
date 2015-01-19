@@ -963,7 +963,7 @@
             <M2_REPO>${settings.localRepository}</M2_REPO>
             <file.encoding>UTF-8</file.encoding>
             <java.awt.headless>true</java.awt.headless>
-            <eclipselink.logging.level>SEVERE</eclipselink.logging.level>
+            <eclipselink.logging.level>CONFIG</eclipselink.logging.level>
             <java.util.logging.config.file>${basedir}/conf/services/java.util.logging.properties</java.util.logging.config.file>
             <logj4.configuration>${basedir}/docs/log4j/log4j.properties</logj4.configuration>
           </systemPropertyVariables>
