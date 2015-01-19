@@ -1,13 +1,13 @@
 <!-- core mobile mode -->
-<div data-role="header" id="mobile-header" data-tap-toggle="false">
-    <!--<a href="#sidebar" class="ui-btn ui-icon-bars ui-btn-icon-notext ui-corner-all" />-->
-    <h2>Missing Buttons!</h2>
+<div id="main-header" data-role="header" data-id="mobile-header" data-position="fixed" data-tap-toggle="false">
+    <div id="videoPagesNav" data-role="navbar">
+    <!-- Space to insert Video Tabs here -->
+    </div><!-- /navbar -->
 </div>
 <div role="main" class="ui-content" id="content-box">
     <div id="engage_content" class="container">
         <!-- Videodisplay plugin container -->
         <div id="engage_video" align="center"></div>
-        <div id="engage_description"></div>
     </div>
 </div>
 <!-- Sidebar
@@ -23,6 +23,7 @@
     </div>
 </div> /Sidebar -->
 <!-- Footer with Control Elements -->
-<div data-role="footer" data-position="fixed" id="mobile-footer" data-tap-toggle="false">
+<div data-role="footer" data-position="fixed" data-id="mobile-footer" data-tap-toggle="false">
+    <div id="engage_description"></div>
     <div id="engage_controls"></div>
 </div>

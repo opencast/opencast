@@ -586,24 +586,62 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
 
     function renderMobile(videoDataView, videoSources, videoDisplays, aspectRatio) {
         Engage.log("Video: Render mobile mode");
+
         checkVideoDisplaySize();
         initMobileEvents();
 
         var init = false;
         var i = 0;
+
+        var player = null;
+        var player_page_id = "";
+
+        var known_players = [];
+
         for (var v in videoSources) {
             if (videoSources[v].length > 0) {
-                if(!init) {
-                    init = true;
-                    Engage.log("Init Video Display: " + v);
-                    Engage.log(videoDataView.videojs_swf);
-                    initVideojsVideo(videoDisplays[i], videoSources[v], videoDataView.videojs_swf);
-                    Basil.set("preferredVideo", v);
-                    ++i;
-                }
+                Engage.log("Init Video Display: " + v);
+                Engage.log(videoDataView.videojs_swf);
+                initVideojsVideo(videoDisplays[i], videoSources[v], videoDataView.videojs_swf);
+                Engage.log("Video: " + videoDisplays[i]);
+
+                player_page_id = "#videoPage_"+(i+1);
+
+                known_players.push(videojs(videoDisplays[i]));
+
+                // Navigation
+                if (i == 0) {
+                    $('#videoPagesNav').append('<ul> </ul>');
+                };
+                Engage.log("i ist: " + i);
+                $('#videoPagesNav ul').append('<li><a href="'+player_page_id+'" title="'+v+'">'+v+'</a></li>').trigger("create");
+
+                //$(player_page_id).data("player", videojs(player_page_id));
+                //$(player_page_id).data("player_id", videoDisplays[i]);
+
+                // Edit videojs
+
+                $(document).on("pagebeforeshow", player_page_id, function(){
+                    Engage.log("Before Page!");
+                    // Get player
+                    Engage.log($(this).children().children()[0].id)
+                    player = videojs($(this).children().children()[0].id);
+
+                    Engage.log(player);
+
+                    Engage.on(plugin.events.play.getName(), function() {
+                        player.play();
+                    });
+
+                    Engage.on(plugin.events.pause.getName(), function() {
+                        player.pause();
+                    });
+                });
+
+                ++i;
             }
         }
-
+        Engage.log("Known Players: " + known_players[0]);
         Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
@@ -619,7 +657,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         if (videoDisplays.length > 0) {
 
             // first as masterdisplay
-            registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
+            //registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
 
             videosReady = true;
             if (!isAudioOnly) {

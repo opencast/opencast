@@ -3,8 +3,15 @@
 	padding-top: 2%
 }
 
+#videojs_wrapper {
+	max-height: 300px;
+}
 .displayWrapper {
-	height: 100%;
+	height: inherit;
+}
+
+.mobileVideoBox {
+	height: 300px;
 }
 
 @media screen and (orientation:landscape) {
