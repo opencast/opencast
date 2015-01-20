@@ -1,0 +1,23 @@
+build_image: shippableimages/ubuntu1204_java
+
+cache: true
+
+language: java
+
+jdk:
+   - openjdk7
+   - oraclejdk8
+
+before_install:
+  - apt-get update
+  - apt-get install --quiet -y tesseract-ocr tesseract-ocr-deu hunspell hunspell-de-de sox maven curl
+  - apt-get install --quiet -y gstreamer0.10-ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-plugins-cutter
+  - apt-get install --quiet -y gstreamer0.10-plugins-ugly gstreamer0.10-plugins-base gstreamer0.10-plugins-good
+  - apt-get install --quiet -y gstreamer0.10-gnonlin libglib2.0-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
+  - curl -s $(curl -s http://johnvansickle.com/ffmpeg/ | grep 64bit-static.tar.xz | grep -v git | cut -d'"' -f2) -o /tmp/ffmpeg.tar.xz
+  - tar -xf /tmp/ffmpeg.tar.xz
+  - export PATH=$PATH:$PWD/ffmpeg-*-64bit-static/
+
+install: mvn --batch-mode clean install -DskipTests=true -Dall -P '!capture'
+
+script: mvn --batch-mode test -Dall -P '!capture'
