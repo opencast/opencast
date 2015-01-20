@@ -15,6 +15,9 @@
  */
 package org.opencastproject.scheduler.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_PRECONDITION_FAILED;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
@@ -930,6 +933,25 @@ public class SchedulerRestService {
     }
   }
 
+  @POST
+  @Path("/removeOldScheduledRecordings")
+  @RestQuery(name = "removeOldScheduledRecordings", description = "This will find and remove any scheduled events before the buffer time to keep performance in the scheduler optimum.", returnDescription = "No return value", reponses = {
+          @RestResponse(responseCode = SC_OK, description = "Removed old scheduled recordings."), @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.")}, restParameters = {
+          @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "604800", isRequired = true, description = "The amount of seconds before now that a capture has to have stopped capturing. It must be 0 or greater.")})
+  public Response removeOldScheduledRecordings(@FormParam("buffer") long buffer) {
+    if (buffer < 0) {
+      return Response.status(SC_BAD_REQUEST).build();
+    }
+
+    try {
+      service.removeScheduledRecordingsBeforeBuffer(buffer);
+    } catch (SchedulerException e) {
+      logger.error("Error while trying to remove old scheduled recordings", e);
+      throw new WebApplicationException(e);
+    }
+    return Response.ok().build();
+  }
+
   /**
    * Generates event Dublin Core without identifier set.
    *
@@ -986,7 +1008,7 @@ public class SchedulerRestService {
      */
     if (!trimmedDcXml.equals(dcXML)) {
       logger.warn("Detected invalid XML data. Trying to fix this by "
-          + "removing spaces from beginning/end.");
+              + "removing spaces from beginning/end.");
     }
     return dcService.load(new ByteArrayInputStream(trimmedDcXml.getBytes("UTF-8")));
   }

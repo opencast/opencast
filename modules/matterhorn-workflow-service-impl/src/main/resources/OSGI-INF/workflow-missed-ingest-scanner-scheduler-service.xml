@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.opencastproject.workflow.impl.WorkflowCleanupScanner"
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.opencastproject.workflow.impl.MissedIngestScanner"
   activate="activate"
   deactivate="deactivate"
   immediate="true">
   
-  <implementation class="org.opencastproject.workflow.impl.WorkflowCleanupScanner" />
-  <property name="service.description" value="Workflow Cleanup Scanner Service" />
+  <implementation class="org.opencastproject.workflow.impl.MissedIngestScanner" />
+  <property name="service.description" value="Missed Ingest Scanner Scheduler Service" />
   
   <service>
     <provide interface="org.osgi.service.cm.ManagedService" />
