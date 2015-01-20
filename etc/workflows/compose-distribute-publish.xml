@@ -176,7 +176,8 @@
         <configuration key="source-flavor">presenter/source</configuration>
         <configuration key="target-flavor">presenter/work</configuration>
         <configuration key="rewrite">true</configuration>
-	<configuration key="encoding-profile">editor.work</configuration>
+	<configuration key="mux-encoding-profile">mux-editor.work</configuration>
+        <configuration key="audio-video-encoding-profile">editor.work</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
     </operation>
@@ -192,7 +193,8 @@
         <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-flavor">presentation/work</configuration>
         <configuration key="rewrite">true</configuration>
-	<configuration key="encoding-profile">editor.work</configuration>
+	<configuration key="mux-encoding-profile">mux-editor.work</configuration>
+	<configuration key="audio-video-encoding-profile">editor.work</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
     </operation>
