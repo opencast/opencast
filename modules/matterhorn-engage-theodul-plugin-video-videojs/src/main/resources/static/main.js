@@ -235,10 +235,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     Basil = new window.Basil(basilOptions);
 
     function acceptFormat(track) {
-        if ((Utils.preferredFormat() == null) || (mimetypes.indexOf(Utils.preferredFormat()) == -1)) {
+        var preferredFormat = Basil.get("preferredFormat");
+        if ((Utils.preferredFormat(preferredFormat) == null) || (mimetypes.indexOf(Utils.preferredFormat(preferredFormat)) == -1)) {
             return true; // preferred format is not available, accept all
         }
-        return track.mimetype == Utils.preferredFormat();
+        return track.mimetype == Utils.preferredFormat(preferredFormat);
     }
 
     function renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio) {
