@@ -15,33 +15,21 @@
  */
 package org.opencastproject.usertracking.api;
 
-import java.util.Date;
-
-
-
-/**
- * A class that represents a summary of a user's activity.
- */
-public interface UserSummary {
-  void combine(UserSummary other);
+public interface UserSession {
 
   String getUserId();
 
   void setUserId(String userId);
 
-  long getSessionCount();
+  String getUserIp();
 
-  void setSessionCount(long sessionCount);
+  void setUserIp(String userIp);
 
-  long getUniqueMediapackages();
+  String getSessionId();
 
-  void setUniqueMediapackages(long uniqueMediapackages);
+  void setSessionId(String sessionId);
 
-  long getLength();
+  String getUserAgent();
 
-  void setLength(long length);
-
-  Date getLast();
-
-  void setLast(Date last);
+  void setUserAgent(String userAgent);
 }

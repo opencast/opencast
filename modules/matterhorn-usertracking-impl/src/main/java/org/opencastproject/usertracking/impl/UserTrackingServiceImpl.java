@@ -21,6 +21,7 @@ import org.opencastproject.usertracking.api.Report;
 import org.opencastproject.usertracking.api.ReportItem;
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserActionList;
+import org.opencastproject.usertracking.api.UserSession;
 import org.opencastproject.usertracking.api.UserTrackingException;
 import org.opencastproject.usertracking.api.UserTrackingService;
 import org.opencastproject.usertracking.endpoint.FootprintImpl;
@@ -47,6 +48,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.spi.PersistenceProvider;
@@ -156,33 +158,38 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   }
 
   @SuppressWarnings("unchecked")
-  public UserAction addUserFootprint(UserAction a) throws UserTrackingException {
+  public UserAction addUserFootprint(UserAction a, UserSession session) throws UserTrackingException {
     a.setType(FOOTPRINT_KEY);
     EntityManager em = null;
     EntityTransaction tx = null;
-    if (!logIp) a.setUserIp("-omitted-");
-    if (!logUser) a.setUserId("-omitted-");
-    if (!logSession) a.setSessionId("-omitted-");
+    if (!logIp) session.setUserIp("-omitted-");
+    if (!logUser) session.setUserId("-omitted-");
+    if (!logSession) session.setSessionId("-omitted-");
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
+      UserSession userSession = populateSession(em, session);
+
       Query q = em.createNamedQuery("findLastUserFootprintOfSession");
       q.setMaxResults(1);
-      q.setParameter("sessionId", a.getSessionId());
+      q.setParameter("session", userSession);
       Collection<UserAction> userActions = q.getResultList();
 
       if (userActions.size() >= 1) {
         UserAction last = userActions.iterator().next();
         if (last.getMediapackageId().equals(a.getMediapackageId()) && last.getType().equals(a.getType())
                 && last.getOutpoint() == a.getInpoint()) {
+          //We are assuming in this case that the sessions match and are unchanged (IP wise, for example)
           last.setOutpoint(a.getOutpoint());
           a = last;
           a.setId(last.getId());
         } else {
+          a.setSession(userSession);
           em.persist(a);
         }
       } else {
+        a.setSession(userSession);
         em.persist(a);
       }
       tx.commit();
@@ -199,16 +206,18 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     }
   }
 
-  public UserAction addUserTrackingEvent(UserAction a) throws UserTrackingException {
+  public UserAction addUserTrackingEvent(UserAction a, UserSession session) throws UserTrackingException {
     EntityManager em = null;
     EntityTransaction tx = null;
-    if (!logIp) a.setUserIp("-omitted-");
-    if (!logUser) a.setUserId("-omitted-");
-    if (!logSession) a.setSessionId("-omitted-");
+    if (!logIp) session.setUserIp("-omitted-");
+    if (!logUser) session.setUserId("-omitted-");
+    if (!logSession) session.setSessionId("-omitted-");
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
+      UserSession userSession = populateSession(em, session);
+      a.setSession(userSession);
       em.persist(a);
       tx.commit();
       return a;
@@ -222,6 +231,21 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
         em.close();
       }
     }
+  }
+
+  private UserSession populateSession(EntityManager em, UserSession session) {
+    //Try and find the session.  If not found, persist it
+    Query q = em.createNamedQuery("findUserSessionBySessionId");
+    q.setMaxResults(1);
+    q.setParameter("sessionId", session.getSessionId());
+    UserSession userSession = null;
+    try {
+      userSession = (UserSession) q.getSingleResult();
+    } catch (NoResultException n) {
+      userSession = session;
+      em.persist(userSession);
+    }
+    return userSession;
   }
 
   @SuppressWarnings("unchecked")
@@ -428,33 +452,6 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
       return result;
     } finally {
-      if (em != null && em.isOpen()) {
-        em.close();
-      }
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public UserSummaryListImpl getUserSummaryByTypeAndMediaPackage(String type, String mediapackageId) {
-    UserSummaryListImpl result = new UserSummaryListImpl();
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("userSummaryByMediapackageByType");
-      q.setParameter("type", type);
-      q.setParameter("mediapackageId", mediapackageId);
-      List<Object[]> users = q.getResultList();
-      for (Object[] user : users) {
-        UserSummaryImpl userSummary = new UserSummaryImpl();
-        userSummary.ingest(user);
-        result.add(userSummary);
-      }
-      return result;
-    } catch (Exception e) {
-      logger.warn("Unable to return any results from mediapackage " + mediapackageId + " of type " + type + " because of ", e);
-      return result;
-    }
-    finally {
       if (em != null && em.isOpen()) {
         em.close();
       }

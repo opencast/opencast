@@ -31,17 +31,9 @@ public interface UserAction {
 
   void setMediapackageId(String mediapackageId);
 
-  String getUserId();
+  UserSession getSession();
 
-  void setUserId(String userId);
-
-  String getUserIp();
-
-  void setUserIp(String userIp);
-
-  String getSessionId();
-
-  void setSessionId(String sessionId);
+  void setSession(UserSession session);
 
   int getInpoint();
 
