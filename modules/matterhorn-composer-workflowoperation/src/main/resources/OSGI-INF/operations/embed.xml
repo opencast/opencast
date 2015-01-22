@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workflow.handler.CaptionEmbedderWorkflowOperationHandler" immediate="true" activate="activate">
-  <implementation class="org.opencastproject.workflow.handler.CaptionEmbedderWorkflowOperationHandler" />
+ name="org.opencastproject.workflow.handler.composer.CaptionEmbedderWorkflowOperationHandler" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.composer.CaptionEmbedderWorkflowOperationHandler" />
   <property name="service.description" value="Caption Embedder Workflow Operation Handler" />
   <property name="workflow.operation" value="embed" />
   <service>

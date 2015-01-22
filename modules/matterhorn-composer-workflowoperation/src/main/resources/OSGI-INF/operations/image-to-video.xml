@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workflow.handler.ImageToVideoWorkflowOperationHandler" immediate="true" activate="activate">
-  <implementation class="org.opencastproject.workflow.handler.ImageToVideoWorkflowOperationHandler" />
+ name="org.opencastproject.workflow.handler.composer.ImageToVideoWorkflowOperationHandler" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.composer.ImageToVideoWorkflowOperationHandler" />
   <property name="service.description" value="Image to Video Workflow Operation Handler" />
   <property name="workflow.operation" value="image-to-video" />
   <service>

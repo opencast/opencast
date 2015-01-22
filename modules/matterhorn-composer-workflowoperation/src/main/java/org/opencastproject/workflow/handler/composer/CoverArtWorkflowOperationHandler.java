@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.composer;
 
 import static org.opencastproject.mediapackage.Attachment.TYPE;
 import static org.opencastproject.mediapackage.MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR;

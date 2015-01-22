@@ -14,7 +14,7 @@
  *
  */
 
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.composer;
 
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;

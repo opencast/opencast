@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.composer;
 
 import static org.opencastproject.util.data.Collections.nil;
 import static org.opencastproject.util.data.Collections.smap;
