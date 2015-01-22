@@ -21,12 +21,13 @@ Using the tarball:
 
  - Download desired tarball from https://bitbucket.org/opencast-community/matterhorn/downloads#tag-downloads
  - Extract the tarball
-
-       tar xf develop.tar.gz
-
+   ```
+   tar xf develop.tar.gz
+   ```
  - Move the source to `/opt/matterhorn`
-
-       mv opencast-community-matterhorn-* /opt/matterhorn/
+   ```
+   mv opencast-community-matterhorn-* /opt/matterhorn/
+   ```
 
 Cloning the Git repository:
 
