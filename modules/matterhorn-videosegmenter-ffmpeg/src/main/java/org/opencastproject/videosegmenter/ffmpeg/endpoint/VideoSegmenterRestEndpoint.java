@@ -70,17 +70,6 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
   protected ServiceRegistry serviceRegistry = null;
 
   /**
-   * Callback from OSGi that is called when this service is activated.
-   *
-   * @param cc
-   *          OSGi component context
-   */
-  public void activate(ComponentContext cc) {
-    // String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
-    // docs = generateDocs(serviceUrl);
-  }
-
-  /**
    * Callback from the OSGi declarative services to set the service registry.
    *
    * @param serviceRegistry

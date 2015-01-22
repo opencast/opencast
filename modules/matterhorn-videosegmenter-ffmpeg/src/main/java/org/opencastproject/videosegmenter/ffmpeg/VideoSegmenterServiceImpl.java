@@ -216,22 +216,20 @@ VideoSegmenterService, ManagedService {
         mediaUrl = mediaFile.toURI().toURL();
       } catch (NotFoundException e) {
         throw new VideoSegmenterException(
-            "Error finding the mjpeg in the workspace", e);
+            "Error finding the video file in the workspace", e);
       } catch (IOException e) {
         throw new VideoSegmenterException(
-            "Error reading the mjpeg in the workspace", e);
+            "Error reading the video file in the workspace", e);
       }
 
       if (track.getDuration() == null)
         throw new MediaPackageException("Track " + track
             + " does not have a duration");
-      long durationInSeconds = Math.min(track.getDuration() / 1000,
-          (long) track.getDuration());
       logger.info("Track {} loaded, duration is {} s", mediaUrl,
-          durationInSeconds);
+          track.getDuration() / 1000);
 
       MediaTime contentTime = new MediaRelTimeImpl(0,
-          (long) durationInSeconds * 1000);
+          track.getDuration());
       MediaLocator contentLocator = new MediaLocatorImpl(track.getURI());
       Video videoContent = mpeg7.addVideoContent("videosegment",
           contentTime, contentLocator);
@@ -248,10 +246,10 @@ VideoSegmenterService, ManagedService {
 
       ProcessBuilder pbuilder = new ProcessBuilder(command);
       List<String> segmentsStrings = new LinkedList<String>();
+      Process process = pbuilder.start();
+      BufferedReader reader = new BufferedReader(
+              new InputStreamReader(process.getErrorStream()));
       try {
-        Process process = pbuilder.start();
-        BufferedReader reader = new BufferedReader(
-            new InputStreamReader(process.getErrorStream()));
         LineReader lr = new LineReader(reader);
         String line = lr.readLine();
         while (null != line) {
@@ -262,6 +260,8 @@ VideoSegmenterService, ManagedService {
         }
       } catch (IOException e) {
         logger.error("Error executing ffmpeg: {}", e.getMessage());
+      } finally {
+	    reader.close();
       }
 
       // [Parsed_showinfo_1 @ 0x157fb40] n:0 pts:12 pts_time:12 pos:227495
@@ -429,8 +429,8 @@ VideoSegmenterService, ManagedService {
    */
   public void setUserDirectoryService(
       UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
-      }
+	this.userDirectoryService = userDirectoryService;
+  }
 
   /**
    * Sets a reference to the organization directory service.
@@ -440,8 +440,8 @@ VideoSegmenterService, ManagedService {
    */
   public void setOrganizationDirectoryService(
       OrganizationDirectoryService organizationDirectory) {
-    this.organizationDirectoryService = organizationDirectory;
-      }
+	this.organizationDirectoryService = organizationDirectory;
+  }
 
   /**
    * {@inheritDoc}
