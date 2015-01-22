@@ -15,7 +15,7 @@ Get Matterhorn source:
 
 You can get the Matterhorn source code by either downloading a tarball of the source code or by cloning the Git
 repository. The latter option is more flexible, it is easier to upgrade and in general preferred for developers. The
-prior option, the tarball download, needs less tools and you don't have to download nearly as much as with Git.
+prior option, the tarball download, needs less tools and you do not have to download nearly as much as with Git.
 
 Using the tarball:
 
