@@ -261,7 +261,7 @@ VideoSegmenterService, ManagedService {
       } catch (IOException e) {
         logger.error("Error executing ffmpeg: {}", e.getMessage());
       } finally {
-	    reader.close();
+        reader.close();
       }
 
       // [Parsed_showinfo_1 @ 0x157fb40] n:0 pts:12 pts_time:12 pos:227495
@@ -429,7 +429,7 @@ VideoSegmenterService, ManagedService {
    */
   public void setUserDirectoryService(
       UserDirectoryService userDirectoryService) {
-	this.userDirectoryService = userDirectoryService;
+    this.userDirectoryService = userDirectoryService;
   }
 
   /**
@@ -440,7 +440,7 @@ VideoSegmenterService, ManagedService {
    */
   public void setOrganizationDirectoryService(
       OrganizationDirectoryService organizationDirectory) {
-	this.organizationDirectoryService = organizationDirectory;
+    this.organizationDirectoryService = organizationDirectory;
   }
 
   /**
