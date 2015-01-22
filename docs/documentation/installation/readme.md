@@ -9,13 +9,13 @@ necessary third party tools. This method will most likely work on all Linux and
 Unix based systems.
 
  - Officially Supported [^officialsupport]
-    - Ubuntu
+    - [Ubuntu](source-debian-ubuntu.md)
     - RedHat Enterprise Linux
     - CentOS
     - Scientific Linux
  - Other Systems
     - Fedora
-    - Debian
+    - [Debian](source-debian-ubuntu.md)
     - openSUSE
     - SLES
     - Mac OS X
