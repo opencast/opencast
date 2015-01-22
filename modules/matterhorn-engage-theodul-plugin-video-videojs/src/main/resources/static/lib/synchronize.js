@@ -376,20 +376,20 @@
                 // if not using flash
                 if (!usingFlash) {
                     if (synchDelay > synchDelayThreshold) {
-                        if (synchDelay < maxGap) {
-                            $(document).trigger("sjs:synchronizing", [getCurrentTime(masterVideoId), videoIds[i]]);
-                            // set a slower playback rate for the video to let the master video catch up
-                            log("SJS: [synchronize] Decreasing playback rate of video element id '" + videoIds[i] + "' from " + getPlaybackRate(videoIds[i]) + " to " + (getPlaybackRate(masterVideoId) - 0.5));
-                            setPlaybackRate(videoIds[i], (getPlaybackRate(masterVideoId) - 0.5));
-                        } else {
-                            $(document).trigger("sjs:synchronizing", [getCurrentTime(masterVideoId), videoIds[i]]);
-                            // set playback rate back to normal
+                        if (getPlaybackRate(masterVideoId) != getPlaybackRate(videoIds[i])) {
                             setPlaybackRate(videoIds[i], getPlaybackRate(masterVideoId));
-                            // pause video shortly
-                            pause(videoIds[i]);
+                            if (!isPaused(masterVideoId) && !waitingForSync[videoIds[i]]) {
+                                play(videoIds[i]);
+                                log("SJS: [synchronize] Restarting video element id '" + videoIds[i] + "' as it paused unexpectedly");
+                            }
+                        }
+                        if (synchDelay < maxGap) {
+                            syncPause(videoIds[i], synchDelay);
+                        } else {
+                            doSeek = true;
                         }
                     } else if (synchDelay < synchDelayThreshold) {
-                        if (synchDelay < maxGap) {
+                        if (Math.abs(synchDelay) < maxGap) {
                             $(document).trigger("sjs:synchronizing", [getCurrentTime(masterVideoId), videoIds[i]]);
                             // set a faster playback rate for the video to catch up to the master video
                             log("SJS: [synchronize] Increasing playback rate of video element id '" + videoIds[i] + "' from " + getPlaybackRate(videoIds[i]) + " to " + (getPlaybackRate(masterVideoId) + 0.5));
