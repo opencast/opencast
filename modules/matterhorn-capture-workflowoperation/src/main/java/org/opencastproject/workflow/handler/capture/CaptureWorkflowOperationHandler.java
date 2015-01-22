@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.capture;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -22,6 +22,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.osgi.service.component.ComponentContext;
+
+import org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase;
 
 /**
  * Workflow operation handler that signifies a workflow that is currently in recording state and is waiting for the
