@@ -368,7 +368,7 @@
         <configuration key="source-flavor">*/trimmed</configuration>
         <configuration key="target-flavor">*/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming,rss,atom</configuration>
-        <configuration key="encoding-profile">mp4.http</configuration>
+        <configuration key="encoding-profile">mp4-medium.http</configuration>
       </configurations>
     </operation>
 
