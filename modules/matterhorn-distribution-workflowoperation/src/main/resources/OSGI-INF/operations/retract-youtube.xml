@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-               name="org.opencastproject.workflow.handler.RetractYouTubeWorkflowOperationHandler"
+               name="org.opencastproject.workflow.handler.distribution.RetractYouTubeWorkflowOperationHandler"
                immediate="true"
                activate="activate">
-  <implementation class="org.opencastproject.workflow.handler.RetractYouTubeWorkflowOperationHandler"/>
+  <implementation class="org.opencastproject.workflow.handler.distribution.RetractYouTubeWorkflowOperationHandler"/>
   <property name="service.description" value="Youtube Retraction Workflow Operation Handler"/>
   <property name="workflow.operation" value="retract-youtube"/>
   <service>

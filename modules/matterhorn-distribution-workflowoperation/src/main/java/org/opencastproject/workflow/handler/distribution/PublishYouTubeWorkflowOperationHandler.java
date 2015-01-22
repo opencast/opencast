@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.distribution;
 
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.job.api.Job;

@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.distribution;
 
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.distribution.api.DistributionService;
@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static org.opencastproject.workflow.handler.EngagePublicationChannel.CHANNEL_ID;
+import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
 /**
  * Workflow operation for retracting a media package from the engage player.

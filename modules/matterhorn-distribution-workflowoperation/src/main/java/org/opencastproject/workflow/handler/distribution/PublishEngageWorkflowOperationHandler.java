@@ -13,14 +13,14 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.distribution;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.opencastproject.systems.MatterhornConstans.SERVER_URL_PROPERTY;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.functions.Strings.toBool;
 import static org.opencastproject.util.data.functions.Strings.trimToNone;
-import static org.opencastproject.workflow.handler.EngagePublicationChannel.CHANNEL_ID;
+import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;

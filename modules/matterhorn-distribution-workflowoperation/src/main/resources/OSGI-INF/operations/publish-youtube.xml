@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workflow.handler.PublishYouTubeWorkflowOperationHandler" immediate="true" activate="activate">
-  <implementation class="org.opencastproject.workflow.handler.PublishYouTubeWorkflowOperationHandler" />
+ name="org.opencastproject.workflow.handler.distribution.PublishYouTubeWorkflowOperationHandler" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.distribution.PublishYouTubeWorkflowOperationHandler" />
   <property name="service.description" value="YouTube Publication Workflow Handler" />
   <property name="workflow.operation" value="publish-youtube" />
   <service>
