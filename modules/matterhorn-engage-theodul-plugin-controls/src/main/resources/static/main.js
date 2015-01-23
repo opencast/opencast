@@ -513,11 +513,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         var vol = Basil.get(storage_volume);
         if (vol) {
             $("#" + id_volume).slider("value", vol);
+            Engage.trigger(plugin.events.volumeSet.getName(), vol);
         }
 
         var pbr = Basil.get(storage_playbackRate);
         if (pbr) {
             $("#" + id_playbackRateIndicator).html(pbr);
+            Engage.trigger(plugin.events.playbackRateChanged.getName(), pbr);
         }
 
         var muted = Basil.get(storage_muted);
@@ -804,6 +806,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 if (!mediapackageError && videosReady) {
                     isPlaying = true;
                     playPause();
+                    loadStoredInitialValues();
                 }
             });
             Engage.on(plugin.events.pause.getName(), function() {
