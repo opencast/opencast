@@ -88,6 +88,24 @@
         <module>modules/matterhorn-workflow-service-impl</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
+        <module>modules/matterhorn-capture-workflowoperation</module>
+        <module>modules/matterhorn-composer-workflowoperation</module>
+        <module>modules/matterhorn-deprecated-workflowoperation</module>
+        <module>modules/matterhorn-distribution-workflowoperation</module>
+        <module>modules/matterhorn-episode-workflowoperation</module>
+        <module>modules/matterhorn-holdstate-workflowoperation</module>
+        <module>modules/matterhorn-incident-workflowoperation</module>
+        <module>modules/matterhorn-ingest-workflowoperation</module>
+        <module>modules/matterhorn-inspection-workflowoperation</module>
+        <module>modules/matterhorn-notification-workflowoperation</module>
+        <module>modules/matterhorn-scheduler-workflowoperation</module>
+        <module>modules/matterhorn-search-workflowoperation</module>
+        <module>modules/matterhorn-sox-workflowoperation</module>
+        <module>modules/matterhorn-speech-recognition-workflowoperation</module>
+        <module>modules/matterhorn-textanalyzer-workflowoperation</module>
+        <module>modules/matterhorn-videoeditor-workflowoperation</module>
+        <module>modules/matterhorn-videosegmenter-workflowoperation</module>
+        <module>modules/matterhorn-workflow-workflowoperation</module>
       </modules>
     </profile>
 
