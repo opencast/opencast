@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.holdstate;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase;
 
 /**
  * Simple implementation that hold for upload of a captions file.

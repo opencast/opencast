@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.holdstate;
 
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.job.api.Job;
@@ -47,6 +47,8 @@ import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.functions.Misc.error;
+
+import org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase;
 
 /**
  * Simple implementation that holds for user-entered trim points.
