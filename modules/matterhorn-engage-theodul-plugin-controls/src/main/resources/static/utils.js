@@ -18,6 +18,15 @@
 define(["jquery"], function($) {
     "use strict";
 
+    var entityMap = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': '&quot;',
+        "'": '&#39;',
+        "/": '&#x2F;'
+    };
+
     function Utils() {
         // nothing to see here
     }
