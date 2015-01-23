@@ -2,7 +2,7 @@
  * Synchronize.js
  * Version 1.2.1
  *
- *  Copyright (C) 2014 Denis Meyer, calltopower88@googlemail.com
+ *  Copyright (C) 2013-2015 Denis Meyer, calltopower88@googlemail.com
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -18,53 +18,43 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 (function($) {
-    var debug = false;
+    var checkBuffer = true; // flag whether to check for the video buffers
+    var checkBufferInterval = 1000; // ms
+    var receivedEventLoadeddata_waitTimeout = 5000; // ms
+    var bufferInterval = 2; // s
+    var tryToPlayWhenBuffering = true; // flag for trying to play after n seconds of buffering
+    var lastSynch = 0;
+    var synchInterval = 1000; // ms
+    // prevent that a slave video lags before even starting to synchronize
+    var synchGap = 1.0; // s
+    // maximum gap that is accepted before seeking (higher playback rate to fill the gap)
+    var maxGap = 4; // s
+    var playbackrateIncrease = 0.5;
+    var playbackrateDecrease = -0.5;
+    var seekAhead = 0.25; // s
+    var pauseDelayThreshold = seekAhead + 0.05;
+    var synchDelayThresholdPositive = 0.05;
+    var synchDelayThresholdNegative = -0.05;
 
+    /* don't change the variables below */
+    var debug = false; // set this via event "sjs:debug"
     var videoIds = [];
     var videoIdsReady = {};
     var videoIdsInit = {};
     var masterVidNumber = 0;
     var masterVideoId;
     var nrOfPlayersReady = 0;
-
-    var lastSynch = 0;
-    var synchInterval = 1500; // ms
-
-    // prevent that a slave video lags before even starting to synchronize
-    // if a slave video is ahead it will always be synchronized
-    var synchGap = 1.0; // s
-
-    // maximum gap that is accepted before seeking (higher playback rate to fill the gap)
-    var maxGap = 5.0; // s
-
-    // seek ahead for synchronized displays, as the master continues to play
-    // while the slave is seeking
-    var seekAhead = 0.25; // s
-    var pauseDelayThreshold = seekAhead + 0.05;
-
-    var synchDelayThreshold = 0.0;
-
     var startClicked = false;
-
-    var checkBuffer = true; // flag whether to check for the video buffers
     var bufferCheckerSet = false;
     var bufferChecker;
-    var checkBufferInterval = 1000; // ms
     var playWhenBuffered = false;
     var ignoreNextPause = false;
     var hitPauseWhileBuffering = false;
-    var bufferInterval = 2; // s
-
-    var tryToPlayWhenBuffering = true; // flag for trying to play after n seconds of buffering
     var tryToPlayWhenBufferingTimer = null;
     var tryToPlayWhenBufferingMS = 10000;
-
     var receivedEventLoadeddata = false;
     var receivedEventLoadeddata_interval = null;
-    var receivedEventLoadeddata_waitTimeout = 5000; // ms
-
     var waitingForSync = [];
-
     var usingFlash = false;
 
     function log(vals) {
@@ -360,7 +350,7 @@
         if ((ctMaster != -1) && (ct != -1) && !isInInterval(ct, ctMaster - synchGap, ctMaster)) {
             return ct - ctMaster; // time difference
         }
-        return 0.0; // delay is acceptable
+        return 0; // delay is acceptable
     }
 
     /**
@@ -375,26 +365,27 @@
                 var synchDelay = getSynchDelay(videoIds[i]);
                 // if not using flash
                 if (!usingFlash) {
-                    if (synchDelay > synchDelayThreshold) {
-                        if (getPlaybackRate(masterVideoId) != getPlaybackRate(videoIds[i])) {
-                            setPlaybackRate(videoIds[i], getPlaybackRate(masterVideoId));
-                            if (!isPaused(masterVideoId) && !waitingForSync[videoIds[i]]) {
-                                play(videoIds[i]);
-                                log("SJS: [synchronize] Restarting video element id '" + videoIds[i] + "' as it paused unexpectedly");
-                            }
-                        }
-                        if (synchDelay < maxGap) {
-                            syncPause(videoIds[i], synchDelay);
+                    if (synchDelay > synchDelayThresholdPositive) {
+                        if (Math.abs(synchDelay) < maxGap) {
+                            $(document).trigger("sjs:synchronizing", [getCurrentTime(masterVideoId), videoIds[i]]);
+                            // set a slower playback rate for the video to let the master video catch up
+                            log("SJS: [synchronize] Decreasing playback rate of video element id '" + videoIds[i] + "' from " + getPlaybackRate(videoIds[i]) + " to " + (getPlaybackRate(masterVideoId) - 0.5));
+                            setPlaybackRate(videoIds[i], (getPlaybackRate(masterVideoId) + playbackrateDecrease));
                         } else {
+                            $(document).trigger("sjs:synchronizing", [getCurrentTime(masterVideoId), videoIds[i]]);
+                            // set playback rate back to normal
+                            setPlaybackRate(videoIds[i], getPlaybackRate(masterVideoId));
+                            // mark for seeking
                             doSeek = true;
                         }
-                    } else if (synchDelay < synchDelayThreshold) {
+                    } else if (synchDelay < synchDelayThresholdNegative) {
                         if (Math.abs(synchDelay) < maxGap) {
                             $(document).trigger("sjs:synchronizing", [getCurrentTime(masterVideoId), videoIds[i]]);
                             // set a faster playback rate for the video to catch up to the master video
-                            log("SJS: [synchronize] Increasing playback rate of video element id '" + videoIds[i] + "' from " + getPlaybackRate(videoIds[i]) + " to " + (getPlaybackRate(masterVideoId) + 0.5));
-                            setPlaybackRate(videoIds[i], (getPlaybackRate(masterVideoId) + 0.5));
+                            log("SJS: [synchronize] Increasing playback rate of video element id '" + videoIds[i] + "' from " + getPlaybackRate(videoIds[i]) + " to " + (getPlaybackRate(masterVideoId) - 0.5));
+                            setPlaybackRate(videoIds[i], (getPlaybackRate(masterVideoId) + playbackrateIncrease));
                         } else {
+                            $(document).trigger("sjs:synchronizing", [getCurrentTime(masterVideoId), videoIds[i]]);
                             // set playback rate back to normal
                             setPlaybackRate(videoIds[i], getPlaybackRate(masterVideoId));
                             // mark for seeking
@@ -403,6 +394,8 @@
                     }
                     // everything is fine
                     else if (!isPaused(masterVideoId) && !waitingForSync[videoIds[i]]) {
+                        // set playback rate back to normal
+                        setPlaybackRate(videoIds[i], getPlaybackRate(masterVideoId));
                         // play the video
                         log("SJS: [synchronize] Playing video element id '" + videoIds[i] + "'");
                         play(videoIds[i]);
@@ -847,10 +840,6 @@
                 setCurrentTime(masterVideoId, time);
             }
         });
-        $(document).on("sjs:debug", function(e, _debug) {
-            log("SJS: Received 'sjs:debug' event");
-            debug = _debug;
-        });
         $(document).on("sjs:synchronize", function(e) {
             log("SJS: Received 'sjs:synchronize' event");
             if (allVideoIdsInitialized()) {
@@ -871,4 +860,8 @@
             bufferCheckerSet = false;
         });
     }
+    $(document).on("sjs:debug", function(e, _debug) {
+        debug = _debug;
+        log("SJS: Received 'sjs:debug' event");
+    });
 })(jQuery);
