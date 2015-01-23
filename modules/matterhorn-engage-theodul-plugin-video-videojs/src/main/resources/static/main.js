@@ -235,11 +235,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     Basil = new window.Basil(basilOptions);
 
     function acceptFormat(track) {
+	// TODO: throws a SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data [basil.js:68]
+	/*
         var preferredFormat = Basil.get("preferredFormat");
         if ((Utils.preferredFormat(preferredFormat) == null) || (mimetypes.indexOf(Utils.preferredFormat(preferredFormat)) == -1)) {
             return true; // preferred format is not available, accept all
         }
         return track.mimetype == Utils.preferredFormat(preferredFormat);
+	*/
+	return true;
     }
 
     function renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio) {
