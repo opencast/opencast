@@ -14,7 +14,7 @@
  *
  */
 
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.speechrecognition;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
