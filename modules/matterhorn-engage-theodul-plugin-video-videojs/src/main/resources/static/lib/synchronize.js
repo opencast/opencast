@@ -403,7 +403,7 @@
                 }
                 // if using flash
                 else if (usingFlash) {
-                    if ((Math.abs(synchDelay) > synchDelayThreshold) && (Math.abs(synchDelay) > pauseDelayThreshold)) {
+                    if ((Math.abs(synchDelay) > synchDelayThresholdPositive) && (Math.abs(synchDelay) > pauseDelayThreshold)) {
                         doSeek = true;
                     }
                     // everything is fine
