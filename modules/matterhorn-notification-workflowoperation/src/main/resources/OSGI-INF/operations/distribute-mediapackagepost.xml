@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-	name="org.opencastproject.workflow.handler.MediaPackagePostOperationHandler" immediate="true" activate="activate">
-	<implementation class="org.opencastproject.workflow.handler.MediaPackagePostOperationHandler" />
+	name="org.opencastproject.workflow.handler.notification.MediaPackagePostOperationHandler" immediate="true" activate="activate">
+	<implementation class="org.opencastproject.workflow.handler.notification.MediaPackagePostOperationHandler" />
 	<property name="service.description" value="Workflow Operation that POSTs MediaPackages via HTTP" />
 	<property name="workflow.operation" value="post-mediapackage" />
 	<service>

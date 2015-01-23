@@ -14,7 +14,7 @@
  *
  */
 
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.notification;
 
 import static java.lang.String.format;
 import static org.apache.http.HttpStatus.SC_ACCEPTED;
@@ -123,7 +123,7 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
+   * @see org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
   @Override

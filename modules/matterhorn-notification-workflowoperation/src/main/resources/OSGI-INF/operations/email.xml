@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-  name="org.opencastproject.workflow.handler.EmailWorkflowOperationHandler" immediate="true" activate="activate">
-  <implementation class="org.opencastproject.workflow.handler.EmailWorkflowOperationHandler" />
+  name="org.opencastproject.workflow.handler.notification.EmailWorkflowOperationHandler" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.notification.EmailWorkflowOperationHandler" />
   <property name="service.description" value="Sends an email with the parameters indicated" />
   <property name="workflow.operation" value="send-email" />
   <service>
