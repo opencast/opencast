@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.videoeditor;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +60,8 @@ import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase;
 
 public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperationHandlerBase {
 

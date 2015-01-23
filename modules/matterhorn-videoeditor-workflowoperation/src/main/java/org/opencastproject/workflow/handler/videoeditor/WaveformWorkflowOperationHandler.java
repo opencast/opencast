@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.videoeditor;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -49,7 +49,7 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.handler.WaveformWorkflowOperationHandler.WaveUtils.WaveException;
+import org.opencastproject.workflow.handler.videoeditor.WaveformWorkflowOperationHandler.WaveUtils.WaveException;
 import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
