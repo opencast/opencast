@@ -20,7 +20,7 @@ import static org.opencastproject.event.EventAdminConstants.PAYLOAD;
 import static org.opencastproject.event.EventAdminConstants.SERIES_ACL_TOPIC;
 import static org.opencastproject.job.api.Job.Status.FINISHED;
 import static org.opencastproject.mediapackage.MediaPackageElementParser.getFromXml;
-import static org.opencastproject.workflow.handler.EngagePublicationChannel.CHANNEL_ID;
+import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
