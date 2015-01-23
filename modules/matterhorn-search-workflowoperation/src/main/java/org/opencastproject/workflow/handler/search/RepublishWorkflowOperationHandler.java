@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.search;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 
