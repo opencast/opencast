@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase;
+
 /**
  * Operation that holds for download of DVD image
  */

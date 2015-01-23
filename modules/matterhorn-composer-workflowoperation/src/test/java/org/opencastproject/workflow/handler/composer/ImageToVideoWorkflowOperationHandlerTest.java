@@ -51,6 +51,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
+
 public class ImageToVideoWorkflowOperationHandlerTest {
   private ImageToVideoWorkflowOperationHandler operationHandler;
 

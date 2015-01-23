@@ -64,6 +64,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
+
 @Ignore
 public class DistributeWorkflowOperationHandlerTest {
   private DistributeWorkflowOperationHandler operationHandler;

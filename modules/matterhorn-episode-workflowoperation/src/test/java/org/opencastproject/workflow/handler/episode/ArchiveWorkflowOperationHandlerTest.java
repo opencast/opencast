@@ -27,6 +27,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
+
 public class ArchiveWorkflowOperationHandlerTest {
 
   private ArchiveWorkflowOperationHandler operationHandler;
