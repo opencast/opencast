@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.incident;
 
 import static org.opencastproject.util.EnumSupport.parseEnum;
 import static org.opencastproject.util.data.Option.option;
