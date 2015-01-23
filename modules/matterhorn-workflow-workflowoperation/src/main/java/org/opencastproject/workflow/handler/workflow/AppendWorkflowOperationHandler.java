@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.util.NotFoundException;
@@ -62,7 +62,7 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#activate(org.osgi.service.component.ComponentContext)
+   * @see org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase#activate(org.osgi.service.component.ComponentContext)
    */
   @Override
   public void activate(ComponentContext componentContext) {
@@ -81,7 +81,7 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
+   * @see org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
   @Override
@@ -98,7 +98,7 @@ public class AppendWorkflowOperationHandler extends ResumableWorkflowOperationHa
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#resume(org.opencastproject.workflow.api.WorkflowInstance,
+   * @see org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase#resume(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext, java.util.Map)
    */
   @Override

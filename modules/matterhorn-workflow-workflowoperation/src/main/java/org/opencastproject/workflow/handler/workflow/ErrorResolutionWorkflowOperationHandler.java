@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.workflow.api.RetryStrategy;
@@ -46,7 +46,7 @@ public class ErrorResolutionWorkflowOperationHandler extends ResumableWorkflowOp
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#activate(org.osgi.service.component.ComponentContext)
+   * @see org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase#activate(org.osgi.service.component.ComponentContext)
    */
   @Override
   public void activate(ComponentContext componentContext) {

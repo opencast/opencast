@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workflow.handler.CleanupWorkflowOperationHandler" immediate="true">
-  <implementation class="org.opencastproject.workflow.handler.CleanupWorkflowOperationHandler" />
+ name="org.opencastproject.workflow.handler.workflow.CleanupWorkflowOperationHandler" immediate="true">
+  <implementation class="org.opencastproject.workflow.handler.workflow.CleanupWorkflowOperationHandler" />
   <property name="service.description" value="Cleanup Workflow Operation Handler" />
   <property name="workflow.operation" value="cleanup" />
   <service>

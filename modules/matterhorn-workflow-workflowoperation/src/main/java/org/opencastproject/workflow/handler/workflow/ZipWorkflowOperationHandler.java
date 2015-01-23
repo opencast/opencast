@@ -13,7 +13,7 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.workflow.handler;
+package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
@@ -92,7 +92,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /** Key for configuring the location of the archive-temp folder */
   public static final String ARCHIVE_TEMP_DIR_CFG_KEY =
-    "org.opencastproject.workflow.handler.ZipWorkflowOperationHandler.tmpdir";
+    "org.opencastproject.workflow.handler.workflow.ZipWorkflowOperationHandler.tmpdir";
 
   /** The default flavor to use for a mediapackage archive */
   public static final MediaPackageElementFlavor DEFAULT_ARCHIVE_FLAVOR = MediaPackageElementFlavor

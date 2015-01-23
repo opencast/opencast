@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workflow.handler.CLIWorkflowOperationHandler" immediate="true">
-  <implementation class="org.opencastproject.workflow.handler.CLIWorkflowOperationHandler" />
+ name="org.opencastproject.workflow.handler.workflow.CLIWorkflowOperationHandler" immediate="true">
+  <implementation class="org.opencastproject.workflow.handler.workflow.CLIWorkflowOperationHandler" />
   <property name="service.description" value="CLI Workflow Operation Handler" />
   <property name="workflow.operation" value="cli" />
   <service>
