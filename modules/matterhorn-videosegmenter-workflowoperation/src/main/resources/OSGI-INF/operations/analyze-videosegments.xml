@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workflow.handler.VideoSegmenterWorkflowOperationHandler" immediate="true" activate="activate">
-  <implementation class="org.opencastproject.workflow.handler.VideoSegmenterWorkflowOperationHandler" />
+ name="org.opencastproject.workflow.handler.videosegmenter.VideoSegmenterWorkflowOperationHandler" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.videosegmenter.VideoSegmenterWorkflowOperationHandler" />
   <property name="service.description" value="Videosegmentation Workflow Operation Handler" />
   <property name="workflow.operation" value="segment-video" />
   <service>
