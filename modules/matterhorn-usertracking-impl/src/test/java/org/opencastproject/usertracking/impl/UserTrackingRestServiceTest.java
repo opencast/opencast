@@ -22,6 +22,7 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.usertracking.api.UserAction;
+import org.opencastproject.usertracking.api.UserSession;
 import org.opencastproject.usertracking.api.UserTrackingException;
 import org.opencastproject.usertracking.api.UserTrackingService;
 import org.opencastproject.usertracking.endpoint.UserTrackingRestService;
@@ -73,7 +74,7 @@ public class UserTrackingRestServiceTest {
     EasyMock.expect(ua.getId()).andReturn(4L).anyTimes();
 
     UserTrackingService usertracking = EasyMock.createMock(UserTrackingService.class);
-    EasyMock.expect(usertracking.addUserFootprint(EasyMock.isA(UserAction.class))).andReturn(ua).anyTimes();
+    EasyMock.expect(usertracking.addUserFootprint(EasyMock.isA(UserAction.class), EasyMock.isA(UserSession.class))).andReturn(ua).anyTimes();
 
     EasyMock.replay(security, bc, dict, context, ua, usertracking);
 
@@ -115,9 +116,9 @@ public class UserTrackingRestServiceTest {
     Assert.assertEquals("FOOTPRINT", a.getType());
     Assert.assertTrue(a.getIsPlaying());
     Assert.assertEquals("test", a.getMediapackageId());
-    Assert.assertEquals(MOCK_SESSION_ID, a.getSessionId());
-    Assert.assertEquals(REMOTE_IP, a.getUserIp());
-    Assert.assertEquals(MOCK_USER, a.getUserId());
+    Assert.assertEquals(MOCK_SESSION_ID, a.getSession().getSessionId());
+    Assert.assertEquals(REMOTE_IP, a.getSession().getUserIp());
+    Assert.assertEquals(MOCK_USER, a.getSession().getUserId());
 
     request = getMockHttpSessionWithProxy();
     r = service.addFootprint("test", "20", "30", "FOOTPRINT", "true", request);
@@ -128,8 +129,8 @@ public class UserTrackingRestServiceTest {
     Assert.assertEquals("FOOTPRINT", a.getType());
     Assert.assertTrue(a.getIsPlaying());
     Assert.assertEquals("test", a.getMediapackageId());
-    Assert.assertEquals(MOCK_SESSION_ID, a.getSessionId());
-    Assert.assertEquals(REMOTE_IP, a.getUserIp());
-    Assert.assertEquals(MOCK_USER, a.getUserId());
+    Assert.assertEquals(MOCK_SESSION_ID, a.getSession().getSessionId());
+    Assert.assertEquals(REMOTE_IP, a.getSession().getUserIp());
+    Assert.assertEquals(MOCK_USER, a.getSession().getUserId());
   }
 }

@@ -793,15 +793,52 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   }
 
   @POST
+  @Path("/failMissedCaptures")
+  @RestQuery(name = "failMissedCaptures", description = "Find workflows that should have started capturing but haven't and move them to a failed status.", returnDescription = "No return value", reponses = {
+          @RestResponse(responseCode = SC_OK, description = "Failed missing captures successfully"), @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.")}, restParameters = {
+          @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a capturing status update before marking a workflow as failed. It must be 0 or greater.")})
+  public Response failMissedCaptures(@FormParam("buffer") long buffer) {
+    if (buffer < 0) {
+      return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
+    }
+
+    try {
+      service.moveMissingCapturesFromUpcomingToFailedStatus(buffer);
+      return Response.ok().build();
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Error while trying to fail missed ingests", e);
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @POST
+  @Path("/failMissedIngests")
+  @RestQuery(name = "failMissedIngests", description = "Find workflows that should have started ingesting but haven't and move them to a failed status.", returnDescription = "No return value", reponses = {
+          @RestResponse(responseCode = SC_OK, description = "Failed missing ingests successfully"), @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.")}, restParameters = {
+          @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a ingest status update before marking a workflow as failed. It must be 0 or greater.")})
+  public Response failMissedIngests(@FormParam("buffer") long buffer) {
+    if (buffer < 0) {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    try {
+      service.moveMissingIngestsFromUpcomingToFailedStatus(buffer);
+      return Response.ok().build();
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Error while trying to fail missed ingests", e);
+      throw new WebApplicationException(e);
+    }
+  }
+
   @Path("/cleanup")
   @RestQuery(name = "cleanup", description = "Cleans up workflow instances", returnDescription = "No return value", reponses = {
           @RestResponse(responseCode = SC_OK, description = "Cleanup OK"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Couldn't parse given state"),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to cleanup. Maybe you need to authenticate."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "It's not allowed to delete other workflow instance statues than STOPPED, SUCCEEDED and FAILED") }, restParameters = {
-          @RestParameter(name = "lifetime", type = Type.INTEGER, defaultValue = "30", isRequired = true, description = "Lifetime in days a workflow instance should live"),
+          @RestParameter(name = "buffer", type = Type.INTEGER, defaultValue = "30", isRequired = true, description = "Lifetime (buffer) in days a workflow instance should live"),
           @RestParameter(name = "state", type = Type.STRING, isRequired = true, description = "Workflow instance state, only STOPPED, SUCCEEDED and FAILED are allowed values here") })
-  public Response cleanup(@FormParam("lifetime") int lifetime, @FormParam("state") String stateParam)
+  public Response cleanup(@FormParam("buffer") int buffer, @FormParam("state") String stateParam)
           throws UnauthorizedException {
 
     WorkflowInstance.WorkflowState state;
@@ -816,7 +853,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       return Response.status(Status.FORBIDDEN).build();
 
     try {
-      service.cleanupWorkflowInstances(lifetime, state);
+      service.cleanupWorkflowInstances(buffer, state);
       return Response.ok().build();
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(e);

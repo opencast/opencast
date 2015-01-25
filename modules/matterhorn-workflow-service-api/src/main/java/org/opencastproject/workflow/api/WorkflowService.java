@@ -327,6 +327,19 @@ public interface WorkflowService {
   List<WorkflowDefinition> listAvailableWorkflowDefinitions() throws WorkflowDatabaseException;
 
   /**
+   * Move workflows where the capture should have started from upcoming into failure status.
+   * @param buffer The amount of time in seconds to wait for a capture to move from Upcoming to Capturing
+   */
+  void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException;
+
+  /**
+   * Move workflows where the ingest has not been successful or is taking longer than expected into a failure status.
+   * @param buffer The amount of time in seconds to wait for an ingest to notify the workflow service.
+   */
+  void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException;
+
+  /**
+   *
    * Starts a cleanup of workflow instances with a given lifetime and a specific state
    *
    * @param lifetime

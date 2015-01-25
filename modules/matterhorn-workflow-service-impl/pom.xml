@@ -24,6 +24,11 @@
       <artifactId>matterhorn-series-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-serviceregistry</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-dublincore</artifactId>
@@ -41,12 +46,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-json</artifactId>
+      <artifactId>matterhorn-kernel</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-serviceregistry</artifactId>
+      <artifactId>matterhorn-json</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -164,6 +169,8 @@
             <Service-Component>
               OSGI-INF/workflow-cleanup-scheduler-service.xml,
               OSGI-INF/workflow-definition-scanner.xml,
+              OSGI-INF/workflow-missed-capture-scanner-scheduler-service.xml,
+              OSGI-INF/workflow-missed-ingest-scanner-scheduler-service.xml,
               OSGI-INF/workflow-service.xml,
               OSGI-INF/workflow-service-index.xml,
               OSGI-INF/workflow-service-rest.xml

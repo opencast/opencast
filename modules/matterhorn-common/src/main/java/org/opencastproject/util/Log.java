@@ -22,6 +22,7 @@ import org.opencastproject.fn.juc.Iterables;
 import org.opencastproject.fn.juc.Mutables;
 import org.opencastproject.util.data.Prelude;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
@@ -38,7 +39,14 @@ import java.util.UUID;
  * {@link String#format(java.util.Locale, String, Object...)} string format syntax.
  */
 public final class Log {
+  /** The number of seconds in a minute. */
+  private static final int SECONDS_IN_MINUTES = 60;
+
+  /** The number of seconds in an hour. */
+  private static final int SECONDS_IN_HOURS = 3600;
+
   private static final String FQCN = Log.class.getName();
+
   private static final String JVM_SESSION = randomString();
 
   /** Hold the context stack. */
@@ -103,6 +111,37 @@ public final class Log {
   public void continueContext(Collection<String> init) {
     ctx.set(Mutables.stack(init));
     updateCurrent();
+  }
+
+  /**
+   * Renders a string representation of seconds that is easier to read by showing hours, minutes and seconds.
+   *
+   * @param seconds
+   *          The number of seconds that you want to represent in hours, minutes and remainder seconds.
+   * @return A human readable string representation of seconds into hours, minutes and seconds.
+   */
+  public static String getHumanReadableTimeString(long seconds) {
+    String result = "";
+    long hours = seconds / SECONDS_IN_HOURS;
+    if (hours == 1) {
+      result += hours + " hour ";
+    } else if (hours > 1) {
+      result += hours + " hours ";
+    }
+    long minutes = (seconds % SECONDS_IN_HOURS) / SECONDS_IN_MINUTES;
+    if (minutes == 1) {
+      result += minutes + " minute ";
+    } else if (minutes > 1) {
+      result += minutes + " minutes ";
+    }
+    long remainderSeconds = (seconds % SECONDS_IN_HOURS) % SECONDS_IN_MINUTES;
+    if (remainderSeconds == 1) {
+      result += remainderSeconds + " second";
+    } else if (remainderSeconds > 1) {
+      result += remainderSeconds + " seconds";
+    }
+    result = StringUtils.trim(result);
+    return result;
   }
 
   /** Return the current log context. */
