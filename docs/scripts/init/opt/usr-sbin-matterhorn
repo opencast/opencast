@@ -48,17 +48,18 @@ show_version() {
 
 if [ $# -ne 1 ] || ( [ "$1" != '--daemon' ] && \
 	[ "$1" != '--interactive' ] && \
+	[ "$1" != '--notty' ] && \
 	[ "$1" != '--quit' ] && \
 	[ "$1" != '--version' ] )
 then
-	echo "Usage: $0 [ --daemon | --interactive | --quit | --help ]"
+	echo "Usage: $0 [ --daemon | --interactive | --notty | --quit | --help ]"
 	echo ''
 	echo 'OPTIONS:'
 	echo '  --version      Show Matterhorn version and exit.'
-	echo '  --daemon       Run matterhorn as _unmanaged_ daemon.'
-	echo '                 Consider using the SysV init script.'
-	echo '  --interactive  Run matterhorn in interactive mode.'
-	echo '  --quit         Stop a previously started matterhorn.'
+	echo '  --daemon       Run Matterhorn as _unmanaged_ daemon. Please consider using init or systemd.'
+	echo '  --interactive  Run Matterhorn in interactive mode.'
+	echo '  --notty        Run Matterhorn as foreground process in noninteractive mode.'
+	echo '  --quit         Try to stop a previously started Matterhorn.'
 	echo '  --help         Show this message.'
 	exit 0
 fi
@@ -133,7 +134,7 @@ DISABLE_PHONEHOME="-Dnet.sf.ehcache.skipUpdateCheck=true"
 DISABLE_PHONEHOME="${DISABLE_PHONEHOME} -Dorg.terracotta.quartz.skipUpdateCheck=true"
 
 JAVA="-Xms1g -Xmx1g"
-[ "$1" == '--daemon' ] && GOSH="-Dgosh.args='--noshutdown -c noop=true'"
+( [ "$1" == '--daemon' ] || [ "$1" == '--notty' ] ) && GOSH="-Dgosh.args='--noshutdown -c noop=true'"
 
 MATTERHORN_OPTS="$GOSH $DEBUG $FELIX $GRAPHICS $JETTY $JAVA $LOGGING $JMX $DISABLE_PHONEHOME $ADD_OPTS"
 
@@ -156,9 +157,7 @@ else
 	echo $$ > $pidfile
 	set -o monitor
 	pushd $MATTERHORN &> /dev/null
-	sudo -u $MATTERHORN_USER \
-		java $MATTERHORN_OPTS -jar $MATTERHORN/bin/felix.jar \
-		$FELIX_CACHE_DIR
+	su -c "java $MATTERHORN_OPTS -jar $MATTERHORN/bin/felix.jar $FELIX_CACHE_DIR" $MATTERHORN_USER
 	rm -f $pidfile
 	popd &> /dev/null
 fi
