@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Install a classical SysV-Init script or a Systemd Unit file?"
 echo -n '[i]nit/[s]ystemd (default: init): '
@@ -22,3 +22,6 @@ echo Installing man-page
 cat matterhorn.8 | gzip > matterhorn.8.gz
 install -p -D -m 0644 matterhorn.8.gz  /usr/share/man/man8
 rm matterhorn.8.gz
+
+echo Installing service configuration
+install -p -D -m 0644 etc-matterhorn-service.conf /etc/matterhorn

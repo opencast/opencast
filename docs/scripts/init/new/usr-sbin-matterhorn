@@ -3,7 +3,6 @@
 
 prog="matterhorn"
 config="/etc/${prog}/service.conf"
-config_opt="/opt/${prog}/etc/service.conf"
 pidfile="/var/run/${prog}.pid"
 
 # Times to try sending a SIGTERM before sending a SIGKILL
@@ -73,9 +72,7 @@ MATTERHORN_USER=matterhorn
 LOGDIR=/var/log/matterhorn
 LOGLEVEL="WARN"
 ECLIPSE_LOGLEVEL="CONFIG"
-[ -z $DEBUG ] && DEBUG=false
-DEBUG_PORT="8000"
-DEBUG_SUSPEND="n"
+[ -z $DEBUG ] && DEBUG=''
 FELIX_CONFIG_DIR=/etc/matterhorn
 FELIX_WORK_DIR=/srv/matterhorn
 FELIX_CACHE_DIR="/tmp/matterhorn/felix-cache"
@@ -88,7 +85,6 @@ else
 fi
 
 # Load configuration files
-[ -e $config_opt ] && . $config_opt
 [ -e $config ] && . $config
 
 # Show version and exit if --version is given
@@ -137,20 +133,8 @@ JETTY="-Dorg.mortbay.jetty.Request.maxFormContentSize=1000000"
 DISABLE_PHONEHOME="-Dnet.sf.ehcache.skipUpdateCheck=true"
 DISABLE_PHONEHOME="${DISABLE_PHONEHOME} -Dorg.terracotta.quartz.skipUpdateCheck=true"
 
-JAVA="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
+JAVA="-Xms1g -Xmx1g"
 ( [ "$1" == '--daemon' ] || [ "$1" == '--notty' ] ) && GOSH="-Dgosh.args='--noshutdown -c noop=true'"
-
-if $DEBUG
-then
-	DEBUG="-Xdebug"
-	DEBUG="${DEBUG} -Xnoagent"
-	DEBUG="${DEBUG} -Xrunjdwp:transport=dt_socket"
-	DEBUG="${DEBUG},address=$DEBUG_PORT"
-	DEBUG="${DEBUG},server=y"
-	DEBUG="${DEBUG},suspend=$DEBUG_SUSPEND"
-else
-	DEBUG=""
-fi
 
 MATTERHORN_OPTS="$GOSH $DEBUG $FELIX $GRAPHICS $JETTY $JAVA $LOGGING $JMX $DISABLE_PHONEHOME $ADD_OPTS"
 
