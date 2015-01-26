@@ -481,10 +481,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
 
                 $(document).on("pagebeforeshow", player_page_id, function(event, data){
 
-                    Engage.log("Before Page!");
-                    Engage.log(event);
-                    console.log(data.prevPage.attr('id'));
-
                     if (data.prevPage.length > 0) {
                         prev_player = videojs(data.prevPage.children().children()[0].id);
                         current_time = prev_player.currentTime();
@@ -498,7 +494,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                     Engage.on(plugin.events.play.getName(), function() {
                         player.play();
                         played_once = true;
-                        //player.currentTime(current_time);
+                        player.currentTime(current_time);
                         play_pause_toggle = true;
                     });
 
