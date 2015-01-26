@@ -47,6 +47,12 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var path_language_en = "language/en.json";
 
     /* don't change these variables */
+    var setCustomError = false; // just for displaying purposes!
+    var pluginControlsInserted = false;
+    var pluginVideoInserted = false;
+    var pluginTabInserted = false;
+    var pluginDescriptionInserted = false;
+    var pluginTimelineInserted = false;
     var id_str_error = "str_error";
     var id_customError_str = "customError_str";
     var id_str_reloadPage = "str_reloadPage";
@@ -134,7 +140,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     function translateCoreHTML() {
         $("#" + id_str_error).html(translate("error", "Error"));
-        $("#" + id_customError_str).html(translate("error_unknown", "An error occurred. Please reload the page."));
+        if (!setCustomError) {
+            $("#" + id_customError_str).html(translate("error_unknown", "An error occurred. Please reload the page."));
+            setCustomError = false;
+        }
         $("#" + id_str_reloadPage).html(translate("reloadPage", "Reload page"));
         $("#" + id_str_login).html(translate("login", "Log in"));
     }
@@ -203,11 +212,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                         location.reload();
                                     } else {
                                         engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
+                                        setCustomError = true;
                                     }
                                     askedForLogin = false;
                                 }).fail(function(msg) {
                                     password = "";
                                     engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
+                                    setCustomError = true;
                                     askedForLogin = false;
                                 });
                             } else {
@@ -326,11 +337,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         return all_plugins_loaded;
     }
 
-    var timelinePluginInserted = false;
-    var id_engage_timeline = "engage_timeline";
-    var id_engage_timeline_expand_btn = "engage_timeline_expand_btn";
-    var id_engage_timeline_plugin = "engage_timeline_plugin";
-
     function loadPlugin(plugin_path, plugin_name) {
         require([plugin_path + "main"], function(plugin) {
             // load styles in link tags via jquery
@@ -377,8 +383,22 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     if (plugin.insertIntoDOM) {
                         // load the compiled HTML into the component
                         engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
-                        if (plugin.type == id_engage_timeline) {
-                            timelinePluginInserted = true;
+                        if (engageCore.model.desktop) {
+                            if (engageCore.pluginView.isControlsPlugin(plugin.type)) {
+                                pluginControlsInserted = true;
+                            }
+                            if (engageCore.pluginView.isVideoPlugin(plugin.type)) {
+                                pluginVideoInserted = true;
+                            }
+                            if (engageCore.pluginView.isTabPlugin(plugin.type)) {
+                                pluginTabInserted = true;
+                            }
+                            if (engageCore.pluginView.isDescriptionPlugin(plugin.type)) {
+                                pluginDescriptionInserted = true;
+                            }
+                            if (engageCore.pluginView.isTimelinePlugin(plugin.type)) {
+                                pluginTimelineInserted = true;
+                            }
                         }
                     }
                     // plugin load done counter
@@ -547,10 +567,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                             loadPlugin("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/", plugin_name);
                                         }
                                     }
-                                    if (!timelinePluginInserted) {
-                                        console.log("Core: No timeline plugin inserted. Removing the container.");
-                                        $("#" + id_engage_timeline_expand_btn + ", #" + id_engage_timeline_plugin).detach();
-                                    }
                                 }
                             });
                             // END LOAD PLUGINS
@@ -570,6 +586,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 $("#" + id_engage_view).hide().detach();
                 $("#" + id_btn_reloadPage).hide();
                 $("#" + id_customError_str).html(str);
+                setCustomError = true;
                 if (getLoginStatus() == 0) {
                     $("#" + id_btn_login).click(login);
                     $("#" + id_customError + ", #" + id_btn_login).show();
@@ -580,6 +597,29 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             });
             // load plugins done, hide loading and show content
             this.dispatcher.on(events.plugin_load_done.getName(), function() {
+                if (engageCore.model.desktop) {
+                    if (!pluginControlsInserted) {
+                        console.log("Core: No controls plugin inserted. Removing the container.");
+                        engageCore.pluginView.removeControls();
+                    }
+                    if (!pluginVideoInserted) {
+                        console.log("Core: No video plugin inserted. Removing the container.");
+                        engageCore.pluginView.removeVideo();
+                    }
+                    if (!pluginTabInserted) {
+                        console.log("Core: No tab plugin inserted. Removing the container.");
+                        engageCore.pluginView.removeTab();
+                    }
+                    if (!pluginDescriptionInserted) {
+                        console.log("Core: No description plugin inserted. Removing the container.");
+                        engageCore.pluginView.removeDescription();
+                    }
+                    if (!pluginTimelineInserted) {
+                        console.log("Core: No timeline plugin inserted. Removing the container.");
+                        engageCore.pluginView.removeTimeline();
+                    }
+                }
+
                 $("#" + id_loading1).hide().detach();
                 $("#" + id_loading2).show();
                 window.setTimeout(function() {
