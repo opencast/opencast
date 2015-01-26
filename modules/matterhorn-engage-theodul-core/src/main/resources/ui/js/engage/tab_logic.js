@@ -195,12 +195,15 @@ define(['jquery', 'bootstrap'], function($, Bootstrap) {
                 activated.addClass(activation_class);
                 ahref = extractIdFromHref(activated[0].firstElementChild);
                 $('#' + ahref).addClass(activation_class);
-            } else {
+            }
+            /*
+	      else {
                 console.log('TabLogic: Activating first tab');
                 activated = $('#' + selector + ' li:first').addClass(activation_class);
-                ahref = extractIdFromHref(activated[0].firstElementChild);
+                ahref = extractIdFromHref(activated.firstElementChild);
                 $('#' + ahref).addClass(activation_class);
-            }
+	    }
+	    */
         };
 
         var restoreActiveBootstrapTabFromCookie = function(selector) {

@@ -17,6 +17,7 @@
 define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "engage/core"], function(require, $, _, Backbone, Basil, Bootbox, Engage) {
     "use strict";
 
+    var insertIntoDOM = true;
     var PLUGIN_NAME = "Engage Controls";
     var PLUGIN_TYPE = "engage_controls";
     var PLUGIN_VERSION = "1.0";
@@ -80,6 +81,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -91,6 +93,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             break;
         case "embed":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -103,6 +106,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         case "desktop":
         default:
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,

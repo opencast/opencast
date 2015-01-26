@@ -17,6 +17,7 @@
 define(["require", "jquery", "backbone", "engage/core"], function(require, $, Backbone, Engage) {
     "use strict";
 
+    var insertIntoDOM = true;
     var PLUGIN_NAME = "Engage Custom Matterhorn Endpoint Connection";
     var PLUGIN_TYPE = "engage_custom";
     var PLUGIN_VERSION = "1.0";
@@ -50,6 +51,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -61,6 +63,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
             break;
         case "embed":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -73,6 +76,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
         case "desktop":
         default:
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,

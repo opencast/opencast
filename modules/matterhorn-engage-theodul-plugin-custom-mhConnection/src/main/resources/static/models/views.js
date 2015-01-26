@@ -18,6 +18,19 @@
 define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     "use strict";
 
+    var ViewsModel = Backbone.Model.extend({
+        initialize: function() {
+            Engage.log("MhConnection: Init empty Views model");
+        },
+        defaults: {
+            "stats": {
+                "views": 0
+            }
+        }
+    });
+
+    /* TODO: Wait for the new usertracking service...
+
     var USERTRACKING_ENDPOINT = "/usertracking";
     var USERTRACKING_ENDPOINT_STATS = "/stats.json";
 
@@ -67,6 +80,8 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
             }
         }
     });
+
+    */
 
     return ViewsModel;
 });
