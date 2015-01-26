@@ -194,7 +194,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
         datasetFill: true,
     }
 
-    /* don"t change these variables */
+    /* don't change these variables */
     var mediapackageChange = "change:mediaPackage";
     var footprintChange = "change:footprints";
     var videoDataModelChange = "change:videoDataModel";
@@ -337,18 +337,18 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
             }
         });
 
-        // load highchart lib
-        require([relative_plugin_path + chartPath], function(videojs) {
-            Engage.log("Timeline:Statistics: Lib chart loaded");
+        // all plugins loaded
+        Engage.on(plugin.events.plugin_load_done.getName(), function() {
+            Engage.log("Timeline:Statistics: Plugin load done");
             initCount -= 1;
             if (initCount == 0) {
                 initPlugin();
             }
         });
 
-        // all plugins loaded
-        Engage.on(plugin.events.plugin_load_done.getName(), function() {
-            Engage.log("Timeline:Statistics: Plugin load done");
+        // load highchart lib
+        require([relative_plugin_path + chartPath], function(videojs) {
+            Engage.log("Timeline:Statistics: Lib chart loaded");
             initCount -= 1;
             if (initCount == 0) {
                 initPlugin();

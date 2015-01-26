@@ -14,8 +14,9 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backbone, Engage) {
+define(["require", "jquery", "underscore", "backbone", "engage/core"], function(require, $, _, Backbone, Engage) {
     "use strict";
+
     var PLUGIN_NAME = "Slide text";
     var PLUGIN_TYPE = "engage_tab";
     var PLUGIN_VERSION = "1.0";
@@ -54,8 +55,7 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                 version: PLUGIN_VERSION,
                 styles: PLUGIN_STYLES_MOBILE,
                 template: PLUGIN_TEMPLATE_MOBILE,
-                events: events,
-                timeStrToSeconds: timeStrToSeconds
+                events: events
             };
             isMobileMode = true;
             break;
@@ -66,8 +66,7 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                 version: PLUGIN_VERSION,
                 styles: PLUGIN_STYLES_EMBED,
                 template: PLUGIN_TEMPLATE_EMBED,
-                events: events,
-                timeStrToSeconds: timeStrToSeconds
+                events: events
             };
             isEmbedMode = true;
             break;
@@ -79,27 +78,22 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                 version: PLUGIN_VERSION,
                 styles: PLUGIN_STYLES_DESKTOP,
                 template: PLUGIN_TEMPLATE_DESKTOP,
-                events: events,
-                timeStrToSeconds: timeStrToSeconds
+                events: events
             };
             isDesktopMode = true;
             break;
     }
 
-    /* change these variables */
-
-    /* don"t change these variables */
+    /* don't change these variables */
+    var Utils;
     var TEMPLATE_TAB_CONTENT_ID = "engage_slidetext_tab_content";
     var html_snippet_id = "engage_slidetext_tab_content";
     var id_segmentNo = "tab_slidetext_segment_";
     var mediapackageChange = "change:mediaPackage";
-    var initCount = 3;
+    var initCount = 4;
     var mediapackageError = false;
     var translations = new Array();
-
-    function detectLanguage() {
-        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-    }
+    var Segment;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginTabSlidetext").replace(/(\.\.\/)/g, "");
@@ -141,56 +135,6 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
 
-    /**
-     * Segment
-     *
-     * @param time
-     * @param image_url
-     */
-    var Segment = function(time, image_url, text) {
-        this.time = time;
-        this.image_url = image_url;
-        this.text = text;
-    };
-
-    /**
-     * Returns the input time in milliseconds
-     *
-     * @param data data in the format ab:cd:ef
-     * @return time from the data in milliseconds
-     */
-    function getTimeInMilliseconds(data) {
-        if ((data !== undefined) && (data !== null) && (data != 0) && (data.length) && (data.indexOf(":") != -1)) {
-            var values = data.split(":");
-            // when the format is correct
-            if (values.length == 3) {
-                // try to convert to numbers
-                var val0 = values[0] * 1;
-                var val1 = values[1] * 1;
-                var val2 = values[2] * 1;
-                // check and parse the seconds
-                if (!isNaN(val0) && !isNaN(val1) && !isNaN(val2)) {
-                    // convert hours, minutes and seconds to milliseconds
-                    val0 *= 60 * 60 * 1000; // 1 hour = 60 minutes = 60 * 60 Seconds = 60 * 60 * 1000 milliseconds
-                    val1 *= 60 * 1000; // 1 minute = 60 seconds = 60 * 1000 milliseconds
-                    val2 *= 1000; // 1 second = 1000 milliseconds
-                    return val0 + val1 + val2;
-                }
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * timeStrToSeconds
-     *
-     * @param timeStr
-     */
-    function timeStrToSeconds(timeStr) {
-        var elements = timeStr.match(/([0-9]{2})/g);
-        return parseInt(elements[0], 10) * 3600 + parseInt(elements[1], 10) * 60 + parseInt(elements[2], 10);
-    }
-
     var SlidetextTabView = Backbone.View.extend({
         initialize: function(mediaPackageModel, template) {
             this.setElement($(plugin.container)); // every plugin view has it"s own container associated with it
@@ -216,7 +160,7 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                             if (time.length > 0) {
                                 var si = "No slide text available.";
                                 for (var i = 0; i < segmentInformation.length; ++i) {
-                                    if (getTimeInMilliseconds(time[0]) == parseInt(segmentInformation[i].time)) {
+                                    if (Utils.getTimeInMilliseconds(time[0]) == parseInt(segmentInformation[i].time)) {
                                         si = segmentInformation[i].text;
                                         break;
                                     }
@@ -246,7 +190,7 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                     $.each(segments, function(i, v) {
                         $("#" + id_segmentNo + i).click(function(e) {
                             e.preventDefault();
-                            var time = parseInt(timeStrToSeconds(v.time));
+                            var time = parseInt(Utils.timeStrToSeconds(v.time));
                             if (!isNaN(time)) {
                                 Engage.trigger(plugin.events.seek.getName(), time);
                             }
@@ -283,21 +227,7 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
 
     // init event
     Engage.log("Tab:Slidetext: Init");
-    // var relative_plugin_path = Engage.getPluginPath("EngagePluginTabSlidetext");
-
-    initTranslate(detectLanguage(), function() {
-        Engage.log("Tab:Slidetext: Successfully translated.");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    }, function() {
-        Engage.log("Notifications: Error translating...");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
+    var relative_plugin_path = Engage.getPluginPath("EngagePluginTabSlidetext");
 
     // listen on a change/set of the mediaPackage model
     Engage.model.on(mediapackageChange, function() {
@@ -314,6 +244,36 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
         if (initCount <= 0) {
             initPlugin();
         }
+    });
+
+    // load segment class
+    require([relative_plugin_path + "segment"], function(segment) {
+        Engage.log("Tab:Slidetext: Segment class loaded");
+        Segment = segment;
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
+
+    // load utils class
+    require([relative_plugin_path + "utils"], function(utils) {
+        Engage.log("Tab:Slidetext: Utils class loaded");
+        Utils = new utils();
+	plugin.timeStrToSeconds = Utils.timeStrToSeconds;
+        initTranslate(Utils.detectLanguage(), function() {
+            Engage.log("Tab:Slidetext: Successfully translated.");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        }, function() {
+            Engage.log("Notifications: Error translating...");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
     });
 
     return plugin;

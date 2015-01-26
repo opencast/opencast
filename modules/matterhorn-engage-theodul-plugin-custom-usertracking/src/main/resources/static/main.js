@@ -81,12 +81,9 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
             break;
     }
 
-    /* change these variables */
-    var USERTRACKING_ENDPOINT = "/usertracking";
+    /* don't change these variables */
     var mediapackageChange = "change:mediaPackage";
     var footprintsChange = "change:footprints";
-
-    /* don"t change these variables */
     var initCount = 3;
     var lastFootprint = undefined;
     var mediapackageID;
@@ -105,7 +102,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
 
         Engage.on(plugin.events.timeupdate.getName(), function(currentTime) {
             if (!mediapackageError) {
-                // add footprint each rounded timeupdate
+                // add footprint each timeupdate
                 var cTime = Math.round(currentTime);
                 if (lastFootprint != undefined) {
                     if (lastFootprint != cTime) {
@@ -150,4 +147,3 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
 
     return plugin;
 });
-

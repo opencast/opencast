@@ -14,8 +14,9 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($, _, Backbone, Engage, Moment) {
+define(["require", "jquery", "underscore", "backbone", "engage/core", "moment"], function(require, $, _, Backbone, Engage, Moment) {
     "use strict";
+
     var PLUGIN_NAME = "Basic Engage Description";
     var PLUGIN_TYPE = "engage_description";
     var PLUGIN_VERSION = "1.0";
@@ -42,7 +43,6 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     var isEmbedMode = false;
     var isMobileMode = false;
 
-    // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
@@ -80,10 +80,8 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
             break;
     }
 
-    /* change these variables */
-    // nothing to see here...
-
     /* don't change these variables */
+    var Utils;
     var initCount = 3;
     var id_engage_description = "engage_description";
     var mediapackageChange = "change:mediaPackage";
@@ -91,10 +89,6 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     var translations = new Array();
     var locale = "en";
     var dateFormat = "MMMM Do YYYY";
-
-    function detectLanguage() {
-        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-    }
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginDescription").replace(/(\.\.\/)/g, "");
@@ -136,17 +130,14 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
 
-    // view //
-
     var DescriptionView = Backbone.View.extend({
-        el: $("#" + id_engage_description), // every view has a element associated with it
+        el: $("#" + id_engage_description),
         initialize: function(mediaPackageModel, template) {
             this.model = mediaPackageModel;
             this.template = template;
-            // bind the render function always to the view
             _.bindAll(this, "render");
-            // listen for changes of the model and bind the render function to this
             this.model.bind("change", this.render);
+            this.render();
         },
         render: function() {
             if (!mediapackageError) {
@@ -172,9 +163,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     });
 
     function initPlugin() {
-        // only init if plugin template was inserted into the DOM
         if ((isDesktopMode || isMobileMode) && plugin.inserted) {
-            // create a new view with the media package model and the template
             var descriptionView = new DescriptionView(Engage.model.get("mediaPackage"), plugin.template);
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
@@ -185,22 +174,6 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     if (isDesktopMode || isMobileMode) {
         // init event
         var relative_plugin_path = Engage.getPluginPath("EngagePluginDescription");
-
-        initTranslate(detectLanguage(), function() {
-            Engage.log("Description: Successfully translated.");
-            locale = translate("value_locale", locale);
-            dateFormat = translate("value_dateFormatFull", dateFormat);
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        }, function() {
-            Engage.log("Description: Error translating...");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        });
 
         // listen on a change/set of the mediaPackage model
         Engage.model.on(mediapackageChange, function() {
@@ -216,6 +189,27 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
             if (initCount <= 0) {
                 initPlugin();
             }
+        });
+
+        // load utils class
+        require([relative_plugin_path + "utils"], function(utils) {
+            Engage.log("Description: Utils class loaded");
+            Utils = new utils();
+            initTranslate(Utils.detectLanguage(), function() {
+                Engage.log("Description: Successfully translated.");
+                locale = translate("value_locale", locale);
+                dateFormat = translate("value_dateFormatFull", dateFormat);
+                initCount -= 1;
+                if (initCount <= 0) {
+                    initPlugin();
+                }
+            }, function() {
+                Engage.log("Description: Error translating...");
+                initCount -= 1;
+                if (initCount <= 0) {
+                    initPlugin();
+                }
+            });
         });
     }
 

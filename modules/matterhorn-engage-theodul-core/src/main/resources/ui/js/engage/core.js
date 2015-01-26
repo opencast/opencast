@@ -93,6 +93,11 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     };
     Basil = new window.Basil(basilOptions);
 
+    // Before jQueryMobile init
+    $( document ).on("mobileinit", function() {
+            $.mobile.autoInitializePage = false;
+    });
+
     function browserSupported() {
         if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
             console.log("User setting: Support unsupported browser: " + Basil.get("overrideBrowser"));
