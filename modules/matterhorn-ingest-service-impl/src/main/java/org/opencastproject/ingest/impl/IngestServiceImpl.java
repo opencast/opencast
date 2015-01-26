@@ -653,7 +653,21 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         logger.warn("Series dublin core document contains no identifier");
       } else {
         try {
+          Boolean isNew = false;
+          try {
+            seriesService.getSeries(id);
+          } catch (NotFoundException e) {
+            logger.info("Creating new series {} with default ACL", id);
+            isNew = true;
+          }
           seriesService.updateSeries(dc);
+
+          if (isNew) {
+            String anonymousRole = securityService.getOrganization().getAnonymousRole();
+            AccessControlList acl = new AccessControlList(new AccessControlEntry(anonymousRole, "read", true));
+            seriesService.updateAccessControl(id, acl);
+          }
+
         } catch (Exception e) {
           throw new IngestException(e);
         }

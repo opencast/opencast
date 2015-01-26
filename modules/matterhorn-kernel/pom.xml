@@ -40,6 +40,10 @@
       <artifactId>jaxb-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>org.springframework.security.core</artifactId>
     </dependency>
@@ -305,6 +309,7 @@
               org.opencastproject.kernel.mail;version=${project.version},
               org.opencastproject.kernel.pingback;version=${project.version},
               org.opencastproject.kernel.rest;version=${project.version},
+              org.opencastproject.kernel.scanner;version=${project.version},
               org.opencastproject.kernel.security;version=${project.version},
               org.opencastproject.kernel.security.persistence;version=${project.version},
               org.opencastproject.kernel.userdirectory;version=${project.version},

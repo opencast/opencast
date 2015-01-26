@@ -1,36 +1,47 @@
-.TH MATTERHORN 8 "June 17, 2013" "Opencast Matterhorn User Manuals"
+.TH "MATTERHORN" "8" "November 26, 2014" "Opencast Matterhorn User Manuals" ""
 .SH NAME
 .PP
 Opencast Matterhorn \[en] Open Source Lecture Capture & Video Management
 .SH SYNOPSIS
 .PP
-matterhorn [ --daemon | --interactive | --quit | --help ]
+matterhorn [ \-\-daemon | \-\-interactive | \-\-notty | \-\-version |
+\-\-quit | \-\-help ]
 .SH SUMMARY
 .PP
-Matterhorn is a free, open-source platform to support the management of
+Matterhorn is a free, open\-source platform to support the management of
 educational audio and video content.
 Institutions will use Matterhorn to produce lecture recordings, manage
 existing video, serve designated distribution channels, and provide user
 interfaces to engage students with educational videos.
 .SH OPTIONS
 .TP
-.B --help
-Show help message
+.B \-\-help
+Show this help.
 .RS
 .RE
 .TP
-.B --daemon
+.B \-\-version
+Show Matterhorn version and exit.
+.RS
+.RE
+.TP
+.B \-\-daemon
 Run Matterhorn as \f[I]unmanaged\f[] daemon.
-Consider using the SysV-init script instead of doing this.
+Please consider using init or systemd.
 .RS
 .RE
 .TP
-.B --interactive
+.B \-\-interactive
 Run matterhorn in interactive mode.
 .RS
 .RE
 .TP
-.B --quit
+.B \-\-notty
+Run Matterhorn as foreground process in noninteractive mode.
+.RS
+.RE
+.TP
+.B \-\-quit
 Stop a previously started Matterhorn.
 .RS
 .RE
@@ -44,16 +55,8 @@ You can start the service with:
 .IP
 .nf
 \f[C]
-%>\ service\ matterhorn\ start
-\f[]
-.fi
-.PP
-To enable Matterhorn by default in various runlevels (make sure
-Matterhorn starts after booting the system) use chkconfig:
-.IP
-.nf
-\f[C]
-%>\ chkconfig\ --level\ 345\ matterhorn\ on
+%>\ service\ matterhorn\ start\ \ \ \ \ \ \ \ \ \ (SysV\-init)
+%>\ systemctl\ start\ matterhorn\ \ \ \ \ \ \ \ \ \ (Systemd)
 \f[]
 .fi
 .PP
@@ -61,7 +64,8 @@ You can check the status of Matterhorn anytime by executing:
 .IP
 .nf
 \f[C]
-\ %>\ service\ matterhorn\ status
+%>\ service\ matterhorn\ status\ \ \ \ \ \ \ \ \ (SysV\-init)
+%>\ systemctl\ status\ matterhorn\ \ \ \ \ \ \ \ \ (Systemd)
 \f[]
 .fi
 .SH GETTING STARTED
@@ -75,7 +79,7 @@ http://localhost:8080/
 \f[]
 .fi
 .PP
-This is were you can find the Matterhorn Admin-UI where you can manage
+This is were you can find the Matterhorn Admin\-UI where you can manage
 your recordings.
 Matterhorn may need a couple of second to load completely.
 During this time you might get some error like "Access Denied" or
@@ -105,9 +109,9 @@ The most important things are configured in
 .TP
 .B org.opencastproject.server.url
 This is set to http://localhost:8080 by default, which means that
-Matterhorn will only be usable from the local machine as localhost will be
-used for all internal links, etc. This is not a protection against access
-from the outside.
+Matterhorn will only be usable from the local machine as localhost will
+be used for all internal links, etc.
+This is not a protection against access from the outside.
 You should change this if your server should be accessible within a
 network.
 Set it to your domain name or IP address.
@@ -130,7 +134,7 @@ from the internet.
 .RS
 .RE
 .TP
-.B org.opencastproject.security.digest.user
+.B org.opencastproject.security.digest.user and
 The user for the communication between Matterhorn nodes.
 This is set to matterhorn_system_account by default.
 .RS
@@ -171,7 +175,7 @@ are stored.
 .TP
 .B /tmp/matterhorn
 Temporary data which are not necessarily preserved between reboots.
-This includes the felix-cache and other temporary data.
+This includes the felix\-cache and other temporary data.
 .RS
 .RE
 .TP
@@ -181,7 +185,7 @@ Matterhorn start script.
 .RE
 .TP
 .B /etc/init.d/matterhorn
-SysV-Init script.
+SysV\-Init script.
 .RS
 .RE
 .SH SEE ALSO

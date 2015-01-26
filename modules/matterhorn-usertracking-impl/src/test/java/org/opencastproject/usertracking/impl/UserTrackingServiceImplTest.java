@@ -19,8 +19,7 @@ import org.opencastproject.usertracking.api.FootprintList;
 import org.opencastproject.usertracking.api.Report;
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserActionList;
-import org.opencastproject.usertracking.api.UserSummary;
-import org.opencastproject.usertracking.api.UserSummaryList;
+import org.opencastproject.usertracking.api.UserSession;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -37,7 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -666,50 +664,6 @@ public class UserTrackingServiceImplTest {
   }
 
   /**
-   * Tests user summaries
-   * @throws Exception
-   */
-  @Test
-  public void testUserSummary() throws Exception {
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 20, 30);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
-
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 40, 50);
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
-
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "other", "me", "127.0.0.1", 60, 70);
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(1, service.getViews("other"));
-
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "mp", "someone else", "127.0.01", 20, 30);
-    Assert.assertEquals(3, service.getViews("mp"));
-    Assert.assertEquals(1, service.getViews("other"));
-
-    UserSummaryList list = service.getUserSummaryByTypeAndMediaPackage(UserTrackingServiceImpl.FOOTPRINT_KEY, "empty");
-    Assert.assertEquals(0, list.getTotal());
-
-    list = service.getUserSummaryByTypeAndMediaPackage(UserTrackingServiceImpl.FOOTPRINT_KEY, "mp");
-    Assert.assertEquals(2, list.getTotal());
-    List<UserSummary> summaries = list.getUserSummaries();
-    //Urgh, lame.  Not sure what the order I'm getting is going to be.
-    for (UserSummary summary : summaries) {
-      if ("me".equals(summary.getUserId())) {
-        Assert.assertEquals(2, summary.getSessionCount());
-        Assert.assertEquals(1, summary.getUniqueMediapackages());
-        Assert.assertEquals(20,  summary.getLength());
-      } else if ("someone else".equals(summary.getUserId())) {
-        Assert.assertEquals(1, summary.getSessionCount());
-        Assert.assertEquals(1, summary.getUniqueMediapackages());
-        Assert.assertEquals(10, summary.getLength());
-      } else {
-        Assert.fail("There should not be another username in this summary!");
-      }
-    }
-  }
-
-  /**
    * Tests to make sure reports with date restrictions work as expected.
    * @throws Exception
    */
@@ -1321,11 +1275,12 @@ public class UserTrackingServiceImplTest {
    * @throws Exception
    */
   private UserAction createAndVerifyUserAction(String type, String sessionId, String mediapackageId, String userId, String userIp, int inpoint, int outpoint, Date createdDate) throws Exception {
-    UserAction userAction = createUserAction(type, sessionId, mediapackageId, userId, userIp, inpoint, outpoint, createdDate);
+    UserSession userSession = createUserSession(sessionId, userId, userIp);
+    UserAction userAction = createUserAction(type, mediapackageId, inpoint, outpoint, createdDate, userSession);
     if (UserTrackingServiceImpl.FOOTPRINT_KEY.equals(type)) {
-      userAction = service.addUserFootprint(userAction);
+      userAction = service.addUserFootprint(userAction, userSession);
     } else {
-      userAction = service.addUserTrackingEvent(userAction);
+      userAction = service.addUserTrackingEvent(userAction, userSession);
     }
     Long id = userAction.getId();
 
@@ -1338,29 +1293,39 @@ public class UserTrackingServiceImplTest {
     Assert.assertNotNull(fromDb.getCreated());
     Assert.assertEquals(id, fromDb.getId());
     Assert.assertEquals(userAction.getMediapackageId(), fromDb.getMediapackageId());
-    Assert.assertEquals(userAction.getSessionId(), fromDb.getSessionId());
+    Assert.assertEquals(userAction.getSession().getSessionId(), fromDb.getSession().getSessionId());
     Assert.assertEquals(userAction.getType(), fromDb.getType());
-    Assert.assertEquals(userAction.getUserId(), fromDb.getUserId());
-    Assert.assertEquals(userAction.getUserIp(), fromDb.getUserIp());
+    Assert.assertEquals(userAction.getSession().getUserId(), fromDb.getSession().getUserId());
+    Assert.assertEquals(userAction.getSession().getUserIp(), fromDb.getSession().getUserIp());
     Assert.assertEquals(userAction.getInpoint(), fromDb.getInpoint());
     Assert.assertEquals(userAction.getOutpoint(), fromDb.getOutpoint());
     Assert.assertEquals(userAction.getIsPlaying(), fromDb.getIsPlaying());
-    Assert.assertEquals(userAction.getUserIp(), fromDb.getUserIp());
+    Assert.assertEquals(userAction.getSession().getUserIp(), fromDb.getSession().getUserIp());
     return userAction;
+  }
+
+  /**
+   * Creates a user session
+   * @throws Exception
+   */
+  private UserSession createUserSession(String sessionId, String userId, String userIp) {
+    UserSession userSession = new UserSessionImpl();
+    userSession.setSessionId(sessionId);
+    userSession.setUserId(userId);
+    userSession.setUserIp(userIp);
+    return userSession;
   }
 
   /**
    * Creates a user action with an arbitrary date
    * @throws Exception
    */
-  private UserAction createUserAction(String type, String sessionId, String mediapackageId, String userId, String userIp, int inpoint, int outpoint, Date createdDate) {
+  private UserAction createUserAction(String type, String mediapackageId, int inpoint, int outpoint, Date createdDate, UserSession userSession) {
     UserAction userAction = new UserActionImpl();
     userAction.setInpoint(inpoint);
     userAction.setOutpoint(outpoint);
     userAction.setMediapackageId(mediapackageId);
-    userAction.setSessionId(sessionId);
-    userAction.setUserId(userId);
-    userAction.setUserIp(userIp);
+    userAction.setSession(userSession);
     userAction.setType(type);
     ((UserActionImpl) userAction).setCreated(createdDate);
     return userAction;

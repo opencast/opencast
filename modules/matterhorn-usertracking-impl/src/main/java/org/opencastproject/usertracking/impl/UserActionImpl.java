@@ -16,6 +16,7 @@
 package org.opencastproject.usertracking.impl;
 
 import org.opencastproject.usertracking.api.UserAction;
+import org.opencastproject.usertracking.api.UserSession;
 
 import java.util.Date;
 
@@ -25,7 +26,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -44,15 +47,15 @@ import javax.xml.bind.annotation.XmlType;
 @Table(name = "mh_user_action")
 @NamedQueries({
         @NamedQuery(name = "findUserActions", query = "SELECT a FROM UserAction a"),
-        @NamedQuery(name = "countSessionsGroupByMediapackage", query = "SELECT a.mediapackageId, COUNT(distinct a.sessionId), SUM(a.length) FROM UserAction a GROUP BY a.mediapackageId"),
-        @NamedQuery(name = "countSessionsGroupByMediapackageByIntervall", query = "SELECT a.mediapackageId, COUNT(distinct a.sessionId), SUM(a.length) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end GROUP BY a.mediapackageId"),
-        @NamedQuery(name = "countSessionsOfMediapackage", query = "SELECT COUNT(distinct a.sessionId) FROM UserAction a WHERE a.mediapackageId = :mediapackageId"),
-        @NamedQuery(name = "findLastUserFootprintOfSession", query = "SELECT a FROM UserAction a  WHERE a.sessionId = :sessionId AND a.type = \'FOOTPRINT\'  ORDER BY a.created DESC"),
-        @NamedQuery(name = "findLastUserActionsOfSession", query = "SELECT a FROM UserAction a  WHERE a.sessionId = :sessionId ORDER BY a.created DESC"),
+        @NamedQuery(name = "countSessionsGroupByMediapackage", query = "SELECT a.mediapackageId, COUNT(distinct a.session), SUM(a.length) FROM UserAction a GROUP BY a.mediapackageId"),
+        @NamedQuery(name = "countSessionsGroupByMediapackageByIntervall", query = "SELECT a.mediapackageId, COUNT(distinct a.session.sessionId), SUM(a.length) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end GROUP BY a.mediapackageId"),
+        @NamedQuery(name = "countSessionsOfMediapackage", query = "SELECT COUNT(distinct a.session) FROM UserAction a WHERE a.mediapackageId = :mediapackageId"),
+        @NamedQuery(name = "findLastUserFootprintOfSession", query = "SELECT a FROM UserAction a  WHERE a.session = :session AND a.type = \'FOOTPRINT\'  ORDER BY a.created DESC"),
+        @NamedQuery(name = "findLastUserActionsOfSession", query = "SELECT a FROM UserAction a  WHERE a.session = :session ORDER BY a.created DESC"),
         @NamedQuery(name = "findUserActionsByType", query = "SELECT a FROM UserAction a WHERE a.type = :type"),
         @NamedQuery(name = "findUserActionsByTypeAndMediapackageId", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type"),
         @NamedQuery(name = "findUserActionsByTypeAndMediapackageIdOrderByOutpointDESC", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type ORDER BY a.outpoint DESC"),
-        @NamedQuery(name = "findUserActionsByTypeAndMediapackageIdByUserOrderByOutpointDESC", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type AND a.userId = :userid ORDER BY a.outpoint DESC"),
+        @NamedQuery(name = "findUserActionsByTypeAndMediapackageIdByUserOrderByOutpointDESC", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type AND a.session.userId = :userid ORDER BY a.outpoint DESC"),
         @NamedQuery(name = "findUserActionsByIntervall", query = "SELECT a FROM UserAction a WHERE :begin <= a.created AND a.created <= :end"),
         @NamedQuery(name = "findUserActionsByTypeAndIntervall", query = "SELECT a FROM UserAction a WHERE :begin <= a.created AND a.created <= :end AND a.type = :type"),
         @NamedQuery(name = "findTotal", query = "SELECT COUNT(a) FROM UserAction a"),
@@ -79,20 +82,10 @@ public class UserActionImpl implements UserAction {
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;
 
-  @Lob
-  @Column(name = "user_id", length = 255)
-  @XmlElement(name = "userId")
-  private String userId;
-
-  @Lob
-  @Column(name = "user_ip", length = 255)
-  @XmlElement(name = "userIp")
-  private String userIp;
-
-  @Lob
-  @Column(name = "session", length = 50)
+  @ManyToOne(targetEntity = UserSessionImpl.class)
+  @JoinColumn(name = "session_id", nullable = false)
   @XmlElement(name = "sessionId")
-  private String sessionId;
+  private UserSessionImpl session;
 
   @Column(name = "inpoint")
   @XmlElement(name = "inpoint")
@@ -135,36 +128,20 @@ public class UserActionImpl implements UserAction {
     this.id = id;
   }
 
+  public void setSession(UserSession session) {
+    this.session = (UserSessionImpl) session;
+  }
+
+  public UserSession getSession() {
+    return session;
+  }
+
   public String getMediapackageId() {
     return mediapackageId;
   }
 
   public void setMediapackageId(String mediapackageId) {
     this.mediapackageId = mediapackageId;
-  }
-
-  public String getUserId() {
-    return userId;
-  }
-
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
-
-  public String getUserIp() {
-    return userIp;
-  }
-
-  public void setUserIp(String userIp) {
-    this.userIp = userIp;
-  }
-
-  public String getSessionId() {
-    return sessionId;
-  }
-
-  public void setSessionId(String sessionId) {
-    this.sessionId = sessionId;
   }
 
   public int getInpoint() {

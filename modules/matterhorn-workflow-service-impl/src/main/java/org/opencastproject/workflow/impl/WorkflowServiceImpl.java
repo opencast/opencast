@@ -87,6 +87,7 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
@@ -110,6 +111,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -128,20 +130,33 @@ import javax.management.ObjectInstance;
  * for custom runners to be added or modified without affecting the workflow service itself.
  */
 public class WorkflowServiceImpl implements WorkflowService, JobProducer, ManagedService {
+  /** The code to use for the incident service to report a failed capture. */
+  private static final int FAILED_CAPTURE_CODE = 1;
+  /** The code to use for the incident service to report a failed ingest. */
+  private static final int FAILED_INGEST_CODE = 2;
+
+  /** The number of milliseconds in a second. */
+  public static final long MILLISECONDS_IN_SECONDS = 1000L;
+
+  /** The unique service template that identifies the capture operation. */
+  public static final String CAPTURE_OPERATION_TEMPLATE = "capture";
+
+  /** The unique service template that identifies the ingest operation. */
+  public static final String INGEST_OPERATION_TEMPLATE = "ingest";
+
+  /** The unique service template that identifies the schedule operation. */
+  public static final String SCHEDULE_OPERATION_TEMPLATE = "schedule";
 
   /** Retry strategy property name */
   private static final String RETRY_STRATEGY = "retryStrategy";
 
   /** Logging facility */
-  // private static final Logger logger = LoggerFactory.getLogger(WorkflowServiceImpl.class);
   private static final Log logger = new Log(LoggerFactory.getLogger(WorkflowServiceImpl.class));
 
   /** List of available operations on jobs */
   enum Operation {
     START_WORKFLOW, RESUME, START_OPERATION
   }
-
-  ;
 
   /** The pattern used by workfow operation configuration keys * */
   public static final Pattern PROPERTY_PATTERN = Pattern.compile("\\$\\{.+?\\}");
@@ -247,10 +262,11 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     this.componentContext = componentContext;
     executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
     try {
+      logger.info("Generating JMX workflow statistics");
       workflowsStatistics = new WorkflowsStatistics(getBeanStatistics(), getHoldWorkflows());
       jmxBeans.add(JmxUtil.registerMXBean(workflowsStatistics, JMX_WORKFLOWS_STATISTICS_TYPE));
     } catch (WorkflowDatabaseException e) {
-      logger.error("Error registarting JMX statistic beans {}", e);
+      logger.error("Error registarting JMX statistic beans", e);
     }
 
     logger.info("Activate Workflow service");
@@ -726,11 +742,36 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    */
   protected Job runWorkflow(WorkflowInstance workflow) throws WorkflowException, UnauthorizedException {
     if (!INSTANTIATED.equals(workflow.getState())) {
+
+      // If the workflow is "running", we need to determine if there is an operation being executed or not.
+      // When a workflow has been restarted, this might not be the case and the status might not have been
+      // updated accordingly.
       if (RUNNING.equals(workflow.getState())) {
-        logger.debug("Not starting workflow %s, it is already in running state", workflow);
-        return null;
+        WorkflowOperationInstance currentOperation = workflow.getCurrentOperation();
+        if (currentOperation != null) {
+          if (currentOperation.getId() != null) {
+            try {
+              Job operationJob = serviceRegistry.getJob(currentOperation.getId());
+              if (Job.Status.RUNNING.equals(operationJob.getStatus())) {
+                logger.debug("Not starting workflow %s, it is already in running state", workflow);
+                return null;
+              } else {
+                logger.info("Scheduling next operation of workflow %s", workflow);
+                operationJob.setStatus(Status.QUEUED);
+                operationJob.setDispatchable(true);
+                return serviceRegistry.updateJob(operationJob);
+              }
+            } catch (Exception e) {
+              logger.warn("Error determining status of current workflow operation in {}: {}", workflow, e.getMessage());
+              return null;
+            }
+          }
+        } else {
+          throw new IllegalStateException("Cannot start a workflow '" + workflow + "' with no current operation");
+        }
+      } else {
+        throw new IllegalStateException("Cannot start a workflow in state '" + workflow.getState() + "'");
       }
-      throw new IllegalStateException("Cannot start a workflow in state '" + workflow.getState() + "'");
     }
 
     // If this is a new workflow, move to the first operation
@@ -929,13 +970,13 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
 
   private void removeTempFiles(WorkflowInstance workflowInstance) throws WorkflowDatabaseException,
           UnauthorizedException, NotFoundException {
-    logger.info("Removing temporary files for workflow {}", workflowInstance);
+    logger.info("Removing temporary files for workflow %s", workflowInstance);
     for (MediaPackageElement elem : workflowInstance.getMediaPackage().getElements()) {
       try {
-        logger.debug("Removing temporary file {} for workflow {}", elem.getURI(), workflowInstance);
+        logger.debug("Removing temporary file %s for workflow %s", elem.getURI(), workflowInstance);
         workspace.delete(elem.getURI());
       } catch (IOException e) {
-        logger.warn("Unable to delete mediapackage element {}", e.getMessage());
+        logger.warn("Unable to delete mediapackage element ", e);
       } catch (NotFoundException e) {
         // File was probably already deleted before...
       }
@@ -972,7 +1013,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         removeTempFiles(instance);
       } catch (NotFoundException e) {
         // If the files aren't their anymore, we don't have to cleanup up them :-)
-        logger.debug("Temporary files of workflow instance {} seem to be gone already...", workflowInstanceId);
+        logger.debug("Temporary files of workflow instance %d seem to be gone already...", workflowInstanceId);
       }
 
       // Second, remove jobs related to a operation which belongs to the workflow instance
@@ -984,10 +1025,10 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
             try {
               serviceRegistry.removeJob(workflowOpId);
             } catch (ServiceRegistryException e) {
-              logger.warn("Problems while removing jobs related to workflow operation '{}': {}", workflowOpId,
+              logger.warn("Problems while removing jobs related to workflow operation '%d': %s", workflowOpId,
                       e.getMessage());
             } catch (NotFoundException e) {
-              logger.debug("No jobs related to the workflow operation '{}' found in the service registry", workflowOpId);
+              logger.debug("No jobs related to the workflow operation '%d' found in the service registry", workflowOpId);
             }
           }
         }
@@ -997,9 +1038,9 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       try {
         serviceRegistry.removeJob(workflowInstanceId);
       } catch (ServiceRegistryException e) {
-        logger.warn("Problems while removing workflow instance job '{}': {}", workflowInstanceId, e.getMessage());
+        logger.warn("Problems while removing workflow instance job '%d': %s", workflowInstanceId, ExceptionUtils.getStackTrace(e));
       } catch (NotFoundException e) {
-        logger.info("No workflow instance job '{}' found in the service registry", workflowInstanceId);
+        logger.info("No workflow instance job '%d' found in the service registry", workflowInstanceId);
       }
 
       // At last, remove workflow instance from the index
@@ -1007,7 +1048,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         index.remove(workflowInstanceId);
       } catch (NotFoundException e) {
         // This should never happen, because we got workflow instance by querying the index...
-        logger.warn("Workflow instance could not be removed from index: {}", e);
+        logger.warn("Workflow instance could not be removed from index: %s", ExceptionUtils.getStackTrace(e));
       }
     } else if (workflows.size() == 0) {
       throw new NotFoundException("Workflow instance with id '" + Long.toString(workflowInstanceId)
@@ -1842,6 +1883,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       logger.warn(e, "Exception while accepting job " + job);
       try {
         if (workflowInstance != null) {
+          logger.warn("Marking workflow instance %s as failed", workflowInstance);
           workflowInstance.setState(FAILED);
           update(workflowInstance);
         } else {
@@ -2229,15 +2271,208 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     }
   }
 
+  /**
+   * @param workflowQuery
+   *          A workflow query to run to retrieve results.
+   * @return A WorkflowSet that has all of the workflow instances.
+   * @throws WorkflowDatabaseException
+   *           Thrown if there is a problem getting the WorkflowInstances.
+   */
+  public WorkflowSet getAllWorkflowInstances(WorkflowQuery workflowQuery) throws WorkflowDatabaseException {
+    WorkflowSet workflowSet = getWorkflowInstances(workflowQuery);
+    long total = workflowSet.getTotalCount();
+    long sofar = workflowSet.getItems().length;
+    if (sofar < total) {
+      workflowQuery.withCount(total);
+      workflowSet = getWorkflowInstances(workflowQuery);
+    }
+    return workflowSet;
+  }
+
+  /**
+   * Find and fail jobs due to their status still being in effect after their start or end capture date
+   * and time.
+   *
+   * @param operation
+   *          The type of operation to look for. e.g. schedule, ingest, capturing
+   * @param workflowState
+   *          The workflow state the given operation needs to be in.
+   * @param buffer
+   *          The amount of time in seconds to wait after the beginning or ending of a capture before marking that
+   *          workflow as failed.
+   * @param useCaptureStartTime
+   *          Whether to use the start time or the end time of the capture to calculate if it is overdue.
+   * @throws WorkflowDatabaseException
+   */
+  public void failJobs(String operation, WorkflowState workflowState, long buffer, boolean useCaptureStartTime)
+          throws WorkflowDatabaseException {
+    Date now = new Date();
+    Date cutoffTime;
+    int failedInstances = 0;
+    int cleaningFailed = 0;
+
+    logger.info("Starting to look for workflows that in operation '%s' that have failed to start if now is %s after their start time.",
+            operation, Log.getHumanReadableTimeString(buffer));
+    WorkflowQuery query = new WorkflowQuery().withState(workflowState);
+    WorkflowInstance[] workflowInstances = getAllWorkflowInstances(query).getItems();
+    if (workflowInstances != null) {
+      for (WorkflowInstance workflowInstance : workflowInstances) {
+        Date startTime = workflowInstance.getMediaPackage().getDate();
+        if (useCaptureStartTime) {
+          cutoffTime = new Date(startTime.getTime() + (buffer * MILLISECONDS_IN_SECONDS));
+        } else {
+          cutoffTime = new Date(startTime.getTime() + workflowInstance.getMediaPackage().getDuration()
+                  + (buffer * MILLISECONDS_IN_SECONDS));
+        }
+        logger.debug("%d's cutoff time is %s.", workflowInstance.getId(), cutoffTime);
+
+        if (!cutoffTime.before(now)) {
+          logger.debug("Ignoring %d as it is still within the grace period. %d", workflowInstance.getId(),
+                  (now.getTime() - cutoffTime.getTime()));
+          continue;
+        }
+
+        WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
+
+        if (currentOperation == null) {
+          currentOperation = findIfFailedState(workflowInstance, operation);
+          if (currentOperation == null) {
+            logger.debug("Ignoring %d as it seems to have no current operation and it has the wrong failed operation.", workflowInstance.getId());
+            continue;
+          }
+        }
+
+        if (currentOperation != null && !operation.equals(currentOperation.getTemplate())) {
+          logger.debug("Ignoring %d as it is the wrong operation. It is '%s' instead of '%s'.", workflowInstance.getId(), currentOperation.getTemplate(), operation);
+          continue;
+        }
+
+        try {
+          if (workflowInstance != null && currentOperation != null) {
+            Job job = null;
+            if (currentOperation.getId() != null) {
+              job = serviceRegistry.getJob(currentOperation.getId());
+            }
+            if (job != null) {
+              job.setStatus(Job.Status.FAILED);
+            }
+            currentOperation.setState(WorkflowOperationInstance.OperationState.FAILED);
+            workflowInstance.setState(WorkflowState.FAILED);
+            update(workflowInstance);
+            removeTempFiles(workflowInstance);
+            recordFailedOperationIncident(operation, buffer, job);
+            failedInstances++;
+          } else {
+            logger.warn("Can't get current operation for workflow %s so it won't be put in a failed status.", workflowInstance);
+            cleaningFailed++;
+          }
+        } catch (WorkflowException e) {
+          logger.warn("Unable to update workflow %d: %s", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
+          cleaningFailed++;
+        } catch (UnauthorizedException e) {
+          logger.warn("Unable to update workflow %d: %s", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
+          cleaningFailed++;
+        } catch (IllegalStateException e) {
+          logger.warn("Unable to fail job %s: %s", workflowInstance.getCurrentOperation().getId(), ExceptionUtils.getStackTrace(e));
+          cleaningFailed++;
+        } catch (NotFoundException e) {
+          logger.warn("Unable to fail job %d: %s", workflowInstance.getCurrentOperation().getId(), ExceptionUtils.getStackTrace(e));
+          cleaningFailed++;
+        } catch (ServiceRegistryException e) {
+          logger.warn("Unable to fail job %d: %s", workflowInstance.getCurrentOperation().getId(), ExceptionUtils.getStackTrace(e));
+          cleaningFailed++;
+        } catch (NullPointerException e) {
+          logger.warn("Unable to update workflow %d: %s", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
+          cleaningFailed++;
+        }
+        logger.info("Setting %d to failed as it should have started.", workflowInstance.getId());
+      }
+    }
+
+    if (failedInstances > 0) {
+      logger.info("Cleaned up %d failed workflow instances", failedInstances);
+    }
+    if (cleaningFailed > 0) {
+      logger.warn("Cleaning failed for %d failed capture workflow instances", cleaningFailed);
+      throw new WorkflowDatabaseException("Unable to clean all failed capture workflow instances, see logs!");
+    }
+    logger.info(
+            "Finished looking for workflows in operation '%s' that have failed to start after %s their start time.",
+            operation, Log.getHumanReadableTimeString(buffer));
+  }
+
+  /**
+   * Records a failed incident for a capture or ingest operation.
+   *
+   * @param operation
+   *          The operation type the job was in when this occurred
+   * @param buffer
+   *          The amount of buffer time the job was given before it was expected to move onto the next operation.
+   * @param job
+   *          The job associated with this incident.
+   */
+  private void recordFailedOperationIncident(String operation, long buffer, Job job) {
+    int failedCode;
+    if (operation.equalsIgnoreCase(SCHEDULE_OPERATION_TEMPLATE)) {
+      failedCode = FAILED_CAPTURE_CODE;
+    } else {
+      failedCode = FAILED_INGEST_CODE;
+    }
+    TreeMap<String, String> properties = new TreeMap<String, String>();
+    properties.put("state", operation);
+    properties.put("buffer", Log.getHumanReadableTimeString(buffer));
+    getServiceRegistry().incident().recordFailure(job, failedCode, properties);
+  }
+
+  /**
+   * Finds a given operation position in a WorkflowInstance if the operation is failed.
+   * @param workflowInstance The workflow instance to search for the failed operation.
+   * @param operation The operation template id to look for.
+   * @return The operation if it can be found, null if it is missing.
+   */
+  protected WorkflowOperationInstance findIfFailedState(WorkflowInstance workflowInstance, String operation) {
+    WorkflowOperationInstance result = null;
+    WorkflowOperationInstance last = null;
+    for (WorkflowOperationInstance current : workflowInstance.getOperations()) {
+      if (current.getState().equals(OperationState.PAUSED) && operation.equals(current.getTemplate()) && last != null && last.getState().equals(OperationState.FAILED)) {
+        result = current;
+        break;
+      }
+      last = current;
+    }
+    return result;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#moveMissingCapturesFromUpcomingToFailedStatus(long)
+   */
   @Override
-  public void cleanupWorkflowInstances(int lifetime, WorkflowState state) throws UnauthorizedException,
+  public void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
+    failJobs(SCHEDULE_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, true);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#moveMissingIngestsFromUpcomingToFailedStatus(long)
+   */
+  @Override
+  public void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
+    failJobs(CAPTURE_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, false);
+    failJobs(INGEST_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, false);
+  }
+
+  @Override
+  public void cleanupWorkflowInstances(int buffer, WorkflowState state) throws UnauthorizedException,
           WorkflowDatabaseException {
-    logger.info("Start cleaning up workflow instances older than {} days with status '{}'", lifetime, state);
+    logger.info("Start cleaning up workflow instances older than {} days with status '{}'", buffer, state);
 
     int instancesCleaned = 0;
     int cleaningFailed = 0;
 
-    WorkflowQuery query = new WorkflowQuery().withState(state).withDateBefore(DateUtils.addDays(new Date(), -lifetime))
+    WorkflowQuery query = new WorkflowQuery().withState(state).withDateBefore(DateUtils.addDays(new Date(), -buffer))
             .withCount(Integer.MAX_VALUE);
     for (WorkflowInstance workflowInstance : getWorkflowInstances(query).getItems()) {
       try {
@@ -2249,12 +2484,12 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         throw e;
       } catch (NotFoundException e) {
         // Since we are in a cleanup operation, we don't have to care about NotFoundExceptions
-        logger.debug("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), e);
+        logger.debug("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
       } catch (WorkflowParsingException e) {
-        logger.warn("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), e);
+        logger.warn("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
         cleaningFailed++;
       } catch (WorkflowStateException e) {
-        logger.warn("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), e);
+        logger.warn("Workflow instance '{}' could not be removed: {}", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
         cleaningFailed++;
       }
     }
@@ -2265,10 +2500,12 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     }
 
     if (instancesCleaned > 0)
-      logger.info("Cleaned up {} workflow instances", instancesCleaned);
+      logger.info("Cleaned up '%d' workflow instances", instancesCleaned);
     if (cleaningFailed > 0) {
-      logger.warn("Cleaning failed for {} workflow instances", cleaningFailed);
+      logger.warn("Cleaning failed for '%d' workflow instances", cleaningFailed);
       throw new WorkflowDatabaseException("Unable to clean all workflow instances, see logs!");
     }
   }
 }
+
+
