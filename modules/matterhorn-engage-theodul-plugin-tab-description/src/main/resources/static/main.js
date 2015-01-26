@@ -16,6 +16,8 @@
 /*global define*/
 define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($, _, Backbone, Engage, Moment) {
     "use strict";
+
+    var insertIntoDOM = true;
     var PLUGIN_NAME = "Description";
     var PLUGIN_TYPE = "engage_tab";
     var PLUGIN_VERSION = "1.0";
@@ -46,6 +48,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -57,6 +60,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
             break;
         case "embed":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -69,6 +73,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
         case "desktop":
         default:
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -155,7 +160,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
                     series: this.model.get("series"),
                     contributor: this.model.get("contributor"),
                     date: this.model.get("date"),
-                    views: Engage.model.get("views").get("stats").views,
+                    views: Engage.model.get("views") ? Engage.model.get("views").get("stats").views : "",
                     str_title: translate("title", "Title"),
                     str_noTitle: translate("noTitle", "No title"),
                     str_creator: translate("creator", "Creator"),

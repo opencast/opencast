@@ -17,6 +17,7 @@
 define(["require", "jquery", "underscore", "backbone", "engage/core"], function(require, $, _, Backbone, Engage) {
     "use strict";
 
+    var insertIntoDOM = true;
     var PLUGIN_NAME = "Slide text";
     var PLUGIN_TYPE = "engage_tab";
     var PLUGIN_VERSION = "1.0";
@@ -50,6 +51,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -61,6 +63,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
             break;
         case "embed":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -73,6 +76,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
         case "desktop":
         default:
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -260,7 +264,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
     require([relative_plugin_path + "utils"], function(utils) {
         Engage.log("Tab:Slidetext: Utils class loaded");
         Utils = new utils();
-	plugin.timeStrToSeconds = Utils.timeStrToSeconds;
+        plugin.timeStrToSeconds = Utils.timeStrToSeconds;
         initTranslate(Utils.detectLanguage(), function() {
             Engage.log("Tab:Slidetext: Successfully translated.");
             initCount -= 1;

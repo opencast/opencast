@@ -16,6 +16,8 @@
 /*global define*/
 define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], function(require, $, _, Backbone, Basil, Engage) {
     "use strict";
+
+    var insertIntoDOM = true;
     var PLUGIN_NAME = "Engage VideoJS Videodisplay";
     var PLUGIN_TYPE = "engage_video";
     var PLUGIN_VERSION = "1.0";
@@ -75,6 +77,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -86,6 +89,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
             break;
         case "embed":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -98,6 +102,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         case "desktop":
         default:
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -235,15 +240,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     Basil = new window.Basil(basilOptions);
 
     function acceptFormat(track) {
-	// TODO: throws a SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data [basil.js:68]
-	/*
+        // TODO: throws a SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data [basil.js:68]
+        /*
         var preferredFormat = Basil.get("preferredFormat");
         if ((Utils.preferredFormat(preferredFormat) == null) || (mimetypes.indexOf(Utils.preferredFormat(preferredFormat)) == -1)) {
             return true; // preferred format is not available, accept all
         }
         return track.mimetype == Utils.preferredFormat(preferredFormat);
 	*/
-	return true;
+        return true;
     }
 
     function renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio) {
@@ -1236,3 +1241,4 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
 
     return plugin;
 });
+

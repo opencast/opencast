@@ -95,7 +95,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     function browserSupported() {
         if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
-            console.log("User setting: Support unsupported browser: " + Basil.get("overrideBrowser"));
+            console.log("Core: User setting - Support unsupported browser: " + Basil.get("overrideBrowser"));
             return true;
         }
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) ||
@@ -113,10 +113,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         var jsonstr = "";
 
         if (language == "de") {
-            console.log("Controls: Chosing german translations");
+            console.log("Core: Chosing german translations");
             jsonstr += path_language_de;
         } else { // No other languages supported, yet
-            console.log("Controls: Chosing english translations");
+            console.log("Core: Chosing english translations");
             jsonstr += path_language_en;
         }
         $.ajax({
@@ -326,6 +326,11 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         return all_plugins_loaded;
     }
 
+    var timelinePluginInserted = false;
+    var id_engage_timeline = "engage_timeline";
+    var id_engage_timeline_expand_btn = "engage_timeline_expand_btn";
+    var id_engage_timeline_plugin = "engage_timeline_plugin";
+
     function loadPlugin(plugin_path, plugin_name) {
         require([plugin_path + "main"], function(plugin) {
             // load styles in link tags via jquery
@@ -368,8 +373,14 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     plugin.templateProcessed = _.template(template, template_data);
                     plugin.template = template;
                     plugin.pluginPath = "engage/theodul/" + plugin_path;
-                    // load the compiled HTML into the component
-                    engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
+                    plugin.insertIntoDOM = plugin.insertIntoDOM ? true : false;
+                    if (plugin.insertIntoDOM) {
+                        // load the compiled HTML into the component
+                        engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
+                        if (plugin.type == id_engage_timeline) {
+                            timelinePluginInserted = true;
+                        }
+                    }
                     // plugin load done counter
                     plugins_loaded[plugin_name] = true;
                     // check if all plugins are ready
@@ -535,6 +546,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                             engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/") + "'...");
                                             loadPlugin("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/", plugin_name);
                                         }
+                                    }
+                                    if (!timelinePluginInserted) {
+                                        console.log("Core: No timeline plugin inserted. Removing the container.");
+                                        $("#" + id_engage_timeline_expand_btn + ", #" + id_engage_timeline_plugin).detach();
                                     }
                                 }
                             });

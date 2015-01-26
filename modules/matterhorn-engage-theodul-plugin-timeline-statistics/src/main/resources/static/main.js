@@ -16,6 +16,8 @@
 /*global define*/
 define(["require", "jquery", "underscore", "backbone", "engage/core"], function(require, $, _, Backbone, Engage) {
     "use strict";
+
+    var insertIntoDOM = false;
     var PLUGIN_NAME = "Timeline Usertracking Statistics";
     var PLUGIN_TYPE = "engage_timeline";
     var PLUGIN_VERSION = "1.0";
@@ -46,6 +48,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -57,6 +60,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
             break;
         case "embed":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -69,6 +73,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
         case "desktop":
         default:
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -205,6 +210,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
     var data; // chart data array
     var lineChartData;
     var mediapackageError = false;
+
+    /* TODO: Wait for the new usertracking service...
 
     function setSize() {
         $("#engage_timeline_statistics_chart").attr("width", $(window).width() - 40).attr("height", 60).css({
@@ -355,6 +362,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
             }
         });
     }
+
+    */
 
     return plugin;
 });
