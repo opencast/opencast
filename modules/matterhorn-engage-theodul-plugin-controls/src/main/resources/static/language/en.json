@@ -29,5 +29,22 @@
     "playbackRate": "Playback rate",
     "remainingTime": "remaining time",
     "embedButton": "Embed button. Select embed size from dropdown.",
-    "checkingLoginStatus": "Checking login status..."
+    "checkingLoginStatus": "Checking login status...",
+    "fullscreen": "Go into fullscreen",
+    "displayShortcuts": "Display shortcuts",
+    "shortcutOverview": "Shortcut overview",
+    "shortcutsNotAvailable": "Currently no shortcuts are available.",
+    "playPause": "Play/Pause",
+    "mute": "Mute",
+    "volDown": "Volume down",
+    "volUp": "Volume up",
+    "fullscreenEnable": "Go into fullscreen",
+    "fullscreenCancel": "Cancel fullscreen",
+    "jumpToBegin": "Jump to the start of the recording",
+    "prevChapter": "Previous chapter",
+    "nextChapter": "Next chapter",
+    "prevEpisode": "Previous episode",
+    "nextEpisode": "Next episode",
+    "name": "Shortcut name",
+    "shortcut": "Shortcut"
 }

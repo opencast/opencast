@@ -15,7 +15,9 @@
    && (typeof str_playbackRateButton !== "undefined")
    && (typeof str_playbackRate !== "undefined")
    && (typeof str_remainingTime !== "undefined")
-   && (typeof str_embedButton !== "undefined")) { %>
+   && (typeof str_embedButton !== "undefined")
+   && (typeof str_fullscreen !== "undefined")
+   && (typeof str_displayShortcuts !== "undefined")) { %>
 <div id="navigation_wrapper">
     <div id="navigation_control">
         <div id="backward_button" class="controlbutton" role="button" aria-label="<%= str_prevChapter %>">
@@ -71,22 +73,27 @@
                     <li role="presentation"><a id="playback150" role="menuitem" tabindex="-1" href="#"><b>1.5</b> (<span id="playbackRemTime150"></span>)</a></li>
                 </ul>
             </div>
-            <button id="fullscreen_button" type="button" class="btn btn-default disabled" role="button" aria-label="Fullscreen video">
+            <button id="fullscreen_button" type="button" class="btn btn-default disabled" role="button" aria-label="<%= str_fullscreen %>">
             <span class="glyphicon glyphicon-fullscreen"></span>
             </button>
         </div>
         <div class="btn-group">
+          <div class="btn-group">
             <button id="embed_button" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" aria-label="<%= str_embedButton %>">
-            <span class="glyphicon glyphicon-share"></span>
-            <span class="caret"></span>
+              <span class="glyphicon glyphicon-share"></span>
+              <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
-                <li role="presentation"><a id="embed0" role="menuitem" tabindex="-1" href="#"></a></li>
-                <li role="presentation"><a id="embed1" role="menuitem" tabindex="-1" href="#"></a></li>
-                <li role="presentation"><a id="embed2" role="menuitem" tabindex="-1" href="#"></a></li>
-                <li role="presentation"><a id="embed3" role="menuitem" tabindex="-1" href="#"></a></li>
-                <li role="presentation"><a id="embed4" role="menuitem" tabindex="-1" href="#"></a></li>
+              <li role="presentation"><a id="embed0" role="menuitem" tabindex="-1" href="#"></a></li>
+              <li role="presentation"><a id="embed1" role="menuitem" tabindex="-1" href="#"></a></li>
+              <li role="presentation"><a id="embed2" role="menuitem" tabindex="-1" href="#"></a></li>
+              <li role="presentation"><a id="embed3" role="menuitem" tabindex="-1" href="#"></a></li>
+              <li role="presentation"><a id="embed4" role="menuitem" tabindex="-1" href="#"></a></li>
             </ul>
+          </div>
+          <button id="shortcuts_button" type="button" class="btn btn-default" role="button" aria-label="<%= str_displayShortcuts %>">
+            <span class="glyphicon glyphicon-info-sign"></span>
+          </button>
         </div>
       <% if((typeof loggedIn !== "undefined")
       && (typeof str_checkingStatus !== "undefined")
