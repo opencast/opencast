@@ -29,5 +29,22 @@
     "playbackRate": "Wiedergaberate",
     "remainingTime": "verbleibende Zeit",
     "embedButton": "Schaltfläche zum Einbetten des Videos. Größe zum Einbetten aus der Liste auswählen.",
-    "checkingLoginStatus": "Login-Status wird überprüft..."
+    "checkingLoginStatus": "Login-Status wird überprüft...",
+    "fullscreen": "Vollbild aktivieren",
+    "displayShortcuts": "Shortcuts anzeigen",
+    "shortcutOverview": "Shortcut-Übersicht",
+    "shortcutsNotAvailable": "Aktuell sind keine Shortcuts verfügbar.",
+    "playPause": "Start/Stop",
+    "mute": "Stumnm schalten",
+    "volDown": "Lautstärke senken",
+    "volUp": "Lautstärke erhöhen",
+    "fullscreenEnable": "Vollbild aktivieren",
+    "fullscreenCancel": "Vollbild verlassen",
+    "jumpToBegin": "Zum Anfang der Aufzeichnung springen",
+    "prevChapter": "Vorheriges Kapitel",
+    "nextChapter": "Nächstes Kapitel",
+    "prevEpisode": "Vorherige Episode",
+    "nextEpisode": "Nächste Episode",
+    "name": "Shortcut-Name",
+    "shortcut": "Shortcut"
 }

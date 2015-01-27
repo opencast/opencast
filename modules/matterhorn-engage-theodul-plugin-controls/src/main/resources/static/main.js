@@ -145,6 +145,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_playbackRate150 = "playback150";
     var id_playpause_controls = "playpause_controls";
     var id_fullscreen_button = "fullscreen_button";
+    var id_displayShortcuts_button = "shortcuts_button";
     var id_embed_button = "embed_button";
     var id_backward_button = "backward_button";
     var id_forward_button = "forward_button";
@@ -205,6 +206,19 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
+    // hotkeys
+    var hotkey_playPause = "playPause";
+    var hotkey_mute = "mute";
+    var hotkey_volDown = "volDown";
+    var hotkey_volUp = "volUp";
+    var hotkey_fullscreenEnable = "fullscreenEnable";
+    var hotkey_fullscreenCancel = "fullscreenCancel";
+    var hotkey_jumpToBegin = "jumpToBegin";
+    var hotkey_prevChapter = "prevChapter";
+    var hotkey_nextChapter = "nextChapter";
+    var hotkey_prevEpisode = "prevEpisode";
+    var hotkey_nextEpisode = "nextEpisode";
+    var hotkey_jumpToX = "jumpToX";
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -244,6 +258,36 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
+    }
+
+    function displayShortcuts() {
+        var shortcuts = Engage.model.get("meInfo").get("hotkeys");
+        if (shortcuts) {
+            var str_shortcuts = "";
+            str_shortcuts += "<table class=\"table table-striped table-hover table-bordered\">";
+            str_shortcuts += "<th>" + translate(name, "Shortcut name") + "</th><th>" + translate("shortcut", "Shortcut") + "</th>";
+            $.each(shortcuts, function(i, v) {
+                str_shortcuts += "<tr><td>" + translate(v.name, v.name) + "</td><td>" + v.key + "</td></tr>";
+            });
+            str_shortcuts += "</table>";
+            Bootbox.dialog({
+                title: translate("shortcutsOverview", "Shortcut overview"),
+                message: str_shortcuts,
+                buttons: {
+                    main: {
+                        label: "Ok",
+                        className: "btn-primary",
+                        callback: function() {
+                            // callback
+                        }
+                    }
+                }
+            });
+        } else {
+            Bootbox.alert(translate("shortcutsNotAvailable", "Currently there are no shortcuts available."), function() {
+                // callback
+            });
+        }
     }
 
     function login() {
@@ -387,7 +431,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_embedButton: translate("embedButton", "Embed Button. Select embed size from dropdown."),
                     loggedIn: false,
                     str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
-                    str_loginLogout: translate("loginLogout", "Login/Logout")
+                    str_loginLogout: translate("loginLogout", "Login/Logout"),
+                    str_fullscreen: translate("fullscreen", "Fullscreen"),
+                    str_displayShortcuts: translate("displayShortcuts", "Display shortcuts")
                 };
 
                 // compile template and load into the html
@@ -596,6 +642,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 if (!isInFullScreen) {
                     Engage.trigger(plugin.events.fullscreenEnable.getName());
                 }
+            });
+
+            $("#" + id_displayShortcuts_button).click(function(e) {
+                e.preventDefault();
+                displayShortcuts();
             });
 
             // slider events

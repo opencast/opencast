@@ -20,9 +20,9 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var events = {
         plugin_load_done: new EngageEvent("Core:plugin_load_done", "when the core loaded the event successfully", "both"),
         coreInit: new EngageEvent("Core:init", "", "trigger"),
-        jumpToX: new EngageEvent("Controls:jumpToX", "", "trigger"),
         nextChapter: new EngageEvent("Video:nextChapter", "", "trigger"),
         fullscreenEnable: new EngageEvent("Video:fullscreenEnable", "", "trigger"),
+        fullscreenCancel: new EngageEvent("Video:fullscreenCancel", "", "trigger"),
         jumpToBegin: new EngageEvent("Video:jumpToBegin", "", "trigger"),
         previousEpisode: new EngageEvent("Core:previousEpisode", "", "trigger"),
         previousChapter: new EngageEvent("Video:previousChapter", "", "trigger"),
@@ -73,18 +73,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var loadingDelay1 = 500;
     var loadingDelay2 = 1000;
     var errorCheckDelay = 3500;
-    var hotkey_jumpToX = "jumpToX";
-    var hotkey_nextChapter = "nextChapter";
-    var hotkey_fullscreen = "fullscreen";
-    var hotkey_jumpToBegin = "jumpToBegin";
-    var hotkey_prevEpisode = "prevEpisode";
-    var hotkey_prevChapter = "prevChapter";
-    var hotkey_play = "play";
-    var hotkey_pause = "pause";
-    var hotkey_mute = "mute";
-    var hotkey_nextEpisode = "nextEpisode";
-    var hotkey_volDown = "volDown";
-    var hotkey_volUp = "volUp";
     var mediapackageError = false;
     var numberOfPlugins = 0;
     var translationData = null;
@@ -93,6 +81,18 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var askedForLogin = false;
     var springSecurityLoginURL = "/j_spring_security_check";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
+    // hotkeys
+    var hotkey_playPause = "playPause";
+    var hotkey_mute = "mute";
+    var hotkey_volDown = "volDown";
+    var hotkey_volUp = "volUp";
+    var hotkey_fullscreenEnable = "fullscreenEnable";
+    var hotkey_fullscreenCancel = "fullscreenCancel";
+    var hotkey_jumpToBegin = "jumpToBegin";
+    var hotkey_prevChapter = "prevChapter";
+    var hotkey_nextChapter = "nextChapter";
+    var hotkey_prevEpisode = "prevEpisode";
+    var hotkey_nextEpisode = "nextEpisode";
 
     var basilOptions = {
         namespace: "mhStorage"
@@ -255,19 +255,19 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         // process hardcoded keys
         $.each(engageCore.model.get("meInfo").get("hotkeys"), function(i, val) {
             switch (val.name) {
-                case hotkey_jumpToX:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.jumpToX.getName());
-                    });
-                    break;
                 case hotkey_nextChapter:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.nextChapter.getName());
                     });
                     break;
-                case hotkey_fullscreen:
+                case hotkey_fullscreenEnable:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.fullscreenEnable.getName());
+                    });
+                    break;
+                case hotkey_fullscreenCancel:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.fullscreenCancel.getName());
                     });
                     break;
                 case hotkey_jumpToBegin:
@@ -285,14 +285,9 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         engageCore.trigger(events.previousChapter.getName());
                     });
                     break;
-                case hotkey_play:
+                case hotkey_playPause:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.play.getName(), false);
-                    });
-                    break;
-                case hotkey_pause:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.pause.getName(), false);
                     });
                     break;
                 case hotkey_mute:
@@ -665,3 +660,4 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     engageCore.trigger(events.coreInit.getName());
     return engageCore;
 });
+
