@@ -60,7 +60,9 @@ public final class Caches {
               if (value == null) logger.trace("Cache miss " + key);
               else logger.trace("Cache expired " + key);
             }
-            final Tuple<Long, V> newValue = tuple(now, loader.apply(key));
+            V tmp = loader.apply(key);
+            if (tmp == null) return null;
+            final Tuple<Long, V> newValue = tuple(now, tmp); 
             // Since the LinkedHashMap is access ordered there is no need to remove the
             // key prior to putting. For an insertion ordered map the
             // key has to be removed first though otherwise the order does not update.
