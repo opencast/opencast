@@ -24,11 +24,9 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         fullscreenEnable: new EngageEvent("Video:fullscreenEnable", "", "trigger"),
         fullscreenCancel: new EngageEvent("Video:fullscreenCancel", "", "trigger"),
         seek: new EngageEvent("Video:seek", "seek video to a given position in seconds", "trigger"),
-        previousEpisode: new EngageEvent("Core:previousEpisode", "", "trigger"),
         previousChapter: new EngageEvent("Video:previousChapter", "", "trigger"),
         playPause: new EngageEvent("Video:playPause", "", "trigger"),
         mute: new EngageEvent("Video:mute", "", "trigger"),
-        nextEpisode: new EngageEvent("Core:nextEpisode", "", "trigger"),
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
         volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
         customSuccess: new EngageEvent("Notification:customSuccess", "a custom success message", "trigger"),
@@ -98,8 +96,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var hotkey_jumpToBegin = "jumpToBegin";
     var hotkey_prevChapter = "prevChapter";
     var hotkey_nextChapter = "nextChapter";
-    var hotkey_prevEpisode = "prevEpisode";
-    var hotkey_nextEpisode = "nextEpisode";
 
     var basilOptions = {
         namespace: "mhStorage"
@@ -309,11 +305,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         engageCore.trigger(events.seek.getName(), 0);
                     });
                     break;
-                case hotkey_prevEpisode:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.previousEpisode.getName());
-                    });
-                    break;
                 case hotkey_prevChapter:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.previousChapter.getName());
@@ -327,11 +318,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 case hotkey_mute:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.mute.getName());
-                    });
-                    break;
-                case hotkey_nextEpisode:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.nextEpisode.getName());
                     });
                     break;
                 case hotkey_volDown:
