@@ -59,6 +59,10 @@ define(["jquery"], function($) {
         return string.replace(new RegExp(escapeRegExp(find), "g"), replace);
     }
 
+    Utils.prototype.getFormattedPlaybackRate = function(rate) {
+	return (rate * 100) + "%";
+    }
+
     /**
      * Returns the input time in milliseconds
      *
