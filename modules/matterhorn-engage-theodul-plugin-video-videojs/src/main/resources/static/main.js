@@ -868,8 +868,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                 }
             });
             Engage.on(plugin.events.volumeSet.getName(), function(volume) {
-                Engage.log("Video: Volume changed to " + volume);
-                audioPlayer.volume(volume);
+                if ((volume >= 0) && (volume <= 1)) {
+                    Engage.log("Video: Volume changed to " + volume);
+                    audioPlayer.volume(volume);
+                }
             });
             Engage.on(plugin.events.volumeGet.getName(), function(callback) {
                 callback(audioPlayer.volume);
@@ -987,11 +989,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                 }
             });
             Engage.on(plugin.events.volumeSet.getName(), function(volume) {
-                Engage.log("Video: Volume changed to " + volume);
-                theodulVideodisplayMaster.volume(volume);
+                if ((volume >= 0) && (volume <= 1)) {
+                    Engage.log("Video: Volume changed to " + volume);
+                    theodulVideodisplayMaster.volume(volume);
+                }
             });
             Engage.on(plugin.events.volumeGet.getName(), function(callback) {
-                callback(theodulVideodisplayMaster.volume());
+                if (callback) {
+                    callback(theodulVideodisplayMaster.volume());
+                }
             });
             Engage.on(plugin.events.seek.getName(), function(time) {
                 Engage.log("Video: Seek to " + time);
