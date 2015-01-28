@@ -58,6 +58,7 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
+import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
@@ -86,6 +87,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -111,17 +115,26 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   public static final String JOB_TYPE = "org.opencastproject.ingest";
 
-  /** Methods that ingest streams create jobs with this operation type */
-  public static final String INGEST_STREAM = "zip";
+  /** Methods that ingest zips create jobs with this operation type */
+  public static final String INGEST_ZIP = "zip";
+
+  /** Methods that ingest tracks directly create jobs with this operation type */
+  public static final String INGEST_TRACK = "track";
 
   /** Methods that ingest tracks from a URI create jobs with this operation type */
-  public static final String INGEST_TRACK_FROM_URI = "track";
+  public static final String INGEST_TRACK_FROM_URI = "uri-track";
+
+  /** Methods that ingest attachments directly create jobs with this operation type */
+  public static final String INGEST_ATTACHMENT = "attachment";
 
   /** Methods that ingest attachments from a URI create jobs with this operation type */
-  public static final String INGEST_ATTACHMENT_FROM_URI = "attachment";
+  public static final String INGEST_ATTACHMENT_FROM_URI = "uri-attachment";
+
+  /** Methods that ingest catalogs directly create jobs with this operation type */
+  public static final String INGEST_CATALOG = "catalog";
 
   /** Methods that ingest catalogs from a URI create jobs with this operation type */
-  public static final String INGEST_CATALOG_FROM_URI = "catalog";
+  public static final String INGEST_CATALOG_FROM_URI = "uri-catalog";
 
   /** Ingest can only occur for a workflow currently in one of these operations. */
   public static final String[] PRE_PROCESSING_OPERATIONS = new String[] { "schedule", "capture", "ingest" };
@@ -174,6 +187,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   public IngestServiceImpl() {
     super(JOB_TYPE);
   }
+
+  /** The formatter for reading in dates provided by the rest wrapper around this service */
+  protected DateFormat formatter = new SimpleDateFormat(UTC_DATE_FORMAT);
 
   /**
    * OSGI callback for activating this component
@@ -299,7 +315,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
       // QUEUED state but set it to INSTANTIATED in the beginning and then manually switch it to RUNNING.
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_ZIP, null, null, false);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
 
@@ -567,7 +583,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           MediaPackage mediaPackage) throws IOException, IngestException {
     Job job = null;
     try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_TRACK, null, null, false);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -675,7 +691,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           MediaPackage mediaPackage) throws IOException, IngestException {
     Job job = null;
     try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG, null, null, false);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -751,7 +767,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           MediaPackage mediaPackage) throws IOException, IngestException {
     Job job = null;
     try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT, null, null, false);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -994,6 +1010,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
         // Ingest succeeded
         currentOperation.setState(OperationState.SUCCEEDED);
+        try {
+          ((WorkflowOperationInstanceImpl) currentOperation).setDateStarted(formatter.parse(properties.get(START_DATE_KEY)));
+        } catch (ParseException e) {
+          logger.warn("Parsing exception when attempting to set ingest start time.");
+        }
 
         // Update
         workflowService.update(workflow);
