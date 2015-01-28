@@ -51,13 +51,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         segmentMouseover: new Engage.Event("Segment:mouseOver", "the mouse is over a segment", "both"),
         segmentMouseout: new Engage.Event("Segment:mouseOut", "the mouse is off a segment", "both"),
         volumeSet: new Engage.Event("Video:volumeSet", "", "both"),
+        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "both"),
         fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "", "trigger"),
         sliderStart: new Engage.Event("Slider:start", "", "trigger"),
         sliderStop: new Engage.Event("Slider:stop", "", "trigger"),
         sliderMousein: new Engage.Event("Slider:mouseIn", "the mouse entered the slider", "trigger"),
         sliderMouseout: new Engage.Event("Slider:mouseOut", "the mouse is off the slider", "trigger"),
         sliderMousemove: new Engage.Event("Slider:mouseMoved", "the mouse is moving over the slider", "trigger"),
-        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "trigger"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
         customOKMessage: new Engage.Event("Notification:customOKMessage", "a custom message with an OK button", "trigger"),
         customSuccess: new Engage.Event("Notification:customSuccess", "a custom success message", "trigger"),
@@ -131,7 +131,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     /* don't change these variables */
     var Utils;
     var volUpDown = 5.0;
-    var storage_playbackRate = "playbackRate";
     var storage_volume = "volume";
     var storage_muted = "muted";
     var bootstrapPath = "lib/bootstrap/js/bootstrap";
@@ -515,31 +514,26 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(0.5));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5);
-                Basil.set(storage_playbackRate, "0.5");
             });
             $("#" + id_playbackRate075).click(function(e) {
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(0.75));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75);
-                Basil.set(storage_playbackRate, "0.75");
             });
             $("#" + id_playbackRate100).click(function(e) {
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(1.0));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0);
-                Basil.set(storage_playbackRate, "1.0");
             });
             $("#" + id_playbackRate125).click(function(e) {
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(1.25));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25);
-                Basil.set(storage_playbackRate, "1.25");
             });
             $("#" + id_playbackRate150).click(function(e) {
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(1.5));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5);
-                Basil.set(storage_playbackRate, "1.5");
             });
         }
     }
@@ -586,12 +580,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         var vol = Basil.get(storage_volume);
         if (vol) {
             Engage.trigger(plugin.events.volumeSet.getName(), vol / 100);
-        }
-
-        var pbr = Basil.get(storage_playbackRate);
-        if (pbr) {
-            $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(pbr));
-            Engage.trigger(plugin.events.playbackRateChanged.getName(), pbr);
         }
 
         var muted = Basil.get(storage_muted);
@@ -795,11 +783,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             $("#" + id_pause_button).show();
             if (!usingFlash && !isAudioOnly) {
                 $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
-                var pbr = Basil.get(storage_playbackRate);
-                if (pbr) {
-                    $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(pbr));
-                    Engage.trigger(plugin.events.playbackRateChanged.getName(), parseInt(pbr));
-                }
             }
         } else {
             $("#" + id_play_button).show();
@@ -870,6 +853,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
             Engage.on(plugin.events.isAudioOnly.getName(), function(audio) {
                 isAudioOnly = audio;
+            });
+            Engage.on(plugin.events.playbackRateChanged.getName(), function(pbr) {
+                if ((pbr > 0) && (pbr < 2)) {
+                    $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(pbr));
+                }
             });
             Engage.on(plugin.events.volumeSet.getName(), function(volume) {
                 $("#" + id_volume).slider("value", volume * 100);
