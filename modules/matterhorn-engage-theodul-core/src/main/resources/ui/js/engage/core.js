@@ -26,8 +26,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         jumpToBegin: new EngageEvent("Video:jumpToBegin", "", "trigger"),
         previousEpisode: new EngageEvent("Core:previousEpisode", "", "trigger"),
         previousChapter: new EngageEvent("Video:previousChapter", "", "trigger"),
-        play: new EngageEvent("Video:play", "", "trigger"),
-        pause: new EngageEvent("Video:pause", "", "trigger"),
+        playPause: new EngageEvent("Video:playPause", "", "trigger"),
         mute: new EngageEvent("Video:mute", "", "trigger"),
         nextEpisode: new EngageEvent("Core:nextEpisode", "", "trigger"),
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
@@ -252,6 +251,12 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     // binds configured hotkeys(see MH org config) to corresponding theodul events
     function bindHotkeysToEvents() {
+        // disable scrolling when pressing the space bar
+        $(document).keydown(function(e) {
+            if (e.keyCode == 32) {
+                return false;
+            }
+        });
         // process hardcoded keys
         $.each(engageCore.model.get("meInfo").get("hotkeys"), function(i, val) {
             switch (val.name) {
@@ -287,7 +292,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     break;
                 case hotkey_playPause:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.play.getName(), false);
+                        engageCore.trigger(events.playPause.getName());
                     });
                     break;
                 case hotkey_mute:

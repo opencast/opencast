@@ -58,6 +58,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "trigger"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "trigger"),
         audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "trigger"),
+        playPause: new Engage.Event("Video:playPause", "", "handler"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "go to fullscreen", "handler"),
         fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "cancel fullscreen", "handler"),
@@ -810,6 +811,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         Engage.on(plugin.events.pause.getName(), function() {
             theodulVideodisplay.pause();
         });
+        Engage.on(plugin.events.playPause.getName(), function() {
+            if (theodulVideodisplay.paused()) {
+                Engage.trigger(plugin.events.play.getName());
+            } else {
+                Engage.trigger(plugin.events.pause.getName());
+            }
+        });
     }
 
     function registerEvents(videoDisplay, numberOfVideodisplays) {
@@ -852,13 +860,16 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                     audioPlayer.pause();
                 }
             });
-            Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {
-                Engage.log("Video: Volume set to " + percentAsDecimal);
-                if ((percentAsDecimal / 100) > 0.09) {
-                    audioPlayer.volume = percentAsDecimal / 100;
+            Engage.on(plugin.events.playPause.getName(), function() {
+                if (audioPlayer.paused()) {
+                    Engage.trigger(plugin.events.play.getName());
                 } else {
-                    audioPlayer.volume = percentAsDecimal;
+                    Engage.trigger(plugin.events.pause.getName());
                 }
+            });
+            Engage.on(plugin.events.volumeSet.getName(), function(volume) {
+                Engage.log("Video: Volume changed to " + volume);
+                audioPlayer.volume(volume);
             });
             Engage.on(plugin.events.volumeGet.getName(), function(callback) {
                 callback(audioPlayer.volume);
@@ -968,9 +979,16 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                     theodulVideodisplayMaster.pause();
                 }
             });
-            Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {
-                Engage.log("Video: Volume changed to " + percentAsDecimal);
-                theodulVideodisplayMaster.volume(percentAsDecimal);
+            Engage.on(plugin.events.playPause.getName(), function() {
+                if (theodulVideodisplayMaster.paused()) {
+                    Engage.trigger(plugin.events.play.getName());
+                } else {
+                    Engage.trigger(plugin.events.pause.getName());
+                }
+            });
+            Engage.on(plugin.events.volumeSet.getName(), function(volume) {
+                Engage.log("Video: Volume changed to " + volume);
+                theodulVideodisplayMaster.volume(volume);
             });
             Engage.on(plugin.events.volumeGet.getName(), function(callback) {
                 callback(theodulVideodisplayMaster.volume());
@@ -1241,4 +1259,3 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
 
     return plugin;
 });
-
