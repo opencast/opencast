@@ -314,12 +314,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     break;
             }
         });
-        //process custom hotkeys
-        $.each(engageCore.model.get("meInfo").get("hotkeysCustom"), function(i, val) {
-            Mousetrap.bind(val.key, function() {
-                engageCore.trigger(val.app + ":" + val.func); // trigger custom event
-            });
-        });
     }
 
     function checkAllPluginsloaded() {
@@ -660,4 +654,3 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     engageCore.trigger(events.coreInit.getName());
     return engageCore;
 });
-
