@@ -27,27 +27,22 @@ define(['jquery', 'backbone'], function($, Backbone) {
             this.ready = false;
             this.fetch({
                 success: function(me) {
-                    me.ready = true;
-                    var hotkeys = new Array(); // hardcoded hotkeys
-                    var customHotkeys = new Array(); // custom hotkeys
-                    // extract hotkey infos
-                    $.each(me.attributes.org.properties, function(key, value) { // hardcoded regex
-                        if (key.match("theodul.hotkey.(pause|jumpToBegin|nextChapter|prevChapter|volUp|volDown|mute|jumpToX|fullscreen|nextEpisode|prevEpisode)") !== null) {
-                            hotkeys.push({
-                                name: key.substring(15, key.length),
-                                key: value
-                            })
-                        } else if (key.match("theodul.hotkey.") !== null) { // else hotkeys are customs
-                            var cSplit = key.substring(15, key.length).split("."); // cut key string and split into app(0) and func(1) string, examp. theodul.hotkey.annotation.add
-                            customHotkeys.push({
-                                app: cSplit[0],
-                                func: cSplit[1],
-                                key: value
-                            });
-                        }
-                    });
+                    var hotkeys = new Array();
+                    if (me && me.attributes && me.attributes.org && me.attributes.org.properties) {
+                        // extract hotkeys
+                        $.each(me.attributes.org.properties, function(key, value) {
+                            var hotkeyprop = "theodul.hotkey.";
+                            var name = key.substring(hotkeyprop.length, key.length);
+                            if ((key.indexOf(hotkeyprop) != -1) && (name.length > 0) && value) {
+                                hotkeys.push({
+                                    name: key.substring(hotkeyprop.length, key.length),
+                                    key: value
+                                });
+                            }
+                        });
+                    }
                     me.set("hotkeys", hotkeys);
-                    me.set("hotkeysCustom", customHotkeys);
+                    me.ready = true;
                 }
             });
         }
