@@ -260,22 +260,50 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
 
+    function translateKeyboardCombination(comb, split) {
+        if (comb.indexOf(split) != -1) {
+            var spl = comb.split(split);
+            var ret = "";
+            for (var i = 0; i < spl.length; ++i) {
+                if (i != 0) {
+                    ret += "+";
+                }
+                ret += translate(spl[i], spl[i]);
+            }
+            return ret;
+        }
+        return translate(comb, comb);
+    }
+
+
+    function shortcutsCompare(a, b) {
+        if (a.name < b.name) {
+            return -1;
+        }
+        if (a.name > b.name) {
+            return 1;
+        }
+        return 0;
+    }
+
     function displayShortcuts() {
         var shortcuts = Engage.model.get("meInfo").get("hotkeys");
         if (shortcuts) {
+            shortcuts.sort(shortcutsCompare);
             var str_shortcuts = "";
             str_shortcuts += "<table class=\"table table-striped table-hover table-bordered\">";
             str_shortcuts += "<th>" + translate(name, "Shortcut name") + "</th><th>" + translate("shortcut", "Shortcut") + "</th>";
             $.each(shortcuts, function(i, v) {
-                str_shortcuts += "<tr><td>" + translate(v.name, v.name) + "</td><td>" + v.key + "</td></tr>";
+                str_shortcuts += "<tr><td>" + translate(v.name, v.name) + "</td><td>" + translateKeyboardCombination(v.key, "+") + "</td></tr>";
             });
             str_shortcuts += "</table>";
+            str_shortcuts += "<div class=\"alert alert-info\" role=\"alert\">" + translate("shortcutDescriptions", "[Modifier] = Control on Windows, Command on Mac OS") + "</div>";
             Bootbox.dialog({
                 title: translate("shortcutsOverview", "Shortcut overview"),
                 message: str_shortcuts,
                 buttons: {
                     main: {
-                        label: "Ok",
+                        label: translate("ok", "OK"),
                         className: "btn-primary",
                         callback: function() {
                             // callback
