@@ -23,7 +23,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         nextChapter: new EngageEvent("Video:nextChapter", "", "trigger"),
         fullscreenEnable: new EngageEvent("Video:fullscreenEnable", "", "trigger"),
         fullscreenCancel: new EngageEvent("Video:fullscreenCancel", "", "trigger"),
-        jumpToBegin: new EngageEvent("Video:jumpToBegin", "", "trigger"),
+        seek: new EngageEvent("Video:seek", "seek video to a given position in seconds", "trigger"),
         previousEpisode: new EngageEvent("Core:previousEpisode", "", "trigger"),
         previousChapter: new EngageEvent("Video:previousChapter", "", "trigger"),
         playPause: new EngageEvent("Video:playPause", "", "trigger"),
@@ -253,7 +253,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     function bindHotkeysToEvents() {
         // disable scrolling when pressing the space bar
         $(document).keydown(function(e) {
-            if (e.keyCode == 32) {
+	    // space = 32, backspace = 8, page up = 73, page down = 81, enter = 10, carriage return = 13
+            if ((e.keyCode == 32)
+	       || (e.keyCode == 8)
+	       || (e.keyCode == 73)
+	       || (e.keyCode == 81)
+	       || (e.keyCode == 10)
+	       || (e.keyCode == 13)) {
                 return false;
             }
         });
@@ -277,7 +283,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     break;
                 case hotkey_jumpToBegin:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.jumpToBegin.getName());
+                        engageCore.trigger(events.seek.getName(), 0);
                     });
                     break;
                 case hotkey_prevEpisode:
