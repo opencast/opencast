@@ -33,6 +33,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
         customSuccess: new EngageEvent("Notification:customSuccess", "a custom success message", "trigger"),
         customError: new EngageEvent("Notification:customError", "an error occurred", "trigger"),
+        seekLeft: new EngageEvent("Video:seekLeft", "", "trigger"),
+        seekRight: new EngageEvent("Video:seekRight", "", "trigger"),
+        playbackRateIncrease: new EngageEvent("Video:playbackRateIncrease", "", "trigger"),
+        playbackRateDecrease: new EngageEvent("Video:playbackRateDecrease", "", "trigger"),
         mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler")
     };
 
@@ -82,6 +86,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
     // hotkeys
     var hotkey_playPause = "playPause";
+    var hotkey_seekLeft = "seekLeft";
+    var hotkey_seekRight = "seekRight";
+    var hotkey_playbackrateIncrease = "playbackrateIncrease";
+    var hotkey_playbackrateDecrease = "playbackrateDecrease";
     var hotkey_mute = "mute";
     var hotkey_volDown = "volDown";
     var hotkey_volUp = "volUp";
@@ -253,19 +261,34 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     function bindHotkeysToEvents() {
         // disable scrolling when pressing the space bar
         $(document).keydown(function(e) {
-	    // space = 32, backspace = 8, page up = 73, page down = 81, enter = 10, carriage return = 13
-            if ((e.keyCode == 32)
-	       || (e.keyCode == 8)
-	       || (e.keyCode == 73)
-	       || (e.keyCode == 81)
-	       || (e.keyCode == 10)
-	       || (e.keyCode == 13)) {
+            // space = 32, backspace = 8, page up = 73, page down = 81, enter = 10, carriage return = 13
+            if ((e.keyCode == 32) || (e.keyCode == 8) || (e.keyCode == 73) || (e.keyCode == 81) || (e.keyCode == 10) || (e.keyCode == 13)) {
                 return false;
             }
         });
         // process hardcoded keys
         $.each(engageCore.model.get("meInfo").get("hotkeys"), function(i, val) {
             switch (val.name) {
+                case hotkey_seekLeft:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.seekLeft.getName());
+                    });
+                    break;
+                case hotkey_seekRight:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.seekRight.getName());
+                    });
+                    break;
+                case hotkey_playbackrateIncrease:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.playbackRateIncrease.getName());
+                    });
+                    break;
+                case hotkey_playbackrateDecrease:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.playbackRateDecrease.getName());
+                    });
+                    break;
                 case hotkey_nextChapter:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.nextChapter.getName());
