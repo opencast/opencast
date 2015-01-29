@@ -96,6 +96,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     // Before jQueryMobile init
     $( document ).on("mobileinit", function() {
             $.mobile.autoInitializePage = false;
+            $.mobile.defaultPageTransition = "none";
     });
 
     function browserSupported() {

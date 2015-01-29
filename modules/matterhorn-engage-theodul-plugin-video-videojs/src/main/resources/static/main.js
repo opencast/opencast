@@ -471,12 +471,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
 
                 known_players.push(videojs(videoDisplays[i]));
 
-                // Navigation
+                // Navigation, append tabs
                 if (i == 0) {
                     $('#videoPagesNav').append('<ul> </ul>');
                 };
-
-                $('#videoPagesNav ul').append('<li><a href="'+player_page_id+'" title="'+v+'">'+v+'</a></li>').trigger("create");
+                $('#videoPagesNav ul').append('<li><a href="'+player_page_id+'">'+v+'</a></li>');
 
 
                 $(document).on("pagebeforeshow", player_page_id, function(event, data){
@@ -484,12 +483,28 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                     if (data.prevPage.length > 0) {
                         prev_player = videojs(data.prevPage.children().children()[0].id);
                         current_time = prev_player.currentTime();
+                        console.log(prev_player);
                     };
 
                     // Get player
                     player = videojs($(this).children().children()[0].id);
 
-                    Engage.log(player);
+                    Engage.log("Player: " + player);
+
+                    player.on("ended", function() {
+
+                    });
+
+                    player.on("timeupdate", function() {
+
+                    });
+                    Engage.on(plugin.events.sliderStart.getName(), function(time) {
+                        current_time = time;
+                    });
+
+                    Engage.on(plugin.events.sliderStop.getName(), function(time) {
+                        
+                    });
 
                     Engage.on(plugin.events.play.getName(), function() {
                         player.play();
@@ -501,6 +516,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                     Engage.on(plugin.events.pause.getName(), function() {
                         player.pause();
                         play_pause_toggle = false;
+                    });
+
+                    Engage.on(plugin.events.timeupdate.getName(), function(events, data) {
+                        console.log(events);
+                        console.log(data);
+                        console.log('timeupdate');
                     });
 
                     if (play_pause_toggle) {
@@ -645,13 +666,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
         events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
         events.swipeLeft = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
-        events.deactivate = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
-        events.activate = new Engage.Event("Video:activate", "videoDisplay activated", "both");
         events.resize = new Engage.Event("Video:resize", "videoDisplay resized", "both");
-
-        Engage.on(plugin.events.deactivate.getName(), function(id) {
-            Engage.log("Video: Deactivate: " + id);
-        });
 
         $(".video-js").on('taphold', function(event) {
             Engage.log("Video: " + event);
