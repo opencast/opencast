@@ -11,5 +11,6 @@
     "logoutSuccessful": "Successfully logged out. Please reload the page if the page does not reload automatically.",
     "loginFailed": "Failed to log in.",
     "description": "Description",
-    "slideText": "Slide text"
+    "slideText": "Slide text",
+    "shortcuts": "Shortcuts"
 }

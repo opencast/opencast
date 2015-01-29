@@ -11,5 +11,6 @@
     "loginSuccessful": "Sie wurden erfolgreich eingeloggt. Bitte laden Sie diese Seite neu, falls sie nicht autoamtisch neu geladen wird.",
     "loginFailed": "Einloggen fehlgeschlagen.",
     "description": "Beschreibung",
-    "slideText": "Folientext"
+    "slideText": "Folientext",
+    "shortcuts": "Shortcuts"
 }
