@@ -141,7 +141,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
 
     var SlidetextTabView = Backbone.View.extend({
         initialize: function(mediaPackageModel, template) {
-            this.setElement($(plugin.container)); // every plugin view has it"s own container associated with it
+            this.setElement($(plugin.container));
             this.model = mediaPackageModel;
             this.template = template;
             // bind the render function always to the view

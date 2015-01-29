@@ -1,3 +1,4 @@
+4
 /**
  * Copyright 2009-2011 The Regents of the University of California Licensed
  * under the Educational Community License, Version 2.0 (the "License"); you may
@@ -14,11 +15,11 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($, _, Backbone, Engage, Moment) {
+define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backbone, Engage) {
     "use strict";
 
     var insertIntoDOM = true;
-    var PLUGIN_NAME = "Description";
+    var PLUGIN_NAME = "Shortcuts";
     var PLUGIN_TYPE = "engage_tab";
     var PLUGIN_VERSION = "1.0";
     var PLUGIN_TEMPLATE_DESKTOP = "templates/desktop.html";
@@ -89,24 +90,24 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     var class_tabGroupItem = "tab-group-item";
 
     /* don't change these variables */
-    var viewsModelChange = "change:views";
-    var mediapackageChange = "change:mediaPackage";
+    var shortcuts = new Array();
     var initCount = 4;
-    var mediapackageError = false;
+    var infoMeChange = "change:infoMe";
+    var mediapackageChange = "change:mediaPackage";
     var translations = new Array();
-    var locale = "en";
-    var dateFormat = "MMMM Do YYYY, h:mm:ss a";
+    var mediapackageError = false;
+    var shortcutsParsed = false;
     var Utils;
 
     function initTranslate(language, funcSuccess, funcError) {
-        var path = Engage.getPluginPath("EngagePluginTabDescription").replace(/(\.\.\/)/g, "");
+        var path = Engage.getPluginPath("EngagePluginTabShortcuts").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
         if (language == "de") {
-            Engage.log("Tab:Description: Chosing german translations");
+            Engage.log("Tab:Shortcuts: Chosing german translations");
             jsonstr += "language/de.json";
         } else { // No other languages supported, yet
-            Engage.log("Tab:Description: Chosing english translations");
+            Engage.log("Tab:Shortcuts: Chosing english translations");
             jsonstr += "language/en.json";
         }
         $.ajax({
@@ -138,9 +139,9 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
 
-    var DescriptionTabView = Backbone.View.extend({
+    var ShortcutsTabView = Backbone.View.extend({
         initialize: function(mediaPackageModel, template) {
-            this.setElement($(plugin.container)); // every plugin view has it"s own container associated with it
+            this.setElement($(plugin.container));
             this.model = mediaPackageModel;
             this.template = template;
             // bind the render function always to the view
@@ -150,109 +151,93 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
         },
         render: function() {
             if (!mediapackageError) {
+                prepareShortcuts();
                 var tempVars = {
-                    description: this.model.get("description"),
-                    creator: this.model.get("creator"),
-                    title: this.model.get("title"),
-                    series: this.model.get("series"),
-                    contributor: this.model.get("contributor"),
-                    date: this.model.get("date"),
-                    views: Engage.model.get("views") ? Engage.model.get("views").get("stats").views : "",
-                    str_title: translate("title", "Title"),
-                    str_noTitle: translate("noTitle", "No title"),
-                    str_creator: translate("creator", "Creator"),
-                    str_contributor: translate("presenter", "Contributor"),
-                    str_views: translate("views", "Views"),
-                    str_series: translate("series", "Series"),
-                    str_recordingDate: translate("recordingDate", "Recording date"),
-                    str_description: translate("description", "Description"),
-                    str_noDescriptionAvailable: translate("noDescriptionAvailable", "No description available.")
+                    str_displayShortcuts: translate("displayShortcuts", "Display shortcuts"),
+                    str_noShortcutsAvailable: translate("noShortcutsAvailable", "No shortcuts available"),
+                    str_shortcutName: translate(name, "Shortcut name"),
+                    str_shortcut: translate(name, "Shortcut"),
+                    shortcuts: shortcuts
                 };
-                // try to format the date
-                Moment.locale(locale, {
-                    // customizations
-                });
-                if (Moment(tempVars.date) != null) {
-                    tempVars.date = Moment(tempVars.date).format(dateFormat);
-                }
-                if (!tempVars.creator) {
-                    tempVars.creator = "";
-                }
-                if (!tempVars.description) {
-                    tempVars.description = "";
-                }
-                if (!tempVars.title) {
-                    tempVars.title = "";
-                }
-                if (!tempVars.series) {
-                    tempVars.series = "";
-                }
-                if (!tempVars.contributor) {
-                    tempVars.contributor = "";
-                }
-                if (!tempVars.date) {
-                    tempVars.date = "";
-                }
-                if (!tempVars.views) {
-                    tempVars.views = "-";
-                }
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
-                /*
-        	    $(".description-item").mouseover(function() {
-        	        $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
-        	    }).mouseout(function() {
-        	        $(this).removeClass("description-itemColor-hover").addClass("description-itemColor");
-        	    });
-        	*/
             }
         }
     });
+
+    function translateKeyboardCombination(comb, split) {
+        if (comb.indexOf(split) != -1) {
+            var spl = comb.split(split);
+            var ret = "";
+            for (var i = 0; i < spl.length; ++i) {
+                if (i != 0) {
+                    ret += "+";
+                }
+                // filter the mod modifier
+                if (spl[i] == "mod") {
+                    if (navigator.platform && (navigator.platform.indexOf("Mac") != -1)) {
+                        ret += translate("modMac", "cmd");
+                    } else {
+                        ret += translate("modOther", "ctrl");
+                    }
+                } else {
+                    ret += translate(spl[i], spl[i]);
+                }
+            }
+            return ret;
+        }
+        return translate(comb, comb);
+    }
+
+    function prepareShortcuts() {
+        if (!shortcutsParsed) {
+            var scuts = Engage.model.get("meInfo").get("hotkeys");
+            if (scuts) {
+                scuts.sort(Utils.shortcutsCompare);
+                $.each(scuts, function(i, v) {
+                    shortcuts.push({
+                        name: translate(v.name, v.name),
+                        val: translateKeyboardCombination(v.key, "+")
+                    });
+                });
+                shortcutsParsed = true;
+            }
+        }
+    }
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
             // create a new view with the media package model and the template
-            var descriptionTabView = new DescriptionTabView(Engage.model.get("mediaPackage"), plugin.template);
+            var shortcutsTabView = new ShortcutsTabView(Engage.model.get("mediaPackage"), plugin.template);
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
             });
-            Engage.model.get("views").on("change", function() {
-                descriptionTabView.render();
-            });
-            descriptionTabView.render();
         }
     }
 
     if (isDesktopMode) {
         // init event
-        Engage.log("Tab:Description: Init");
-        var relative_plugin_path = Engage.getPluginPath("EngagePluginTabDescription");
+        Engage.log("Tab:Shortcuts: Init");
+        var relative_plugin_path = Engage.getPluginPath("EngagePluginTabShortcuts");
 
         // load utils class
         require([relative_plugin_path + "utils"], function(utils) {
-            Engage.log("Tab:Description: Utils class loaded");
+            Engage.log("Tab:Shortcuts: Utils class loaded");
             Utils = new utils();
             initTranslate(Utils.detectLanguage(), function() {
-                Engage.log("Tab:Description: Successfully translated.");
+                Engage.log("Tab:Shortcuts: Successfully translated.");
                 initCount -= 1;
                 if (initCount <= 0) {
                     initPlugin();
                 }
             }, function() {
-                Engage.log("Tab:Description: Error translating...");
+                Engage.log("Tab:Shortcuts: Error translating...");
                 initCount -= 1;
                 if (initCount <= 0) {
                     initPlugin();
                 }
             });
-        });
-
-        Engage.model.on(viewsModelChange, function() {
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
         });
 
         // listen on a change/set of the mediaPackage model
@@ -263,9 +248,17 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
             }
         });
 
+        // listen on a change/set of the infoMe model
+        Engage.model.on(infoMeChange, function() {
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+
         // all plugins loaded
         Engage.on(plugin.events.plugin_load_done.getName(), function() {
-            Engage.log("Tab:Description: Plugin load done");
+            Engage.log("Tab:Shortcuts: Plugin load done");
             initCount -= 1;
             if (initCount <= 0) {
                 initPlugin();
