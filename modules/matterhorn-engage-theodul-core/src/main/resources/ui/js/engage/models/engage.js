@@ -74,7 +74,8 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
 
 
             // Check for user setting "Preferred format"
-            Basil.set("preferredFormat", this.get("urlParameters").format);
+            if (this.get("urlParameters").format != null)
+                Basil.set("preferredFormat", this.get("urlParameters").format);
 
             if (window.console) {
                 console.log("EngageModel: Player mode: " + this.get("mode"));

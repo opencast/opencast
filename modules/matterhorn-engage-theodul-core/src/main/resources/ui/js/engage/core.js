@@ -20,20 +20,21 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var events = {
         plugin_load_done: new EngageEvent("Core:plugin_load_done", "when the core loaded the event successfully", "both"),
         coreInit: new EngageEvent("Core:init", "", "trigger"),
-        jumpToX: new EngageEvent("Controls:jumpToX", "", "trigger"),
         nextChapter: new EngageEvent("Video:nextChapter", "", "trigger"),
         fullscreenEnable: new EngageEvent("Video:fullscreenEnable", "", "trigger"),
-        jumpToBegin: new EngageEvent("Video:jumpToBegin", "", "trigger"),
-        previousEpisode: new EngageEvent("Core:previousEpisode", "", "trigger"),
+        fullscreenCancel: new EngageEvent("Video:fullscreenCancel", "", "trigger"),
+        seek: new EngageEvent("Video:seek", "seek video to a given position in seconds", "trigger"),
         previousChapter: new EngageEvent("Video:previousChapter", "", "trigger"),
-        play: new EngageEvent("Video:play", "", "trigger"),
-        pause: new EngageEvent("Video:pause", "", "trigger"),
+        playPause: new EngageEvent("Video:playPause", "", "trigger"),
         mute: new EngageEvent("Video:mute", "", "trigger"),
-        nextEpisode: new EngageEvent("Core:nextEpisode", "", "trigger"),
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
         volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
         customSuccess: new EngageEvent("Notification:customSuccess", "a custom success message", "trigger"),
         customError: new EngageEvent("Notification:customError", "an error occurred", "trigger"),
+        seekLeft: new EngageEvent("Video:seekLeft", "", "trigger"),
+        seekRight: new EngageEvent("Video:seekRight", "", "trigger"),
+        playbackRateIncrease: new EngageEvent("Video:playbackRateIncrease", "", "trigger"),
+        playbackRateDecrease: new EngageEvent("Video:playbackRateDecrease", "", "trigger"),
         mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler")
     };
 
@@ -47,6 +48,12 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var path_language_en = "language/en.json";
 
     /* don't change these variables */
+    var setCustomError = false; // just for displaying purposes!
+    var pluginControlsInserted = false;
+    var pluginVideoInserted = false;
+    var pluginTabInserted = false;
+    var pluginDescriptionInserted = false;
+    var pluginTimelineInserted = false;
     var id_str_error = "str_error";
     var id_customError_str = "customError_str";
     var id_str_reloadPage = "str_reloadPage";
@@ -67,18 +74,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var loadingDelay1 = 500;
     var loadingDelay2 = 1000;
     var errorCheckDelay = 3500;
-    var hotkey_jumpToX = "jumpToX";
-    var hotkey_nextChapter = "nextChapter";
-    var hotkey_fullscreen = "fullscreen";
-    var hotkey_jumpToBegin = "jumpToBegin";
-    var hotkey_prevEpisode = "prevEpisode";
-    var hotkey_prevChapter = "prevChapter";
-    var hotkey_play = "play";
-    var hotkey_pause = "pause";
-    var hotkey_mute = "mute";
-    var hotkey_nextEpisode = "nextEpisode";
-    var hotkey_volDown = "volDown";
-    var hotkey_volUp = "volUp";
     var mediapackageError = false;
     var numberOfPlugins = 0;
     var translationData = null;
@@ -87,6 +82,20 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var askedForLogin = false;
     var springSecurityLoginURL = "/j_spring_security_check";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
+    // hotkeys
+    var hotkey_playPause = "playPause";
+    var hotkey_seekLeft = "seekLeft";
+    var hotkey_seekRight = "seekRight";
+    var hotkey_playbackrateIncrease = "playbackrateIncrease";
+    var hotkey_playbackrateDecrease = "playbackrateDecrease";
+    var hotkey_mute = "mute";
+    var hotkey_volDown = "volDown";
+    var hotkey_volUp = "volUp";
+    var hotkey_fullscreenEnable = "fullscreenEnable";
+    var hotkey_fullscreenCancel = "fullscreenCancel";
+    var hotkey_jumpToBegin = "jumpToBegin";
+    var hotkey_prevChapter = "prevChapter";
+    var hotkey_nextChapter = "nextChapter";
 
     var basilOptions = {
         namespace: "mhStorage"
@@ -101,7 +110,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     function browserSupported() {
         if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
-            console.log("User setting: Support unsupported browser: " + Basil.get("overrideBrowser"));
+            console.log("Core: User setting - Support unsupported browser: " + Basil.get("overrideBrowser"));
             return true;
         }
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) ||
@@ -119,10 +128,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         var jsonstr = "";
 
         if (language == "de") {
-            console.log("Controls: Chosing german translations");
+            console.log("Core: Chosing german translations");
             jsonstr += path_language_de;
         } else { // No other languages supported, yet
-            console.log("Controls: Chosing english translations");
+            console.log("Core: Chosing english translations");
             jsonstr += path_language_en;
         }
         $.ajax({
@@ -140,7 +149,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     function translateCoreHTML() {
         $("#" + id_str_error).html(translate("error", "Error"));
-        $("#" + id_customError_str).html(translate("error_unknown", "An error occurred. Please reload the page."));
+        if (!setCustomError) {
+            $("#" + id_customError_str).html(translate("error_unknown", "An error occurred. Please reload the page."));
+            setCustomError = false;
+        }
         $("#" + id_str_reloadPage).html(translate("reloadPage", "Reload page"));
         $("#" + id_str_login).html(translate("login", "Log in"));
     }
@@ -209,11 +221,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                         location.reload();
                                     } else {
                                         engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
+                                        setCustomError = true;
                                     }
                                     askedForLogin = false;
                                 }).fail(function(msg) {
                                     password = "";
                                     engageCore.trigger(events.customError.getName(), translate("loginFailed", "Failed to log in."));
+                                    setCustomError = true;
                                     askedForLogin = false;
                                 });
                             } else {
@@ -247,12 +261,34 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     // binds configured hotkeys(see MH org config) to corresponding theodul events
     function bindHotkeysToEvents() {
+        // disable scrolling when pressing the space bar
+        $(document).keydown(function(e) {
+            // space = 32, backspace = 8, page up = 73, page down = 81, enter = 10, carriage return = 13
+            if ((e.keyCode == 32) || (e.keyCode == 8) || (e.keyCode == 73) || (e.keyCode == 81) || (e.keyCode == 10) || (e.keyCode == 13)) {
+                return false;
+            }
+        });
         // process hardcoded keys
         $.each(engageCore.model.get("meInfo").get("hotkeys"), function(i, val) {
             switch (val.name) {
-                case hotkey_jumpToX:
+                case hotkey_seekLeft:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.jumpToX.getName());
+                        engageCore.trigger(events.seekLeft.getName());
+                    });
+                    break;
+                case hotkey_seekRight:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.seekRight.getName());
+                    });
+                    break;
+                case hotkey_playbackrateIncrease:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.playbackRateIncrease.getName());
+                    });
+                    break;
+                case hotkey_playbackrateDecrease:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.playbackRateDecrease.getName());
                     });
                     break;
                 case hotkey_nextChapter:
@@ -260,19 +296,19 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         engageCore.trigger(events.nextChapter.getName());
                     });
                     break;
-                case hotkey_fullscreen:
+                case hotkey_fullscreenEnable:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.fullscreenEnable.getName());
                     });
                     break;
-                case hotkey_jumpToBegin:
+                case hotkey_fullscreenCancel:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.jumpToBegin.getName());
+                        engageCore.trigger(events.fullscreenCancel.getName());
                     });
                     break;
-                case hotkey_prevEpisode:
+                case hotkey_jumpToBegin:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.previousEpisode.getName());
+                        engageCore.trigger(events.seek.getName(), 0);
                     });
                     break;
                 case hotkey_prevChapter:
@@ -280,24 +316,14 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         engageCore.trigger(events.previousChapter.getName());
                     });
                     break;
-                case hotkey_play:
+                case hotkey_playPause:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.play.getName(), false);
-                    });
-                    break;
-                case hotkey_pause:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.pause.getName(), false);
+                        engageCore.trigger(events.playPause.getName());
                     });
                     break;
                 case hotkey_mute:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.mute.getName());
-                    });
-                    break;
-                case hotkey_nextEpisode:
-                    Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.nextEpisode.getName());
                     });
                     break;
                 case hotkey_volDown:
@@ -313,12 +339,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 default:
                     break;
             }
-        });
-        //process custom hotkeys
-        $.each(engageCore.model.get("meInfo").get("hotkeysCustom"), function(i, val) {
-            Mousetrap.bind(val.key, function() {
-                engageCore.trigger(val.app + ":" + val.func); // trigger custom event
-            });
         });
     }
 
@@ -374,8 +394,28 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     plugin.templateProcessed = _.template(template, template_data);
                     plugin.template = template;
                     plugin.pluginPath = "engage/theodul/" + plugin_path;
-                    // load the compiled HTML into the component
-                    engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
+                    plugin.insertIntoDOM = plugin.insertIntoDOM ? true : false;
+                    if (plugin.insertIntoDOM) {
+                        // load the compiled HTML into the component
+                        engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
+                        if (engageCore.model.desktop) {
+                            if (engageCore.pluginView.isControlsPlugin(plugin.type)) {
+                                pluginControlsInserted = true;
+                            }
+                            if (engageCore.pluginView.isVideoPlugin(plugin.type)) {
+                                pluginVideoInserted = true;
+                            }
+                            if (engageCore.pluginView.isTabPlugin(plugin.type)) {
+                                pluginTabInserted = true;
+                            }
+                            if (engageCore.pluginView.isDescriptionPlugin(plugin.type)) {
+                                pluginDescriptionInserted = true;
+                            }
+                            if (engageCore.pluginView.isTimelinePlugin(plugin.type)) {
+                                pluginTimelineInserted = true;
+                            }
+                        }
+                    }
                     // plugin load done counter
                     plugins_loaded[plugin_name] = true;
                     // check if all plugins are ready
@@ -561,6 +601,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 $("#" + id_engage_view).hide().detach();
                 $("#" + id_btn_reloadPage).hide();
                 $("#" + id_customError_str).html(str);
+                setCustomError = true;
                 if (getLoginStatus() == 0) {
                     $("#" + id_btn_login).click(login);
                     $("#" + id_customError + ", #" + id_btn_login).show();
@@ -571,6 +612,29 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             });
             // load plugins done, hide loading and show content
             this.dispatcher.on(events.plugin_load_done.getName(), function() {
+                if (engageCore.model.desktop) {
+                    if (!pluginControlsInserted) {
+                        console.log("Core: No controls plugin inserted. Removing the container.");
+                        engageCore.pluginView.removeControls();
+                    }
+                    if (!pluginVideoInserted) {
+                        console.log("Core: No video plugin inserted. Removing the container.");
+                        engageCore.pluginView.removeVideo();
+                    }
+                    if (!pluginTabInserted) {
+                        console.log("Core: No tab plugin inserted. Removing the container.");
+                        engageCore.pluginView.removeTab();
+                    }
+                    if (!pluginDescriptionInserted) {
+                        console.log("Core: No description plugin inserted. Removing the container.");
+                        engageCore.pluginView.removeDescription();
+                    }
+                    if (!pluginTimelineInserted) {
+                        console.log("Core: No timeline plugin inserted. Removing the container.");
+                        engageCore.pluginView.removeTimeline();
+                    }
+                }
+
                 $("#" + id_loading1).hide().detach();
                 $("#" + id_loading2).show();
                 window.setTimeout(function() {

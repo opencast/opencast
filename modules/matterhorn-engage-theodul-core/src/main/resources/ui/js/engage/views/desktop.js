@@ -38,6 +38,46 @@ define(["jquery", "engage/core", "engage/models/engage", "engage/tab_logic"], fu
     var timelineplugin_opened = "Engage:timelineplugin_opened";
     var timelineplugin_closed = "Engage:timelineplugin_closed";
 
+    var isControlsPlugin = function(str) {
+        return str == id_engage_controls;
+    }
+
+    var isVideoPlugin = function(str) {
+        return str == id_engage_video;
+    }
+
+    var isTabPlugin = function(str) {
+        return str == id_engage_tab;
+    }
+
+    var isDescriptionPlugin = function(str) {
+        return str == id_engage_description;
+    }
+
+    var isTimelinePlugin = function(str) {
+        return str == id_engage_timeline;
+    }
+
+    var removeControls = function() {
+        $("#" + id_engage_controls).detach();
+    }
+
+    var removeVideo = function() {
+        $("#" + id_engage_video).detach();
+    }
+
+    var removeTab = function() {
+        $("#" + id_engage_tab_nav + ", #" + id_engage_tab_content).detach();
+    }
+
+    var removeDescription = function() {
+        $("#" + id_engage_description).detach();
+    }
+
+    var removeTimeline = function() {
+        $("#" + id_engage_timeline_expand_btn + ", #" + id_engage_timeline_plugin).detach();
+    }
+
     /*
      * init logic function
      */
@@ -122,6 +162,16 @@ define(["jquery", "engage/core", "engage/models/engage", "engage/tab_logic"], fu
 
     // public functions for the module
     return {
+        isControlsPlugin: isControlsPlugin,
+        isVideoPlugin: isVideoPlugin,
+        isTabPlugin: isTabPlugin,
+        isDescriptionPlugin: isDescriptionPlugin,
+        isTimelinePlugin: isTimelinePlugin,
+        removeControls: removeControls,
+        removeVideo: removeVideo,
+        removeTab: removeTab,
+        removeDescription: removeDescription,
+        removeTimeline: removeTimeline,
         initView: initDesktopView,
         insertPlugin: insertPluginToDOM,
         allPluginsLoaded: allPluginsLoadedEvent

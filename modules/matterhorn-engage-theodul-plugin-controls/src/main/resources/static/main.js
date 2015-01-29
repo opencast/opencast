@@ -17,6 +17,7 @@
 define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "engage/core"], function(require, $, _, Backbone, Basil, Bootbox, Engage) {
     "use strict";
 
+    var insertIntoDOM = true;
     var PLUGIN_NAME = "Engage Controls";
     var PLUGIN_TYPE = "engage_controls";
     var PLUGIN_VERSION = "1.0";
@@ -49,18 +50,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         unmute: new Engage.Event("Video:unmute", "", "both"),
         segmentMouseover: new Engage.Event("Segment:mouseOver", "the mouse is over a segment", "both"),
         segmentMouseout: new Engage.Event("Segment:mouseOut", "the mouse is off a segment", "both"),
+        volumeSet: new Engage.Event("Video:volumeSet", "", "both"),
+        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "both"),
         fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "", "trigger"),
         sliderStart: new Engage.Event("Slider:start", "", "trigger"),
         sliderStop: new Engage.Event("Slider:stop", "", "trigger"),
         sliderMousein: new Engage.Event("Slider:mouseIn", "the mouse entered the slider", "trigger"),
         sliderMouseout: new Engage.Event("Slider:mouseOut", "the mouse is off the slider", "trigger"),
         sliderMousemove: new Engage.Event("Slider:mouseMoved", "the mouse is moving over the slider", "trigger"),
-        volumeSet: new Engage.Event("Video:volumeSet", "", "trigger"),
-        playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "trigger"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
         customOKMessage: new Engage.Event("Notification:customOKMessage", "a custom message with an OK button", "trigger"),
         customSuccess: new Engage.Event("Notification:customSuccess", "a custom success message", "trigger"),
         customError: new Engage.Event("Notification:customError", "an error occurred", "trigger"),
+        volumeUp: new Engage.Event("Video:volumeUp", "", "handler"),
+        volumeDown: new Engage.Event("Video:volumeDown", "", "handler"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "handler"),
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
@@ -80,6 +83,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -91,6 +95,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             break;
         case "embed":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -103,6 +108,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         case "desktop":
         default:
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -124,7 +130,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     /* don't change these variables */
     var Utils;
-    var storage_playbackRate = "playbackRate";
+    var volUpDown = 5.0;
     var storage_volume = "volume";
     var storage_muted = "muted";
     var bootstrapPath = "lib/bootstrap/js/bootstrap";
@@ -201,14 +207,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
-    var entityMap = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': '&quot;',
-        "'": '&#39;',
-        "/": '&#x2F;'
-    };
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -391,7 +389,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_embedButton: translate("embedButton", "Embed Button. Select embed size from dropdown."),
                     loggedIn: false,
                     str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
-                    str_loginLogout: translate("loginLogout", "Login/Logout")
+                    str_loginLogout: translate("loginLogout", "Login/Logout"),
+                    str_fullscreen: translate("fullscreen", "Fullscreen")
                 };
 
                 // compile template and load into the html
@@ -440,33 +439,28 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             // setup listeners for the playback rate
             $("#" + id_playbackRate050).click(function(e) {
                 e.preventDefault();
-                $("#" + id_playbackRateIndicator).html("50%");
+                $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(0.5));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5);
-                Basil.set(storage_playbackRate, "0.5");
             });
             $("#" + id_playbackRate075).click(function(e) {
                 e.preventDefault();
-                $("#" + id_playbackRateIndicator).html("75%");
+                $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(0.75));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75);
-                Basil.set(storage_playbackRate, "0.75");
             });
             $("#" + id_playbackRate100).click(function(e) {
                 e.preventDefault();
-                $("#" + id_playbackRateIndicator).html("100%");
+                $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(1.0));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0);
-                Basil.set(storage_playbackRate, "1.0");
             });
             $("#" + id_playbackRate125).click(function(e) {
                 e.preventDefault();
-                $("#" + id_playbackRateIndicator).html("125%");
+                $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(1.25));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25);
-                Basil.set(storage_playbackRate, "1.25");
             });
             $("#" + id_playbackRate150).click(function(e) {
                 e.preventDefault();
-                $("#" + id_playbackRateIndicator).html("150%");
+                $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(1.5));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5);
-                Basil.set(storage_playbackRate, "1.5");
             });
         }
     }
@@ -512,12 +506,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     function loadStoredInitialValues() {
         var vol = Basil.get(storage_volume);
         if (vol) {
-            $("#" + id_volume).slider("value", vol);
-        }
-
-        var pbr = Basil.get(storage_playbackRate);
-        if (pbr) {
-            $("#" + id_playbackRateIndicator).html(pbr);
+            Engage.trigger(plugin.events.volumeSet.getName(), vol / 100);
         }
 
         var muted = Basil.get(storage_muted);
@@ -566,10 +555,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 min: 1,
                 max: 100,
                 value: 100,
-                change: function(event, ui) {
-                    Engage.trigger(plugin.events.volumeSet.getName(), (ui.value) / 100);
-                    Basil.set(storage_volume, ui.value);
-                }
+                change: function(event, ui) {}
             });
 
             $("#" + id_volumeIcon).click(function() {
@@ -650,24 +636,25 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     }
 
     function initMobileEvents() {
-            Engage.log("Init Mobile Events in Control");
-            events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
-            events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
-            events.swipeLeft = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
-            events.deactivate = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
+        Engage.log("Init Mobile Events in Control");
+        events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
+        events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
+        events.swipeLeft = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
+        events.deactivate = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
 
-            Engage.on(events.tapHold.getName(), function(display) {
-                Engage.log("Control: " + display);
-                Engage.trigger(plugin.events.deactivate.getName(), display);
-            });
+        Engage.on(events.tapHold.getName(), function(display) {
+            Engage.log("Control: " + display);
+            Engage.trigger(plugin.events.deactivate.getName(), display);
+        });
 
-            Engage.on(events.swipeLeft.getName(), function(target) {
-                Engage.log('Control: ' + target);
-            });
-        }
-        /**
-         * getVolume
-         */
+        Engage.on(events.swipeLeft.getName(), function(target) {
+            Engage.log('Control: ' + target);
+        });
+    }
+
+    /**
+     * getVolume
+     */
     function getVolume() {
         if (isMute) {
             return 0;
@@ -718,11 +705,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             $("#" + id_pause_button).show();
             if (!usingFlash && !isAudioOnly) {
                 $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
-                var pbr = Basil.get(storage_playbackRate);
-                if (pbr) {
-                    $("#" + id_playbackRateIndicator).html(pbr);
-                    Engage.trigger(plugin.events.playbackRateChanged.getName(), parseInt(pbr));
-                }
             }
         } else {
             $("#" + id_play_button).show();
@@ -738,7 +720,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         } else {
             $("#" + id_unmute_button).show();
             $("#" + id_mute_button).hide();
-            Engage.trigger(plugin.events.volumeSet.getName(), getVolume());
+            Engage.trigger(plugin.events.volumeSet.getName(), getVolume() / 100);
         }
     }
 
@@ -794,6 +776,42 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.on(plugin.events.isAudioOnly.getName(), function(audio) {
                 isAudioOnly = audio;
             });
+            Engage.on(plugin.events.playbackRateChanged.getName(), function(pbr) {
+                if ((pbr > 0) && (pbr < 2)) {
+                    $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(pbr));
+                }
+            });
+            Engage.on(plugin.events.volumeSet.getName(), function(volume) {
+                $("#" + id_volume).slider("value", volume * 100);
+                Basil.set(storage_volume, volume * 100);
+                if (volume > 0) {
+                    isMute = false;
+                    Basil.set(storage_muted, "false");
+                } else {
+                    isMute = true;
+                    Basil.set(storage_muted, "true");
+                }
+            });
+            Engage.on(plugin.events.volumeUp.getName(), function(audio) {
+                var vol = getVolume();
+                if ((vol + volUpDown) <= 100) {
+                    Engage.trigger(plugin.events.volumeSet.getName(), (vol + volUpDown) / 100);
+                    mute();
+                } else {
+                    Engage.trigger(plugin.events.volumeSet.getName(), 1);
+                    mute();
+                }
+            });
+            Engage.on(plugin.events.volumeDown.getName(), function(audio) {
+                var vol = getVolume();
+                if ((vol - volUpDown) > 0) {
+                    Engage.trigger(plugin.events.volumeSet.getName(), (vol - volUpDown) / 100);
+                    mute();
+                } else {
+                    isMute = true;
+                    mute();
+                }
+            });
             Engage.on(plugin.events.ready.getName(), function() {
                 if (!mediapackageError) {
                     videosReady = true;
@@ -804,6 +822,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 if (!mediapackageError && videosReady) {
                     isPlaying = true;
                     playPause();
+                    loadStoredInitialValues();
                 }
             });
             Engage.on(plugin.events.pause.getName(), function() {

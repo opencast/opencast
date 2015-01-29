@@ -18,6 +18,15 @@
 define(["jquery"], function($) {
     "use strict";
 
+    var entityMap = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': '&quot;',
+        "'": '&#39;',
+        "/": '&#x2F;'
+    };
+
     function Utils() {
         // nothing to see here
     }
@@ -48,6 +57,10 @@ define(["jquery"], function($) {
 
     Utils.prototype.replaceAll = function(string, find, replace) {
         return string.replace(new RegExp(escapeRegExp(find), "g"), replace);
+    }
+
+    Utils.prototype.getFormattedPlaybackRate = function(rate) {
+	return (rate * 100) + "%";
     }
 
     /**

@@ -1,5 +1,6 @@
 {
     "value_locale": "de",
+    "ok": "OK",
     "login": "Einloggen",
     "logout": "Ausloggen",
     "loginLogout": "Einloggen/Ausloggen",

@@ -15,6 +15,8 @@
  */
 package org.opencastproject.util;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +39,26 @@ public class LogTest {
     log.info("hello");
     log.info("hello");
     log.info("hello");
+  }
+
+  @Test
+  public void testGetHumanReadableTimeStringInputHoursMinutesAndSecondsExpectsAllThreePresent() {
+    assertEquals("1 hour 1 minute 1 second", Log.getHumanReadableTimeString(3661));
+  }
+
+  @Test
+  public void testGetHumanReadableTimeStringInputHoursExpectsOnlyHours() {
+    assertEquals("2 hours", Log.getHumanReadableTimeString(7200));
+  }
+
+  @Test
+  public void testGetHumanReadableTimeStringInputMinutesExpectsOnlyMinutes() {
+    assertEquals("2 minutes", Log.getHumanReadableTimeString(120));
+  }
+
+  @Test
+  public void testGetHumanReadableTimeStringInputSecondsExpectsOnlySeconds() {
+    assertEquals("2 seconds", Log.getHumanReadableTimeString(2));
   }
 
   private void spawnThread(List<String> unitOfWork) {

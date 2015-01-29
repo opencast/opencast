@@ -15,9 +15,9 @@
  */
 package org.opencastproject.scheduler.impl;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 import static net.fortuna.ical4j.model.Component.VEVENT;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_AVAILABLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CONTRIBUTOR;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
@@ -44,11 +44,14 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
@@ -57,6 +60,7 @@ import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.scheduler.endpoint.SchedulerRestService;
 import org.opencastproject.scheduler.impl.persistence.SchedulerServiceDatabaseImpl;
 import org.opencastproject.scheduler.impl.solr.SchedulerServiceSolrIndex;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
@@ -65,6 +69,7 @@ import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.workflow.api.WorkflowDefinition;
+import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
@@ -75,8 +80,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import junit.framework.Assert;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -94,7 +97,10 @@ import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.eclipse.persistence.jpa.PersistenceProvider;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -103,9 +109,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -633,6 +641,220 @@ public class SchedulerServiceImplTest {
     } finally {
       schedSvc2 = null;
     }
+  }
+
+  @Test
+  public void getCutOffDateWorksForDaylightSavingsTime() {
+    DateTimeZone zurichDateTimeZone = DateTimeZone.forID("Europe/Zurich");
+    /** Is a date and time that isn't around a daylight savings time Jan 1st, 2013 @ 3:00am.
+     * After the buffer is subtracted it should be Jan 1st, 2013 @ 2:00am local time, Jan 1st, 2013 1:00am GMT.
+     */
+    DateTime normalTime =  new DateTime(2013, 1, 2, 3, 7, zurichDateTimeZone);
+    DateTime normalCutoff = SchedulerServiceImpl.getCutoffDate(3600, normalTime);
+    assertEquals(2013, normalCutoff.getYear());
+    assertEquals(01, normalCutoff.getMonthOfYear());
+    assertEquals(02, normalCutoff.getDayOfMonth());
+    assertEquals(01, normalCutoff.getHourOfDay());
+    assertEquals(07, normalCutoff.getMinuteOfHour());
+
+    /** Sunday, March 31, 2013, 2:00:00 AM clocks were turned forward 1 hour to
+    Sunday, March 31, 2013, 3:00:00 AM local daylight time instead.
+    Therefore, March 31, 2013 @ 3:01am back 1 hour will be March 31, 2013 @ 1:01am Zurich time
+    and 0:01am GMT due to time zone difference of 1 hour. */
+    DateTime forwardTime =  new DateTime(2013, 03, 31, 3, 1, zurichDateTimeZone);
+    DateTime forwardCutOff = SchedulerServiceImpl.getCutoffDate(3600, forwardTime);
+    assertEquals(2013, forwardCutOff.getYear());
+    assertEquals(03, forwardCutOff.getMonthOfYear());
+    assertEquals(31, forwardCutOff.getDayOfMonth());
+    assertEquals(00, forwardCutOff.getHourOfDay());
+    assertEquals(01, forwardCutOff.getMinuteOfHour());
+
+    /** Sunday, October 27, 2013, 3:00:00 AM clocks were turned backward 1 hour to
+    Sunday, October 27, 2013, 2:00:00 AM local standard time instead.
+    Therefore, Oct. 27th, 2013 @ 2:01am back 1 hour is 1:01 am local time and 23:01 GMT.*/
+    DateTime backwardTime =  new DateTime(2013, 10, 27, 2, 1, zurichDateTimeZone);
+    DateTime backwardCutoff = SchedulerServiceImpl.getCutoffDate(3600, backwardTime);
+    assertEquals(2013, backwardCutoff.getYear());
+    assertEquals(10, backwardCutoff.getMonthOfYear());
+    assertEquals(26, backwardCutoff.getDayOfMonth());
+    assertEquals(23, backwardCutoff.getHourOfDay());
+    assertEquals(01, backwardCutoff.getMinuteOfHour());
+  }
+
+  @Test (expected = SchedulerException.class)
+  public void removeScheduledRecordingsBeforeBufferInputSchedulerExceptionExpectsIllegalStateException() throws SchedulerException, SchedulerServiceDatabaseException {
+    SchedulerServiceIndex index = EasyMock.createMock(SchedulerServiceIndex.class);
+    EasyMock.expect(index.search(EasyMock.anyObject(SchedulerQuery.class))).andThrow(new SchedulerServiceDatabaseException("Mock exception"));
+    EasyMock.replay(index);
+
+    SchedulerServiceImpl service = new SchedulerServiceImpl();
+    service.setIndex(index);
+    service.removeScheduledRecordingsBeforeBuffer(0);
+  }
+
+  @Test
+  public void removeScheduledRecordingsBeforeBufferInputEmptyFinishedSchedulesExpectsNoException() throws SchedulerException, SchedulerServiceDatabaseException {
+    // Setup data
+    LinkedList<DublinCoreCatalog> catalogs = new LinkedList<DublinCoreCatalog>();
+    DublinCoreCatalogList list = new DublinCoreCatalogList(catalogs, catalogs.size());
+    // Setup index
+    SchedulerServiceIndex index = EasyMock.createMock(SchedulerServiceIndex.class);
+    EasyMock.expect(index.search(EasyMock.anyObject(SchedulerQuery.class))).andReturn(list);
+    EasyMock.replay(index);
+    // Run test
+    SchedulerServiceImpl service = new SchedulerServiceImpl();
+    service.setIndex(index);
+    service.removeScheduledRecordingsBeforeBuffer(0);
+  }
+
+  @Test
+  public void removeScheduledRecordingsBeforeBufferInputOneEventEmptyExpectsNoEventDeleted() throws SchedulerException, SchedulerServiceDatabaseException {
+    // Setup data
+    DublinCoreCatalog catalog = EasyMock.createMock(DublinCoreCatalog.class);
+    EasyMock.expect(catalog.getFirst(EasyMock.anyObject(EName.class))).andReturn(null);
+    EasyMock.replay(catalog);
+    LinkedList<DublinCoreCatalog> catalogs = new LinkedList<DublinCoreCatalog>();
+    catalogs.add(catalog);
+    DublinCoreCatalogList list = new DublinCoreCatalogList(catalogs, catalogs.size());
+    // Setup index
+    SchedulerServiceIndex index = EasyMock.createMock(SchedulerServiceIndex.class);
+    EasyMock.expect(index.search(EasyMock.anyObject(SchedulerQuery.class))).andReturn(list);
+    EasyMock.replay(index);
+    // Run test
+    SchedulerServiceImpl service = new SchedulerServiceImpl();
+    service.setIndex(index);
+    service.removeScheduledRecordingsBeforeBuffer(0);
+  }
+
+  private URI[] createMediapackageURIs(long[] ids) throws URISyntaxException {
+    URI[] uris = new URI[ids.length];
+    for (int i = 0; i < ids.length; i++) {
+      long id = ids[i];
+      URI uri = new URI("location" + id);
+      uris[i] = uri;
+    }
+    return uris;
+  }
+
+  private Workspace createWorkspace(URI[] uris, boolean throwException) throws NotFoundException, IOException {
+    Workspace workspace = EasyMock.createMock(Workspace.class);
+    for (int i = 0; i < uris.length; i++) {
+      workspace.delete(uris[i]);
+      if (throwException && i == 0) {
+        EasyMock.expectLastCall().andThrow(new NotFoundException("Mock Exception"));
+      } else {
+        EasyMock.expectLastCall();
+      }
+    }
+    EasyMock.replay(workspace);
+    return workspace;
+  }
+
+  private WorkflowService createWorkflowService(long[] ids, URI[] uris) throws WorkflowException, NotFoundException,
+          UnauthorizedException {
+    WorkflowService workflowService = EasyMock.createMock(WorkflowService.class);
+    for (int i = 0; i < ids.length; i++) {
+      long id = ids[i];
+      URI uri = uris[i];
+      // Setup elements
+      MediaPackageElement element = EasyMock.createMock(MediaPackageElement.class);
+      EasyMock.expect(element.getURI()).andReturn(uri);
+      EasyMock.replay(element);
+      MediaPackageElement[] elements = { element };
+      MediaPackage mediaPackage = EasyMock.createMock(MediaPackage.class);
+      EasyMock.expect(mediaPackage.getElements()).andReturn(elements);
+      EasyMock.replay(mediaPackage);
+      // Setup WorkflowInstance
+      WorkflowInstance workflowServiceInstance = EasyMock.createMock(WorkflowInstance.class);
+      EasyMock.expect(workflowServiceInstance.getMediaPackage()).andReturn(mediaPackage);
+      EasyMock.replay(workflowServiceInstance);
+      EasyMock.expect(workflowService.stop(id)).andReturn(workflowServiceInstance);
+    }
+    EasyMock.replay(workflowService);
+    return workflowService;
+  }
+
+  private SchedulerServiceDatabase setupPersistence(long[] ids) throws NotFoundException,
+          SchedulerServiceDatabaseException {
+    SchedulerServiceDatabase persistence = EasyMock.createMock(SchedulerServiceDatabase.class);
+    for (long id : ids) {
+      persistence.deleteEvent(id);
+      EasyMock.expectLastCall();
+    }
+    EasyMock.replay(persistence);
+    return persistence;
+  }
+
+  private SchedulerServiceIndex createIndex(long[] ids, boolean throwSchedulerException,
+          boolean throwNullPointerException) throws SchedulerServiceDatabaseException {
+    LinkedList<DublinCoreCatalog> catalogs = new LinkedList<DublinCoreCatalog>();
+    for (long id : ids) {
+      DublinCoreCatalog catalog = EasyMock.createMock(DublinCoreCatalog.class);
+      EasyMock.expect(catalog.getFirst(EasyMock.anyObject(EName.class))).andReturn(Long.toString(id));
+      EasyMock.replay(catalog);
+      catalogs.add(catalog);
+    }
+    DublinCoreCatalogList list = new DublinCoreCatalogList(catalogs, catalogs.size());
+    SchedulerServiceIndex index = EasyMock.createMock(SchedulerServiceIndex.class);
+    if (throwSchedulerException) {
+      EasyMock.expect(index.search(EasyMock.anyObject(SchedulerQuery.class))).andThrow(
+              new SchedulerException("Mock scheduler exception"));
+    } else if (throwNullPointerException) {
+      EasyMock.expect(index.search(EasyMock.anyObject(SchedulerQuery.class))).andThrow(
+              new NullPointerException("Mock null exception"));
+    } else {
+      EasyMock.expect(index.search(EasyMock.anyObject(SchedulerQuery.class))).andReturn(list);
+      for (long id : ids) {
+        index.delete(id);
+        EasyMock.expectLastCall();
+      }
+    }
+    EasyMock.replay(index);
+    return index;
+  }
+
+  @Test
+  public void removeScheduledRecordingsBeforeBufferInputOneEventOneIDExpectsEventDeleted() throws SchedulerException, NotFoundException, UnauthorizedException, SchedulerServiceDatabaseException, URISyntaxException, IOException, WorkflowException {
+    //Setup data
+    long[] ids = { 1L };
+    URI[] uris = createMediapackageURIs(ids);
+    // Run test
+    SchedulerServiceImpl service = new SchedulerServiceImpl();
+    service.setIndex(createIndex(ids, false, false));
+    service.setWorkspace(createWorkspace(uris, false));
+    service.setWorkflowService(createWorkflowService(ids, uris));
+    service.setPersistence(setupPersistence(ids));
+    service.removeScheduledRecordingsBeforeBuffer(0);
+  }
+
+  @Test
+  public void scanInputMultipleEventOneIDExpectsEventsDeleted() throws SchedulerException, NotFoundException, UnauthorizedException, SchedulerServiceDatabaseException, URISyntaxException, IOException, WorkflowException {
+    //Setup data
+    long[] ids = { 4L, 5L, 6L };
+    URI[] uris = createMediapackageURIs(ids);
+    // Run test
+    SchedulerServiceImpl service = new SchedulerServiceImpl();
+    service.setIndex(createIndex(ids, false, false));
+    service.setWorkspace(createWorkspace(uris, false));
+    service.setWorkflowService(createWorkflowService(ids, uris));
+    service.setPersistence(setupPersistence(ids));
+    service.removeScheduledRecordingsBeforeBuffer(0);
+  }
+
+  @Test
+  public void scanInputWorkSpaceExceptionExpectsProperEventDeleted() throws SchedulerException, NotFoundException,
+          UnauthorizedException, SchedulerServiceDatabaseException, URISyntaxException, IOException, WorkflowException {
+    // Setup data
+    long[] ids = { 7L, 8L, 9L };
+    // Setup workspace
+    URI[] uris = createMediapackageURIs(ids);
+    // Run test
+    SchedulerServiceImpl service = new SchedulerServiceImpl();
+    service.setIndex(createIndex(ids, false, false));
+    service.setWorkspace(createWorkspace(uris, true));
+    service.setWorkflowService(createWorkflowService(ids, uris));
+    service.setPersistence(setupPersistence(ids));
+    service.removeScheduledRecordingsBeforeBuffer(0);
   }
 
   private void checkEvent(long eventId, Properties initialCaProps, String title) throws Exception {

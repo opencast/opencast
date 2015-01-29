@@ -16,6 +16,8 @@
 /*global define*/
 define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($, _, Backbone, Engage, Moment) {
     "use strict";
+
+    var insertIntoDOM = true;
     var PLUGIN_NAME = "Description";
     var PLUGIN_TYPE = "engage_tab";
     var PLUGIN_VERSION = "1.0";
@@ -46,6 +48,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -57,6 +60,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
             break;
         case "embed":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -69,6 +73,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
         case "desktop":
         default:
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -91,10 +96,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     var translations = new Array();
     var locale = "en";
     var dateFormat = "MMMM Do YYYY, h:mm:ss a";
-
-    function detectLanguage() {
-        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-    }
+    var Utils;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginTabDescription").replace(/(\.\.\/)/g, "");
@@ -155,7 +157,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
                     series: this.model.get("series"),
                     contributor: this.model.get("contributor"),
                     date: this.model.get("date"),
-                    views: Engage.model.get("views").get("stats").views,
+                    views: Engage.model.get("views") ? Engage.model.get("views").get("stats").views : "",
                     str_title: translate("title", "Title"),
                     str_noTitle: translate("noTitle", "No title"),
                     str_creator: translate("creator", "Creator"),
@@ -202,7 +204,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
         	    }).mouseout(function() {
         	        $(this).removeClass("description-itemColor-hover").addClass("description-itemColor");
         	    });
-        	    */
+        	*/
             }
         }
     });
@@ -218,6 +220,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
             Engage.model.get("views").on("change", function() {
                 descriptionTabView.render();
             });
+            descriptionTabView.render();
         }
     }
 
@@ -226,20 +229,23 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
         Engage.log("Tab:Description: Init");
         var relative_plugin_path = Engage.getPluginPath("EngagePluginTabDescription");
 
-        initTranslate(detectLanguage(), function() {
-            Engage.log("Tab:Description: Successfully translated.");
-            locale = translate("value_locale", locale);
-            dateFormat = translate("value_dateFormatFull", dateFormat);
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        }, function() {
-            Engage.log("Tab:Description: Error translating...");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
+        // load utils class
+        require([relative_plugin_path + "utils"], function(utils) {
+            Engage.log("Tab:Description: Utils class loaded");
+            Utils = new utils();
+            initTranslate(Utils.detectLanguage(), function() {
+                Engage.log("Tab:Description: Successfully translated.");
+                initCount -= 1;
+                if (initCount <= 0) {
+                    initPlugin();
+                }
+            }, function() {
+                Engage.log("Tab:Description: Error translating...");
+                initCount -= 1;
+                if (initCount <= 0) {
+                    initPlugin();
+                }
+            });
         });
 
         Engage.model.on(viewsModelChange, function() {

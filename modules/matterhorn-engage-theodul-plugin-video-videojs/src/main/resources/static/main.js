@@ -16,6 +16,8 @@
 /*global define*/
 define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], function(require, $, _, Backbone, Basil, Engage) {
     "use strict";
+
+    var insertIntoDOM = true;
     var PLUGIN_NAME = "Engage VideoJS Videodisplay";
     var PLUGIN_TYPE = "engage_video";
     var PLUGIN_VERSION = "1.0";
@@ -39,6 +41,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     var events = {
         play: new Engage.Event("Video:play", "plays the video", "both"),
         pause: new Engage.Event("Video:pause", "pauses the video", "both"),
+        seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "both"),
         ready: new Engage.Event("Video:ready", "all videos loaded successfully", "trigger"),
         ended: new Engage.Event("Video:ended", "end of the video", "trigger"),
         playerLoaded: new Engage.Event("Video:playerLoaded", "player loaded successfully", "trigger"),
@@ -56,15 +59,19 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "trigger"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "trigger"),
         audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "trigger"),
+        playPause: new Engage.Event("Video:playPause", "", "handler"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "go to fullscreen", "handler"),
         fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "cancel fullscreen", "handler"),
         volumeSet: new Engage.Event("Video:volumeSet", "set the volume", "handler"),
         volumeGet: new Engage.Event("Video:volumeGet", "get the volume", "handler"),
         sliderStop: new Engage.Event("Slider:stop", "slider stopped", "handler"),
-        seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "handler"),
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "handler"),
-        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler")
+        playbackRateIncrease: new Engage.Event("Video:playbackRateIncrease", "", "handler"),
+        playbackRateDecrease: new Engage.Event("Video:playbackRateDecrease", "", "handler"),
+        mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
+        seekLeft: new Engage.Event("Video:seekLeft", "", "handler"),
+        seekRight: new Engage.Event("Video:seekRight", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -75,6 +82,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -86,6 +94,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
             break;
         case "embed":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -98,6 +107,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         case "desktop":
         default:
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -121,6 +131,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     var videoDisplaySizeTimesCheck = 100; // the smaller the factor, the higher the times check!
     var checkVideoDisplaySizeTimeout = 1500;
     var audioLoadTimeoutCheckDelay = 5000;
+    var seekSeconds = 5;
 
     /* don't change these variables */
     var Utils;
@@ -235,10 +246,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     Basil = new window.Basil(basilOptions);
 
     function acceptFormat(track) {
-        if ((Utils.preferredFormat() == null) || (mimetypes.indexOf(Utils.preferredFormat()) == -1)) {
+        // TODO: throws a SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data [basil.js:68]
+        /*
+        var preferredFormat = Basil.get("preferredFormat");
+        if ((Utils.preferredFormat(preferredFormat) == null) || (mimetypes.indexOf(Utils.preferredFormat(preferredFormat)) == -1)) {
             return true; // preferred format is not available, accept all
         }
-        return track.mimetype == Utils.preferredFormat();
+        return track.mimetype == Utils.preferredFormat(preferredFormat);
+	*/
+        return true;
     }
 
     function renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio) {
@@ -824,6 +840,76 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         Engage.on(plugin.events.pause.getName(), function() {
             theodulVideodisplay.pause();
         });
+        Engage.on(plugin.events.playPause.getName(), function() {
+            if (theodulVideodisplay.paused()) {
+                Engage.trigger(plugin.events.play.getName());
+            } else {
+                Engage.trigger(plugin.events.pause.getName());
+            }
+        });
+        Engage.on(plugin.events.seekLeft.getName(), function() {
+            if (pressedPlayOnce) {
+                var currTime = theodulVideodisplay.currentTime();
+                if ((currTime - seekSeconds) >= 0) {
+                    Engage.trigger(plugin.events.seek.getName(), currTime - seekSeconds);
+                } else {
+                    Engage.trigger(plugin.events.seek.getName(), 0);
+                }
+            }
+        });
+        Engage.on(plugin.events.seekRight.getName(), function() {
+            if (pressedPlayOnce) {
+                var currTime = theodulVideodisplay.currentTime();
+                var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
+                if (duration && ((currTime + seekSeconds) < duration)) {
+                    Engage.trigger(plugin.events.seek.getName(), currTime + seekSeconds);
+                } else {
+                    Engage.trigger(plugin.events.seek.getName(), duration);
+                }
+            }
+        });
+        Engage.on(plugin.events.playbackRateIncrease.getName(), function() {
+            if (pressedPlayOnce) {
+                var rate = theodulVideodisplayMaster.playbackRate();
+                switch (rate * 100) {
+                    case 50:
+                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
+                        break;
+                    case 75:
+                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
+                        break;
+                    case 100:
+                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
+                        break;
+                    case 125:
+                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5)
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+        Engage.on(plugin.events.playbackRateDecrease.getName(), function() {
+            if (pressedPlayOnce) {
+                var rate = theodulVideodisplayMaster.playbackRate();
+                switch (rate * 100) {
+                    case 75:
+                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5)
+                        break;
+                    case 100:
+                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
+                        break;
+                    case 125:
+                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
+                        break;
+                    case 150:
+                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
     }
 
     function registerEvents(videoDisplay, numberOfVideodisplays) {
@@ -866,12 +952,80 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                     audioPlayer.pause();
                 }
             });
-            Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {
-                Engage.log("Video: Volume set to " + percentAsDecimal);
-                if ((percentAsDecimal / 100) > 0.09) {
-                    audioPlayer.volume = percentAsDecimal / 100;
+            Engage.on(plugin.events.playPause.getName(), function() {
+                if (audioPlayer.paused()) {
+                    Engage.trigger(plugin.events.play.getName());
                 } else {
-                    audioPlayer.volume = percentAsDecimal;
+                    Engage.trigger(plugin.events.pause.getName());
+                }
+            });
+            Engage.on(plugin.events.seekLeft.getName(), function() {
+                if (pressedPlayOnce) {
+                    var currTime = audioPlayer.currentTime();
+                    if ((currTime - seekSeconds) >= 0) {
+                        Engage.trigger(plugin.events.seek.getName(), currTime - seekSeconds);
+                    } else {
+                        Engage.trigger(plugin.events.seek.getName(), 0);
+                    }
+                }
+            });
+            Engage.on(plugin.events.seekRight.getName(), function() {
+                if (pressedPlayOnce) {
+                    var currTime = audioPlayer.currentTime();
+                    var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
+                    if (duration && ((currTime + seekSeconds) < duration)) {
+                        Engage.trigger(plugin.events.seek.getName(), currTime + seekSeconds);
+                    } else {
+                        Engage.trigger(plugin.events.seek.getName(), duration);
+                    }
+                }
+            });
+            Engage.on(plugin.events.playbackRateIncrease.getName(), function() {
+                if (pressedPlayOnce) {
+                    var rate = audioPlayer.playbackRate();
+                    switch (rate * 100) {
+                        case 50:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
+                            break;
+                        case 75:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
+                            break;
+                        case 100:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
+                            break;
+                        case 125:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5)
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+            Engage.on(plugin.events.playbackRateDecrease.getName(), function() {
+                if (pressedPlayOnce) {
+                    var rate = audioPlayer.playbackRate();
+                    switch (rate * 100) {
+                        case 75:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5)
+                            break;
+                        case 100:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
+                            break;
+                        case 125:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
+                            break;
+                        case 150:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+            Engage.on(plugin.events.volumeSet.getName(), function(volume) {
+                if ((volume >= 0) && (volume <= 1)) {
+                    Engage.log("Video: Volume changed to " + volume);
+                    audioPlayer.volume(volume);
                 }
             });
             Engage.on(plugin.events.volumeGet.getName(), function(callback) {
@@ -982,12 +1136,86 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                     theodulVideodisplayMaster.pause();
                 }
             });
-            Engage.on(plugin.events.volumeSet.getName(), function(percentAsDecimal) {
-                Engage.log("Video: Volume changed to " + percentAsDecimal);
-                theodulVideodisplayMaster.volume(percentAsDecimal);
+            Engage.on(plugin.events.playPause.getName(), function() {
+                if (theodulVideodisplayMaster.paused()) {
+                    Engage.trigger(plugin.events.play.getName());
+                } else {
+                    Engage.trigger(plugin.events.pause.getName());
+                }
+            });
+            Engage.on(plugin.events.seekLeft.getName(), function() {
+                if (pressedPlayOnce) {
+                    var currTime = theodulVideodisplayMaster.currentTime();
+                    if ((currTime - seekSeconds) >= 0) {
+                        Engage.trigger(plugin.events.seek.getName(), currTime - seekSeconds);
+                    } else {
+                        Engage.trigger(plugin.events.seek.getName(), 0);
+                    }
+                }
+            });
+            Engage.on(plugin.events.seekRight.getName(), function() {
+                if (pressedPlayOnce) {
+                    var currTime = theodulVideodisplayMaster.currentTime();
+                    var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
+                    if (duration && ((currTime + seekSeconds) < duration)) {
+                        Engage.trigger(plugin.events.seek.getName(), currTime + seekSeconds);
+                    } else {
+                        Engage.trigger(plugin.events.seek.getName(), duration);
+                    }
+                }
+            });
+            Engage.on(plugin.events.playbackRateIncrease.getName(), function() {
+                if (pressedPlayOnce) {
+                    var rate = theodulVideodisplayMaster.playbackRate();
+                    switch (rate * 100) {
+                        case 50:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
+                            break;
+                        case 75:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
+                            break;
+                        case 100:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
+                            break;
+                        case 125:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5)
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+            Engage.on(plugin.events.playbackRateDecrease.getName(), function() {
+                if (pressedPlayOnce) {
+                    var rate = theodulVideodisplayMaster.playbackRate();
+                    switch (rate * 100) {
+                        case 75:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5)
+                            break;
+                        case 100:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
+                            break;
+                        case 125:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
+                            break;
+                        case 150:
+                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+            Engage.on(plugin.events.volumeSet.getName(), function(volume) {
+                if ((volume >= 0) && (volume <= 1)) {
+                    Engage.log("Video: Volume changed to " + volume);
+                    theodulVideodisplayMaster.volume(volume);
+                }
             });
             Engage.on(plugin.events.volumeGet.getName(), function(callback) {
-                callback(theodulVideodisplayMaster.volume());
+                if (callback) {
+                    callback(theodulVideodisplayMaster.volume());
+                }
             });
             Engage.on(plugin.events.seek.getName(), function(time) {
                 Engage.log("Video: Seek to " + time);

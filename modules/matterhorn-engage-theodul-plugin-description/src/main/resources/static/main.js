@@ -17,6 +17,7 @@
 define(["require", "jquery", "underscore", "backbone", "engage/core", "moment"], function(require, $, _, Backbone, Engage, Moment) {
     "use strict";
 
+    var insertIntoDOM = true;
     var PLUGIN_NAME = "Basic Engage Description";
     var PLUGIN_TYPE = "engage_description";
     var PLUGIN_VERSION = "1.0";
@@ -46,6 +47,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core", "moment"],
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -57,6 +59,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core", "moment"],
             break;
         case "embed":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -69,6 +72,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core", "moment"],
         case "desktop":
         default:
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,

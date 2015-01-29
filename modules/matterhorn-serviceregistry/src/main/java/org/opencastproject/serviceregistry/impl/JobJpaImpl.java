@@ -84,7 +84,7 @@ import javax.xml.bind.annotation.XmlType;
         @NamedQuery(name = "Job.undispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = false and "
                 + "j.status in :statuses order by j.dateCreated"),
         @NamedQuery(name = "Job.processinghost.status", query = "SELECT j FROM Job j "
-                + "where j.status = :status and j.processorServiceRegistration is not null and "
+                + "where j.status in :statuses and j.processorServiceRegistration is not null and "
                 + "j.processorServiceRegistration.serviceType = :serviceType and "
                 + "j.processorServiceRegistration.hostRegistration.baseUrl = :host order by j.dateCreated"),
         @NamedQuery(name = "Job.root.children", query = "SELECT j FROM Job j WHERE j.rootJob.id = :id ORDER BY j.dateCreated"),

@@ -16,6 +16,8 @@
 /*global define*/
 define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     "use strict";
+
+    var insertIntoDOM = false;
     var PLUGIN_NAME = "Engage Plugin Custom Usertracking";
     var PLUGIN_TYPE = "engage_custom";
     var PLUGIN_VERSION = "1.0";
@@ -47,6 +49,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     switch (Engage.model.get("mode")) {
         case "mobile":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -58,6 +61,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
             break;
         case "embed":
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -70,6 +74,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
         case "desktop":
         default:
             plugin = {
+                insertIntoDOM: insertIntoDOM,
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
@@ -88,6 +93,8 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     var lastFootprint = undefined;
     var mediapackageID;
     var mediapackageError = false;
+
+    /* TODO: Wait for the new usertracking service...
 
     function initPlugin() {
         mediapackageID = Engage.model.get("urlParameters").id;
@@ -144,6 +151,8 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
             initPlugin();
         }
     });
+
+    */
 
     return plugin;
 });
