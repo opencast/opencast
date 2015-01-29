@@ -465,27 +465,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
         var i = 0;
 
         var player = null;
-        var prev_player = null;
         var current_time = 0;
-
-        var play_pause_toggle = false;
-        var played_once = false;
 
         var player_page_id = "";
 
-        var known_players = [];
+        var prev_player = null;
+        var active_player = null
 
         for (var v in videoSources) {
             if (videoSources[v].length > 0) {
-                Engage.log("Init Video Display: " + v);
-                Engage.log(videoDataView.videojs_swf);
                 initVideojsVideo(videoDisplays[i], videoSources[v], videoDataView.videojs_swf);
 
-                Engage.log("Video: " + videoDisplays[i]);
-
                 player_page_id = "#videoPage_"+(i+1);
-
-                known_players.push(videojs(videoDisplays[i]));
 
                 // Navigation, append tabs
                 if (i == 0) {
@@ -494,62 +485,69 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                 $('#videoPagesNav ul').append('<li><a href="'+player_page_id+'">'+v+'</a></li>');
 
 
+                Engage.on(plugin.events.sliderStop.getName(), function(time) {
+                        var duration = parseInt(Engage.model.get("videoDataModel").get("duration"));
+                        current_time = (time / 1000) * (duration / 1000);
+                        active_player.currentTime(current_time);
+                });
+
+                Engage.on(plugin.events.pause.getName(), function() {
+                    active_player.pause();
+                });
+
+                Engage.on(plugin.events.play.getName(), function() {
+                    active_player.play();
+                    active_player.currentTime(current_time);
+                });
+
+                var continue_playing = false;
+                $(document).on("pagecontainerbeforetransition", function() {
+                    console.log('pagecontainerbeforetransition');
+                    $("body").hide();
+                });
+                $(document).on("pagecontainertransition", function() {
+                    console.log('pagecontainertransition');
+                });
+                $(document).on("pagecontainershow", function() {
+                    console.log('pagecontainershow');
+                    $("body").show();
+                });
+
                 $(document).on("pagebeforeshow", player_page_id, function(event, data){
 
+                    // Get prev. Player
                     if (data.prevPage.length > 0) {
                         prev_player = videojs(data.prevPage.children().children()[0].id);
-                        current_time = prev_player.currentTime();
-                        console.log(prev_player);
+                        continue_playing = !prev_player.paused()
+                        prev_player.pause();
+                        prev_player.off("timeupdate");
+                        prev_player.off("ended");
                     };
 
                     // Get player
                     player = videojs($(this).children().children()[0].id);
+                    active_player = player;
 
-                    Engage.log("Player: " + player);
-
-                    player.on("ended", function() {
-
-                    });
-
-                    player.on("timeupdate", function() {
-
-                    });
-                    Engage.on(plugin.events.sliderStart.getName(), function(time) {
-                        current_time = time;
-                    });
-
-                    Engage.on(plugin.events.sliderStop.getName(), function(time) {
-                        
-                    });
-
-                    Engage.on(plugin.events.play.getName(), function() {
-                        player.play();
-                        played_once = true;
-                        player.currentTime(current_time);
-                        play_pause_toggle = true;
-                    });
-
-                    Engage.on(plugin.events.pause.getName(), function() {
-                        player.pause();
-                        play_pause_toggle = false;
-                    });
-
-                    Engage.on(plugin.events.timeupdate.getName(), function(events, data) {
-                        console.log(events);
-                        console.log(data);
-                        console.log('timeupdate');
-                    });
-
-                    if (play_pause_toggle) {
-                        player.play();
-                        player.currentTime(current_time).trigger("create");
+                    if (continue_playing) {
+                        active_player.play();
+                        active_player.currentTime(current_time);
                     };
+
+                    active_player.on("ended", function() {
+                        Engage.trigger(plugin.events.pause.getName());
+                        current_time = 0;
+                        Engage.trigger(plugin.events.timeupdate.getName(), 0);
+                    });
+
+                    active_player.on("timeupdate", function() {
+                        Engage.trigger(plugin.events.timeupdate.getName(), active_player.currentTime());
+                        current_time = active_player.currentTime();
+                    }); 
                 });
                 ++i;
             }
         }
 
-        Engage.log("Known Players: " + known_players[0]);
         Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
