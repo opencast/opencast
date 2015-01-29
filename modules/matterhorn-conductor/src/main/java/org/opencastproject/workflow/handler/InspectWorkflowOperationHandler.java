@@ -62,7 +62,7 @@ import java.util.TreeMap;
 public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(ComposeWorkflowOperationHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(InspectWorkflowOperationHandler.class);
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
