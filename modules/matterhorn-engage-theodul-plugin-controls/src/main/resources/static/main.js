@@ -147,7 +147,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_playbackRate150 = "playback150";
     var id_playpause_controls = "playpause_controls";
     var id_fullscreen_button = "fullscreen_button";
-    var id_displayShortcuts_button = "shortcuts_button";
     var id_embed_button = "embed_button";
     var id_backward_button = "backward_button";
     var id_forward_button = "forward_button";
@@ -208,19 +207,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
-    // hotkeys
-    var hotkey_playPause = "playPause";
-    var hotkey_mute = "mute";
-    var hotkey_volDown = "volDown";
-    var hotkey_volUp = "volUp";
-    var hotkey_fullscreenEnable = "fullscreenEnable";
-    var hotkey_fullscreenCancel = "fullscreenCancel";
-    var hotkey_jumpToBegin = "jumpToBegin";
-    var hotkey_prevChapter = "prevChapter";
-    var hotkey_nextChapter = "nextChapter";
-    var hotkey_prevEpisode = "prevEpisode";
-    var hotkey_nextEpisode = "nextEpisode";
-    var hotkey_jumpToX = "jumpToX";
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -260,64 +246,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function translate(str, strIfNotFound) {
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
-    }
-
-    function translateKeyboardCombination(comb, split) {
-        if (comb.indexOf(split) != -1) {
-            var spl = comb.split(split);
-            var ret = "";
-            for (var i = 0; i < spl.length; ++i) {
-                if (i != 0) {
-                    ret += "+";
-                }
-                ret += translate(spl[i], spl[i]);
-            }
-            return ret;
-        }
-        return translate(comb, comb);
-    }
-
-
-    function shortcutsCompare(a, b) {
-        if (a.name < b.name) {
-            return -1;
-        }
-        if (a.name > b.name) {
-            return 1;
-        }
-        return 0;
-    }
-
-    function displayShortcuts() {
-        var shortcuts = Engage.model.get("meInfo").get("hotkeys");
-        if (shortcuts) {
-            shortcuts.sort(shortcutsCompare);
-            var str_shortcuts = "";
-            str_shortcuts += "<table class=\"table table-striped table-hover table-bordered\">";
-            str_shortcuts += "<th>" + translate(name, "Shortcut name") + "</th><th>" + translate("shortcut", "Shortcut") + "</th>";
-            $.each(shortcuts, function(i, v) {
-                str_shortcuts += "<tr><td>" + translate(v.name, v.name) + "</td><td>" + translateKeyboardCombination(v.key, "+") + "</td></tr>";
-            });
-            str_shortcuts += "</table>";
-            str_shortcuts += "<div class=\"alert alert-info\" role=\"alert\">" + translate("shortcutDescriptions", "[Modifier] = Control on Windows, Command on Mac OS") + "</div>";
-            Bootbox.dialog({
-                title: translate("shortcutsOverview", "Shortcut overview"),
-                message: str_shortcuts,
-                buttons: {
-                    main: {
-                        label: translate("ok", "OK"),
-                        className: "btn-primary",
-                        callback: function() {
-                            // callback
-                        }
-                    }
-                }
-            });
-        } else {
-            Bootbox.alert(translate("shortcutsNotAvailable", "Currently there are no shortcuts available."), function() {
-                // callback
-            });
-        }
     }
 
     function login() {
@@ -462,8 +390,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     loggedIn: false,
                     str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
                     str_loginLogout: translate("loginLogout", "Login/Logout"),
-                    str_fullscreen: translate("fullscreen", "Fullscreen"),
-                    str_displayShortcuts: translate("displayShortcuts", "Display shortcuts")
+                    str_fullscreen: translate("fullscreen", "Fullscreen")
                 };
 
                 // compile template and load into the html
@@ -657,11 +584,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 if (!isInFullScreen) {
                     Engage.trigger(plugin.events.fullscreenEnable.getName());
                 }
-            });
-
-            $("#" + id_displayShortcuts_button).click(function(e) {
-                e.preventDefault();
-                displayShortcuts();
             });
 
             // slider events
