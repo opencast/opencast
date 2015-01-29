@@ -502,15 +502,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
 
                 var continue_playing = false;
                 $(document).on("pagecontainerbeforetransition", function() {
-                    console.log('pagecontainerbeforetransition');
-                    $("body").hide();
+                    Engage.log('pagecontainerbeforetransition');
                 });
                 $(document).on("pagecontainertransition", function() {
-                    console.log('pagecontainertransition');
+                    Engage.log('pagecontainertransition');
                 });
                 $(document).on("pagecontainershow", function() {
-                    console.log('pagecontainershow');
-                    $("body").show();
+                    Engage.log('pagecontainershow');
                 });
 
                 $(document).on("pagebeforeshow", player_page_id, function(event, data){
