@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], function(require, $, _, Backbone, Basil, Engage) {
+define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engage/core"], function(require, $, _, Backbone, Basil, Bowser, Engage) {
     "use strict";
 
     var insertIntoDOM = true;
@@ -188,8 +188,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
     var event_sjs_buffering = "sjs:buffering";
     var event_sjs_bufferedAndAutoplaying = "sjs:bufferedAndAutoplaying";
     var event_sjs_bufferedButNotAutoplaying = "sjs:bufferedButNotAutoplaying";
-    var event_sjs_isUsingFlash = "sjs:isUsingFlash";
     var event_sjs_debug = "sjs:debug";
+    var event_sjs_stopBufferChecker = "sjs:stopBufferChecker";
     var currentlySelectedVideodisplay = 0;
     var globalVideoSource = new Array();
     var videoResultions = new Array();
@@ -342,10 +342,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                     }
                     ++i;
                 }
-                if (isUsingFlash) {
-                    $(document).trigger(event_sjs_isUsingFlash, []);
-                    $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
-                }
+                $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
+		if(Bowser.chrome) {
+		    $(document).trigger(event_sjs_stopBufferChecker);
+		    Engage.trigger(plugin.events.customError.getName(), translate("chromeBuffer", "The buffer checker has been disabled due to Chrome limitations. It is possible that you will encounter problems with the video playback."));
+		}
             } else {
                 videosReady = true;
                 if (!isAudioOnly) {
@@ -535,10 +536,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "engage/core"], 
                     }
                     ++i;
                 }
-                if (isUsingFlash) {
-                    $(document).trigger(event_sjs_isUsingFlash, []);
-                    $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
-                }
+                $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
+		if(Bowser.chrome) {
+		    $(document).trigger(event_sjs_stopBufferChecker);
+		    Engage.trigger(plugin.events.customError.getName(), translate("chromeBuffer", "The buffer checker has been disabled due to Chrome limitations. It is possible that you will encounter problems with the video playback."));
+		}
             } else {
                 videosReady = true;
                 if (!isAudioOnly) {

@@ -11,5 +11,6 @@
     "msg_waitToSetTime": "Bitte warten, bis das Video geladen wurde, um eine Zeit zu setzen.",
     "msg_startPlayingToSetTime": "Bitte das Video einmal starten, um eine Zeit zu setzen.",
     "msg_waitToSeek": "Bitte warten, bis das Video geladen wurde, um eine Zeit zu setzen.",
-    "msg_startPlayingToSeek": "Bitte das Video einmal starten, um eine Zeit zu setzen."
+    "msg_startPlayingToSeek": "Bitte das Video einmal starten, um eine Zeit zu setzen.",
+    "chromeBuffer": "Der Buffer-Checker ist durch Einschränkungen von Chrome deaktiviert worden. Es ist möglich, dass Video-Abspiel-Probleme auftreten werden."
 }

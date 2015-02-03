@@ -29,6 +29,9 @@ requirejs.config({
         "basil": {
             exports: "Basil"
         },
+        "bowser": {
+            exports: "Bowser"
+        },
         "bootbox": {
             exports: "Bootbox"
         }

@@ -1,6 +1,6 @@
 /**
  * Synchronize.js
- * Version 1.2.1
+ * Version 1.2.2
  *
  *  Copyright (C) 2013-2015 Denis Meyer, calltopower88@googlemail.com
  *  This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@
     var pauseDelayThreshold = seekAhead + 0.05;
     var synchDelayThresholdPositive = 0.05;
     var synchDelayThresholdNegative = -0.05;
+    var synchDelayThresholdFlash = 0.05;
 
     /* don't change the variables below */
     var debug = false; // set this via event "sjs:debug"
@@ -44,6 +45,7 @@
     var masterVidNumber = 0;
     var masterVideoId;
     var nrOfPlayersReady = 0;
+    var isBuffering = false;
     var startClicked = false;
     var bufferCheckerSet = false;
     var bufferChecker;
@@ -148,13 +150,18 @@
      * @return true if id is not undefined and video plays
      */
     function play(id) {
-        if (id) {
-            log("SJS: [play] Playing video element id '" + id + "'");
-            getVideo(id).play();
-            return true;
+        if(!isBuffering) {
+            if (id) {
+                log("SJS: [play] Playing video element id '" + id + "'");
+                getVideo(id).play();
+                return true;
+            } else {
+                log("SJS: [play] Undefined video element id '" + id + "'");
+                return false;
+            }
         } else {
-            log("SJS: [play] Undefined video element id '" + id + "'");
-            return false;
+                log("SJS: [play] A video is currently buffering");
+                return false;
         }
     }
 
@@ -403,7 +410,7 @@
                 }
                 // if using flash
                 else if (usingFlash) {
-                    if ((Math.abs(synchDelay) > synchDelayThresholdPositive) && (Math.abs(synchDelay) > pauseDelayThreshold)) {
+                    if ((Math.abs(synchDelay) > synchDelayThresholdFlash) && (Math.abs(synchDelay) > pauseDelayThreshold)) {
                         doSeek = true;
                     }
                     // everything is fine
@@ -568,6 +575,7 @@
                         }
                     }
                     allBuffered = allBuffered && buffered;
+                    isBuffering = !allBuffered;
                 } else {
                     // Do something?
                 }
@@ -858,6 +866,7 @@
             log("SJS: Received 'sjs:stopBufferChecker' event");
             window.clearInterval(bufferChecker);
             bufferCheckerSet = false;
+            isBuffering = false;
         });
     }
     $(document).on("sjs:debug", function(e, _debug) {
