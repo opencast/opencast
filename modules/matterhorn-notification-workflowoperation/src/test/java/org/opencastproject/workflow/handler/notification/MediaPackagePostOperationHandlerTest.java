@@ -96,10 +96,9 @@ public class MediaPackagePostOperationHandlerTest {
     try {
       tuple.workflowHandler.start(tuple.workflowInstance, null);
     } catch (WorkflowOperationException e) {
-      Assert.assertTrue(("org.opencastproject.workflow.api.WorkflowOperationException: "
-          + "org.apache.http.conn.HttpHostConnectException: "
-          + "Connection to http://127.0.0.1:9 refused").equals(e.toString()));
       logger.info(e.toString());
+      Assert.assertTrue(e.toString().contains("Connection"));
+      Assert.assertTrue(e.toString().contains("refused"));
     }
 
   }
@@ -123,10 +122,9 @@ public class MediaPackagePostOperationHandlerTest {
     try {
       tuple.workflowHandler.start(tuple.workflowInstance, null);
     } catch (WorkflowOperationException e) {
-      Assert.assertTrue(("org.opencastproject.workflow.api.WorkflowOperationException: "
-          + "org.apache.http.conn.HttpHostConnectException: "
-          + "Connection to http://127.0.0.1:9 refused").equals(e.toString()));
       logger.info(e.toString());
+      Assert.assertTrue(e.toString().contains("Connection"));
+      Assert.assertTrue(e.toString().contains("refused"));
     }
 
   }

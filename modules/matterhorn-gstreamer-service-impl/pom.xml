@@ -32,7 +32,6 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>3.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -71,7 +70,7 @@
     <dependency>
       <groupId>com.googlecode.gstreamer-java</groupId>
       <artifactId>gstreamer-java</artifactId>
-      <version>1.4</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>net.java.dev.jna</groupId>
