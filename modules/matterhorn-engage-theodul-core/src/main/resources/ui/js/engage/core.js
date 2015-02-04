@@ -82,20 +82,20 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var askedForLogin = false;
     var springSecurityLoginURL = "/j_spring_security_check";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
-    // hotkeys
-    var hotkey_playPause = "playPause";
-    var hotkey_seekLeft = "seekLeft";
-    var hotkey_seekRight = "seekRight";
-    var hotkey_playbackrateIncrease = "playbackrateIncrease";
-    var hotkey_playbackrateDecrease = "playbackrateDecrease";
-    var hotkey_mute = "mute";
-    var hotkey_volDown = "volDown";
-    var hotkey_volUp = "volUp";
-    var hotkey_fullscreenEnable = "fullscreenEnable";
-    var hotkey_fullscreenCancel = "fullscreenCancel";
-    var hotkey_jumpToBegin = "jumpToBegin";
-    var hotkey_prevChapter = "prevChapter";
-    var hotkey_nextChapter = "nextChapter";
+    // shortcuts
+    var shortcut_playPause = "playPause";
+    var shortcut_seekLeft = "seekLeft";
+    var shortcut_seekRight = "seekRight";
+    var shortcut_playbackrateIncrease = "playbackrateIncrease";
+    var shortcut_playbackrateDecrease = "playbackrateDecrease";
+    var shortcut_mute = "mute";
+    var shortcut_volDown = "volDown";
+    var shortcut_volUp = "volUp";
+    var shortcut_fullscreenEnable = "fullscreenEnable";
+    var shortcut_fullscreenCancel = "fullscreenCancel";
+    var shortcut_jumpToBegin = "jumpToBegin";
+    var shortcut_prevChapter = "prevChapter";
+    var shortcut_nextChapter = "nextChapter";
 
     var basilOptions = {
         namespace: "mhStorage"
@@ -158,7 +158,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         return ((translationData != null) && (translationData[str] != undefined)) ? translationData[str] : strIfNotFound;
     }
 
-    // theodul core init
     if (window.console) {
         console.log("Core: Init");
     }
@@ -253,8 +252,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         return -1;
     }
 
-    // binds configured hotkeys(see MH org config) to corresponding theodul events
-    function bindHotkeysToEvents() {
+    // binds configured shortcuts (see MH org config) to corresponding events
+    function bindShortcutsToEvents() {
         // disable scrolling when pressing the space bar
         $(document).keydown(function(e) {
             // space = 32, backspace = 8, page up = 73, page down = 81, enter = 10, carriage return = 13
@@ -263,69 +262,69 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             }
         });
         // process hardcoded keys
-        $.each(engageCore.model.get("meInfo").get("hotkeys"), function(i, val) {
+        $.each(engageCore.model.get("meInfo").get("shortcuts"), function(i, val) {
             switch (val.name) {
-                case hotkey_seekLeft:
+                case shortcut_seekLeft:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.seekLeft.getName());
                     });
                     break;
-                case hotkey_seekRight:
+                case shortcut_seekRight:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.seekRight.getName());
                     });
                     break;
-                case hotkey_playbackrateIncrease:
+                case shortcut_playbackrateIncrease:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.playbackRateIncrease.getName());
                     });
                     break;
-                case hotkey_playbackrateDecrease:
+                case shortcut_playbackrateDecrease:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.playbackRateDecrease.getName());
                     });
                     break;
-                case hotkey_nextChapter:
+                case shortcut_nextChapter:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.nextChapter.getName());
                     });
                     break;
-                case hotkey_fullscreenEnable:
+                case shortcut_fullscreenEnable:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.fullscreenEnable.getName());
                     });
                     break;
-                case hotkey_fullscreenCancel:
+                case shortcut_fullscreenCancel:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.fullscreenCancel.getName());
                     });
                     break;
-                case hotkey_jumpToBegin:
+                case shortcut_jumpToBegin:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.seek.getName(), 0);
                     });
                     break;
-                case hotkey_prevChapter:
+                case shortcut_prevChapter:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.previousChapter.getName());
                     });
                     break;
-                case hotkey_playPause:
+                case shortcut_playPause:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.playPause.getName());
                     });
                     break;
-                case hotkey_mute:
+                case shortcut_mute:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.mute.getName());
                     });
                     break;
-                case hotkey_volDown:
+                case shortcut_volDown:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.volumeDown.getName());
                     });
                     break;
-                case hotkey_volUp:
+                case shortcut_volUp:
                     Mousetrap.bind(val.key, function() {
                         engageCore.trigger(events.volumeUp.getName());
                     });
@@ -435,11 +434,11 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var EngageCore = Backbone.View.extend({
         el: $("#" + id_engage_view),
         Event: EngageEvent,
-        // bind a key event as a string to given theodul event
-        bindKeyToEvent: function(hotkey, event) {
+        // bind a key event as a string to given event
+        bindKeyToEvent: function(shortcuts, event) {
             // only for EngageEvent objects
             if (event instanceof EngageEvent) {
-                Mousetrap.bind(hotkey, function() {
+                Mousetrap.bind(shortcut, function() {
                     engageCore.trigger(event);
                 });
             }
@@ -581,7 +580,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             // END LOAD PLUGINS
                             // wait that me infos are loaded
                             while (engageCore.model.get("meInfo").ready == false) {}
-                            bindHotkeysToEvents(); // bind configured hotkeys to theodul events
+                            bindShortcutsToEvents(); // bind configured shortcuts to events
                         } else {
                             engageCore.trigger(events.plugin_load_done.getName());
                         }

@@ -118,71 +118,71 @@ $(document).ready(function() {
     }
 
     function login() {
-	if(!askedForLogin) {
-	    askedForLogin = true;
+        if (!askedForLogin) {
+            askedForLogin = true;
             var username = "User";
             var password = "Password";
-	    bootbox.dialog({
-		title: title_enterUsernamePassword,
-		message: '<form class="form-signin">' +
-		    '<h2 class="form-signin-heading">' + msg_enterUsernamePassword + '</h2>' +
-		    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + placeholder_username + '" required="true" autofocus="" />' +
-		    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + placeholder_password + '" required="true" />' +
-		    '<label class="checkbox">' +
-		    '<input type="checkbox" value="' + placeholder_rememberMe + '" id="rememberMe" name="rememberMe" checked> ' + placeholder_rememberMe +
-		    '</label>' +
-		    '</form>',
-		buttons: {
-		    cancel: {
-			label: "Cancel",
-			className: "btn-default",
-			callback: function () {
-			    askedForLogin = false;
-			}
-		    },
-		    login: {
-			label: "Log in",
-			className: "btn-success",
-			callback: function () {
-			    var username = $("#username").val().trim();
-			    var password = $("#password").val().trim();
-			    if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
-				$.ajax({
+            bootbox.dialog({
+                title: title_enterUsernamePassword,
+                message: '<form class="form-signin">' +
+                    '<h2 class="form-signin-heading">' + msg_enterUsernamePassword + '</h2>' +
+                    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + placeholder_username + '" required="true" autofocus="" />' +
+                    '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + placeholder_password + '" required="true" />' +
+                    '<label class="checkbox">' +
+                    '<input type="checkbox" value="' + placeholder_rememberMe + '" id="rememberMe" name="rememberMe" checked> ' + placeholder_rememberMe +
+                    '</label>' +
+                    '</form>',
+                buttons: {
+                    cancel: {
+                        label: "Cancel",
+                        className: "btn-default",
+                        callback: function() {
+                            askedForLogin = false;
+                        }
+                    },
+                    login: {
+                        label: "Log in",
+                        className: "btn-success",
+                        callback: function() {
+                            var username = $("#username").val().trim();
+                            var password = $("#password").val().trim();
+                            if ((username !== null) && (username.length > 0) && (password !== null) && (password.length > 0)) {
+                                $.ajax({
                                     type: "POST",
                                     url: springSecurityLoginURL,
                                     data: {
-					"j_username": username,
-					"j_password": password,
-					"_spring_security_remember_me": $("#rememberMe").is(":checked")
+                                        "j_username": username,
+                                        "j_password": password,
+                                        "_spring_security_remember_me": $("#rememberMe").is(":checked")
                                     }
-				}).done(function(msg) {
+                                }).done(function(msg) {
                                     password = "";
                                     if (msg.indexOf(springLoggedInStrCheck) == -1) {
-					location.reload();
-					alertify.success(msg_loginSuccessful + " '" + username + "'.");
-					initialize();
+                                        location.reload();
+                                        alertify.success(msg_loginSuccessful + " '" + username + "'.");
+                                        initialize();
                                     } else {
-					alertify.error(msg_loginFailed + " '" + username + "'.");
+                                        alertify.error(msg_loginFailed + " '" + username + "'.");
                                     }
-				    askedForLogin = false;
-				}).fail(function(msg) {
+                                    askedForLogin = false;
+                                }).fail(function(msg) {
                                     password = "";
                                     alertify.error(msg_loginFailed + " '" + username + "'.");
-				    askedForLogin = false;
-				});
-			    } else {
-				askedForLogin = false;
-			    }
-			}
-		    }
-		},
-		className: "usernamePassword-modal",
-		onEscape: function() {
-		    askedForLogin = false;
-		},
-		closeButton: false
-	    });
-	}
+                                    askedForLogin = false;
+                                });
+                            } else {
+                                askedForLogin = false;
+                            }
+                        }
+                    }
+                },
+                className: "usernamePassword-modal",
+                onEscape: function() {
+                    askedForLogin = false;
+                },
+                closeButton: false
+            });
+        }
     }
 
     function logout() {
@@ -260,11 +260,11 @@ $(document).ready(function() {
                         var logo = data.org.properties.logo_large ? data.org.properties.logo_large : "";
                         $($headerLogo).attr("src", logo);
 
-                        var player = data.org.properties.player ? data.org.properties.player : "";
-                        if (player == "theodul") {
-                            playerEndpoint = playerEndpoint + corePlayerURL;
-                        } else {
+                        var player = data.org.properties["player.type"] ? data.org.properties["player.type"] : "html5";
+                        if (player == "old") {
                             playerEndpoint = playerEndpoint + oldPlayerURL;
+                        } else { // "html5"
+                            playerEndpoint = playerEndpoint + corePlayerURL;
                         }
                     } else {
                         $.log("Error: No info data received.");
