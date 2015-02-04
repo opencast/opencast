@@ -18,6 +18,9 @@
 define(['jquery', 'backbone'], function($, Backbone) {
     "use strict";
 
+    var prop_shortcut = "player.shortcut.";
+    var prop_mastervideotype = "player.mastervideotype";
+
     /*
      * Model with information about the current user and the current MH configuration
      */
@@ -28,20 +31,26 @@ define(['jquery', 'backbone'], function($, Backbone) {
             this.fetch({
                 success: function(me) {
                     var shortcuts = new Array();
+                    var mastervideotype = "";
                     if (me && me.attributes && me.attributes.org && me.attributes.org.properties) {
                         // extract shortcuts
                         $.each(me.attributes.org.properties, function(key, value) {
-                            var prop = "player.shortcut.";
-                            var name = key.substring(prop.length, key.length);
-                            if ((key.indexOf(prop) != -1) && (name.length > 0) && value) {
+                            var name = key.substring(prop_shortcut.length, key.length);
+                            // shortcuts
+                            if ((key.indexOf(prop_shortcut) != -1) && (name.length > 0) && value) {
                                 shortcuts.push({
-                                    name: key.substring(prop.length, key.length),
+                                    name: key.substring(prop_shortcut.length, key.length),
                                     key: value
                                 });
+                            }
+                            // master video type
+                            else if ((key == prop_mastervideotype) && value) {
+                                mastervideotype = value;
                             }
                         });
                     }
                     me.set("shortcuts", shortcuts);
+                    me.set("mastervideotype", mastervideotype);
                     me.ready = true;
                 }
             });

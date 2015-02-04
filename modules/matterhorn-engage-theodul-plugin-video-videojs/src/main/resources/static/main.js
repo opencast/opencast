@@ -138,8 +138,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var VideoDataModel;
     var isAudioOnly = false;
     var isUsingFlash = false;
+    var mastervideotype = "";
     var aspectRatio = "";
-    var initCount = 6;
+    var initCount = 7;
+    var infoMeChange = "change:infoMe";
     var mediapackageError = false;
     var videoDisplayNamePrefix = "videojs_videodisplay_";
     var id_engage_video = "engage_video";
@@ -302,12 +304,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     }
 
     function renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio) {
-        var i = 0;
-        for (var v in videoSources) {
-            if ((videoSources[v].length > 0) && (videoDisplays.length > i)) {
-                initVideojsVideo(videoDisplays[i], videoSources[v], videoDataView.videojs_swf);
-                ++i;
-            }
+        var tuples = getSortedVideosourcesArray(videoSources);
+        for (var i = 0; i < tuples.length; i++) {
+            var key = tuples[i][0];
+            var value = tuples[i][1];
+
+            initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
         }
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
@@ -333,10 +335,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
         if (videoDisplays.length > 0) {
             var nr = 0;
-            for (var v in videoSources) {
-                if (videoSources[v].length > 0) {
-                    ++nr;
-                }
+            for (var i = 0; i < tuples.length; i++) {
+                var key = tuples[i][0];
+                var value = tuples[i][1];
+                ++nr;
             }
 
             // set first videoDisplay as master
@@ -422,17 +424,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     function renderEmbed(videoDataView, videoSources, videoDisplays, aspectRatio) {
         var nrOfVideoSources = 0;
         var init = false;
-        for (var v in videoSources) {
-            if (videoSources[v].length > 0) {
-                if (!init) { // just init the first video
-                    init = true;
-                    initVideojsVideo(videoDisplays[0], videoSources[v], videoDataView.videojs_swf);
-                }
-                globalVideoSource.push({
-                    id: videoDisplays[0],
-                    src: videoSources[v]
-                });
+
+        var tuples = getSortedVideosourcesArray(videoSources);
+        for (var i = 0; i < tuples.length; i++) {
+            var key = tuples[i][0];
+            var value = tuples[i][1];
+
+            if (!init) { // just init the first video
+                init = true;
+                initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
             }
+            globalVideoSource.push({
+                id: videoDisplays[0],
+                src: value
+            });
         }
 
         if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
@@ -1223,6 +1228,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     function setupStreams(tracks, attachments) {
         Engage.log("Video: Setting up streams");
+
+        mastervideotype = Engage.model.get("meInfo").get("mastervideotype").toLowerCase();
+        Engage.log("Video: Master video type is '" + mastervideotype + "'");
+
         var mediaInfo = {};
         mediaInfo.tracks = tracks;
         mediaInfo.attachments = attachments;
@@ -1333,12 +1342,48 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     ++i;
                 }
             }
+
             Engage.model.set("videoDataModel", new VideoDataModel(videoDisplays, videoSources, duration));
         }
     }
 
+    /* usage:
+        var tuples = getSortedVideosourcesArray(videoSources);
+	for (var i = 0; i < tuples.length; i++) {
+	    var key = tuples[i][0];
+	    var value = tuples[i][1];
+
+	    console.log(key + ": " + value);
+	}
+     */
+    function getSortedVideosourcesArray(videoSources) {
+        var tuples = [];
+
+        for (var key in videoSources) {
+            tuples.push([key, videoSources[key]]);
+        }
+
+        tuples.sort(compareVideoSources);
+
+        return tuples;
+    }
+
+    function compareVideoSources(a, b) {
+        var s1 = a[1][0].typemh;
+        var s2 = b[1][0].typemh;
+        if (s1 == mastervideotype) {
+            return -1;
+        } else if (s2 == mastervideotype) {
+            return 1;
+        } else {
+            return 0;
+        }
+        return 0;
+    }
+
     function initPlugin() {
-        Engage.log("Video: Init Plugin " + initCount);
+        Engage.log("Video: Init Plugin");
+
         // only init if plugin template was inserted into the DOM
         if (plugin.inserted) {
             Engage.log("Video: Video Plugin inserted");
@@ -1423,6 +1468,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     // load synchronize.js lib
     require([relative_plugin_path + synchronizePath], function(videojs) {
         Engage.log("Video: Lib synchronize loaded");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
+
+    // listen on a change/set of the infoMe model
+    Engage.model.on(infoMeChange, function() {
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
