@@ -191,7 +191,7 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
 
     function prepareShortcuts() {
         if (!shortcutsParsed) {
-            var scuts = Engage.model.get("meInfo").get("hotkeys");
+            var scuts = Engage.model.get("meInfo").get("shortcuts");
             if (scuts) {
                 scuts.sort(Utils.shortcutsCompare);
                 $.each(scuts, function(i, v) {

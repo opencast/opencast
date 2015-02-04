@@ -27,21 +27,21 @@ define(['jquery', 'backbone'], function($, Backbone) {
             this.ready = false;
             this.fetch({
                 success: function(me) {
-                    var hotkeys = new Array();
+                    var shortcuts = new Array();
                     if (me && me.attributes && me.attributes.org && me.attributes.org.properties) {
-                        // extract hotkeys
+                        // extract shortcuts
                         $.each(me.attributes.org.properties, function(key, value) {
-                            var hotkeyprop = "theodul.hotkey.";
-                            var name = key.substring(hotkeyprop.length, key.length);
-                            if ((key.indexOf(hotkeyprop) != -1) && (name.length > 0) && value) {
-                                hotkeys.push({
-                                    name: key.substring(hotkeyprop.length, key.length),
+                            var prop = "player.shortcut.";
+                            var name = key.substring(prop.length, key.length);
+                            if ((key.indexOf(prop) != -1) && (name.length > 0) && value) {
+                                shortcuts.push({
+                                    name: key.substring(prop.length, key.length),
                                     key: value
                                 });
                             }
                         });
                     }
-                    me.set("hotkeys", hotkeys);
+                    me.set("shortcuts", shortcuts);
                     me.ready = true;
                 }
             });
