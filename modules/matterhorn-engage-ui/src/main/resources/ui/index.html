@@ -3,9 +3,11 @@
     <head>
         <!-- styles -->
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-accessibility.css">
         <link rel="stylesheet" type="text/css" href="css/engage-ui.css">
         <link rel="stylesheet" type="text/css" href="js/alertify/alertify.css">
         <link rel="stylesheet" type="text/css" href="js/alertify/alertify-bootstrap-3.css">
+        <link rel="stylesheet" type="text/css" href="css/dropdowns-enhancement.css">
         <!-- scripts -->
         <script type="text/javascript" src="/engage/ui/js/jquery/jquery.js"></script>
         <script type="text/javascript" src="js/jquery.liveSearch.js"></script>
@@ -14,6 +16,7 @@
         <script type="text/javascript" src="js/seedrandom.js"></script>
         <script type="text/javascript" src="/engage/ui/js/jquery/plugins/jquery.utils.js"></script>
         <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap-accessibility.min.js"></script>
         <script type="text/javascript" src="js/engage-ui.js"></script>
         <!--<script type="text/javascript" src="js/engage-ui-mobile.js"></script>-->
         <!--<script type="text/javascript" src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>-->
@@ -33,7 +36,10 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/">Opencast Matterhorn</a>
+                    <div class="navbar-brand">
+                        <img id="headerLogo" src="" class="img-responsive">
+                    </div>
+                    <h1 class="navbar-brand">Media Module</h1>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav" id="nav-switch">
@@ -52,24 +58,51 @@
 			</li>
 		    </ul>
                     <form id="oc-search-form" class="navbar-form navbar-right" role="search" autocomplete="off">
+                        <div class="btn-group">
+                            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Sorting <span class="caret"></span></button>
+                              <ul class="dropdown-menu" role="menu">
+                                  <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED_DESC" value="DATE_CREATED_DESC" checked="checked"><label for="DATE_CREATED_DESC">Recording Date (newer)</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED" value="DATE_CREATED"><label for="DATE_CREATED">Recording Date (older)</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED_DESC" value="DATE_PUBLISHED_DESC"><label for="DATE_PUBLISHED_DESC">Publishing Date (newer)</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED" value="DATE_PUBLISHED"><label for="DATE_PUBLISHED">Publishing Date (older)</label></li>
+                                <li class="divider"></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="TITLE" value="TITLE"><label for="TITLE">Title (A-Z)</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="TITLE_DESC" value="TITLE_DESC"><label for="TITLE_DESC">Title (Z-A)</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="CREATOR" value="CREATOR"><label for="CREATOR">Author (A-Z)</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="CREATOR_DESC" value="CREATOR_DESC"><label for="CREATOR_DESC">Author (Z-A)</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="CONTRIBUTOR" value="CONTRIBUTOR"><label for="CONTRIBUTOR">Contributor (A-Z)</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="CONTRIBUTOR_DESC" value="CONTRIBUTOR_DESC"><label for="CONTRIBUTOR_DESC">Contributor (Z-A)</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="PUBLISHER" value="PUBLISHER"><label for="PUBLISHER">Publisher (A-Z)</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="PUBLISHER_DESC" value="PUBLISHER_DESC"><label for="PUBLISHER_DESC">Publisher (Z-A)</label></li>
+                                <li class="divider"></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="SERIES_ID" value="SERIES_ID"><label for="SERIES_ID">Series</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="LANGUAGE" value="LANGUAGE"><label for="LANGUAGE">Language</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="LICENSE" value="LICENSE"><label for="LICENSE">License</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="SUBJECT" value="SUBJECT"><label for="SUBJECT">Subject</label></li>
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DESCRIPTION" value="DESCRIPTION"><label for="DESCRIPTION">Description</label></li>
+                              </ul>     
+                        </div>                        
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="Search" name="q">
                         </div>
                         <button id="oc-search-btn" type="submit" class="btn btn-default">Search</button>
                     </form>
                 </div>
+           <!--     <a class="navbar-brand" href="/"><img id="headerLogo" src="" class="img-responsive"></a>-->
             </div>
         </div>
         <div class="container main-grid">
-        <div class="page-header">
-	    <img id="headerLogo" src="" class="img-responsive">
-            <h1>Media Module</h1>
-        </div>
-        <div class="container-fluid" id="main-container">
+        <div class="main-content" id="main-content">
+            <div class="container-fluid" id="main-container">
+            </div>
         </div>
         <ul class="pager">
-            <li class="previous disabled"><a>&larr; Newer</a></li>
-            <li class="next"><a>Older &rarr;</a></li>
+            <li class="first previous disabled"><a>&#8676; First</a></li>
+            <li class="previous disabled"><a>&larr; Previous</a></li>
+            <li class="last next"><a>Last &#8677;</a></li>
+            <li class="next"><a>Next &rarr;</a></li>
         </ul>
+        <div id="more" class="scroll-indicator">Loading More Content</div>
+        <div id="no-more" class="scroll-indicator">No More Content</div>        
     </body>
 </html>
