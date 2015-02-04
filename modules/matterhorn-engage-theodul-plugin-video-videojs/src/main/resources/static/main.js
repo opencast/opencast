@@ -305,7 +305,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     function renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio) {
         var tuples = getSortedVideosourcesArray(videoSources);
-        for (var i = 0; i < tuples.length; i++) {
+        for (var i = 0; i < tuples.length; ++i) {
             var key = tuples[i][0];
             var value = tuples[i][1];
 
@@ -334,12 +334,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
         if (videoDisplays.length > 0) {
-            var nr = 0;
-            for (var i = 0; i < tuples.length; i++) {
-                var key = tuples[i][0];
-                var value = tuples[i][1];
-                ++nr;
-            }
+            var nr = tuples.length;
 
             // set first videoDisplay as master
             registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
@@ -426,7 +421,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         var init = false;
 
         var tuples = getSortedVideosourcesArray(videoSources);
-        for (var i = 0; i < tuples.length; i++) {
+        for (var i = 0; i < tuples.length; ++i) {
             var key = tuples[i][0];
             var value = tuples[i][1];
 
@@ -481,13 +476,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         Engage.log("Video: Render mobile mode");
         initMobileEvents();
 
-        var i = 0;
-        for (var v in videoSources) {
-            if (videoSources[v].length > 0) {
-                Engage.log("Video: Init Video Display: " + v);
-                initVideojsVideo(videoDisplays[i], videoSources[v], videoDataView.videojs_swf);
-                ++i;
-            }
+        var tuples = getSortedVideosourcesArray(videoSources);
+        for (var i = 0; i < tuples.length; ++i) {
+            var key = tuples[i][0];
+            var value = tuples[i][1];
+
+            initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
         }
 
         Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
@@ -503,12 +497,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         $("." + class_vjsposter).show();
 
         if (videoDisplays.length > 0) {
-            var nr = 0;
-            for (var v in videoSources) {
-                if (videoSources[v].length > 0) {
-                    ++nr;
-                }
-            }
+            var nr = tuples.length;
 
             // first as masterdisplay
             registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
@@ -1237,7 +1226,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         mediaInfo.attachments = attachments;
 
         if (mediaInfo.tracks && (mediaInfo.tracks.length > 0)) {
-            for (i = 0; i < mediaInfo.tracks.length; i++) {
+            for (var i = 0; i < mediaInfo.tracks.length; ++i) {
                 if (flavors.indexOf(mediaInfo.tracks[i].type) < 0) {
                     flavors += mediaInfo.tracks[i].type + ",";
                 }
@@ -1269,7 +1258,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             var videoSources = [];
             videoSources.audio = [];
 
-            for (i = 0; i < flavorsArray.length; i++) {
+            for (var i = 0; i < flavorsArray.length; ++i) {
                 videoSources[Utils.extractFlavorMainType(flavorsArray[i])] = [];
             }
 
@@ -1315,7 +1304,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 });
 
                 if (!hasVideo) {
-                    for (i = 0; i < videoSources.length; i++) {
+                    for (var i = 0; i < videoSources.length; ++i) {
                         if (videoSources[i] !== videoSources.audio) {
                             delete videoSources.flavor;
                         }
@@ -1349,7 +1338,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     /* usage:
         var tuples = getSortedVideosourcesArray(videoSources);
-	for (var i = 0; i < tuples.length; i++) {
+	for (var i = 0; i < tuples.length; ++i) {
 	    var key = tuples[i][0];
 	    var value = tuples[i][1];
 
