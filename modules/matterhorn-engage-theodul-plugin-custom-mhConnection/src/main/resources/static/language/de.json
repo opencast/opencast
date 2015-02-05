@@ -1,6 +1,6 @@
 {
-    "value_locale": "de",
-    "error_mediaPackageInformationNotLoaded": "Es gibt zwei mögliche Gründe fur diesen Fehler:<ul><li>Die Aufzeichnung ist nicht mehr verfügbar</li><li>Die Aufzeichnung ist geschützt und ist nur für eingeloggte Nutzer verfügbar</li></ul>",
-    "error_noMediaInformationAvailable": "Es sind keine Medien-Informationen verfügbar.",
-    "error_endpointNotAvailable": "Ein angefragter Such-Endpoint ist momentan nicht verfügbar."
+  "value_locale":"de",
+  "error_mediaPackageInformationNotLoaded":"Es gibt zwei mögliche Gründe fur diesen Fehler:<ul><li>Die Aufzeichnung ist nicht mehr verfügbar<\/li><li>Die Aufzeichnung ist geschützt und ist nur für eingeloggte Nutzer verfügbar<\/li><\/ul>",
+  "error_noMediaInformationAvailable":"Es sind keine Medien-Informationen verfügbar.",
+  "error_endpointNotAvailable":"Ein angefragter Such-Endpunkt ist momentan nicht verfügbar."
 }

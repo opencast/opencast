@@ -1,13 +1,13 @@
 {
-    "value_locale": "de",
-    "value_dateFormatFull": "Do MMMM YYYY, h:mm:ss a",
-    "error_videoLoading": "Das Video wird geladen. Bitte einen Moment warten.",
-    "error_audioLoading": "Das Audio wird geladen. Bitte einen Moment warten.",
-    "msg_videoLoadedSuccessfully": "Das Video ist erfolgreich geladen worden.",
-    "msg_audioLoadedSuccessfully": "Das Audio ist erfolgreich geladen worden.",
-    "msg_videoBuffering": "Das Video puffert gerade. Bitte einen Moment warten",
-    "msg_videoBufferedSuccessfullyAndAutoplaying": "Das Video wurde erfolgreich gepuffert und wird nun abgespielt.",
-    "msg_videoBufferedSuccessfully": "Das Video wurde erfolgreich gepuffert.",
-    "error": "Fehler",
-    "error_AudioCodecNotSupported": "Fehler: Der Audio-Codec wird nicht von diesem Browser unterstützt."
+  "value_locale":"de",
+  "value_dateFormatFull":"Do MMMM YYYY, h:mm:ss a",
+  "error_videoLoading":"Das Video wird geladen. Bitte einen Moment warten.",
+  "error_audioLoading":"Das Audio wird geladen. Bitte einen Moment warten.",
+  "msg_videoLoadedSuccessfully":"Das Video ist erfolgreich geladen worden.",
+  "msg_audioLoadedSuccessfully":"Das Audio ist erfolgreich geladen worden.",
+  "msg_videoBuffering":"Das Video puffert gerade. Bitte einen Moment warten.",
+  "msg_videoBufferedSuccessfullyAndAutoplaying":"Das Video wurde erfolgreich gepuffert und wird nun abgespielt.",
+  "msg_videoBufferedSuccessfully":"Das Video wurde erfolgreich gepuffert.",
+  "error":"Fehler",
+  "error_AudioCodecNotSupported":"Fehler: Der Audio-Codec wird nicht von diesem Browser unterstützt"
 }
