@@ -651,11 +651,11 @@ public class SchedulerImplTest {
     List<ScheduledEvent> events = schedulerImpl.getSchedule();
     Assert.assertTrue("There should be some events in the schedule.", events.size() > 0);
     for (ScheduledEvent scheduleEvent : events) {
-      if (scheduleEvent.getTitle().equalsIgnoreCase("1st-Capture")) {
+      if ("1st-Capture".equalsIgnoreCase(scheduleEvent.getTitle())) {
         checkTime(start, firstMinuteOffset, scheduleEvent);
-      } else if (scheduleEvent.getTitle().equalsIgnoreCase("2nd-Capture")) {
+      } else if ("2nd-Capture".equalsIgnoreCase(scheduleEvent.getTitle())) {
         checkTime(start, secondMinuteOffset, scheduleEvent);
-      } else if (scheduleEvent.getTitle().equalsIgnoreCase("3rd-Capture")) {
+      } else if ("3rd-Capture".equalsIgnoreCase(scheduleEvent.getTitle())) {
         checkTime(start, thirdMinuteOffset, scheduleEvent);
       }
     }

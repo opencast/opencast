@@ -85,7 +85,6 @@
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
-      <version>1.6.6_1</version>
     </dependency>
     <!-- Logging -->
     <dependency>
@@ -118,7 +117,6 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>2.5.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -150,6 +148,11 @@
       <groupId>c3p0</groupId>
       <artifactId>c3p0</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-distribution-workflowoperation</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>

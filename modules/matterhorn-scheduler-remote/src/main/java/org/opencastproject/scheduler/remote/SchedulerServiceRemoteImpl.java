@@ -361,4 +361,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     throw new UnsupportedOperationException();
   }
 
+  @Override
+  public void removeScheduledRecordingsBeforeBuffer(long buffer) throws SchedulerException {
+    throw new UnsupportedOperationException();
+  }
+
 }

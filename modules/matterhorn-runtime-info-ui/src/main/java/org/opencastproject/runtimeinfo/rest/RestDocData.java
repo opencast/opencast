@@ -356,10 +356,10 @@ public class RestDocData extends DocData {
     endpoint.setTestForm(new RestFormData(endpoint));
 
     // Add the endpoint to the corresponding group based on its HTTP method
-    if ((httpMethodString.equalsIgnoreCase("GET")) || (httpMethodString.equalsIgnoreCase("HEAD"))) {
+    if (("GET".equalsIgnoreCase(httpMethodString)) || ("HEAD".equalsIgnoreCase(httpMethodString))) {
       addEndpoint(READ_ENDPOINT_HOLDER_NAME, endpoint);
-    } else if ((httpMethodString.equalsIgnoreCase("DELETE")) || (httpMethodString.equalsIgnoreCase("POST"))
-            || (httpMethodString.equalsIgnoreCase("PUT"))) {
+    } else if (("DELETE".equalsIgnoreCase(httpMethodString)) || ("POST".equalsIgnoreCase(httpMethodString))
+            || ("PUT".equalsIgnoreCase(httpMethodString))) {
       addEndpoint(WRITE_ENDPOINT_HOLDER_NAME, endpoint);
     }
   }

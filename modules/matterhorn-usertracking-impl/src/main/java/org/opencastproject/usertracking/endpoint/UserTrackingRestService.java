@@ -21,10 +21,12 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.usertracking.api.UserSession;
 import org.opencastproject.usertracking.api.UserTrackingException;
 import org.opencastproject.usertracking.api.UserTrackingService;
 import org.opencastproject.usertracking.impl.UserActionImpl;
 import org.opencastproject.usertracking.impl.UserActionListImpl;
+import org.opencastproject.usertracking.impl.UserSessionImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -176,29 +178,6 @@ public class UserTrackingRestService {
 
   @GET
   @Produces(MediaType.TEXT_XML)
-  @Path("/stats.xml")
-  @RestQuery(name = "statsasxml", description = "Get the statistics for an episode", returnDescription = "The statistics.", restParameters = { @RestParameter(name = "id", description = "The ID of the single episode to return the statistics for, if it exists", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the episode's statistics") })
-  public StatsImpl statsAsXml(@QueryParam("id") String mediapackageId) {
-    StatsImpl s = new StatsImpl();
-    s.setMediapackageId(mediapackageId);
-    try {
-      s.setViews(usertrackingService.getViews(mediapackageId));
-    } catch (UserTrackingException e) {
-      throw new WebApplicationException(e);
-    }
-    return s;
-  }
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("/stats.json")
-  @RestQuery(name = "statsasjson", description = "Get the statistics for an episode", returnDescription = "The statistics.", restParameters = { @RestParameter(name = "id", description = "The ID of the single episode to return the statistics for, if it exists", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the episode's statistics") })
-  public StatsImpl statsAsJson(@QueryParam("id") String mediapackageId) {
-    return statsAsXml(mediapackageId); // same logic, different @Produces annotation
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_XML)
   @Path("/report.xml")
   @RestQuery(name = "reportasxml", description = "Get a report for a time range", returnDescription = "The report.", restParameters = {
           @RestParameter(name = "from", description = "The beginning of the time range", isRequired = false, type = Type.STRING),
@@ -247,8 +226,9 @@ public class UserTrackingRestService {
   @RestQuery(name = "add", description = "Record a user action", returnDescription = "An XML representation of the user action", restParameters = {
           @RestParameter(name = "id", description = "The episode identifier", isRequired = true, type = Type.STRING),
           @RestParameter(name = "type", description = "The episode identifier", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "in", description = "The beginning of the time range", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "out", description = "The end of the time range", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_CREATED, description = "An XML representation of the user action") })
+          @RestParameter(name = "in", description = "The beginning of the time range", isRequired = true, type = Type.STRING),
+          @RestParameter(name = "out", description = "The end of the time range", isRequired = false, type = Type.STRING),
+          @RestParameter(name = "playing", description = "Whether the player is currently playing", isRequired = false, type = Type.STRING)}, reponses = { @RestResponse(responseCode = SC_CREATED, description = "An XML representation of the user action") })
   public Response addFootprint(@FormParam("id") String mediapackageId, @FormParam("in") String inString,
           @FormParam("out") String outString, @FormParam("type") String type, @FormParam("playing") String isPlaying,
           @Context HttpServletRequest request) {
@@ -275,33 +255,43 @@ public class UserTrackingRestService {
       try {
         out = Integer.parseInt(StringUtils.trim(outString));
       } catch (NumberFormatException e) {
-        throw new WebApplicationException(e, Response.status(Status.BAD_REQUEST).entity("in must be a non null integer").build());
+        throw new WebApplicationException(e, Response.status(Status.BAD_REQUEST).entity("out must be a non null integer").build());
       }
     }
 
-    UserActionImpl a = new UserActionImpl();
-    a.setMediapackageId(mediapackageId);
-    a.setUserId(userId);
-    a.setSessionId(sessionId);
-    a.setInpoint(in);
-    a.setOutpoint(out);
-    a.setType(type);
-    a.setIsPlaying(Boolean.valueOf(isPlaying));
-
-    // MH-8616 the connection might be via a proxy
+    //MH-8616 the connection might be via a proxy
     String clientIP = request.getHeader("X-FORWARDED-FOR");
 
     if (clientIP == null) {
       clientIP = request.getRemoteAddr();
     }
     logger.debug("Got client ip: {}", clientIP);
-    a.setUserIp(clientIP);
+
+    UserSession s = new UserSessionImpl();
+    s.setSessionId(sessionId);
+    s.setUserIp(clientIP);
+    s.setUserId(userId);
+    //Column length is currently 255, let's limit it to that.
+    String userAgent = StringUtils.trimToNull(request.getHeader("User-Agent"));
+    if (userAgent != null && userAgent.length() > 255) {
+      s.setUserAgent(userAgent.substring(0, 255));
+    } else {
+      s.setUserAgent(userAgent);
+    }
+
+    UserActionImpl a = new UserActionImpl();
+    a.setMediapackageId(mediapackageId);
+    a.setSession(s);
+    a.setInpoint(in);
+    a.setOutpoint(out);
+    a.setType(type);
+    a.setIsPlaying(Boolean.valueOf(isPlaying));
 
     try {
       if ("FOOTPRINT".equals(type)) {
-        a = (UserActionImpl) usertrackingService.addUserFootprint(a);
+        a = (UserActionImpl) usertrackingService.addUserFootprint(a, s);
       } else {
-        a = (UserActionImpl) usertrackingService.addUserTrackingEvent(a);
+        a = (UserActionImpl) usertrackingService.addUserTrackingEvent(a, s);
       }
     } catch (UserTrackingException e) {
       throw new WebApplicationException(e);

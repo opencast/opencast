@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.workflow.handler.videoeditor.VideoEditorWorkflowOperationHandler" immediate="true"
+  activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.workflow.handler.videoeditor.VideoEditorWorkflowOperationHandler" />
+  <property name="service.description" value="Video Editor Workflow Operation Handler" />
+  <property name="workflow.operation" value="editor" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+  <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    policy="static" bind="setServiceRegistry" />
+  <reference name="smil-service" cardinality="1..1" interface="org.opencastproject.smil.api.SmilService"
+    policy="static" bind="setSmilService" />
+  <reference name="videoeditor-service" interface="org.opencastproject.videoeditor.api.VideoEditorService"
+    cardinality="1..1" policy="static" bind="setVideoEditorService" />
+  <reference name="ingest-service" interface="org.opencastproject.ingest.api.IngestService"
+    cardinality="1..1" policy="static" bind="setIngestService" />
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+    cardinality="1..1" policy="static" bind="setWorkspace" />
+</scr:component>

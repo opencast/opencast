@@ -24,6 +24,11 @@
       <artifactId>matterhorn-series-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-serviceregistry</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-dublincore</artifactId>
@@ -41,12 +46,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-json</artifactId>
+      <artifactId>matterhorn-kernel</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-serviceregistry</artifactId>
+      <artifactId>matterhorn-json</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -105,7 +110,7 @@
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
     </dependency>
-    
+
     <!-- Scope test -->
     <dependency>
       <groupId>junit</groupId>
@@ -115,7 +120,6 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>3.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -139,6 +143,11 @@
       <version>${project.version}</version>
       <type>bundle</type>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-workflow-workflowoperation</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -164,6 +173,8 @@
             <Service-Component>
               OSGI-INF/workflow-cleanup-scheduler-service.xml,
               OSGI-INF/workflow-definition-scanner.xml,
+              OSGI-INF/workflow-missed-capture-scanner-scheduler-service.xml,
+              OSGI-INF/workflow-missed-ingest-scanner-scheduler-service.xml,
               OSGI-INF/workflow-service.xml,
               OSGI-INF/workflow-service-index.xml,
               OSGI-INF/workflow-service-rest.xml

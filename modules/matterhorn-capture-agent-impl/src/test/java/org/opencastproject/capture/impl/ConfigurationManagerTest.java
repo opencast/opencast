@@ -330,7 +330,7 @@ public class ConfigurationManagerTest {
 
     Properties returnedProperties = configManager.getAllProperties();
     Assert.assertTrue("Configuration Manager doesn't trim blank entries properly. ",
-            returnedProperties.getProperty(blanks).equalsIgnoreCase(""));
+            "".equalsIgnoreCase(returnedProperties.getProperty(blanks)));
     Assert.assertTrue("Configuration Manager doesn't trim ntries with spaces properly. ", returnedProperties
             .getProperty(withoutLeadingAndTrailing).equalsIgnoreCase(withoutLeadingAndTrailing));
   }
