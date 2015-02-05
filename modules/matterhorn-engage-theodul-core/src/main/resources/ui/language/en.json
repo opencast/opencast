@@ -8,6 +8,7 @@
     "password": "Password",
     "rememberMe": "Remember me",
     "cancel": "Cancel",
+    "loginSuccessful": "Successfully logged in. Please reload the page if the page does not reload automatically.",
     "logoutSuccessful": "Successfully logged out. Please reload the page if the page does not reload automatically.",
     "loginFailed": "Failed to log in.",
     "description": "Description",
