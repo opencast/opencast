@@ -35,6 +35,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         seekRight: new EngageEvent("Video:seekRight", "", "trigger"),
         playbackRateIncrease: new EngageEvent("Video:playbackRateIncrease", "", "trigger"),
         playbackRateDecrease: new EngageEvent("Video:playbackRateDecrease", "", "trigger"),
+        autoplay: new EngageEvent("Video:autoplay", "", "trigger"),
         mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler")
     };
 
@@ -432,6 +433,12 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         });
     }
 
+    function throwEvents() {
+        if (engageCore.model.get("autoplay")) {
+            engageCore.trigger(events.autoplay.getName());
+        }
+    }
+
     // core main
     var EngageCore = Backbone.View.extend({
         el: $("#" + id_engage_view),
@@ -652,6 +659,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                         $("#" + id_customError).show();
                                     } else {
                                         $("#" + id_customError + ", #" + id_btn_login).hide().detach();
+                                        throwEvents();
                                     }
                                 }, errorCheckDelay);
                             }
