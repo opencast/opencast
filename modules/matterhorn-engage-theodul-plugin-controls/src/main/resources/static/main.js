@@ -636,7 +636,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     }
 
     function initMobileEvents() {
-        Engage.log("Init Mobile Events in Control");
+        Engage.log("Controls: Init Mobile Events");
         events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
         events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
         events.swipeLeft = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");

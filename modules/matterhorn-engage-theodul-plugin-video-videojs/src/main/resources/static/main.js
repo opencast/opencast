@@ -1342,7 +1342,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 	    var key = tuples[i][0];
 	    var value = tuples[i][1];
 
-	    console.log(key + ": " + value);
+	    // do something with key and value
 	}
      */
     function getSortedVideosourcesArray(videoSources) {

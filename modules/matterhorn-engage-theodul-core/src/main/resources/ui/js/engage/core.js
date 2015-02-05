@@ -104,7 +104,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     function browserSupported() {
         if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
-            console.log("Core: User setting - Support unsupported browser: " + Basil.get("overrideBrowser"));
+            // console.log("Core: User setting - Support unsupported browser: " + Basil.get("overrideBrowser"));
             return true;
         }
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) ||
@@ -122,10 +122,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         var jsonstr = "";
 
         if (language == "de") {
-            console.log("Core: Chosing german translations");
+            // console.log("Core: Chosing german translations");
             jsonstr += path_language_de;
         } else { // No other languages supported, yet
-            console.log("Core: Chosing english translations");
+            // console.log("Core: Chosing english translations");
             jsonstr += path_language_en;
         }
         $.ajax({
@@ -158,9 +158,11 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         return ((translationData != null) && (translationData[str] != undefined)) ? translationData[str] : strIfNotFound;
     }
 
+    /*
     if (window.console) {
         console.log("Core: Init");
     }
+    */
 
     function login() {
         if (!askedForLogin) {
@@ -492,8 +494,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             this.model = new EngageModel();
             // listen to all events
             this.dispatcher.on("all", function(name) {
-                if (engageCore.model.get("isEventDebug")) {
-                    engageCore.log("Event log: '" + name + "'");
+                if (engageCore.model.get("isEventDebug") && window.console) {
+                    console.log("[Core:Event] '" + name + "'");
                 }
             });
             this.model.browserSupported = browserSupported();
@@ -607,23 +609,23 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             this.dispatcher.on(events.plugin_load_done.getName(), function() {
                 if (engageCore.model.desktop) {
                     if (!pluginControlsInserted) {
-                        console.log("Core: No controls plugin inserted. Removing the container.");
+                        engageCore.log("Core: No controls plugin inserted. Removing the container.");
                         engageCore.pluginView.removeControls();
                     }
                     if (!pluginVideoInserted) {
-                        console.log("Core: No video plugin inserted. Removing the container.");
+                        engageCore.log("Core: No video plugin inserted. Removing the container.");
                         engageCore.pluginView.removeVideo();
                     }
                     if (!pluginTabInserted) {
-                        console.log("Core: No tab plugin inserted. Removing the container.");
+                        engageCore.log("Core: No tab plugin inserted. Removing the container.");
                         engageCore.pluginView.removeTab();
                     }
                     if (!pluginDescriptionInserted) {
-                        console.log("Core: No description plugin inserted. Removing the container.");
+                        engageCore.log("Core: No description plugin inserted. Removing the container.");
                         engageCore.pluginView.removeDescription();
                     }
                     if (!pluginTimelineInserted) {
-                        console.log("Core: No timeline plugin inserted. Removing the container.");
+                        engageCore.log("Core: No timeline plugin inserted. Removing the container.");
                         engageCore.pluginView.removeTimeline();
                     }
                 }
