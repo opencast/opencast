@@ -27,7 +27,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.handler.workflow.CopyWorkflowOperationHandler;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
