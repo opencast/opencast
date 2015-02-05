@@ -75,24 +75,24 @@ define(["jquery"], function($) {
 
     // parameter from Basil.get("preferredFormat")
     Utils.prototype.preferredFormat = function(preferredFormat) {
-	if(preferredFormat == null) {
+        if (preferredFormat == null) {
             return null;
-	}
+        }
         switch (preferredFormat) {
-        case "hls":
-            return "application/x-mpegURL";
-        case "dash":
-            return "application/dash+xml";
-        case "rtmp":
-            return "rtmp/mp4";
-        case "mp4":
-            return "video/mp4";
-        case "webm":
-            return "video/webm";
-        case "audio":
-            return "audio/";
-        default:
-            return null;
+            case "hls":
+                return "application/x-mpegURL";
+            case "dash":
+                return "application/dash+xml";
+            case "rtmp":
+                return "rtmp/mp4";
+            case "mp4":
+                return "video/mp4";
+            case "webm":
+                return "video/webm";
+            case "audio":
+                return "audio/";
+            default:
+                return null;
         }
         return null;
     }
@@ -103,6 +103,95 @@ define(["jquery"], function($) {
 
     Utils.prototype.replaceAll = function(string, find, replace) {
         return string.replace(new RegExp(this.escapeRegExp(find), "g"), replace);
+    }
+
+
+
+    /**
+     * @description Returns a time in the URL time format, e.g. 30m10s
+     * @param data Time in the format ab:cd:ef
+     * @return data in the URl time format when data correct, -1 else
+     */
+    Utils.prototype.getURLTimeFormat = function(data) {
+        if ((data !== undefined) && (data !== null) && (data != 0) && (data.length) && (data.indexOf(':') != -1)) {
+            var values = data.split(':');
+            if (values.length == 3) {
+                var val0 = values[0] * 1;
+                var val1 = values[1] * 1;
+                var val2 = values[2] * 1;
+                if (!isNaN(val0) && !isNaN(val1) && !isNaN(val2)) {
+                    var valMin = val0 * 60 + val1;
+                    return valMin + "m" + val2 + "s";
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * @description parses seconds
+     *
+     * Format: Minutes and seconds:  XmYs    or    YsXm    or    XmY
+     *         Minutes only:         Xm
+     *         Seconds only:         Ys      or    Y
+     *
+     * @return parsed seconds if parsing was successful, 0 else
+     */
+    Utils.prototype.parseSeconds = function(val) {
+        if ((val !== undefined) && !(val == "")) {
+            if (!isNaN(val)) {
+                return val;
+            }
+            var tmpVal = val + "";
+            var min = -1;
+            var sec = -1;
+            var charArr = tmpVal.split("");
+            var tmp = "";
+            for (var i = 0; i < charArr.length; ++i) {
+                // minutes suffix detected
+                if (charArr[i] == "m") {
+                    if (!isNaN(tmp)) {
+                        min = parseInt(tmp);
+                    } else {
+                        min = 0;
+                    }
+                    tmp = "";
+                }
+                // seconds suffix detected
+                else if (charArr[i] == "s") {
+                    if (!isNaN(tmp)) {
+                        sec = parseInt(tmp);
+                    } else {
+                        sec = 0;
+                    }
+                    tmp = "";
+                }
+                // any number detected
+                else if (!isNaN(charArr[i])) {
+                    tmp += charArr[i];
+                }
+            }
+            if (min < 0) {
+                min = 0;
+            }
+            if (sec < 0) {
+                // seconds without 's' suffix
+                if (tmp != "") {
+                    if (!isNaN(tmp)) {
+                        sec = parseInt(tmp);
+                    } else {
+                        sec = 0;
+                    }
+                } else {
+                    sec = 0;
+                }
+            }
+            var ret = min * 60 + sec;
+            if (!isNaN(ret)) {
+                return ret;
+            }
+        }
+        return 0;
     }
 
     return Utils;
