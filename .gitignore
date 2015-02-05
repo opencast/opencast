@@ -4,6 +4,7 @@
 # ignore runtime artifacts
 lib/matterhorn/*
 lib/ext/*
+lib/build-information/*
 inbox/*
 logs/*
 work/*
@@ -19,6 +20,10 @@ target/
 
 # ignore NetBeans project data
 */nbproject/*
+
+# ignore NetBeans project data
+.idea
+*.iml
 
 # just in case.. ignore SVN subdir
 */.svn/*

@@ -53,6 +53,8 @@
           <span id="dist">
             <input id="distribution" name="distribution" type="checkbox" checked="checked" disabled="disabled" class="configField" value="Matterhorn Media Module" />
             <span id="i18n_dist_mmm">&nbsp;Matterhorn Media Module</span>
+            <input id="youtube" name="youtube" type="checkbox" class="configField" value="Youtube" />
+            <span id="i18n_dist_mmm">&nbsp;Youtube</span>
           </span>
         </li>
       </ul>
@@ -266,6 +268,18 @@
         <configuration key="smil-flavors">*/smil</configuration>
         <configuration key="target-smil-flavor">episode/smil</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="publish-youtube"
+        if="${youtube}"
+        max-attempts="2"
+        fail-on-error="true"
+        exception-handler-workflow="error"
+        description="Publish to YouTube">
+      <configurations>
+        <configuration key="source-flavors">presentation/trimmed</configuration>
       </configurations>
     </operation>
 

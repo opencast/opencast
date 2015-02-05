@@ -241,6 +241,12 @@
       <artifactId>com.springsource.org.jdom</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.2.3</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-core-lgpl</artifactId>
       <version>1.8.1</version>
@@ -250,6 +256,12 @@
       <artifactId>jackson-mapper-lgpl</artifactId>
       <version>1.8.1</version>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-xc</artifactId>
+      <version>1.8.1</version>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
