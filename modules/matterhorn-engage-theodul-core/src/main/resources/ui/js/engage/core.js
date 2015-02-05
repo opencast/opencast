@@ -36,6 +36,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         playbackRateIncrease: new EngageEvent("Video:playbackRateIncrease", "", "trigger"),
         playbackRateDecrease: new EngageEvent("Video:playbackRateDecrease", "", "trigger"),
         autoplay: new EngageEvent("Video:autoplay", "", "trigger"),
+        initialSeek: new EngageEvent("Video:initialSeek", "", "trigger"),
         mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler")
     };
 
@@ -436,6 +437,9 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     function throwEvents() {
         if (engageCore.model.get("autoplay")) {
             engageCore.trigger(events.autoplay.getName());
+        }
+        if (engageCore.model.get("time")) {
+            engageCore.trigger(events.initialSeek.getName(), engageCore.model.get("time"));
         }
     }
 

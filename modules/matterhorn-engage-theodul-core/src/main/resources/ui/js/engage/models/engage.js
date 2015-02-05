@@ -52,6 +52,9 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
             this.set("isEventDebug", this.get("urlParameters").debugEvents == "true");
             // set autplay mode
             this.set("autoplay", this.get("urlParameters").autoplay == "true");
+            if (this.get("urlParameters").time) {
+                this.set("time", this.get("urlParameters").time);
+            }
 
             // check mode, if no mode param given try to discover browser
             if (this.get("urlParameters").mode == "desktop") {
@@ -88,4 +91,3 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
 
     return EngageModel;
 });
-

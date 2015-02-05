@@ -72,7 +72,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
         seekLeft: new Engage.Event("Video:seekLeft", "", "handler"),
         seekRight: new Engage.Event("Video:seekRight", "", "handler"),
-        autoplay: new Engage.Event("Video:autoplay", "", "trigger")
+        autoplay: new Engage.Event("Video:autoplay", "", "handler"),
+        initialSeek: new Engage.Event("Video:initialSeek", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -134,10 +135,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var audioLoadTimeoutCheckDelay = 5000;
     var seekSeconds = 5;
     var interval_autoplay_ms = 1000;
+    var interval_initialSeek_ms = 1000;
+    var timeout_initialSeek_ms = 250;
 
     /* don't change these variables */
     var Utils;
+    var parsedSeconds = 0;
     var interval_autoplay;
+    var interval_initialSeek;
     var VideoDataModel;
     var isAudioOnly = false;
     var isUsingFlash = false;
@@ -778,6 +783,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         window.clearInterval(interval_autoplay);
     }
 
+    function clearInitialSeek() {
+        window.clearInterval(interval_initialSeek);
+    }
+
     function registerEvents(videoDisplay) {
         var videodisplay = videojs(videoDisplay);
 
@@ -789,18 +798,32 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             if (videosReady) {
                 clearAutoplay();
                 videodisplay.play();
-		pressedPlayOnce = true;
+                pressedPlayOnce = true;
             }
         });
         Engage.on(plugin.events.autoplay.getName(), function() {
-            interval_autoplay = setInterval(function() {
-		if(pressedPlayOnce) {
+            interval_autoplay = window.setInterval(function() {
+                if (pressedPlayOnce) {
                     clearAutoplay();
-		} else if (videosReady) {
+                } else if (videosReady) {
                     videodisplay.play();
                     clearAutoplay();
                 }
             }, interval_autoplay_ms);
+        });
+        Engage.on(plugin.events.initialSeek.getName(), function(e) {
+            parsedSeconds = Utils.parseSeconds(e);
+            interval_initialSeek = window.setInterval(function() {
+                if (pressedPlayOnce) {
+                    clearInitialSeek();
+                } else if (videosReady) {
+                    videodisplay.play();
+                    window.setTimeout(function() {
+                        Engage.trigger(plugin.events.seek.getName(), parsedSeconds);
+                    }, timeout_initialSeek_ms);
+                    clearInitialSeek();
+                }
+            }, interval_initialSeek_ms);
         });
         Engage.on(plugin.events.pause.getName(), function() {
             clearAutoplay();
@@ -915,14 +938,28 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             });
             Engage.on(plugin.events.autoplay.getName(), function() {
-                interval_autoplay = setInterval(function() {
-		    if(pressedPlayOnce) {
+                interval_autoplay = window.setInterval(function() {
+                    if (pressedPlayOnce) {
                         clearAutoplay();
-		    } else if (videosReady) {
+                    } else if (videosReady) {
                         audioPlayer.play();
                         clearAutoplay();
                     }
                 }, interval_autoplay_ms);
+            });
+            Engage.on(plugin.events.initialSeek.getName(), function(e) {
+                parsedSeconds = Utils.parseSeconds(e);
+                interval_initialSeek = window.setInterval(function() {
+                    if (pressedPlayOnce) {
+                        clearInitialSeek();
+                    } else if (videosReady) {
+                        audioPlayer.play();
+                        window.setTimeout(function() {
+                            Engage.trigger(plugin.events.seek.getName(), parsedSeconds);
+                        }, timeout_initialSeek_ms);
+                        clearInitialSeek();
+                    }
+                }, interval_initialSeek_ms);
             });
             Engage.on(plugin.events.pause.getName(), function(triggeredByMaster) {
                 if (!triggeredByMaster && pressedPlayOnce) {
@@ -1111,14 +1148,28 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             });
             Engage.on(plugin.events.autoplay.getName(), function() {
-                interval_autoplay = setInterval(function() {
-		    if(pressedPlayOnce) {
+                interval_autoplay = window.setInterval(function() {
+                    if (pressedPlayOnce) {
                         clearAutoplay();
-		    } else if (videosReady) {
+                    } else if (videosReady) {
                         videodisplayMaster.play();
                         clearAutoplay();
                     }
                 }, interval_autoplay_ms);
+            });
+            Engage.on(plugin.events.initialSeek.getName(), function(e) {
+                parsedSeconds = Utils.parseSeconds(e);
+                interval_initialSeek = window.setInterval(function() {
+                    if (pressedPlayOnce) {
+                        clearInitialSeek();
+                    } else if (videosReady) {
+                        videodisplayMaster.play();
+                        window.setTimeout(function() {
+                            Engage.trigger(plugin.events.seek.getName(), parsedSeconds);
+                        }, timeout_initialSeek_ms);
+                        clearInitialSeek();
+                    }
+                }, interval_initialSeek_ms);
             });
             Engage.on(plugin.events.pause.getName(), function(triggeredByMaster) {
                 if (!triggeredByMaster && pressedPlayOnce) {
