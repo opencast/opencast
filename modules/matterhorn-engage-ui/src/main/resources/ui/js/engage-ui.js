@@ -1,17 +1,16 @@
 $(document).ready(function() {
-    var restEndpoint = "/search/"
-    var mediaContainer = '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">'
+    var restEndpoint = "/search/";
+    var mediaContainer = '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">';
     var playerEndpoint = "";
     var page = 1;
-    var totalEntries = -1; 
+    var totalEntries = -1;
     var bufferEntries = 6; // number of entries to load for one page.
     var restData = "";
     var active = "episodes";
     var stack = new Array();
     var visited = 1;
-    var seriesRgbMax = new Array(220, 220, 220);  //color range. 
-    var seriesRgbOffset = new Array (20, 20, 20); //darkest possible color 
-
+    var seriesRgbMax = new Array(220, 220, 220); //color range. 
+    var seriesRgbOffset = new Array(20, 20, 20); //darkest possible color 
     var title_enterUsernamePassword = "Login";
     var placeholder_username = "Username";
     var placeholder_password = "Password";
@@ -52,6 +51,10 @@ $(document).ready(function() {
     var $more_content = "#more";
     var $no_more_content = "#no-more";
 
+    String.prototype.endsWith = function(suffix) {
+        return this.indexOf(suffix, this.length - suffix.length) !== -1;
+    };
+
     function initialize() {
         $.enableLogging(true);
 
@@ -75,29 +78,29 @@ $(document).ready(function() {
         active = "episodes";
         loadEpisodes(true);
         endlessScrolling();
-          
+
     }
 
-    function endlessScrolling(){
+    function endlessScrolling() {
         $.log("init endless scrolling");
-        $(window).scroll(function () {
+        $(window).scroll(function() {
             $($more_content).hide();
             $($no_more_content).hide();
-            $($more_content).show();     
-        
-            if($(window).scrollTop() + $(window).height() > $(document).height() - 200) {
+            $($more_content).show();
+
+            if ($(window).scrollTop() + $(window).height() > $(document).height() - 200) {
                 $($more_content).show();
             }
-            if($(window).scrollTop() + $(window).height() == $(document).height()) {
+            if ($(window).scrollTop() + $(window).height() == $(document).height()) {
                 $($more_content).hide();
                 $($no_more_content).hide();
                 page++;
-                
+
                 if (page > 1) {
                     $($previous).removeClass("disabled");
-                };                
+                };
 
-                if((page-1)* bufferEntries > totalEntries){
+                if ((page - 1) * bufferEntries > totalEntries) {
                     $($no_more_content).show();
                     $($next).addClass("disabled");
                 } else {
@@ -111,7 +114,7 @@ $(document).ready(function() {
 
             }
         });
-        
+
     }
 
     $(window).load(function() {
@@ -263,10 +266,6 @@ $(document).ready(function() {
         initLogin();
     }
 
-    String.prototype.endsWith = function(suffix) {
-        return this.indexOf(suffix, this.length - suffix.length) !== -1;
-    };
-
     function getInfo() {
         $.ajax({
             url: infoMeURL,
@@ -308,7 +307,7 @@ $(document).ready(function() {
                         $($headerLogo).attr("src", logo);
 
                         var player = data.org.properties.player ? data.org.properties.player : defaultPlayerURL;
-                        if (player.charAt(0) != "/" )
+                        if (player.charAt(0) != "/")
                             player = "/" + player;
 
                         playerEndpoint = player;
@@ -356,7 +355,7 @@ $(document).ready(function() {
             if ($(this).hasClass("disabled")) {
                 return;
             };
-            
+
             var cleanGrid = false;
 
             if ($(this).hasClass("last")) {
@@ -379,18 +378,18 @@ $(document).ready(function() {
             };
 
         });
-        
+
         $($previous).on("click", function() {
             if ($(this).hasClass("disabled")) {
                 return;
             };
-            
+
             if ($(this).hasClass("first")) {
                 page = 1;
             } else {
                 --page;
             }
-            
+
             if (page == 1) {
                 $(this).addClass("disabled");
             };
@@ -403,7 +402,7 @@ $(document).ready(function() {
                 loadEpisodes(true);
             };
         });
-        
+
         /* handle search input */
         $($oc_search_form).submit(function(event) {
             event.preventDefault();
@@ -422,22 +421,22 @@ $(document).ready(function() {
                 pushHistory(page, "episodes", restData);
                 loadEpisodes(true);
             }
-            
+
             $(".navbar-collapse").collapse('hide');
         });
-        
+
         $($oc_sort_dropdown).on("change", function() {
             $.log("submiting");
             $($oc_search_form).submit();
         });
-        
+
         $.log("Handler registered");
     }
 
     function loadEpisodes(cleanGrid) {
-        var requestUrl = restEndpoint + "episode.json?limit=" + bufferEntries + 
-                        "&offset=" + ((page - 1)) * bufferEntries +
-                        "&" + restData;
+        var requestUrl = restEndpoint + "episode.json?limit=" + bufferEntries +
+            "&offset=" + ((page - 1)) * bufferEntries +
+            "&" + restData;
         $.ajax({
             url: requestUrl,
             dataType: "json",
@@ -445,7 +444,7 @@ $(document).ready(function() {
                 // clear main grid
                 if (cleanGrid) {
                     $($main_container).empty();
-                    window.scrollTo(0,0);
+                    window.scrollTo(0, 0);
                 }
 
                 if (data && data["search-results"] && data["search-results"]["total"]) {
@@ -498,15 +497,15 @@ $(document).ready(function() {
                 $.log("Error: Episode with no ID.")
                 serID = "0";
             };
-            
+
             var seriesClass = "";
             if (data.mediapackage) {
-                seriesClass = "series" + data.mediapackage.series +" ";
+                seriesClass = "series" + data.mediapackage.series + " ";
             }
 
             var tile = mediaContainer + "<div class=\"tile\" id=\"" + serID + "\">" +
-                    "<div class=\"" + seriesClass + "seriesindicator \"/> " +
-                    "<div class=\"tilecontent\">";
+                "<div class=\"" + seriesClass + "seriesindicator \"/> " +
+                "<div class=\"tilecontent\">";
 
             tile = tile + "<h4 class=\"title\">" + data.dcTitle + "</h4>";
 
@@ -524,7 +523,7 @@ $(document).ready(function() {
                 };
 
                 tile = tile + "<div class=\"infos\">";
-                
+
                 if (data.dcCreator) {
                     creator = data.dcCreator;
                 };
@@ -569,40 +568,41 @@ $(document).ready(function() {
 
                 if (data.mediapackage.seriestitle) {
                     var color = generateSeriesColor(data.mediapackage.series);
-                    $("."+seriesClass).css({'background': color});
-                }                
+                    $("." + seriesClass).css({
+                        'background': color
+                    });
+                }
             } else {
                 $($main_container).html(msg_html_mediapackageempty);
-            }            
+            }
         } else {
             $($main_container).html(msg_html_nodata);
         }
 
         /* TODO: Swipe events etc. for mobile devices */
-        //registerMobileEvents();
     }
 
     function createSeriesGrid(data) {
-        if (data && data.id) {            
-            var seriesClass = "series" + data.id +" ";
+        if (data && data.id) {
+            var seriesClass = "series" + data.id + " ";
             var color = generateSeriesColor(data.id);
-                    
+
             var creator = "<br>";
             var contributor = "<br>";
-                    
-            var tile = mediaContainer + "<div class=\"tile\" id=\"" + data.id + "\"> "+
-                    "<div class=\"" + seriesClass + "seriesindicator \"/> " +
-                    "<div class=\"tilecontent\">";
+
+            var tile = mediaContainer + "<div class=\"tile\" id=\"" + data.id + "\"> " +
+                "<div class=\"" + seriesClass + "seriesindicator \"/> " +
+                "<div class=\"tilecontent\">";
 
             tile = tile + "<h4 class=\"title\">" + (data.dcTitle ? data.dcTitle : "Unknown title") + "</h4>";
 
             if (data.dcCreator) {
-                    creator = data.dcCreator;
+                creator = data.dcCreator;
             };
             tile = tile + "<div class=\"creator\">" + creator + "</div>";
-            
+
             if (data.dcContributor) {
-                    contributor = data.dcContributor;
+                contributor = data.dcContributor;
             };
             tile = tile + "<div class=\"contributor\">" + contributor + "</div>";
 
@@ -619,9 +619,11 @@ $(document).ready(function() {
                 pushHistory(1, "episodes", restData);
                 loadEpisodes(true);
             });
-            
-            $("."+seriesClass).css({'background': color});
-            $.log("Series Color: " + seriesClass + " " + color);            
+
+            $("." + seriesClass).css({
+                'background': color
+            });
+            $.log("Series Color: " + seriesClass + " " + color);
         } else {
             $.log("Error: Data for creating series grid is empty.");
         }
@@ -636,7 +638,7 @@ $(document).ready(function() {
                 if (data2 && data2["search-results"] && data2["search-results"]["total"]) {
                     if (cleanGrid) {
                         $($main_container).empty();
-                        window.scrollTo(0,0);
+                        window.scrollTo(0, 0);
                     }
 
                     var total = data2["search-results"]["total"];
@@ -674,23 +676,19 @@ $(document).ready(function() {
         });
     }
 
-    function registerMobileEvents() {
-        // TODO
-    }
-    
     function generateSeriesColor(value) {
-        var rgb = new Array (0, 0, 0);
-        
+        var rgb = new Array(0, 0, 0);
+
         for (i = 0; i < value.length; i++) {
-            rgb[(i % 3)] += value.charCodeAt(i); 
+            rgb[(i % 3)] += value.charCodeAt(i);
         }
-        
+
         for (i = 0; i < 3; i++) {
             rgb[i] = ((rgb[i] % seriesRgbMax[i]) + seriesRgbOffset[i]).toString(16);
-            if (rgb[i].length < 1) 
+            if (rgb[i].length < 1)
                 rgb[i] = "0" + rgb[i];
         }
-        
-        return "#" + rgb[0] + rgb[1] + rgb[2];        
+
+        return "#" + rgb[0] + rgb[1] + rgb[2];
     }
 });
