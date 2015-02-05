@@ -45,19 +45,14 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
             }
 
             this.set("orientation", "landscape");
-
             this.set("urlParameters", urlParams);
+
             // set players debug mode
-            if (this.get("urlParameters").debug == "true") {
-                this.set("isDebug", true);
-            } else {
-                this.set("isDebug", false);
-            }
-            if (this.get("urlParameters").debugEvents == "true") {
-                this.set("isEventDebug", true);
-            } else {
-                this.set("isEventDebug", false);
-            }
+            this.set("isDebug", this.get("urlParameters").debug == "true");
+            this.set("isEventDebug", this.get("urlParameters").debugEvents == "true");
+            // set autplay mode
+            this.set("autoplay", this.get("urlParameters").autoplay == "true");
+
             // check mode, if no mode param given try to discover browser
             if (this.get("urlParameters").mode == "desktop") {
                 this.set("mode", "desktop");
@@ -73,10 +68,11 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
             Basil.set("overrideBrowser", this.get("urlParameters").browser == "all");
 
             // Check for user setting "Preferred format"
-            if (this.get("urlParameters").format != null)
+            if (this.get("urlParameters").format != null) {
                 Basil.set("preferredFormat", this.get("urlParameters").format);
+            }
 
-	    /*
+            /*
             if (window.console) {
                 console.log("EngageModel: Player mode: " + this.get("mode"));
             }
@@ -92,3 +88,4 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
 
     return EngageModel;
 });
+
