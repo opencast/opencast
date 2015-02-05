@@ -272,7 +272,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
                 initPlugin();
             }
         }, function() {
-            Engage.log("Notifications: Error translating...");
+            Engage.log("Tab:Slidetext: Error translating...");
             initCount -= 1;
             if (initCount <= 0) {
                 initPlugin();

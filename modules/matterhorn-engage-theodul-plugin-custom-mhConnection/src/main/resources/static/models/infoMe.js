@@ -37,10 +37,10 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
                     model.roles = [];
                     var attr = model.attributes;
                     if (attr.username) {
-                        Engage.log("Username found: " + attr.username);
+                        Engage.log("MhConnection: Username found: " + attr.username);
                         model.username = attr.username;
                     } else {
-                        Engage.log("No username found.");
+                        Engage.log("MhConnection: No username found.");
                     }
                     if (attr.roles && (attr.roles.length > 0)) {
                         model.roles = attr.roles;
@@ -52,12 +52,12 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
                         }
                         model.loggedIn = notAnonymous;
                         if (notAnonymous) {
-                            Engage.log("User has one or more roles.");
+                            Engage.log("MhConnection: User has one or more roles.");
                         } else {
-                            Engage.log("User has no role.");
+                            Engage.log("MhConnection: User has no role.");
                         }
                     } else {
-                        Engage.log("Error: No roles found.");
+                        Engage.log("MhConnection: Error: No roles found.");
                     }
                     model.trigger("change");
                 }

@@ -92,9 +92,9 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
                             }
                         }
                         model.trigger("change");
-                        Engage.log("Mediapackage Data change event thrown");
+                        Engage.log("MhConnection: Mediapackage Data change event thrown");
                     } else {
-                        Engage.log("Mediapackage data not loaded successfully");
+                        Engage.log("MhConnection: Mediapackage data not loaded successfully");
                         Engage.trigger(events.mediaPackageModelInternalError.getName());
                     }
                 }
