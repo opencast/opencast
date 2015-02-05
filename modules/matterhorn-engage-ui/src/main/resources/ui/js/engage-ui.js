@@ -1,12 +1,16 @@
 $(document).ready(function() {
     var restEndpoint = "/search/"
     var mediaContainer = '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">'
-    var playerEndpoint = "/engage/";
+    var playerEndpoint = "";
     var page = 1;
+    var totalEntries = -1; 
+    var bufferEntries = 6; // number of entries to load for one page.
     var restData = "";
     var active = "episodes";
     var stack = new Array();
     var visited = 1;
+    var seriesRgbMax = new Array(220, 220, 220);  //color range. 
+    var seriesRgbOffset = new Array (20, 20, 20); //darkest possible color 
 
     var title_enterUsernamePassword = "Login";
     var placeholder_username = "Username";
@@ -22,8 +26,7 @@ $(document).ready(function() {
     var msg_loginSuccessful = "Successfully logged in. Please reload the page if the page does not reload automatically.";
     var msg_loginFailed = "Failed to log in.";
     var infoMeURL = "/info/me.json";
-    var corePlayerURL = "theodul/ui/core.html?id=";
-    var oldPlayerURL = "ui/watch.html?id=";
+    var defaultPlayerURL = "/engage/ui/watch.html?id=";
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
@@ -37,11 +40,17 @@ $(document).ready(function() {
     var $headerLogo = "#headerLogo";
     var $nav_switch_li = "#nav-switch li";
     var $oc_search_form = "#oc-search-form";
+    var $oc_sort_dropdown = ".oc-sort-dropdown";
     var $main_container = "#main-container";
+    var $main_grid = ".main-grid";
     var $next = ".next";
     var $previous = ".previous";
+    var $first = ".first";
+    var $last = ".last";
     var askedForLogin = false;
     var checkLoggedOut = false;
+    var $more_content = "#more";
+    var $no_more_content = "#no-more";
 
     function initialize() {
         $.enableLogging(true);
@@ -64,7 +73,45 @@ $(document).ready(function() {
         $($navbarEpisodes).addClass("active");
         $($navbarSeries).removeClass("active");
         active = "episodes";
-        loadEpisodes();
+        loadEpisodes(true);
+        endlessScrolling();
+          
+    }
+
+    function endlessScrolling(){
+        $.log("init endless scrolling");
+        $(window).scroll(function () {
+            $($more_content).hide();
+            $($no_more_content).hide();
+            $($more_content).show();     
+        
+            if($(window).scrollTop() + $(window).height() > $(document).height() - 200) {
+                $($more_content).show();
+            }
+            if($(window).scrollTop() + $(window).height() == $(document).height()) {
+                $($more_content).hide();
+                $($no_more_content).hide();
+                page++;
+                
+                if (page > 1) {
+                    $($previous).removeClass("disabled");
+                };                
+
+                if((page-1)* bufferEntries > totalEntries){
+                    $($no_more_content).show();
+                    $($next).addClass("disabled");
+                } else {
+                    $.log("loading data");
+                    if (active == "series") {
+                        loadSeries(false);
+                    } else {
+                        loadEpisodes(false);
+                    }
+                }
+
+            }
+        });
+        
     }
 
     $(window).load(function() {
@@ -96,13 +143,13 @@ $(document).ready(function() {
             $($navbarEpisodes).addClass("active");
             $($navbarSeries).removeClass("active");
             active = "episodes";
-            loadEpisodes();
+            loadEpisodes(true);
         };
         if (dest.active == "series") {
             $($navbarSeries).addClass("active");
             $($navbarEpisodes).removeClass("active");
             active = "series";
-            loadSeries();
+            loadSeries(true);
         };
     });
 
@@ -260,12 +307,11 @@ $(document).ready(function() {
                         var logo = data.org.properties.logo_large ? data.org.properties.logo_large : "";
                         $($headerLogo).attr("src", logo);
 
-                        var player = data.org.properties["player.type"] ? data.org.properties["player.type"] : "html5";
-                        if (player == "old") {
-                            playerEndpoint = playerEndpoint + oldPlayerURL;
-                        } else { // "html5"
-                            playerEndpoint = playerEndpoint + corePlayerURL;
-                        }
+                        var player = data.org.properties.player ? data.org.properties.player : defaultPlayerURL;
+                        if (player.charAt(0) != "/" )
+                            player = "/" + player;
+
+                        playerEndpoint = player;
                     } else {
                         $.log("Error: No info data received.");
                         resetAnonymousUser();
@@ -291,17 +337,18 @@ $(document).ready(function() {
                     active = "episodes";
                     page = 1;
                     pushHistory(1, "episodes", null);
-                    loadEpisodes();
+                    loadEpisodes(true);
                     break;
                 case "series":
                     active = "series";
                     page = 1;
                     pushHistory(1, "series", null);
-                    loadSeries();
+                    loadSeries(true);
                     break;
                 default:
                     break;
             }
+            $(".navbar-collapse").collapse('hide');
         });
 
         /* pagination */
@@ -309,8 +356,15 @@ $(document).ready(function() {
             if ($(this).hasClass("disabled")) {
                 return;
             };
+            
+            var cleanGrid = false;
 
-            page++;
+            if ($(this).hasClass("last")) {
+                page = Math.floor(totalEntries / bufferEntries);
+                cleanGrid = true;
+            } else {
+                page++;
+            }
 
             if (page > 1) {
                 $($previous).removeClass("disabled");
@@ -318,33 +372,38 @@ $(document).ready(function() {
 
             if (active == "series") {
                 pushHistory(page, "series", restData);
-                loadSeries();
+                loadSeries(cleanGrid);
             } else if (active == "episodes") {
                 pushHistory(page, "episodes", restData);
-                loadEpisodes();
+                loadEpisodes(cleanGrid);
             };
 
         });
-
+        
         $($previous).on("click", function() {
             if ($(this).hasClass("disabled")) {
                 return;
             };
-
-            --page;
+            
+            if ($(this).hasClass("first")) {
+                page = 1;
+            } else {
+                --page;
+            }
+            
             if (page == 1) {
                 $(this).addClass("disabled");
             };
 
             if (active == "series") {
                 pushHistory(page, "series", restData);
-                loadSeries();
+                loadSeries(true);
             } else if (active == "episodes") {
                 pushHistory(page, "episodes", restData);
-                loadEpisodes();
+                loadEpisodes(true);
             };
         });
-
+        
         /* handle search input */
         $($oc_search_form).submit(function(event) {
             event.preventDefault();
@@ -355,31 +414,44 @@ $(document).ready(function() {
 
             if (active == "series") {
                 pushHistory(page, "series", restData);
-                loadSeries();
+                loadSeries(true);
             } else if (active == "episodes") {
                 pushHistory(page, "episodes", restData);
-                loadEpisodes();
+                loadEpisodes(true);
             } else {
                 pushHistory(page, "episodes", restData);
-                loadEpisodes()
+                loadEpisodes(true);
             }
-
+            
+            $(".navbar-collapse").collapse('hide');
         });
+        
+        $($oc_sort_dropdown).on("change", function() {
+            $.log("submiting");
+            $($oc_search_form).submit();
+        });
+        
         $.log("Handler registered");
     }
 
-    function loadEpisodes() {
-        var requestUrl = restEndpoint + "episode.json?limit=6&offset=" + ((page - 1)) * 6 + "&" + restData;
+    function loadEpisodes(cleanGrid) {
+        var requestUrl = restEndpoint + "episode.json?limit=" + bufferEntries + 
+                        "&offset=" + ((page - 1)) * bufferEntries +
+                        "&" + restData;
         $.ajax({
             url: requestUrl,
             dataType: "json",
             success: function(data) {
                 // clear main grid
-                $($main_container).empty();
+                if (cleanGrid) {
+                    $($main_container).empty();
+                    window.scrollTo(0,0);
+                }
 
                 if (data && data["search-results"] && data["search-results"]["total"]) {
                     // number of total search results
                     var total = data["search-results"]["total"];
+                    totalEntries = total;
                     if (data["search-results"] == undefined || total == undefined) {
                         $.log("Error: Search results (total) undefined");
                         $($main_container).append(msg_html_sthWentWrong);
@@ -397,7 +469,7 @@ $(document).ready(function() {
                         $($previous).addClass("disabled");
                     };
 
-                    if (result.length < 6 || total < 6) {
+                    if (result.length < bufferEntries || total < bufferEntries) {
                         $($next).addClass("disabled");
                     } else {
                         $($next).removeClass("disabled");
@@ -426,15 +498,21 @@ $(document).ready(function() {
                 $.log("Error: Episode with no ID.")
                 serID = "0";
             };
+            
+            var seriesClass = "";
+            if (data.mediapackage) {
+                seriesClass = "series" + data.mediapackage.series +" ";
+            }
 
-            var tile = mediaContainer + "<div class=\"tile\" id=\"" + serID + "\">";
+            var tile = mediaContainer + "<div class=\"tile\" id=\"" + serID + "\">" +
+                    "<div class=\"" + seriesClass + "seriesindicator \"/> " +
+                    "<div class=\"tilecontent\">";
 
             tile = tile + "<h4 class=\"title\">" + data.dcTitle + "</h4>";
 
             // append thumbnail 
             var thumb = "";
             var time = 0;
-            var color = "A6A6A6";
             var creator = "<br>";
             var seriestitle = "<br>";
             var date = "<br>";
@@ -446,7 +524,7 @@ $(document).ready(function() {
                 };
 
                 tile = tile + "<div class=\"infos\">";
-
+                
                 if (data.dcCreator) {
                     creator = data.dcCreator;
                 };
@@ -469,35 +547,33 @@ $(document).ready(function() {
                     var hours = Math.floor((time / (1000 * 60 * 60) % 60));
 
                     if (seconds < 10) {
-                        seconds = "0" + seconds
+                        seconds = "0" + seconds;
                     };
                     if (minutes < 10) {
-                        minutes = "0" + minutes
+                        minutes = "0" + minutes;
                     };
                     if (hours < 10) {
-                        hours = "0" + hours
+                        hours = "0" + hours;
                     };
 
                     tile = tile + "<div class=\"duration\">" + hours + ":" + minutes + ":" + seconds + "</div>";
                 };
 
-                tile = tile + "</div>";
-
-                if (data.mediapackage.series) {
-                    Math.seedrandom(data.mediapackage.series);
-                    color = Math.ceil(Math.random() * 1000000);
-                };
-
-                tile = tile + "</div></div>";
+                tile = tile + "</div></div></div></div>";
 
                 $($main_container).append(tile);
 
                 $("#" + data["id"]).on("click", function() {
                     $(location).attr("href", playerEndpoint + data["id"]);
                 });
+
+                if (data.mediapackage.seriestitle) {
+                    var color = generateSeriesColor(data.mediapackage.series);
+                    $("."+seriesClass).css({'background': color});
+                }                
             } else {
                 $($main_container).html(msg_html_mediapackageempty);
-            }
+            }            
         } else {
             $($main_container).html(msg_html_nodata);
         }
@@ -507,16 +583,30 @@ $(document).ready(function() {
     }
 
     function createSeriesGrid(data) {
-        if (data && data.id) {
-            var tile = mediaContainer + "<div class=\"tile\" id=\"" + data.id + "\">";
+        if (data && data.id) {            
+            var seriesClass = "series" + data.id +" ";
+            var color = generateSeriesColor(data.id);
+                    
+            var creator = "<br>";
+            var contributor = "<br>";
+                    
+            var tile = mediaContainer + "<div class=\"tile\" id=\"" + data.id + "\"> "+
+                    "<div class=\"" + seriesClass + "seriesindicator \"/> " +
+                    "<div class=\"tilecontent\">";
 
             tile = tile + "<h4 class=\"title\">" + (data.dcTitle ? data.dcTitle : "Unknown title") + "</h4>";
 
-            tile = tile + "</div></div>";
+            if (data.dcCreator) {
+                    creator = data.dcCreator;
+            };
+            tile = tile + "<div class=\"creator\">" + creator + "</div>";
+            
+            if (data.dcContributor) {
+                    contributor = data.dcContributor;
+            };
+            tile = tile + "<div class=\"contributor\">" + contributor + "</div>";
 
-            // Set Color. TODO: Better generator, use series color for ep.
-            Math.seedrandom(data.id);
-            var color = Math.ceil(Math.random() * 1000000);
+            tile = tile + "</div></div></div>";
 
             $($main_container).append(tile);
 
@@ -527,23 +617,30 @@ $(document).ready(function() {
                 $($navbarEpisodes).addClass("active");
                 $($navbarSeries).removeClass("active");
                 pushHistory(1, "episodes", restData);
-                loadEpisodes();
+                loadEpisodes(true);
             });
+            
+            $("."+seriesClass).css({'background': color});
+            $.log("Series Color: " + seriesClass + " " + color);            
         } else {
             $.log("Error: Data for creating series grid is empty.");
         }
     }
 
-    function loadSeries() {
+    function loadSeries(cleanGrid) {
         var requestUrl = restEndpoint + "/series.json?limit=6&offset=" + (page - 1) * 6 + "&" + restData;
         $.ajax({
             url: requestUrl,
             dataType: "json",
             success: function(data2) {
                 if (data2 && data2["search-results"] && data2["search-results"]["total"]) {
-                    $($main_container).empty();
+                    if (cleanGrid) {
+                        $($main_container).empty();
+                        window.scrollTo(0,0);
+                    }
 
                     var total = data2["search-results"]["total"];
+                    totalEntries = total;
 
                     if (total == 0) {
                         $($main_container).append(msg_html_noseries);
@@ -579,5 +676,21 @@ $(document).ready(function() {
 
     function registerMobileEvents() {
         // TODO
+    }
+    
+    function generateSeriesColor(value) {
+        var rgb = new Array (0, 0, 0);
+        
+        for (i = 0; i < value.length; i++) {
+            rgb[(i % 3)] += value.charCodeAt(i); 
+        }
+        
+        for (i = 0; i < 3; i++) {
+            rgb[i] = ((rgb[i] % seriesRgbMax[i]) + seriesRgbOffset[i]).toString(16);
+            if (rgb[i].length < 1) 
+                rgb[i] = "0" + rgb[i];
+        }
+        
+        return "#" + rgb[0] + rgb[1] + rgb[2];        
     }
 });

@@ -1,44 +1,55 @@
 /* navbar */
 .navbar-default {
-    background-color: #A72123;
-    border-color: #E7E7E7;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #8C939B;
 }
 #nav-dropdownLoggedin {
     display: none;
 }
+
+.navbar-brand img {
+    height: 40px;
+    margin-top: 5px;
+    margin-right: 20px;
+}
+
 /* title */
 .navbar-default .navbar-brand {
-    color: #FFF;
+    color: #000;
+    padding: 0px;
+    margin-right: 10px;
+    line-height: 0.7em;
+    height: auto;
 }
 .navbar-default .navbar-brand:hover,
 .navbar-default .navbar-brand:focus {
-    color: #FBB900;
+    color: #24425C;
 }
 /* link */
 .navbar-default .navbar-nav > li > a {
-    color: #FFF;
+    color: #000;
     cursor: pointer;
 }
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
-    color: #FBB900;
+    color: #24425C;
 }
 .navbar-default .navbar-nav > .active > a, 
 .navbar-default .navbar-nav > .active > a:hover, 
 .navbar-default .navbar-nav > .active > a:focus {
-    color: #555;
-    background-color: #FBB900;
+    color: #FFF;
+    background-color: #24425C;
 }
 .navbar-default .navbar-nav > .open > a, 
 .navbar-default .navbar-nav > .open > a:hover, 
 .navbar-default .navbar-nav > .open > a:focus {
-    color: #555;
-    background-color: #FBB900;
+    color: #FFF;
+    background-color: #24425C;
 }
 /* caret */
 .navbar-default .navbar-nav > .dropdown > a .caret {
-    border-top-color: #777;
-    border-bottom-color: #777;
+    border-top-color: #8C939B;
+    border-bottom-color: #8C939B;
 }
 .navbar-default .navbar-nav > .dropdown > a:hover .caret,
 .navbar-default .navbar-nav > .dropdown > a:focus .caret {
@@ -57,14 +68,14 @@
 }
 .navbar-default .navbar-toggle:hover,
 .navbar-default .navbar-toggle:focus {
-    background-color: #FBB900;
+    background-color: #378DD4;
 }
 .navbar-default .navbar-toggle .icon-bar {
     background-color: black;
 }
 @media (max-width: 767px) {
     .navbar-default .navbar-nav .open .dropdown-menu > li > a {
-        color: #777;
+        color: #8C939B;
     }
     .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
     .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
@@ -74,6 +85,9 @@
 /* Customization of central Content */
 .main-grid{
     padding: 50px 15px
+}
+.main-content{
+    margin-top: 25px;
 }
 .oc-media-container {
     border: 1px solid gray;
@@ -118,7 +132,7 @@ strong {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: "Open Sans", "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
-    line-height: 1.5em;
+    line-height: 1em;
     font-weight: 300;
 }
 
@@ -129,23 +143,33 @@ strong {
 .tile {
     width: 100%;
     display: inline-block;
-    box-sizing: border-box;
-    padding: 20px;
     margin-bottom: 30px;
     border: 1px solid gray;
-    background: linear-gradient(to bottom, #A6A6A6 10%,#FFFFFF 10%,#FFFFFF 50%,#FFFFFF 100%);
 }
 .tile:hover {
-    background: #FBB900;
+    background: #24425C;
+    color: #FFF;
     cursor: pointer;
-    background: linear-gradient(to top, #FBB900 90%, #FFFFFF 90%, #FFFFFF 10%,#A6A6A6 10%);
+    background: #24425C;
 } 
+
+.tilecontent {
+    padding: 5px 15px 15px 15px;
+    box-sizing: border-box;
+}
 
 .tile img {
     width: 50%;
     float: left;
     margin-right: 2%;
     max-height: 163px; 
+}
+
+.headline {
+    margin-top: 10px;
+    margin-right: 10px;
+    line-height: 0.7em;
+    font-weight: 100;
 }
 
 @media (min-width: 768px) {
@@ -178,15 +202,15 @@ strong {
 }
 .pager li>a:hover, .pager li>a:focus {
     text-decoration: none;
-    background-color: #FBB900;
+    background-color: #24425C;
     cursor: pointer;
 }
 .oc-search-btn {
-    border-color: #FBB900;
+    border-color: #24425C;
 }
 .oc-search-btn:hover {
-    background: #FBB900;
-    border-color: #FBB900;
+    background: #24425C;
+    border-color: #24425C;
 }
 .form-signin {
     max-width: 380px;
@@ -226,4 +250,16 @@ strong {
     margin-bottom: 20px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+}
+
+.scroll-indicator {
+    visibility: hidden;
+    text-align: center;
+    vertical-align: bottom;
+    color: #8C939B;
+}
+
+.seriesindicator {
+    height: 15px;
+    width: 100%;
 }
