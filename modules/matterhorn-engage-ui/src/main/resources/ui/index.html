@@ -18,8 +18,6 @@
         <script type="text/javascript" src="js/bootstrap.min.js"></script>
         <script type="text/javascript" src="js/bootstrap-accessibility.min.js"></script>
         <script type="text/javascript" src="js/engage-ui.js"></script>
-        <!--<script type="text/javascript" src="js/engage-ui-mobile.js"></script>-->
-        <!--<script type="text/javascript" src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>-->
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8">
         <meta name="description" content="Matterhorn Media Module">
@@ -49,19 +47,19 @@
                     <ul class="nav navbar-nav navbar-right" id="nav-login">
                         <li id="navbarLogin"><a>Login</a></li>
                     </ul>
-		    <ul class="nav navbar-nav navbar-right" id="nav-dropdownLoggedin">
-		        <li class="dropdown">
-			    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Logged in as: <span id="nav-userName">Anonymous</span> <span class="caret"></span></a>
-			    <ul class="dropdown-menu" role="menu">
-			        <li><a id="nav-logoutLink" href="">Logout</a></li>
-			    </ul>
-			</li>
-		    </ul>
+                    <ul class="nav navbar-nav navbar-right" id="nav-dropdownLoggedin">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Logged in as: <span id="nav-userName">Anonymous</span> <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a id="nav-logoutLink" href="">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
                     <form id="oc-search-form" class="navbar-form navbar-right" role="search" autocomplete="off">
                         <div class="btn-group">
                             <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Sorting <span class="caret"></span></button>
-                              <ul class="dropdown-menu" role="menu">
-                                  <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED_DESC" value="DATE_CREATED_DESC" checked="checked"><label for="DATE_CREATED_DESC">Recording Date (newer)</label></li>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED_DESC" value="DATE_CREATED_DESC" checked="checked"><label for="DATE_CREATED_DESC">Recording Date (newer)</label></li>
                                 <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED" value="DATE_CREATED"><label for="DATE_CREATED">Recording Date (older)</label></li>
                                 <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED_DESC" value="DATE_PUBLISHED_DESC"><label for="DATE_PUBLISHED_DESC">Publishing Date (newer)</label></li>
                                 <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED" value="DATE_PUBLISHED"><label for="DATE_PUBLISHED">Publishing Date (older)</label></li>
@@ -80,15 +78,14 @@
                                 <li><input type="radio" class="oc-sort-dropdown" name="sort" id="LICENSE" value="LICENSE"><label for="LICENSE">License</label></li>
                                 <li><input type="radio" class="oc-sort-dropdown" name="sort" id="SUBJECT" value="SUBJECT"><label for="SUBJECT">Subject</label></li>
                                 <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DESCRIPTION" value="DESCRIPTION"><label for="DESCRIPTION">Description</label></li>
-                              </ul>     
-                        </div>                        
+                            </ul>
+                        </div>
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="Search" name="q">
                         </div>
                         <button id="oc-search-btn" type="submit" class="btn btn-default">Search</button>
                     </form>
                 </div>
-           <!--     <a class="navbar-brand" href="/"><img id="headerLogo" src="" class="img-responsive"></a>-->
             </div>
         </div>
         <div class="container main-grid">
@@ -103,6 +100,6 @@
             <li class="next"><a>Next &rarr;</a></li>
         </ul>
         <div id="more" class="scroll-indicator">Loading More Content</div>
-        <div id="no-more" class="scroll-indicator">No More Content</div>        
+        <div id="no-more" class="scroll-indicator">No More Content</div>
     </body>
 </html>
