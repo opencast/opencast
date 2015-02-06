@@ -20,6 +20,9 @@ define(['jquery', 'backbone'], function($, Backbone) {
 
     var prop_shortcut = "player.shortcut.";
     var prop_mastervideotype = "player.mastervideotype";
+    var prop_positioncontrols = "player.positioncontrols";
+    var ready = false;
+    var positioncontrols = "";
 
     /*
      * Model with information about the current user and the current MH configuration
@@ -27,7 +30,6 @@ define(['jquery', 'backbone'], function($, Backbone) {
     var MeInfoModel = Backbone.Model.extend({
         urlRoot: "../../../info/me.json",
         initialize: function() {
-            this.ready = false;
             this.fetch({
                 success: function(me) {
                     var shortcuts = new Array();
@@ -47,13 +49,23 @@ define(['jquery', 'backbone'], function($, Backbone) {
                             else if ((key == prop_mastervideotype) && value) {
                                 mastervideotype = value;
                             }
+                            // controls position
+                            else if ((key == prop_positioncontrols) && value) {
+                                positioncontrols = value;
+                            }
                         });
                     }
                     me.set("shortcuts", shortcuts);
                     me.set("mastervideotype", mastervideotype);
-                    me.ready = true;
+                    ready = true;
                 }
             });
+        },
+        ready: function() {
+            return ready;
+        },
+        getPositionControls: function() {
+            return positioncontrols;
         }
     });
 
