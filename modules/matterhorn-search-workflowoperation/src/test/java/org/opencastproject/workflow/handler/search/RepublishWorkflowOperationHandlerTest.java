@@ -133,7 +133,6 @@ public class RepublishWorkflowOperationHandlerTest {
     Assert.assertEquals("Found more catalogs than expected", 2, mp.getCatalogs().length);
     Assert.assertEquals("Found more attachments than expected", 1, mp.getAttachments().length);
     Assert.assertEquals("Found more publications than expected", 1, mp.getPublications().length);
-    System.out.println(mp.getPublications().length);
 
     // Make sure that the merged mediapackage contains the updated catalog
     Assert.assertEquals("Merge picked the wrong catalog", "catalog-1",
