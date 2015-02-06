@@ -1,0 +1,178 @@
+#navigation_wrapper {
+    min-width: 980px;
+    width: 100%;
+    background-color: #ffffff;
+}
+
+#navigation_control {
+    float: left;
+    margin-left: 20px;
+    margin-top: 13px;
+}
+
+.well-alert {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.controlbutton {
+    float: left;
+    margin: 0px 3px;
+}
+
+.controlbutton:hover {
+    cursor: pointer;
+}
+
+#navigation_time {
+    float: left;
+    margin-left: 20px;
+    font-size: 16px;
+}
+
+#navigation_time input {
+    font-size: 16px;
+    width: 90px;
+    margin-bottom: 3px !important;
+    min-height: 25px;
+    float: left;
+    margin-top: 13px;
+    margin-right: 5px;
+}
+
+#navigation_time_current_overview {
+    float: left;
+    margin-top: 19px;
+}
+
+#menu {
+    float: right;
+    margin-top: 13px;
+    margin-right: 20px;
+}
+
+#menu img {
+    margin-top: -3px;
+}
+
+#menu .btn-small {
+    width: 30px !important;
+}
+
+#navigation_logo {
+    float: right;
+    margin-right: 24px;
+    margin-top: 18px;
+}
+
+/* SLIDER */
+#volume {
+    position: relative;
+    margin-top: 26px;
+    width: 100px;
+    float: left;
+    margin-left: 20px;
+    margin-right: 2px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #333 #333 #777 #333;
+    border-radius: 25px;
+    height: 4px;
+    background-color: #8e8d8d;
+    background: url('../images/bg-track.png') repeat top left;
+    box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px
+    rgba(250, 250, 250, .5);
+}
+
+.volume_icon {
+    float: left;
+    margin-top: 17px;
+    margin-left: 15px;
+}
+
+#slider {
+    margin: 15px 20px 0px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #333 #333 #777 #333;
+    border-radius: 25px;
+    height: 4px;
+    background-color: #8e8d8d;
+    background: url('../images/bg-track.png') repeat top left;
+    box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px
+    rgba(250, 250, 250, .5);
+}
+
+.ui-slider-handle {
+    position: absolute;
+    z-index: 2;
+    width: 25px !important;
+    height: 25px !important;
+    cursor: pointer !important;
+    background: url('../images/handle.png') no-repeat 50% 50% !important;
+    font-weight: bold;
+    color: #1C94C4;
+    outline: none;
+    border: none !important;
+    top: -10px !important;
+    margin-left: -12px;
+}
+
+.ui-slider-range {
+    background: #ffffff; /* Old browsers */
+    background: -moz-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+    /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff),
+				 color-stop(100%, #eaeaea)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+    /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+    /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+    /* IE10+ */
+    background: linear-gradient(top, #ffffff 0%, #eaeaea 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient(  startColorstr='#ffffff',
+							 endColorstr='#eaeaea', GradientType=0); /* IE6-9 */
+    position: absolute;
+    border: 0;
+    top: 0;
+    height: 100%;
+    border-radius: 25px;
+}
+
+#segment_wrapper {
+    margin: 0px 22px;
+    margin-bottom: 15px;
+}
+
+#segment_wrapper .row-fluid .span12 {
+    min-height: auto;
+}
+
+.segment {
+    height: 20px !important;
+    min-height: 20px !important;
+    border-right: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    margin: 0px !important;
+    padding-left: 0 !important;
+    transition: background-color 0.3s;
+    -moz-transition: background-color 0.3s;
+    -webkit-transition: background-color 0.3s;
+    -o-transition: background-color 0.3s;
+    float: left;
+}
+
+.segment:first-child {
+    border-left: 1px solid #000000;
+}
+
+.segmentspan {
+    display: none;
+}
+
+.segmentHover {
+    cursor: pointer;
+    background-color: #dddddd;
+/* border-bottom: 1px solid #cccccc; */
+}
