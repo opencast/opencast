@@ -125,6 +125,8 @@ LOGGING="${LOGGING} -Djava.util.logging.config.file=$FELIX_CONFIG_DIR/services/j
 LOGGING="${LOGGING} -Dorg.ops4j.pax.logging.DefaultServiceLog.level=${LOGLEVEL}"
 LOGGING="${LOGGING} -Declipselink.logging.level=${ECLIPSE_LOGLEVEL}"
 
+# This is needed by matterhorn-videosegmenter-impl
+# It can probably be removed once the module is removed
 GRAPHICS="-Djava.awt.headless=true"
 GRAPHICS="${GRAPHICS} -Dawt.toolkit=sun.awt.HeadlessToolkit"
 
@@ -133,7 +135,10 @@ JETTY="-Dorg.mortbay.jetty.Request.maxFormContentSize=1000000"
 DISABLE_PHONEHOME="-Dnet.sf.ehcache.skipUpdateCheck=true"
 DISABLE_PHONEHOME="${DISABLE_PHONEHOME} -Dorg.terracotta.quartz.skipUpdateCheck=true"
 
-JAVA="-Xms1g -Xmx1g"
+# Set memory allocation options
+# -XX:MaxPermSize has been removed in OpenJDK >= 8
+# Hence we should remove this options once we discontinue support for Java 7
+JAVA="-Xms1g -Xmx1g -XX:MaxPermSize=256m"
 ( [ "$1" == '--daemon' ] || [ "$1" == '--notty' ] ) && GOSH="-Dgosh.args='--noshutdown -c noop=true'"
 
 MATTERHORN_OPTS="$GOSH $DEBUG $FELIX $GRAPHICS $JETTY $JAVA $LOGGING $JMX $DISABLE_PHONEHOME $ADD_OPTS"
