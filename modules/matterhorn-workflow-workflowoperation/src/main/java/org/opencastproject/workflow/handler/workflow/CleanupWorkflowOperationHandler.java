@@ -177,8 +177,9 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
             continue;
           }
 
+          HttpResponse response = null;
           try {
-            HttpResponse response = client.execute(delete);
+            response = client.execute(delete);
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == HttpStatus.SC_NO_CONTENT || statusCode == HttpStatus.SC_OK) {
               logger.info("Sucessfully deleted external URI {}", delete.getURI());
@@ -190,6 +191,8 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
           } catch (TrustedHttpClientException e) {
             logger.warn("Unable to execute DELETE request on external URI {}", delete.getURI());
             throw new WorkflowOperationException(e);
+          } finally {
+            client.close(response);
           }
         }
         continue;

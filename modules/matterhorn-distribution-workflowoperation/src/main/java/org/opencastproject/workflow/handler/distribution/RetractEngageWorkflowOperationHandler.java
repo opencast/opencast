@@ -15,7 +15,8 @@
  */
 package org.opencastproject.workflow.handler.distribution;
 
-import org.apache.commons.lang.StringUtils;
+import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
+
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
@@ -31,6 +32,8 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -40,8 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
 /**
  * Workflow operation for retracting a media package from the engage player.
@@ -149,12 +150,15 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         MediaPackage searchMediaPackage = result.getItems()[0].getMediaPackage();
         logger.info("Retracting media package {} from download/streaming distribution channel", searchMediaPackage);
         for (MediaPackageElement element : searchMediaPackage.getElements()) {
-          Job retractDownloadJob = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage, element.getIdentifier());
+          Job retractDownloadJob = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage,
+                  element.getIdentifier());
           jobs.add(retractDownloadJob);
 
           if (distributeStreaming) {
-            Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, searchMediaPackage, element.getIdentifier());
-            jobs.add(retractStreamingJob);
+            Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, searchMediaPackage,
+                    element.getIdentifier());
+            if (retractStreamingJob != null)
+              jobs.add(retractStreamingJob);
           }
         }
       }

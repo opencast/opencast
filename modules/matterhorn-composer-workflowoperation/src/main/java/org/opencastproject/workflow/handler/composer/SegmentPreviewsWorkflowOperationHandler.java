@@ -270,7 +270,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
           // convert to time array
           double[] timeArray = new double[timePointList.size()];
           for (int i = 0; i < timePointList.size(); i++)
-            timeArray[i] = timePointList.get(i).getTimeInMilliseconds() / 1000;
+            timeArray[i] = (double) timePointList.get(i).getTimeInMilliseconds() / 1000;
 
           Job job = composerService.image(t, profile.getIdentifier(), timeArray);
           if (!waitForStatus(job).isSuccess()) {

@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workflow.handler.search;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 import org.opencastproject.job.api.Job;
@@ -24,11 +25,13 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
+import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -92,6 +95,7 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
+  @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
@@ -197,20 +201,21 @@ public class RepublishWorkflowOperationHandler extends AbstractWorkflowOperation
    *          the mediapackage that is currently published
    * @return the merged mediapackage
    */
-  protected MediaPackage merge(MediaPackage updatedMp, MediaPackage publishedMp) {
+  static MediaPackage merge(MediaPackage updatedMp, MediaPackage publishedMp) {
     if (publishedMp == null)
       return updatedMp;
 
-    MediaPackage mergedMediaPackage = (MediaPackage) updatedMp.clone();
-    for (MediaPackageElement element : publishedMp.elements()) {
-      if (updatedMp.getElementsByFlavor(element.getFlavor()).length == 0) {
-        String type = element.getElementType().toString().toLowerCase();
-        logger.info("Merging {} '{}' into the updated mediapackage", type, element.getIdentifier());
-        mergedMediaPackage.add((MediaPackageElement) element.clone());
+    final MediaPackage mergedMp = MediaPackageSupport.copy(publishedMp);
+    for (final MediaPackageElement updatedElement : updatedMp.elements()) {
+      for (final MediaPackageElementFlavor flavor : Option.option(updatedElement.getFlavor())) {
+        for (final MediaPackageElement outdated : mergedMp.getElementsByFlavor(flavor)) {
+          mergedMp.remove(outdated);
+        }
+        logger.info(format("Update %s of type %s", updatedElement.getIdentifier(), updatedElement.getElementType()));
+        mergedMp.add(updatedElement);
       }
     }
-
-    return mergedMediaPackage;
+    return mergedMp;
   }
 
   /**

@@ -88,7 +88,7 @@
               org.opencastproject.event.handler;version=${project.version}
             </Private-Package>
             <Service-Component>
-              OSGI-INF/events/series-updated.xml,
+              OSGI-INF/events/series-updated.xml
             </Service-Component>
           </instructions>
         </configuration>
