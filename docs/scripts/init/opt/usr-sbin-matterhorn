@@ -75,7 +75,7 @@ ECLIPSE_LOGLEVEL="CONFIG"
 [ -z $DEBUG ] && DEBUG=''
 FELIX_CONFIG_DIR=/opt/matterhorn/etc
 FELIX_WORK_DIR=/opt/matterhorn/work
-FELIX_CACHE_DIR=/opt/matterhorn/work/felix-cache
+FELIX_CACHE_DIR=$FELIX_WORK_DIR/felix-cache
 ADD_OPTS=""
 if [ -f $MATTERHORN/lib/matterhorn/matterhorn-capture-agent-impl*.jar ]
 then
