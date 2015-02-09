@@ -209,6 +209,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var mimetypes = "";
     var translations = new Array();
     var videoDataView = undefined;
+    var fullscreen = false;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginVideoVideoJS").replace(/(\.\.\/)/g, "");
@@ -1089,6 +1090,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             });
         } else {
+            $(document).on("webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange", function(e) {
+                fullscreen = !fullscreen;
+                if (fullscreen) {
+                    Engage.trigger(plugin.events.fullscreenEnable.getName());
+                } else {
+                    Engage.trigger(plugin.events.fullscreenCancel.getName());
+                }
+            });
+
             var videodisplayMaster = videojs(videoDisplay);
 
             if (numberOfVideodisplays == 1) {
@@ -1111,28 +1121,52 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 Engage.trigger(plugin.events.fullscreenCancel.getName());
             });
             Engage.on(plugin.events.fullscreenEnable.getName(), function() {
-                $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
                 if (numberOfVideodisplays == 1) {
                     videodisplayMaster.requestFullscreen();
-                } else {
-                    $(window).scrollTop(0);
-                    $("body").css("overflow", "hidden");
-                    $(window).scroll(function() {
-                        $(this).scrollTop(0);
-                    });
-                    $("#" + id_engage_video).css("z-index", 995).css("position", "relative");
-                    $("#" + id_page_cover).css("opacity", 0.9).fadeIn(300, function() {});
+                } else if (!fullscreen) {
+                    var viewer = document.getElementById(id_engage_video);
+                    if (viewer.mozRequestFullScreen) {
+                        viewer.mozRequestFullScreen();
+                    } else if (viewer.webkitRequestFullscreen) {
+                        viewer.webkitRequestFullscreen();
+                    } else if (viewer.requestFullscreen) {
+                        viewer.requestFullscreen();
+                    } else if (viewer.msRequestFullscreen) {
+                        viewer.msRequestFullscreen();
+                    } else {
+                        $(window).scrollTop(0);
+                        $("body").css("overflow", "hidden");
+                        $(window).scroll(function() {
+                            $(this).scrollTop(0);
+                        });
+                        $("#" + id_engage_video).css("z-index", 995).css("position", "relative");
+                        $("#" + id_page_cover).css("opacity", 0.9).fadeIn(300, function() {});
+                        fullscreen = true;
+                    }
                 }
+                $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
             });
             Engage.on(plugin.events.fullscreenCancel.getName(), function() {
-                $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
-                if (numberOfVideodisplays > 1) {
-                    $("body").css("overflow", "auto");
-                    $(window).unbind("scroll");
-                    $("#" + id_page_cover).css("opacity", 0.9).fadeOut(300, function() {
-                        $("#" + id_engage_video).css("z-index", 0).css("position", "");
-                    });
+                if (fullscreen && (numberOfVideodisplays > 1)) {
+                    var viewer = document.getElementById(id_engage_video);
+                    if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    } else {
+                        $("body").css("overflow", "auto");
+                        $(window).unbind("scroll");
+                        $("#" + id_page_cover).css("opacity", 0.9).fadeOut(300, function() {
+                            $("#" + id_engage_video).css("z-index", 0).css("position", "");
+                        });
+                        fullscreen = false;
+                    }
                 }
+                $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
             });
             Engage.on(plugin.events.playbackRateChanged.getName(), function(rate) {
                 if (pressedPlayOnce) {

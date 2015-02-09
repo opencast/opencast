@@ -349,6 +349,59 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         });
         return all_plugins_loaded;
     }
+    
+    function loadTemplate(plugin, plugin_name, plugin_path) {
+        if (plugin.template !== "none") {
+            // load template asynchronously
+            $.get("engage/theodul/" + plugin_path + plugin.template, function(template) {
+                var template_data = {};
+                // add template data if not undefined
+                if (plugin.template_data != undefined) {
+                    template_data = plugin.template_data;
+                }
+                // add full plugin path to the template data
+                template_data.plugin_path = "engage/theodul/" + plugin_path;
+                // process the template using underscore and set it in the plugin obj
+                plugin.templateProcessed = _.template(template, template_data);
+                plugin.template = template;
+                plugin.pluginPath = "engage/theodul/" + plugin_path;
+                if (plugin.insertIntoDOM) {
+                    // load the compiled HTML into the component
+                    engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
+                    if (engageCore.model.desktop) {
+                        if (engageCore.pluginView.isControlsPlugin(plugin.type)) {
+                            pluginControlsInserted = true;
+                        }
+                        if (engageCore.pluginView.isVideoPlugin(plugin.type)) {
+                            pluginVideoInserted = true;
+                        }
+                        if (engageCore.pluginView.isTabPlugin(plugin.type)) {
+                            pluginTabInserted = true;
+                        }
+                        if (engageCore.pluginView.isDescriptionPlugin(plugin.type)) {
+                            pluginDescriptionInserted = true;
+                        }
+                        if (engageCore.pluginView.isTimelinePlugin(plugin.type)) {
+                            pluginTimelineInserted = true;
+                        }
+                    }
+                }
+                plugins_loaded[plugin_name] = true;
+                // check if all plugins are ready
+                if (checkAllPluginsloaded()) {
+                    engageCore.pluginView.allPluginsLoaded();
+                    engageCore.trigger(events.plugin_load_done.getName());
+                }
+            });
+        } else {
+            plugins_loaded[plugin_name] = true;
+            // check if all plugins are ready
+            if (checkAllPluginsloaded()) {
+                engageCore.pluginView.allPluginsLoaded();
+                engageCore.trigger(events.plugin_load_done.getName());
+            }
+        }
+    }
 
     function loadPlugin(plugin_path, plugin_name) {
         require([plugin_path + "main"], function(plugin) {
@@ -377,84 +430,25 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 }
             }
 
-            if (plugin.template_topIfBottom && plugin.template_topIfBottom !== "none") {
+            // we have to change that in the future... this is only for loading a second controls template to put above the video if the player controls are below it
+            if (plugin.template_topIfBottom && plugin.template_topIfBottom != "none") {
                 // load template asynchronously
                 $.get("engage/theodul/" + plugin_path + plugin.template_topIfBottom, function(template) {
-                    // empty data object
                     var template_data = {};
-                    // add template if not undefined
+                    // add template data if not undefined
                     if (plugin.template_data_topIfBottom !== undefined) {
                         template_data = plugin.template_data_topIfBottom;
                     }
-                    // add full plugin path to the tmeplate data
+                    // add full plugin path to the template data
                     template_data.plugin_path = "engage/theodul/" + plugin_path;
                     // process the template using underscore and set it in the plugin obj
                     plugin.templateProcessed_topIfBottom = _.template(template, template_data);
                     plugin.template_topIfBottom = template;
                     plugin.pluginPath_topIfBottom = "engage/theodul/" + plugin_path;
-                    // plugin load done counter
-                    plugins_loaded[plugin_name] = true;
-                    // check if all plugins are ready
-                    if (checkAllPluginsloaded() === true) {
-                        engageCore.pluginView.allPluginsLoaded();
-                        // trigger done event
-                        engageCore.trigger(events.plugin_load_done.getName());
-                    }
-                });
-            }
-            if (plugin.template !== "none") {
-                // load template asynchronously
-                $.get("engage/theodul/" + plugin_path + plugin.template, function(template) {
-                    // empty data object
-                    var template_data = {};
-                    // add template if not undefined
-                    if (plugin.template_data !== undefined) {
-                        template_data = plugin.template_data;
-                    }
-                    // add full plugin path to the tmeplate data
-                    template_data.plugin_path = "engage/theodul/" + plugin_path;
-                    // process the template using underscore and set it in the plugin obj
-                    plugin.templateProcessed = _.template(template, template_data);
-                    plugin.template = template;
-                    plugin.pluginPath = "engage/theodul/" + plugin_path;
-                    if (plugin.insertIntoDOM) {
-                        // load the compiled HTML into the component
-                        engageCore.pluginView.insertPlugin(plugin, plugin_name, translationData);
-                        if (engageCore.model.desktop) {
-                            if (engageCore.pluginView.isControlsPlugin(plugin.type)) {
-                                pluginControlsInserted = true;
-                            }
-                            if (engageCore.pluginView.isVideoPlugin(plugin.type)) {
-                                pluginVideoInserted = true;
-                            }
-                            if (engageCore.pluginView.isTabPlugin(plugin.type)) {
-                                pluginTabInserted = true;
-                            }
-                            if (engageCore.pluginView.isDescriptionPlugin(plugin.type)) {
-                                pluginDescriptionInserted = true;
-                            }
-                            if (engageCore.pluginView.isTimelinePlugin(plugin.type)) {
-                                pluginTimelineInserted = true;
-                            }
-                        }
-                    }
-                    // plugin load done counter
-                    plugins_loaded[plugin_name] = true;
-                    // check if all plugins are ready
-                    if (checkAllPluginsloaded() === true) {
-                        engageCore.pluginView.allPluginsLoaded();
-                        // trigger done event
-                        engageCore.trigger(events.plugin_load_done.getName());
-                    }
+                    loadTemplate(plugin, plugin_name, plugin_path);
                 });
             } else {
-                plugins_loaded[plugin_name] = true;
-                // check if all plugins are ready
-                if (checkAllPluginsloaded() === true) {
-                    engageCore.pluginView.allPluginsLoaded();
-                    // trigger done event
-                    engageCore.trigger(events.plugin_load_done.getName());
-                }
+                loadTemplate(plugin, plugin_name, plugin_path);
             }
         });
     }
@@ -468,7 +462,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         }
     }
 
-    // core main
     var EngageCore = Backbone.View.extend({
         el: $("#" + id_engage_view),
         Event: EngageEvent,
