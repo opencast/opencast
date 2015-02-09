@@ -50,6 +50,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "", "both"),
         mute: new Engage.Event("Video:mute", "", "both"),
         unmute: new Engage.Event("Video:unmute", "", "both"),
+        muteToggle: new Engage.Event("Video:muteToggle", "", "both"),
         segmentMouseover: new Engage.Event("Segment:mouseOver", "the mouse is over a segment", "both"),
         segmentMouseout: new Engage.Event("Segment:mouseOut", "the mouse is off a segment", "both"),
         volumeSet: new Engage.Event("Video:volumeSet", "", "both"),
@@ -135,6 +136,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var Utils;
     var volUpDown = 5.0;
     var storage_volume = "volume";
+    var storage_lastvolume = "lastvolume";
     var storage_muted = "muted";
     var bootstrapPath = "lib/bootstrap/js/bootstrap";
     var jQueryUIPath = "lib/jqueryui/jquery-ui";
@@ -547,6 +549,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     function loadStoredInitialValues() {
         var vol = Basil.get(storage_volume);
         if (vol) {
+            Basil.set(storage_lastvolume, volume);
             Engage.trigger(plugin.events.volumeSet.getName(), vol / 100);
         }
 
@@ -761,7 +764,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         } else {
             $("#" + id_unmute_button).show();
             $("#" + id_mute_button).hide();
-            Engage.trigger(plugin.events.volumeSet.getName(), getVolume() / 100);
+            var vol = Basil.get(storage_lastvolume);
+            if (vol) {
+                Engage.trigger(plugin.events.volumeSet.getName(), vol / 100);
+            } else {
+                Engage.trigger(plugin.events.volumeSet.getName(), 1);
+            }
         }
     }
 
@@ -827,6 +835,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
             Engage.on(plugin.events.volumeSet.getName(), function(volume) {
                 $("#" + id_volume).slider("value", volume * 100);
+                if((volume * 100) > 1) {
+                    Basil.set(storage_lastvolume, volume * 100);
+                }
                 Basil.set(storage_volume, volume * 100);
                 if (volume > 0) {
                     isMute = false;
@@ -885,6 +896,16 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 if (!mediapackageError) {
                     isMute = false;
                     mute();
+                }
+            });
+            Engage.on(plugin.events.muteToggle.getName(), function() {
+                if (!mediapackageError) {
+                    var muted = Basil.get(storage_muted);
+                    if (muted == "true") {
+                        Engage.trigger(plugin.events.unmute.getName());
+                    } else {
+                        Engage.trigger(plugin.events.mute.getName());
+                    }
                 }
             });
             Engage.on(plugin.events.fullscreenChange.getName(), function() {
