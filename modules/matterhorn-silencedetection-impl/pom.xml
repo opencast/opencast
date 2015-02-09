@@ -14,7 +14,6 @@
   </parent>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
@@ -31,18 +30,11 @@
             <Import-Package>
               *;resolution:=optional
             </Import-Package>
-            <Private-Package>
-              org.gstreamer
-            </Private-Package>
             <Export-Package>
               org.opencastproject.silencedetection.impl.*;version=${project.version},
               org.opencastproject.silencedetection.endpoint.*;version=${project.version},
-              org.opencastproject.silencedetection.gstreamer.*;version=${project.version},
+              org.opencastproject.silencedetection.ffmpeg.*;version=${project.version},
             </Export-Package>
-            <Embed-Dependency>
-              gstreamer-java;inline=true,
-              jna;inline=true
-            </Embed-Dependency>
             <Service-Component>
               OSGI-INF/silence-detection-service.xml,
             </Service-Component>
@@ -86,19 +78,11 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.gstreamer-java</groupId>
-      <artifactId>gstreamer-java</artifactId>
-      <version>1.5</version>
-    </dependency>
-    <dependency>
-      <groupId>net.java.dev.jna</groupId>
-      <artifactId>jna</artifactId>
-      <version>3.2.4</version>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+
+    <!-- For testing -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -112,6 +96,11 @@
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

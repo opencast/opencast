@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
-import org.gstreamer.Gst;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -37,8 +36,7 @@ import org.opencastproject.silencedetection.api.MediaSegment;
 import org.opencastproject.silencedetection.api.MediaSegments;
 import org.opencastproject.silencedetection.api.SilenceDetectionFailedException;
 import org.opencastproject.silencedetection.api.SilenceDetectionService;
-import org.opencastproject.silencedetection.gstreamer.GstreamerSilenceDetector;
-import org.opencastproject.silencedetection.gstreamer.PipelineBuildException;
+import org.opencastproject.silencedetection.ffmpeg.FFmpegSilenceDetector;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
@@ -51,7 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of SilenceDetectionService using Gstreamer framework.
+ * Implementation of SilenceDetectionService using FFmpeg.
  */
 public class SilenceDetectionServiceImpl extends AbstractJobProducer implements SilenceDetectionService, ManagedService {
 
@@ -185,13 +183,8 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
    */
   protected MediaSegments runDetection(Track track) throws SilenceDetectionFailedException {
     try {
-      String filePath = workspace.get(track.getURI()).getAbsolutePath();
-      GstreamerSilenceDetector silenceDetector = new GstreamerSilenceDetector(properties, track.getIdentifier(), filePath);
-      silenceDetector.runDetection();
+      FFmpegSilenceDetector silenceDetector = new FFmpegSilenceDetector(properties, track, workspace);
       return silenceDetector.getMediaSegments();
-
-    } catch (PipelineBuildException ex) {
-      throw new SilenceDetectionFailedException("Unable to build detection Pipeline!");
     } catch (Exception ex) {
       throw new SilenceDetectionFailedException(ex.getMessage());
     }
@@ -241,8 +234,6 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
 
   protected void activate(ComponentContext context) {
     logger.debug("activating...");
-    Gst.setUseDefaultContext(true);
-    Gst.init();
   }
 
   protected void deactivate(ComponentContext context) {
