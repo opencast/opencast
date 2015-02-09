@@ -30,11 +30,19 @@ h1, h2, h3 {
 
 #engage_video {
     margin: 0 auto;
+    margin-top: 5px;
 }
 
 #engage_controls {
     width: 100%;
     height: 80px;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #999999;
+}
+
+#engage_controls_second {
+    width: 100%;
+    height: 43px;
     background-color: #FFFFFF;
     border-bottom: 1px solid #999999;
 }

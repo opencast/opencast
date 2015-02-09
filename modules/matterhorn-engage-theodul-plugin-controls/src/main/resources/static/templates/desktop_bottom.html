@@ -55,6 +55,7 @@
         <input id="navigation_time_current" type="text" value="00:00:00" /><span> / <span id="navigation_time_duration">00:00:00</span></span>
         <% } %>
     </div>
+    <% if((typeof controlsTop !== "undefined") && controlsTop) { %>
     <!-- ##### Logo ##### -->
     <div id="navigation_logo">
         <% if(typeof logoLink !== "undefined") { %>
@@ -67,27 +68,6 @@
     </div>
     <!-- ##### Navigation ##### -->
     <div id="menu">
-        <div class="btn-group">
-            <div class="btn-group">
-                <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_playbackRateButton %>">
-                <span class="glyphicon glyphicon-time"></span>
-                <span id="playbackRateIndicator">100%</span>
-                <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu">
-                    <li class="disabled" role="presentation"><a id="playbackDescription" role="menuitem" tabindex="-1" href="#"><b><%= str_playbackRate %></b> (<%= str_remainingTime %>)</a></li>
-                    <li class="divider"></li>
-                    <li role="presentation"><a id="playback050" role="menuitem" tabindex="-1" href="#"><b>50%</b> (<span id="playbackRemTime050"></span>)</a></li>
-                    <li role="presentation"><a id="playback075" role="menuitem" tabindex="-1" href="#"><b>75%</b> (<span id="playbackRemTime075"></span>)</a></li>
-                    <li role="presentation"><a id="playback100" role="menuitem" tabindex="-1" href="#"><b>100%</b> (<span id="playbackRemTime100"></span>)</a></li>
-                    <li role="presentation"><a id="playback125" role="menuitem" tabindex="-1" href="#"><b>125%</b> (<span id="playbackRemTime125"></span>)</a></li>
-                    <li role="presentation"><a id="playback150" role="menuitem" tabindex="-1" href="#"><b>150%</b> (<span id="playbackRemTime150"></span>)</a></li>
-                </ul>
-            </div>
-            <button id="fullscreen_button" type="button" class="btn btn-default disabled" role="button" aria-label="<%= str_fullscreen %>">
-            <span class="glyphicon glyphicon-fullscreen"></span>
-            </button>
-        </div>
         <div class="btn-group">
           <div class="btn-group">
             <button id="embed_button" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" aria-label="<%= str_embedButton %>">
@@ -127,6 +107,29 @@
 	</div>
         <% } %>
     </div>
+    <% } else { %>
+        <div id="dropdownControlsButtons" class="btn-group">
+            <div class="btn-group">
+                <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_playbackRateButton %>">
+                <span class="glyphicon glyphicon-time"></span>
+                <span id="playbackRateIndicator">100%</span>
+                <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li class="disabled" role="presentation"><a id="playbackDescription" role="menuitem" tabindex="-1" href="#"><b><%= str_playbackRate %></b> (<%= str_remainingTime %>)</a></li>
+                    <li class="divider"></li>
+                    <li role="presentation"><a id="playback050" role="menuitem" tabindex="-1" href="#"><b>50%</b> (<span id="playbackRemTime050"></span>)</a></li>
+                    <li role="presentation"><a id="playback075" role="menuitem" tabindex="-1" href="#"><b>75%</b> (<span id="playbackRemTime075"></span>)</a></li>
+                    <li role="presentation"><a id="playback100" role="menuitem" tabindex="-1" href="#"><b>100%</b> (<span id="playbackRemTime100"></span>)</a></li>
+                    <li role="presentation"><a id="playback125" role="menuitem" tabindex="-1" href="#"><b>125%</b> (<span id="playbackRemTime125"></span>)</a></li>
+                    <li role="presentation"><a id="playback150" role="menuitem" tabindex="-1" href="#"><b>150%</b> (<span id="playbackRemTime150"></span>)</a></li>
+                </ul>
+            </div>
+            <button id="fullscreen_button" type="button" class="btn btn-default disabled" role="button" aria-label="<%= str_fullscreen %>">
+            <span class="glyphicon glyphicon-fullscreen"></span>
+            </button>
+        </div>
+    <% } %>
 </div>
 <% } %>
 <!-- end Navigation -->

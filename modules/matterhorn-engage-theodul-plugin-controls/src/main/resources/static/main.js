@@ -22,6 +22,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var PLUGIN_TYPE = "engage_controls";
     var PLUGIN_VERSION = "1.0";
     var PLUGIN_TEMPLATE_DESKTOP = Engage.controls_top ? "templates/desktop_top.html" : "templates/desktop_bottom.html";
+    var PLUGIN_TEMPLATE_DESKTOP_TOP_IFBOTTOM = Engage.controls_top ? "" : "templates/desktop_top_ifbottom.html";
     var PLUGIN_TEMPLATE_EMBED = "templates/embed.html";
     var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
     var PLUGIN_STYLES_DESKTOP = [
@@ -114,6 +115,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 version: PLUGIN_VERSION,
                 styles: PLUGIN_STYLES_DESKTOP,
                 template: PLUGIN_TEMPLATE_DESKTOP,
+                template_topIfBottom: PLUGIN_TEMPLATE_DESKTOP_TOP_IFBOTTOM,
                 events: events
             };
             isDesktopMode = true;
@@ -136,6 +138,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var bootstrapPath = "lib/bootstrap/js/bootstrap";
     var jQueryUIPath = "lib/jqueryui/jquery-ui";
     var id_engage_controls = "engage_controls";
+    var id_engage_controls_topIfBottom = "engage_controls_second";
     var id_slider = "slider";
     var id_volume = "volume";
     var id_volumeIcon = "volumeIcon";
@@ -182,6 +185,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var event_slidestart = "slidestart";
     var event_slidestop = "slidestop";
     var plugin_path = "";
+    var plugin_path_topIfBottom = "";
     var initCount = 7;
     var isPlaying = false;
     var isSliding = false;
@@ -350,10 +354,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var ControlsView = Backbone.View.extend({
         el: $("#" + id_engage_controls), // every view has an element associated with it
         initialize: function(videoDataModel, template, plugin_path) {
-            this.setElement($(plugin.container)); // every plugin view has it"s own container associated with it
+            this.setElement($(plugin.container));
             this.model = videoDataModel;
             this.template = template;
             this.pluginPath = plugin_path;
+
             // bind the render function always to the view
             _.bindAll(this, "render");
             // listen for changes of the model and bind the render function to this
@@ -390,7 +395,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     loggedIn: false,
                     str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
                     str_loginLogout: translate("loginLogout", "Login/Logout"),
-                    str_fullscreen: translate("fullscreen", "Fullscreen")
+                    str_fullscreen: translate("fullscreen", "Fullscreen"),
+                    controlsTop: Engage.controls_top
                 };
 
                 // compile template and load into the html
@@ -430,6 +436,39 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     checkLoginStatus();
                 }
 
+            }
+        }
+    });
+
+    var ControlsViewTop_ifBottom = Backbone.View.extend({
+        el: $("#" + id_engage_controls_topIfBottom), // every view has an element associated with it
+        initialize: function(videoDataModel, template, plugin_path) {
+            this.setElement($(plugin.containerSecondIfBottom));
+            this.model = videoDataModel;
+            this.template = template;
+            this.pluginPath = plugin_path;
+
+            // bind the render function always to the view
+            _.bindAll(this, "render");
+            // listen for changes of the model and bind the render function to this
+            this.model.bind("change", this.render);
+            this.render();
+        },
+        render: function() {
+            if (!mediapackageError) {
+                var tempVars = {
+                    plugin_path: this.pluginPath,
+                    logoLink: logoLink,
+                    str_openMediaModule: translate("openMediaModule", "Go to Media Module"),
+                    str_embedButton: translate("embedButton", "Embed Button. Select embed size from dropdown."),
+                    str_fullscreen: translate("fullscreen", "Fullscreen"),
+                    loggedIn: false,
+                    str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
+                    str_loginLogout: translate("loginLogout", "Login/Logout")
+                };
+
+                // compile template and load into the html
+                this.$el.html(_.template(this.template, tempVars));
             }
         }
     });
@@ -753,6 +792,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if ((isDesktopMode || isMobileMode) && plugin.inserted) {
+            if (!Engage.controls_top && (plugin.template_topIfBottom != "")) {
+                var controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get("videoDataModel"), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
+            }
             var controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
                 if (as) {

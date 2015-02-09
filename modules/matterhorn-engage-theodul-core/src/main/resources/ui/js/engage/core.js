@@ -377,6 +377,31 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 }
             }
 
+            if (plugin.template_topIfBottom && plugin.template_topIfBottom !== "none") {
+                // load template asynchronously
+                $.get("engage/theodul/" + plugin_path + plugin.template_topIfBottom, function(template) {
+                    // empty data object
+                    var template_data = {};
+                    // add template if not undefined
+                    if (plugin.template_data_topIfBottom !== undefined) {
+                        template_data = plugin.template_data_topIfBottom;
+                    }
+                    // add full plugin path to the tmeplate data
+                    template_data.plugin_path = "engage/theodul/" + plugin_path;
+                    // process the template using underscore and set it in the plugin obj
+                    plugin.templateProcessed_topIfBottom = _.template(template, template_data);
+                    plugin.template_topIfBottom = template;
+                    plugin.pluginPath_topIfBottom = "engage/theodul/" + plugin_path;
+                    // plugin load done counter
+                    plugins_loaded[plugin_name] = true;
+                    // check if all plugins are ready
+                    if (checkAllPluginsloaded() === true) {
+                        engageCore.pluginView.allPluginsLoaded();
+                        // trigger done event
+                        engageCore.trigger(events.plugin_load_done.getName());
+                    }
+                });
+            }
             if (plugin.template !== "none") {
                 // load template asynchronously
                 $.get("engage/theodul/" + plugin_path + plugin.template, function(template) {
@@ -519,7 +544,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     MeInfoModel = new me();
                     // wait that me infos are loaded
                     var intv = window.setInterval(function() {
-                        if(MeInfoModel.ready()) {
+                        if (MeInfoModel.ready()) {
                             window.clearInterval(intv);
                             // switch view template and css rules for current player mode
                             // link tag for css file
@@ -530,7 +555,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             };
                             engageCore.controls_top = MeInfoModel.getPositionControls() == "top"; // bottom else
                             engageCore.log("Core: Position of the controls is " + (engageCore.controls_top ? "top" : "bottom"));
-                
+
                             // template obj
                             var core_template = "none";
                             // path to the require module with the view logic
