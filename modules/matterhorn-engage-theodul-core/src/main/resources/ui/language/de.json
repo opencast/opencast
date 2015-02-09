@@ -2,6 +2,7 @@
   "error":"Fehler",
   "error_unknown":"Ein Fehler ist aufgetreten. Bitte laden Sie die Seite erneut.",
   "reloadPage":"Seite neu laden",
+  "loginInformation":"Einloggen mit einem Matterhorn-Benutzerkonto",
   "login":"Einloggen",
   "enterUsernamePassword":"Bitte geben Sie ihren Benutzernamen und ihr Passwort ein:",
   "username":"Benutzername",

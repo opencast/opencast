@@ -262,7 +262,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             var password = "Password";
 
             Bootbox.dialog({
-                title: translate("login", "Log in"),
+                title: translate("loginInformation", "Log in"),
                 message: '<form class="form-signin">' +
                     '<h2 class="form-signin-heading">' + translate("enterUsernamePassword", "Please enter your username and password") + '</h2>' +
                     '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate("username", "Username") + '" required="true" autofocus="" />' +
