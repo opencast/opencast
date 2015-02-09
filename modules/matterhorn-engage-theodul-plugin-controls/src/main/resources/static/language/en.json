@@ -1,6 +1,7 @@
 {
     "value_locale": "en",
     "ok": "OK",
+    "loginInformation": "Log in with your Matterhorn user account",
     "login": "Log in",
     "logout": "Log out",
     "loginLogout": "Log in/Log out",
