@@ -35,7 +35,9 @@
                     <span class="icon-bar"></span>
                     </button>
                     <div class="navbar-brand">
-                        <img id="headerLogo" src="" class="img-responsive">
+                        <a href="#" id="mhlogolink">
+                            <img id="headerLogo" src="" class="img-responsive">
+                        </a>
                     </div>
                     <h1 class="navbar-brand">Media Module</h1>
                 </div>
@@ -57,27 +59,115 @@
                     </ul>
                     <form id="oc-search-form" class="navbar-form navbar-right" role="search" autocomplete="off">
                         <div class="btn-group">
-                            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Sorting <span class="caret"></span></button>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED_DESC" value="DATE_CREATED_DESC" checked="checked"><label for="DATE_CREATED_DESC">Recording Date (newer)</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED" value="DATE_CREATED"><label for="DATE_CREATED">Recording Date (older)</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED_DESC" value="DATE_PUBLISHED_DESC"><label for="DATE_PUBLISHED_DESC">Publishing Date (newer)</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED" value="DATE_PUBLISHED"><label for="DATE_PUBLISHED">Publishing Date (older)</label></li>
-                                <li class="divider"></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="TITLE" value="TITLE"><label for="TITLE">Title (A-Z)</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="TITLE_DESC" value="TITLE_DESC"><label for="TITLE_DESC">Title (Z-A)</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="CREATOR" value="CREATOR"><label for="CREATOR">Author (A-Z)</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="CREATOR_DESC" value="CREATOR_DESC"><label for="CREATOR_DESC">Author (Z-A)</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="CONTRIBUTOR" value="CONTRIBUTOR"><label for="CONTRIBUTOR">Contributor (A-Z)</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="CONTRIBUTOR_DESC" value="CONTRIBUTOR_DESC"><label for="CONTRIBUTOR_DESC">Contributor (Z-A)</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="PUBLISHER" value="PUBLISHER"><label for="PUBLISHER">Publisher (A-Z)</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="PUBLISHER_DESC" value="PUBLISHER_DESC"><label for="PUBLISHER_DESC">Publisher (Z-A)</label></li>
-                                <li class="divider"></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="SERIES_ID" value="SERIES_ID"><label for="SERIES_ID">Series</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="LANGUAGE" value="LANGUAGE"><label for="LANGUAGE">Language</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="LICENSE" value="LICENSE"><label for="LICENSE">License</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="SUBJECT" value="SUBJECT"><label for="SUBJECT">Subject</label></li>
-                                <li><input type="radio" class="oc-sort-dropdown" name="sort" id="DESCRIPTION" value="DESCRIPTION"><label for="DESCRIPTION">Description</label></li>
+                            <button id="buttonSorting" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-label="Sorting">
+                                Sorting
+                                <span class="caret"></span>
+                            </button>
+                            <ul id="dropdownMenuSorting" class="dropdown-menu" role="menu">
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED_DESC" value="DATE_CREATED_DESC" checked="checked">
+                                    <label for="DATE_CREATED_DESC">
+                                        Recording Date (newer)
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED" value="DATE_CREATED">
+                                    <label for="DATE_CREATED">
+                                        Recording Date (older)
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED_DESC" value="DATE_PUBLISHED_DESC">
+                                    <label for="DATE_PUBLISHED_DESC">
+                                        Publishing Date (newer)
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED" value="DATE_PUBLISHED">
+                                    <label for="DATE_PUBLISHED">
+                                        Publishing Date (older)
+                                    </label>
+                                </li>
+                                <li role="presentation" class="divider"></li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="TITLE" value="TITLE">
+                                    <label for="TITLE">
+                                        Title (A-Z)
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="TITLE_DESC" value="TITLE_DESC">
+                                    <label for="TITLE_DESC">
+                                        Title (Z-A)
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="CREATOR" value="CREATOR">
+                                    <label for="CREATOR">
+                                        Author (A-Z)
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="CREATOR_DESC" value="CREATOR_DESC">
+                                    <label for="CREATOR_DESC">
+                                        Author (Z-A)
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="CONTRIBUTOR" value="CONTRIBUTOR">
+                                    <label for="CONTRIBUTOR">
+                                        Contributor (A-Z)
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="CONTRIBUTOR_DESC" value="CONTRIBUTOR_DESC">
+                                    <label for="CONTRIBUTOR_DESC">
+                                        Contributor (Z-A)
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="PUBLISHER" value="PUBLISHER">
+                                    <label for="PUBLISHER">
+                                        Publisher (A-Z)
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="PUBLISHER_DESC" value="PUBLISHER_DESC">
+                                    <label for="PUBLISHER_DESC">
+                                        Publisher (Z-A)
+                                    </label>
+                                </li>
+                                <li role="presentation" class="divider"></li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="SERIES_ID" value="SERIES_ID">
+                                    <label for="SERIES_ID">
+                                        Series
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="LANGUAGE" value="LANGUAGE">
+                                    <label for="LANGUAGE">
+                                        Language
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="LICENSE" value="LICENSE">
+                                    <label for="LICENSE">
+                                        License
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="SUBJECT" value="SUBJECT">
+                                    <label for="SUBJECT">
+                                        Subject
+                                    </label>
+                                </li>
+                                <li role="presentation">
+                                    <input type="radio" class="oc-sort-dropdown" name="sort" id="DESCRIPTION" value="DESCRIPTION">
+                                    <label for="DESCRIPTION">
+                                        Description
+                                    </label>
+                                </li>
                             </ul>
                         </div>
                         <div class="form-group">

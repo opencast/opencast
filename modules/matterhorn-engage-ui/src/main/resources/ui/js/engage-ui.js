@@ -11,7 +11,7 @@ $(document).ready(function() {
     var visited = 1;
     var seriesRgbMax = new Array(220, 220, 220); //color range. 
     var seriesRgbOffset = new Array(20, 20, 20); //darkest possible color 
-    var title_enterUsernamePassword = "Login";
+    var title_enterUsernamePassword = "Login with your Matterhorn account";
     var placeholder_username = "Username";
     var placeholder_password = "Password";
     var placeholder_rememberMe = "Remember me";
@@ -50,6 +50,7 @@ $(document).ready(function() {
     var checkLoggedOut = false;
     var $more_content = "#more";
     var $no_more_content = "#no-more";
+    var id_mhlogolink = "mhlogolink";
 
     String.prototype.endsWith = function(suffix) {
         return this.indexOf(suffix, this.length - suffix.length) !== -1;
@@ -58,6 +59,7 @@ $(document).ready(function() {
     function initialize() {
         $.enableLogging(true);
 
+        $("#" + id_mhlogolink).attr("href", location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''));
         getInfo();
         registerHandler();
 
@@ -679,14 +681,15 @@ $(document).ready(function() {
     function generateSeriesColor(value) {
         var rgb = new Array(0, 0, 0);
 
-        for (i = 0; i < value.length; i++) {
+        for (var i = 0; i < value.length; ++i) {
             rgb[(i % 3)] += value.charCodeAt(i);
         }
 
-        for (i = 0; i < 3; i++) {
+        for (var i = 0; i < 3; ++i) {
             rgb[i] = ((rgb[i] % seriesRgbMax[i]) + seriesRgbOffset[i]).toString(16);
-            if (rgb[i].length < 1)
+            if (rgb[i].length < 1) {
                 rgb[i] = "0" + rgb[i];
+            }
         }
 
         return "#" + rgb[0] + rgb[1] + rgb[2];
