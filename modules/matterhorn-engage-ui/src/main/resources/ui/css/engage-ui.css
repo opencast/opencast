@@ -13,6 +13,10 @@
     margin-right: 20px;
 }
 
+#dropdownMenuSorting {
+    right: auto;
+}
+
 /* title */
 .navbar-default .navbar-brand {
     color: #000;
