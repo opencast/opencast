@@ -23,6 +23,7 @@ define(["jquery", "engage/core", "engage/models/engage", "engage/tab_logic"], fu
     var id_engage_timeline_plugin = "engage_timeline_plugin";
     var id_engage_timeline_expand_btn_img = "engage_timeline_expand_btn_img";
     var id_engage_controls = "engage_controls";
+    var id_engage_controls_secondIfBottom = "engage_controls_second"; // second container on top if controls are on the bottom
     var id_engage_video = "engage_video";
     var id_engage_tab = "engage_tab";
     var id_engage_tab_split1 = "engage_";
@@ -119,6 +120,7 @@ define(["jquery", "engage/core", "engage/models/engage", "engage/tab_logic"], fu
                 $("#" + id_engage_controls).html(plugin.templateProcessed);
                 plugin.inserted = true;
                 plugin.container = "#" + id_engage_controls;
+                plugin.containerSecondIfBottom = "#" + id_engage_controls_secondIfBottom;
                 break;
             case id_engage_video:
                 $("#" + id_engage_video).html(plugin.templateProcessed);
