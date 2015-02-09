@@ -22,7 +22,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var PLUGIN_TYPE = "engage_controls";
     var PLUGIN_VERSION = "1.0";
     var PLUGIN_TEMPLATE_DESKTOP = Engage.controls_top ? "templates/desktop_top.html" : "templates/desktop_bottom.html";
-    var PLUGIN_TEMPLATE_DESKTOP_TOP_IFBOTTOM = Engage.controls_top ? "" : "templates/desktop_top_ifbottom.html";
+    // provide this additional template if the controls are below the video to have content above the video
+    var PLUGIN_TEMPLATE_DESKTOP_TOP_IFBOTTOM = Engage.controls_top ? "none" : "templates/desktop_top_ifbottom.html";
     var PLUGIN_TEMPLATE_EMBED = "templates/embed.html";
     var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
     var PLUGIN_STYLES_DESKTOP = [
@@ -38,7 +39,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     ];
 
     var basilOptions = {
-        namespace: 'mhStorage'
+        namespace: "mhStorage"
     };
     Basil = new window.Basil(basilOptions);
 
@@ -440,6 +441,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         }
     });
 
+    // provide this additional view if the controls are below the video to have content above the video
     var ControlsViewTop_ifBottom = Backbone.View.extend({
         el: $("#" + id_engage_controls_topIfBottom), // every view has an element associated with it
         initialize: function(videoDataModel, template, plugin_path) {
@@ -792,7 +794,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if ((isDesktopMode || isMobileMode) && plugin.inserted) {
-            if (!Engage.controls_top && (plugin.template_topIfBottom != "")) {
+            if (!Engage.controls_top && plugin.template_topIfBottom && (plugin.template_topIfBottom != "none")) {
                 var controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get("videoDataModel"), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
             }
             var controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);

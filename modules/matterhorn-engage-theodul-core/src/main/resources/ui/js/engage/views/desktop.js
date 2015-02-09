@@ -23,7 +23,7 @@ define(["jquery", "engage/core", "engage/models/engage", "engage/tab_logic"], fu
     var id_engage_timeline_plugin = "engage_timeline_plugin";
     var id_engage_timeline_expand_btn_img = "engage_timeline_expand_btn_img";
     var id_engage_controls = "engage_controls";
-    var id_engage_controls_secondIfBottom = "engage_controls_second"; // second container on top if controls are on the bottom
+    var id_engage_controls_secondIfBottom = "engage_controls_second"; // second container for controls above the video if player controls are below
     var id_engage_video = "engage_video";
     var id_engage_tab = "engage_tab";
     var id_engage_tab_split1 = "engage_";
