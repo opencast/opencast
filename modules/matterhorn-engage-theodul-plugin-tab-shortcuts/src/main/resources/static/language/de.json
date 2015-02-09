@@ -10,7 +10,7 @@
   "playbackrateIncrease":"Wiedergaberate verringern",
   "seekLeft":"Ein paar Sekunden in die Vergangenheit springen",
   "seekRight":"Ein paar Sekunden in die Zukunft springen",
-  "mute":"Stummschalten",
+  "muteToggle":"Stummschaltung ein\/aus",
   "volDown":"Lautstärke senken",
   "volUp":"Lautstärke erhöhen",
   "fullscreenEnable":"Vollbild aktivieren",

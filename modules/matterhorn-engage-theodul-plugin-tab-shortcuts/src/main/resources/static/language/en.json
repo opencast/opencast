@@ -10,7 +10,7 @@
     "playbackrateIncrease": "Increase playback rate",
     "seekLeft": "Seek a few seconds to the past",
     "seekRight": "Seek a few seconds to the future",
-    "mute": "Mute",
+    "muteToggle": "Toggle mute",
     "volDown": "Volume down",
     "volUp": "Volume up",
     "fullscreenEnable": "Go into fullscreen",

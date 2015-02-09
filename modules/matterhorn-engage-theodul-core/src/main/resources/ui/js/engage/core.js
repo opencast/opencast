@@ -26,7 +26,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         seek: new EngageEvent("Video:seek", "seek video to a given position in seconds", "trigger"),
         previousChapter: new EngageEvent("Video:previousChapter", "", "trigger"),
         playPause: new EngageEvent("Video:playPause", "", "trigger"),
-        mute: new EngageEvent("Video:mute", "", "trigger"),
+        muteToggle: new EngageEvent("Video:muteToggle", "", "trigger"),
         volumeUp: new EngageEvent("Video:volumeUp", "", "trigger"),
         volumeDown: new EngageEvent("Video:volumeDown", "", "trigger"),
         customSuccess: new EngageEvent("Notification:customSuccess", "a custom success message", "trigger"),
@@ -91,7 +91,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var shortcut_seekRight = "seekRight";
     var shortcut_playbackrateIncrease = "playbackrateIncrease";
     var shortcut_playbackrateDecrease = "playbackrateDecrease";
-    var shortcut_mute = "mute";
+    var shortcut_muteToggle = "muteToggle";
     var shortcut_volDown = "volDown";
     var shortcut_volUp = "volUp";
     var shortcut_fullscreenEnable = "fullscreenEnable";
@@ -319,9 +319,9 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         engageCore.trigger(events.playPause.getName());
                     });
                     break;
-                case shortcut_mute:
+                case shortcut_muteToggle:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.mute.getName());
+                        engageCore.trigger(events.muteToggle.getName());
                     });
                     break;
                 case shortcut_volDown:
