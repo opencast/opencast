@@ -27,6 +27,38 @@ public final class RequireUtil {
   }
 
   /**
+   * Require an expression to hold true.
+   *
+   * @param expr
+   *          the expression
+   * @param exprName
+   *          the name of the expression used to create an error message in case <code>expr</code> evaluates to false
+   * @throws IllegalArgumentException
+   *          in case <code>expr</code> evaluates to false
+   */
+  public static void requireTrue(boolean expr, String exprName) {
+    if (!expr) {
+      throw new IllegalArgumentException("Requirement '" + exprName + "' must hold true");
+    }
+  }
+
+  /**
+   * Require an expression to be false.
+   *
+   * @param expr
+   *         the expression
+   * @param exprName
+   *         the name of the expression used to create an error message in case <code>expr</code> evaluates to false
+   * @throws IllegalArgumentException
+   *         in case <code>expr</code> evaluates to true
+   */
+  public static void requireFalse(boolean expr, String exprName) {
+    if (expr) {
+      throw new IllegalArgumentException("Requirement '" + exprName + "' must be false");
+    }
+  }
+
+  /**
    * The given value must not be null.
    * <p/>
    * Example:
@@ -81,6 +113,22 @@ public final class RequireUtil {
   public static String notEmpty(String value, String valueName) {
     if (StringUtils.isEmpty(value))
       throw new IllegalArgumentException(valueName + " must not be null or empty");
+    return value;
+  }
+
+  /**
+   * The given string value must not be blank, empty nor {@code null}. Otherwise, an {@link IllegalArgumentException} is
+   * thrown.
+   * 
+   * @param value
+   *          the value to check for not being empty
+   * @param valueName
+   *          the name of the value
+   * @return the value, if not blank
+   */
+  public static String requireNotBlank(String value, String valueName) {
+    if (StringUtils.isBlank(value))
+      throw new IllegalArgumentException(valueName + " must not be null or blank");
     return value;
   }
 

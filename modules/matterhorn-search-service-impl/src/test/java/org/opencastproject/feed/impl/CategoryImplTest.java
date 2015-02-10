@@ -15,11 +15,10 @@
  */
 package org.opencastproject.feed.impl;
 
-import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class CategoryImplTest {
@@ -63,7 +62,7 @@ public class CategoryImplTest {
     public void testSetName() {
         String name = "name";
         instance.setName(name);
-        Assert.assertEquals(instance.getName(),name);
+        assertEquals(instance.getName(),name);
     }
 
     /**
@@ -73,6 +72,6 @@ public class CategoryImplTest {
     public void testSetTaxonomyUri() {
         String taxonomyUri = "uri";
         instance.setTaxonomyUri(taxonomyUri);
-        Assert.assertEquals(instance.getTaxonomyUri(), taxonomyUri);
+        assertEquals(instance.getTaxonomyUri(), taxonomyUri);
     }
 }

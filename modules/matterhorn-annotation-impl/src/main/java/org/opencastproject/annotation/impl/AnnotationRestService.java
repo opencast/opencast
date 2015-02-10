@@ -15,7 +15,9 @@
  */
 package org.opencastproject.annotation.impl;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import org.opencastproject.annotation.api.Annotation;
 import org.opencastproject.annotation.api.AnnotationService;

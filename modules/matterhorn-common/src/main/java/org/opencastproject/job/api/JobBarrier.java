@@ -254,7 +254,8 @@ public final class JobBarrier {
                   break;
               }
             } catch (NotFoundException e) {
-              logger.warn("Error polling job {}: Not found!");
+              logger.warn("Error polling job {}: Not found!", job);
+              finishedJobs.put(job, Job.Status.DELETED);
               pollingException = e;
               break;
             } catch (ServiceRegistryException e) {
