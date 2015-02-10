@@ -21,8 +21,8 @@ Module Configuration
 --------------------
 
  - YouTube Publication Configuration
- - [Text Extraction Configuration](textextraction.md)
- - [Video Segmentation Configuration](videosegmentation.md)
+ - [Text Extraction Configuration](modules/textextraction.md)
+ - [Video Segmentation Configuration](modules/videosegmentation.md)
 
 
 Additional Documentation
