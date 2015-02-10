@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    var debug = false;
     var restEndpoint = "/search/";
     var mediaContainer = '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">';
     var playerEndpoint = "";
@@ -52,6 +53,12 @@ $(document).ready(function() {
     var $no_more_content = "#no-more";
     var id_mhlogolink = "mhlogolink";
 
+    function log(args) {
+	if(debug && window.console) {
+	    console.log(args);
+	}
+    }
+
     String.prototype.endsWith = function(suffix) {
         return this.indexOf(suffix, this.length - suffix.length) !== -1;
     };
@@ -66,7 +73,7 @@ $(document).ready(function() {
         var retrievedObject = sessionStorage.getItem("historyStack");
         if (retrievedObject != null) {
             stack = JSON.parse(retrievedObject);
-            $.log("Retrieved history stack from session storage");
+            log("Retrieved history stack from session storage");
         } else {
             stack.push({
                 "page": 1,
@@ -84,7 +91,7 @@ $(document).ready(function() {
     }
 
     function endlessScrolling() {
-        $.log("init endless scrolling");
+        log("init endless scrolling");
         $(window).scroll(function() {
             $($more_content).hide();
             $($no_more_content).hide();
@@ -106,7 +113,7 @@ $(document).ready(function() {
                     $($no_more_content).show();
                     $($next).addClass("disabled");
                 } else {
-                    $.log("loading data");
+                    log("loading data");
                     if (active == "series") {
                         loadSeries(false);
                     } else {
@@ -273,7 +280,7 @@ $(document).ready(function() {
             url: infoMeURL,
             dataType: "json",
             success: function(data) {
-                $.log("User information loaded");
+                log("User information loaded");
 
                 if (data) {
                     if (data.roles && (data.roles.length > 0)) {
@@ -288,20 +295,20 @@ $(document).ready(function() {
                                 window.location = springSecurityLogoutURL;
                             }
                             $($nav_logoutLink).click(logout);
-                            $.log("User is not anonymous");
+                            log("User is not anonymous");
                             if (data.username) {
-                                $.log("Username found: " + data.username);
+                                log("Username found: " + data.username);
                                 setUsername(data.username);
                             } else {
-                                $.log("Username not found");
+                                log("Username not found");
                             }
                         } else {
                             checkLoggedOut = false;
-                            $.log("User is anonymous");
+                            log("User is anonymous");
                             resetAnonymousUser();
                         }
                     } else {
-                        $.log("Error: No role");
+                        log("Error: No role");
                         resetAnonymousUser();
                     }
                     if (data.org && data.org.properties) {
@@ -314,12 +321,12 @@ $(document).ready(function() {
 
                         playerEndpoint = player;
                     } else {
-                        $.log("Error: No info data received.");
+                        log("Error: No info data received.");
                         resetAnonymousUser();
                     }
                 }
 
-                $.log("Chosen player: " + player);
+                log("Chosen player: " + player);
             }
         })
     }
@@ -428,11 +435,11 @@ $(document).ready(function() {
         });
 
         $($oc_sort_dropdown).on("change", function() {
-            $.log("submiting");
+            log("submiting");
             $($oc_search_form).submit();
         });
 
-        $.log("Handler registered");
+        log("Handler registered");
     }
 
     function loadEpisodes(cleanGrid) {
@@ -454,7 +461,7 @@ $(document).ready(function() {
                     var total = data["search-results"]["total"];
                     totalEntries = total;
                     if (data["search-results"] == undefined || total == undefined) {
-                        $.log("Error: Search results (total) undefined");
+                        log("Error: Search results (total) undefined");
                         $($main_container).append(msg_html_sthWentWrong);
                         return;
                     };
@@ -496,7 +503,7 @@ $(document).ready(function() {
             var serID = data["id"];
 
             if (data["id"] == undefined) {
-                $.log("Error: Episode with no ID.")
+                log("Error: Episode with no ID.")
                 serID = "0";
             };
 
@@ -625,9 +632,9 @@ $(document).ready(function() {
             $("." + seriesClass).css({
                 'background': color
             });
-            $.log("Series Color: " + seriesClass + " " + color);
+            log("Series Color: " + seriesClass + " " + color);
         } else {
-            $.log("Error: Data for creating series grid is empty.");
+            log("Error: Data for creating series grid is empty.");
         }
     }
 
