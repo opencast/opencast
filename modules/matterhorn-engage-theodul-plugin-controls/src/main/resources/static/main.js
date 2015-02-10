@@ -192,7 +192,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var initCount = 7;
     var isPlaying = false;
     var isSliding = false;
-    var isMute = false;
     var duration;
     var usingFlash = false;
     var isAudioOnly = false;
@@ -406,36 +405,24 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 this.$el.html(_.template(this.template, tempVars));
                 if (isDesktopMode) {
                     initControlsEvents();
-
                     if (aspectRatioTriggered) {
                         calculateEmbedAspectRatios();
                         addEmbedRatioEvents();
                     }
-
                     ready();
                     playPause();
-                    mute();
                     timeUpdate();
                     // init dropdown menus
                     $("." + class_dropdown).dropdown();
-
                     addNonFlashEvents();
-
                     checkLoginStatus();
                 } else if (isMobileMode) {
-
                     initControlsEvents();
                     initMobileEvents();
-
                     ready();
                     playPause();
-                    mute();
                     timeUpdate();
-                    // init dropdown menus
-                    //$("." + class_dropdown).dropdown();
-
                     addNonFlashEvents();
-
                     checkLoginStatus();
                 }
 
@@ -603,7 +590,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
 
             $("#" + id_volumeIcon).click(function() {
-                if (isMute) {
+                var isMute = Basil.get(storage_muted);
+                if (isMute == "true") {
                     Engage.trigger(plugin.events.unmute.getName());
                     Basil.set(storage_muted, "false");
                 } else {
@@ -654,7 +642,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
             // volume event
             $("#" + id_volume).on(event_slidestop, function(event, ui) {
-                Engage.trigger(plugin.events.unmute.getName());
+                Engage.trigger(plugin.events.volumeSet.getName(), ui.value / 100);
             });
 
             if (segments && (segments.length > 0)) {
@@ -700,7 +688,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
      * getVolume
      */
     function getVolume() {
-        if (isMute) {
+        var isMute = Basil.get(storage_muted);
+        if (isMute == "true") {
             return 0;
         } else {
             var vol = $("#" + id_volume).slider("option", "value");
@@ -757,19 +746,19 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     }
 
     function mute() {
-        if (isMute) {
-            $("#" + id_unmute_button).hide();
-            $("#" + id_mute_button).show();
-            Engage.trigger(plugin.events.volumeSet.getName(), 0);
+        $("#" + id_unmute_button).hide();
+        $("#" + id_mute_button).show();
+        Engage.trigger(plugin.events.volumeSet.getName(), 0);
+    }
+
+    function unmute() {
+        $("#" + id_unmute_button).show();
+        $("#" + id_mute_button).hide();
+        var vol = Basil.get(storage_lastvolume);
+        if (vol) {
+            Engage.trigger(plugin.events.volumeSet.getName(), vol / 100);
         } else {
-            $("#" + id_unmute_button).show();
-            $("#" + id_mute_button).hide();
-            var vol = Basil.get(storage_lastvolume);
-            if (vol) {
-                Engage.trigger(plugin.events.volumeSet.getName(), vol / 100);
-            } else {
-                Engage.trigger(plugin.events.volumeSet.getName(), 1);
-            }
+            Engage.trigger(plugin.events.volumeSet.getName(), 1);
         }
     }
 
@@ -835,15 +824,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
             Engage.on(plugin.events.volumeSet.getName(), function(volume) {
                 $("#" + id_volume).slider("value", volume * 100);
-                if((volume * 100) > 1) {
+                if ((volume * 100) > 1) {
                     Basil.set(storage_lastvolume, volume * 100);
                 }
                 Basil.set(storage_volume, volume * 100);
                 if (volume > 0) {
-                    isMute = false;
                     Basil.set(storage_muted, "false");
                 } else {
-                    isMute = true;
                     Basil.set(storage_muted, "true");
                 }
             });
@@ -851,20 +838,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 var vol = getVolume();
                 if ((vol + volUpDown) <= 100) {
                     Engage.trigger(plugin.events.volumeSet.getName(), (vol + volUpDown) / 100);
-                    mute();
                 } else {
                     Engage.trigger(plugin.events.volumeSet.getName(), 1);
-                    mute();
                 }
+                unmute();
             });
             Engage.on(plugin.events.volumeDown.getName(), function(audio) {
                 var vol = getVolume();
                 if ((vol - volUpDown) > 0) {
                     Engage.trigger(plugin.events.volumeSet.getName(), (vol - volUpDown) / 100);
-                    mute();
+                    unmute();
                 } else {
-                    isMute = true;
-                    mute();
+                    Engage.trigger(plugin.events.mute.getName());
                 }
             });
             Engage.on(plugin.events.ready.getName(), function() {
@@ -888,14 +873,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
             Engage.on(plugin.events.mute.getName(), function() {
                 if (!mediapackageError) {
-                    isMute = true;
                     mute();
                 }
             });
             Engage.on(plugin.events.unmute.getName(), function() {
                 if (!mediapackageError) {
-                    isMute = false;
-                    mute();
+                    unmute();
                 }
             });
             Engage.on(plugin.events.muteToggle.getName(), function() {
