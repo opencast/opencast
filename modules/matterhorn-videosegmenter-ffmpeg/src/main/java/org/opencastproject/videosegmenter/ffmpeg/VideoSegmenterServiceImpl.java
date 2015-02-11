@@ -56,6 +56,7 @@ import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,6 +137,14 @@ VideoSegmenterService, ManagedService {
     this.binary = FFMPEG_BINARY_DEFAULT;
   }
 
+
+  public void activate(ComponentContext cc) {
+    /* Configure segmenter */
+    final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG);
+    this.binary = path == null ? FFMPEG_BINARY_DEFAULT : path;
+    logger.debug("Configuration {}: {}", FFMPEG_BINARY_CONFIG, FFMPEG_BINARY_DEFAULT);
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -144,6 +153,9 @@ VideoSegmenterService, ManagedService {
   @SuppressWarnings("unchecked")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
+    if (properties == null) {
+      return;
+    }
     logger.debug("Configuring the videosegmenter");
 
     // Stability threshold
@@ -278,8 +290,8 @@ VideoSegmenterService, ManagedService {
       } else {
         long starttime = 0;
         long endtime = 0;
+        Pattern pattern = Pattern.compile("pts_time\\:\\d+");
         for (String seginfo : segmentsStrings) {
-          Pattern pattern = Pattern.compile("pts_time\\:\\d+");
           Matcher matcher = pattern.matcher(seginfo);
           String time = "0";
           while (matcher.find()) {

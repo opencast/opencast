@@ -69,6 +69,7 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -84,9 +85,6 @@
               org.opencastproject.videosegmenter.impl;version=${project.version},
               org.opencastproject.videosegmenter.impl.endpoint;version=${project.version}
             </Export-Package>
-            <Embed-Dependency>
-              jmf;inline=true
-            </Embed-Dependency>
             <Import-Package>
               *;resolution:=optional
             </Import-Package>
