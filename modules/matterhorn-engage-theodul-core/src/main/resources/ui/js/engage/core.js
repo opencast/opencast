@@ -105,6 +105,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     };
     Basil = new window.Basil(basilOptions);
 
+    // Before jQueryMobile init
+    $( document ).on("mobileinit", function() {
+            $.mobile.autoInitializePage = false;
+            $.mobile.defaultPageTransition = "flow";
+            $.mobile.orientationChangeEnabled = false;
+    });
+
     function browserSupported() {
         if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
             // console.log("Core: User setting - Support unsupported browser: " + Basil.get("overrideBrowser"));
@@ -702,7 +709,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             $("#" + id_browserWarning).show();
                             $("#" + id_btn_tryAnyway).click(function(e) {
                                 e.preventDefault();
-                                window.open(window.location.href + "&browser=all");
+                                window.open(window.location.href + "&browser=all", "_self");
                             });
                         }
                     }, loadingDelay2);
