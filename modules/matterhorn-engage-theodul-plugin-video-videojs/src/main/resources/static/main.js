@@ -257,14 +257,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     Basil = new window.Basil(basilOptions);
 
     function acceptFormat(track) {
-        // TODO: throws a SyntaxError: JSON.parse: unexpected character at line 1 column 1 of the JSON data [basil.js:68]
-        /*
         var preferredFormat = Basil.get("preferredFormat");
-        if ((Utils.preferredFormat(preferredFormat) == null) || (mimetypes.indexOf(Utils.preferredFormat(preferredFormat)) == -1)) {
-            return true; // preferred format is not available, accept all
+        if (preferredFormat && (preferredFormat != null)) {
+            var preferredFormat_checked = Utils.preferredFormat(preferredFormat);
+            // preferred format is not available
+            if ((preferredFormat_checked == null) || (mimetypes.indexOf(preferredFormat_checked) == -1)) {
+                return true; // accept all
+            }
+            return track.mimetype == preferredFormat_checked;
         }
-        return track.mimetype == Utils.preferredFormat(preferredFormat);
-	*/
         return true;
     }
 
