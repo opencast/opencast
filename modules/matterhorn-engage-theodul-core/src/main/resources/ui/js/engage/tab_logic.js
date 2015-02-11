@@ -155,12 +155,19 @@ define(["jquery", "bootstrap", "engage/core"], function($, Bootstrap, Engage) {
 
         var addBootstrapTabClickBehaviour = function(selector) {
             // click listener to change tab
-            Engage.log('TabLogic: Adding click behaviour to tabs');
+            Engage.log('TabLogic: Adding click and enter behaviour to tabs');
             $('#' + selector + ' a').click(function(e) {
                 e.preventDefault();
                 $(this).tab('show');
                 saveBootstrapActiveTab($(this).parent());
-            });
+            }).keypress(function (e) {
+		var key = e.which;
+		// enter
+		if(key == 13) {
+		    $(this).click();
+		    return false;  
+		}
+	    }); 
         };
 
         var saveBootstrapActiveTab = function(tab) {
