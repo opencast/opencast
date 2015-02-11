@@ -10,6 +10,7 @@ $(document).ready(function() {
     var active = "episodes";
     var stack = new Array();
     var visited = 1;
+    var tabIndexNumber = 100;
     var seriesRgbMax = new Array(220, 220, 220); //color range. 
     var seriesRgbOffset = new Array(20, 20, 20); //darkest possible color 
     var title_enterUsernamePassword = "Login with your Matterhorn account";
@@ -113,6 +114,7 @@ $(document).ready(function() {
                     $($next).addClass("disabled");
                 } else {
                     log("loading data");
+                    $($more_content).show();
                     if (active == "series") {
                         loadSeries(false);
                     } else {
@@ -353,6 +355,34 @@ $(document).ready(function() {
             }
             $(".navbar-collapse").collapse('hide');
         });
+        
+        $($nav_switch_li).on("keypress", function(ev) {
+            if (ev.which == 13 || ev.which == 32) {
+                $($nav_switch_li).removeClass("active");
+                $(this).addClass("active");
+
+                restData = "";
+                $("input").val("");
+
+                switch ($(this).attr("data-search")) {
+                    case "episodes":
+                        active = "episodes";
+                        page = 1;
+                        pushHistory(1, "episodes", null);
+                        loadEpisodes(true);
+                        break;
+                    case "series":
+                        active = "series";
+                        page = 1;
+                        pushHistory(1, "series", null);
+                        loadSeries(true);
+                        break;
+                    default:
+                        break;
+                }
+                $(".navbar-collapse").collapse('hide');                
+            }
+        });      
 
         /* pagination */
         $($next).on("click", function() {
@@ -360,11 +390,8 @@ $(document).ready(function() {
                 return;
             };
 
-            var cleanGrid = false;
-
             if ($(this).hasClass("last")) {
                 page = Math.floor(totalEntries / bufferEntries);
-                cleanGrid = true;
             } else {
                 page++;
             }
@@ -375,12 +402,38 @@ $(document).ready(function() {
 
             if (active == "series") {
                 pushHistory(page, "series", restData);
-                loadSeries(cleanGrid);
+                loadSeries(true);
             } else if (active == "episodes") {
                 pushHistory(page, "episodes", restData);
-                loadEpisodes(cleanGrid);
+                loadEpisodes(true);
             };
 
+        });
+        
+        $($next).on("keypress", function(ev) {
+            if (ev.which == 13 || ev.which == 32) {
+                if ($(this).hasClass("disabled")) {
+                    return;
+                };
+
+                if ($(this).hasClass("last")) {
+                    page = Math.floor(totalEntries / bufferEntries);
+                } else {
+                    page++;
+                }
+
+                if (page > 1) {
+                    $($previous).removeClass("disabled");
+                };
+
+                if (active == "series") {
+                    pushHistory(page, "series", restData);
+                    loadSeries(true);
+                } else if (active == "episodes") {
+                    pushHistory(page, "episodes", restData);
+                    loadEpisodes(true);
+                };                
+            }   
         });
 
         $($previous).on("click", function() {
@@ -406,6 +459,32 @@ $(document).ready(function() {
                 loadEpisodes(true);
             };
         });
+
+        $($previous).on("keypress", function(ev) {
+            if (ev.which == 13 || ev.which == 32) {
+                if ($(this).hasClass("disabled")) {
+                    return;
+                };
+
+                if ($(this).hasClass("first")) {
+                    page = 1;
+                } else {
+                    --page;
+                }
+
+                if (page == 1) {
+                    $(this).addClass("disabled");
+                };
+
+                if (active == "series") {
+                    pushHistory(page, "series", restData);
+                    loadSeries(true);
+                } else if (active == "episodes") {
+                    pushHistory(page, "episodes", restData);
+                    loadEpisodes(true);
+                };
+            }
+        });        
 
         /* handle search input */
         $($oc_search_form).submit(function(event) {
@@ -449,6 +528,7 @@ $(document).ready(function() {
                 if (cleanGrid) {
                     $($main_container).empty();
                     window.scrollTo(0, 0);
+                    tabIndexNumber = 100;
                 }
 
                 if (data && data["search-results"] && data["search-results"]["total"]) {
@@ -505,7 +585,7 @@ $(document).ready(function() {
                 seriesClass = "series" + data.mediapackage.series + " ";
             }
 
-            var tile = mediaContainer + "<div class=\"tile\" id=\"" + serID + "\">" +
+            var tile = mediaContainer + "<div class=\"tile\" id=\"" + serID + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\">" +
                 "<div class=\"" + seriesClass + "seriesindicator \"/> " +
                 "<div class=\"tilecontent\">";
 
@@ -568,6 +648,12 @@ $(document).ready(function() {
                     $(location).attr("href", playerEndpoint + data["id"]);
                 });
 
+                $("#" + data["id"]).on("keypress", function(ev) {
+                    if (ev.which == 13 || ev.which == 32) {
+                        $(location).attr("href", playerEndpoint + data["id"]);
+                    }
+                });                
+
                 if (data.mediapackage.seriestitle) {
                     var color = generateSeriesColor(data.mediapackage.series);
                     $("." + seriesClass).css({
@@ -592,7 +678,7 @@ $(document).ready(function() {
             var creator = "<br>";
             var contributor = "<br>";
 
-            var tile = mediaContainer + "<div class=\"tile\" id=\"" + data.id + "\"> " +
+            var tile = mediaContainer + "<div class=\"tile\" id=\"" + data.id + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\"> " +
                 "<div class=\"" + seriesClass + "seriesindicator \"/> " +
                 "<div class=\"tilecontent\">";
 
@@ -621,6 +707,18 @@ $(document).ready(function() {
                 pushHistory(1, "episodes", restData);
                 loadEpisodes(true);
             });
+            
+            $("#" + data.id).on("keypress", function(ev) {
+                if (ev.which == 13 || ev.which == 32) {
+                    restData = "sid=" + data.id;
+                    page = 1;
+                    active = "episodes";
+                    $($navbarEpisodes).addClass("active");
+                    $($navbarSeries).removeClass("active");
+                    pushHistory(1, "episodes", restData);
+                    loadEpisodes(true);
+                }
+            });            
 
             $("." + seriesClass).css({
                 'background': color
@@ -641,6 +739,7 @@ $(document).ready(function() {
                     if (cleanGrid) {
                         $($main_container).empty();
                         window.scrollTo(0, 0);
+                        tabIndexNumber=100;
                     }
 
                     var total = data2["search-results"]["total"];
