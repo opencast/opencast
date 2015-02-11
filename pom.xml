@@ -88,6 +88,24 @@
         <module>modules/matterhorn-workflow-service-impl</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
+        <module>modules/matterhorn-capture-workflowoperation</module>
+        <module>modules/matterhorn-composer-workflowoperation</module>
+        <module>modules/matterhorn-deprecated-workflowoperation</module>
+        <module>modules/matterhorn-distribution-workflowoperation</module>
+        <module>modules/matterhorn-episode-workflowoperation</module>
+        <module>modules/matterhorn-holdstate-workflowoperation</module>
+        <module>modules/matterhorn-incident-workflowoperation</module>
+        <module>modules/matterhorn-ingest-workflowoperation</module>
+        <module>modules/matterhorn-inspection-workflowoperation</module>
+        <module>modules/matterhorn-notification-workflowoperation</module>
+        <module>modules/matterhorn-scheduler-workflowoperation</module>
+        <module>modules/matterhorn-search-workflowoperation</module>
+        <module>modules/matterhorn-sox-workflowoperation</module>
+        <module>modules/matterhorn-speech-recognition-workflowoperation</module>
+        <module>modules/matterhorn-textanalyzer-workflowoperation</module>
+        <module>modules/matterhorn-videoeditor-workflowoperation</module>
+        <module>modules/matterhorn-videosegmenter-workflowoperation</module>
+        <module>modules/matterhorn-workflow-workflowoperation</module>
       </modules>
     </profile>
 
@@ -1024,7 +1042,8 @@
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
     </plugins>
-    <!-- This defines the global plugin configurations.  Plugins with configuration shared across multiple child poms should be configured here, and then referenced in the child. -->
+    <!-- This defines the global plugin configurations.  Plugins with configuration shared across multiple child poms
+         should be configured here, and then referenced in the child. -->
     <pluginManagement>
       <plugins>
         <!-- Fix eclipse (indigo) maven integration -->
@@ -1083,7 +1102,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.3.2</version>
+          <version>3.2</version>
           <configuration>
             <source>1.6</source>
             <target>1.6</target>
@@ -1092,13 +1111,13 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>2.1.2</version>
+          <version>2.4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <!-- NOTE: this should match the settings for the reporting plugin below -->
-          <version>2.6.1</version>
+          <version>2.10.1</version>
           <configuration>
             <!-- <aggregate>true</aggregate> -->
             <!-- <detectLinks>true</detectLinks> -->
@@ -1134,47 +1153,47 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.6</version>
+          <version>2.18</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.6</version>
+          <version>2.13</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.6</version>
+          <version>1.7</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.9</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.3</version>
+          <version>3.4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-eclipse-plugin</artifactId>
-          <version>2.7</version>
+          <version>2.9</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
-          <version>2.4.2</version>
+          <version>2.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.2-beta-2</version>
+          <version>2.5.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>2.4.3</version>
+          <version>2.7</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -1209,7 +1228,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
-          <version>3.0.1</version>
+          <version>3.3</version>
           <configuration>
             <!--<includeTests>true</includeTests>-->
             <typeResolution>true</typeResolution>
@@ -1242,25 +1261,25 @@
       <dependency>
         <groupId>org.apache.mina</groupId>
         <artifactId>mina-core</artifactId>
-        <version>2.0.0-M6</version>
+        <version>2.0.9</version>
       </dependency>
 
       <dependency>
         <groupId>org.apache.mina</groupId>
         <artifactId>mina-integration-beans</artifactId>
-        <version>2.0.0-M6</version>
+        <version>2.0.9</version>
       </dependency>
 
       <dependency>
         <groupId>org.apache.mina</groupId>
         <artifactId>mina-integration-jmx</artifactId>
-        <version>2.0.0-M6</version>
+        <version>2.0.9</version>
       </dependency>
 
       <dependency>
         <groupId>org.apache.mina</groupId>
         <artifactId>mina-integration-ognl</artifactId>
-        <version>2.0.0-M6</version>
+        <version>2.0.9</version>
       </dependency>
 
       <dependency>
@@ -1361,7 +1380,7 @@
       <dependency>
         <groupId>javax.mail</groupId>
         <artifactId>mail</artifactId>
-        <version>1.4.1</version>
+        <version>1.4.7</version>
       </dependency>
 
       <dependency>
@@ -1574,13 +1593,20 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore-osgi</artifactId>
-        <version>4.2.4</version>
+        <version>4.3.3</version>
       </dependency>
 
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient-osgi</artifactId>
-        <version>4.2.5</version>
+        <version>4.3.6</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <scope>test</scope>
+        <version>3.3</version>
       </dependency>
 
       <dependency>
@@ -1668,7 +1694,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.3</version>
+        <version>2.6</version>
       </dependency>
 
       <dependency>
@@ -2207,7 +2233,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <!-- NOTE: this should match the settings for the build plugin above -->
-        <version>2.6.1</version>
+        <version>2.10.1</version>
         <configuration>
           <!-- <aggregate>true</aggregate> -->
           <!-- <detectLinks>true</detectLinks> -->
@@ -2310,7 +2336,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>3.3</version>
         <configuration>
           <aggregate>true</aggregate>
           <!--<includeTests>true</includeTests>-->

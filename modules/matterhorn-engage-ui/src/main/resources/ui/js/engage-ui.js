@@ -18,10 +18,10 @@ $(document).ready(function() {
     var placeholder_rememberMe = "Remember me";
     var msg_enterUsernamePassword = "Please enter your username and password:";
     var msg_html_sthWentWrong = "<h2> Something went wrong. Try again! </h2>";
-    var msg_html_noepisodes = "<h2>No Episodes available</h2>";
-    var msg_html_noseries = "<h2>No Series available</h2>";
+    var msg_html_noepisodes = "<h2>No episodes available</h2>";
+    var msg_html_noseries = "<h2>No series available</h2>";
     var msg_html_loading = "<h2>Loading...</h2>";
-    var msg_html_mediapackageempty = "<h2>The mediapackage is empty</h2>";
+    var msg_html_mediapackageempty = "<h2>No episodes available</h2>";
     var msg_html_nodata = "<h2>No data available</h2>";
     var msg_loginSuccessful = "Successfully logged in. Please reload the page if the page does not reload automatically.";
     var msg_loginFailed = "Failed to log in.";
@@ -32,11 +32,6 @@ $(document).ready(function() {
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
     var $navbarEpisodes = "#navbarEpisodes";
     var $navbarSeries = "#navbarSeries";
-    var $nav_userName = "#nav-userName";
-    var $nav_login = "#nav-login";
-    var $nav_dropdownLoggedin = "#nav-dropdownLoggedin";
-    var $navbarLogin = "#navbarLogin";
-    var $nav_logoutLink = "#nav-logoutLink";
     var $headerLogo = "#headerLogo";
     var $nav_switch_li = "#nav-switch li";
     var $oc_search_form = "#oc-search-form";
@@ -52,11 +47,15 @@ $(document).ready(function() {
     var $more_content = "#more";
     var $no_more_content = "#no-more";
     var id_mhlogolink = "mhlogolink";
+    var $nav_username = "#nav-username";
+    var $nav_loginlogoutLink = "#nav-loginlogoutLink";
+    var $name_loginlogout = "#name-loginlogout";
+    var $glyph_loginlogout = "#glyph-loginlogout";
 
     function log(args) {
-	if(debug && window.console) {
-	    console.log(args);
-	}
+        if (debug && window.console) {
+            console.log(args);
+        }
     }
 
     String.prototype.endsWith = function(suffix) {
@@ -256,23 +255,20 @@ $(document).ready(function() {
         });
     }
 
+    function setAnonymousUser() {
+        $($nav_username).html("Not logged in");
+        $($name_loginlogout).html("Login");
+        $($glyph_loginlogout).removeClass("glyphicon-log-out").addClass("glyphicon-log-in");
+        $($nav_loginlogoutLink).unbind("click");
+        $($nav_loginlogoutLink).click(login);
+    }
+
     function setUsername(name) {
-        $($nav_userName).html(name);
-        $($nav_login).hide();
-        $($nav_dropdownLoggedin).show();
-    }
-
-    function initLogin() {
-        $($navbarLogin).click(function() {
-            $($nav_login).click(login);
-        });
-    }
-
-    function resetAnonymousUser() {
-        $($nav_userName).html("");
-        $($nav_dropdownLoggedin).hide();
-        $($nav_login).show();
-        initLogin();
+        $($nav_username).html(name);
+        $($name_loginlogout).html("Logout");
+        $($glyph_loginlogout).removeClass("glyphicon-log-in").addClass("glyphicon-log-out");
+        $($nav_loginlogoutLink).unbind("click");
+        $($nav_loginlogoutLink).click(logout);
     }
 
     function getInfo() {
@@ -294,7 +290,6 @@ $(document).ready(function() {
                             if (checkLoggedOut) {
                                 window.location = springSecurityLogoutURL;
                             }
-                            $($nav_logoutLink).click(logout);
                             log("User is not anonymous");
                             if (data.username) {
                                 log("Username found: " + data.username);
@@ -305,11 +300,11 @@ $(document).ready(function() {
                         } else {
                             checkLoggedOut = false;
                             log("User is anonymous");
-                            resetAnonymousUser();
+                            setAnonymousUser();
                         }
                     } else {
                         log("Error: No role");
-                        resetAnonymousUser();
+                        setAnonymousUser();
                     }
                     if (data.org && data.org.properties) {
                         var logo = data.org.properties.logo_large ? data.org.properties.logo_large : "";
@@ -322,7 +317,7 @@ $(document).ready(function() {
                         playerEndpoint = player;
                     } else {
                         log("Error: No info data received.");
-                        resetAnonymousUser();
+                        setAnonymousUser();
                     }
                 }
 
@@ -482,12 +477,10 @@ $(document).ready(function() {
                     } else {
                         $($next).removeClass("disabled");
                     }
-
                     if (total == 1) {
                         buildGrid(result);
                         return;
                     };
-
                     $.each(result, function(index, val) {
                         buildGrid(val);
                     });
@@ -505,7 +498,7 @@ $(document).ready(function() {
             if (data["id"] == undefined) {
                 log("Error: Episode with no ID.")
                 serID = "0";
-            };
+            }
 
             var seriesClass = "";
             if (data.mediapackage) {
@@ -528,7 +521,7 @@ $(document).ready(function() {
             if (data.mediapackage) {
                 if (data.mediapackage.attachments && data.mediapackage.attachments.attachment[1].url) {
                     thumb = data.mediapackage.attachments.attachment[1].url;
-                    tile = tile + "<div><img class=\"img-responsive img-rounded\" src=\"" + thumb + "\"></div>";
+                    tile = tile + "<div><img class=\"thumbnail img-responsive img-rounded\" src=\"" + thumb + "\"></div>";
                 };
 
                 tile = tile + "<div class=\"infos\">";

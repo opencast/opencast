@@ -295,7 +295,7 @@ public final class EncodingSchemeUtils {
     boolean mayBeW3CDTFEncoded = true;
     if (schemeMatcher.find()) {
       String schemeString = schemeMatcher.group(1);
-      if (!schemeString.equalsIgnoreCase("W3C-DTF") && !schemeString.equalsIgnoreCase("W3CDTF")) {
+      if (!"W3C-DTF".equalsIgnoreCase(schemeString) && !"W3CDTF".equalsIgnoreCase(schemeString)) {
         mayBeW3CDTFEncoded = false;
       }
     }

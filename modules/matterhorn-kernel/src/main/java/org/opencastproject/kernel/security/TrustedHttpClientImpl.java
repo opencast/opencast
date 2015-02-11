@@ -271,6 +271,10 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     return StandAloneTrustedHttpClientImpl.run(this, httpUriRequest);
   }
 
+  @Override public <A> RequestRunner<A> runner(HttpUriRequest req) {
+    return StandAloneTrustedHttpClientImpl.runner(this, req);
+  }
+
   /**
    * {@inheritDoc}
    *

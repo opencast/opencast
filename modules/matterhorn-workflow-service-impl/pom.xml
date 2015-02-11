@@ -110,7 +110,7 @@
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
     </dependency>
-    
+
     <!-- Scope test -->
     <dependency>
       <groupId>junit</groupId>
@@ -120,7 +120,6 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>3.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -144,6 +143,11 @@
       <version>${project.version}</version>
       <type>bundle</type>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-workflow-workflowoperation</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
