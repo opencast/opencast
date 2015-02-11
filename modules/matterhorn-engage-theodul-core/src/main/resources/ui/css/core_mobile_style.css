@@ -1,8 +1,15 @@
-/*Core mobile css rules*/
-  .panel-content {
-    padding: 1em;
-  }
-  #close-panel {
-  	position: absolute;
-  	bottom: 10px;
-  }
+/*Core embed css rules*/
+
+body {
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+}
+
+#engage_content {
+    width: 100%;
+}
+
+.container {
+	padding-right: 0px !important;
+	padding-left: 0px !important;
+}

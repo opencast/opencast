@@ -15,93 +15,51 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(['jquery', 'backbone', "engage/core", "engage/models/engage", 'jquery.mobile'], function($, Backbone, EngageCore, EngageModel) {
+define(['jquery', 'backbone', "engage/core", "engage/models/engage"], function($, Backbone, EngageCore, EngageModel) {
     'use strict';
+
+    var id_engage_controls = "engage_controls";
+    var id_engage_video = "engage_video";
+    var id_engage_tab = "engage_tab";
+    var id_engage_description = "engage_description";
+    var id_engage_timeline = "engage_timeline";
 
     /*
      * Init logic function
      */
-    var initMobileView = function() {
-        //load jquery mobile css files
+    var initEmbedView = function() {
+        // load bootstrap css
         var link = $("<link>");
         link.attr({
             type: 'text/css',
             rel: 'stylesheet',
-            href: 'css/jqueryMobile/matterhorn-alpha-theme.min.css'
-        });
-        $("head").append(link);
-
-        link = $("<link>");
-        link.attr({
-            type: 'text/css',
-            rel: 'stylesheet',
-            href: 'css/jqueryMobile/jquery.mobile.icons-1.4.2.css'
+            href: 'css/bootstrap/css/bootstrap.css'
         });
         $("head").append(link);
         link = $("<link>");
         link.attr({
             type: 'text/css',
             rel: 'stylesheet',
-            href: 'css/jqueryMobile/jquery.mobile.inline-png-1.4.2.css'
-        });
-        //$("head").append(link);
-        link = $("<link>");
-        link.attr({
-            type: 'text/css',
-            rel: 'stylesheet',
-            href: 'css/jqueryMobile/jquery.mobile.inline-svg-1.4.2.css'
-        });
-        //$("head").append(link);
-        link = $("<link>");
-        link.attr({
-            type: 'text/css',
-            rel: 'stylesheet',
-            href: 'css/jqueryMobile/jquery.mobile.structure-1.4.2.css'
+            href: 'css/bootstrap/css/bootstrap-responsive.css'
         });
         $("head").append(link);
-        link = $("<link>");
-        link.attr({
-            type: 'text/css',
-            rel: 'stylesheet',
-            href: 'css/jqueryMobile/jquery.mobile.theme-1.4.2.css'
-        });
-        // $("head").append(link);
-        link = $("<link>");
-        link.attr({
-            type: 'text/css',
-            rel: 'stylesheet',
-            href: 'css/jqueryMobile/jquery.mobile-1.4.2.css'
-        });
-        //$("head").append(link);
-
-        // Set Viewport for mobile Devices
-        $("head").append('<meta name="viewport" content="width=device-width, initial-scale=1">');
     }
 
     /*
-     * Logic to insert a plugin with name and type to the player in mobile mode
+     * Logic to insert a plugin with name and type to the player in embed mode
      */
-    var insertPluginIntoDOM = function(plugin) {
+    var insertPluginToDOM = function(plugin) {
+        plugin.inserted = false; // TODO
         switch (plugin.type) {
-            case "engage_controls":
-                $("#engage_controls").html(plugin.templateProcessed);
+            case id_engage_video:
+                $("#" + id_engage_video).html(plugin.templateProcessed);
                 plugin.inserted = true;
-                plugin.container = "#engage_controls";
+                plugin.container = "#" + id_engage_video;
                 break;
-            case "engage_video":
-                $('#engage_video').html(plugin.templateProcessed);
-                plugin.inserted = true;
-                plugin.container = "#engage_video";
-                break;
-            case "engage_tab":
-                break;
-            case "engage_description":
-                $('#engage_description').html(plugin.templateProcessed);
-                plugin.inserted = true;
-                plugin.container = "#engage_description";
-                break;
-            case "engage_timeline":
-                break;
+            case id_engage_controls:
+            case id_engage_tab:
+            case id_engage_description:
+            case id_engage_timeline:
             default:
                 plugin.inserted = false;
                 plugin.container = "";
@@ -112,17 +70,13 @@ define(['jquery', 'backbone', "engage/core", "engage/models/engage", 'jquery.mob
      * This function is triggered when all plugins are loaded and inserted into the DOM
      */
     var allPluginsLoadedEvent = function() {
-        var orientation = "";
-        $(window).on("orientationchange", function(event) {
-            EngageCore.model.set("orientation", event.orientation);
-        });
-        $(window).orientationchange();
+
     }
 
     // public functions fo the module
     return {
-        initView: initMobileView,
-        insertPlugin: insertPluginIntoDOM,
+        initView: initEmbedView,
+        insertPlugin: insertPluginToDOM,
         allPluginsLoaded: allPluginsLoadedEvent
     }
 });
