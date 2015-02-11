@@ -17,6 +17,7 @@
         <script type="text/javascript" src="js/seedrandom.js"></script>
         <script type="text/javascript" src="js/jquery.utils.js"></script>
         <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/dropdowns-enhancement.js"></script>
         <script type="text/javascript" src="js/bootstrap-accessibility.min.js"></script>
         <script type="text/javascript" src="js/engage-ui.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,7 +27,7 @@
         <title>Media Module</title>
     </head>
     <body>
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation" role="menubar">
             <div class="container">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -43,13 +44,13 @@
                     <h1 class="navbar-brand">Media Module</h1>
                 </div>
                 <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav" id="nav-switch">
-                        <li id="navbarEpisodes" data-search="episodes" class="active"><a>Episodes</a></li>
-                        <li id="navbarSeries" data-search="series"><a>Series</a></li>
+                    <ul class="nav navbar-nav" id="nav-switch" role="menu">
+                        <li id="navbarEpisodes" data-search="episodes" class="active"><a role="menuitem" tabindex="1">Episodes</a></li>
+                        <li id="navbarSeries" data-search="series"><a role="menuitem" tabindex="2">Series</a></li>
                     </ul>
                     <ul class="navbar-form navbar-right" id="nav-dropdownLoginLogout">
 		      <div class="btn-group">
-			<button id="dropdownMenuLoginLogoutInfo" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button">
+			<button id="dropdownMenuLoginLogoutInfo" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" tabindex="6">
 			  <span class="glyphicon glyphicon-user"></span>
 			  <span id="nav-username">
 			    Anonymous
@@ -68,14 +69,14 @@
                     </ul>
                     <form id="oc-search-form" class="navbar-form navbar-right" role="search" autocomplete="off">
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search" name="q">
+                            <input type="text" class="form-control" placeholder="Search" name="q" tabindex="3">
                         </div>
                         <div class="btn-group">
-                            <button id="buttonSorting" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-label="Sorting">
+                            <button id="buttonSorting" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-label="Sorting" tabindex="4">
                                 Sort
                                 <span class="caret"></span>
                             </button>
-                            <ul id="dropdownMenuSorting" class="dropdown-menu" role="menu">
+                            <ul id="dropdownMenuSorting" class="dropdown-menu" role="menu" tabindex="-1">
                                 <li role="presentation">
                                     <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED_DESC" value="DATE_CREATED_DESC" checked="checked">
                                     <label for="DATE_CREATED_DESC">
@@ -182,21 +183,20 @@
                                 </li>
                             </ul>
                         </div>
-                        <button id="oc-search-btn" type="submit" class="btn btn-default">Search</button>
+                        <button id="oc-search-btn" type="submit" class="btn btn-default" tabindex="5">Search</button>
                     </form>
                 </div>
             </div>
         </div>
         <div class="container main-grid">
         <div class="main-content" id="main-content">
-            <div class="container-fluid" id="main-container">
-            </div>
+            <div class="container-fluid" id="main-container" role="menu"></div>
         </div>
-        <ul class="pager">
-            <li class="first previous disabled"><a>&#8676; First</a></li>
-            <li class="previous disabled"><a>&larr; Previous</a></li>
-            <li class="last next"><a>Last &#8677;</a></li>
-            <li class="next"><a>Next &rarr;</a></li>
+        <ul class="pager" role="menu">
+            <li class="first previous disabled"><a role="menuitem" tabindex="10">&#8676; First</a></li>
+            <li class="previous disabled"><a role="menuitem" tabindex="9">&larr; Previous</a></li>
+            <li class="last next"><a role="menuitem" tabindex="8">Last &#8677;</a></li>
+            <li class="next"><a role="menuitem" tabindex="7">Next &rarr;</a></li>
         </ul>
         <div id="more" class="scroll-indicator">Loading More Content</div>
         <div id="no-more" class="scroll-indicator">No More Content</div>
