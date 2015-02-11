@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>theodul</id>
-  <title>Theodul Player HTML5 Videos</title>
+  <id>theodulmulti</id>
+  <title>Theodul Player: Multi Quality MP4</title>
   <tags>
     <tag>upload</tag>
     <tag>schedule</tag>
@@ -214,33 +214,33 @@
         <configuration key="rewrite">false</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
-    </operation> 
+    </operation>
 
     <operation
       id="prepare-av"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Preparing audience audio and video work version">
+      description="Preparing presentation (screen) audio and video work version">
       <configurations>
         <configuration key="source-flavor">audience/source</configuration>
         <configuration key="target-flavor">audience/work</configuration>
         <configuration key="rewrite">false</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
-    </operation> 
+    </operation>
 
     <operation
       id="prepare-av"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Preparing date audio and video work version">
+      description="Preparing presentation (screen) audio and video work version">
       <configurations>
         <configuration key="source-flavor">data/source</configuration>
         <configuration key="target-flavor">data/work</configuration>
         <configuration key="rewrite">false</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
-    </operation> 
+    </operation>
 
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -367,26 +367,49 @@
       <configurations>
         <configuration key="source-flavor">*/trimmed</configuration>
         <configuration key="target-flavor">*/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming,rss,atom</configuration>
-        <configuration key="encoding-profile">mp4-medium.http</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,low-quality</configuration>
+        <configuration key="encoding-profile">mp4-low.http</configuration>
       </configurations>
     </operation>
-
-    <!-- encode to Engage player WebMformat -->
 
     <operation
       id="compose"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="Encoding WebM video">
+      description="Encoding MP4 video">
       <configurations>
         <configuration key="source-flavor">*/trimmed</configuration>
         <configuration key="target-flavor">*/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">webm.http</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,rss,atom,medium-quality</configuration>
+        <configuration key="encoding-profile">mp4-medium.http</configuration>
       </configurations>
     </operation>
 
+    <operation
+      id="compose"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Encoding MP4 video">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,high-quality</configuration>
+        <configuration key="encoding-profile">mp4-high.http</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="compose"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Encoding MP4 video">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,hd-quality</configuration>
+        <configuration key="encoding-profile">mp4-hd.http</configuration>
+      </configurations>
+    </operation>
 
     <!-- encode to Engage player audio only format -->
 
