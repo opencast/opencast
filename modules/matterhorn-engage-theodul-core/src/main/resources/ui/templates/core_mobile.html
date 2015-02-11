@@ -1,7 +1,8 @@
 <!-- core mobile mode -->
-<div data-role="header" id="mobile-header" data-tap-toggle="false">
-    <a href="#sidebar" class="ui-btn ui-icon-bars ui-btn-icon-notext ui-corner-all" />
-    <h2>Theodul Player</h2>
+<div id="main-header" data-role="header" data-id="mobile-header" data-position="fixed" data-tap-toggle="false" style="overflow:hidden;">
+    <div id="videoPagesNav" data-role="navbar">
+    <!-- Space to insert Video Tabs here -->
+    </div><!-- /navbar -->
 </div>
 <div role="main" class="ui-content" id="content-box">
     <div id="engage_content" class="container">
@@ -9,7 +10,7 @@
         <div id="engage_video" align="center"></div>
     </div>
 </div>
-<!-- Sidebar  -->
+<!-- Sidebar
 <div data-role="panel" id="sidebar" data-display="overlay" data-theme="b">
     <div class="panel-content">
         <% if(typeof title !== "undefined" ){ %>
@@ -19,10 +20,10 @@
         <% } %>
         <div id="engage_description"></div>
         <div id="video-displays"></div>
-        <a id="close-panel" href="#demo-links" data-rel="close" data-role="button" data-theme="a" data-icon="delete" data-inline="true">Schließen</a>
-    </div><!-- /content wrapper for padding -->
-</div><!-- /Sidebar -->
+    </div>
+</div> /Sidebar -->
 <!-- Footer with Control Elements -->
-<div data-role="footer" data-position="fixed" id="mobile-footer" data-tap-toggle="false">
+<div data-role="footer" data-position="fixed" data-id="mobile-footer" data-tap-toggle="false">
+    <div id="engage_description"></div>
     <div id="engage_controls"></div>
 </div>

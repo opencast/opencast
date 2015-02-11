@@ -484,14 +484,86 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     function renderMobile(videoDataView, videoSources, videoDisplays, aspectRatio) {
         Engage.log("Video: Render mobile mode");
+        checkVideoDisplaySize();
         initMobileEvents();
 
+        var init = false;
+        var player = null;
+        var current_time = 0;
+        var player_page_id = "";
+        var prev_player = null;
+        var active_player = null
         var tuples = getSortedVideosourcesArray(videoSources);
         for (var i = 0; i < tuples.length; ++i) {
             var key = tuples[i][0];
             var value = tuples[i][1];
-
+            
             initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
+            
+            player_page_id = "#videoPage_" + (i + 1);
+
+            // Navigation, append tabs
+            if (i == 0) {
+                $('#videoPagesNav').append('<ul> </ul>');
+            };
+            $('#videoPagesNav ul').append('<li><a href="' + player_page_id + '"></a></li>'); // ' + v + ' -- var v in videoSources, videoSources[v] = value = tuples[i][1]
+
+            Engage.on(plugin.events.sliderStop.getName(), function(time) {
+                var duration = parseInt(Engage.model.get("videoDataModel").get("duration"));
+                current_time = (time / 1000) * (duration / 1000);
+                active_player.currentTime(current_time);
+            });
+
+            Engage.on(plugin.events.pause.getName(), function() {
+                active_player.pause();
+            });
+
+            Engage.on(plugin.events.play.getName(), function() {
+                active_player.play();
+                active_player.currentTime(current_time);
+            });
+
+            var continue_playing = false;
+            $(document).on("pagecontainerbeforetransition", function() {
+                Engage.log('pagecontainerbeforetransition');
+            });
+            $(document).on("pagecontainertransition", function() {
+                Engage.log('pagecontainertransition');
+            });
+            $(document).on("pagecontainershow", function() {
+                Engage.log('pagecontainershow');
+            });
+
+            $(document).on("pagebeforeshow", player_page_id, function(event, data) {
+                // Get prev. Player
+                if (data.prevPage.length > 0) {
+                    prev_player = videojs(data.prevPage.children().children()[0].id);
+                    continue_playing = !prev_player.paused()
+                    prev_player.pause();
+                    prev_player.off("timeupdate");
+                    prev_player.off("ended");
+                };
+
+                // Get player
+                player = videojs($(this).children().children()[0].id);
+                active_player = player;
+
+                if (continue_playing) {
+                    active_player.play();
+                    active_player.currentTime(current_time);
+                };
+
+                active_player.on("ended", function() {
+                    Engage.trigger(plugin.events.pause.getName());
+                    current_time = 0;
+                    Engage.trigger(plugin.events.timeupdate.getName(), 0);
+                });
+
+                active_player.on("timeupdate", function() {
+                    Engage.trigger(plugin.events.timeupdate.getName(), active_player.currentTime());
+                    current_time = active_player.currentTime();
+                });
+            });
         }
 
         Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
@@ -505,33 +577,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
         // show poster
         $("." + class_vjsposter).show();
-
         if (videoDisplays.length > 0) {
-            var nr = tuples.length;
-
-            // first as masterdisplay
-            registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
-
-            if (nr >= 2) {
-                registerSynchronizeEvents();
-
-                var i = 0;
-                for (var vd in videoDisplays) {
-                    if (i > 0) {
-                        // sync every other videodisplay with the master
-                        $.synchronizeVideos(0, videoDisplays[0], videoDisplays[vd]);
-                        Engage.log("Video: Videodisplay " + vd + " is now being synchronized with the master videodisplay");
-                    }
-                    ++i;
-                }
-                initSynchronize();
-            } else {
-                videosReady = true;
-                if (!isAudioOnly) {
-                    Engage.trigger(plugin.events.ready.getName());
-                }
+            videosReady = true;
+            if (!isAudioOnly) {
+                Engage.trigger(plugin.events.ready.getName());
             }
         }
+
+        // init jqm pages
+        $.mobile.initializePage();
         // Set Displays to correct size
         orderVideoDisplays(videoDisplays);
         checkVideoDisplaySize();
@@ -639,8 +693,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
         events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
         events.swipeLeft = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
-        events.deactivate = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
-        events.activate = new Engage.Event("Video:activate", "videoDisplay activated", "both");
         events.resize = new Engage.Event("Video:resize", "videoDisplay resized", "both");
 
         $(window).on("orientationchange", function(event) {
@@ -649,11 +701,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             orderVideoDisplays(videoDisplays);
         });
 
-        Engage.on(plugin.events.deactivate.getName(), function(id) {
-            Engage.log("Video: Deactivate: " + id);
-        });
-
-        $(".video-js").on("taphold", function(event) {
+        $(".video-js").on('taphold', function(event) {
             Engage.log("Video: " + event);
             Engage.trigger(plugin.events.tapHold.getName(), event.currentTarget.id);
         });
@@ -713,6 +761,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     function orderVideoDisplays(videoDisplays) {
         // max size of display
         // minus footer and header
+        /*
         var maxHeight = window.screen.height - 120;
         var maxWidth = window.screen.width;
         var videoWidth = 0;
@@ -738,12 +787,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
         Engage.log("Video: Video size (w/h): " + videoWidth + "/" + videoHeight);
 
-        // if (isMobileMode) {
-        if (Engage.model.get("orientation") == "landscape") {
-            $("#videojs_wrapper").height(maxHeight - 120);
-        } else {
-            $("#videojs_wrapper").height(maxHeight - 120);
-        }
+        if (videoDisplays.length == 1) {
+            Engage.log("Video: Single Display");
+            if (Engage.model.get("orientation") == "landscape") {
+                $('#videojs_wrapper').height(maxHeight);
+            }
+        };
+
         if (Engage.model.get("orientation") == "portrait") {
             if (videoDisplays.length > 1) {
                 $(".mobileVideoBox").height((((1 / videoDisplays.length) * 100) - 0.5) + "%");
@@ -752,14 +802,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
         };
         Engage.log("Video: Video box (w/h): " + $(".mobileVideoBox").width() + "/" + $(".mobileVideoBox").height());
-        // }
+        */
     }
 
     function checkVideoDisplaySize() {
         // make sure the video height is not greater than the window height
         if (Engage.model.get("mode") == "mobile") {
-            var headerHeight = $("#mobile-header").height();
-            var footerHeight = $("#mobile-footer").height();
+            /*
+            var headerHeight = $('#mobile-header').height();
+            var footerHeight = $('#mobile-footer').height();
 
             var total = headerHeight + footerHeight;
             if (Engage.model.get("orientation") == "portrait") {
@@ -769,6 +820,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 $("#" + id_engageContent).css("height", ($(window).height() - total) * 0.9);
                 $("#" + id_engageContent).css("width", $(window).width() * 0.9);
             };
+            */
         } else {
             $("#" + id_engageContent).css("max-width", "");
             for (var i = 0; i < videoDisplaySizeTimesCheck; ++i) {
@@ -1467,14 +1519,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     }
 
     /* usage:
-        var tuples = getSortedVideosourcesArray(videoSources);
-	for (var i = 0; i < tuples.length; ++i) {
-	    var key = tuples[i][0];
-	    var value = tuples[i][1];
+            var tuples = getSortedVideosourcesArray(videoSources);
+    	for (var i = 0; i < tuples.length; ++i) {
+    	    var key = tuples[i][0];
+    	    var value = tuples[i][1];
 
-	    // do something with key and value
-	}
-     */
+    	    // do something with key and value
+    	}
+         */
     function getSortedVideosourcesArray(videoSources) {
         var tuples = [];
 

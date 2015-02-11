@@ -2,7 +2,7 @@
 <div id="videojs_wrapper" class="mobile_wrapper" align="center">
         <% if(typeof ids !== "undefined" ){ var i = 1;%>
         <% _.each(ids, function(id) { %>
-        <div class="mobileVideoBox resizable draggable displayActive">
+        <div data-role="page" class="mobileVideoBox" id="videoPage_<%=i%>">
 	        <div id="videoDisplay<%= i%>" class="displayWrapper">
 	           <video id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin container"  width="auto" height="auto" data-setup="{}"></video>
 	        </div>

@@ -536,7 +536,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     function loadStoredInitialValues() {
         var vol = Basil.get(storage_volume);
         if (vol) {
-            Basil.set(storage_lastvolume, volume);
+            Basil.set(storage_lastvolume, vol);
             Engage.trigger(plugin.events.volumeSet.getName(), vol / 100);
         }
 
