@@ -17,6 +17,10 @@
     right: auto;
 }
 
+.thumbnail {
+    padding-bottom: 5px;
+}
+
 /* title */
 .navbar-default .navbar-brand {
     color: #000;
@@ -266,4 +270,16 @@ strong {
 .seriesindicator {
     height: 15px;
     width: 100%;
+}
+
+.creator {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.seriestitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
