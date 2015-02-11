@@ -113,7 +113,7 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
       logger.warn("{} denies to handle request for {} due to missing search service", this, query);
       return false;
     } else if (feedURI == null) {
-      logger.warn("{} denies to handle request for {} since no uri is defined", this);
+      logger.warn("{} denies to handle request for {} since no uri is defined", this, query);
       return false;
     } else if (query.length == 0) {
       logger.debug("{} denies to handle unknown request", this);
