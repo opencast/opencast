@@ -59,6 +59,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "trigger"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "trigger"),
         audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "trigger"),
+        videoFormatsFound: new Engage.Event("Video:videoFormatsFound", "", "trigger"),
         playPause: new Engage.Event("Video:playPause", "", "handler"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "go to fullscreen", "handler"),
@@ -73,7 +74,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         seekLeft: new Engage.Event("Video:seekLeft", "", "handler"),
         seekRight: new Engage.Event("Video:seekRight", "", "handler"),
         autoplay: new Engage.Event("Video:autoplay", "", "handler"),
-        initialSeek: new Engage.Event("Video:initialSeek", "", "handler")
+        initialSeek: new Engage.Event("Video:initialSeek", "", "handler"),
+        qualitySet: new Engage.Event("Video:qualitySet", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -211,6 +213,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var translations = new Array();
     var videoDataView = undefined;
     var fullscreen = false;
+    var mappedResolutions = undefined;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginVideoVideoJS").replace(/(\.\.\/)/g, "");
@@ -314,13 +317,91 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
     }
 
+    function compareResolutions(a, b) {
+        var aspl = a.split("x");
+        var bspl = b.split("x");
+        aspl[0] = parseInt(aspl[0]);
+        bspl[0] = parseInt(bspl[0]);
+        aspl[1] = parseInt(aspl[1]);
+        bspl[1] = parseInt(bspl[1]);
+        if (aspl[0] == bspl[0]) {
+            if (aspl[1] == bspl[1]) {
+                return 0;
+            }
+            return aspl[1] > bspl[1] ? 1 : -1;
+        }
+        return aspl[0] > bspl[0] ? 1 : -1;
+    }
+
+    function getSortedMappedResolutionArray(resolutions) {
+        resolutions.sort(compareResolutions);
+        var maparr = [];
+        maparr["low"] = resolutions[0];
+        maparr["medium"] = resolutions[resolutions.length - 2];
+        maparr["high"] = resolutions[resolutions.length - 1];
+        return maparr;
+    }
+
+    function registerQualityChangeEvent() {
+        Engage.on(plugin.events.qualitySet.getName(), function(q) {
+            changeQuality(q);
+        });
+    }
+
+    function changeQuality(q) {
+        if (q) {
+            Engage.trigger(plugin.events.pause.getName(), false);
+            Engage.trigger(plugin.events.seek.getName(), 0);
+            q = q.toLowerCase();
+            if ((q == "low") || (q == "medium") || (q == "high")) {
+                Engage.model.set("quality", q);
+                Engage.log("Setting quality to: " + q);
+
+                var tuples = getSortedVideosourcesArray(globalVideoSource);
+                for (var i = 0; i < tuples.length; ++i) {
+                    var key = tuples[i][0];
+                    var value = tuples[i][1];
+
+                    for (var val in value[1]) {
+                        if (value[1][val].resolution) {
+                            if (mappedResolutions[q] == value[1][val].resolution) {
+                                videojs(value[0]).src(value[1][val].src);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     function renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio) {
         var tuples = getSortedVideosourcesArray(videoSources);
+
         for (var i = 0; i < tuples.length; ++i) {
             var key = tuples[i][0];
             var value = tuples[i][1];
 
+            globalVideoSource.push([videoDisplays[i], value]);
+
             initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
+        }
+
+        var key_tmp = tuples[0][0];
+        var value_tmp = tuples[0][1];
+        var nr_res = 0;
+        var res_array = [];
+        for (var val in value_tmp) {
+            if (value_tmp[val].resolution) {
+                res_array[res_array.length] = value_tmp[val].resolution;
+            }
+            ++nr_res;
+        }
+        if (nr_res > 2) {
+            registerQualityChangeEvent();
+            mappedResolutions = getSortedMappedResolutionArray(res_array);
+            Engage.trigger(plugin.events.videoFormatsFound.getName(), mappedResolutions);
+            changeQuality(Engage.model.get("quality"));
         }
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {

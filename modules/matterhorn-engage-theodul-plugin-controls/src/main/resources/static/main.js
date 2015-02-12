@@ -65,6 +65,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         customOKMessage: new Engage.Event("Notification:customOKMessage", "a custom message with an OK button", "trigger"),
         customSuccess: new Engage.Event("Notification:customSuccess", "a custom success message", "trigger"),
         customError: new Engage.Event("Notification:customError", "an error occurred", "trigger"),
+        qualitySet: new Engage.Event("Video:qualitySet", "", "trigger"),
         volumeUp: new Engage.Event("Video:volumeUp", "", "handler"),
         volumeDown: new Engage.Event("Video:volumeDown", "", "handler"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
@@ -75,7 +76,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "handler"),
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "handler"),
-        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler")
+        isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler"),
+        videoFormatsFound: new Engage.Event("Video:videoFormatsFound", "", "handler")
     };
 
     var isDesktopMode = false;
@@ -151,6 +153,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_playbackRate100 = "playback100";
     var id_playbackRate125 = "playback125";
     var id_playbackRate150 = "playback150";
+    var id_qualityLow = "qualityLow";
+    var id_qualityMedium = "qualityMedium";
+    var id_qualityHigh = "qualityHigh";
+    var id_qualityIndicator = "qualityIndicator";
     var id_playpause_controls = "playpause_controls";
     var id_fullscreen_button = "fullscreen_button";
     var id_embed_button = "embed_button";
@@ -213,6 +219,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
+    var resolutions = undefined;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -398,6 +405,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
                     str_loginLogout: translate("loginLogout", "Login/Logout"),
                     str_fullscreen: translate("fullscreen", "Fullscreen"),
+                    str_qualityButton: translate("quality", "Quality"),
+                    str_quality: translate("quality", "Quality"),
+                    hasqualities: resolutions !== "undefined",
                     controlsTop: Engage.controls_top
                 };
 
@@ -482,6 +492,26 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(1.5));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5);
+            });
+        }
+    }
+
+    function addQualityChangeEvents() {
+        if (!mediapackageError) {
+            $("#" + id_qualityLow).click(function(e) {
+                e.preventDefault();
+                $("#" + id_qualityIndicator).html("Low");
+                Engage.trigger(plugin.events.qualitySet.getName(), "low");
+            });
+            $("#" + id_qualityMedium).click(function(e) {
+                e.preventDefault();
+                $("#" + id_qualityIndicator).html("Medium");
+                Engage.trigger(plugin.events.qualitySet.getName(), "medium");
+            });
+            $("#" + id_qualityHigh).click(function(e) {
+                e.preventDefault();
+                $("#" + id_qualityIndicator).html("High");
+                Engage.trigger(plugin.events.qualitySet.getName(), "high");
             });
         }
     }
@@ -635,7 +665,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             $("#" + id_volume).on(event_slidestop, function(event, ui) {
                 Engage.trigger(plugin.events.volumeSet.getName(), ui.value / 100);
             });
-	    // check segments
+            // check segments
             if (segments && (segments.length > 0)) {
                 Engage.log("Controls: " + segments.length + " segments are available.");
                 $.each(segments, function(i, v) {
@@ -756,6 +786,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         }
     }
 
+    var controlsViewTopIfBottom = undefined;
+    var controlsView = undefined;
+
     /**
      * Initializes the plugin
      */
@@ -763,9 +796,21 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
             if (!Engage.controls_top && plugin.template_topIfBottom && (plugin.template_topIfBottom != "none")) {
-                var controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get("videoDataModel"), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
+                controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get("videoDataModel"), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
             }
-            var controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
+            controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
+            Engage.on(plugin.events.videoFormatsFound.getName(), function(formatarr) {
+                resolutions = formatarr;
+                if (controlsViewTopIfBottom) {
+                    controlsViewTopIfBottom.render();
+                }
+                if (controlsView) {
+                    controlsView.render();
+                }
+                addQualityChangeEvents();
+		var q = Engage.model.get("quality");
+                $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
+            });
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
                 if (as) {
                     aspectRatioWidth = as[0] || 0;
