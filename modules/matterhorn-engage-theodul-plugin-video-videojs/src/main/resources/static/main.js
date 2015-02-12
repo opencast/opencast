@@ -139,8 +139,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var interval_autoplay_ms = 1000;
     var interval_initialSeek_ms = 1000;
     var timeout_initialSeek_ms = 250;
+    var timer_qualitychange = 1000;
 
     /* don't change these variables */
+    var currentTime = 0;
     var Utils;
     var parsedSeconds = 0;
     var interval_autoplay;
@@ -309,11 +311,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
     }
 
-    function initSynchronize() {
+    function initSynchronize(showMsg) {
         $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
         if (Bowser.chrome) {
             $(document).trigger(event_sjs_stopBufferChecker);
-            Engage.trigger(plugin.events.customError.getName(), translate("chromeBuffer", "The buffer checker has been disabled due to Chrome limitations. It is possible that you will encounter problems with the video playback."));
+            if (showMsg) {
+                Engage.trigger(plugin.events.customError.getName(), translate("chromeBuffer", "The buffer checker has been disabled due to Chrome limitations. It is possible that you will encounter problems with the video playback."));
+            }
         }
     }
 
@@ -351,7 +355,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     function changeQuality(q) {
         if (q) {
             Engage.trigger(plugin.events.pause.getName(), false);
-            Engage.trigger(plugin.events.seek.getName(), 0);
             q = q.toLowerCase();
             if ((q == "low") || (q == "medium") || (q == "high")) {
                 Engage.model.set("quality", q);
@@ -370,6 +373,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                             }
                         }
                     }
+                }
+                if (pressedPlayOnce && (currentTime > 0)) {
+                    window.setTimeout(function() {
+                        initSynchronize(false);
+                        Engage.trigger(plugin.events.seek.getName(), currentTime);
+                    }, timer_qualitychange);
                 }
             }
         }
@@ -443,7 +452,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     }
                     ++i;
                 }
-                initSynchronize();
+                initSynchronize(true);
             } else {
                 videosReady = true;
                 if (!isAudioOnly) {
@@ -1076,6 +1085,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             Engage.on(plugin.events.volumeGet.getName(), function(callback) {
                 callback(audioPlayer.volume);
             });
+            Engage.on(plugin.events.timeupdate.getName(), function(time) {
+                currentTime = time;
+            });
             Engage.on(plugin.events.seek.getName(), function(time) {
                 Engage.log("Video: Seek to " + time);
                 if (videosReady && pressedPlayOnce) {
@@ -1320,6 +1332,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 if (callback) {
                     callback(videodisplayMaster.volume());
                 }
+            });
+            Engage.on(plugin.events.timeupdate.getName(), function(time) {
+                currentTime = time;
             });
             Engage.on(plugin.events.seek.getName(), function(time) {
                 Engage.log("Video: Seek to " + time);

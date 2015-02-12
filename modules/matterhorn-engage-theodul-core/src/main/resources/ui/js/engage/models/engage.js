@@ -58,23 +58,23 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
             }
             // set quality
             if (this.get("urlParameters").quality) {
-		switch(this.get("urlParameters").quality) {
-		    case "low":
-                    this.set("quality", "low");
-		    break;
-		    case "medium":
-                    this.set("quality", "medium");
-		    break;
-		    case "high":
-                    this.set("quality", "high");
-		    break;
-		    default:
-                    this.set("quality", "medium");
-		    break;
-		}
+                switch (this.get("urlParameters").quality) {
+                    case "low":
+                        this.set("quality", "low");
+                        break;
+                    case "medium":
+                        this.set("quality", "medium");
+                        break;
+                    case "high":
+                        this.set("quality", "high");
+                        break;
+                    default:
+                        this.set("quality", "medium");
+                        break;
+                }
             } else {
-		this.set("quality", "medium");
-	    }
+                this.set("quality", "medium");
+            }
 
             // check mode, if no mode param given try to discover browser
             if (this.get("urlParameters").mode == "desktop") {
@@ -93,6 +93,8 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
             // Check for user setting "Preferred format"
             if (this.get("urlParameters").format != null) {
                 Basil.set("preferredFormat", this.get("urlParameters").format);
+            } else {
+                Basil.set("preferredFormat", "");
             }
 
             /*
