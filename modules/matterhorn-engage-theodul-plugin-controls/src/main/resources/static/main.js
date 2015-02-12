@@ -219,6 +219,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
+    var controlsViewTopIfBottom = undefined;
+    var controlsView = undefined;
     var resolutions = undefined;
 
     function initTranslate(language, funcSuccess, funcError) {
@@ -407,7 +409,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_fullscreen: translate("fullscreen", "Fullscreen"),
                     str_qualityButton: translate("quality", "Quality"),
                     str_quality: translate("quality", "Quality"),
-                    hasqualities: resolutions !== "undefined",
+                    str_qualityLow: translate("qualityLow", "Low"),
+                    str_qualityMedium: translate("qualityMedium", "Medium"),
+                    str_qualityHigh: translate("qualityHigh", "High"),
+                    hasqualities: resolutions !== undefined,
                     controlsTop: Engage.controls_top
                 };
 
@@ -500,17 +505,17 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         if (!mediapackageError) {
             $("#" + id_qualityLow).click(function(e) {
                 e.preventDefault();
-                $("#" + id_qualityIndicator).html("Low");
+                $("#" + id_qualityIndicator).html(translate("qualityLow", "Low"));
                 Engage.trigger(plugin.events.qualitySet.getName(), "low");
             });
             $("#" + id_qualityMedium).click(function(e) {
                 e.preventDefault();
-                $("#" + id_qualityIndicator).html("Medium");
+                $("#" + id_qualityIndicator).html(translate("qualityMedium", "Medium"));
                 Engage.trigger(plugin.events.qualitySet.getName(), "medium");
             });
             $("#" + id_qualityHigh).click(function(e) {
                 e.preventDefault();
-                $("#" + id_qualityIndicator).html("High");
+                $("#" + id_qualityIndicator).html(translate("qualityHigh", "High"));
                 Engage.trigger(plugin.events.qualitySet.getName(), "high");
             });
         }
@@ -786,9 +791,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         }
     }
 
-    var controlsViewTopIfBottom = undefined;
-    var controlsView = undefined;
-
     /**
      * Initializes the plugin
      */
@@ -800,16 +802,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             }
             controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
             Engage.on(plugin.events.videoFormatsFound.getName(), function(formatarr) {
-                resolutions = formatarr;
-                if (controlsViewTopIfBottom) {
-                    controlsViewTopIfBottom.render();
+                if (formatarr) {
+                    resolutions = formatarr;
+                    if (controlsViewTopIfBottom) {
+                        controlsViewTopIfBottom.render();
+                    }
+                    if (controlsView) {
+                        controlsView.render();
+                    }
+                    addQualityChangeEvents();
+                    var q = Engage.model.get("quality");
+                    $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
                 }
-                if (controlsView) {
-                    controlsView.render();
-                }
-                addQualityChangeEvents();
-		var q = Engage.model.get("quality");
-                $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
             });
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
                 if (as) {

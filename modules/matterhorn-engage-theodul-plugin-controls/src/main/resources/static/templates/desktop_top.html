@@ -58,19 +58,22 @@
         <div class="btn-group">
 	  <% if((typeof hasqualities !== "undefined") && hasqualities
 	     && (typeof str_qualityButton !== "undefined")
-	     && (typeof str_quality !== "undefined")) { %>
+	     && (typeof str_quality !== "undefined")
+	     && (typeof str_qualityLow !== "undefined")
+	     && (typeof str_qualityMedium !== "undefined")
+	     && (typeof str_qualityHigh !== "undefined")) { %>
             <div class="btn-group">
                 <button id="dropdownMenuQuality" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_qualityButton %>">
                 <span class="glyphicon glyphicon-wrench"></span>
-                <span id="qualityIndicator">Medium</span>
+                <span id="qualityIndicator"><%= str_quality %></span>
                 <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu pull-right" role="menu">
                     <li class="disabled" role="presentation"><a id="qualityDescription" role="menuitem" tabindex="-1" href="#"><b><%= str_quality %></b></a></li>
                     <li class="divider"></li>
-                    <li role="presentation"><a id="qualityLow" role="menuitem" tabindex="-1" href="#"><b>Low</b></a></li>
-                    <li role="presentation"><a id="qualityMedium" role="menuitem" tabindex="-1" href="#"><b>Medium</b></a></li>
-                    <li role="presentation"><a id="qualityHigh" role="menuitem" tabindex="-1" href="#"><b>High</b></a></li>
+                    <li role="presentation"><a id="qualityLow" role="menuitem" tabindex="-1" href="#"><b><%= str_qualityLow %></b></a></li>
+                    <li role="presentation"><a id="qualityMedium" role="menuitem" tabindex="-1" href="#"><b><%= str_qualityMedium %></b></a></li>
+                    <li role="presentation"><a id="qualityHigh" role="menuitem" tabindex="-1" href="#"><b><%= str_qualityHigh %></b></a></li>
                 </ul>
             </div>
 	    <% } %>

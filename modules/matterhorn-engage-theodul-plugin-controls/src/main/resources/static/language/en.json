@@ -31,5 +31,9 @@
     "playbackRate": "Playback rate",
     "remainingTime": "remaining time",
     "embedButton": "Embed button. Select embed size from dropdown.",
-    "checkingLoginStatus": "Checking login status..."
+    "checkingLoginStatus": "Checking login status...",
+    "quality": "Quality",
+    "qualityLow": "Low",
+    "qualityMedium": "Medium",
+    "qualityHigh": "High"
 }

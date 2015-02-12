@@ -31,5 +31,9 @@
   "playbackRate":"Wiedergaberate",
   "remainingTime":"verbleibende Zeit",
   "embedButton":"Schaltfläche zum Einbetten des Videos. Größe zum Einbetten aus der Liste auswählen.",
-  "checkingLoginStatus":"Login-Status wird überprüft..."
+  "checkingLoginStatus":"Login-Status wird überprüft...",
+  "quality": "Qualität",
+  "qualityLow": "Niedrig",
+  "qualityMedium": "Mittel",
+  "qualityHigh": "Hoch"
 }
