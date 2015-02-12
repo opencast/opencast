@@ -167,6 +167,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var id_btn_video2 = "btn-video2";
     var id_switchPlayer_value = "switchPlayer-value";
     var id_audioDisplay = "audioDisplay";
+    var id_switchPlayers = "switchPlayers";
     var class_vjs_switchPlayer = "vjs-switchPlayer";
     var class_btn_video = "btn-video";
     var class_vjs_menu_button = "vjs-menu-button";
@@ -377,6 +378,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
     }
 
+    // TODO: this is just a temporary solution until the embed player has been designed and implemented
     function appendEmbedPlayer_switchPlayers() {
         $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_switchPlayer + "\" class=\"" + class_vjs_switchPlayer + " " + class_vjs_control + " " + class_vjs_menu_button + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"></div>");
         $("#" + id_btn_switchPlayer).append(
@@ -403,6 +405,38 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         $("#" + id_btn_video2).click(function(e) {
             $("#" + id_switchPlayer_value).html(translate("video_short", "Vid.") + " 2");
             if (!currentlySelectedVideodisplay == 1) {
+                currentlySelectedVideodisplay = 1;
+                videojs(globalVideoSource[1].id).src(globalVideoSource[1].src);
+            }
+        });
+    }
+
+    // TODO: this is just a temporary solution until the mobile player has been designed and implemented
+    function appendMobilePlayer_switchPlayers() {
+        $("#" + id_switchPlayers).html(
+            translate("switchPlayer", "Switch player") + ':' +
+            '<ul class="nav nav-pills">' +
+            '<li id="' + id_btn_video1 + '" role="presentation" class="active"><a href="#">' +
+            translate("video_short", "Vid.") + ' 1' +
+            '</a></li>' +
+            '<li id="' + id_btn_video2 + '" role="presentation"><a href="#">' +
+            translate("video_short", "Vid.") + ' 2' +
+            '</a></li>' +
+            '</ul>'
+        );
+
+        $("#" + id_btn_video1).click(function(e) {
+            if (!currentlySelectedVideodisplay == 0) {
+                $("#" + id_btn_video1).addClass("active");
+                $("#" + id_btn_video2).removeClass("active");
+                currentlySelectedVideodisplay = 0;
+                videojs(globalVideoSource[0].id).src(globalVideoSource[0].src);
+            }
+        });
+        $("#" + id_btn_video2).click(function(e) {
+            if (!currentlySelectedVideodisplay == 1) {
+                $("#" + id_btn_video1).removeClass("active");
+                $("#" + id_btn_video2).addClass("active");
                 currentlySelectedVideodisplay = 1;
                 videojs(globalVideoSource[1].id).src(globalVideoSource[1].src);
             }
@@ -502,7 +536,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
 
         if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
-            appendEmbedPlayer_switchPlayers();
+            appendMobilePlayer_switchPlayers();
         }
         // appendEmbedPlayer_openInPlayer();
 
@@ -593,7 +627,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 if (isEmbedMode) {
                     renderEmbed(videoDataView, videoSources, videoDisplays, aspectRatio);
                 } else if (isMobileMode) {
-                    renderEmbed(videoDataView, videoSources, videoDisplays, aspectRatio);
+                    renderMobile(videoDataView, videoSources, videoDisplays, aspectRatio);
                 } else { // isDesktopMode
                     renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio);
                 }
