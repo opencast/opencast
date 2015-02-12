@@ -39,6 +39,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.XProperties;
 import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -104,6 +105,8 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
 
   private String[] tags;
 
+  private XProperties properties = new XProperties();
+
   /**
    * The maximum length of a Recording or Series title.
    * A value of zero will be treated as no limit
@@ -129,11 +132,15 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
    * Called when service activates. Defined in OSGi resource file.
    */
   public synchronized void activate(final ComponentContext cc) {
+    properties.setBundleContext(cc.getBundleContext());
   }
 
   @Override
-  public void updated(final Dictionary properties) throws ConfigurationException {
+  public void updated(final Dictionary props) throws ConfigurationException {
+    properties.merge(props);
+
     final String dataStore = YouTubeUtils.get(properties, YouTubeKey.credentialDatastore);
+
     try {
       final ClientCredentials clientCredentials = new ClientCredentials();
       clientCredentials.setCredentialDatastore(dataStore);

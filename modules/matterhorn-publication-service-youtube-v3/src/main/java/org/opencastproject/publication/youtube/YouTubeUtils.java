@@ -15,6 +15,8 @@
  */
 package org.opencastproject.publication.youtube;
 
+import org.opencastproject.util.XProperties;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Dictionary;
@@ -38,7 +40,7 @@ public final class YouTubeUtils {
    * @param key  may not be {@code null}
    * @return associated value or null
    */
-  static String get(final Dictionary dictionary, final YouTubeKey key) {
+  static String get(final XProperties dictionary, final YouTubeKey key) {
     return get(dictionary, key, true);
   }
 
@@ -50,8 +52,8 @@ public final class YouTubeUtils {
    * @param required when true, and property result is null, we throw {@link java.lang.IllegalArgumentException}
    * @return associated value or null
    */
-  static String get(final Dictionary dictionary, final YouTubeKey key, final boolean required) {
-    final String value = (String) dictionary.get(keyPrefix + key.name());
+  static String get(final XProperties dictionary, final YouTubeKey key, final boolean required) {
+    final String value = (String) dictionary.getProperty(keyPrefix + key.name());
     final String trimmed = StringUtils.trimToNull(value);
     if (required && trimmed == null) {
       throw new IllegalArgumentException("Null or blank value for YouTube-related property: " + keyPrefix + key.name());
