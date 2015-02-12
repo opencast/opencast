@@ -109,6 +109,24 @@
     </div>
     <% } else { %>
         <div id="dropdownControlsButtons" class="btn-group">
+	  <% if((typeof hasqualities !== "undefined") && hasqualities
+	     && (typeof str_qualityButton !== "undefined")
+	     && (typeof str_quality !== "undefined")) { %>
+            <div class="btn-group">
+                <button id="dropdownMenuQuality" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_qualityButton %>">
+                <span class="glyphicon glyphicon-wrench"></span>
+                <span id="qualityIndicator">Medium</span>
+                <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li class="disabled" role="presentation"><a id="qualityDescription" role="menuitem" tabindex="-1" href="#"><b><%= str_quality %></b></a></li>
+                    <li class="divider"></li>
+                    <li role="presentation"><a id="qualityLow" role="menuitem" tabindex="-1" href="#"><b>Low</b></a></li>
+                    <li role="presentation"><a id="qualityMedium" role="menuitem" tabindex="-1" href="#"><b>Medium</b></a></li>
+                    <li role="presentation"><a id="qualityHigh" role="menuitem" tabindex="-1" href="#"><b>High</b></a></li>
+                </ul>
+            </div>
+	    <% } %>
             <div class="btn-group">
                 <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_playbackRateButton %>">
                 <span class="glyphicon glyphicon-time"></span>
