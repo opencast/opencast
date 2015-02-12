@@ -1230,6 +1230,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         throw new WorkflowDatabaseException(e);
       } catch (NotFoundException e) {
         logger.warn("Series %s not found, unable to set ACLs", seriesId);
+      } catch (Exception e) {
+        logger.error("Error reading ACL from series {}: {}", seriesId, e);
       }
     }
 
