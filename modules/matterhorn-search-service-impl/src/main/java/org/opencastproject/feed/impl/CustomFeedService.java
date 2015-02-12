@@ -109,7 +109,7 @@ public class CustomFeedService extends AbstractFeedService implements FeedGenera
     }
     super.initialize(properties);
     // Clear the selector, since super.accept() relies on the fact that it's not set
-    selector = null;
+    setSelector(null);
   }
 
 }

@@ -266,7 +266,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("series.json")
-  public Response getSeriesAsJson(@QueryParam("startPage") long startPage, @QueryParam("count") long count)
+  public Response getSeriesAsJson(@QueryParam("startPage") int startPage, @QueryParam("count") int count)
           throws UnauthorizedException {
     try {
       DublinCoreCatalogList result = getSeries(new SeriesQuery().setStartPage(startPage).setCount(count));

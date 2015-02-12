@@ -795,8 +795,8 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    */
   @Override
   public DublinCoreCatalogList search(SeriesQuery query) throws SeriesServiceDatabaseException {
-    int count = query.getCount() > 0 ? (int) query.getCount() : 20; // default to 20 items if not specified
-    int startPage = query.getStartPage() > 0 ? (int) query.getStartPage() : 0; // default to page zero
+    int count = query.getCount() > 0 ? query.getCount() : 20; // default to 20 items if not specified
+    int startPage = query.getStartPage() > 0 ? query.getStartPage() : 0; // default to page zero
 
     SolrQuery solrQuery = new SolrQuery();
     solrQuery.setRows(count);
