@@ -34,6 +34,9 @@ import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchResultItem.SearchResultItemType;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -47,13 +50,69 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * This class provides basic functionality for creating feeds and is used as the base implementation for the default
  * feed generators.
  */
 public abstract class AbstractFeedGenerator implements FeedGenerator {
+
+  /** the logging facility provided by log4j */
+  private static final Logger logger = LoggerFactory.getLogger(AbstractFeedGenerator.class);
+
+  /** Property key for the organizations engage ui url */
+  public static final String PROP_ORG_ENGAGE_UI_URL = "org.opencastproject.engage.ui.url";
+
+  /** Property key for the organizations feed url */
+  public static final String PROP_ORG_FEED_URL = "feed.url";
+
+  /** Property key for the feed uri */
+  public static final String PROP_URI = "feed.uri";
+
+  /** Property key for the number of feed entries */
+  public static final String PROP_SIZE = "feed.size";
+
+  /** Property key for the feed selector pattern */
+  public static final String PROP_SELECTOR = "feed.selector";
+
+  /** Property key for the feed name */
+  public static final String PROP_NAME = "feed.name";
+
+  /** Property key for the feed description */
+  public static final String PROP_DESCRIPTION = "feed.description";
+
+  /** Property key for the feed copyright note */
+  public static final String PROP_COPYRIGHT = "feed.copyright";
+
+  /** Property key for the feed home url */
+  public static final String PROP_HOME = "feed.home";
+
+  /** Property key for the feed cover url */
+  public static final String PROP_COVER = "feed.cover";
+
+  /** Property key for the feed entry link template */
+  public static final String PROP_ENTRY = "feed.entry";
+
+  /** Property key for the feed entry rel=self link template */
+  public static final String PROP_SELF = "feed.self";
+
+  /** Property key for the feed rss media element flavor */
+  public static final String PROP_RSSFLAVORS = "feed.rssflavors";
+
+  /** Property key for the feed atom media element flavor */
+  public static final String PROP_ATOMFLAVORS = "feed.atomflavors";
+
+  /** Property key for the feed rss media element flavor */
+  public static final String PROP_RSSTAGS = "feed.rsstags";
+
+  /** Property key for the feed rss media type */
+  public static final String PROP_RSS_MEDIA_TYPE = "feed.rssmediatype";
+
+  /** Property key for the feed atom media element flavor */
+  public static final String PROP_ATOMTAGS = "feed.atomtags";
 
   /** A default value for limit */
   protected static final int DEFAULT_LIMIT = 100;
@@ -74,52 +133,49 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   public static final String PROP_RSS_MEDIA_TYPE_DEFAULT = "*";
 
   /** Link to the user interface */
-  protected String linkTemplate = null;
+  private String linkTemplate = null;
 
   /** Link to the user alternative interface */
-  protected String linkSelf = null;
+  private String linkSelf = null;
 
   /** The feed homepage */
-  protected String home = null;
+  private String home = null;
 
   /** Default format for rss feeds */
-  protected List<MediaPackageElementFlavor> rssTrackFlavors = null;
+  private List<MediaPackageElementFlavor> rssTrackFlavors = null;
 
   /** The */
-  protected List<String> rssMediaTypes = null;
+  private List<String> rssMediaTypes = null;
 
   /** Formats for atom feeds */
-  protected Set<MediaPackageElementFlavor> atomTrackFlavors = null;
+  private Set<MediaPackageElementFlavor> atomTrackFlavors = null;
 
   /** Tags used to mark rss tracks */
-  protected Set<String> rssTags = null;
+  private Set<String> rssTags = null;
 
   /** Tags used to mark atom tracks */
-  protected Set<String> atomTags = null;
+  private Set<String> atomTags = null;
 
   /** the feed uri */
-  protected String uri = null;
+  private String uri = null;
 
   /** the feed size */
-  protected int size = DEFAULT_LIMIT;
+  private int size = DEFAULT_LIMIT;
 
   /** The feed name */
-  protected String name = null;
+  private String name = null;
 
   /** Url to the cover image */
-  protected String cover = null;
+  private String cover = null;
 
   /** Copyright notice */
-  protected String copyright = null;
+  private String copyright = null;
 
   /** The feed description */
-  protected String description = null;
+  private String description = null;
 
   /** The URL of the server for valid URIs in the feeds */
-  protected String serverUrl = null;
-
-  /** the logging facility provided by log4j */
-  private static final Logger logger = LoggerFactory.getLogger(AbstractFeedGenerator.class);
+  private String serverUrl = null;
 
   /**
    * Creates a new abstract feed generator.
@@ -163,6 +219,77 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     this.linkTemplate = entryLinkTemplate;
     if (atomFlavors != null)
       this.atomTrackFlavors.addAll(Arrays.asList(atomFlavors));
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.feed.api.FeedGenerator#initialize(java.util.Properties)
+   */
+  @Override
+  public void initialize(Properties properties) {
+    serverUrl = (String) properties.get(MatterhornConstans.SERVER_URL_PROPERTY);
+
+    uri = generateFeedUri((String) properties.get(PROP_URI));
+
+    String sizeAsString = (String) properties.get(PROP_SIZE);
+    try {
+      if (StringUtils.isNotBlank(sizeAsString)) {
+        size = Integer.parseInt(sizeAsString);
+        if (size == 0)
+          size = Integer.MAX_VALUE;
+      }
+    } catch (NumberFormatException e) {
+      logger.warn("Unable to set the size of the feed to {}", sizeAsString);
+    }
+    name = (String) properties.get(PROP_NAME);
+    description = (String) properties.get(PROP_DESCRIPTION);
+    copyright = (String) properties.get(PROP_COPYRIGHT);
+    home = (String) properties.get(PROP_HOME);
+    // feed.cover can be unset if no branding is required
+    if (StringUtils.isBlank((String) properties.get(PROP_COVER))) {
+      cover = null;
+    } else {
+      cover = (String) properties.get(PROP_COVER);
+    }
+    linkTemplate = (String) properties.get(PROP_ENTRY);
+    if (properties.get(PROP_SELF) != null)
+      linkSelf = (String) properties.get(PROP_SELF);
+    String rssFlavors = (String) properties.get(PROP_RSSFLAVORS);
+    if (rssFlavors != null) {
+      StringTokenizer tok = new StringTokenizer(rssFlavors, " ,;");
+      while (tok.hasMoreTokens()) {
+        addRssTrackFlavor(MediaPackageElementFlavor.parseFlavor(tok.nextToken()));
+      }
+    }
+    String rssMediaTypes = (String) properties.get(PROP_RSS_MEDIA_TYPE);
+    if (rssFlavors == null) {
+      this.rssMediaTypes.add(PROP_RSS_MEDIA_TYPE_DEFAULT);
+    } else {
+      StringTokenizer tok = new StringTokenizer(rssMediaTypes, " ,;");
+      while (tok.hasMoreTokens()) {
+        this.rssMediaTypes.add(tok.nextToken());
+      }
+    }
+    String atomFlavors = (String) properties.get(PROP_ATOMFLAVORS);
+    if (atomFlavors != null) {
+      StringTokenizer tok = new StringTokenizer(atomFlavors, " ,;");
+      while (tok.hasMoreTokens()) {
+        addAtomTrackFlavor(MediaPackageElementFlavor.parseFlavor(tok.nextToken()));
+      }
+    }
+    String rssTags = (String) properties.get(PROP_RSSTAGS);
+    if (rssTags != null) {
+      for (String tag : rssTags.split("\\W")) {
+        addRSSTag(tag);
+      }
+    }
+    String atomTags = (String) properties.get(PROP_ATOMTAGS);
+    if (atomTags != null) {
+      for (String tag : atomTags.split("\\W")) {
+        addAtomTag(tag);
+      }
+    }
   }
 
   /**
@@ -245,11 +372,80 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.feed.api.FeedGenerator#getCover()
+   * @see org.opencastproject.feed.api.FeedGenerator#getCover(Organization)
    */
   @Override
-  public String getCover() {
-    return cover;
+  public String getCover(Organization organization) {
+    String feedURL = organization.getProperties().get(PROP_ORG_FEED_URL);
+    String engageUIURL = organization.getProperties().get(PROP_ORG_ENGAGE_UI_URL);
+    return ensureUrl(cover, feedURL, engageUIURL, serverUrl);
+  }
+
+  /**
+   * Returns the feed's base URI.
+   *
+   * @return the feed uri
+   */
+  protected String getURI() {
+    return uri;
+  }
+
+  /**
+   * Returns the default size of the feed.
+   *
+   * @return the size
+   */
+  protected int getSize() {
+    return size;
+  }
+
+  /**
+   * Returns the link to the homepage.
+   *
+   * @param organization
+   *          the organization
+   * @return the homepage
+   */
+  protected String getHome(Organization organization) {
+    String feedURL = organization.getProperties().get(PROP_ORG_FEED_URL);
+    String engageUIURL = organization.getProperties().get(PROP_ORG_ENGAGE_UI_URL);
+    return ensureUrl(home, feedURL, engageUIURL, serverUrl);
+  }
+
+  /**
+   * Returns the template used to render link to feed items.
+   *
+   * @param organization
+   *          the organization
+   * @return the link template
+   */
+  public String getLinkTemplate(Organization organization) {
+    String feedURL = organization.getProperties().get(PROP_ORG_FEED_URL);
+    String engageUIURL = organization.getProperties().get(PROP_ORG_ENGAGE_UI_URL);
+    return ensureUrl(linkTemplate, feedURL, engageUIURL, serverUrl);
+  }
+
+  /**
+   * Returns the link to the feed itself.
+   *
+   * @param organization
+   *          the organization
+   * @return the link to the feed
+   */
+  public String getLinkToSelf(Organization organization) {
+    String feedURL = organization.getProperties().get(PROP_ORG_FEED_URL);
+    String engageUIURL = organization.getProperties().get(PROP_ORG_ENGAGE_UI_URL);
+    return ensureUrl(linkSelf, feedURL, engageUIURL, serverUrl);
+  }
+
+  /**
+   * Returns the feed uri
+   *
+   * @param feedId
+   * @return
+   */
+  protected String generateFeedUri(String feedId) {
+    return ensureUrl(feedId, serverUrl);
   }
 
   /**
@@ -324,7 +520,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    * @see org.opencastproject.feed.api.FeedGenerator#createFeed(org.opencastproject.feed.api.Feed.Type,
    *      java.lang.String[], int)
    */
-  public final Feed createFeed(Feed.Type type, String[] query, int size) {
+  public final Feed createFeed(Feed.Type type, String[] query, int size, Organization organization) {
     logger.debug("Started to create {} feed", type);
     SearchResult result = null;
 
@@ -341,9 +537,9 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
       throw new IllegalStateException("Feed uri (feed.uri) must be configured");
     if (name == null)
       throw new IllegalStateException("Feed name (feed.name) must be configured");
-    if (home == null)
+    if (getHome(organization) == null)
       throw new IllegalStateException("Feed url (feed.home) must be configured");
-    if (linkTemplate == null)
+    if (getLinkTemplate(organization) == null)
       throw new IllegalStateException("Feed link template (feed.entry) must be configured");
 
     // Have the concrete implementation load the feed data
@@ -355,13 +551,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
     // Create the feed
     Feed f = createFeed(type, getIdentifier(), new ContentImpl(getName()), new ContentImpl(getDescription()),
-            getFeedLink());
-
-    // Set the copyright
-    if (StringUtils.isNotBlank(getCopyright()))
-      f.setCopyright(getCopyright());
-
-    // Adjust the feed encoding
+            getFeedLink(organization));
     f.setEncoding(ENCODING);
 
     // Set iTunes tags
@@ -380,9 +570,9 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     for (SearchResultItem resultItem : result.getItems()) {
       try {
         if (resultItem.getType().equals(SearchResultItemType.Series))
-          addSeries(f, query, resultItem);
+          addSeries(f, query, resultItem, organization);
         else
-          addEpisode(f, query, resultItem);
+          addEpisode(f, query, resultItem, organization);
       } catch (Throwable t) {
         logger.error(
                 "Error creating entry with id " + resultItem.getId() + " for feed " + this + ": " + t.getMessage(), t);
@@ -403,9 +593,11 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    *          the query that results in the feed
    * @param resultItem
    *          the series item
+   * @param organization
+   *          the organization
    * @return the feed
    */
-  protected Feed addSeries(Feed feed, String[] query, SearchResultItem resultItem) {
+  protected Feed addSeries(Feed feed, String[] query, SearchResultItem resultItem, Organization organization) {
     Date d = resultItem.getDcCreated();
 
     // find iTunes module
@@ -446,7 +638,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
       feed.setLanguage(resultItem.getDcLanguage());
 
     feed.setUri(resultItem.getId());
-    feed.addLink(new LinkImpl(getLinkForEntry(feed, resultItem)));
+    feed.addLink(new LinkImpl(getLinkForEntry(feed, resultItem, organization)));
 
     if (d != null)
       feed.setPublishedDate(d);
@@ -475,10 +667,12 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    *          the query that results in the feed
    * @param resultItem
    *          the episodes item
+   * @param organization
+   *          the organization
    * @return the feed
    */
-  protected Feed addEpisode(Feed feed, String[] query, SearchResultItem resultItem) {
-    String link = getLinkForEntry(feed, resultItem);
+  protected Feed addEpisode(Feed feed, String[] query, SearchResultItem resultItem, Organization organization) {
+    String link = getLinkForEntry(feed, resultItem, organization);
     String title = resultItem.getDcTitle();
 
     // Get the media enclosures
@@ -507,8 +701,8 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         entryUri = generateEntryUri(resultItem.getId());
         FeedEntry entry = createEntry(feed, title, link, entryUri);
         entry = populateFeedEntry(entry, resultItem, enclosures);
-        if (getLinkSelf() != null) {
-          LinkImpl self = new LinkImpl(getSelfLinkForEntry(feed, resultItem));
+        if (getLinkSelf(organization) != null) {
+          LinkImpl self = new LinkImpl(getSelfLinkForEntry(feed, resultItem, organization));
           self.setRel("self");
           entry.addLink(self);
         }
@@ -650,14 +844,14 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         trackLength = 0;
         if (((TrackImpl) element).hasVideo()) {
           List<VideoStream> video = ((TrackImpl) element).getVideo();
-          if (video != null && video.get(0) != null && video.get(0).getBitRate() != null) {
+          if (video.get(0).getBitRate() != null) {
             trackLength += metadata.getDcExtent() / 1000 * video.get(0).getBitRate() / 8;
           }
         }
 
         if (((TrackImpl) element).hasAudio()) {
           List<AudioStream> audio = ((TrackImpl) element).getAudio();
-          if (audio != null && audio.get(0) != null && audio.get(0).getBitRate() != null) {
+          if (audio.get(0).getBitRate() != null) {
             trackLength += metadata.getDcExtent() / 1000 * audio.get(0).getBitRate() / 8;
           }
         }
@@ -948,10 +1142,14 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /**
    * Returns the url to the feed's homepage.
    *
+   * @param organization
+   *          the organization
    * @return the feed home
    */
-  public String getFeedLink() {
-    return home;
+  public String getFeedLink(Organization organization) {
+    String feedURL = organization.getProperties().get(PROP_ORG_FEED_URL);
+    String engageUIURL = organization.getProperties().get(PROP_ORG_ENGAGE_UI_URL);
+    return ensureUrl(home, feedURL, engageUIURL, serverUrl);
   }
 
   /**
@@ -963,15 +1161,6 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    */
   public void setLinkTemplate(String url) {
     linkTemplate = url;
-  }
-
-  /**
-   * Returns the link template to the default user interface.
-   *
-   * @return the link to the ui
-   */
-  public String getLinkTemplate() {
-    return linkTemplate;
   }
 
   /**
@@ -990,8 +1179,10 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    *
    * @return the link to the ui
    */
-  public String getLinkSelf() {
-    return linkSelf;
+  public String getLinkSelf(Organization organization) {
+    String feedURL = organization.getProperties().get(PROP_ORG_FEED_URL);
+    String engageUIURL = organization.getProperties().get(PROP_ORG_ENGAGE_UI_URL);
+    return ensureUrl(linkSelf, feedURL, engageUIURL, serverUrl);
   }
 
   /**
@@ -1003,12 +1194,12 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    *          the feed
    * @param solrResultItem
    *          solr search result for this feed entry
+   * @param organization
+   *          the organization
    * @return the link to the ui
    */
-  protected String getLinkForEntry(Feed feed, SearchResultItem solrResultItem) {
-    if (linkTemplate == null)
-      throw new IllegalStateException("No template defined");
-    return MessageFormat.format(linkTemplate, solrResultItem.getId());
+  protected String getLinkForEntry(Feed feed, SearchResultItem solrResultItem, Organization organization) {
+    return MessageFormat.format(getLinkTemplate(organization), solrResultItem.getId());
   }
 
   /**
@@ -1019,12 +1210,36 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    *          the feed
    * @param solrResultItem
    *          solr search result for this feed entry
+   * @param organization
+   *          the organization
    * @return the link to the ui
    */
-  protected String getSelfLinkForEntry(Feed feed, SearchResultItem solrResultItem) {
-    if (linkSelf == null)
-      return linkSelf;
-    return MessageFormat.format(linkSelf, solrResultItem.getId());
+  protected String getSelfLinkForEntry(Feed feed, SearchResultItem solrResultItem, Organization organization) {
+    return MessageFormat.format(getLinkSelf(organization), solrResultItem.getId());
+  }
+
+  /**
+   * Ensures that this string is an absolute URL. If not, prepend the local serverUrl to the string.
+   *
+   * @param string
+   *          The absolute or relative URL
+   * @param baseUrl
+   *          The base URL to prepend
+   * @return An absolute URL
+   */
+  protected String ensureUrl(String string, String... baseUrl) {
+    String pathOrUrl = StringUtils.trimToEmpty(string);
+    try {
+      new URL(pathOrUrl);
+      return pathOrUrl;
+    } catch (Exception e) {
+      for (String url : baseUrl) {
+        if (StringUtils.isNotBlank(url)) {
+          return UrlSupport.concat(url, pathOrUrl);
+        }
+      }
+      throw new IllegalArgumentException("All potential base urls were blank");
+    }
   }
 
   /**

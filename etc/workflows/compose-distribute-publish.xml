@@ -175,7 +175,9 @@
       <configurations>
         <configuration key="source-flavor">presenter/source</configuration>
         <configuration key="target-flavor">presenter/work</configuration>
-        <configuration key="rewrite">false</configuration>
+        <configuration key="rewrite">true</configuration>
+	<configuration key="mux-encoding-profile">mux-editor.work</configuration>
+        <configuration key="audio-video-encoding-profile">editor.work</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
     </operation>
@@ -190,7 +192,9 @@
       <configurations>
         <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-flavor">presentation/work</configuration>
-        <configuration key="rewrite">false</configuration>
+        <configuration key="rewrite">true</configuration>
+	<configuration key="mux-encoding-profile">mux-editor.work</configuration>
+	<configuration key="audio-video-encoding-profile">editor.work</configuration>
         <configuration key="promiscuous-audio-muxing">true</configuration>
       </configurations>
     </operation>
@@ -204,7 +208,7 @@
       <configurations>
         <configuration key="source-flavor">*/work</configuration>
         <configuration key="target-flavor">*/preview</configuration>
-        <configuration key="encoding-profile">editor.work</configuration>
+        <configuration key="encoding-profile">mp4-preview.http</configuration>
       </configurations>
     </operation>
 
@@ -256,7 +260,7 @@
       exception-handler-workflow="error"
       description="Waiting for user to review / video edit recording">
       <configurations>
-        <configuration key="source-flavors">*/preview</configuration>
+        <configuration key="source-flavors">*/work</configuration>
         <configuration key="preview-flavors">*/preview</configuration>
         <configuration key="skipped-flavors">*/work</configuration>
         <configuration key="smil-flavors">*/smil</configuration>

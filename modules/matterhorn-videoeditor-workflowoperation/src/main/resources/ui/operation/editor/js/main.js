@@ -489,7 +489,7 @@ function loadTracks() {
             // load metadata from DC xml for editing
             $.each(ocUtils.ensureArray(workflowInstance.mediapackage.metadata.catalog), function(key, value) {
                 if (value.type == "dublincore/episode") {
-                    catalogUrl = value.url;
+                    catalogUrl = window.location.protocol + value.url.substring(value.url.indexOf('/'));
                 }
             });
 
