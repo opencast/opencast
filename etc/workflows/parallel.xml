@@ -334,29 +334,15 @@
       id="encode"
       fail-on-error="true"
       exception-handler-workflow="error"
-      description="encoding video files">
+      description="encoding media files">
       <configurations>
-        <configuration key="source-flavor">presenter/trimmed</configuration>
-        <configuration key="target-flavor">presenter/delivery</configuration>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
         <configuration key="encoding-profile">parallel.http</configuration>
       </configurations>
     </operation>
 
-    <!-- encode presentation (vga) to Engage player format -->
-
-    <operation
-      id="compose"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="encoding vga files">
-      <configurations>
-        <configuration key="source-flavor">presentation/trimmed</configuration>
-        <configuration key="target-flavor">presentation/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">parallel.http</configuration>
-      </configurations>
-    </operation>
     <!-- encode to feed preview images -->
 
     <operation
