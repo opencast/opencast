@@ -463,11 +463,11 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       }
     }
   }
-  
+
   /**
    * Executes the command line encoder with the given set of files and properties and using the provided encoding
    * profile.
-   * 
+   *
    * @param videoSource
    *          the video file
    * @param profile
@@ -500,7 +500,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       }
       String outDir = mediaSource.getAbsoluteFile().getParent();
       String outFileName = FilenameUtils.getBaseName(mediaSource.getName());
-      
+
 
       if (params.containsKey("time")) {
         outFileName += "_" + properties.get("time");
@@ -510,16 +510,16 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       outFileName += "_" + UUID.randomUUID().toString();
 
       params.put("out.dir", outDir);
-      params.put("out.name", outFileName); 
-      
+      params.put("out.name", outFileName);
+
       ArrayList<String> suffixes = new ArrayList<String>();
-      
+
       for (String tag : profile.getTags()) {
         String outSuffix = processParameters(profile.getSuffix(tag));
         params.put("out.suffix" + "." + tag, outSuffix);
         suffixes.add(outSuffix);
       }
-      
+
       // create encoder process.
       // no special working dir is set which means the working dir of the
       // current java process is used.
@@ -555,7 +555,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       for (String outSuffix : suffixes) {
           tracks.add(new File(mediaSource.getParent(), outFileName + outSuffix));
       }
-      return tracks; 
+      return tracks;
     } catch (EncoderException e) {
       logger.warn("Error while encoding video track {} using '{}': {}", new String[] {
              (mediaSource == null ? "N/A" : mediaSource.getName()), profile.getIdentifier(), e.getMessage() });
@@ -570,11 +570,11 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       IoSupport.closeQuietly(in);
       IoSupport.closeQuietly(encoderProcess);
     }
-  }  
-  
+  }
+
   protected List<String> getTags(EncodingProfile profile) {
     ArrayList<String> tags = new ArrayList<String>();
-    
+
     return tags;
   }
 

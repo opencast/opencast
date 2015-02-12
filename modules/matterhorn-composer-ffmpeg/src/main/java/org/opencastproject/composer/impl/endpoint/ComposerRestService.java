@@ -166,10 +166,10 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
-  
+
   /**
    * Encodes a track to multiple tracks in parallel.
-   * 
+   *
    * @param sourceTrack
    *          The source track
    * @param profileId
@@ -201,7 +201,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
     if (job == null)
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Encoding failed").build();
     return Response.ok().entity(new JaxbJob(job)).build();
-  }    
+  }
 
   /**
    * Trims a track to a new length.

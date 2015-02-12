@@ -17,6 +17,8 @@
 package org.opencastproject.feed.api;
 
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesService;
 
 import java.util.Properties;
@@ -50,9 +52,11 @@ public interface FeedGenerator {
   /**
    * Return the feed link.
    *
+   * @param organization
+   *          the organization
    * @return the feed link
    */
-  String getFeedLink();
+  String getFeedLink(Organization organization);
 
   /**
    * Returns <code>true</code> if the generator is able to satisfy the request for a feed described by the query. The
@@ -72,9 +76,11 @@ public interface FeedGenerator {
    *          the request
    * @param size
    *          the requested size of the feed
+   * @param organization
+   *          the organization
    * @return the feed or <code>null</code>
    */
-  Feed createFeed(Feed.Type type, String[] query, int size);
+  Feed createFeed(Feed.Type type, String[] query, int size, Organization organization);
 
   /**
    * Returns the copyright for the feed.
@@ -86,9 +92,11 @@ public interface FeedGenerator {
   /**
    * Returns the url to the cover art.
    *
+   * @param organization
+   *          the organization
    * @return the cover
    */
-  String getCover();
+  String getCover(Organization organization);
 
   /**
    * Initializes the feed generator using the following properties:
@@ -132,5 +140,14 @@ public interface FeedGenerator {
    *          The series service to use in finding data to expose in the feed
    */
   void setSeriesService(SeriesService seriesService);
+
+  /**
+   * Sets the security service for this feed generator. FIXME: This shouldn't be exposed in the API, but must be present
+   * for the FeedRegistrationScanner to function.
+   *
+   * @param securityService
+   *          The security service to use in finding data to expose in the feed
+   */
+  void setSecurityService(SecurityService securityService);
 
 }

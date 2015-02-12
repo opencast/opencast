@@ -235,5 +235,15 @@ public interface SchedulerService {
 
   /** Update all events with metadata from eventCatalog. */
   void updateEvents(List<Long> eventIds, final DublinCoreCatalog eventCatalog) throws NotFoundException,
-          SchedulerException, UnauthorizedException;
+  SchedulerException, UnauthorizedException;
+
+  /**
+   * Remove all of the scheduled events before a buffer.
+   *
+   * @param buffer
+   *          The number of seconds before now that defines a cutoff for events, if they have their end time before this
+   *          cutoff they will be removed
+   * @throws SchedulerException
+   */
+  void removeScheduledRecordingsBeforeBuffer(long buffer) throws SchedulerException;
 }

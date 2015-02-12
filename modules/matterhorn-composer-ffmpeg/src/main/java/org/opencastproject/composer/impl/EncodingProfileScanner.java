@@ -197,18 +197,18 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
     //Suffixes with tags?
     List<String> tags = getTags(profile, properties, defaultProperties);
-    if (tags.size() > 0) {     
+    if (tags.size() > 0) {
       for (String tag : tags) {
         String prop = PROP_SUFFIX + "." + tag;
         String suffixObj = getDefaultProperty(profile, prop, properties, defaultProperties);
         df.setSuffix(tag, StringUtils.trim(suffixObj));
       }
-    } else {   
+    } else {
       // Suffix old stile, without tags
       String suffixObj = getDefaultProperty(profile, PROP_SUFFIX, properties, defaultProperties);
       if (StringUtils.isBlank(suffixObj))
         throw new ConfigurationException("Suffix (" + PROP_SUFFIX + ") of profile '" + profile + "' is missing");
-      df.setSuffix(StringUtils.trim(suffixObj)); 
+      df.setSuffix(StringUtils.trim(suffixObj));
     }
 
     // Mimetype
@@ -277,7 +277,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
    *          the list of default property keys
    * @return A list of tags for output files
    */
-  
+
   private static List<String> getTags(String profile, Properties properties, List<String> list) {
     Set<Object> keys = properties.keySet();
     StringBuffer buf = new StringBuffer(PROP_PREFIX);
@@ -286,15 +286,15 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     String key = buf.toString();
 
     ArrayList<String> tags = new ArrayList<String>();
-    for (Object o : keys) {       
-      String k = o.toString(); 
+    for (Object o : keys) {
+      String k = o.toString();
       if (k.startsWith(key)) {
         if (k.substring(key.length()).length() > 0) {
           list.add(k);
           tags.add(k.substring(key.length() + 1));
         }
       }
-    }  
+    }
     return tags;
   }
 

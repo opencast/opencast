@@ -21,31 +21,6 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-kernel</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-inspection-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-ingest-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-composer-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-series-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -66,102 +41,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-publication-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-working-file-repository-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workspace-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-textanalyzer-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-sox-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-videosegmenter-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-caption-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-smil-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-smil-impl</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-silencedetection-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-videoeditor-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-dublincore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-mpeg7</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-speech-recognition-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>3.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -173,19 +58,9 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.gstreamer</groupId>
-      <artifactId>gstreamer-java</artifactId>
-      <version>1.4-no-tests-and-bin-launch</version>
-    </dependency>
-    <dependency>
-      <groupId>net.java.dev.jna</groupId>
-      <artifactId>jna</artifactId>
-      <version>3.2.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sakaiproject.nakamura</groupId>
-      <artifactId>javax.activation-mail</artifactId>
-      <version>1.1.1.1.4.2-1.4.2</version>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-distribution-workflowoperation</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -213,56 +88,7 @@
               org.opencastproject.event.handler;version=${project.version}
             </Private-Package>
             <Service-Component>
-              OSGI-INF/events/series-updated.xml,
-              OSGI-INF/operations/analyze-audio.xml,
-              OSGI-INF/operations/analyze-text.xml,
-              OSGI-INF/operations/analyze-videosegments.xml,
-              OSGI-INF/operations/append.xml,
-              OSGI-INF/operations/apply-acl.xml,
-              OSGI-INF/operations/archive.xml,
-              OSGI-INF/operations/capture.xml,
-              OSGI-INF/operations/caption.xml,
-              OSGI-INF/operations/cli.xml,
-              OSGI-INF/operations/cleanup.xml,
-              OSGI-INF/operations/compose.xml,
-              OSGI-INF/operations/composite.xml,
-              OSGI-INF/operations/concat.xml,
-              OSGI-INF/operations/coverart.xml,
-              OSGI-INF/operations/delete-archive.xml,
-              OSGI-INF/operations/editor.xml,
-              OSGI-INF/operations/distribute-acl.xml,
-              OSGI-INF/operations/distribute-mediapackagepost.xml,
-              OSGI-INF/operations/download-dvd.xml,
-              OSGI-INF/operations/encode.xml,  
-              OSGI-INF/operations/email.xml,
-              OSGI-INF/operations/embed.xml,
-              OSGI-INF/operations/publish-engage.xml,
-              OSGI-INF/operations/publish-youtube.xml,
-              OSGI-INF/operations/error-handler.xml,
-              OSGI-INF/operations/error-resolution.xml,
-              OSGI-INF/operations/failing.xml,
-              OSGI-INF/operations/http-notify.xml,
-              OSGI-INF/operations/image.xml,
-              OSGI-INF/operations/image-to-video.xml,
-              OSGI-INF/operations/ingest.xml,
-              OSGI-INF/operations/ingest-download.xml,
-              OSGI-INF/operations/inspect.xml,
-              OSGI-INF/operations/normalize-audio.xml,
-              OSGI-INF/operations/prepare-av.xml,
-              OSGI-INF/operations/republish.xml,
-              OSGI-INF/operations/retract-engage.xml,
-              OSGI-INF/operations/retract-youtube.xml,
-              OSGI-INF/operations/review.xml,
-              OSGI-INF/operations/searchindex-remove.xml,
-              OSGI-INF/operations/schedule.xml,
-              OSGI-INF/operations/segmentpreviews.xml,
-              OSGI-INF/operations/silence.xml,
-              OSGI-INF/operations/speech-recognition.xml,
-              OSGI-INF/operations/tag.xml,
-              OSGI-INF/operations/trim.xml,
-              OSGI-INF/operations/zip.xml,
-              OSGI-INF/operations/waveform.xml,
-              OSGI-INF/operations/watermark.xml
+              OSGI-INF/events/series-updated.xml
             </Service-Component>
           </instructions>
         </configuration>

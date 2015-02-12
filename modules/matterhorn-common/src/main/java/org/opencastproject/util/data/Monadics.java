@@ -254,7 +254,7 @@ public final class Monadics {
 
   // -- matchers and constructors
 
-  public static interface Matcher<A, B> {
+  public interface Matcher<A, B> {
     boolean matches(ListMonadic<A> m);
 
     B apply(ListMonadic<A> m);

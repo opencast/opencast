@@ -71,7 +71,7 @@
     <dependency>
       <groupId>com.jayway.restassured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>1.8.1</version>
+      <version>2.4.0</version>
       <exclusions>
         <exclusion>
           <groupId>org.hamcrest</groupId>
@@ -86,8 +86,19 @@
     <dependency>
       <groupId>org.xmlmatchers</groupId>
       <artifactId>xml-matchers</artifactId>
-      <version>0.10</version>
+      <version>1.0-RC1</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>net.sf.saxon</artifactId>
+          <groupId>Saxon-HE</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.saxon</groupId>
+      <artifactId>Saxon-HE</artifactId>
+      <version>9.6.0-4</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -107,7 +118,6 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>3.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

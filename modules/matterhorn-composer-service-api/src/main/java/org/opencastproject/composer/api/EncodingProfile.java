@@ -93,19 +93,19 @@ public interface EncodingProfile {
 
   /**
    * Returns a suffix of the files. First tag found used if tags are used but not provided in the request
-   * 
+   *
    * @return the suffix
    */
   String getSuffix();
-  
+
   /**
    * Returns a suffix of the files for a certain tag.
-   * 
+   *
    * @param tag a tag that describes the aoutput file
    * @return the suffix
    */
-  String getSuffix(String tag);  
-  
+  String getSuffix(String tag);
+
   /**
    * Returns a list of the tags for output files used in this request
    * @return a list of the used tags

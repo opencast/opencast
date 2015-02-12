@@ -317,11 +317,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
     }
   }
- 
+
   /**
    * Encodes audio and video track to a file. If both an audio and a video track are given, they are muxed together into
    * one movie container.
-   * 
+   *
    * @param videoTrack
    *          the video track
    * @param audioTrack
@@ -374,7 +374,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         URI returnURL = null;
         InputStream in = null;
         final String targetTrackId = idBuilder.createNew().toString();
-        
+
         try {
           in = new FileInputStream(encodingOutput);
           returnURL = workspace.putInCollection(COLLECTION,
@@ -405,8 +405,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
         Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
         inspectedTrack.setIdentifier(targetTrackId);
-        
-        List<String> tags = profile.getTags();        
+
+        List<String> tags = profile.getTags();
         if (tags.size() > 0) {
           for (int j = 0; j < tags.size(); j++) {
             if (encodingOutput.getName().endsWith(profile.getSuffix(tags.get(j))))
@@ -414,14 +414,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           }
         }
 
-// Will the mimetype be provided by the inspect service?        
+// Will the mimetype be provided by the inspect service?
 //        if (profile.getMimeType() != null)
 //          inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
 
         encodedTracks.add(inspectedTrack);
         i++;
       }
-      
+
       return encodedTracks;
     } catch (Exception e) {
       logger.warn("Error encoding " + mediaTrack, e);
@@ -431,11 +431,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         throw new EncoderException(e);
       }
     }
-  }  
-  
+  }
+
     /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.composer.api.ComposerService#encode(org.opencastproject.mediapackage.Track,
    *      java.lang.String)
    */
@@ -1517,7 +1517,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
           break;
         case ParallelEncode:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
-          encodingProfile = arguments.get(1);         
+          encodingProfile = arguments.get(1);
           serialized = MediaPackageElementParser.getArrayAsXml(parralelEncode(job, firstTrack, encodingProfile, null));
           break;
         case Image:

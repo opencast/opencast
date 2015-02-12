@@ -339,7 +339,7 @@ public class ComposerServiceTest {
       assertTrue("The Job parameter must not be null".equals(e.getMessage()));
     }
   }
-  
+
   @Test
   public void testParallelEncode() throws Exception {
     if (!ffmpegInstalled)
@@ -370,7 +370,7 @@ public class ComposerServiceTest {
     } catch (EncoderException e) {
       assertTrue("test complete".equals(e.getMessage()));
     }
-  }  
+  }
 
   /**
    * Test method for

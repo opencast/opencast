@@ -18,7 +18,9 @@ package org.opencastproject.util;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.util.JsonVal.*;
+import static org.opencastproject.util.JsonVal.asString;
+import static org.opencastproject.util.JsonVal.asInteger;
+import static org.opencastproject.util.JsonVal.asBoolean;
 
 public class JsonObjTest {
   private static final String JSON = "{\"service\": {\n"

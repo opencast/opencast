@@ -70,9 +70,9 @@
       <classifier>jdk5</classifier>
     </dependency>
     <dependency>
-      <groupId>org.gstreamer</groupId>
+      <groupId>com.googlecode.gstreamer-java</groupId>
       <artifactId>gstreamer-java</artifactId>
-      <version>1.4-no-tests-and-bin-launch</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>net.java.dev.jna</groupId>
@@ -143,7 +143,6 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>3.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

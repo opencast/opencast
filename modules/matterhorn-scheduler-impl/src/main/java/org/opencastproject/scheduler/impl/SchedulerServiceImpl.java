@@ -44,7 +44,9 @@ import org.opencastproject.scheduler.api.SchedulerQuery.Sort;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
@@ -63,6 +65,9 @@ import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -915,6 +920,34 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     }
   }
 
+  /**
+   * Removes an event but doesn't fail if the event's workflow or persistence record has already been deleted.
+   * @param eventId The id of the event to remove.
+   */
+  private void removeEventTolerantOfNotFound(final long eventId) throws SchedulerException, NotFoundException, UnauthorizedException {
+    try {
+      stopWorkflowInstance(eventId);
+    } catch (NotFoundException e) {
+      logger.info("Skipping removing workflow instance with id {} because it wasn't found, it must have been removed already.", eventId);
+    }
+
+    try {
+      persistence.deleteEvent(eventId);
+    } catch (NotFoundException e) {
+      logger.info("Skipping removing scheduled event from persistence with id {} because it wasn't found, it must have been removed already.", eventId);
+    } catch (SchedulerServiceDatabaseException e) {
+      logger.error("Could not remove event '{}' from persistent storage: {}", eventId, e);
+      throw new SchedulerException(e);
+    }
+
+    try {
+      index.delete(eventId);
+    } catch (Exception e) {
+      logger.warn("Unable to delete event '{}' from index: {}", eventId, e);
+      throw new SchedulerException(e);
+    }
+  }
+
   /*
    * (non-Javadoc)
    *
@@ -1099,6 +1132,79 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
       logger.error("Failed to retrieve last modified for CA {}: {}", filter, e.getMessage());
       throw new SchedulerException(e);
     }
+  }
+
+  /**
+   * Determine the cutoff date to remove recordings in GMT
+   * @param buffer The number of seconds before now to start the cutoff date
+   * @return A date that is the number of seconds in buffer before now in GMT.
+   */
+  public static org.joda.time.DateTime getCutoffDate(long buffer) {
+    return getCutoffDate(buffer, new org.joda.time.DateTime(DateTimeZone.getDefault()));
+  }
+
+ /**
+  * Determine the cutoff date to remove recordings in GMT
+  * @param buffer The number of seconds before now to start the cutoff date
+  * @param dateTimeZone The time zone to use to get the current time.
+  * @return A date that is the number of seconds in buffer before now in GMT.
+  */
+  public static org.joda.time.DateTime getCutoffDate(long buffer, org.joda.time.DateTime dateTime) {
+    org.joda.time.DateTime dt = dateTime.toDateTime(DateTimeZone.UTC).minus(buffer * 1000);
+    return dt;
+  }
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see org.opencastproject.scheduler.api.SchedulerService#removeScheduledRecordingsBeforeBuffer(long)
+   */
+  @Override
+  public void removeScheduledRecordingsBeforeBuffer(long buffer) throws SchedulerException {
+    int recordingsRemoved = 0;
+    DublinCoreCatalogList finishedEvents;
+    DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    org.joda.time.DateTime end = getCutoffDate(buffer);
+
+    org.joda.time.DateTime start = new org.joda.time.DateTime();
+    start.withYear(1999);
+    start.withDayOfYear(1);
+
+    logger.info("Starting to look for scheduled recordings that have finished "
+            + Log.getHumanReadableTimeString(buffer) + " ago from " + dateTimeFormatter.print(start) + " to " + dateTimeFormatter.print(end) + ".");
+    SchedulerQuery q = new SchedulerQuery();
+    long id = -1;
+    try {
+      q.setEndsFrom(SolrUtils.parseDate(dateTimeFormatter.print(start)));
+      q.setEndsTo(SolrUtils.parseDate(dateTimeFormatter.print(end)));
+    } catch (ParseException e) {
+      logger.error("Unable to parse the date " + end + " as a cut off to remove finished scheduled recordings.");
+      throw new SchedulerException(e);
+    }
+
+    try {
+      finishedEvents = search(q);
+    } catch (SchedulerException e) {
+      logger.error("Unable to search for finished events: ", e);
+      throw new SchedulerException(e);
+    }
+
+    logger.debug("Found {} events from search.", finishedEvents.getTotalCount());
+    for (DublinCoreCatalog catalog : finishedEvents.getCatalogList()) {
+      try {
+        String idText = catalog.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER);
+        id = Long.parseLong(StringUtils.trimToNull(idText));
+        removeEventTolerantOfNotFound(id);
+        logger.debug("Sucessfully removed scheduled event with id " + id);
+        recordingsRemoved++;
+      } catch (NotFoundException e) {
+        logger.debug("Skipping event with id {} because it is not found", id);
+      } catch (Exception e) {
+        logger.warn("Unable to delete event with id '" + id + "':", e);
+      }
+    }
+    logger.info("Found " + recordingsRemoved + " to remove that ended " + Log.getHumanReadableTimeString(buffer)
+            + " ago from " + dateTimeFormatter.print(start) + " to " + dateTimeFormatter.print(end) + ".");
   }
 
   /**

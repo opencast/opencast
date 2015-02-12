@@ -19,22 +19,20 @@ import org.opencastproject.feed.api.Feed.Type;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesService;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 /**
  * Convenience implementation that is intended to serve as a base implementation for feed generator services. It handles
  * service activation, reads a default set of properties (see below) and can be configured to track the opencast
- * {@link SearchService} by using {@link #setSearchService(SearchService)}.
- * {@link SeriesService} by using {@link #setSeriesService(SeriesService)}.
+ * {@link SearchService} by using {@link #setSearchService(SearchService)}, {@link SeriesService} by using
+ * {@link #setSeriesService(SeriesService)} and {@link SecurityService} by using
+ * {@link #setSecurityService(SecurityService)}.
  * <p>
  * By using this implementation as the basis for feed services, only the two methods accept and loadFeedData need to be
  * implemented by subclasses.
@@ -62,59 +60,17 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
   /** Logging facility */
   private static Logger logger = LoggerFactory.getLogger(AbstractFeedService.class);
 
-  /** Property key for the feed uri */
-  public static final String PROP_URI = "feed.uri";
-
-  /** Property key for the number of feed entries */
-  public static final String PROP_SIZE = "feed.size";
-
-  /** Property key for the feed selector pattern */
-  public static final String PROP_SELECTOR = "feed.selector";
-
-  /** Property key for the feed name */
-  public static final String PROP_NAME = "feed.name";
-
-  /** Property key for the feed description */
-  public static final String PROP_DESCRIPTION = "feed.description";
-
-  /** Property key for the feed copyright note */
-  public static final String PROP_COPYRIGHT = "feed.copyright";
-
-  /** Property key for the feed home url */
-  public static final String PROP_HOME = "feed.home";
-
-  /** Property key for the feed cover url */
-  public static final String PROP_COVER = "feed.cover";
-
-  /** Property key for the feed entry link template */
-  public static final String PROP_ENTRY = "feed.entry";
-
-  /** Property key for the feed entry rel=self link template */
-  public static final String PROP_SELF = "feed.self";
-
-  /** Property key for the feed rss media element flavor */
-  public static final String PROP_RSSFLAVORS = "feed.rssflavors";
-
-  /** Property key for the feed atom media element flavor */
-  public static final String PROP_ATOMFLAVORS = "feed.atomflavors";
-
-  /** Property key for the feed rss media element flavor */
-  public static final String PROP_RSSTAGS = "feed.rsstags";
-
-  /** Property key for the feed rss media type */
-  public static final String PROP_RSS_MEDIA_TYPE = "feed.rssmediatype";
-
-  /** Property key for the feed atom media element flavor */
-  public static final String PROP_ATOMTAGS = "feed.atomtags";
-
   /** The selector used to match urls */
-  protected String selector = null;
+  private String selector = null;
 
   /** The search service */
   protected SearchService searchService = null;
 
   /** The search service */
   protected SeriesService seriesService = null;
+
+  /** The security service */
+  protected SecurityService securityService = null;
 
   /**
    * Creates a new abstract feed generator.
@@ -151,20 +107,22 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
    * @see org.opencastproject.feed.api.FeedGenerator#accept(java.lang.String[])
    */
   public boolean accept(String[] query) {
+    String feedURI = getURI();
+
     if (searchService == null) {
       logger.warn("{} denies to handle request for {} due to missing search service", this, query);
       return false;
-    } else if (uri == null) {
-      logger.warn("{} denies to handle request for {} since no uri is defined", this);
+    } else if (feedURI == null) {
+      logger.warn("{} denies to handle request for {} since no uri is defined", this, query);
       return false;
     } else if (query.length == 0) {
       logger.debug("{} denies to handle unknown request", this);
       return false;
     }
 
-    //truncate uri, as it had to be and real uri not an id
+    // truncate uri, as it had to be and real uri not an id
 
-    String id = extractId(uri);
+    String id = extractId(feedURI);
 
     // Check the uri
     if (!query[0].equalsIgnoreCase(id)) {
@@ -182,12 +140,13 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
   }
 
   protected String extractId(String uri) {
-  String id = uri.substring(uri.lastIndexOf("/") + 1);
-  if (id == null) return uri;
-  return id;
-}
+    String id = uri.substring(uri.lastIndexOf("/") + 1);
+    if (id == null)
+      return uri;
+    return id;
+  }
 
-/**
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#loadFeedData(org.opencastproject.feed.api.Feed.Type,
@@ -202,79 +161,33 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
    */
   @Override
   public void initialize(Properties properties) {
-    serverUrl = (String) properties.get("org.opencastproject.engage.ui.url");
-    if (serverUrl == null) serverUrl = (String) properties.get("org.opencastproject.server.url");
+    super.initialize(properties);
 
-    uri = generateFeedUri((String) properties.get(PROP_URI));
-
-
-    String sizeAsString = (String) properties.get(PROP_SIZE);
-    try {
-      if (StringUtils.isNotBlank(sizeAsString)) {
-        size = Integer.parseInt(sizeAsString);
-        if (size == 0)
-          size = Integer.MAX_VALUE;
-      }
-    } catch (NumberFormatException e) {
-      logger.warn("Unable to set the size of the feed to {}", sizeAsString);
-    }
     selector = (String) properties.get(PROP_SELECTOR);
-    name = (String) properties.get(PROP_NAME);
-    description = (String) properties.get(PROP_DESCRIPTION);
-    copyright = (String) properties.get(PROP_COPYRIGHT);
-    home = ensureUrl(((String) properties.get(PROP_HOME)), serverUrl);
-    // feed.cover can be unset if no branding is required
-    if (StringUtils.isBlank((String)properties.get(PROP_COVER))) {
-      cover = null;
-    } else {
-      cover = ensureUrl((String) properties.get(PROP_COVER), serverUrl);
-    }
-    linkTemplate = ensureUrl((String) properties.get(PROP_ENTRY), serverUrl);
-    if (properties.get(PROP_SELF) != null)
-       linkSelf = ensureUrl((String) properties.get(PROP_SELF), serverUrl);
-    String rssFlavors = (String) properties.get(PROP_RSSFLAVORS);
-    if (rssFlavors != null) {
-      StringTokenizer tok = new StringTokenizer(rssFlavors, " ,;");
-      while (tok.hasMoreTokens()) {
-        addRssTrackFlavor(MediaPackageElementFlavor.parseFlavor(tok.nextToken()));
-      }
-    }
-    String rssMediaTypes = (String) properties.get(PROP_RSS_MEDIA_TYPE);
-    if (rssFlavors == null) {
-      this.rssMediaTypes.add(PROP_RSS_MEDIA_TYPE_DEFAULT);
-    } else {
-      StringTokenizer tok = new StringTokenizer(rssMediaTypes, " ,;");
-      while (tok.hasMoreTokens()) {
-        this.rssMediaTypes.add(tok.nextToken());
-      }
-    }
-    String atomFlavors = (String) properties.get(PROP_ATOMFLAVORS);
-    if (atomFlavors != null) {
-      StringTokenizer tok = new StringTokenizer(atomFlavors, " ,;");
-      while (tok.hasMoreTokens()) {
-        addAtomTrackFlavor(MediaPackageElementFlavor.parseFlavor(tok.nextToken()));
-      }
-    }
-    String rssTags = (String) properties.get(PROP_RSSTAGS);
-    if (rssTags != null) {
-      for (String tag : rssTags.split("\\W")) {
-        addRSSTag(tag);
-      }
-    }
-    String atomTags = (String) properties.get(PROP_ATOMTAGS);
-    if (atomTags != null) {
-      for (String tag : atomTags.split("\\W")) {
-        addAtomTag(tag);
-      }
-    }
   }
 
-  protected String generateFeedUri(String feedId) {
-    return ensureUrl(feedId, serverUrl);
+  /**
+   * Returns the feed query.
+   *
+   * @return the query
+   */
+  protected String getSelector() {
+    return selector;
+  }
+
+  /**
+   * Sets the selector.
+   *
+   * @param selector
+   *          the new selector
+   */
+  protected void setSelector(String selector) {
+    this.selector = selector;
   }
 
   /**
    * {@inheritDoc}
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#hashCode()
    */
   @Override
@@ -284,32 +197,14 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
 
   /**
    * {@inheritDoc}
+   *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof AbstractFeedService) || selector == null)
       return super.equals(o);
-    return super.equals(o) && selector.equals(((AbstractFeedService)o).selector);
-  }
-
-  /**
-   * Ensures that this string is an absolute URL. If not, prepend the local serverUrl to the string.
-   *
-   * @param string
-   *          The absolute or relative URL
-   * @param baseUrl
-   *          The base URL to prepend
-   * @return An absolute URL
-   */
-  protected String ensureUrl(String string, String baseUrl) {
-    try {
-      new URL(string);
-      return string;
-    } catch (MalformedURLException e) {
-      if (baseUrl.endsWith("/") || string.startsWith("/")) return baseUrl + string;
-      else return baseUrl + "/" + string;
-    }
+    return super.equals(o) && selector.equals(((AbstractFeedService) o).selector);
   }
 
   /**
@@ -348,6 +243,25 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
    */
   protected SeriesService getSeriesService() {
     return seriesService;
+  }
+
+  /**
+   * Sets the security service.
+   *
+   * @param securityService
+   *          the security service
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  /**
+   * Returns the security service.
+   *
+   * @return the security services
+   */
+  protected SecurityService getSecurityService() {
+    return securityService;
   }
 
 }

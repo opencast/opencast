@@ -29,6 +29,12 @@ import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchResultItemImpl;
+import org.opencastproject.util.Cache;
+import org.opencastproject.util.Caches;
+import org.opencastproject.util.data.Function;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Properties;
@@ -40,11 +46,20 @@ import java.util.Properties;
  */
 public class SeriesFeedService extends AbstractFeedService implements FeedGenerator {
 
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(SeriesFeedService.class);
+
   /** The series identifier */
   protected ThreadLocal<String> series = new ThreadLocal<String>();
 
   /** The series data */
   protected ThreadLocal<SearchResult> seriesData = new ThreadLocal<SearchResult>();
+
+  /** Number of milliseconds to cache the recordings (1h) */
+  private static final long SERIES_CACHE_TIME = 60L * 60L * 1000L;
+
+  /** The series metadata, cached for up to the indicated amount of time  */
+  private final Cache<String, SearchResult> seriesCache = Caches.lru(500, SERIES_CACHE_TIME);
 
   /**
    * @see org.opencastproject.feed.api.FeedGenerator#accept(java.lang.String[])
@@ -57,24 +72,25 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
     // Build the series id, first parameter is the selector. Note that if the series identifier
     // contained slashes (e. g. in the case of a handle or doi), we need to reassemble the
     // identifier
-    StringBuffer seriesId = new StringBuffer();
+    StringBuffer sId = new StringBuffer();
     int idparts = query.length - 1;
     if (idparts < 1)
       return false;
     for (int i = 1; i <= idparts; i++) {
-      if (seriesId.length() > 0)
-        seriesId.append("/");
-      seriesId.append(query[i]);
+      if (sId.length() > 0)
+        sId.append("/");
+      sId.append(query[i]);
     }
 
     // Remember the series id
-    series.set(seriesId.toString());
+    final String seriesId = sId.toString();
+    series.set(seriesId);
 
     try {
       // To check if we can accept the query it is enough to query for just one result
       // Check the series service to see if the series exists
       // but has not yet had anything published from it
-      SearchResult result = findSeries(seriesId.toString());
+      SearchResult result = seriesCache.get(seriesId, loadSeries);
       if (result != null)
         seriesData.set(result);
       return result != null && result.size() > 0;
@@ -139,7 +155,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
   public void initialize(Properties properties) {
     super.initialize(properties);
     // Clear the selector, since super.accept() relies on the fact that it's not set
-    selector = null;
+    setSelector(null);
   }
 
   /**
@@ -150,179 +166,198 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
    *          the series to lookup
    * @return search result, null if series not found
    */
-  private SearchResult findSeries(String id) {
-    try {
-      final DublinCoreCatalog seriesDublinCore = seriesService.getSeries(id);
-      SearchResultImpl result = new SearchResultImpl();
+  private final Function<String, SearchResult> loadSeries = new Function<String, SearchResult>() {
 
-      // Response either finds the one series or nothing at all
-      result.setLimit(1);
-      result.setOffset(0);
-      result.setTotal(1);
+    public SearchResult apply(String id) {
 
-      SearchResultItemImpl item = new SearchResultItemImpl().fill(new SearchResultItem() {
-        private final String dfltString = null;
+      // Try to look up the series from the search service
+      SearchQuery q = new SearchQuery();
+      q.includeEpisodes(false);
+      q.includeSeries(true);
+      q.withId(id);
+      SearchResult result = searchService.getByQuery(q);
+      if (result.getItems().length > 0) {
+        logger.trace("Metadata for series {} loaded from search service", id);
+        return result;
+      }
 
-        @Override
-        public String getId() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-        }
+      // There is nothing in the search index, let's ask the series service
+      try {
 
-        @Override
-        public String getOrganization() {
-          return null;
-        }
+        logger.debug("Loading metadata for series {} from series service", id);
 
-        @Override
-        public MediaPackage getMediaPackage() {
-          return null;
-        }
+        final DublinCoreCatalog seriesDublinCore = seriesService.getSeries(id);
+        SearchResultImpl artificialResult = new SearchResultImpl();
 
-        @Override
-        public long getDcExtent() {
-          return -1;
-        }
+        // Response either finds the one series or nothing at all
+        artificialResult.setLimit(1);
+        artificialResult.setOffset(0);
+        artificialResult.setTotal(1);
 
-        @Override
-        public String getDcTitle() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE);
-        }
+        SearchResultItemImpl item = SearchResultItemImpl.fill(new SearchResultItem() {
 
-        @Override
-        public String getDcSubject() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_SUBJECT);
-        }
-
-        @Override
-        public String getDcDescription() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_DESCRIPTION);
-        }
-
-        @Override
-        public String getDcCreator() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_CREATOR);
-        }
-
-        @Override
-        public String getDcPublisher() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_PUBLISHER);
-        }
-
-        @Override
-        public String getDcContributor() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_CONTRIBUTOR);
-        }
-
-        @Override
-        public String getDcAbstract() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_ABSTRACT);
-        }
-
-        @Override
-        public Date getDcCreated() {
-          String date = seriesDublinCore.getFirst(DublinCore.PROPERTY_CREATED);
-          if (date != null) {
-            return EncodingSchemeUtils.decodeDate(date);
+          @Override
+          public String getId() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_IDENTIFIER);
           }
 
-          return null;
-        }
+          @Override
+          public String getOrganization() {
+            return null;
+          }
 
-        @Override
-        public Date getDcAvailableFrom() {
-          return null;
-        }
+          @Override
+          public MediaPackage getMediaPackage() {
+            return null;
+          }
 
-        @Override
-        public Date getDcAvailableTo() {
-          return null;
-        }
+          @Override
+          public long getDcExtent() {
+            return -1;
+          }
 
-        @Override
-        public String getDcLanguage() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_LANGUAGE);
-        }
+          @Override
+          public String getDcTitle() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE);
+          }
 
-        @Override
-        public String getDcRightsHolder() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER);
-        }
+          @Override
+          public String getDcSubject() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_SUBJECT);
+          }
 
-        @Override
-        public String getDcSpatial() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_SPATIAL);
-        }
+          @Override
+          public String getDcDescription() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_DESCRIPTION);
+          }
 
-        @Override
-        public String getDcTemporal() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_TEMPORAL);
-        }
+          @Override
+          public String getDcCreator() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_CREATOR);
+          }
 
-        @Override
-        public String getDcIsPartOf() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_IS_PART_OF);
-        }
+          @Override
+          public String getDcPublisher() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_PUBLISHER);
+          }
 
-        @Override
-        public String getDcReplaces() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_REPLACES);
-        }
+          @Override
+          public String getDcContributor() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_CONTRIBUTOR);
+          }
 
-        @Override
-        public String getDcType() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_TYPE);
-        }
+          @Override
+          public String getDcAbstract() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_ABSTRACT);
+          }
 
-        @Override
-        public String getDcAccessRights() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_ACCESS_RIGHTS);
-        }
+          @Override
+          public Date getDcCreated() {
+            String date = seriesDublinCore.getFirst(DublinCore.PROPERTY_CREATED);
+            if (date != null) {
+              return EncodingSchemeUtils.decodeDate(date);
+            }
 
-        @Override
-        public String getDcLicense() {
-          return seriesDublinCore.getFirst(DublinCore.PROPERTY_LICENSE);
-        }
+            return null;
+          }
 
-        @Override
-        public String getOcMediapackage() {
-          return null;
-        }
+          @Override
+          public Date getDcAvailableFrom() {
+            return null;
+          }
 
-        @Override
-        public SearchResultItem.SearchResultItemType getType() {
-          return SearchResultItemType.Series;
-        }
+          @Override
+          public Date getDcAvailableTo() {
+            return null;
+          }
 
-        @Override
-        public String[] getKeywords() {
-          return new String[0];
-        }
+          @Override
+          public String getDcLanguage() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_LANGUAGE);
+          }
 
-        @Override
-        public String getCover() {
-          return null;
-        }
+          @Override
+          public String getDcRightsHolder() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER);
+          }
 
-        @Override
-        public Date getModified() {
-          return null;
-        }
+          @Override
+          public String getDcSpatial() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_SPATIAL);
+          }
 
-        @Override
-        public double getScore() {
-          return 0.0;
-        }
+          @Override
+          public String getDcTemporal() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_TEMPORAL);
+          }
 
-        @Override
-        public MediaSegment[] getSegments() {
-          return new MediaSegmentImpl[0];
-        }
-      });
+          @Override
+          public String getDcIsPartOf() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_IS_PART_OF);
+          }
 
-      result.addItem(item);
-      return result;
-    } catch (Exception e) {
-      return null;
+          @Override
+          public String getDcReplaces() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_REPLACES);
+          }
+
+          @Override
+          public String getDcType() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_TYPE);
+          }
+
+          @Override
+          public String getDcAccessRights() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_ACCESS_RIGHTS);
+          }
+
+          @Override
+          public String getDcLicense() {
+            return seriesDublinCore.getFirst(DublinCore.PROPERTY_LICENSE);
+          }
+
+          @Override
+          public String getOcMediapackage() {
+            return null;
+          }
+
+          @Override
+          public SearchResultItem.SearchResultItemType getType() {
+            return SearchResultItemType.Series;
+          }
+
+          @Override
+          public String[] getKeywords() {
+            return new String[0];
+          }
+
+          @Override
+          public String getCover() {
+            return null;
+          }
+
+          @Override
+          public Date getModified() {
+            return null;
+          }
+
+          @Override
+          public double getScore() {
+            return 0.0;
+          }
+
+          @Override
+          public MediaSegment[] getSegments() {
+            return new MediaSegmentImpl[0];
+          }
+        });
+
+        artificialResult.addItem(item);
+        return artificialResult;
+      } catch (Exception e) {
+        return null;
+      }
     }
-  }
+  };
+
 }

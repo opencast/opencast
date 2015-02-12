@@ -61,11 +61,11 @@ public class EncodingProfileImpl implements EncodingProfile {
   @XmlElement(name = "outputmediatype")
   protected MediaType outputType = null;
 
-  /** Suffix 
+  /** Suffix
   @XmlElement(name = "suffix")
   protected String suffix = null;
-  */ 
-  
+  */
+
   /** Mime type */
   @XmlElement(name = "mimetype")
   protected String mimeType = null;
@@ -81,7 +81,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   @XmlElementWrapper(name = "suffixes")
   protected HashMap<String,String> suffixes = new HashMap<String, String>();
-  
+
   /**
    * Private, since the profile should be created using the static factory method.
    *
@@ -176,11 +176,11 @@ public class EncodingProfileImpl implements EncodingProfile {
    * @see org.opencastproject.composer.api.EncodingProfile#getSuffix()
    */
   @Override
-  public String getSuffix() {  
+  public String getSuffix() {
     if (suffixes.keySet().size() == 0) return null;
     if (suffixes.containsKey("default")) {
       return suffixes.get("default");
-    } else {  
+    } else {
       return suffixes.get(suffixes.values().toArray()[0]);
     }
   }
@@ -193,11 +193,11 @@ public class EncodingProfileImpl implements EncodingProfile {
    */
   public void setSuffix(String suffix) {
     setSuffix("default", suffix);
-  }  
-  
+  }
+
   /**
    * Sets the suffix for encoded file names.
-   * 
+   *
    * @param suffix
    *          the file suffix
    */
