@@ -443,6 +443,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
     }
 
+    // TODO: this is just a temporary solution until the embed player has been designed and implemented
     function appendEmbedPlayer_openInPlayer() {
         $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">" + translate("openInPlayer", "Open in player") + "</span></div></div>");
         $("." + class_audio_wrapper).append("<a id=\"" + id_btn_openInPlayer + "\" href=\"#\">" + translate("openInPlayer", "Open in player") + "</a>");
@@ -1307,7 +1308,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     flavors += mediaInfo.tracks[i].type + ",";
                 }
 
-                // rtmp is treated differently for video.js. Mimetype and url have to be changed                      
+                // rtmp is treated differently for video.js. Mimetype and URL have to be changed                      
                 if ((mediaInfo.tracks[i].mimetype == "video/mp4") &&
                     (mediaInfo.tracks[i].url.toLowerCase().indexOf("rtmp://") > -1)) {
                     mediaInfo.tracks[i].mimetype = "rtmp/mp4";

@@ -401,7 +401,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     controlsTop: Engage.controls_top
                 };
 
-                // compile template and load into the html
+                // compile template and load it
                 this.$el.html(_.template(this.template, tempVars));
                 if (isDesktopMode) {
                     initControlsEvents();
@@ -551,7 +551,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Utils.disable(id_navigation_time);
             $("#" + id_navigation_time_current).keyup(function(e) {
                 e.preventDefault();
-                // pressed enter
+                // enter
                 if (e.keyCode == 13) {
                     $(this).blur();
                     try {
@@ -635,7 +635,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             $("#" + id_volume).on(event_slidestop, function(event, ui) {
                 Engage.trigger(plugin.events.volumeSet.getName(), ui.value / 100);
             });
-
+	    // check segments
             if (segments && (segments.length > 0)) {
                 Engage.log("Controls: " + segments.length + " segments are available.");
                 $.each(segments, function(i, v) {
@@ -658,9 +658,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         }
     }
 
-    /**
-     * getVolume
-     */
     function getVolume() {
         var isMute = Basil.get(storage_muted);
         if (isMute == "true") {

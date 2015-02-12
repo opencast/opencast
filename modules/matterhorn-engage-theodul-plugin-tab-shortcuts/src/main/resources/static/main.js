@@ -28,11 +28,11 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
     var PLUGIN_STYLES_DESKTOP = [
         "styles/desktop.css"
     ];
-    var PLUGIN_STYLES_MOBILE = [
-        "styles/mobile.css"
-    ];
     var PLUGIN_STYLES_EMBED = [
         "styles/embed.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "styles/mobile.css"
     ];
 
     var plugin;

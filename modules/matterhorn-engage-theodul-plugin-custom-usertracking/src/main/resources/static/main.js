@@ -21,16 +21,16 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     var PLUGIN_NAME = "Engage Plugin Custom Usertracking";
     var PLUGIN_TYPE = "engage_custom";
     var PLUGIN_VERSION = "1.0";
-    var PLUGIN_TEMPLATE = "none";
+    var PLUGIN_TEMPLATE_DESKTOP = "none";
     var PLUGIN_TEMPLATE_MOBILE = "none";
     var PLUGIN_TEMPLATE_EMBED = "none";
-    var PLUGIN_STYLES = [
-        ""
-    ];
-    var PLUGIN_STYLES_MOBILE = [
+    var PLUGIN_STYLES_DESKTOP = [
         ""
     ];
     var PLUGIN_STYLES_EMBED = [
+        ""
+    ];
+    var PLUGIN_STYLES_MOBILE = [
         ""
     ];
 
@@ -78,8 +78,8 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES,
-                template: PLUGIN_TEMPLATE,
+                styles: PLUGIN_STYLES_DESKTOP,
+                template: PLUGIN_TEMPLATE_DESKTOP,
                 events: events
             };
             isDesktopMode = true;
