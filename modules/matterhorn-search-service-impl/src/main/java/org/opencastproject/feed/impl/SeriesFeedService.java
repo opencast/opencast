@@ -139,7 +139,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
   public void initialize(Properties properties) {
     super.initialize(properties);
     // Clear the selector, since super.accept() relies on the fact that it's not set
-    selector = null;
+    setSelector(null);
   }
 
   /**
