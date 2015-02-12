@@ -27,11 +27,11 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     var PLUGIN_STYLES_DESKTOP = [
         "styles/desktop.css"
     ];
-    var PLUGIN_STYLES_MOBILE = [
-        "styles/mobile.css"
-    ];
     var PLUGIN_STYLES_EMBED = [
         "styles/embed.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "styles/mobile.css"
     ];
 
     var plugin;
@@ -140,7 +140,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
 
     var DescriptionTabView = Backbone.View.extend({
         initialize: function(mediaPackageModel, template) {
-            this.setElement($(plugin.container)); // every plugin view has it"s own container associated with it
+            this.setElement($(plugin.container)); // every plugin view has it's own container associated with it
             this.model = mediaPackageModel;
             this.template = template;
             // bind the render function always to the view

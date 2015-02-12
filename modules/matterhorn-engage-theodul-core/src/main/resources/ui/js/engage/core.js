@@ -590,10 +590,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                     engageCore.pluginView.initView();
                                     if (engageCore.model.get("pluginsInfo") && engageCore.model.browserSupported) {
                                         // BEGIN LOAD PLUGINS
-                                        // fetch plugin information
                                         engageCore.model.get("pluginsInfo").fetch({
                                             success: function(pluginInfos) {
-                                                // load plugin as requirejs module
                                                 if ((pluginInfos.get("pluginlist").plugins != undefined) && pluginInfos.get("pluginlist")) {
                                                     numberOfPlugins = pluginInfos.get("pluginlist").plugins.length;
                                                     if ($.isArray(pluginInfos.get("pluginlist").plugins)) {
@@ -602,13 +600,11 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                                             plugins_loaded[plugin_name] = false;
                                                         });
                                                         $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
-                                                            // load plugin
                                                             var plugin_name = value["name"];
                                                             engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + value["static-path"] + "/") + "'...");
                                                             loadPlugin("../../../plugin/" + value["static-path"] + "/", plugin_name);
                                                         });
                                                     } else {
-                                                        // load plugin
                                                         var plugin_name = pluginInfos.get("pluginlist").plugins["name"];
                                                         plugins_loaded[plugin_name] = false;
                                                         engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/") + "'...");

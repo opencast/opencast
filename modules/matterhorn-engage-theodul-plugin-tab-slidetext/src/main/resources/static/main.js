@@ -27,11 +27,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
     var PLUGIN_STYLES_DESKTOP = [
         "styles/desktop.css"
     ];
-    var PLUGIN_STYLES_MOBILE = [
-        "styles/mobile.css"
-    ];
     var PLUGIN_STYLES_EMBED = [
         "styles/embed.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
+        "styles/mobile.css"
     ];
 
     var plugin;
@@ -221,7 +221,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
-            // create a new view with the media package model and the template
             var slidetextTabView = new SlidetextTabView(Engage.model.get("mediaPackage"), plugin.template);
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;

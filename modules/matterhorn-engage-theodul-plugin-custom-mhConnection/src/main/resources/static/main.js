@@ -21,16 +21,16 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     var PLUGIN_NAME = "Engage Custom Matterhorn Endpoint Connection";
     var PLUGIN_TYPE = "engage_custom";
     var PLUGIN_VERSION = "1.0";
-    var PLUGIN_TEMPLATE = "none";
+    var PLUGIN_TEMPLATE_DESKTOP = "none";
     var PLUGIN_TEMPLATE_MOBILE = "none";
     var PLUGIN_TEMPLATE_EMBED = "none";
-    var PLUGIN_STYLES = [
-        ""
-    ];
-    var PLUGIN_STYLES_MOBILE = [
+    var PLUGIN_STYLES_DESKTOP = [
         ""
     ];
     var PLUGIN_STYLES_EMBED = [
+        ""
+    ];
+    var PLUGIN_STYLES_MOBILE = [
         ""
     ];
 
@@ -80,8 +80,8 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES,
-                template: PLUGIN_TEMPLATE,
+                styles: PLUGIN_STYLES_DESKTOP,
+                template: PLUGIN_TEMPLATE_DESKTOP,
                 events: events
             };
             isDesktopMode = true;
@@ -144,9 +144,6 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
         return (translations[str] != undefined) ? translations[str] : strIfNotFound;
     }
 
-    /**
-     * extractMediaInfo
-     */
     function extractMediaInfo() {
         if (mediaPackage) {
             mediaInfo = {};
@@ -203,7 +200,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     Engage.log("MhConnection: Init");
     var relative_plugin_path = Engage.getPluginPath("EngagePluginCustomMhConnection");
 
-    // get ID
+    // get mediaPackage ID
     mediaPackageID = Engage.model.get("urlParameters").id;
     if (!mediaPackageID) {
         mediaPackageID = "";
@@ -215,7 +212,6 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
 
     Engage.on(plugin.events.getMediaInfo.getName(), function(callback) {
         if (callback === "function") {
-            // check if data has already been loaded
             if (!mediaPackage && !mediaInfo) {
                 callSearchEndpoint(function() {
                     callback(mediaInfo);
@@ -228,7 +224,6 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
 
     Engage.on(plugin.events.getMediaPackage.getName(), function(callback) {
         if (callback === "function") {
-            // check if data has already been loaded
             if (!mediaPackage) {
                 callSearchEndpoint(function() {
                     callback(mediaPackage);

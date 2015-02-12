@@ -21,18 +21,18 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     var PLUGIN_NAME = "Engage Custom Notifications";
     var PLUGIN_TYPE = "engage_custom";
     var PLUGIN_VERSION = "1.0";
-    var PLUGIN_TEMPLATE = "none";
+    var PLUGIN_TEMPLATE_DESKTOP = "none";
     var PLUGIN_TEMPLATE_MOBILE = "none";
     var PLUGIN_TEMPLATE_EMBED = "none";
-    var PLUGIN_STYLES = [
-        "lib/alertify/alertify.css",
-        "lib/alertify/alertify-bootstrap-3.css"
-    ];
-    var PLUGIN_STYLES_MOBILE = [
+    var PLUGIN_STYLES_DESKTOP = [
         "lib/alertify/alertify.css",
         "lib/alertify/alertify-bootstrap-3.css"
     ];
     var PLUGIN_STYLES_EMBED = [
+        "lib/alertify/alertify.css",
+        "lib/alertify/alertify-bootstrap-3.css"
+    ];
+    var PLUGIN_STYLES_MOBILE = [
         "lib/alertify/alertify.css",
         "lib/alertify/alertify-bootstrap-3.css"
     ];
@@ -90,8 +90,8 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
                 name: PLUGIN_NAME,
                 type: PLUGIN_TYPE,
                 version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES,
-                template: PLUGIN_TEMPLATE,
+                styles: PLUGIN_STYLES_DESKTOP,
+                template: PLUGIN_TEMPLATE_DESKTOP,
                 events: events
             };
             isDesktopMode = true;
