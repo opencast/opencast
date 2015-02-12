@@ -95,10 +95,10 @@ public class MediaPackagePostOperationHandlerTest {
 
     try {
       tuple.workflowHandler.start(tuple.workflowInstance, null);
+      /* This should raise an exception. Something is wrong if not. */
+      Assert.fail();
     } catch (WorkflowOperationException e) {
       logger.info(e.toString());
-      Assert.assertTrue(e.toString().contains("Connection"));
-      Assert.assertTrue(e.toString().contains("refused"));
     }
 
   }
@@ -121,10 +121,10 @@ public class MediaPackagePostOperationHandlerTest {
 
     try {
       tuple.workflowHandler.start(tuple.workflowInstance, null);
+      /* This should raise an exception. Something is wrong if not. */
+      Assert.fail();
     } catch (WorkflowOperationException e) {
       logger.info(e.toString());
-      Assert.assertTrue(e.toString().contains("Connection"));
-      Assert.assertTrue(e.toString().contains("refused"));
     }
 
   }
