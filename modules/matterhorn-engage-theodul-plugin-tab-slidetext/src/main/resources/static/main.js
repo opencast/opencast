@@ -49,18 +49,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
-        case "mobile":
-            plugin = {
-                insertIntoDOM: insertIntoDOM,
-                name: PLUGIN_NAME,
-                type: PLUGIN_TYPE,
-                version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES_MOBILE,
-                template: PLUGIN_TEMPLATE_MOBILE,
-                events: events
-            };
-            isMobileMode = true;
-            break;
         case "embed":
             plugin = {
                 insertIntoDOM: insertIntoDOM,
@@ -72,6 +60,18 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
                 events: events
             };
             isEmbedMode = true;
+            break;
+        case "mobile":
+            plugin = {
+                insertIntoDOM: insertIntoDOM,
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_MOBILE,
+                template: PLUGIN_TEMPLATE_MOBILE,
+                events: events
+            };
+            isMobileMode = true;
             break;
         case "desktop":
         default:
@@ -220,7 +220,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if (plugin.inserted) {
+        if (isDesktopMode && plugin.inserted) {
             // create a new view with the media package model and the template
             var slidetextTabView = new SlidetextTabView(Engage.model.get("mediaPackage"), plugin.template);
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
@@ -229,56 +229,58 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
         }
     }
 
-    // init event
-    Engage.log("Tab:Slidetext: Init");
-    var relative_plugin_path = Engage.getPluginPath("EngagePluginTabSlidetext");
+    if (isDesktopMode) {
+        // init event
+        Engage.log("Tab:Slidetext: Init");
+        var relative_plugin_path = Engage.getPluginPath("EngagePluginTabSlidetext");
 
-    // listen on a change/set of the mediaPackage model
-    Engage.model.on(mediapackageChange, function() {
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
-
-    // all plugins loaded
-    Engage.on(plugin.events.plugin_load_done.getName(), function() {
-        Engage.log("Tab:Slidetext: Plugin load done");
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
-
-    // load segment class
-    require([relative_plugin_path + "segment"], function(segment) {
-        Engage.log("Tab:Slidetext: Segment class loaded");
-        Segment = segment;
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
-        }
-    });
-
-    // load utils class
-    require([relative_plugin_path + "utils"], function(utils) {
-        Engage.log("Tab:Slidetext: Utils class loaded");
-        Utils = new utils();
-        plugin.timeStrToSeconds = Utils.timeStrToSeconds;
-        initTranslate(Utils.detectLanguage(), function() {
-            Engage.log("Tab:Slidetext: Successfully translated.");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        }, function() {
-            Engage.log("Tab:Slidetext: Error translating...");
+        // listen on a change/set of the mediaPackage model
+        Engage.model.on(mediapackageChange, function() {
             initCount -= 1;
             if (initCount <= 0) {
                 initPlugin();
             }
         });
-    });
+
+        // all plugins loaded
+        Engage.on(plugin.events.plugin_load_done.getName(), function() {
+            Engage.log("Tab:Slidetext: Plugin load done");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+
+        // load segment class
+        require([relative_plugin_path + "segment"], function(segment) {
+            Engage.log("Tab:Slidetext: Segment class loaded");
+            Segment = segment;
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+
+        // load utils class
+        require([relative_plugin_path + "utils"], function(utils) {
+            Engage.log("Tab:Slidetext: Utils class loaded");
+            Utils = new utils();
+            plugin.timeStrToSeconds = Utils.timeStrToSeconds;
+            initTranslate(Utils.detectLanguage(), function() {
+                Engage.log("Tab:Slidetext: Successfully translated.");
+                initCount -= 1;
+                if (initCount <= 0) {
+                    initPlugin();
+                }
+            }, function() {
+                Engage.log("Tab:Slidetext: Error translating...");
+                initCount -= 1;
+                if (initCount <= 0) {
+                    initPlugin();
+                }
+            });
+        });
+    }
 
     return plugin;
 });

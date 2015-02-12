@@ -105,13 +105,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     };
     Basil = new window.Basil(basilOptions);
 
-    // Before jQueryMobile init
-    $( document ).on("mobileinit", function() {
-            $.mobile.autoInitializePage = false;
-            $.mobile.defaultPageTransition = "flow";
-            $.mobile.orientationChangeEnabled = false;
-    });
-
     function browserSupported() {
         if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
             // console.log("Core: User setting - Support unsupported browser: " + Basil.get("overrideBrowser"));
@@ -561,17 +554,17 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             // path to the require module with the view logic
                             var view_logic_path = "";
                             switch (engageCore.model.get("mode")) {
-                                case "mobile":
-                                    cssAttr.href = "css/core_mobile_style.css";
-                                    core_template = "templates/core_mobile.html";
-                                    view_logic_path = "engage/views/mobile";
-                                    engageCore.model.mobile = true;
-                                    break;
                                 case "embed":
                                     cssAttr.href = "css/core_embed_style.css";
                                     core_template = "templates/core_embed.html";
                                     view_logic_path = "engage/views/embed";
                                     engageCore.model.embed = true;
+                                    break;
+                                case "mobile":
+                                    cssAttr.href = "css/core_mobile_style.css";
+                                    core_template = "templates/core_mobile.html";
+                                    view_logic_path = "engage/views/mobile";
+                                    engageCore.model.mobile = true;
                                     break;
                                 case "desktop":
                                 default:
@@ -595,7 +588,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                                     $(engageCore.el).html(_.template(template)).trigger("create"); // variables do not work in here!
                                     // run init function of the view
                                     engageCore.pluginView.initView();
-                                    if (engageCore.model.get("pluginsInfo") && engageCore.model.mobile || !(engageCore.model.desktop || engageCore.model.embed) || ((engageCore.model.desktop || engageCore.model.embed) && engageCore.model.browserSupported)) {
+                                    if (engageCore.model.get("pluginsInfo") && engageCore.model.browserSupported) {
                                         // BEGIN LOAD PLUGINS
                                         // fetch plugin information
                                         engageCore.model.get("pluginsInfo").fetch({

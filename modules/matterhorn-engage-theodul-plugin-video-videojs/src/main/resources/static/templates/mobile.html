@@ -1,12 +1,28 @@
-<!-- theodul video videojs plugin mobile mode -->
-<div id="videojs_wrapper" class="mobile_wrapper" align="center">
-        <% if(typeof ids !== "undefined" ){ var i = 1;%>
-        <% _.each(ids, function(id) { %>
-        <div data-role="page" class="mobileVideoBox" id="videoPage_<%=i%>">
-	        <div id="videoDisplay<%= i%>" class="displayWrapper">
-	           <video id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin container"  width="auto" height="auto" data-setup="{}"></video>
+<!-- theodul video videojs plugin embed mode -->
+<% if((typeof type !== "undefined") && (type == "audio")) { %>
+	<div class="audio_wrapper">
+		<% if(typeof sources !== "undefined") { %>
+			<div class="audioDisplay">
+				<audio id="audioDisplay">
+				  <% _.each(sources, function(src) { %>
+				    <% if((src.src != "") && (src.type != "")) { %>
+				      <source src="<%= src.src %>" type="<%= src.type %>" />
+				    <% } %>
+				  <% }); %>
+				  <p class="lang_error_AudioElementNotSupported">Error: Your browser does not support the audio element.</p>
+				</audio>
+			</div>
+		<% } %>
+	</div>
+<% } else { %>
+	<div class="videojs_wrapper clearfix">
+	    <% if(typeof id !== "undefined" ){%>
+	    <div class="videoDisplay">
+	        <div id="videoDisplay1_wrapper" class="videoFrame">
+	            <video id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin container" data-setup="{}"></video>
 	        </div>
 	    </div>
-        <% i++;}); %>
-        <% } %>
-</div>
+	    <% } %>
+	</div>
+<% } %>
+<div id="switchPlayers" class="switchPlayers_mobile"></div>

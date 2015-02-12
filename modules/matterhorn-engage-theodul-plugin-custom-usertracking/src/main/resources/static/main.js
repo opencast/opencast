@@ -47,18 +47,6 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
-        case "mobile":
-            plugin = {
-                insertIntoDOM: insertIntoDOM,
-                name: PLUGIN_NAME,
-                type: PLUGIN_TYPE,
-                version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES_MOBILE,
-                template: PLUGIN_TEMPLATE_MOBILE,
-                events: events
-            };
-            isMobileMode = true;
-            break;
         case "embed":
             plugin = {
                 insertIntoDOM: insertIntoDOM,
@@ -70,6 +58,18 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
                 events: events
             };
             isEmbedMode = true;
+            break;
+        case "mobile":
+            plugin = {
+                insertIntoDOM: insertIntoDOM,
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_MOBILE,
+                template: PLUGIN_TEMPLATE_MOBILE,
+                events: events
+            };
+            isMobileMode = true;
             break;
         case "desktop":
         default:

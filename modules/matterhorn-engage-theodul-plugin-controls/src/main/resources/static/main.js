@@ -84,18 +84,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
-        case "mobile":
-            plugin = {
-                insertIntoDOM: insertIntoDOM,
-                name: PLUGIN_NAME,
-                type: PLUGIN_TYPE,
-                version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES_MOBILE,
-                template: PLUGIN_TEMPLATE_MOBILE,
-                events: events
-            };
-            isMobileMode = true;
-            break;
         case "embed":
             plugin = {
                 insertIntoDOM: insertIntoDOM,
@@ -107,6 +95,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 events: events
             };
             isEmbedMode = true;
+            break;
+        case "mobile":
+            plugin = {
+                insertIntoDOM: insertIntoDOM,
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_MOBILE,
+                template: PLUGIN_TEMPLATE_MOBILE,
+                events: events
+            };
+            isMobileMode = true;
             break;
         case "desktop":
         default:
@@ -416,16 +416,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     $("." + class_dropdown).dropdown();
                     addNonFlashEvents();
                     checkLoginStatus();
-                } else if (isMobileMode) {
-                    initControlsEvents();
-                    initMobileEvents();
-                    ready();
-                    playPause();
-                    timeUpdate();
-                    addNonFlashEvents();
-                    checkLoginStatus();
                 }
-
             }
         }
     });
@@ -667,23 +658,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         }
     }
 
-    function initMobileEvents() {
-        Engage.log("Controls: Init Mobile Events");
-        events.tapHold = new Engage.Event("Video:tapHold", "videoDisplay tapped", "both");
-        events.resize = new Engage.Event("Video:resize", "videoDisplay is resized", "both");
-        events.swipeLeft = new Engage.Event("Video:swipeLeft", "videoDisplay swiped", "both");
-        events.deactivate = new Engage.Event("Video:deactivate", "videoDisplay deactivated", "both");
-
-        Engage.on(events.tapHold.getName(), function(display) {
-            Engage.log("Control: " + display);
-            Engage.trigger(plugin.events.deactivate.getName(), display);
-        });
-
-        Engage.on(events.swipeLeft.getName(), function(target) {
-            Engage.log('Control: ' + target);
-        });
-    }
-
     /**
      * getVolume
      */
@@ -790,7 +764,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
      */
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if ((isDesktopMode || isMobileMode) && plugin.inserted) {
+        if (isDesktopMode && plugin.inserted) {
             if (!Engage.controls_top && plugin.template_topIfBottom && (plugin.template_topIfBottom != "none")) {
                 var controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get("videoDataModel"), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
             }
@@ -922,7 +896,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         }
     }
 
-    if (isDesktopMode || isMobileMode) {
+    if (isDesktopMode) {
         // init event
         Engage.log("Controls: Init");
         var relative_plugin_path = Engage.getPluginPath("EngagePluginControls");

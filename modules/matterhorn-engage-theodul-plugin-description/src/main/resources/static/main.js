@@ -45,18 +45,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/core", "moment"],
     var isMobileMode = false;
 
     switch (Engage.model.get("mode")) {
-        case "mobile":
-            plugin = {
-                insertIntoDOM: insertIntoDOM,
-                name: PLUGIN_NAME,
-                type: PLUGIN_TYPE,
-                version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES_MOBILE,
-                template: PLUGIN_TEMPLATE_MOBILE,
-                events: events
-            };
-            isMobileMode = true;
-            break;
         case "embed":
             plugin = {
                 insertIntoDOM: insertIntoDOM,
@@ -68,6 +56,18 @@ define(["require", "jquery", "underscore", "backbone", "engage/core", "moment"],
                 events: events
             };
             isEmbedMode = true;
+            break;
+        case "mobile":
+            plugin = {
+                insertIntoDOM: insertIntoDOM,
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_MOBILE,
+                template: PLUGIN_TEMPLATE_MOBILE,
+                events: events
+            };
+            isMobileMode = true;
             break;
         case "desktop":
         default:
@@ -167,7 +167,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core", "moment"],
     });
 
     function initPlugin() {
-        if ((isDesktopMode || isMobileMode) && plugin.inserted) {
+        if (isDesktopMode && plugin.inserted) {
             var descriptionView = new DescriptionView(Engage.model.get("mediaPackage"), plugin.template);
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
                 mediapackageError = true;
@@ -175,7 +175,7 @@ define(["require", "jquery", "underscore", "backbone", "engage/core", "moment"],
         }
     }
 
-    if (isDesktopMode || isMobileMode) {
+    if (isDesktopMode) {
         // init event
         var relative_plugin_path = Engage.getPluginPath("EngagePluginDescription");
 

@@ -46,18 +46,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
-        case "mobile":
-            plugin = {
-                insertIntoDOM: insertIntoDOM,
-                name: PLUGIN_NAME,
-                type: PLUGIN_TYPE,
-                version: PLUGIN_VERSION,
-                styles: PLUGIN_STYLES_MOBILE,
-                template: PLUGIN_TEMPLATE_MOBILE,
-                events: events
-            };
-            isMobileMode = true;
-            break;
         case "embed":
             plugin = {
                 insertIntoDOM: insertIntoDOM,
@@ -69,6 +57,18 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
                 events: events
             };
             isEmbedMode = true;
+            break;
+        case "mobile":
+            plugin = {
+                insertIntoDOM: insertIntoDOM,
+                name: PLUGIN_NAME,
+                type: PLUGIN_TYPE,
+                version: PLUGIN_VERSION,
+                styles: PLUGIN_STYLES_MOBILE,
+                template: PLUGIN_TEMPLATE_MOBILE,
+                events: events
+            };
+            isMobileMode = true;
             break;
         case "desktop":
         default:
@@ -89,6 +89,10 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
     var renderEveryTimes = 10;
     var chartPath = "lib/Chart";
     var timelineplugin_opened = "Engage:timelineplugin_opened";
+    
+    // TODO: Wait for the new usertracking service...
+    
+    /*
     var chartOptions = {
         // Boolean - Whether to animate the chart
         animation: false,
@@ -198,8 +202,10 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
         // Boolean - Whether to fill the dataset with a colour
         datasetFill: true,
     }
+    */
 
     /* don't change these variables */
+    /*
     var mediapackageChange = "change:mediaPackage";
     var footprintChange = "change:footprints";
     var videoDataModelChange = "change:videoDataModel";
@@ -210,8 +216,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
     var data; // chart data array
     var lineChartData;
     var mediapackageError = false;
-
-    /* TODO: Wait for the new usertracking service...
 
     function setSize() {
         $("#engage_timeline_statistics_chart").attr("width", $(window).width() - 40).attr("height", 60).css({
@@ -362,7 +366,6 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
             }
         });
     }
-
     */
 
     return plugin;
