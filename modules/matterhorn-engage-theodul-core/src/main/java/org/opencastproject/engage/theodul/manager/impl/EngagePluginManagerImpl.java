@@ -41,7 +41,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/* A service that tracks the de-/registration of Theodul Player Plugins and 
+/* A service that tracks the de-/registration of Theodul Player Plugins and
  * de-/installs static resource and REST endpoint servlets under a shared
  * URL.
  */
@@ -55,7 +55,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
 
   protected void activate(BundleContext bc) {
     bundleContext = bc;
-    
+
     try {
       bundleContext.addServiceListener(this, pluginServiceFilter);
     } catch (InvalidSyntaxException ex) {
@@ -92,6 +92,8 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
           log.error("Error while uninstalling Theodul Plugin: " + e.getMessage(), e);
         }
         break;
+      default:
+          break;
     }
   }
 
@@ -123,7 +125,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     }
 
     plugins.add(plugin);
-    
+
     // construct and log success message
     StringBuilder sb = new StringBuilder();
     sb.append("Installed Theodul plugin ").append(plugin.getName()).append(" (static: ")
@@ -132,9 +134,9 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     log.info(sb.toString());
   }
 
-  /** Registers a <code>StaticResource</code> that serves the contents of the 
+  /** Registers a <code>StaticResource</code> that serves the contents of the
    * plugins /static resource directory.
-   * 
+   *
    * @returns ServiceRegistration for the StaticResource
    */
   private ServiceRegistration installStaticResources(PluginData plugin) throws Exception {
@@ -148,7 +150,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
   }
 
   /** Publishes the REST endpoint implemented by the plugin bundle.
-   * 
+   *
    * @returns ServiceRegistration for the REST endpoint
    */
   private ServiceRegistration installRestEndpoint(PluginData plugin) throws Exception {
@@ -163,21 +165,21 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
   private void uninstallPlugin(ServiceReference sref) {
     PluginData plugin = plugins.getByServiceReference(sref);
     if (plugin != null) {
-      
+
       // uninstall static resources
       ServiceRegistration staticReg = plugin.getStaticResourceRegistration();
       if (staticReg != null) {
         log.info("Unregistering static resources for plugin " + plugin.getName());
         staticReg.unregister();
       }
-      
+
       // uninstall REST endpoint
       ServiceRegistration restReg = plugin.getRestEndpointRegistration();
       if (restReg != null) {
         log.info("Unregistering REST endpoint for plugin " + plugin.getName());
         restReg.unregister();
       }
-      
+
       plugins.remove(plugin);
     } else {
       throw new IllegalArgumentException("Unable to uninstall plugin. No plugin registered with the given ServiceReference.");
@@ -192,7 +194,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
 
   @Override
   public List<EngagePluginRegistration> getAllRegisteredPlugins() {
-    synchronized(plugins) {
+    synchronized (plugins) {
       List<EngagePluginRegistration> list = new ArrayList<EngagePluginRegistration>();
       for (PluginData plugin : plugins.getAll()) {
         EngagePluginRegistrationImpl reg = new EngagePluginRegistrationImpl(
@@ -223,7 +225,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
   class PluginDataStore {
 
     private Set<PluginData> data = new HashSet<PluginData>();
-    
+
     public synchronized int size() {
       return data.size();
     }
@@ -244,7 +246,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
       }
       return out;
     }
-    
+
     public synchronized PluginData getByName(String name) {
       for (PluginData p : data) {
         if (p.getName().equals(name)) {
@@ -270,7 +272,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     public boolean containsWithPath(String path) {
       return null != getByPath(path);
     }
-    
+
     public synchronized PluginData getByServiceReference(ServiceReference sref) {
       for (PluginData p : data) {
         if (p.getServiceReference().equals(sref)) {

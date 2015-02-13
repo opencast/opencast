@@ -15,10 +15,7 @@
  */
 package org.opencastproject.engage.theodul.plugin.timeline.statistics;
 
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import org.opencastproject.engage.theodul.api.AbstractEngagePlugin;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -27,16 +24,9 @@ import org.slf4j.LoggerFactory;
 @Path("/")
 public class EngagePluginTimelineStatistics extends AbstractEngagePlugin {
 
-  private static final Logger log = LoggerFactory.getLogger(EngagePluginTimelineStatistics.class);
-  
-  protected void activate(ComponentContext cc) {
-    log.info("Activated.");
-  }
-  /*
-  @GET
-  @Path("sayhello")
-  @Produces(MediaType.TEXT_PLAIN)
-  public String sayHello() {
-    return "Hi-didly-doh, neighbourino!";
-  }*/
+    private static final Logger log = LoggerFactory.getLogger(EngagePluginTimelineStatistics.class);
+
+    protected void activate(ComponentContext cc) {
+        log.info("Activated.");
+    }
 }

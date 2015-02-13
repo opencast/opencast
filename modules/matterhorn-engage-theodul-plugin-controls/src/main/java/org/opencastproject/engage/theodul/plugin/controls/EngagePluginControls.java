@@ -15,10 +15,7 @@
  */
 package org.opencastproject.engage.theodul.plugin.controls;
 
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import org.opencastproject.engage.theodul.api.AbstractEngagePlugin;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -28,15 +25,8 @@ import org.slf4j.LoggerFactory;
 public class EngagePluginControls extends AbstractEngagePlugin {
 
   private static final Logger log = LoggerFactory.getLogger(EngagePluginControls.class);
-  
+
   protected void activate(ComponentContext cc) {
     log.info("Activated.");
   }
-  /*
-  @GET
-  @Path("sayhello")
-  @Produces(MediaType.TEXT_PLAIN)
-  public String sayHello() {
-    return "Hi-didly-doh, neighbourino!";
-  }*/
 }
