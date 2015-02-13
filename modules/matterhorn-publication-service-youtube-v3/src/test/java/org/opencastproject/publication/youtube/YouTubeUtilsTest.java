@@ -17,7 +17,7 @@ package org.opencastproject.publication.youtube;
 
 import org.junit.Test;
 
-import java.util.Properties;
+import org.opencastproject.util.XProperties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -29,22 +29,22 @@ public class YouTubeUtilsTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testGetWhenRequired() {
-    YouTubeUtils.get(new Properties(), YouTubeKey.clientSecretsV3, true);
+    YouTubeUtils.get(new XProperties(), YouTubeKey.clientSecretsV3, true);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testGetWhenRequiredByDefault() {
-    YouTubeUtils.get(new Properties(), YouTubeKey.clientSecretsV3);
+    YouTubeUtils.get(new XProperties(), YouTubeKey.clientSecretsV3);
   }
 
   @Test
   public void testNull() {
-    assertNull(YouTubeUtils.get(new Properties(), YouTubeKey.clientSecretsV3, false));
+    assertNull(YouTubeUtils.get(new XProperties(), YouTubeKey.clientSecretsV3, false));
   }
 
   @Test
   public void testGet() {
-    final Properties p = new Properties();
+    final XProperties p = new XProperties();
     final String value = "value";
     YouTubeUtils.put(p, YouTubeKey.clientSecretsV3, value);
     assertEquals(value, YouTubeUtils.get(p, YouTubeKey.clientSecretsV3, true));
