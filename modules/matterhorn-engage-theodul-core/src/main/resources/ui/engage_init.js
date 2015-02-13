@@ -17,9 +17,6 @@ requirejs.config({
         "underscore": {
             exports: "_"
         },
-        "jquery.mobile": {
-            deps: ["jquery"]
-        },
         "mousetrap": {
             exports: "Mousetrap"
         },
