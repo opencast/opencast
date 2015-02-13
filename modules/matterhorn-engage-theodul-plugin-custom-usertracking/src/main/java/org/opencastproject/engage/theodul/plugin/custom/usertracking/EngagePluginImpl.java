@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
 
 public class EngagePluginImpl extends AbstractEngagePlugin {
 
-  private static final Logger log = LoggerFactory.getLogger(EngagePluginImpl.class);
-  
-  protected void activate(ComponentContext cc) {
-    log.info("Activated Theodul plugin: Engage Plugin Custom Usertracking");
-  } 
+    private static final Logger log = LoggerFactory.getLogger(EngagePluginImpl.class);
+
+    protected void activate(ComponentContext cc) {
+        log.info("Activated Theodul plugin: Engage Plugin Custom Usertracking");
+    }
 }

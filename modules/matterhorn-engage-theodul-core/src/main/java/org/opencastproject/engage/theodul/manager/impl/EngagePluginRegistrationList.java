@@ -24,8 +24,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.opencastproject.engage.theodul.api.EngagePluginRegistration;
 
-/** An JAX-B annotated class that warps around a list of <code>EngagePluginRegistration</code>
- *  so that we can generate an XML representation of the list via JAX-B.
+/**
+ * An JAX-B annotated class that warps around a list of
+ * <code>EngagePluginRegistration</code> so that we can generate an XML
+ * representation of the list via JAX-B.
  */
 //@XmlAccessorType(XmlAccessType.NONE)
 //@XmlRootElement(name = "pluginlist", namespace = "http://engageplugin.opencastproject.org")
@@ -33,21 +35,21 @@ import org.opencastproject.engage.theodul.api.EngagePluginRegistration;
 @XmlRootElement(name = "pluginlist", namespace = "http://engageplugin.opencastproject.org")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EngagePluginRegistrationList {
-  
-  @XmlElement(name = "plugins")
-  private List<EngagePluginRegistrationImpl> plugins = new ArrayList<EngagePluginRegistrationImpl>();
 
-  public EngagePluginRegistrationList() {
-    plugins = new ArrayList<EngagePluginRegistrationImpl>();
-  }
-  
-  public EngagePluginRegistrationList(List<EngagePluginRegistration> plugins) {
-    for (EngagePluginRegistration reg : plugins) {
-      this.plugins.add((EngagePluginRegistrationImpl)reg);
+    @XmlElement(name = "plugins")
+    private List<EngagePluginRegistrationImpl> plugins = new ArrayList<EngagePluginRegistrationImpl>();
+
+    public EngagePluginRegistrationList() {
+        plugins = new ArrayList<EngagePluginRegistrationImpl>();
     }
-  }
 
-  public List<EngagePluginRegistrationImpl> getPlugins() {
-    return plugins;
-  }
+    public EngagePluginRegistrationList(List<EngagePluginRegistration> plugins) {
+        for (EngagePluginRegistration reg : plugins) {
+            this.plugins.add((EngagePluginRegistrationImpl) reg);
+        }
+    }
+
+    public List<EngagePluginRegistrationImpl> getPlugins() {
+        return plugins;
+    }
 }
