@@ -391,7 +391,7 @@ $(document).ready(function() {
             };
 
             if ($(this).hasClass("last")) {
-                page = Math.floor(totalEntries / bufferEntries);
+                page = Math.floor(totalEntries / bufferEntries) + 1;
             } else {
                 page++;
             }
@@ -417,7 +417,7 @@ $(document).ready(function() {
                 };
 
                 if ($(this).hasClass("last")) {
-                    page = Math.floor(totalEntries / bufferEntries);
+                    page = Math.floor(totalEntries / bufferEntries) + 1;
                 } else {
                     page++;
                 }
