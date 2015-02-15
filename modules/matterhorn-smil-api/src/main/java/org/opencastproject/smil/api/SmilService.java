@@ -95,6 +95,23 @@ public interface SmilService {
   SmilResponse addClip(Smil smil, String parentId, Track track, long start, long duration) throws SmilException;
 
   /**
+   * Add a {@link SmilMediaElement} based on given track and start/duration
+   * information.
+   *
+   * @param smil {@link Smil} to edit
+   * @param parentId element id, where to add new {@link SmilMediaElement}
+   * @param track {@link Track} to add as {@link SmilMediaElement}
+   * @param start start position in {@link Track} in milliseconds
+   * @param duration duration in milliseconds
+   * @param paramGroupId clip should be added as a part of a previously created param group
+   * @return edited {@link Smil}, the new {@link SmilMediaElement} and generated
+   * meta data
+   * @throws SmilException if there is no element with the given parentId
+   */
+  SmilResponse addClip(Smil smil, String parentId, Track track, long start, long duration, String paramGroupId)
+          throws SmilException;
+
+  /**
    * Add a list of {@link SmilMediaElement}s based on given tracks and
    * start/duration information.
    *
