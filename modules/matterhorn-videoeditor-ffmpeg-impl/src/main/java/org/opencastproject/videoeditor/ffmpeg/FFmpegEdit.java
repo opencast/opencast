@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -152,7 +154,7 @@ public class FFmpegEdit {
   public List<String> makeEdits(List<String> inputfiles, String dest, String outputResolution,
           List<VideoClip> clips) throws Exception {
 
-    DecimalFormat f = new DecimalFormat("0.00");
+    DecimalFormat f = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.US));
     int n = clips.size();
     int i;
     String outmap = "";
