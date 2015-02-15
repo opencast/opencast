@@ -426,7 +426,7 @@
         <module>modules/matterhorn-textextractor-tesseract</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videoeditor-api</module>
-        <module>modules/matterhorn-videoeditor-impl</module>
+        <module>modules/matterhorn-videoeditor-ffmpeg-impl</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
@@ -475,7 +475,7 @@
         <module>modules/matterhorn-textextractor-tesseract</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videoeditor-api</module>
-        <module>modules/matterhorn-videoeditor-impl</module>
+        <module>modules/matterhorn-videoeditor-ffmpeg-impl</module>
         <module>modules/matterhorn-videosegmenter-api</module>
         <module>modules/matterhorn-videosegmenter-impl</module>
         <module>modules/matterhorn-webconsole</module>
