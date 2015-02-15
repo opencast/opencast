@@ -27,7 +27,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.inspection.api.MediaInspectionException;
-import org.opencastproject.inspection.impl.MediaInfoAnalyzer;
+import org.opencastproject.inspection.ffmpeg.FFmpegAnalyzer;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -192,7 +192,7 @@ public class VideoEditorTest {
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bc.getProperty("org.opencastproject.storage.dir")).andReturn(storageDir).anyTimes();
     EasyMock.expect(bc.getProperty("org.opencastproject.composer.ffmpegpath")).andReturn(FFMPEG_BINARY).anyTimes();
-    EasyMock.expect(bc.getProperty(MediaInfoAnalyzer.MEDIAINFO_BINARY_CONFIG)).andReturn("mediainfo").anyTimes();
+    EasyMock.expect(bc.getProperty(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG)).andReturn("ffprobe").anyTimes();
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();
     EasyMock.replay(bc,cc,workspace,userDirectoryService,organizationDirectoryService,securityService);
