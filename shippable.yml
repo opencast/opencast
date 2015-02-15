@@ -14,6 +14,7 @@ before_install:
   - apt-get install --quiet -y gstreamer0.10-ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-plugins-cutter
   - apt-get install --quiet -y gstreamer0.10-plugins-ugly gstreamer0.10-plugins-base gstreamer0.10-plugins-good
   - apt-get install --quiet -y gstreamer0.10-gnonlin libglib2.0-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
+  - rm -rf /tmp/ffmpeg.tar.xz ffmpeg-*
   - curl -s $(curl -s http://johnvansickle.com/ffmpeg/ | grep 64bit-static.tar.xz | grep -v git | cut -d'"' -f2) -o /tmp/ffmpeg.tar.xz
   - tar -xf /tmp/ffmpeg.tar.xz
   - mv ffmpeg-*-64bit-static/ff* /usr/bin/
