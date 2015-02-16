@@ -161,7 +161,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var id_videoDisplayClass = "videoDisplay";
     var id_engageContent = "engage_content";
     var id_videojs_wrapperClass = "videojs_wrapper";
-    var id_engage_video = "engage_video";
+    var id_engage_video_fullsceen_wrapper = "fullscreen_video_wrapper";
     var id_page_cover = "page-cover";
     var id_btn_fullscreenCancel = "btn_fullscreenCancel";
     var id_generated_videojs_flash_component = "videojs_videodisplay_0_flash_api";
@@ -1165,7 +1165,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 if (numberOfVideodisplays == 1) {
                     videodisplayMaster.requestFullscreen();
                 } else if (!fullscreen) {
-                    var viewer = document.getElementById(id_engage_video);
+                    var viewer = document.getElementById(id_engage_video_fullsceen_wrapper);
                     if (viewer.mozRequestFullScreen) {
                         viewer.mozRequestFullScreen();
                     } else if (viewer.webkitRequestFullscreen) {

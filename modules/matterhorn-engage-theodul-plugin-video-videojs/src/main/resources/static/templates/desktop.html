@@ -22,7 +22,7 @@
 		<% } %>
 	</div>
 <% } else { %>
-	<div class="videojs_wrapper clearfix">
+	<div id="fullscreen_video_wrapper" class="videojs_wrapper clearfix">
 		<% if(typeof ids !== "undefined") { var i = 1; %>
 			<% _.each(ids, function(id) { %>
 				<div class="videoDisplay">
