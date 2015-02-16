@@ -174,7 +174,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Export-Package>
               org.opencastproject.scheduler.impl;version=${project.version},
               org.opencastproject.scheduler.impl.solr;version=${project.version},
