@@ -20,7 +20,7 @@ General Configuration
 Module Configuration
 --------------------
 
- - YouTube Publication Configuration
+ - [YouTube Publication Configuration](modules/youtubepublication.md)
  - [Text Extraction Configuration](modules/textextraction.md)
  - [Video Segmentation Configuration](modules/videosegmentation.md)
 
