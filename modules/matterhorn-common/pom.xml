@@ -232,6 +232,8 @@
                /modules/matterhorn-common/src/main/java/org/opencastproject/util/persistence/PersistenceUtil.java
                200:9   expecting EOF, found 'try' -->
           <excludes>
+            **/ProcessRunner.java,
+            **/StreamConsumer.java,
             **/package-info.java,
             **/PersistenceUtil.java,
             **/PersistenceEnvs.java,

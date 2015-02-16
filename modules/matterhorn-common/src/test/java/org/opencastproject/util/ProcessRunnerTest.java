@@ -13,28 +13,24 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.util.data;
+package org.opencastproject.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Collections.toList;
-import static org.opencastproject.util.data.Iterators.intRangeE;
+import com.entwinemedia.fn.Fns;
+import com.entwinemedia.fn.fns.Booleans;
+import com.entwinemedia.fn.fns.Strings;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.NoSuchElementException;
+import java.io.IOException;
 
-public class IteratorsTest {
+public class ProcessRunnerTest {
   @Test
-  public void testIntRangeE1() {
-    assertFalse(intRangeE(0, 0).hasNext());
-    assertTrue(intRangeE(0, 1).hasNext());
-    assertEquals(10, toList(intRangeE(0, 10)).size());
-  }
-
-  @Test(expected = NoSuchElementException.class)
-  public void testIntRangeE2() {
-    intRangeE(0, 0).next();
+  @Ignore
+  public void testRunner() throws IOException {
+    int exit = ProcessRunner.run(ProcessRunner.mk("ls -Xal", true),
+                                 Fns.<String, Boolean>tee(Booleans.not.o(Strings.matches("^ls.*")), ProcessRunner.TO_CONSOLE.toFx()),
+                                 ProcessRunner.IGNORE);
+    System.out.println(exit);
   }
 }

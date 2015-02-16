@@ -29,6 +29,7 @@ import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -211,7 +212,7 @@ public abstract class AbstractJobProducer implements JobProducer {
       } catch (Throwable e) {
         job.setStatus(Status.FAILED);
         getServiceRegistry().incident().unhandledException(job, Severity.FAILURE, e);
-        logger.error("Error handling operation '{}': {}", job.getOperation(), e);
+        logger.error("Error handling operation '{}': {}", job.getOperation(), ExceptionUtils.getStackTrace(e));
         if (e instanceof ServiceRegistryException)
           throw (ServiceRegistryException) e;
       } finally {

@@ -18,11 +18,12 @@ package org.opencastproject.mediapackage;
 
 import org.opencastproject.util.data.Function;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * ELement flavors describe {@link MediaPackageElement}s in a semantic way. They reveal or give at least a hint about
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @XmlJavaTypeAdapter(MediaPackageElementFlavor.FlavorAdapter.class)
 public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPackageElementFlavor>, Serializable {
+  public static final String WILDCARD = "*";
 
   /**
    * Serial version uid
@@ -202,6 +204,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
   /**
    * @see java.lang.String#compareTo(java.lang.Object)
    */
+  @Override
   public int compareTo(MediaPackageElementFlavor m) {
     return toString().compareTo(m.toString());
   }
@@ -238,6 +241,16 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
               return parseFlavor(s);
             }
           };
+
+  /** Check if <code>type</code> is a {@link #WILDCARD wildcard}. */
+  public static boolean isWildcard(String type) {
+    return WILDCARD.equals(type);
+  }
+
+  /** Check if type or subtype of <code>flavor</code> is a wildcard. */
+  public static boolean hasWildcard(MediaPackageElementFlavor flavor) {
+    return isWildcard(flavor.getType()) || isWildcard(flavor.getSubtype());
+  }
 
   /**
    * Helper class to store type/subtype equivalents for a given element type.
@@ -328,14 +341,14 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     if (this == other)
       return true;
     if (subtype == null) {
-      if (other.subtype != null && !"*".equals(other.subtype))
+      if (other.subtype != null && !isWildcard(other.subtype))
         return false;
-    } else if (!subtype.equals(other.subtype) && (!"*".equals(subtype) && !"*".equals(other.subtype)))
+    } else if (!subtype.equals(other.subtype) && (!isWildcard(subtype) && !isWildcard(other.subtype)))
       return false;
     if (type == null) {
-      if (other.type != null && !"*".equals(other.type))
+      if (other.type != null && !isWildcard(other.type))
         return false;
-    } else if (!type.equals(other.type) && (!"*".equals(type) && !"*".equals(other.type)))
+    } else if (!type.equals(other.type) && (!isWildcard(type) && !isWildcard(other.type)))
       return false;
     return true;
   }

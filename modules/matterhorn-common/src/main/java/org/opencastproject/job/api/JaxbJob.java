@@ -243,8 +243,8 @@ public class JaxbJob implements Job {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.Job#getType()
+   * 
+   * @see Job#getJobType()
    */
   @XmlAttribute(name = "type")
   @Override
@@ -628,7 +628,7 @@ public class JaxbJob implements Job {
    */
   @Override
   public int hashCode() {
-    return (int) id >> 32;
+    return (int) (id ^ (id >>> 32));
   }
 
   /**
