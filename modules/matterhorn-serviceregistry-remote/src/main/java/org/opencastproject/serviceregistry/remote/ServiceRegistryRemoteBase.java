@@ -652,10 +652,11 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
 
   @Override
   public long count(String serviceType, String host, String operation, Status status) throws ServiceRegistryException {
-    if (isBlank(serviceType)) {
-      throw new IllegalArgumentException("Service type must not be null");
-    }
-    QueryStringBuilder queryStringBuilder = new QueryStringBuilder("count").add("serviceType", serviceType);
+    QueryStringBuilder queryStringBuilder = new QueryStringBuilder("count");
+
+    if (StringUtils.isNotBlank(serviceType))
+      queryStringBuilder.add("serviceType", serviceType);
+
     if (status != null)
       queryStringBuilder.add("status", status.toString());
 
@@ -687,7 +688,6 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCountOfAbnormalServices()
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public long countOfAbnormalServices() throws ServiceRegistryException {
     QueryStringBuilder queryStringBuilder = new QueryStringBuilder("servicewarnings");

@@ -472,15 +472,18 @@ public class ServiceRegistryEndpoint {
           @RestParameter(name = "operation", isRequired = false, type = Type.STRING, description = "The job's operation") }, reponses = { @RestResponse(responseCode = SC_OK, description = "Job count returned.") })
   public long count(@QueryParam("serviceType") String serviceType, @QueryParam("status") Job.Status status,
           @QueryParam("host") String host, @QueryParam("operation") String operation) {
-    if (isBlank(serviceType)) {
-      throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
-    }
     try {
       if (isNotBlank(host) && isNotBlank(operation)) {
+        if (isBlank(serviceType))
+          throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
         return serviceRegistry.count(serviceType, host, operation, status);
       } else if (isNotBlank(host)) {
+        if (isBlank(serviceType))
+          throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
         return serviceRegistry.countByHost(serviceType, host, status);
       } else if (isNotBlank(operation)) {
+        if (isBlank(serviceType))
+          throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
         return serviceRegistry.countByOperation(serviceType, operation, status);
       } else {
         return serviceRegistry.count(serviceType, status);
