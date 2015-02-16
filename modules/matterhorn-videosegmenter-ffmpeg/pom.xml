@@ -81,8 +81,8 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Export-Package>
-              org.opencastproject.videosegmenter.impl;version=${project.version},
-              org.opencastproject.videosegmenter.impl.endpoint;version=${project.version}
+              org.opencastproject.videosegmenter.ffmpeg;version=${project.version},
+              org.opencastproject.videosegmenter.ffmpeg.endpoint;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
               jmf;inline=true
