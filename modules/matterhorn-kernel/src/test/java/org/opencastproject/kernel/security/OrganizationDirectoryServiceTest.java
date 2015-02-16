@@ -15,12 +15,15 @@
  */
 package org.opencastproject.kernel.security;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.opencastproject.kernel.security.persistence.OrganizationDatabase;
 import org.opencastproject.kernel.security.persistence.OrganizationDatabaseException;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,31 +51,32 @@ public class OrganizationDirectoryServiceTest {
       public void storeOrganization(Organization organization) throws OrganizationDatabaseException {
         this.organization = organization;
         if (i == 0) {
-          Assert.assertNotNull(organization);
-          Assert.assertEquals("mh_default", organization.getId());
-          Assert.assertEquals("Opencast Test", organization.getName());
-          Assert.assertEquals("ROLE_TEST_ADMIN", organization.getAdminRole());
-          Assert.assertEquals("ROLE_TEST_ANONYMOUS", organization.getAnonymousRole());
+          assertNotNull(organization);
+          assertEquals("mh_default", organization.getId());
+          assertEquals("Opencast Test", organization.getName());
+          assertEquals("ROLE_TEST_ADMIN", organization.getAdminRole());
+          assertEquals("ROLE_TEST_ANONYMOUS", organization.getAnonymousRole());
           Map<String, Integer> servers = organization.getServers();
-          Assert.assertEquals(1, servers.size());
-          Assert.assertTrue(servers.containsKey("localhost"));
-          Assert.assertTrue(servers.containsValue(8080));
-          Assert.assertEquals("true", organization.getProperties().get("org.test"));
+          assertEquals(1, servers.size());
+          assertTrue(servers.containsKey("localhost"));
+          assertTrue(servers.containsValue(8080));
+          assertEquals("true", organization.getProperties().get("org.test"));
         } else if (i == 1) {
-          Assert.assertNotNull(organization);
-          Assert.assertEquals("mh_default", organization.getId());
-          Assert.assertEquals("Opencast Test 2", organization.getName());
-          Assert.assertEquals("ROLE_TEST2_ADMIN", organization.getAdminRole());
-          Assert.assertEquals("ROLE_TEST2_ANONYMOUS", organization.getAnonymousRole());
+          assertNotNull(organization);
+          assertEquals("mh_default", organization.getId());
+          assertEquals("Opencast Test 2", organization.getName());
+          assertEquals("ROLE_TEST2_ADMIN", organization.getAdminRole());
+          assertEquals("ROLE_TEST2_ANONYMOUS", organization.getAnonymousRole());
           Map<String, Integer> servers = organization.getServers();
-          Assert.assertEquals(2, servers.size());
-          Assert.assertTrue(servers.containsKey("localhost"));
-          Assert.assertTrue(servers.containsValue(8080));
-          Assert.assertTrue(servers.containsKey("localhost2"));
-          Assert.assertTrue(servers.containsValue(8081));
-          Assert.assertEquals("false", organization.getProperties().get("org.test"));
+          assertEquals(3, servers.size());
+          assertTrue(servers.containsKey("localhost"));
+          assertTrue(servers.containsValue(8080));
+          assertTrue(servers.containsKey("localhost2"));
+          assertTrue(servers.containsValue(8081));
+          assertTrue(servers.containsKey("another"));
+          assertEquals("false", organization.getProperties().get("org.test"));
         } else {
-          Assert.fail("Too much storeOrganization calls: " + i);
+          fail("Too many storeOrganization calls: " + i);
         }
         i++;
       }
@@ -122,7 +126,7 @@ public class OrganizationDirectoryServiceTest {
     // Test wrong configuration
     try {
       orgDirectoryService.updated("mh_default", properties);
-      Assert.fail("No configuration exception occured");
+      fail("No configuration exception occured");
     } catch (ConfigurationException e) {
       // Should be an exception
     }
@@ -140,13 +144,13 @@ public class OrganizationDirectoryServiceTest {
     try {
       orgDirectoryService.updated("mh_default", properties);
     } catch (ConfigurationException e) {
-      Assert.fail("Configuration exception occured");
+      fail("Configuration exception occured");
     }
 
     // Update properties
     properties.put(OrganizationDirectoryServiceImpl.ORG_ID_KEY, "mh_default");
     properties.put(OrganizationDirectoryServiceImpl.ORG_NAME_KEY, "Opencast Test 2");
-    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_KEY, "localhost2");
+    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_KEY, "localhost2,another");
     properties.put(OrganizationDirectoryServiceImpl.ORG_PORT_KEY, "8081");
     properties.put(OrganizationDirectoryServiceImpl.ORG_ADMIN_ROLE_KEY, "ROLE_TEST2_ADMIN");
     properties.put(OrganizationDirectoryServiceImpl.ORG_ANONYMOUS_ROLE_KEY, "ROLE_TEST2_ANONYMOUS");
@@ -156,7 +160,7 @@ public class OrganizationDirectoryServiceTest {
     try {
       orgDirectoryService.updated("mh_default", properties);
     } catch (ConfigurationException e) {
-      Assert.fail("Configuration exception occured");
+      fail("Configuration exception occured");
     }
   }
 }
