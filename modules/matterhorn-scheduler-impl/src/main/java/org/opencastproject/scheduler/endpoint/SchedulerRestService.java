@@ -29,6 +29,7 @@ import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
