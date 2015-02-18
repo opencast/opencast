@@ -142,8 +142,6 @@ public class VideoEditorTest {
     String paramGroupId = groups.get(0).getId();
 
     smilResponse = smilService.addClip(smilResponse.getSmil(), par.getId(), track2, 1000L, 12000L, paramGroupId);
-    System.setProperty("java.awt.headless", "true");
-    System.setProperty("awt.toolkit", "sun.awt.HeadlessToolkit");
     smil = smilResponse.getSmil();
   }
 
