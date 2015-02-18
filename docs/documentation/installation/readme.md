@@ -10,11 +10,11 @@ Unix based systems.
 
  - Officially Supported [^officialsupport]
     - [Ubuntu](source-debian-ubuntu.md)
-    - RedHat Enterprise Linux
-    - CentOS
-    - Scientific Linux
+    - [RedHat Enterprise Linux](source-rhel-sl-centos.md)
+    - [CentOS](source-rhel-sl-centos.md)
+    - [Scientific Linux](source-rhel-sl-centos.md)
  - Other Systems
-    - Fedora
+    - [Fedora](source-rhel-sl-centos.md)
     - [Debian](source-debian-ubuntu.md)
     - openSUSE
     - SLES

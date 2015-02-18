@@ -6,10 +6,9 @@ These instructions outline how to install an all in one Matterhorn system on Ubu
 Preparatiom
 -----------
 
-Create Matterhorn installation directory
+Create a dedicated Matterhorn user.
 
-    sudo mkdir -p /opt/matterhorn
-    sudo chown $USER:$GROUPS /opt/matterhorn
+    useradd -d /opt/matterhorn matterhorn
 
 Get Matterhorn source:
 
@@ -19,15 +18,13 @@ prior option, the tarball download, needs less tools and you do not have to down
 
 Using the tarball:
 
- - Download desired tarball from https://bitbucket.org/opencast-community/matterhorn/downloads#tag-downloads
- - Extract the tarball
-   ```
-   tar xf develop.tar.gz
-   ```
- - Move the source to `/opt/matterhorn`
-   ```
-   mv opencast-community-matterhorn-* /opt/matterhorn/
-   ```
+Select the tarball for the version you want to install from
+https://bitbucket.org/opencast-community/matterhorn/downloads#tag-downloads
+
+    # Download desired tarball
+    curl -O https://bitbucket.org/opencast-community/matterhorn/...
+    tar xf develop.tar.gz
+    mv opencast-community-matterhorn-* /opt/matterhorn/
 
 Cloning the Git repository:
 
@@ -37,87 +34,102 @@ Cloning the Git repository:
     git checkout TAG   <-  Switch to desired version
 
 
-Install
--------
+Install Dependencies
+--------------------
 
-### Java:
+Please make sure to install the following dependencies:
 
-    sudo apt-get install openjdk-7-jdk
+Required:
 
-Make sure that openjdk ≥ 7 is the prefered Java version (`java -version`). Otherwise run
-`sudo update-alternatives --config java`.
+    openjdk-7-jdk or openjdk-8-jdk
+    ffmpeg >= 1.1
+    maven >= 3
 
-### Apache Maven:
+Required for text extraction (recommended):
 
-    sudo apt-get install maven
+    tesseract >= 3
 
-### Gstreamer:
+Required for the video editor (recommended):
 
-    sudo apt-get install gstreamer0.10-plugins-base
-    sudo apt-get install gstreamer0.10-plugins-good
-    sudo apt-get install gstreamer0.10-gnonlin
-    sudo apt-get install gstreamer0.10-ffmpeg
+    gnonlin0.10
+    gstreamer
+    gstreamer-ffmpeg
+    gstreamer0.10-plugins-base
+    gstreamer0.10-plugins-good
+    gstreamer0.10-plugins-ugly
+    gstreamer0.10-plugins-bad
+    gstreamer0.10-gnonlin
+
+*Note: Make sure to install Gstreamer 0.10*
+
+Required for hunspell based text filtering (optional):
+
+    hunspell >= 1.2.8
+
+Required for audio normalization (optional):
+
+    sox >= 14
 
 
 Configure
 ---------
 
-Please follow the steps of the Basic Configuration guide. It will help you to set your hostname, login information, …
+Please follow the steps of the [Basic Configuration guide](../configuration/basic.md). It will help you to set your
+hostname, login information, …
 
 
-Build
------
+Building Matterhorn
+-------------------
 
-### Matterhorn
+Make sure everything belongs to the user `matterhorn`:
 
-    export MAVEN_OPTS='-Xms256m -Xmx960m -XX:PermSize=64m -XX:MaxPermSize=256m'
+    sudo chown -R matterhorn:matterhorn /opt/matterhorn
+
+Switch to user `matterhorn`:
+
+    sudo su - matterhorn
+
+Compile the source code:
+
     cd /opt/matterhorn
     mvn clean install -DdeployTo=/opt/matterhorn
 
-### Third-party tools
 
-    cd /opt/matterhorn/docs/scripts/3rd_party
+Running Matterhorn
+------------------
 
-Read README file for additional instructions
+Install Matterhorn start script and man-page for installations in /opt:
 
+    cd /opt/matterhorn/docs/scripts/init/opt
+    sudo ./install.sh
 
-Run
----
+This will install the start script along with either a SysV-Init script or a
+systemd unit file.
 
-Export environment variables
+Now you can start Matterhorn by running
 
-    echo "export M2_REPO=/home/$USER/.m2/repository" >> ~/.bashrc
-    echo "export FELIX_HOME=/opt/matterhorn" >> ~/.bashrc
-    echo "export JAVA_OPTS='-Xms1024m -Xmx1024m -XX:MaxPermSize=256m'" >> ~/.bashrc
-    source ~/.bashrc
+    sudo matterhorn --interactive
 
-Run Matterhorn
-
-This method is intended for testing, debugging and development. The start script might pose security risks for public
-systems like enabled debugging, JMX, etc. For production use, please have a look at the service scripts in the next
-section.
-
-    sh /opt/matterhorn/bin/start_matterhorn.sh
-
-Browse http://localhost:8080
+Browse to [http://localhost:8080] to get to the admin interface.
 
 
 Run Matterhorn as Service
 -------------------------
 
-Edit the SysV-init script and configure it for your system. Then copy it to `/etc/init.d`
+Usually, you do not want to run Matterhorn in interactive mode but as system
+service to make sure matterhorn is run only once on a system and is started
+automatically.
 
-    cp /opt/matterhorn/docs/scripts/init/old/etc-init.d-matterhorn /etc/init.d/matterhorn
+SysV-Init:
 
-When you run an init script on Ubuntu, the shell variables from .bashrc are unfortunately ingnored and you need to set
-the user that runs Matterhorn (in this example "matterhorn"). So you need to edit /etc/init.d/matterhorn and set
-`FELIX_HOME`:
+    # Start Matterhorn
+    sudo service matterhorn start
+    # Autostart after reboot
+    sudo chkconfig --level 345 matterhorn on
 
-    /etc/init.d/matterhorn
-    FELIX_HOME=/opt/matterhorn
-    ...
-    MATTERHORN_USER="matterhorn"
+Systemd:
 
-Then start Matterhorn as service:
-
-  service matterhorn start
+    # Start Matterhorn
+    sudo systemctl start matterhorn
+    # Autostart after reboot
+    sudo systemctl enable matterhorn

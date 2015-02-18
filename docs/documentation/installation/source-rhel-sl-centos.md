@@ -1,5 +1,5 @@
-Install from Source (RedHat Enterprise Linux, CentOS, Scientific Linux)
-=======================================================================
+Install from Source (RedHat Enterprise Linux, CentOS, Scientific Linux, Fedora)
+===============================================================================
 
 Preparatiom
 -----------
