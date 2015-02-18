@@ -1,0 +1,206 @@
+.TH MATTERHORN 8 "June 17, 2013" "Opencast Matterhorn User Manuals"
+.SH NAME
+.PP
+Opencast Matterhorn \[en] Open Source Lecture Capture & Video Management
+.SH SYNOPSIS
+.PP
+matterhorn [ --daemon | --interactive | --quit | --help ]
+.SH SUMMARY
+.PP
+Matterhorn is a free, open-source platform to support the management of
+educational audio and video content.
+Institutions will use Matterhorn to produce lecture recordings, manage
+existing video, serve designated distribution channels, and provide user
+interfaces to engage students with educational videos.
+.SH OPTIONS
+.TP
+.B --help
+Show help message
+.RS
+.RE
+.TP
+.B --daemon
+Run Matterhorn as \f[I]unmanaged\f[] daemon.
+Consider using the SysV-init script instead of doing this.
+.RS
+.RE
+.TP
+.B --interactive
+Run matterhorn in interactive mode.
+.RS
+.RE
+.TP
+.B --quit
+Stop a previously started Matterhorn.
+.RS
+.RE
+.SH SYSTEM DAEMON
+.PP
+Normally you should \f[I]not\f[] start Matterhorn directly unless you
+want to have a look at the output for debugging purposes (This would be
+the case if the Matterhorn service fails to start at all).
+Instead you should run Matterhorn as service.
+You can start the service with:
+.IP
+.nf
+\f[C]
+%>\ service\ matterhorn\ start
+\f[]
+.fi
+.PP
+To enable Matterhorn by default in various runlevels (make sure
+Matterhorn starts after booting the system) use chkconfig:
+.IP
+.nf
+\f[C]
+%>\ chkconfig\ --level\ 345\ matterhorn\ on
+\f[]
+.fi
+.PP
+You can check the status of Matterhorn anytime by executing:
+.IP
+.nf
+\f[C]
+\ %>\ service\ matterhorn\ status
+\f[]
+.fi
+.SH GETTING STARTED
+.PP
+After installing Matterhorn and running it as system daemon (service
+start matterhorn) open the browser of your choice and navigate to
+.IP
+.nf
+\f[C]
+http://localhost:8080/
+\f[]
+.fi
+.PP
+This is were you can find the Matterhorn Admin-UI where you can manage
+your recordings.
+Matterhorn may need a couple of second to load completely.
+During this time you might get some error like "Access Denied" or
+"Internal server Error".
+Do not worry about that, wait a couple of seconds and try again.
+The errors should go away (They are not real errors but HTTP status
+codes).
+.PP
+Now you should see a login page.
+The default administrative credentials are:
+.IP
+.nf
+\f[C]
+Username:\ admin
+Password:\ opencast
+\f[]
+.fi
+.PP
+Using this credentials you can log in, start uploading videos, \&...
+.SH CONFIGURATION
+.PP
+While Matterhorn comes preconfigured for testing you probably have to
+modify the configuration if you start advanced testing or deploy a
+productive system.
+The most important things are configured in
+/opt/matterhorn/etc/config.properties
+.TP
+.B org.opencastproject.server.url
+This is set to http://localhost:8080 by default, which means that
+Matterhorn will only be usable from the local machine as localhost will be
+used for all internal links, etc. This is not a protection against access
+from the outside.
+You should change this if your server should be accessible within a
+network.
+Set it to your domain name or IP address.
+.RS
+.RE
+.TP
+.B org.opencastproject.security.admin.user
+The user for the administrative account.
+This is set to “admin” by default.
+You should definitely change the credentials if your server is reachable
+from the internet.
+.RS
+.RE
+.TP
+.B org.opencastproject.security.admin.pass
+The password for the administrative account.
+This is set to “opencast” by default.
+You should definitely change the credentials if your server is reachable
+from the internet.
+.RS
+.RE
+.TP
+.B org.opencastproject.security.digest.user
+The user for the communication between Matterhorn nodes.
+This is set to matterhorn_system_account by default.
+.RS
+.RE
+.TP
+.B org.opencastproject.security.digest.pass
+The password for the communication between Matterhorn nodes.
+This is set to CHANGE_ME by default.
+.RS
+.RE
+.SH FILES
+.TP
+.B /opt/matterhorn
+Software and data not modified by Matterhorn.
+This includes Apache Felix, the Matterhorn modules and external
+libraries.
+.RS
+.RE
+.TP
+.B /opt/matterhorn/etc
+The Matterhorn configuration files (Felix and service configuration,
+workflows, encoding profiles, etc.)
+.RS
+.RE
+.TP
+.B /opt/matterhorn/logs
+The Matterhorn logfiles.
+.RS
+.RE
+.TP
+.B /opt/matterhorn/work/opencast
+Matterhorn storage.
+This is the place were all the recordings, the archive, the Solr
+indexes, etc.
+are stored.
+.RS
+.RE
+.TP
+.B /opt/matterhorn/work/felix-cache
+Temporary data which are not necessarily preserved between reboots.
+This includes the felix-cache and other temporary data.
+.RS
+.RE
+.TP
+.B /usr/sbin/matterhorn
+Matterhorn start script.
+.RS
+.RE
+.TP
+.B /etc/init.d/matterhorn
+SysV-Init script.
+.RS
+.RE
+.SH SEE ALSO
+.TP
+.B The Opencast Project
+http://opencast.org
+.RS
+.RE
+.TP
+.B IRC
+Check out the #opencast IRC channel on freenode.
+You might use the IRC web interface at
+http://webchat.freenode.net/?channels=opencast
+.RS
+.RE
+.TP
+.B Mailinglist
+Have a look at the Opencast Google Groups:
+.RS
+.PP
+https://groups.google.com/a/opencast.org/forum/#!forumsearch/
+.RE

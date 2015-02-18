@@ -2,8 +2,7 @@
 
 
 prog="matterhorn"
-config="/etc/${prog}/service.conf"
-config_opt="/opt/${prog}/etc/service.conf"
+config="/opt/${prog}/etc/service.conf"
 pidfile="/var/run/${prog}.pid"
 
 # Times to try sending a SIGTERM before sending a SIGKILL
@@ -67,18 +66,16 @@ fi
 
 
 # Load default configuration
-MATTERHORN=/usr/share/matterhorn
+MATTERHORN=/opt/matterhorn
 CA=$MATTERHORN/capture-agent
 MATTERHORN_USER=matterhorn
-LOGDIR=/var/log/matterhorn
+LOGDIR=/opt/matterhorn/logs
 LOGLEVEL="WARN"
 ECLIPSE_LOGLEVEL="CONFIG"
-[ -z $DEBUG ] && DEBUG=false
-DEBUG_PORT="8000"
-DEBUG_SUSPEND="n"
-FELIX_CONFIG_DIR=/etc/matterhorn
-FELIX_WORK_DIR=/srv/matterhorn
-FELIX_CACHE_DIR="/tmp/matterhorn/felix-cache"
+[ -z $DEBUG ] && DEBUG=''
+FELIX_CONFIG_DIR=/opt/matterhorn/etc
+FELIX_WORK_DIR=/opt/matterhorn/work
+FELIX_CACHE_DIR=$FELIX_WORK_DIR/felix-cache
 ADD_OPTS=""
 if [ -f $MATTERHORN/lib/matterhorn/matterhorn-capture-agent-impl*.jar ]
 then
@@ -88,7 +85,6 @@ else
 fi
 
 # Load configuration files
-[ -e $config_opt ] && . $config_opt
 [ -e $config ] && . $config
 
 # Show version and exit if --version is given
@@ -129,6 +125,8 @@ LOGGING="${LOGGING} -Djava.util.logging.config.file=$FELIX_CONFIG_DIR/services/j
 LOGGING="${LOGGING} -Dorg.ops4j.pax.logging.DefaultServiceLog.level=${LOGLEVEL}"
 LOGGING="${LOGGING} -Declipselink.logging.level=${ECLIPSE_LOGLEVEL}"
 
+# This is needed by matterhorn-videosegmenter-impl
+# It can probably be removed once the module is removed
 GRAPHICS="-Djava.awt.headless=true"
 GRAPHICS="${GRAPHICS} -Dawt.toolkit=sun.awt.HeadlessToolkit"
 
@@ -137,20 +135,11 @@ JETTY="-Dorg.mortbay.jetty.Request.maxFormContentSize=1000000"
 DISABLE_PHONEHOME="-Dnet.sf.ehcache.skipUpdateCheck=true"
 DISABLE_PHONEHOME="${DISABLE_PHONEHOME} -Dorg.terracotta.quartz.skipUpdateCheck=true"
 
-JAVA="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
+# Set memory allocation options
+# -XX:MaxPermSize has been removed in OpenJDK >= 8
+# Hence we should remove this options once we discontinue support for Java 7
+JAVA="-Xms1g -Xmx1g -XX:MaxPermSize=256m"
 ( [ "$1" == '--daemon' ] || [ "$1" == '--notty' ] ) && GOSH="-Dgosh.args='--noshutdown -c noop=true'"
-
-if $DEBUG
-then
-	DEBUG="-Xdebug"
-	DEBUG="${DEBUG} -Xnoagent"
-	DEBUG="${DEBUG} -Xrunjdwp:transport=dt_socket"
-	DEBUG="${DEBUG},address=$DEBUG_PORT"
-	DEBUG="${DEBUG},server=y"
-	DEBUG="${DEBUG},suspend=$DEBUG_SUSPEND"
-else
-	DEBUG=""
-fi
 
 MATTERHORN_OPTS="$GOSH $DEBUG $FELIX $GRAPHICS $JETTY $JAVA $LOGGING $JMX $DISABLE_PHONEHOME $ADD_OPTS"
 
