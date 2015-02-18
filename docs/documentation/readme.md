@@ -34,6 +34,13 @@ for each release. It contains:
  - Module Documentation
 
 
+Development Documentation
+-------------------------
+
+ - Development Process
+ - [Packaging Guidelines](development/packaging.md)
+
+
 Further Documentation
 ---------------------
 
