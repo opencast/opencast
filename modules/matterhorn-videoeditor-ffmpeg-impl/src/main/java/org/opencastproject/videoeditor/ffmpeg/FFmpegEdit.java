@@ -179,29 +179,34 @@ public class FFmpegEdit {
       int fileindx = vclip.getSrc();   // get source file by index
       double inpt = vclip.getStart();     // get in points
       double duration = vclip.getDuration();
-      double vend = duration - vfade;
-      double aend = duration - afade;
-      String clip;
-      // Add filters for video
-      clip = "[" + fileindx + ":v]trim=" + f.format(inpt)
-                + ":duration=" + f.format(duration)
-                + scale
-                + ",setpts=PTS-STARTPTS,fade=t=in:st=0:d=" + vfade
-                + ",fade=t=out:st=" + f.format(vend) + ":d=" + vfade + "[v"
-                + i + "]";
+
+      String vfadeFilter = "";
+      /* Only include fade into the filter graph if necessary */
+      if (vfade > 0.00001) {
+        double vend = duration - vfade;
+        vfadeFilter = ",fade=t=in:st=0:d=" + vfade + ",fade=t=out:st=" + f.format(vend) + ":d=" + vfade;
+      }
+      /* Add filters for video */
+      String clip = "[" + fileindx + ":v]trim=" + f.format(inpt) + ":duration=" + f.format(duration)
+                + scale + ",setpts=PTS-STARTPTS" + vfadeFilter + "[v" + i + "]";
 
       clauses.add(clip);
-      // Add filters for audio
-      clip = "[" + fileindx + ":a]atrim=" + f.format(inpt) + ":duration="
-                + f.format(duration)
-                + ",asetpts=PTS-STARTPTS,afade=t=in:st=0:d=" + afade
-                + ",afade=t=out:st=" + f.format(aend) + ":d=" + afade + "[a"
+
+      String afadeFilter = "";
+      /* Only include fade into the filter graph if necessary */
+      if (afade > 0.00001) {
+        double aend = duration - afade;
+        afadeFilter = ",afade=t=in:st=0:d=" + afade + ",afade=t=out:st=" + f.format(aend) + ":d=" + afade;
+      }
+      /* Add filters for audio */
+      clip = "[" + fileindx + ":a]atrim=" + f.format(inpt) + ":duration=" + f.format(duration)
+                + ",asetpts=PTS-STARTPTS" + afadeFilter + "[a"
                 + i + "]";
       clauses.add(clip);
     }
     if (n > 1) { // concat the outpads when there are more then 1 per stream
                   // use unsafe because different files may have different SAR/framerate
-      clauses.add(StringUtils.join(vpads, "") + "concat=n=" + n + ":unsafe=1[ov0]"); // concat video clips      
+      clauses.add(StringUtils.join(vpads, "") + "concat=n=" + n + ":unsafe=1[ov0]"); // concat video clips
       clauses.add(StringUtils.join(apads, "") + "concat=n=" + n
                 + ":v=0:a=1[oa0]"); // concat audio clips in stream 0, video in stream 1
       outmap = "o";                 // if more than one clip
