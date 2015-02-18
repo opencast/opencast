@@ -48,7 +48,7 @@ public class FFmpegEdit {
   private static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
   private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpegpath";
 
-  private static final String DEFAULT_FFMPEG_PROPERTIES = "-strict -2 -preset fast -qp 0";
+  private static final String DEFAULT_FFMPEG_PROPERTIES = "-strict -2 -preset faster -crf 18";
   public static final String DEFAULT_OUTPUT_FILE_EXTENSION = ".mp4";
   private static final String DEFAULT_AUDIO_FADE = "2.0";
   private static final String DEFAULT_VIDEO_FADE = "2.0";
@@ -84,19 +84,19 @@ public class FFmpegEdit {
     try {
       this.afade = Float.parseFloat(fade);
     } catch (Exception e) {
+      logger.error("Unable to parse audio fade duration {}. Falling back to default value.", DEFAULT_AUDIO_FADE);
       this.afade = Float.parseFloat(DEFAULT_AUDIO_FADE);
     }
     fade = properties.getProperty(VideoEditorProperties.VIDEO_FADE, DEFAULT_VIDEO_FADE);
     try {
       this.vfade = Float.parseFloat(fade);
     } catch (Exception e) {
+      logger.error("Unable to parse video fade duration {}. Falling back to default value.", DEFAULT_VIDEO_FADE);
       this.vfade = Float.parseFloat(DEFAULT_VIDEO_FADE);
     }
     this.ffmpegProperties = properties.getProperty(VideoEditorProperties.FFMPEG_PROPERTIES, DEFAULT_FFMPEG_PROPERTIES);
-    this.videoCodec = properties.getProperty(
-            VideoEditorProperties.VIDEO_CODEC, null);
-    this.audioCodec = properties.getProperty(
-            VideoEditorProperties.AUDIO_CODEC, null);
+    this.videoCodec = properties.getProperty(VideoEditorProperties.VIDEO_CODEC, null);
+    this.audioCodec = properties.getProperty(VideoEditorProperties.AUDIO_CODEC, null);
   }
 
 
