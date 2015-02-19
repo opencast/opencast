@@ -16,7 +16,13 @@
 
 package org.opencastproject.util;
 
-import org.apache.commons.io.FileUtils;
+import static java.lang.String.format;
+import static java.nio.file.Files.createLink;
+import static java.nio.file.Files.deleteIfExists;
+import static java.nio.file.Files.exists;
+import static java.util.Objects.requireNonNull;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +30,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /** Utility class, dealing with files. */
 public final class FileSupport {
@@ -256,89 +263,6 @@ public final class FileSupport {
   }
 
   /**
-   * Links recursively the <em>content</em> of the specified <code>sourceDirectory</code> to
-   * <code>targetDirectory</code>.
-   * <p/>
-   * If <code>overwrite</code> is set to <code>false</code>, this method throws an {@link IOException} if the target
-   * file already exists.
-   *
-   * @param sourceDirectory
-   *         the source directory
-   * @param targetDirectory
-   *         the target directory to link the content of the source directory to
-   * @param overwrite
-   *         <code>true</code> to overwrite existing files
-   * @throws IOException
-   *         if copying fails
-   */
-  public static void linkContent(File sourceDirectory, File targetDirectory, boolean overwrite) throws IOException {
-    if (sourceDirectory == null)
-      throw new IllegalArgumentException("Source directory must not by null");
-    if (!sourceDirectory.isDirectory())
-      throw new IllegalArgumentException(sourceDirectory.getAbsolutePath() + " is not a directory");
-    if (targetDirectory == null)
-      throw new IllegalArgumentException("Target directory must not by null");
-    if (targetDirectory.exists() && !targetDirectory.isDirectory())
-      throw new IllegalArgumentException(targetDirectory.getAbsolutePath() + " is not a directory");
-
-    // Create the target directory if it doesn't exist yet
-    if (!targetDirectory.exists()) {
-      FileUtils.forceMkdir(targetDirectory);
-    }
-
-    logger.trace("Linking files in " + sourceDirectory + " to " + targetDirectory);
-    Process p = null;
-    StreamHelper stdout = null;
-    StreamHelper stderr = null;
-    StringBuffer error = new StringBuffer();
-    try {
-      p = createLinkDirectoryProcess(sourceDirectory, targetDirectory, overwrite);
-      stdout = new StreamHelper(p.getInputStream());
-      stderr = new LinkErrorStreamHelper(p.getErrorStream(), error);
-      p.waitFor();
-      stdout.stopReading();
-      stderr.stopReading();
-      // Find does not return with an error if -exec fails
-      if (p.exitValue() != 0 || error.length() > 0) {
-        logger.debug("Unable to link files from " + sourceDirectory + " to " + targetDirectory + ": " + error);
-        copyContent(sourceDirectory, targetDirectory, overwrite);
-      }
-    } catch (InterruptedException e) {
-      throw new IOException("Interrupted while creating links from " + sourceDirectory + " to " + targetDirectory
-                                    + ": " + e.getMessage());
-    } finally {
-      IoSupport.closeQuietly(stdout);
-      IoSupport.closeQuietly(stderr);
-      IoSupport.closeQuietly(p);
-    }
-
-    // Link nested directories
-    File[] children = sourceDirectory.listFiles();
-    for (int i = 0; i < children.length; i++) {
-      if (children[i].isDirectory())
-        link(children[i], targetDirectory, overwrite);
-    }
-    // return targetDirectory;
-  }
-
-  /**
-   * Links recursively the <em>content</em> of the specified <code>sourceDirectory</code> to
-   * <code>targetDirectory</code>.
-   * <p/>
-   * Note that existing files and directories will be overwritten.
-   *
-   * @param sourceDirectory
-   *         the source directory
-   * @param targetDirectory
-   *         the target directory to link the content of the source directory to
-   * @throws IOException
-   *         if copying fails
-   */
-  public static void linkContent(File sourceDirectory, File targetDirectory) throws IOException {
-    linkContent(sourceDirectory, targetDirectory, false);
-  }
-
-  /**
    * Links the specified file or directory from <code>sourceLocation</code> to <code>targetLocation</code>. If
    * <code>targetLocation</code> does not exist, it will be created, if the target file already exists, an
    * {@link IOException} will be thrown.
@@ -377,87 +301,36 @@ public final class FileSupport {
    * @throws IOException
    *         if linking of the file or directory failed
    */
-  public static File link(File sourceLocation, File targetLocation, boolean overwrite) throws IOException {
-    if (sourceLocation == null)
-      throw new IllegalArgumentException("Source location must not by null");
-    if (targetLocation == null)
-      throw new IllegalArgumentException("Target location must not by null");
+  public static File link(final File sourceLocation, final File targetLocation, final boolean overwrite)
+          throws IOException {
+    final Path sourcePath = requireNonNull(sourceLocation).toPath();
+    final Path targetPath = requireNonNull(targetLocation).toPath();
 
-    File dest = determineDestination(targetLocation, sourceLocation, overwrite);
-
-    // Special treatment for directories as sources
-    if (sourceLocation.isDirectory()) {
-      if (!dest.exists()) {
-        dest.mkdir();
-      }
-      logger.trace("Linking files in " + sourceLocation + " to " + dest);
-      Process p = null;
-      StreamHelper stdout = null;
-      StreamHelper stderr = null;
-      StringBuffer error = new StringBuffer();
-      try {
-        p = createLinkDirectoryProcess(sourceLocation, dest, overwrite);
-        stdout = new StreamHelper(p.getInputStream());
-        stderr = new LinkErrorStreamHelper(p.getErrorStream(), error);
-        p.waitFor();
-        stdout.stopReading();
-        stderr.stopReading();
-        // Find does not return with an error if -exec fails
-        if (p.exitValue() != 0 || error.length() > 0) {
-          logger.debug("Unable to link files from " + sourceLocation + " to " + dest + ": " + error);
-          copy(sourceLocation, dest, overwrite);
+    if (exists(sourcePath)) {
+      if (overwrite) {
+        deleteIfExists(targetPath);
+      } else {
+        if (exists(targetPath)) {
+          throw new IOException(format("There is already a file/directory at %s", targetPath));
         }
-      } catch (InterruptedException e) {
-        throw new IOException("Interrupted while creating links from " + sourceLocation + " to " + dest + ": "
-                                      + e.getMessage());
-      } finally {
-        IoSupport.closeQuietly(stdout);
-        IoSupport.closeQuietly(stderr);
-        IoSupport.closeQuietly(p);
       }
 
-      // Link nested directories
-      File[] children = sourceLocation.listFiles();
-      for (int i = 0; i < children.length; i++) {
-        if (children[i].isDirectory())
-          link(children[i], dest, overwrite);
+      try {
+        createLink(targetPath, sourcePath);
+      } catch (UnsupportedOperationException e) {
+        logger.debug(format("Copy file because creating hard-links is not supported by the current file system: %s",
+                ExceptionUtils.getMessage(e)));
+        Files.copy(sourcePath, targetPath);
+      } catch (IOException e) {
+        logger.debug(format("Copy file because creating a hard-link at '%s' for existing file '%s' did not work: %s",
+                targetPath, sourcePath, ExceptionUtils.getStackTrace(e)));
+        Files.copy(sourcePath, targetPath);
       }
+    } else {
+      throw new IOException(format("No file/directory found at %s", sourcePath));
     }
 
-    // Normal file
-    else {
-      logger.trace("Creating link from " + sourceLocation + " to " + dest);
-      Process p = null;
-      StreamHelper stdout = null;
-      StreamHelper stderr = null;
-      StringBuffer error = new StringBuffer();
-      try {
-        p = createLinkFileProcess(sourceLocation, dest, overwrite);
-        stdout = new StreamHelper(p.getInputStream());
-        stderr = new LinkErrorStreamHelper(p.getErrorStream(), error);
-        p.waitFor();
-        stdout.stopReading();
-        stderr.stopReading();
-        // Find does not return with an error if -exec fails
-        if (p.exitValue() != 0 || error.length() > 0) {
-          logger.debug("Unable to create a link from " + sourceLocation + " to " + dest + ": " + error);
-          copy(sourceLocation, dest, overwrite);
-        }
-        if (sourceLocation.length() != dest.length()) {
-          logger.warn("Source " + sourceLocation + " and target " + dest + " do not have the same length");
-          // TOOD: Why would this happen?
-          // throw new IOException("Source " + sourceLocation + " and target " +
-          // dest + " do not have the same length");
-        }
-      } catch (InterruptedException e) {
-        throw new IOException("Interrupted while creating a link from " + sourceLocation + " to " + dest + ": " + error);
-      } finally {
-        IoSupport.closeQuietly(stdout);
-        IoSupport.closeQuietly(stderr);
-        IoSupport.closeQuietly(p);
-      }
-    }
-    return dest;
+    return targetPath.toFile();
   }
 
   /**
@@ -474,95 +347,21 @@ public final class FileSupport {
    *         if linking of the file failed
    */
   public static boolean supportsLinking(File sourceLocation, File targetLocation) {
-    if (sourceLocation == null)
-      throw new IllegalArgumentException("Source location must not by null");
-    if (targetLocation == null)
-      throw new IllegalArgumentException("Target location must not by null");
-    if (!sourceLocation.exists())
-      throw new IllegalArgumentException("Source " + sourceLocation + " does not exist");
+    final Path sourcePath = requireNonNull(sourceLocation).toPath();
+    final Path targetPath = requireNonNull(targetLocation).toPath();
 
-    logger.trace("Creating link from " + sourceLocation + " to " + targetLocation);
-    Process p = null;
-    StreamHelper stdout = null;
-    StreamHelper stderr = null;
-    StringBuffer error = new StringBuffer();
+    if (!exists(sourcePath))
+      throw new IllegalArgumentException(format("Source %s does not exist", sourcePath));
+
+    logger.debug(format("Creating hard link from %s to %s", sourcePath, targetPath));
     try {
-      p = createLinkFileProcess(sourceLocation, targetLocation, true);
-      stdout = new StreamHelper(p.getInputStream());
-      stderr = new LinkErrorStreamHelper(p.getErrorStream(), error);
-      p.waitFor();
-      stdout.stopReading();
-      stderr.stopReading();
-      // Find does not return with an error if -exec fails
-      if (p.exitValue() != 0 || error.length() > 0) {
-        logger.debug("Unable to create a link from " + sourceLocation + " to " + targetLocation + ": " + error);
-        return false;
-      }
-      if (sourceLocation.length() != targetLocation.length()) {
-        logger.warn("Source " + sourceLocation + " and target " + targetLocation + " do not have the same length");
-        // TOOD: Why would this happen?
-        // throw new IOException("Source " + sourceLocation + " and target " +
-        // dest + " do not have the same length");
-      }
+      createLink(targetPath, sourcePath);
     } catch (Exception e) {
-      logger.debug("Unable to create a link from " + sourceLocation + " to " + targetLocation + ": " + error.toString());
+      logger.debug(format("Unable to create a link from %s to %s: %s", sourcePath, targetPath, e));
       return false;
-    } finally {
-      IoSupport.closeQuietly(stdout);
-      IoSupport.closeQuietly(stderr);
-      IoSupport.closeQuietly(p);
     }
+
     return true;
-  }
-
-  /**
-   * @param sourceLocation
-   *         The location of the file you want to link.
-   * @param targetLocation
-   *         The location and name to place the link.
-   * @param overwrite
-   *         Whether to overwrite a link if it exists.
-   * @return Returns a process that should link the two
-   * @throws IOException
-   */
-  private static Process createLinkFileProcess(File sourceLocation, File targetLocation,
-                                               boolean overwrite) throws IOException {
-    Process p;
-    if (!System.getProperty("os.name").startsWith("Windows")) {
-      if (overwrite) {
-        p = new ProcessBuilder("ln", "-f", sourceLocation.getAbsolutePath(), targetLocation.getAbsolutePath()).start();
-      } else {
-        p = new ProcessBuilder("ln", sourceLocation.getAbsolutePath(), targetLocation.getAbsolutePath()).start();
-      }
-    } else {
-      /**
-       * Handle the windows special case by using mklink instead of ln. mklink is also a command in the cmd.exe command
-       * shell, not a separate application so we need to run a command shell with the /C switch to be able to use the
-       * utility. There also is no force in windows. **/
-      p = new ProcessBuilder("cmd", "/C", "mklink", "/H", targetLocation.getAbsolutePath(), sourceLocation.getAbsolutePath()).start();
-    }
-    return p;
-  }
-
-  private static Process createLinkDirectoryProcess(File sourceDirectory, File targetDirectory, boolean overwrite)
-          throws IOException {
-    Process p;
-    if (!System.getProperty("os.name").startsWith("Windows")) {
-      if (overwrite) {
-        p = new ProcessBuilder("find", sourceDirectory.getAbsolutePath(), "-maxdepth", "1", "-type", "f", "-follow",
-                               "-exec", "ln", "-fF", "{}", targetDirectory.getAbsolutePath() + File.separator, ";").start();
-      } else {
-        p = new ProcessBuilder("find", sourceDirectory.getAbsolutePath(), "-maxdepth", "1", "-type", "f", "-follow",
-                               "-exec", "ln", "{}", targetDirectory.getAbsolutePath() + File.separator, ";").start();
-      }
-    } else {
-      /**
-       * Handle the windows special case by using mklink instead of ln. mklink is also a command in the cmd.exe command
-       * shell, not a separate application so we need to run a command shell with the /C switch to be able to use the
-       * utility. There also is no force in windows. **/
-      p = new ProcessBuilder("cmd", "/C", "mklink", "/J", sourceDirectory.getAbsolutePath(), targetDirectory.getAbsolutePath()).start();
-    }
-    return p;
   }
 
   private static File determineDestination(File targetLocation, File sourceLocation, boolean overwrite)
@@ -574,36 +373,43 @@ public final class FileSupport {
       // Is the source file/directory readable
       if (sourceLocation.canRead()) {
         // If a directory...
-        if (targetLocation.isDirectory())
+        if (targetLocation.isDirectory()) {
           // Create a destination file within it, with the same name of the source target
           dest = new File(targetLocation, sourceLocation.getName());
-        else
+        } else {
           // targetLocation is either a normal file or doesn't exist
           dest = targetLocation;
+        }
 
         // Source and target locations can not be the same
-        if (sourceLocation.equals(dest))
+        if (sourceLocation.equals(dest)) {
           throw new IOException("Source and target locations must be different");
+        }
 
         // Search the first existing parent of the target file, to check if it can be written
         // getParentFile can return null even though there *is* a parent file, if the file is not absolute
         // That's the reason why getAbsoluteFile is used here
-        for (File iter = dest.getAbsoluteFile(); iter != null; iter = iter.getParentFile())
+        for (File iter = dest.getAbsoluteFile(); iter != null; iter = iter.getParentFile()) {
           if (iter.exists()) {
-            if (iter.canWrite())
+            if (iter.canWrite()) {
               break;
-            else
+            } else {
               throw new IOException("Destination " + dest + "cannot be written/modified");
+            }
           }
+        }
 
         // Check the target file can be overwritten
-        if (dest.exists() && !dest.isDirectory() && !overwrite)
+        if (dest.exists() && !dest.isDirectory() && !overwrite) {
           throw new IOException("Destination " + dest + " already exists");
+        }
 
-      } else
+      } else {
         throw new IOException(sourceLocation + " cannot be read");
-    } else
+      }
+    } else {
       throw new IOException("Source " + sourceLocation + " does not exist");
+    }
 
     return dest;
   }
@@ -789,33 +595,6 @@ public final class FileSupport {
       return a != null && b != null && a.getCanonicalPath().equals(b.getCanonicalPath());
     } catch (IOException e) {
       return false;
-    }
-  }
-
-  /**
-   * Special implementation of the stream helper that will swallow some of the videosegmenter's output erroneously
-   * written to stderr.
-   */
-  private static class LinkErrorStreamHelper extends StreamHelper {
-
-    /**
-     * Creates a new stream helper that will swallow some well known error messages while linking.
-     *
-     * @param stream
-     *         the content stream
-     * @param output
-     *         the output buffer
-     */
-    public LinkErrorStreamHelper(InputStream stream, StringBuffer output) {
-      super(stream, output);
-    }
-
-    /** @see org.opencastproject.util.StreamHelper#log(java.lang.String) */
-    protected void log(String output) {
-      if (output.endsWith("Invalid cross-device link"))
-        return;
-      else
-        super.log(output);
     }
   }
 
