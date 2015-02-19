@@ -214,8 +214,14 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
         // add attachment
         final String elementId = toElementId(scope);
-        URI uri = workspace.put(mp.getIdentifier().toString(), elementId, XACML_FILENAME,
-                IOUtils.toInputStream(xacmlContent));
+        URI uri;
+        InputStream in = null;
+        try {
+          in = IOUtils.toInputStream(xacmlContent);
+          uri = workspace.put(mp.getIdentifier().toString(), elementId, XACML_FILENAME, in);
+        } finally {
+          IOUtils.closeQuietly(in);
+        }
 
         if (attachment == null) {
           attachment = (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
