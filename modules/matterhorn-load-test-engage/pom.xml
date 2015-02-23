@@ -4,7 +4,7 @@
   <artifactId>matterhorn-load-test-engage</artifactId>
   <packaging>jar</packaging>
   <name>matterhorn-load-test-engage</name>
-  <version>1.6.0-SNAPSHOT</version>
+  <version>1.6.x-SNAPSHOT</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
