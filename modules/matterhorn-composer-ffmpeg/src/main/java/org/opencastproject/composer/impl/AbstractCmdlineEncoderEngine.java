@@ -468,27 +468,27 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    * Executes the command line encoder with the given set of files and properties and using the provided encoding
    * profile.
    *
-   * @param videoSource
+   * @param mediaSource
    *          the video file
    * @param profile
    *          the profile identifier
    * @param properties
    *          the encoding properties to be interpreted by the actual encoder implementation
-   * @return a list of the precessed Tracks
+   * @return a list of the processed Tracks
    * @throws EncoderException
    *           if processing fails
    */
   public List<File> parallelEncode(File mediaSource, EncodingProfile profile, Map<String, String> properties)
           throws EncoderException {
+    if (mediaSource == null) {
+      throw new IllegalArgumentException("At least one track must be specified.");
+    }
     // Fist, update the parameters
     if (properties != null)
       params.putAll(properties);
     // build command
     BufferedReader in = null;
     Process encoderProcess = null;
-    if (mediaSource == null) {
-      throw new IllegalArgumentException("At least one track must be specified.");
-    }
     try {
       // Set encoding parameters
       if (mediaSource != null) {
