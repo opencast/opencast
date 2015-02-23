@@ -219,6 +219,8 @@ public class XACMLAuthorizationService implements AuthorizationService {
         try {
           in = IOUtils.toInputStream(xacmlContent);
           uri = workspace.put(mp.getIdentifier().toString(), elementId, XACML_FILENAME, in);
+        } catch (IOException e) {
+          throw new MediaPackageException("Error storing xacml for mediapackage " + mp.getIdentifier());
         } finally {
           IOUtils.closeQuietly(in);
         }
