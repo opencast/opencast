@@ -37,7 +37,7 @@ public class SeriesServiceTest {
   TrustedHttpClient client;
   private static final String baseUrl = BASE_URL + "/series";
 
-  private static final Logger logger = LoggerFactory.getLogger(IngestZipTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(SeriesServiceTest.class);
 
   @BeforeClass
   public static void setupClass() throws Exception {
