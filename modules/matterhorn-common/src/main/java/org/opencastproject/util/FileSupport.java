@@ -355,6 +355,7 @@ public final class FileSupport {
 
     logger.debug("Creating hard link from {} to {}", sourcePath, targetPath);
     try {
+      deleteIfExists(targetPath);
       createLink(targetPath, sourcePath);
     } catch (Exception e) {
       logger.debug("Unable to create a link from {} to {}: {}", new Object[] { sourcePath, targetPath, e });
