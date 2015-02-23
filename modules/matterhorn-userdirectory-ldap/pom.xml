@@ -126,6 +126,9 @@
               com.sun.net.ssl.internal.ssl,
               *;resolution:=optional
             </Import-Package>
+            <Service-Component>
+              OSGI-INF/ldap-user-factory.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
