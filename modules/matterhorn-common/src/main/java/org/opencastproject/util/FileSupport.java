@@ -318,12 +318,12 @@ public final class FileSupport {
       try {
         createLink(targetPath, sourcePath);
       } catch (UnsupportedOperationException e) {
-        logger.debug(format("Copy file because creating hard-links is not supported by the current file system: %s",
-                ExceptionUtils.getMessage(e)));
+        logger.debug("Copy file because creating hard-links is not supported by the current file system: {}",
+                ExceptionUtils.getMessage(e));
         Files.copy(sourcePath, targetPath);
       } catch (IOException e) {
-        logger.debug(format("Copy file because creating a hard-link at '%s' for existing file '%s' did not work: %s",
-                targetPath, sourcePath, ExceptionUtils.getStackTrace(e)));
+        logger.debug("Copy file because creating a hard-link at '{}' for existing file '{}' did not work: {}",
+                new Object[] { targetPath, sourcePath, ExceptionUtils.getStackTrace(e) });
         Files.copy(sourcePath, targetPath);
       }
     } else {
@@ -353,11 +353,11 @@ public final class FileSupport {
     if (!exists(sourcePath))
       throw new IllegalArgumentException(format("Source %s does not exist", sourcePath));
 
-    logger.debug(format("Creating hard link from %s to %s", sourcePath, targetPath));
+    logger.debug("Creating hard link from {} to {}", sourcePath, targetPath);
     try {
       createLink(targetPath, sourcePath);
     } catch (Exception e) {
-      logger.debug(format("Unable to create a link from %s to %s: %s", sourcePath, targetPath, e));
+      logger.debug("Unable to create a link from {} to {}: {}", new Object[] { sourcePath, targetPath, e });
       return false;
     }
 
