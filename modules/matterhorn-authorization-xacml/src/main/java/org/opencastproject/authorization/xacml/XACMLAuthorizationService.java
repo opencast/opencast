@@ -42,6 +42,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
@@ -131,7 +132,8 @@ public class XACMLAuthorizationService implements AuthorizationService {
       public Tuple<AccessControlList, AclScope> apply() {
         logger.debug("No XACML attachment found in {}", mp);
         if (StringUtils.isNotBlank(mp.getSeries())) {
-          logger.info("Falling back to using default acl from series");
+          logger.info("Falling back to using default acl from series {} for mediapackage {}", mp.getSeries(),
+                  mp.getIdentifier());
           try {
             return tuple(seriesService.getSeriesAccessControl(mp.getSeries()), AclScope.Series);
           } catch (Exception e) {
@@ -213,11 +215,14 @@ public class XACMLAuthorizationService implements AuthorizationService {
         // add attachment
         final String elementId = toElementId(scope);
         URI uri;
+        InputStream in = null;
         try {
-          uri = workspace.put(mp.getIdentifier().toString(), elementId, XACML_FILENAME,
-                  IOUtils.toInputStream(xacmlContent));
+          in = IOUtils.toInputStream(xacmlContent);
+          uri = workspace.put(mp.getIdentifier().toString(), elementId, XACML_FILENAME, in);
         } catch (IOException e) {
-          throw new MediaPackageException("Can not store xacml for mediapackage " + mp.getIdentifier());
+          throw new MediaPackageException("Error storing xacml for mediapackage " + mp.getIdentifier());
+        } finally {
+          IOUtils.closeQuietly(in);
         }
 
         if (attachment == null) {
@@ -226,6 +231,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
         }
         attachment.setURI(uri);
         attachment.setIdentifier(elementId);
+        attachment.setMimeType(MimeTypes.XML);
         // setting the URI to a new source so the checksum will most like be invalid
         attachment.setChecksum(null);
         mp.add(attachment);
