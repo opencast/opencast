@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-// TODO improve this with respect to a cleaner JAXB approach
 @XmlType(name = "plugin", namespace = "http://engageplugin.opencastproject.org")
 @XmlRootElement(name = "plugin", namespace = "http://engageplugin.opencastproject.org")
 @XmlAccessorType(XmlAccessType.NONE)

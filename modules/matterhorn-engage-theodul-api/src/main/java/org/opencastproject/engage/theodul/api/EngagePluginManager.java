@@ -17,12 +17,17 @@ package org.opencastproject.engage.theodul.api;
 
 import java.util.List;
 
+/**
+ * Interface for the EngagePluginManager
+ * Stores registered engage plugins
+ */
 public interface EngagePluginManager {
 
-  /** Returns an Array of <code>EngagePluginRegistration</code> for all registered
-   *  Engage plugins.
+  /**
+   * Returns a list of <code>EngagePluginRegistration</code> for all registered
+   * Engage plugins.
    * 
-   * @return Array of <code>EngagePluginRegistration</code>
+   * @return List of <code>EngagePluginRegistration</code>
    */
   List<EngagePluginRegistration> getAllRegisteredPlugins();
 }

@@ -15,20 +15,52 @@
  */
 package org.opencastproject.engage.theodul.api;
 
+/**
+ * Interface for the EngagePluginRegistration
+ * Describes and engage plugin and stores its values
+ */
 public interface EngagePluginRegistration {
 
+  /**
+   * Returns the description of the engage plugin
+   * @return description
+   */
   String getDescription();
 
+  /**
+   * Returns the ID of the engage plugin
+   * @return ID
+   */
   int getId();
 
+  /**
+   * Returns the name of the engage plugin
+   * @return name
+   */
   String getName();
 
+  /**
+   * Returns the REST path of the engage plugin
+   * @return REST path
+   */
   String getRestPath();
 
+  /**
+   * Returns the static resource path of the engage plugin
+   * @return static resource path
+   */
   String getStaticPath();
 
+  /**
+   * Returns whether this engage plugin has a REST endpoint
+   * @return true if this plugin has a REST endpoint
+   */
   boolean hasRestEndpoint();
 
+  /**
+   * Returns whether this engage plugin has a static resource path
+   * @return true if this plugin has a static resource path, false else
+   */
   boolean hasStaticResources();
 
 }

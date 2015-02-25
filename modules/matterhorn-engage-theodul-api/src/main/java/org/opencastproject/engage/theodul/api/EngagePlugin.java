@@ -15,6 +15,11 @@
  */
 package org.opencastproject.engage.theodul.api;
 
+/**
+ * Interface for an EngagePlugin
+ * Provides the property keys of the engage name, description and its REST endpoints
+ * Provides the static resources path and the REST endpoint path
+ */
 public interface EngagePlugin {
 
   /* Service property key; Plugin's human readable name */
