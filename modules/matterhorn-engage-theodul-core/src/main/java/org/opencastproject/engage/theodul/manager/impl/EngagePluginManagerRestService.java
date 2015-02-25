@@ -45,7 +45,6 @@ public class EngagePluginManagerRestService {
     private static final Logger log = LoggerFactory.getLogger(EngagePluginManagerRestService.class);
     private EngagePluginManager manager;
 
-    // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
     protected void setPluginManager(EngagePluginManager manager) {
         this.manager = manager;
     }
@@ -53,7 +52,6 @@ public class EngagePluginManagerRestService {
     protected void activate() {
         log.info("Activated.");
     }
-  // </editor-fold>
 
     @GET
     @Produces({MediaType.TEXT_XML, MediaType.APPLICATION_JSON})
@@ -82,8 +80,6 @@ public class EngagePluginManagerRestService {
     /**
      * Builds an error message in case of an unexpected error in an endpoint
      * method, includes the exception type and message if existing.
-     *
-     * TODO append stack trace
      *
      * @param e Exception that was thrown
      * @return error message
