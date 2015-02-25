@@ -1576,13 +1576,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     try {
       em = emf.createEntityManager();
       Query query;
-      if (status == null) {
+      if (serviceType == null && status == null) {
+        query = em.createNamedQuery("Job.count.all");
+      } else if (serviceType == null) {
+        query = em.createNamedQuery("Job.count.nullType");
+        query.setParameter("status", status);
+      } else if (status == null) {
         query = em.createNamedQuery("Job.count.nullStatus");
+        query.setParameter("serviceType", serviceType);
       } else {
         query = em.createNamedQuery("Job.count");
         query.setParameter("status", status);
+        query.setParameter("serviceType", serviceType);
       }
-      query.setParameter("serviceType", serviceType);
       Number countResult = (Number) query.getSingleResult();
       return countResult.longValue();
     } catch (Exception e) {
@@ -1677,7 +1683,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCountOfAbnormalServices()
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public long countOfAbnormalServices() throws ServiceRegistryException {
     EntityManager em = null;
@@ -1696,7 +1701,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceStatistics()
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -2031,7 +2036,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** OSGi DI. */
   public void setIncidentService(IncidentService incidentService) {
     // Manually resolve the cyclic dependency between the incident service and the service registry
-    ((OsgiIncidentService)incidentService).setServiceRegistry(this);
+    ((OsgiIncidentService) incidentService).setServiceRegistry(this);
     this.incidents = new Incidents(this, incidentService);
   }
 
@@ -2480,8 +2485,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           break;
         }
       }
-
-      // Determine the maximum load for this host
       if (hostLoadMax == null)
         logger.warn("Unable to determine max load for host {}", service.getHost());
 
@@ -2555,8 +2558,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       // We found a candidate service
       logger.debug("Adding candidate service {} for processing of job of type '{}'", service, jobType);
-        filteredList.add(service);
-      }
+      filteredList.add(service);
+    }
 
     // Sort the list by capacity
     Collections.sort(filteredList, new LoadComparator(loadByHost));
@@ -2739,7 +2742,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   class JobProducerHeartbeat implements Runnable {
 
     /** List of service registrations that have been found unresponsive last time we checked */
-    private List<ServiceRegistration> unresponsive = new ArrayList<ServiceRegistration>();
+    private final List<ServiceRegistration> unresponsive = new ArrayList<ServiceRegistration>();
 
     /**
      * {@inheritDoc}
@@ -2858,9 +2861,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public int compare(Job jobA, Job jobB) {
 
       // Jobs that are in "restart" mode should be handled first
-      if (Job.Status.RESTART.equals(jobA.getStatus())) {
+      if (Job.Status.RESTART.equals(jobA.getStatus()) && !Job.Status.RESTART.equals(jobB.getStatus())) {
         return 1;
-      } else if (Job.Status.RESTART.equals(jobB.getStatus())) {
+      } else if (Job.Status.RESTART.equals(jobB.getStatus()) && !Job.Status.RESTART.equals(jobA.getStatus())) {
         return -1;
       }
 
