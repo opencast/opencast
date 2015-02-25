@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.Servlet;
@@ -41,9 +40,9 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/* A service that tracks the de-/registration of Theodul Player Plugins and
- * de-/installs static resource and REST endpoint servlets under a shared
- * URL.
+/**
+ * A service that tracks the de-/registration of Theodul Player Plugins and
+ * de-/installs static resource and REST endpoint servlets under a shared URL.
  */
 public class EngagePluginManagerImpl implements EngagePluginManager, ServiceListener {
 
@@ -127,11 +126,11 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     plugins.add(plugin);
 
     // construct and log success message
-    StringBuilder sb = new StringBuilder();
-    sb.append("Installed Theodul plugin ").append(plugin.getName()).append(" (static: ")
-            .append(plugin.getStaticResourceRegistration() != null ? plugin.getStaticResourcesPath() : "no")
-            .append("  REST: ").append(plugin.getRestEndpointRegistration() != null ? plugin.getRestPath() : "no").append(")");
-    log.info(sb.toString());
+    log.info("Installed Theodul plugin {} (static: {} REST: {})", new Object[] {
+        plugin.getName(),
+        (plugin.getStaticResourceRegistration() != null) ? plugin.getStaticResourcesPath() : "no",
+        (plugin.getRestEndpointRegistration() != null) ? plugin.getRestPath() : "no"
+    });
   }
 
   /** Registers a <code>StaticResource</code> that serves the contents of the
@@ -224,7 +223,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
 
   class PluginDataStore {
 
-    private Set<PluginData> data = new HashSet<PluginData>();
+    private final Set<PluginData> data = new HashSet<PluginData>();
 
     public synchronized int size() {
       return data.size();
@@ -239,12 +238,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     }
 
     public synchronized PluginData[] getAll() {
-      PluginData[] out = new PluginData[data.size()];
-      int i = 0;
-      for (Iterator<PluginData> it = data.iterator(); it.hasNext(); i++) {
-        out[i] = it.next();
-      }
-      return out;
+      return data.toArray(new PluginData[0]);
     }
 
     public synchronized PluginData getByName(String name) {

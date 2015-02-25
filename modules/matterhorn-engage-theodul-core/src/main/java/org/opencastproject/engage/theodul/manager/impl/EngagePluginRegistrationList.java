@@ -25,12 +25,10 @@ import javax.xml.bind.annotation.XmlType;
 import org.opencastproject.engage.theodul.api.EngagePluginRegistration;
 
 /**
- * An JAX-B annotated class that warps around a list of
+ * An JAX-B annotated class that wraps around a list of
  * <code>EngagePluginRegistration</code> so that we can generate an XML
  * representation of the list via JAX-B.
  */
-//@XmlAccessorType(XmlAccessType.NONE)
-//@XmlRootElement(name = "pluginlist", namespace = "http://engageplugin.opencastproject.org")
 @XmlType(name = "pluginlist", namespace = "http://engageplugin.opencastproject.org")
 @XmlRootElement(name = "pluginlist", namespace = "http://engageplugin.opencastproject.org")
 @XmlAccessorType(XmlAccessType.FIELD)
