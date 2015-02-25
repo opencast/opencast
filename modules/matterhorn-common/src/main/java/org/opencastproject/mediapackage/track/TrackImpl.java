@@ -52,7 +52,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   private static final long serialVersionUID = -1092781733885994038L;
 
   public static enum StreamingProtocol {
-    HTTP,HLS,DASH,SMOOTH,MMS,RTP,RTSP,RTMP,RTMPE,HDS,PNM,PNA,ICY,BITTORENTLIVE,FILE,UNKNOWN
+    DOWNLOAD,HLS,DASH,HDS,SMOOTH,MMS,RTP,RTSP,RTMP,RTMPE,PNM,PNA,ICY,BITTORENTLIVE,FILE,UNKNOWN
   }
 
   /** The duration in milliseconds */
@@ -267,11 +267,11 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   private StreamingProtocol autodetectTransport(URI uri) {
     if (uri == null || uri.getScheme() == null) return null;
     if (uri.getScheme().toLowerCase().startsWith("http")) {
-        if (uri.getFragment() == null) return StreamingProtocol.HTTP;
+        if (uri.getFragment() == null) return StreamingProtocol.DOWNLOAD;
         else if (uri.getFragment().toLowerCase().endsWith(".m3u8")) return StreamingProtocol.HLS;
         else if (uri.getFragment().toLowerCase().endsWith(".mpd")) return StreamingProtocol.DASH;
         else if (uri.getFragment().toLowerCase().endsWith(".f4m")) return StreamingProtocol.HDS;
-        else setTransport(StreamingProtocol.HTTP);
+        else setTransport(StreamingProtocol.DOWNLOAD);
     }
     else if (uri.getScheme().toLowerCase().startsWith("rtmp")) return StreamingProtocol.RTMP;
     else if (uri.getScheme().toLowerCase().startsWith("rtmpe")) return StreamingProtocol.RTMPE;

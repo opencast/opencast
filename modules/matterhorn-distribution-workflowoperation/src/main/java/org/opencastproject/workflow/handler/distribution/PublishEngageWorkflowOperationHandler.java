@@ -460,9 +460,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       if (job.getPayload() == null)
         continue;
 
-      List distributedElements = null;
+      List <MediaPackageElement> distributedElements = null;
       try {
-        distributedElements = MediaPackageElementParser.getArrayFromXml(job.getPayload());
+        distributedElements = (List <MediaPackageElement>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
       } catch (MediaPackageException e) {
         throw new WorkflowOperationException(e);
       }
