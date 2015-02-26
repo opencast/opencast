@@ -26,8 +26,8 @@ for each release. It contains:
 
  - [Installation Guides](installation)
  - [Configuration Guides](configuration)
-    - Basic Configuration
-    - Database Configuration
+    - [Basic Configuration](configuration/basic.md)
+    - [Database Configuration](configuration/database.md)
     - Workflow Configuration
     - Encoding Configuration
     - [more...](configuration)
