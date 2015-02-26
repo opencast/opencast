@@ -12,7 +12,7 @@ General Configuration
  - [Database Configuration](database.md)
  - Encoding Profile Configuration
  - [Logging and Privacy Configuration](logging.and.privacy.md)
- - Multi Tenancy Configuration
+ - [Multi Tenancy Configuration](multi.tenancy.md)
  - Security Configuration
  - Workflow Configuration
 
