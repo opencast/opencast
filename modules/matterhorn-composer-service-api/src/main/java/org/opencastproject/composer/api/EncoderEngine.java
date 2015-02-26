@@ -61,6 +61,21 @@ public interface EncoderEngine {
   Option<File> encode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException;
 
   /**
+   * Encodes a file into the specified formats end creates several output files at once.
+   *
+   * @param mediaSource
+   *          the media file to use in encoding
+   * @param format
+   *          the media format definition
+   * @return list aof encoded tracks (empty if there is no resulting file).
+   *
+   * @throws EncoderException
+   *           if an error occurs during encoding
+   */
+  List<File> parallelEncode(File mediaSource, EncodingProfile format, Map<String, String> properties) throws EncoderException;
+
+
+  /**
    * Encodes a file into the specified format.
    *
    * @param audioSource

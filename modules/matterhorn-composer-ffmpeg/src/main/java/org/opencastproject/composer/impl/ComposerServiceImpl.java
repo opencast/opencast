@@ -126,7 +126,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /** List of available operations on jobs */
   private enum Operation {
-    Caption, Encode, Image, ImageConversion, Mux, Trim, Watermark, Composite, Concat, ImageToVideo
+    Caption, Encode, Image, ImageConversion, Mux, Trim, Watermark, Composite, Concat, ImageToVideo, ParallelEncode
   }
 
   /** Encoding profile manager */
@@ -315,6 +315,138 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       } else {
         throw new EncoderException(e);
       }
+    }
+  }
+
+  /**
+   * Encodes audio and video track to a file. If both an audio and a video track are given, they are muxed together into
+   * one movie container.
+   *
+   * @param videoTrack
+   *          the video track
+   * @param audioTrack
+   *          the audio track
+   * @param profileId
+   *          the encoding profile
+   * @param properties
+   *          encoding properties
+   * @return the encoded track or none if the operation does not return a track. This may happen for example when doing
+   *         two pass encodings where the first pass only creates metadata for the second one
+   * @throws EncoderException
+   *           if encoding fails
+   */
+  protected List <Track> parralelEncode(Job job, Track mediaTrack, String profileId,
+          Map<String, String> properties) throws EncoderException, MediaPackageException {
+    if (job == null) {
+      throw new EncoderException("The Job parameter must not be null");
+    }
+    try {
+      // Get the tracks and make sure they exist
+      final File mediaFile;
+      if (mediaTrack == null) {
+        mediaFile = null;
+      } else {
+        try {
+          mediaFile = workspace.get(mediaTrack.getURI());
+        } catch (NotFoundException e) {
+          throw new EncoderException("Requested media track " + mediaTrack + " is not found");
+        } catch (IOException e) {
+          throw new EncoderException("Unable to access media track " + mediaTrack);
+        }
+      }
+
+      // Create the engine
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      if (profile == null) {
+        throw new EncoderException(null, "Profile '" + profileId + " is unknown");
+      }
+      final EncoderEngine encoderEngine = encoderEngineFactory.newEncoderEngine(profile);
+      if (encoderEngine == null) {
+        throw new EncoderException(null, "No encoder engine available for profile '" + profileId + "'");
+      }
+
+      // List of encoded tracks
+      LinkedList <Track> encodedTracks = new LinkedList<Track>();
+      // Do the work
+      int i = 0;
+      for (File encodingOutput : encoderEngine.parallelEncode(mediaFile, profile, properties)) {
+        // Put the file in the workspace
+        URI returnURL = null;
+        InputStream in = null;
+        final String targetTrackId = idBuilder.createNew().toString();
+
+        try {
+          in = new FileInputStream(encodingOutput);
+          returnURL = workspace.putInCollection(COLLECTION,
+                  job.getId() + "-" + i + "." + FilenameUtils.getExtension(encodingOutput.getAbsolutePath()), in);
+          logger.info("Copied the encoded file to the workspace at {}", returnURL);
+          if (encodingOutput.delete()) {
+            logger.info("Deleted the local copy of the encoded file at {}", encodingOutput.getAbsolutePath());
+          } else {
+            logger.warn("Unable to delete the encoding output at {}", encodingOutput);
+          }
+        } catch (Exception e) {
+          throw new EncoderException("Unable to put the encoded file into the workspace", e);
+        } finally {
+          IOUtils.closeQuietly(in);
+        }
+
+        // Have the encoded track inspected and return the result
+        Job inspectionJob = null;
+        try {
+          inspectionJob = inspectionService.inspect(returnURL);
+          JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
+          if (!barrier.waitForJobs().isSuccess()) {
+            throw new EncoderException("Media inspection of " + returnURL + " failed");
+          }
+        } catch (MediaInspectionException e) {
+          throw new EncoderException("Media inspection of " + returnURL + " failed", e);
+        }
+
+        Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+        inspectedTrack.setIdentifier(targetTrackId);
+
+        List<String> tags = profile.getTags();
+        if (tags.size() > 0) {
+          for (int j = 0; j < tags.size(); j++) {
+            if (encodingOutput.getName().endsWith(profile.getSuffix(tags.get(j))))
+              inspectedTrack.addTag(tags.get(j));
+          }
+        }
+
+// Will the mimetype be provided by the inspect service?
+//        if (profile.getMimeType() != null)
+//          inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
+
+        encodedTracks.add(inspectedTrack);
+        i++;
+      }
+
+      return encodedTracks;
+    } catch (Exception e) {
+      logger.warn("Error encoding " + mediaTrack, e);
+      if (e instanceof EncoderException) {
+        throw (EncoderException) e;
+      } else {
+        throw new EncoderException(e);
+      }
+    }
+  }
+
+    /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.composer.api.ComposerService#encode(org.opencastproject.mediapackage.Track,
+   *      java.lang.String)
+   */
+  @Override
+  public Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException {
+    try {
+logger.info("Starting parallel encode with profile {} ", profileId);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.ParallelEncode.toString(),
+              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId));
+    } catch (ServiceRegistryException e) {
+      throw new EncoderException("Unable to create a job", e);
     }
   }
 
@@ -1382,6 +1514,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           encodingProfile = arguments.get(1);
           serialized = encode(job, firstTrack, null, encodingProfile, null).map(
                   MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
+          break;
+        case ParallelEncode:
+          firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
+          encodingProfile = arguments.get(1);
+          serialized = MediaPackageElementParser.getArrayAsXml(parralelEncode(job, firstTrack, encodingProfile, null));
           break;
         case Image:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
