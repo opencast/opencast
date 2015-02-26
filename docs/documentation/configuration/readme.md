@@ -11,7 +11,7 @@ General Configuration
  - [Basic Configuration](basic.md)
  - [Database Configuration](database.md)
  - Encoding Profile Configuration
- - Logging and Privacy Configuration
+ - [Logging and Privacy Configuration](logging.and.privacy.md)
  - Multi Tenancy Configuration
  - Security Configuration
  - Workflow Configuration
