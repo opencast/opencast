@@ -10,7 +10,7 @@ General Configuration
 
  - [Basic Configuration](basic.md)
  - [Database Configuration](database.md)
- - Encoding Profile Configuration
+ - [Encoding Profile Configuration](encoding.md)
  - [Logging and Privacy Configuration](logging.and.privacy.md)
  - [Multi Tenancy Configuration](multi.tenancy.md)
  - Security Configuration
