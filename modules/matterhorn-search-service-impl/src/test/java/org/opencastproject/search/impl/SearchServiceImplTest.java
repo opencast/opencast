@@ -396,6 +396,7 @@ public class SearchServiceImplTest {
     assertEquals(1, service.getByQuery(new SearchQuery().withText("Institut")).size());
   }
 
+  @Ignore("This test randomly fails. See MH-10573.")
   @Test
   public void testSorting() throws Exception {
     MediaPackage mediaPackageNewer = getMediaPackage("/manifest-full.xml");
