@@ -95,8 +95,8 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     }
     throw new EncoderException("Unable to encode track " + sourceTrack + " using a remote composer service");
   }
-  
-    /**
+
+  /**
    * {@inheritDoc}
    * 
    * @see org.opencastproject.composer.api.ComposerService#paralellEncode(org.opencastproject.mediapackage.Track,
