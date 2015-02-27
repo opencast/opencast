@@ -1017,7 +1017,7 @@ public class SchedulerRestService {
      * Warn the user if trimming was necessary as this meant that the XML string was technically invalid.
      */
     if (!trimmedDcXml.equals(dcXML)) {
-      logger.warn("Detected invalid XML data. Trying to fix this by " + "removing spaces from beginning/end.");
+      logger.warn("Detected invalid XML data. Trying to fix this by removing spaces from beginning/end.");
     }
     return dcService.load(new ByteArrayInputStream(trimmedDcXml.getBytes("UTF-8")));
   }
