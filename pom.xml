@@ -695,29 +695,6 @@
     </profile>
 
     <profile>
-      <id>capture</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-capture-admin-service-api</module>
-        <module>modules/matterhorn-capture-agent-api</module>
-        <module>modules/matterhorn-capture-agent-impl</module>
-        <module>modules/matterhorn-confidence-monitoring-ui</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-webconsole</module>
-      </modules>
-    </profile>
-
-    <profile>
       <id>server-management</id>
       <activation>
         <activeByDefault>false</activeByDefault>
