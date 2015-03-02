@@ -21,10 +21,6 @@ target/
 # ignore NetBeans project data
 */nbproject/*
 
-# ignore NetBeans project data
-.idea
-*.iml
-
 # just in case.. ignore SVN subdir
 */.svn/*
 
