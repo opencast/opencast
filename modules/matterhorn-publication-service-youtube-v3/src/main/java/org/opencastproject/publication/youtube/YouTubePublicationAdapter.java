@@ -35,8 +35,6 @@ import java.io.InputStream;
 
 /**
  * Strategy to determine destination of publication. Instances of this class are not thread-safe.
- *
- * @author John Crossman
  */
 public class YouTubePublicationAdapter {
 

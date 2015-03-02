@@ -30,8 +30,6 @@ import java.util.List;
 /**
  * <code>ClientCredentials</code> class represents the set of parameters required to make an authorization
  * request.
- *
- * @author Fernando Alvarez
  */
 public final class ClientCredentials {
 

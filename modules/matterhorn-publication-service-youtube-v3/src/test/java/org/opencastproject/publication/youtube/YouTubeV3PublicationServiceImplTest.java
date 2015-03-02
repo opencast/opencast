@@ -47,9 +47,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 
-/**
- * @author John Crossman
- */
 public class YouTubeV3PublicationServiceImplTest {
 
   private YouTubeV3PublicationServiceImpl service;

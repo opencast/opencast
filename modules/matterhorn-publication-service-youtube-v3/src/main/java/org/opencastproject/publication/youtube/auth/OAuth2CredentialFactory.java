@@ -24,9 +24,6 @@ import java.io.IOException;
 /**
  * <code>OAuth2CredentialFactory</code> implementation is a factory class that returns
  * <code>GoogleCredential</code> objects.
- *
- * @author Fernando Alvarez
- * @author John Crossman
  */
 public interface OAuth2CredentialFactory {
 

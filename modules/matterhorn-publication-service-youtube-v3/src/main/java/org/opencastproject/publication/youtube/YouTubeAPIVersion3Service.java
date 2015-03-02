@@ -27,8 +27,6 @@ import java.io.IOException;
 
 /**
  * Provides convenient access to {@link com.google.api.services.youtube.YouTube} service.
- *
- * @author John Crossman
  */
 public interface YouTubeAPIVersion3Service {
 

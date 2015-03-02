@@ -27,8 +27,6 @@ import java.io.IOException;
  * <code>GoogleAPICredentialRequestor</code> obtains credentials from Google
  * and persists them in a data store on the local file system for later use
  * when invoking the Google Data API V3 to upload a file to YouTube.
- *
- * @author Fernando Alvarez
  */
 public final class GoogleAPICredentialRequestor {
 

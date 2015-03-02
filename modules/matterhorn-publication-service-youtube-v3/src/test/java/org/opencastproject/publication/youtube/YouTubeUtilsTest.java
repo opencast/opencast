@@ -22,9 +22,6 @@ import org.opencastproject.util.XProperties;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-/**
- * @author John Crossman
- */
 public class YouTubeUtilsTest {
 
   @Test(expected = IllegalArgumentException.class)

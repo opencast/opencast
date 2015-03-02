@@ -23,8 +23,6 @@ import java.util.Dictionary;
 
 /**
  * Supports YouTube property management.
- *
- * @author John Crossman
  */
 public final class YouTubeUtils {
 

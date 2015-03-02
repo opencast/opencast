@@ -23,7 +23,6 @@ import java.io.File;
  * Represents a YouTube video.
  *
  * @see com.google.api.services.youtube.model.Video
- * @author John Crossman
  */
 public class VideoUpload {
 

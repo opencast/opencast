@@ -37,8 +37,6 @@ import java.text.MessageFormat;
 
 /**
  * @see com.google.api.client.googleapis.auth.oauth2.GoogleCredential
- * @author Fernando Alvarez
- * @author John Crossman
  */
 public final class OAuth2CredentialFactoryImpl implements OAuth2CredentialFactory {
 

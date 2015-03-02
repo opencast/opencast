@@ -48,9 +48,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author John Crossman
- */
 public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service {
 
   private YouTube youTube;

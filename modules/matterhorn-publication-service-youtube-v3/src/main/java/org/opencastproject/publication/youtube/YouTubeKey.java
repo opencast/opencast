@@ -19,8 +19,6 @@ package org.opencastproject.publication.youtube;
  * Used to reference individual YouTube service configurations.
  *
  * @see com.google.api.client.googleapis.auth.oauth2.GoogleCredential
- *
- * @author John Crossman
  */
 public enum YouTubeKey {
 

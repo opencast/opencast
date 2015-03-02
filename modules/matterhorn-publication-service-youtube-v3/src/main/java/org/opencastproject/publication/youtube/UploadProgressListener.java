@@ -25,8 +25,6 @@ import java.io.IOException;
 
 /**
  * Log progress of a YouTube video upload.
- *
- * @author John Crossman
  */
 public class UploadProgressListener implements MediaHttpUploaderProgressListener {
 
