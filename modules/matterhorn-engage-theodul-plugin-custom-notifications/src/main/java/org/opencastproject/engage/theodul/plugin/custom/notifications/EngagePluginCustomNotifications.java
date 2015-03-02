@@ -27,6 +27,6 @@ public class EngagePluginCustomNotifications extends AbstractEngagePlugin {
     private static final Logger log = LoggerFactory.getLogger(EngagePluginCustomNotifications.class);
 
     protected void activate(ComponentContext cc) {
-        log.info("Activated.");
+        log.info("Activated engage plugin: Notifications.");
     }
 }

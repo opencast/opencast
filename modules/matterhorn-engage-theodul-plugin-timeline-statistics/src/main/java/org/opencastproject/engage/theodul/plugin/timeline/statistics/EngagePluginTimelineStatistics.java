@@ -27,6 +27,6 @@ public class EngagePluginTimelineStatistics extends AbstractEngagePlugin {
     private static final Logger log = LoggerFactory.getLogger(EngagePluginTimelineStatistics.class);
 
     protected void activate(ComponentContext cc) {
-        log.info("Activated.");
+        log.info("Activated engage plugin: Timeline statistics.");
     }
 }

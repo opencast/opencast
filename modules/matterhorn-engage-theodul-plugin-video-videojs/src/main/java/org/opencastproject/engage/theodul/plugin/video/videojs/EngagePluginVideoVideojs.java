@@ -27,6 +27,6 @@ public class EngagePluginVideoVideojs extends AbstractEngagePlugin {
     private static final Logger log = LoggerFactory.getLogger(EngagePluginVideoVideojs.class);
 
     protected void activate(ComponentContext cc) {
-        log.info("Activated.");
+        log.info("Activated engage plugin: Videojs.");
     }
 }

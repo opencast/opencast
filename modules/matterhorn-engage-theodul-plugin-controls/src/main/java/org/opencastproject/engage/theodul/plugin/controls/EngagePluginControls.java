@@ -23,10 +23,10 @@ import org.slf4j.LoggerFactory;
 
 @Path("/")
 public class EngagePluginControls extends AbstractEngagePlugin {
-
-  private static final Logger log = LoggerFactory.getLogger(EngagePluginControls.class);
-
-  protected void activate(ComponentContext cc) {
-    log.info("Activated.");
-  }
+    
+    private static final Logger log = LoggerFactory.getLogger(EngagePluginControls.class);
+    
+    protected void activate(ComponentContext cc) {
+        log.info("Activated engage plugin: Controls.");
+    }
 }
