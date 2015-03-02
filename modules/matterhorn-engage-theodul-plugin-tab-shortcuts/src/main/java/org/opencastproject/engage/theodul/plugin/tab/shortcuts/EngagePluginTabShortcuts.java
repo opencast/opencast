@@ -27,6 +27,6 @@ public class EngagePluginTabShortcuts extends AbstractEngagePlugin {
     private static final Logger log = LoggerFactory.getLogger(EngagePluginTabShortcuts.class);
 
     protected void activate(ComponentContext cc) {
-        log.info("Activated.");
+        log.info("Activated engage plugin: Shortcuts.");
     }
 }

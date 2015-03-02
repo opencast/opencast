@@ -27,6 +27,6 @@ public class EngagePluginDescription extends AbstractEngagePlugin {
     private static final Logger log = LoggerFactory.getLogger(EngagePluginDescription.class);
 
     protected void activate(ComponentContext cc) {
-        log.info("Activated.");
+        log.info("Activated engage plugin: Description.");
     }
 }
