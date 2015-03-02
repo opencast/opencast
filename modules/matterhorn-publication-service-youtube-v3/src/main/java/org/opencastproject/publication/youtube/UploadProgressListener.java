@@ -15,6 +15,7 @@
  */
 package org.opencastproject.publication.youtube;
 
+import org.opencastproject.mediapackage.MediaPackage;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import org.slf4j.Logger;
@@ -30,20 +31,17 @@ public class UploadProgressListener implements MediaHttpUploaderProgressListener
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final File file;
-  private final String episodeName;
-  private final String seriesTitle;
+  private final MediaPackage mediaPackage;
   private boolean complete;
 
   /**
-   * @param episodeName may not be {@code null}
-   * @param seriesTitle may be {@code null}
+   * @param mediaPackage may not be {@code null}
    * @param file may not be {@code null}
    */
-  public UploadProgressListener(final String episodeName, final String seriesTitle, final File file) {
+  public UploadProgressListener(final MediaPackage mediaPackage, final File file) {
     this.file = file;
     complete = false;
-    this.episodeName = episodeName;
-    this.seriesTitle = seriesTitle;
+    this.mediaPackage = mediaPackage;
   }
 
   @Override
@@ -69,7 +67,7 @@ public class UploadProgressListener implements MediaHttpUploaderProgressListener
       default:
         describeProgress = "Warning: No formal description for upload state: " + uploadState;
     }
-    logger.info(describeProgress + "(Episode name: " + episodeName + "; Series title: " + seriesTitle + ')');
+    logger.info(describeProgress + "(MediaPackage Identifier: " + mediaPackage.getIdentifier().toString() + ')');
   }
 
   public boolean isComplete() {

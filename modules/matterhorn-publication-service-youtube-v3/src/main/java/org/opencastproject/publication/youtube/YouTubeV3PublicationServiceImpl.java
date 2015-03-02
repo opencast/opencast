@@ -208,7 +208,7 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
       final YouTubePublicationAdapter c = new YouTubePublicationAdapter(mediaPackage, workspace);
       final File file = workspace.get(element.getURI());
       final String episodeName = c.getEpisodeName();
-      final UploadProgressListener operationProgressListener = new UploadProgressListener(episodeName, mediaPackage.getSeriesTitle(), file);
+      final UploadProgressListener operationProgressListener = new UploadProgressListener(mediaPackage, file);
       final String privacyStatus = makeVideosPrivate ? "private" : "public";
       final VideoUpload videoUpload = new VideoUpload(truncateTitleToMaxFieldLength(episodeName, false), c.getEpisodeDescription(), privacyStatus, file, operationProgressListener, tags);
       final Video video = youTubeService.addVideoToMyChannel(videoUpload);
