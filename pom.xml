@@ -200,7 +200,7 @@
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-publication-service-api</module>
-        <module>modules/matterhorn-publication-service-youtube</module>
+        <module>modules/matterhorn-publication-service-youtube-v3</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -235,7 +235,7 @@
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-publication-service-api</module>
-        <module>modules/matterhorn-publication-service-youtube</module>
+        <module>modules/matterhorn-publication-service-youtube-v3</module>
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -431,6 +431,7 @@
         <module>modules/matterhorn-videosegmenter-ffmpeg</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workspace-api</module>
+        <module>modules/matterhorn-solr</module>
       </modules>
     </profile>
 

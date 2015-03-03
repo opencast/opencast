@@ -4,6 +4,7 @@
 # ignore runtime artifacts
 lib/matterhorn/*
 lib/ext/*
+lib/build-information/*
 inbox/*
 logs/*
 work/*

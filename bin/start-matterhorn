@@ -49,7 +49,7 @@ LOGGING="${LOGGING} -Declipselink.logging.level=${ECLIPSE_LOGLEVEL}"
 # This is needed by matterhorn-videosegmenter-impl
 # It can probably be removed once the module is removed
 GRAPHICS="-Djava.awt.headless=true"
-GRAPHICS="${GRAPHICS} -Dawt.toolkit=sun.awt.HeadlessToolkit"
+GRAPHICS="${GRAPHICS}"
 
 JETTY="-Dorg.mortbay.jetty.Request.maxFormContentSize=1000000"
 
