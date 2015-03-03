@@ -62,7 +62,7 @@ var continueProcessing = false;
 var jQMsg = undefined;
 var messageShown = false;
 var timeout_canplay = undefined;
-var timeout_canplay_delay = 5000; // ms
+var timeout_canplay_delay = 10000; // ms
 
 // key codes
 var KEY_ENTER = 13;
@@ -247,12 +247,15 @@ editor.parseSmil = function(xmlData) {
  * @param func function to execute after smil has been downloaded
  */
 editor.downloadSmil = function(func) {
+    var smil_url = editor.mediapackageParser.smil_url,
+        parsed_smil_url = window.location.protocol + smil_url.substring(smil_url.indexOf('/'));
+
     if (!editor.error) {
         ocUtils.log("Downloading smil");
         $.ajax({
             dataType: "text", // get it as "text", don't use jQuery smart guess!
             type: "GET",
-            url: editor.mediapackageParser.smil_url
+            url: parsed_smil_url
         }).done(function(data) {
             ocUtils.log("Done: Downloading smil");
 
@@ -2436,7 +2439,7 @@ function cancelCanplayTimeout() {
 function setCanplayTimeout() {
     timeout_canplay = window.setTimeout(function() {
         $("#loadingDisplayText").html("The media source could not be loaded.\n Please refresh the page or try another browser.");
-        displayMsg("The media source could not be loaded.\n Please refresh the page or try another browser.", "Media source not loaded", false);
+        displayMsg("The media source could not be loaded.<br> Please refresh the page or try another browser.", "Media source not loaded", false);
     }, timeout_canplay_delay);
 }
 
@@ -2482,7 +2485,7 @@ $(document).ready(function() {
 
     editor.player = $('#videoPlayer');
     setCanplayTimeout();
-    editor.player.on("canplay", playerReady);
+    editor.player.on("loadeddata", playerReady);
 
     $('.video-split-button').click(splitButtonClick);
     $('#okButton').click(okButtonClick);

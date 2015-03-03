@@ -25,6 +25,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -59,7 +60,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
    */
   @SuppressWarnings("unchecked")
   public Collection<T> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {
-    Set<T> result = new HashSet<T>();
+    Set<T> result = new LinkedHashSet<T>();
 
     // If no flavors and tags are set, return empty list
     if (flavors.isEmpty() && tags.isEmpty())

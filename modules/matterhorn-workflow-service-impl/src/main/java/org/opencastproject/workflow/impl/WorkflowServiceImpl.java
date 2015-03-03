@@ -247,6 +247,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
     this.componentContext = componentContext;
     executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
     try {
+      logger.info("Generating JMX workflow statistics");
       workflowsStatistics = new WorkflowsStatistics(getBeanStatistics(), getHoldWorkflows());
       jmxBeans.add(JmxUtil.registerMXBean(workflowsStatistics, JMX_WORKFLOWS_STATISTICS_TYPE));
     } catch (WorkflowDatabaseException e) {
@@ -726,11 +727,36 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
    */
   protected Job runWorkflow(WorkflowInstance workflow) throws WorkflowException, UnauthorizedException {
     if (!INSTANTIATED.equals(workflow.getState())) {
+
+      // If the workflow is "running", we need to determine if there is an operation being executed or not.
+      // When a workflow has been restarted, this might not be the case and the status might not have been
+      // updated accordingly.
       if (RUNNING.equals(workflow.getState())) {
-        logger.debug("Not starting workflow %s, it is already in running state", workflow);
-        return null;
+        WorkflowOperationInstance currentOperation = workflow.getCurrentOperation();
+        if (currentOperation != null) {
+          if (currentOperation.getId() != null) {
+            try {
+              Job operationJob = serviceRegistry.getJob(currentOperation.getId());
+              if (Job.Status.RUNNING.equals(operationJob.getStatus())) {
+                logger.debug("Not starting workflow %s, it is already in running state", workflow);
+                return null;
+              } else {
+                logger.info("Scheduling next operation of workflow %s", workflow);
+                operationJob.setStatus(Status.QUEUED);
+                operationJob.setDispatchable(true);
+                return serviceRegistry.updateJob(operationJob);
+              }
+            } catch (Exception e) {
+              logger.warn("Error determining status of current workflow operation in {}: {}", workflow, e.getMessage());
+              return null;
+            }
+          }
+        } else {
+          throw new IllegalStateException("Cannot start a workflow '" + workflow + "' with no current operation");
+        }
+      } else {
+        throw new IllegalStateException("Cannot start a workflow in state '" + workflow.getState() + "'");
       }
-      throw new IllegalStateException("Cannot start a workflow in state '" + workflow.getState() + "'");
     }
 
     // If this is a new workflow, move to the first operation
@@ -1189,6 +1215,8 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
         throw new WorkflowDatabaseException(e);
       } catch (NotFoundException e) {
         logger.warn("Series %s not found, unable to set ACLs", seriesId);
+      } catch (Exception e) {
+        logger.error("Error reading ACL from series {}: {}", seriesId, e);
       }
     }
 
@@ -1842,6 +1870,7 @@ public class WorkflowServiceImpl implements WorkflowService, JobProducer, Manage
       logger.warn(e, "Exception while accepting job " + job);
       try {
         if (workflowInstance != null) {
+          logger.warn("Marking workflow instance %s as failed", workflowInstance);
           workflowInstance.setState(FAILED);
           update(workflowInstance);
         } else {
