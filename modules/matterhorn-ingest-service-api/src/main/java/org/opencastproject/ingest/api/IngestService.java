@@ -35,6 +35,9 @@ import java.util.Map;
  */
 public interface IngestService extends JobProducer {
 
+  String UTC_DATE_FORMAT = "yyyyMMdd'T'HHmmss'Z'";
+  String START_DATE_KEY = "ingest_start_date";
+
   /**
    * Ingests the compressed mediapackage and starts the default workflow as defined by the
    * <code>org.opencastproject.workflow.default.definition</code> key, found in the system configuration.
@@ -332,5 +335,4 @@ public interface IngestService extends JobProducer {
    *           if an unexpected error occurs
    */
   void discardMediaPackage(MediaPackage mediaPackage) throws IOException, IngestException;
-
 }
