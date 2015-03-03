@@ -111,6 +111,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
     String id = null;
     MimeType mimeType = null;
     MediaPackageElementFlavor flavor = null;
+    TrackImpl.StreamingProtocol transport = null;
     String reference = null;
     URI url = null;
     long size = -1;
@@ -135,6 +136,11 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
       String flavorValue = (String) xpath.evaluate("@type", elementNode, XPathConstants.STRING);
       if (StringUtils.isNotEmpty(flavorValue))
         flavor = MediaPackageElementFlavor.parseFlavor(flavorValue);
+
+      // transport
+      String transportValue = (String) xpath.evaluate("@transport", elementNode, XPathConstants.STRING);
+      if (StringUtils.isNotEmpty(transportValue))
+        transport = TrackImpl.StreamingProtocol.valueOf(transportValue);
 
       // checksum
       String checksumValue = (String) xpath.evaluate("checksum/text()", elementNode, XPathConstants.STRING);
@@ -176,6 +182,10 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
 
       if (flavor != null)
         track.setFlavor(flavor);
+
+      //set transport
+      if (transport != null)
+        track.setTransport(transport);
 
       // description
       String description = (String) xpath.evaluate("description/text()", elementNode, XPathConstants.STRING);

@@ -60,7 +60,7 @@ public final class MimeTypes {
   private MimeTypes() {
   }
 
-  public static final Pattern MIME_TYPE_PATTERN = Pattern.compile("([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)");
+  public static final Pattern MIME_TYPE_PATTERN = Pattern.compile("([a-zA-Z0-9-]+)/([a-zA-Z0-9-+.]+)");
 
   /** Name of the mime type files */
   public static final String DEFINITION_FILE = "/org/opencastproject/util/MimeTypes.xml";

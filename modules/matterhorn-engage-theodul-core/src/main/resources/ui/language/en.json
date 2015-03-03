@@ -1,0 +1,18 @@
+{
+    "error": "Error",
+    "error_unknown": "An error occurred. Please reload the page.",
+    "reloadPage": "Reload page",
+    "loginInformation": "Log in with your Matterhorn user account",
+    "login": "Log in",
+    "enterUsernamePassword": "Please enter your username and password:",
+    "username": "Username",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "cancel": "Cancel",
+    "loginSuccessful": "Successfully logged in. Please reload the page if the page does not reload automatically.",
+    "logoutSuccessful": "Successfully logged out. Please reload the page if the page does not reload automatically.",
+    "loginFailed": "Failed to log in.",
+    "description": "Description",
+    "slideText": "Slide text",
+    "shortcuts": "Shortcuts"
+}

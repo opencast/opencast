@@ -34,3 +34,6 @@ target/
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked
 Makefile
+
+# Ignore phantomjs logs
+phantomjsdriver.log
