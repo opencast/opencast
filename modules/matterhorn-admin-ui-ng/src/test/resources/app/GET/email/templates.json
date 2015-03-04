@@ -1,0 +1,23 @@
+{
+    "count": 1,
+    "limit": 10,
+    "offset": 0,
+    "results": [
+        {
+            "body": "${optOutLink}${staff}<#list modules as module>${module.name}</#list><#list modules as module>${module.description}</#list>",
+            "comments": [],
+            "creationDate": "2015-01-06T12:38:47Z",
+            "creator": {
+                "email": "",
+                "name": "Admin User",
+                "username": "pascal"
+            },
+            "hidden": false,
+            "id": 1101,
+            "name": "•mock• New Template",
+            "subject": "Bar",
+            "type": "INVITATION"
+        }
+    ],
+    "total": 1
+}

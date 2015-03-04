@@ -40,7 +40,7 @@ public class SecurityServiceStub implements SecurityService {
   static {
     HashSet<JaxbRole> roles = new HashSet<JaxbRole>();
     roles.add(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, new DefaultOrganization(), ""));
-    DEFAULT_ORG_ADMIN = new JaxbUser("admin", new DefaultOrganization(), roles);
+    DEFAULT_ORG_ADMIN = new JaxbUser("admin", "test", new DefaultOrganization(), roles);
   }
 
   /**

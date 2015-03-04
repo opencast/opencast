@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.adminui.endpoint.ThemesEndpoint" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.adminui.endpoint.ThemesEndpoint" />
+  <property name="service.description" value="Admin UI - Themes facade Endpoint" />
+  
+  <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.ThemesEndpoint" />
+  <property name="opencast.service.path" value="/admin-ng/themes" />
+  <service>
+    <provide interface="org.opencastproject.adminui.endpoint.ThemesEndpoint" />
+  </service>
+            
+  <reference name="themesServiceDatabase" interface="org.opencastproject.themes.ThemesServiceDatabase"
+    cardinality="1..1" policy="static" bind="setThemesServiceDatabase"/>
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="AdminUISearchIndex" interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
+    cardinality="1..1" policy="static" bind="setIndex" />
+  <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
+    cardinality="1..1" policy="static" bind="setSeriesService"/>
+  <reference name="StaticFileService" interface="org.opencastproject.staticfiles.api.StaticFileService"
+    cardinality="1..1" policy="static" bind="setStaticFileService"/>
+  <reference name="StaticFileRestService" interface="org.opencastproject.staticfiles.endpoint.StaticFileRestService"
+    cardinality="1..1" policy="static" bind="setStaticFileRestService"/>
+</scr:component>

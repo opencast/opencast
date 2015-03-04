@@ -37,6 +37,34 @@ public interface User {
   String getPassword();
 
   /**
+   * Gets the user's name.
+   *
+   * @return the user name
+   */
+  String getName();
+
+  /**
+   * Gets the user's email address.
+   *
+   * @return the user's email address
+   */
+  String getEmail();
+
+  /**
+   * Gets the provider where the user is coming from.
+   *
+   * @return the provider where the user is coming from.
+   */
+  String getProvider();
+
+  /**
+   * Returns <code>true</code> if this user object can be managed by Matterhorn.
+   *
+   * @return <code>true</code> if this user is manageable
+   */
+  boolean isManageable();
+
+  /**
    * Returns <code>true</code> if this user object can be used to log into Matterhorn.
    *
    * @return <code>true</code> if this user can login

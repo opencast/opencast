@@ -1,0 +1,147 @@
+<section ng-form="scheduleTaskForm" ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation ng-hide" ng-controller="ScheduleTaskCtrl">
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2 translate="BULK_ACTIONS.SCHEDULE_TASK.CAPTION">Template</h2>
+    </header>
+    <nav id="modal-nav" class="step-by-step">
+        <a ng-click="navigateTo('generalForm', currentForm, [])" ng-class="{ active: currentForm === 'generalForm', 'not-complete': !generalForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.CAPTION' | translate }}</a>
+        <a ng-click="navigateTo('taskForm', currentForm, [generalForm])" ng-class="{ active: currentForm === 'taskForm', 'not-complete': !taskForm.$valid}">{{ 'BULK_ACTIONS.SCHEDULE_TASK.TASKS.CAPTION' | translate }}</a>
+        <a ng-click="navigateTo('summary', currentForm, [generalForm, taskForm])" ng-class="{ active: currentForm === 'summary', 'not-complete': !taskForm.$valid}">{{ 'BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CAPTION' | translate }}</a>
+    </nav>
+    
+    <nav id="breadcrumb"></nav>
+    
+    <div class="modal-content"  ng-class="{active: currentForm === 'generalForm'}">
+        <div class="modal-body" ng-form="generalForm">
+            <div class="row">
+                <div ng-show="generalForm.$error.taskStartable" class="alert sticky warning">
+                    <p translate="BULK_ACTIONS.SCHEDULE_TASK.GENERAL.CANNOTSTART"></p>
+                </div>
+                <div data-notifications="schedule-task"/>
+            </div>
+            <div class="full-col">
+            <div class="obj tbl-list" >
+                <header>General <span class="header-value" translate="BULK_ACTIONS.SCHEDULE_TASK.GENERAL.SUMMARY" translate-values='{ count: rows.length}'></span></header>  
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <thead>
+                            <tr>
+                                <th class="small"></th>
+                                <th class="full-width" translate="EVENTS.EVENTS.TABLE.TITLE">Title</th>
+                                <th class="full-width" translate="EVENTS.EVENTS.TABLE.SERIES">Series</th>
+                                <th class="full-width" translate="EVENTS.EVENTS.TABLE.WORKFLOW_STATE">Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: rowsForm.selection.$error.taskStartable}">
+                                <td><input name="selection" type="checkbox" task-startable="{{row.source}}" ng-model="row.selected" class="child-cbox"></td>
+                                <td>{{ row.title }}</td>
+                                <td>{{ row.series_name}}</td>
+                                <td>{{ row.source }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                </div><!-- obj-container -->
+            
+            </div><!-- obj -->
+        
+        </div>
+        
+        </div>
+      
+    </div><!-- modal-content [general] -->
+    <footer ng-if="currentForm === 'generalForm'">
+        <a ng-click="navigateTo('taskForm', currentForm, [generalForm])"
+            data-modal-tab="next" class="submit"
+            ng-class="{active: generalForm.$valid, inactive: generalForm.$invalid}">
+            {{ 'WIZARD.NEXT_STEP' | translate }}
+        </a>
+    </footer>
+    
+    <div class="modal-content" ng-class="{active: currentForm === 'taskForm'}">
+        
+        <div class="modal-body">
+            <div class="full-col">
+    
+                <div class="obj list-obj" ng-form="taskForm">
+                    <header translate="BULK_ACTIONS.SCHEDULE_TASK.TASKS.SELECT">Select Task</header>
+                    <div class="obj-container">
+                        <select chosen
+                            data-width="'100%'"
+                            ng-change="processing.changeWorkflow()"
+                            data-disable-search-threshold="8"
+                            not-empty-selection
+                            ng-model="processing.ud.workflow"
+                            ng-model-options="{ allowInvalid: true }"
+                            ng-options="w.title for (obj, w) in processing.workflows"
+                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW' | translate }}"
+                            no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW_EMPTY' | translate }}'"
+                        />
+
+                        <div id="new-event-workflow-configuration"
+                             class="checkbox-container"
+                             ng-click="processing.save()"
+                             ng-bind-html="processing.workflowConfiguration"
+                             class="obj-container">
+                        </div>
+                        
+                    </div><!-- obj-container --> 
+                    
+                </div><!--list-obj -->
+            </div><!-- full-col-->
+        </div><!-- modal-body -->
+    </div><!-- modal-content [task] -->
+    <footer ng-if="currentForm === 'taskForm'">
+        <a ng-click="navigateTo('summary', currentForm, [generalForm, taskForm])"
+            data-modal-tab="next" class="submit"
+            ng-class="{active: taskForm.$valid, inactive: taskForm.$invalid}">
+            {{ 'WIZARD.NEXT_STEP' | translate }}
+        </a>
+        <a ng-click="navigateTo('generalForm', currentForm, [generalForm])"
+            data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
+        </a>
+    </footer>
+    
+
+    <div class="modal-content" ng-class="{active: currentForm === 'summary'}">
+        
+        <div class="modal-body">
+            <div class="full-col">
+                <!-- TODO: Add summary of events --> 
+            <div class="obj list-obj">
+                <header translat="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY">Summary</header>
+                <div class="obj-container">
+                    <ul>
+                        <li>
+                            <span translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.EVENTS">Events</span>
+                            <p translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.EVENTS_SUMMARY" translate-values="{numberOfEvents: rows.length}">
+                                You have selected 44 events</p>
+                        </li>
+                        <li>
+                            <span translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.WORKFLOW"></span>
+                            <p>{{ processing.ud.workflow.selection.id }}</p>
+                        </li>
+                        <li>
+                            <span translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CONFIGURATION"></span>
+                            <p ng-repeat="(key, value) in processing.ud.workflow.selection.configuration">{{key}}</p>
+                        </li>
+                    </ul>
+                </div><!-- obj-container -->
+            </div>
+        </div>
+      
+    </div><!-- modal-content [summary] -->
+    <footer ng-if="currentForm === 'summary'">
+        <a ng-click="submit()"
+            data-modal-tab="next" class="submit"
+            ng-class="{active: schedulaTaskForm.$valid, inactive: scheduleTaskForm.$invalid}">
+            {{ 'WIZARD.CREATE' | translate }}
+        </a>
+        <a ng-click="navigateTo('taskForm', currentForm, [generalForm, taskForm])"
+            data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
+        </a>
+    </footer>
+    
+    <div class="btm-spacer"></div>
+</section>

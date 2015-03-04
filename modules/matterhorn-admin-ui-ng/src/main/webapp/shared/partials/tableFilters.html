@@ -1,0 +1,117 @@
+<div class="filters-container">
+    <input type="search" class="search expand"
+        placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate }}"
+        ng-model="textFilter"
+        ng-change="selectFilterTextValue('textFilter', textFilter)">
+
+    <div class="table-filter" ng-show="filters.filters">
+        <div class="filters">
+            <i title="{{ 'TABLE_FILTERS.ADD' | translate }}"
+                ng-click="showFilterSelector = true" class="fa fa-filter"></i>
+
+            <select ng-model="selectedFilter" ng-change="filter = filters.filters[selectedFilter]"
+                ng-show="showFilterSelector">
+                <option ng-repeat="(name, filter) in filters.filters"
+                    value="{{ name }}">
+                    {{ filter.label | translate }}
+                </option>
+            </select>
+
+            <div ng-show="selectedFilter"
+                ng-switch on="filters.filters[selectedFilter].type">
+                <div ng-switch-when="select">
+                    <select ng-model="filter.value"
+                        ng-change="selectFilterSelectValue(selectedFilter, filter)">
+                        <option></option>
+                        <option ng-repeat="(value, label) in filters.filters[selectedFilter].options"
+                            value="{{ value }}">
+                            {{ label | translate }}
+                        </option>
+                    </select>
+                </div>
+
+                <div ng-switch-when="period">
+                    <input type="text" class="small-search" datepicker ng-model="filter.period.from"
+                        select="selectFilterPeriodValue(selectedFilter, filter)" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}">
+                    <input type="text" class="small-search" datepicker ng-model="filter.period.to"
+                        select="selectFilterPeriodValue(selectedFilter, filter)" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}">
+                </div>
+            </div>
+
+            <span ng-repeat="(name, filter) in filters.filters"
+                class="ng-multi-value" ng-show="filter.value">
+                <span ng-switch on="filter.type">
+                    <span ng-switch-when="select">
+                        {{ filter.label | translate }}: {{ filter.options[filter.value] | translate }}
+                    </span>
+                    <span ng-switch-when="period">
+                        {{ filter.label | translate }}: {{ formatDateRange('short', filter.value) }}
+                    </span>
+                </span>
+                <a title="{{ 'TABLE_FILTERS.REMOVE' | translate }}"
+                    ng-click="removeFilter(name, filter)">
+                    <i class="fa fa-times"></i>
+                </a>
+            </span>
+        </div>
+        <i ng-click="removeFilters()"
+            title="{{ 'TABLE_FILTERS.CLEAR' | translate }}"
+            class="clear fa fa-times"></i>
+
+        <div class="btn-dd filter-settings-dd">
+            <i ng-click="mode = mode ? 0:1"></i>
+
+            <div ng-show="mode == 1" class="filters-list">
+                <header>
+                    <h4 translate="TABLE_FILTERS.PROFILES.FILTERS_HEADER"><!--Saved Filter Sets--></h4>
+                </header>
+                <ul>
+                    <li ng-repeat="profile in profiles">
+                        <a title="{{ profile.description }}"
+                            ng-click="loadFilterProfile($index)"
+                            ng-class="{ active: $index === activeProfile }">
+                            {{ profile.name }}
+                        </a>
+                        <a ng-click="removeFilterProfile($index)" class="icon remove"></a>
+                        <a ng-click="editFilterProfile($index)" class="icon edit"></a>
+                    </li>
+                    <li ng-show="profiles.length == 0"
+                    translate="TABLE_FILTERS.PROFILES.EMPTY"><!--No saved filters yet--></li>
+                </ul>
+
+                <div class="input-container">
+                    <div class="btn-container">
+                        <a class="save" ng-click="mode = 2">
+                            {{ 'TABLE_FILTERS.PROFILES.SAVE_FILTERS' | translate }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div ng-show="mode == 2" class="filter-details">
+                <header>
+                    <h4 translate="TABLE_FILTERS.PROFILES.FILTER_HEADER"><!--Save Filter Set--></h4>
+                </header>
+                <div ng-form="profileForm" ng-model="profile" class="input-container">
+                    <label>{{ 'TABLE_FILTERS.PROFILES.NAME' | translate }} <i class="required">*</i></label>
+                    <input required name="name" ng-model="profile.name"
+                        ng-change="validateProfileName()"
+                        type="text"
+                        placeholder="{{ 'TABLE_FILTERS.PROFILES.NAME_PLACEHOLDER' | translate }}">
+
+                    <label translate="TABLE_FILTERS.PROFILES.DESCRIPTION"><!--Description--></label>
+                    <textarea ng-model="profile.description"
+                        placeholder="{{ 'TABLE_FILTERS.PROFILES.DESCRIPTION_PLACEHOLDER' | translate }}"></textarea>
+
+                    <div class="btn-container">
+                        <a ng-click="cancelProfileEditing()" class="cancel"
+                            translate="CANCEL"><!--Cancel--></a>
+                        <a ng-click="saveProfile()"
+                            ng-class="{ disabled: !profileForm.$valid }"
+                            class="save" translate="SAVE"><!--Save--></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

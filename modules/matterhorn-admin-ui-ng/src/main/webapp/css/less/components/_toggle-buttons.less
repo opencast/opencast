@@ -1,0 +1,46 @@
+.toggle-btn {
+    display: block;
+    margin: 20px 0;
+
+    li {
+        display: inline-block;
+
+        &:not(:first-child) {
+            margin-left: -5px;
+        }
+
+        a {
+            .btn(grey);
+            font-size: 13px;
+            border: 1px solid @main-border-color;
+            border-radius: 0;
+            padding: 10px 12px;
+            margin: 0;
+
+            &.active {
+                color: #fff !important;
+                text-shadow: 0px 1px 0px rgba(0,0,0,0.2);
+                border: 1px solid @l-blue;
+                border-right: 1px solid darken(@l-blue, 10%);
+                #gradient > .vertical(lighten(#2b77b9, 5%), #388ed6);
+                box-shadow: 0px 2px 3px 1px rgba(0,0,0,.05);
+            }
+        }
+
+        &:first-child {
+            a {
+                border-top-left-radius: @main-border-radius;
+                border-bottom-left-radius: @main-border-radius;
+                border-right: none;
+            }
+        }
+
+        &:last-child {
+            a {
+                border-top-right-radius: @main-border-radius;
+                border-bottom-right-radius: @main-border-radius;
+                border-left: none;
+            }
+        }
+    }
+}

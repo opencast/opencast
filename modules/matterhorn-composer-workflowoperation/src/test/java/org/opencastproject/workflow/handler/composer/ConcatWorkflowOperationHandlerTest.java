@@ -136,7 +136,7 @@ public class ConcatWorkflowOperationHandlerTest {
   }
 
   @Test
-  public void testResolutionByTrack() throws Exception {
+  public void testResolutionByTrackMandatory() throws Exception {
     setMockups();
 
     // operation configuration
@@ -144,6 +144,7 @@ public class ConcatWorkflowOperationHandlerTest {
     Map<String, String> configurations = new HashMap<String, String>();
     configurations.put("source-flavor-part-0", "presentation/source");
     configurations.put("source-flavor-part-1", "presenter/source");
+    configurations.put("source-flavor-part-1-mandatory", "true");
     configurations.put("target-tags", targetTags);
     configurations.put("target-flavor", "presenter/concat");
     configurations.put("encoding-profile", "concat");

@@ -1,0 +1,70 @@
+[{
+    "name": "•mock• ROLE_ADMIN",
+    "organization": {
+        "adminRole": "ROLE_ADMIN",
+        "anonymousRole": "ROLE_ANONYMOUS",
+        "id": "mh_default_org",
+        "name": "•mock• Opencast Project",
+        "properties": {
+            "property": [
+            {
+                "$": "http://opencast.org/matterhorn/",
+                "key": "engageui.link_mobile_redirect.url"
+            }
+            ]
+        },
+        "servers": {
+            "server": {
+                "name": "•mock• localhost",
+                "port": "8080"
+            }
+        }
+    }
+},
+{
+    "name": "•mock• ROLE_USER",
+    "organization": {
+        "adminRole": "ROLE_ADMIN",
+        "anonymousRole": "ROLE_ANONYMOUS",
+        "id": "mh_default_org",
+        "name": "•mock• Opencast Project",
+        "properties": {
+            "property": [
+            {
+                "$": "http://opencast.org/matterhorn/",
+                "key": "engageui.link_mobile_redirect.url"
+            }
+            ]
+        },
+        "servers": {
+            "server": {
+                "name": "•mock• localhost",
+                "port": "8080"
+            }
+        }
+    }
+},
+{
+    "name": "•mock• ROLE_OAUTH_USER",
+    "organization": {
+        "adminRole": "ROLE_ADMIN",
+        "anonymousRole": "ROLE_ANONYMOUS",
+        "id": "mh_default_org",
+        "name": "•mock• Opencast Project",
+        "properties": {
+            "property": [
+            {
+                "$": "http://opencast.org/matterhorn/",
+                "key": "engageui.link_mobile_redirect.url"
+            }
+            ]
+        },
+        "servers": {
+            "server": {
+                "name": "•mock• localhost",
+                "port": "8080"
+            }
+        }
+    }
+}
+]

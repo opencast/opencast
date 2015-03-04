@@ -1,0 +1,11 @@
+node_modules
+www
+.jshintrc
+deploy.sh
+*.swo
+bin
+coverage
+src/test/resources/*.jar
+src/test/resources/chromedriver
+.agignore
+adi_deploy.sh

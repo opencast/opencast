@@ -22,6 +22,7 @@ import org.opencastproject.remotetest.util.TrustedHttpClient;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -72,6 +73,9 @@ public class ConcurrentWorkflowTest {
   @After
   public void tearDown() throws Exception {
     Main.returnClient(client);
+    for (File f : tempFiles) {
+      FileUtils.deleteQuietly(f);
+    }
   }
 
   @Test

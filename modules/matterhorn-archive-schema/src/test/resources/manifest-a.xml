@@ -1,0 +1,15 @@
+<mediapackage xmlns="http://mediapackage.opencastproject.org" id="mp-a" start="2007-12-05T13:40:00"
+  duration="1004400000">
+  <series>series-a</series>
+  <seriestitle>French literature</seriestitle>
+  <metadata>
+    <catalog id="catalog-1" type="dublincore/episode">
+      <mimetype>text/xml</mimetype>
+      <url>dublincore-a.xml</url>
+    </catalog>
+    <catalog id="catalog-2" type="dublincore/series" ref="series:series-a">
+      <mimetype>text/xml</mimetype>
+      <url>series-dublincore-a.xml</url>
+    </catalog>
+  </metadata>
+</mediapackage>

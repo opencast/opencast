@@ -1,0 +1,37 @@
+<!-- theodul video videojs plugin desktop mode -->
+<% if((typeof str_error_AudioCodecNotSupported !== "undefined")
+   && (typeof str_error_AudioElementNotSupported !== "undefined")) { %>
+<% if((typeof type !== "undefined") && (type == "audio")) { %>
+	<div class="audio_wrapper">
+		<% if(typeof sources !== "undefined") { %>
+			<div class="audioDisplayError">
+			  <div class="alert alert-danger" role="alert">
+			  <p><%= str_error_AudioCodecNotSupported %></p>
+			  </div>
+			</div>
+			<div class="audioDisplay">
+				<audio id="audioDisplay">
+				  <% _.each(sources, function(src) { %>
+				    <% if((src.src != "") && (src.type != "")) { %>
+				      <source src="<%= src.src %>" type="<%= src.type %>" />
+				    <% } %>
+				  <% }); %>
+				  <p><%= str_error_AudioElementNotSupported %></p>
+				</audio>
+			</div>
+		<% } %>
+	</div>
+<% } else { %>
+	<div id="fullscreen_video_wrapper" class="videojs_wrapper clearfix">
+		<% if(typeof ids !== "undefined") { var i = 1; %>
+			<% _.each(ids, function(id) { %>
+				<div class="videoDisplay">
+					<div id="videoDisplay<%= i %>_wrapper" class="videoFrame">
+						<video id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin container" data-setup="{}"></video>
+					</div>
+				</div>
+			<% i++;}); %>
+		<% } %>
+	</div>
+<% } %>
+<% } %>

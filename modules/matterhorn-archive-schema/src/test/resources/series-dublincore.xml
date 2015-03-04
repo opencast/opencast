@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:dcterms="http://purl.org/dc/terms/">
+
+  <dcterms:title xml:lang="en">
+    Climate Sciences 101
+  </dcterms:title>
+  <dcterms:subject>
+    Atmospheric Science
+  </dcterms:subject>
+  <dcterms:description xml:lang="en">
+    Introduction to Climate Science.
+  </dcterms:description>
+  <dcterms:publisher>
+    ETH Zurich, Switzerland
+  </dcterms:publisher>
+  <dcterms:identifier>
+    foobar-series
+  </dcterms:identifier>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">
+    2007-12-05
+  </dcterms:modified>
+
+</dublincore>

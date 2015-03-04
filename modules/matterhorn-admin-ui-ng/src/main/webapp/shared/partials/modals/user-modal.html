@@ -1,0 +1,85 @@
+<section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="user-modal" ng-controller="UserCtrl">
+
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2 translate="{{ caption }}">Create New User</h2>
+    </header>
+
+    <nav class="modal-nav" id="modal-nav">
+        <a ng-click="openTab('user')" data-modal-tab="user" ng-class="{ active: tab == 'user' }" translate="USERS.USERS.DETAILS.TABS.USER">User</a>
+        <a ng-click="openTab('roles')" data-modal-tab="roles" ng-class="{ active: tab == 'roles' }" translate="USERS.USERS.DETAILS.TABS.ROLES">Roles</a>
+    </nav>
+
+    <form name="userForm">
+        <div class="modal-content" data-modal-tab-content="user">
+            <div class="modal-body">
+                <div class="form-container">
+                    <div data-admin-ng-notifications="" context="user-form"></div>
+                    <div class="row">
+                        <label>{{'USERS.USERS.DETAILS.FORM.USERNAME' | translate }}<i class="required"> *</i></label>
+                        <input type="text" name="username" required
+                            placeholder="{{ 'USERS.USERS.DETAILS.FORM.USERNAME' | translate }}..."
+                            ng-disabled="action == 'edit'"
+                            ng-init="blurred.username = false"
+                            ng-model="user.username"
+                            ng-blur="blurred.username = true"
+                            ng-change="checkUserUniqueness()"
+                            ng-class="{ disabled: action == 'edit', error: blurred.username && !userForm.username.$valid }">
+                    </div>
+                    <div class="row">
+                        <label>{{'USERS.USERS.DETAILS.FORM.NAME' | translate }}<i class="required"> *</i></label>
+                        <input type="text" name="name" required
+                            placeholder="{{ 'USERS.USERS.DETAILS.FORM.NAME' | translate }}..."
+                            ng-disabled="!manageable"
+                            ng-init="blurred.name = false"
+                            ng-model="user.name"
+                            ng-blur="blurred.name = true"
+                            ng-class="{ disabled: !manageable, error: blurred.name && !userForm.name.$valid }">
+                    </div>
+                    <div class="row">
+                        <label>{{ 'USERS.USERS.DETAILS.FORM.EMAIL' | translate }}<i class="required"> *</i></label>
+                        <input type="email" name="email" required
+                            placeholder="{{ 'USERS.USERS.DETAILS.FORM.EMAIL' | translate }}..."
+                            ng-disabled="!manageable"
+                            ng-init="blurred.email = false"
+                            ng-model="user.email"
+                            ng-blur="blurred.email = true"
+                            ng-class="{ disabled: !manageable, error: blurred.email && !userForm.email.$valid }">
+                    </div>
+
+                    <div class="row"  ng-if="action != 'edit'">
+                        <label>{{ 'USERS.USERS.DETAILS.FORM.PASSWORD' | translate }}<i class="required"> *</i></label>
+                        <input type="password" name="password" required
+                            placeholder="{{ 'USERS.USERS.DETAILS.FORM.PASSWORD' | translate }}..."
+                            admin-ng-pw-check="user.repeatedPassword"
+                            ng-required="action != 'edit'"
+                            ng-disabled="!manageable"
+                            ng-init="blurred.password = false"
+                            ng-model="user.password"
+                            ng-blur="blurred.password = true"
+                            ng-class="{ disabled: !manageable, error: blurred.password && !userForm.password.$valid }">
+
+                        <input type="password"
+                            placeholder="{{ 'USERS.USERS.DETAILS.FORM.REPEAT_PASSWORD' | translate }}..."
+                            ng-disabled="!manageable"
+                            ng-required="action != 'edit'"
+                            ng-model="user.repeatedPassword"
+                            ng-class="{ disabled: !manageable, error: blurred.password && (user.repeatedPassword !== user.password || !userForm.password.$valid) }">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-content" data-modal-tab-content="roles">
+            <div class="modal-body">
+                <div class="form-container">
+                    <admin-ng-select-box resource="role" data-disabled="!manageable"></admin-ng-select-box>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <footer>
+        <a ng-click="submit()" ng-class="userForm.$valid && manageable ? 'active' : 'disabled'" class="submit" translate="SUBMIT">Submit</a>
+        <a ng-click="close()" class="cancel" translate="CANCEL">Cancel</a>
+    </footer>
+</section>

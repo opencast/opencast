@@ -1,0 +1,15 @@
+{
+  "id":1101,
+  "creationDate":"2015-01-06T12:38:47Z",
+  "body":"${optOutLink}${staff}<#list modules as module>${module.name}</#list><#list modules as module>${module.description}</#list>",
+  "hidden":false,
+  "subject":"Bar",
+  "name": "•mock• New Template",
+  "type":"INVITATION",
+  "comments":[],
+  "creator": {
+      "email": "",
+      "name": "Admin User",
+      "username": "pascal"
+  }
+}

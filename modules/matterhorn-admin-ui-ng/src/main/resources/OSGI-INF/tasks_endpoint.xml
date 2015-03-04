@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.adminui.endpoint.TasksEndpoint" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.adminui.endpoint.TasksEndpoint" />
+  <property name="service.description" value="Admin UI - Tasks facade Endpoint" />
+  
+  <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.TasksEndpoint" />
+  <property name="opencast.service.path" value="/admin-ng/tasks" />
+  <service>
+    <provide interface="org.opencastproject.adminui.endpoint.TasksEndpoint" />
+  </service>
+
+  <reference name="workflowService" interface="org.opencastproject.workflow.api.WorkflowService"
+    cardinality="1..1" policy="static" bind="setWorkflowService"/>   
+  <reference name="archive" interface="org.opencastproject.archive.opencast.OpencastArchive"
+    cardinality="1..1" policy="static" bind="setArchive" />
+  <reference name="httpMediaPackageElementProvider" interface="org.opencastproject.archive.api.HttpMediaPackageElementProvider"
+    cardinality="1..1" policy="static" bind="setHttpMediaPackageElementProvider" />
+             
+</scr:component>

@@ -57,8 +57,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${build.number}</Build-Number>
-            <Mh-Db-Version>${mh.db.version}</Mh-Db-Version>
             <Fragment-Host>matterhorn-kernel</Fragment-Host>
             <Import-Package>
               javax.servlet.http,

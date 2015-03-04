@@ -1,0 +1,29 @@
+<div ng-click="enterEditMode()" ng-form="innerForm">
+    <ul ng-show="!editMode">
+        <li ng-repeat="value in params.value">
+            <span>{{ collection[value] }}</span>
+        </li>
+    </ul>
+
+    <i class="edit fa fa-pencil-square" ng-show="!editMode"></i>
+    <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
+
+    <div ng-show="editMode">
+        <input type="text" ng-blur="leaveEditMode()" ng-required="params.required"
+            list="data-list" ng-keyup="keyUp($event)" name="{{ params.name }}"
+            ng-model="value">
+        <datalist id="data-list">
+            <option ng-repeat="(item, label) in collection"
+                value="{{ item }}">
+                {{ label }}
+            </option>
+        </datalist>
+    </div>
+    <span ng-show="editMode" class="ng-multi-value"
+        ng-repeat="value in params.value">
+        {{ collection[value] }}
+        <a ng-mousedown="removeValue(params.value, value)">
+            <i class="fa fa-times"></i>
+        </a>
+    </span>
+</div>

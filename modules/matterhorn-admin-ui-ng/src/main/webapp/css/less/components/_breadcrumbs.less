@@ -1,0 +1,51 @@
+#breadcrumb {
+    @height: 35px;
+    display: none;
+    background: lighten(@modal-nav-bg-color, 4%);
+    border-bottom: 1px solid @modal-nav-border-color;
+    line-height: @height;
+    
+    &.active {
+        display: block;
+    }
+    
+    > a {
+        color: @modal-nav-link-color;
+        font-size: 12px;
+        position: relative;
+        margin-right: 30px;
+        text-transform: capitalize;
+        
+        &:first-child {
+            margin-left: 30px;
+        }
+        
+        &:hover {
+            color: @modal-nav-link-active-color;
+            
+            &:before {
+                color: @modal-nav-link-color;
+            }
+        }
+        
+        .fa-icon(@fa-chevron-right, after, inline-block, 0, 0, inherit, 9px);
+        
+        &:after {
+            position: relative;
+            top: -1px;
+            right: -15px;
+        }
+        
+        
+        &:last-child {
+            color: @modal-nav-link-active-color;
+            font-weight: 600;
+        }
+    
+        // Seperated to fix Chrome rendering issue
+        &:last-child:after {
+            display: none;
+        }
+    }
+    
+} // Breadcrumb

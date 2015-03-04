@@ -1,0 +1,1196 @@
+{
+  "MATTERHORN":"Opencast",
+  "NAV_HOME":"Inicio",
+  "NAV_ABOUT":"Acerca de",
+  "SUBMIT":"Enviar",
+  "UPDATE":"Actualizar",
+  "CANCEL":"Cancelar",
+  "SAVE":"Guardar",
+  "LOGOUT":"Cerrar sesión",
+  "RESET":"Reestablecer",
+  "PREFERENCES":{
+    "CAPTION":"Preferencias",
+    "PROFILE":"Perfil",
+    "NAME":"Nombre",
+    "REPLYTO":"Dirección de correo de respuesta",
+    "SIGNATURE":"Firma de correo electrónico",
+    "TABLE":{
+      "CAPTION":"Modificar Vista de Tabla",
+      "SUBHEADING":"Seleccione los datos que se mostrarán por defecto en la vista de la tabla {{ tableName }}",
+      "AVAILABLE_COLUMNS":"Columnas disponibles",
+      "SELECTED_COLUMNS":"Columnas seleccionadas",
+      "FOOTER_TEXT":"El orden y la selección se guardarán automáticamente. Pulse \"{{resetTranslation}}\" para restaurar la vista por defecto."
+    }
+  },
+  "NOTIFICATIONS":{
+    "USER_ADDED":"Se ha creado el usuario",
+    "USER_UPDATED":"El usuario ha sido actualizado",
+    "USER_NOT_SAVED":"No se ha podido guardar el usuario",
+    "USER_DELETED":"El usuario ha sido eliminado",
+    "USER_NOT_DELETED":"No se ha podido eliminar el usuario",
+    "USER_NOT_MANAGEABLE":"No es posible administrar el usuario",
+    "GROUP_ADDED":"Se ha creado el grupo",
+    "GROUP_UPDATED":"El grupo ha sido actualizado",
+    "GROUP_NOT_SAVED":"No se ha podido guardar el grupo",
+    "GROUP_DELETED":"El grupo ha sido eliminado",
+    "GROUP_NOT_DELETED":"No se ha podido eliminar el grupo",
+    "ACCESS_DENIED":"Acceso denegado. No está autorizado a ver esta página",
+    "SERIES_ADDED":"Se ha creado la serie",
+    "SERIES_NOT_SAVED":"No se ha podido guardar la serie",
+    "EVENTS_CREATED":"Se ha creado el evento",
+    "EVENTS_UPLOAD_STARTED":"Subiendo el evento...",
+    "EVENTS_NOT_CREATED":"No se ha podido crear el evento",
+    "EVENTS_UPDATED":"El evento ha sido actualizado",
+    "EVENTS_NOT_UPDATED":"No se ha podido guardar el evento",
+    "EVENTS_DELETED":"El evento ha sido eliminado",
+    "EVENTS_NOT_DELETED":"No se ha(n) podido eliminar el\/los evento(s)",
+    "USER_BLACKLIST_CREATED":"Se ha creado la lista negra",
+    "USER_BLACKLIST_NOT_CREATED":"No se ha podido crear la lista negra",
+    "USER_BLACKLIST_SAVED":"Se ha guardado la lista negra",
+    "USER_BLACKLIST_NOT_SAVED":"No se ha podido guardar la lista negra",
+    "USER_BLACKLIST_DELETED":"La lista negra ha sido eliminada",
+    "USER_BLACKLIST_NOT_DELETED":"No se ha podido eliminar la lista negra",
+    "LOCATION_BLACKLIST_CREATED":"Se ha creado la lista negra",
+    "LOCATION_BLACKLIST_NOT_CREATED":"No se ha podido crear la lista negra",
+    "LOCATION_BLACKLIST_SAVED":"Se ha guardado la lista negra",
+    "LOCATION_BLACKLIST_NOT_SAVED":"No se ha podido guardar la lista negra",
+    "LOCATION_BLACKLIST_DELETED":"La lista negra ha sido eliminada",
+    "LOCATION_BLACKLIST_NOT_DELETED":"No se ha podido eliminar la lista negra",
+    "EMAIL_TEMPLATE_CREATED":"Se ha creado la plantilla",
+    "EMAIL_TEMPLATE_NOT_CREATED":"No se ha podido crear la plantilla",
+    "EMAIL_TEMPLATE_SAVED":"Se ha guardado la plantilla",
+    "EMAIL_TEMPLATE_NOT_SAVED":"No se ha podido guardar la plantilla",
+    "EMAIL_TEMPLATE_DELETED":"La plantilla ha sido eliminada",
+    "EMAIL_TEMPLATE_NOT_DELETED":"No se ha podido eliminar la plantilla",
+    "EMAIL_TEMPLATE_NAME_TAKEN":"Este nombre ya está en uso",
+    "EMAIL_SENT":"El mensaje ha sido enviado",
+    "EMAIL_NOT_SENT":"No se ha podido enviar el mensaje",
+    "CONFLICT_DETECTED":"Conflicto de programación: el nuevo evento coincide con otro existente. Por favor, cambie la sala, las fechas o las horas.",
+    "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Los eventos que contiene esta serie deberán ser reprocesados",
+    "THEME_NAME_ALREADY_TAKEN":"El nombre ya está en uso",
+    "THEME_NAME_EMPTY":"El nombre no puede estar vacío",
+    "BUMPER_UPLOAD_ERROR":"Error en la subida de archivos",
+    "TRAILER_UPLOAD_ERROR":"Error en la subida de archivos",
+    "TITLE_UPLOAD_ERROR":"Error en la subida de archivos",
+    "LICENSE_UPLOAD_ERROR":"Error en la subida de archivos",
+    "WATERMARK_UPLOAD_ERROR":"Error en la subida de archivos",
+    "THEME_UPLOAD_STARTED":"Se están subiendo los archivos...",
+    "THEME_CREATED":"Se ha creado el estilo",
+    "THEME_NOT_CREATED":"No se ha podido crear el estilo",
+    "THEME_DELETED":"El estilo ha sido eliminado",
+    "THEME_NOT_DELETED":"No se ha podido eliminar el estilo",
+    "TASK_CREATED":"Se ha creado la tarea",
+    "TASK_NOT_CREATED":"No se ha podido crear la tarea",
+    "VIDEO_CUT_NOT_SAVED":"No se han podido guardar los datos de edición",
+    "VIDEO_CUT_SAVED":"Se han guardado los datos de edición",
+    "VIDEO_CUT_PROCESSING":"Se está procesando el vídeo..."
+  },
+  "BULK_ACTIONS":{
+    "CAPTION":"Acciones",
+    "SEND_MESSAGE":"Enviar mensaje",
+    "EDIT_STATUS":{
+      "CAPTION":"Modificar estado",
+      "READY_FOR_RECORDING":"Preparado para grabar",
+      "OPTED_OUT":"Excluído"
+    },
+    "DELETE":{
+      "SERIES":{
+        "CAPTION":"Eliminar"
+      },
+      "EVENTS":{
+        "CAPTION":"Eliminar"
+      }
+    },
+    "DELETE_WARNING_LINE1":"Una vez eliminados todos los metadatos, los archivos de audio y vídeo serán eliminados e irrecuperables.",
+    "DELETE_WARNING_LINE2":"",
+    "SCHEDULE_TASK":{
+      "CAPTION":"Comenzar Tarea",
+      "GENERAL":{
+        "SUMMARY":"({{ count }} eventos seleccionados)",
+        "CANNOTSTART":"El\/Los evento(s) indicados no pueden procesarse en este momento. Desmárquelo(s) o inténtelo de nuevo más tarde."
+      },
+      "TASKS":{
+        "CAPTION":"Tareas",
+        "SELECT":"Seleccione Tarea"
+      },
+      "SUMMARY":{
+        "CAPTION":"Resumen",
+        "EVENTS":"Eventos",
+        "EVENTS_SUMMARY":"Ha seleccionado {{numberOfEvents}} eventos",
+        "CONFIGURATION":"Configuración",
+        "WORKFLOW":"Tarea"
+      }
+    }
+  },
+  "DATES":{
+    "TODAY":"Hoy",
+    "TOMORROW":"Mañana",
+    "YESTERDAY":"Ayer"
+  },
+  "DATETIMES":{
+    "TODAY":"Hoy a la(s) {{ time }}",
+    "TOMORROW":"Mañana a la(s) {{ time }}",
+    "YESTERDAY":"Ayer a la(s) {{ time }}"
+  },
+  "WIZARD":{
+    "NEXT_STEP":"Siguiente",
+    "BACK":"Anterior",
+    "CREATE":"Crear",
+    "UPDATE":"Actualizar",
+    "DURATION":{
+      "HOURS":"Horas",
+      "MINUTES":"Minutos"
+    }
+  },
+  "CAPTURE_AGENT":{
+    "DEVICE":{
+      "MICROPHONE":"Micrófono",
+      "CAMERA":"Cámara",
+      "PRESENTATION":"Presentación"
+    }
+  },
+  "NAV":{
+    "DASHBOARD":{
+      "TITLE":"Panel de Control"
+    },
+    "EVENTS":{
+      "TITLE":"Grabaciones"
+    },
+    "SYSTEMS":{
+      "TITLE":"Sistemas"
+    },
+    "CAPTUREAGENTS":{
+      "TITLE":"Captura"
+    },
+    "USERS":{
+      "TITLE":"Organización"
+    },
+    "INTEGRATIONS":{
+      "TITLE":"Integraciones"
+    },
+    "CONFIGURATION":{
+      "TITLE":"Configuración"
+    }
+  },
+  "EVENTS":{
+    "LICENSE":{
+      "BSD":"BSD",
+      "CCND":"CCND",
+      "GPL":"GPL"
+    },
+    "SEND_MESSAGE":{
+      "CAPTION":"Enviar Mensaje",
+      "TABS":{
+        "RECIPIENTS":"Destinatarios",
+        "MESSAGE":"Mensaje",
+        "SUMMARY":"Resumen"
+      },
+      "RECIPIENTS":{
+        "AUDIT_TRAIL_CAPTION":"Añadir al Informe de Auditoría",
+        "AUDIT_TRAIL_DESCRIPTION":"Marque la casilla para añadir el mensaje al informe de auditoría",
+        "AUDIT_TRAIL_LABEL":""
+      },
+      "MESSAGE":{
+        "EMAIL_TEMPLATE":"Seleccione la plantilla de correo electrónico",
+        "SUBJECT":"Asunto",
+        "MESSAGE":"Mensaje",
+        "INCLUDE_SIGNATURE":"Incluír mi firma en el correo"
+      },
+      "SUMMARY":{
+        "MESSAGE_SUMMARY":"Resumen"
+      }
+    },
+    "EVENTS":{
+      "NEW":{
+        "CAPTION":"Crear evento",
+        "METADATA":{
+          "CAPTION":"Metadatos"
+        },
+        "METADATA_EXTENDED":{
+          "CAPTION":"Metadatos extendidos",
+          "DESCRIPTION":"",
+          "METADATA":{
+            "TITLE":"Metadatos extendidos"
+          }
+        },
+        "SOURCE":{
+          "CAPTION":"Origen",
+          "SELECT_SOURCE":"Seleccionar origen",
+          "PLACEHOLDER":{
+            "ROOM":"Sala",
+            "INPUTS":"Entradas",
+            "HOUR":"Hora",
+            "MINUTE":"Minuto",
+            "REPEATS":"Repetir",
+            "START_DATE":"aaaa-mm-dd",
+            "END_DATE":"aaaa-mm-dd"
+          },
+          "UPLOAD":{
+            "CAPTION":"Subir archivos",
+            "RECORDING_ELEMENTS":"Elementos de la grabación",
+            "SEGMENTABLE":{
+              "SHORT":"Diapositivas",
+              "DETAIL":"El archivo contiene la grabación de una presentación de diapositivas (Keynote, Powerpoint, etc.)."
+            },
+            "NON_SEGMENTABLE":{
+              "SHORT":"Ponente",
+              "DETAIL":"El archivo contiene la grabación de una persona dirigiéndose a una audiencia."
+            },
+            "AUDIO_ONLY":{
+              "SHORT":"Solo audio",
+              "DETAIL":"El archivo solo contiene sonido."
+            }
+          },
+          "DATE_TIME":{
+            "CAPTION":"Programación",
+            "START_DATE":"Fecha de inicio",
+            "START_TIME":"Hora de inicio",
+            "END_DATE":"Fecha de finalización",
+            "DURATION":"Duración"
+          },
+          "SCHEDULE_SINGLE":{
+            "CAPTION":"Programar un único evento"
+          },
+          "SCHEDULE_MULTIPLE":{
+            "CAPTION":"Programar múltiples eventos",
+            "REPEATS":"Repeticiones",
+            "REPEAT_ON":"Repetir el",
+            "WEEKDAYS":"Entre semana"
+          }
+        },
+        "PROCESSING":{
+          "CAPTION":"Procesado",
+          "SELECT_WORKFLOW":"Seleccione flujo de trabajo",
+          "SELECT_WORKFLOW_EMPTY":"No se han encontrado flujos de trabajo",
+          "WORKFLOW":"Flujo de Trabajo"
+        },
+        "ACCESS":{
+          "CAPTION":"Política de acceso",
+          "POLICY":"Política de acceso",
+          "ACL":"ACL"
+        },
+        "SUMMARY":{
+          "CAPTION":"Resumen"
+        },
+        "WEEKDAYS":{
+          "MO":"Lu",
+          "TU":"Ma",
+          "WE":"Mi",
+          "TH":"Ju",
+          "FR":"Vi",
+          "SA":"Sá",
+          "SU":"Do"
+        }
+      },
+      "NAVIGATION":{
+        "EVENTS":"Eventos",
+        "SERIES":"Series",
+        "OVERVIEW":"Resumen"
+      },
+      "UPLOAD":"Subir",
+      "ADD_SERIES":"Añadir serie",
+      "ADD_EVENT":"Añadir evento",
+      "TABLE":{
+        "CAPTION":"Eventos",
+        "TITLE":"Título",
+        "CREATORS":"Protagonista(s)",
+        "SERIES":"Serie",
+        "DATE":"Fecha",
+        "START":"Inicio",
+        "STOP":"Fin",
+        "STATUS":"Estado",
+        "LOCATION":"Ubicación",
+        "AGENT":"Agente",
+        "ACTION":"Acciones",
+        "FIRST":"Primero",
+        "LAST":"Último",
+        "NEXT":"Siguiente",
+        "MANAGED_ACL":"Política de acceso",
+        "SCHEDULING_STATUS":"Estado",
+        "WORKFLOW_STATE":"Progreso",
+        "REVIEW_STATUS":"Estado de revisión",
+        "PREVIOUS":"Anterior",
+        "NOCONTENT":"No hay información disponible"
+      },
+      "SCHEDULING_STATUS":{
+        "READY_FOR_RECORDING":"Preparado para grabar",
+        "BLACKLISTED":"En la lista negra",
+        "OPTED_OUT":"Excluído"
+      },
+      "DETAILS":{
+        "HEADER":"Detalles del evento {{resourceId}}",
+        "TABS":{
+          "GENERAL":"General",
+          "METADATA":"Metadatos",
+          "EXTENDED-METADATA":"Metadatos II",
+          "MEDIA":"Archivos multimedia",
+          "ATTACHMENTS":"Adjuntos",
+          "WORKFLOWS":"Flujos de Trabajo",
+          "ACCESS":"Política de acceso",
+          "COMMENTS":"Comentarios"
+        },
+        "GENERAL":{
+          "PUBLICATION_STATUS":"Estado de publicación",
+          "SCHEDULING_STATUS":"Estado",
+          "READY_FOR_RECORDING":"Preparado para grabar",
+          "OPTED_OUT":"Excluído",
+          "CUSTOM":"Custom",
+          "ENGAGE":"Engage",
+          "YOUTUBE":"Youtube"
+        },
+        "MEDIA":{
+          "TRIM_MEDIA":"Cortar vídeos",
+          "MEDIA":"Archivos multimedia",
+          "ID":"Identificador",
+          "TYPE":"Tipo",
+          "MIMETYPE":"Tipo MIME",
+          "URL":"URL",
+          "DETAILS":"Detalles"
+        },
+        "ATTACHMENTS":{
+          "CAPTION":"Adjuntos",
+          "ID":"Id.",
+          "TYPE":"Tipo",
+          "MIMETYPE":"Tipo MIME",
+          "TAGS":"Etiquetas",
+          "LINK":"Enlace"
+        },
+        "ACCESS":{
+          "CAPTION":"Política de acceso",
+          "SELECTPLACEHOLDER":"Seleccione política de acceso"
+        },
+        "COMMENTS":{
+          "CAPTION":"Comentarios",
+          "PLACEHOLDER":"Comentario...",
+          "SELECTPLACEHOLDER":"Seleccione motivos",
+          "RESOLVED":"Resuelto",
+          "REPLY":"Responder",
+          "REPLY_TO":"Responder a",
+          "CANCEL_REPLY":"Rechazar",
+          "DELETE":"Eliminar",
+          "REASON":"Causa"
+        },
+        "METADATA":{
+          "TITLE":"Título",
+          "UID":"UID",
+          "SERIES":"Serie",
+          "RECORDING_DATE":"Fecha de grabación",
+          "SUBJECT":"Tema",
+          "DESCRIPTION":"Descripción",
+          "START_DATE":"Fecha de inicio",
+          "START_TIME":"Hora de inicio",
+          "DURATION":"Duración",
+          "AGENT":"Agente",
+          "SOURCE":"Origen",
+          "CREATED":"Fecha de creación",
+          "CREATED_BY":"Creado por",
+          "LICENSE":"Licencia",
+          "CONTRIBUTORS":"Participante(s)",
+          "RIGHTS":"Permisos",
+          "PRESENTERS":"Protagonista(s)",
+          "LANGUAGE":"Idioma",
+          "COPYRIGHT":"Copyright",
+          "VISIBILITY":"Visibilidad",
+          "PUBLIC":"Objetivo público",
+          "OS":"Procesado en el sistema operativo",
+          "LOCKED":{
+            "RUNNING":"No está permitida la edición de metadatos mientras se ejecutan operaciones en un evento"
+          }
+        },
+        "WORKFLOWS":{
+          "DETAILS":"Detalles",
+          "DESCRIPTION":"",
+          "ID":"Identificador",
+          "TYPE":"Tipo",
+          "TITLE":"Título",
+          "STATE":"Estado",
+          "STARTED":"Iniciado",
+          "SERIES":"Serie",
+          "SUBMITTED":"Enviado",
+          "MIMETYPE":"Tipo MIME",
+          "URL":"URL"
+        },
+        "WORKFLOW_DETAILS":{
+          "TITLE":"Detalles del flujo de trabajo"
+        },
+        "WORKFLOW_OPERATIONS":{
+          "TITLE":"Operaciones del flujo de trabajo"
+        },
+        "OPERATION_DETAILS":{
+          "TITLE":"Detalles de la operación"
+        },
+        "QUICKACTION_WORKFLOW_DETAILS":{
+          "TITLE":"Detalles del flujo de trabajo"
+        },
+        "MEDIA_DETAILS":{
+          "TITLE":"Detalles de los archivos multimedia",
+          "ID":"Identificador",
+          "TYPE":"Tipo",
+          "MIMETYPE":"Tipo MIME",
+          "URL":"URL",
+          "RECORDING_DATE":"Fecha de grabación",
+          "FLAVOR":"Sabor",
+          "TAGS":"Etiquetas",
+          "DURATION":"Duración",
+          "STREAM_AUDIO":"Flujos de audio",
+          "STREAM_VIDEO":"Flujos de vídeo",
+          "CHANNELS":"Canales",
+          "BITRATE":"Tasa de transferencia",
+          "FRAMERATE":"Velocidad de cuadro",
+          "RESOLUTION":"Resolución"
+        },
+        "ERRORS_AND_WARNINGS":{
+          "HEADER":"Errores y Avisos",
+          "TITLE":"Errores y Avisos",
+          "DATE":"Fecha",
+          "HOST":"Servidor",
+          "TYPE":"Tipo",
+          "EMPTY":"Sin errores",
+          "DETAILS":{
+            "HEADER":"Detalles del error",
+            "SEVERITY":"Gravedad",
+            "TITLE":"Título",
+            "DESCRIPTION":"Descripción",
+            "JOB_ID":"Id. del trabajo",
+            "DATE":"Fecha",
+            "HOST":"Procesado en el servidor",
+            "TYPE":"Tipo de servicio",
+            "TECHNICAL_DETAILS":"Detalles técnicos"
+          }
+        }
+      }
+    },
+    "SERIES":{
+      "NEW":{
+        "CAPTION":"Crear serie",
+        "METADATA":{
+          "CAPTION":"Metadatos",
+          "DESCRIPTION":"",
+          "METADATA":{
+            "TITLE":"Metadatos"
+          }
+        },
+        "METADATA_EXTENDED":{
+          "CAPTION":"Metadatos extendidos",
+          "DESCRIPTION":"",
+          "METADATA":{
+            "TITLE":"Metadatos extendidos"
+          }
+        },
+        "ACCESS":{
+          "CAPTION":"Política de acceso",
+          "DESCRIPTION":"",
+          "TEMPLATES":{
+            "TITLE":"Plantillas"
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Política de acceso",
+            "DESCRIPTION":"",
+            "LABEL":"Seleccione una plantilla",
+            "EMPTY":"No hay plantillas disponibles",
+            "ROLE":"Rol",
+            "WRITE":"Escritura",
+            "READ":"Lectura",
+            "ACTION":"Acciones",
+            "NEW":"New policy",
+            "DETAILS":"Detalles"
+          },
+          "ROLES":{
+            "LABEL":"Seleccione un rol",
+            "EMPTY":"No hay roles disponibles"
+          }
+        },
+        "THEME":{
+          "CAPTION":"Estilo",
+          "DESCRIPTION":"",
+          "TITLE":"Estilo",
+          "LABEL":"Sin estilo",
+          "EMPTY":"No  hay estilos disponibles"
+        },
+        "SUMMARY":{
+          "CAPTION":"Resumen"
+        }
+      },
+      "TABLE":{
+        "CAPTION":"Series",
+        "TITLE":"Series",
+        "CREATORS":"Organizador(es)",
+        "CONTRIBUTORS":"Participante(s)",
+        "CREATED":"Fecha de creación",
+        "MANAGED_ACL":"Política de acceso",
+        "EVENTS":"Eventos",
+        "ACTION":"Acciones"
+      },
+      "DETAILS":{
+        "TABS":{
+          "METADATA":"Metadatos",
+          "EXTENDED_METADATA":"Metadatos II",
+          "EVENTS":"Eventos",
+          "PERMISSIONS":"Política de acceso",
+          "THEME":"Estilo"
+        },
+        "ACCESS":{
+          "CAPTION":"Política de acceso",
+          "DESCRIPTION":"",
+          "TEMPLATES":{
+            "TITLE":"Plantillas"
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Política de acceso",
+            "DESCRIPTION":"",
+            "LABEL":"Seleccione una plantilla",
+            "EMPTY":"No hay plantillas disponibles",
+            "ROLE":"Rol",
+            "WRITE":"Escritura",
+            "READ":"Lectura",
+            "ACTION":"Acciones",
+            "NEW":"Nueva política",
+            "DETAILS":"Detalles"
+          },
+          "ROLES":{
+            "LABEL":"Seleccione un rol",
+            "EMPTY":"No hay roles disponibles"
+          }
+        },
+        "METADATA":{
+          "TITLE":"Título",
+          "UID":"UID",
+          "SERIES":"Serie",
+          "PUBLISHERS":"Editore(s)",
+          "ORGANIZERS":"Organizador(es)",
+          "CONTRIBUTORS":"Participante(s)",
+          "RECORDING_DATE":"Fecha de grabación",
+          "CREATED_BY":"Creado Por",
+          "RIGHTS":"Permisos",
+          "SUBJECT":"Tema",
+          "LANGUAGE":"Idioma",
+          "LICENSE":"Licencia",
+          "DESCRIPTION":"Descripción"
+        },
+        "EVENTS":{
+          "TITLE":"Título",
+          "PRESENTER":"Protagonista(s)",
+          "CREATED":"Fecha de creación",
+          "MODIFIED":"Modificado",
+          "STATUS":"Estado",
+          "LOCATION":"Ubicación",
+          "LINK":"Enlace"
+        }
+      }
+    }
+  },
+  "RECORDINGS":{
+    "NAVIGATION":{
+      "LOCATIONS":"Ubicaciones",
+      "BLACKLISTS":"Listas negras"
+    },
+    "ACTIONS":{
+      "EXPORT":"Exportar",
+      "ADD_BLACKLIST":"Añadir lista negra"
+    },
+    "RECORDINGS":{
+      "TABLE":{
+        "CAPTION":"Ubicaciones",
+        "TITLE":"UID",
+        "NAME":"Nombre",
+        "LOCATION":"Ubicación",
+        "UPDATED":"Última actualización",
+        "NEXT_DATE":"Próximo evento",
+        "NEXT_NAME":"Título del próximo evento",
+        "STATUS":"Estado",
+        "VERSION":"Versión",
+        "BLACKLIST_FROM":"En la lista negra desde",
+        "BLACKLIST_TO":"En la lista negra hasta",
+        "ACTION":"Acciones"
+      }
+    },
+    "BLACKLISTS":{
+      "TABLE":{
+        "CAPTION":"Lista negra de ubicaciones",
+        "NAME":"Nombre",
+        "ACTIONS":"Acciones"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Crear lista negra",
+        "EDITCAPTION":"Modificar lista negra",
+        "TABS":{
+          "LOCATIONS":"Ubicaciones",
+          "DATES":"Fechas",
+          "REASON":"Causa",
+          "SUMMARY":"Resumen"
+        },
+        "LOCATIONS":{
+          "REMOVE":"Eliminar",
+          "ADD_LOCATION":"Elija ubicación",
+          "ALL_LOCATIONS":"Todas las ubicaciones",
+          "SELECT_LOCATION":"Seleccionar"
+        },
+        "DATES":{
+          "START_DATE":"Fecha de inicio",
+          "END_DATE":"Fecha de finalización"
+        },
+        "REASON":{
+          "SELECT_REASON":"Seleccionar",
+          "REASON":"Causa",
+          "COMMENTS":"Comentarios"
+        },
+        "SUMMARY":{
+          "SUMMARY":"Resumen",
+          "LOCATION":"Ubicación",
+          "DATE_FROM":"Desde",
+          "DATE_TO":"Hasta",
+          "REASON":"Causa",
+          "COMMENTS":"Comentarios"
+        }
+      }
+    }
+  },
+  "USERS":{
+    "ACTIONS":{
+      "ADD_USER":"Añadir usuario",
+      "ADD_GROUP":"Añadir grupo",
+      "ADD_ACL":"Añadir política de acceso",
+      "ADD_BLACKLIST":"Añadir lista negra"
+    },
+    "NAVIGATION":{
+      "USERS":"Usuarios",
+      "GROUPS":"Grupos",
+      "PERMISSIONS":"Políticas de acceso",
+      "BLACKLISTS":"Lista Negra"
+    },
+    "USERS":{
+      "TABLE":{
+        "CAPTION":"Usuarios",
+        "NAME":"Nombre",
+        "USERNAME":"Nombre de Usuario",
+        "ROLES":"Roles",
+        "TYPE":"Tipo",
+        "BLACKLIST_FROM":"En la lista negra desde",
+        "BLACKLIST_TO":"En la lista negra hasta",
+        "ACTION":"Acciones"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Crear usuario",
+        "EDITCAPTION":"Modificar usuario",
+        "TABS":{
+          "USER":"Usuario",
+          "ROLES":"Roles"
+        },
+        "FORM":{
+          "USERNAME":"Nombre de Usuario",
+          "NAME":"Nombre",
+          "EMAIL":"Correo Electrónico",
+          "PASSWORD":"Contraseña",
+          "REPEAT_PASSWORD":"Repetir contraseña"
+        },
+        "ROLES":{
+          "LEFT":"Roles",
+          "RIGHT":"Roles seleccionados",
+          "REMOVE":"Eliminar rol",
+          "ADD":"Añadir rol"
+        }
+      }
+    },
+    "GROUPS":{
+      "NEW":{
+        "CAPTION":"Crear grupo"
+      },
+      "TABLE":{
+        "CAPTION":"Grupos",
+        "NAME":"Nombre",
+        "DESCRIPTION":"Descripción",
+        "ROLE":"Rol",
+        "ACTION":"Acciones"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Crear grupo",
+        "EDITCAPTION":"Modificar grupo",
+        "TABS":{
+          "GROUP":"Grupo",
+          "ROLES":"Roles",
+          "METADATA":"Metadatos",
+          "USERS":"Usuarios",
+          "SUMMARY":"Resumen"
+        },
+        "FORM":{
+          "NAME":"Nombre",
+          "DESCRIPTION":"Descripción",
+          "SUMMARY":"Resumen",
+          "ROLES":"Roles",
+          "USERS":"Usuarios"
+        },
+        "USERS":{
+          "LEFT":"Usuarios",
+          "RIGHT":"Usuarios seleccionados",
+          "REMOVE":"Eliminar usuario",
+          "ADD":"Añadir usuario"
+        },
+        "ROLES":{
+          "LEFT":"Roles",
+          "RIGHT":"Roles seleccionados",
+          "REMOVE":"Eliminar rol",
+          "ADD":"Añadir rol"
+        }
+      }
+    },
+    "ACLS":{
+      "TABLE":{
+        "CAPTION":"Políticas de acceso",
+        "NAME":"Nombre",
+        "CREATED":"Fecha de creación",
+        "CREATOR":"Creador",
+        "IN_USE":"En uso",
+        "ACTION":"Acciones"
+      }
+    },
+    "BLACKLISTS":{
+      "TABLE":{
+        "CAPTION":"Lista negra de usuarios",
+        "NAME":"Nombre",
+        "DATE_FROM":"Desde",
+        "DATE_TO":"Hasta",
+        "REASON":"Causa",
+        "ACTION":"Acciones"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Crear lista negra",
+        "EDITCAPTION":"Modificar lista negra",
+        "TABS":{
+          "USERS":"Usuarios",
+          "DATES":"Fechas",
+          "REASON":"Causa",
+          "SUMMARY":"Resumen"
+        },
+        "USERS":{
+          "REMOVE":"Eliminar",
+          "ADD_USER":"Seleccione usuario",
+          "ALL_USERS":"Todos los usuarios",
+          "SELECT_USER":"Seleccionar"
+        },
+        "DATES":{
+          "START_DATE":"Fecha de inicio",
+          "END_DATE":"Fecha de finalización"
+        },
+        "REASON":{
+          "SELECT_REASON":"Seleccionar",
+          "REASON":"Causa",
+          "COMMENTS":"Comentarios"
+        },
+        "SUMMARY":{
+          "SUMMARY":"Resumen",
+          "USER":"Usuario",
+          "DATE_FROM":"Desde",
+          "DATE_TO":"Hasta",
+          "REASON":"Causa",
+          "COMMENTS":"Comentarios"
+        }
+      }
+    }
+  },
+  "THEMES":{
+    "THEMES":{
+      "DETAILS":{
+        "HEADER":"Detalles del estilo {{resourceId}}",
+        "TABS":{
+          "GENERAL":"General",
+          "BUMPER":"Cortinilla (principio)",
+          "TRAILER":"Cortinilla (final)",
+          "TITLE":"Título",
+          "LICENSE":"Licencia",
+          "WATERMARK":"Marca de agua",
+          "USAGE":"Usado en"
+        },
+        "GENERAL":{
+          "CAPTION":"General",
+          "NAME":"Nombre",
+          "DESCRIPTION":"Descripción",
+          "DEFAULT":"Por defecto",
+          "SET_DEFAULT_INFO":"Establecer como estilo por defecto para todas las series y eventos",
+          "NAME_ERROR":"El nombre ya está en uso",
+          "NAME_REQUIRED":"Obligatorio"
+        },
+        "BUMPER":{
+          "CAPTION":"Cortinilla (principio)",
+          "DESCRIPTION":"Vídeo predefinido que se anexa al principio de las grabación.",
+          "ACTIVE":"Activada"
+        },
+        "TRAILER":{
+          "CAPTION":"Cortinilla (final)",
+          "DESCRIPTION":"Vídeo predefinido que se anexa al final de la grabación.",
+          "ACTIVE":"Activada"
+        },
+        "TITLE":{
+          "CAPTION":"Título",
+          "DESCRIPTION":"Diapositiva predefinida que se adjunta al principio o al final de las grabación y contiene metadatos descriptivos.",
+          "ACTIVE":"Activado"
+        },
+        "WATERMARK":{
+          "CAPTION":"Marca de agua",
+          "DESCRIPTION":"Imagen semitransparente que se superpone sobre cada fotograma de la grabación.",
+          "ACTIVE":"Activada"
+        },
+        "USAGE":{
+          "CAPTION":"Usada en",
+          "SERIES":"Nombre de la serie"
+        }
+      }
+    }
+  },
+  "CONFIGURATION":{
+    "ACTIONS":{
+      "ADD_MAIL_TEMPLATE":"Añadir plantilla",
+      "ADD_THEME":"Añadir estilo"
+    },
+    "NAVIGATION":{
+      "MAIL_TEMPLATES":"Plantillas de correo electrónico",
+      "MAIL_SERVERS":"Configuración de correo electrónico",
+      "THEMES":"Estilos"
+    },
+    "EMAIL_TEMPLATES":{
+      "TABLE":{
+        "CAPTION":"Plantillas de correo electrónico",
+        "NAME":"Nombre",
+        "CREATOR":"Creador",
+        "CREATED":"Fecha de creación",
+        "ACTION":"Acciones"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Crear plantilla",
+        "EDITCAPTION":"Modificar plantilla",
+        "TABS":{
+          "MESSAGE":"Mensaje",
+          "SUMMARY":"Resumen"
+        },
+        "MESSAGE":{
+          "NAME":"Nombre",
+          "SUBJECT":"Tema",
+          "MESSAGE":"Mensaje"
+        },
+        "SUMMARY":{
+          "MESSAGE_SUMMARY":"Resumen del mensaje"
+        }
+      }
+    },
+    "THEMES":{
+      "TABLE":{
+        "CAPTION":"Estilos",
+        "NAME":"Nombre",
+        "DESCRIPTION":"Descripción",
+        "CREATOR":"Creador",
+        "CREATED":"Fecha de creación",
+        "DEFAULT":"Por defecto",
+        "USAGE":"Usada en",
+        "ACTION":"Acciones"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Crear estilo",
+        "EDITCAPTION":"Modificar estilo",
+        "GENERAL":{
+          "CAPTION":"General",
+          "NAME":"Nombre",
+          "DESCRIPTION":"Descripción",
+          "DEFAULT":"Por defecto",
+          "SET_DEFAULT_INFO":"Establecer como estilo por defecto para todas las series y eventos",
+          "NAME_REQUIRED":"Obligatorio"
+        },
+        "BUMPER":{
+          "CAPTION":"Cortinilla (principio)",
+          "FILE_UPLOADED":"Archivo subido: ",
+          "DESCRIPTION":"Vídeo predefinido que se anexa al principio de las grabación.",
+          "ACTIVE":"Activada",
+          "ENABLE":"Activar cortinilla",
+          "SELECT":"Seleccionar",
+          "UPLOAD_LABEL":"Subir vídeo",
+          "UPLOAD_BUTTON":"Subir"
+        },
+        "TRAILER":{
+          "CAPTION":"Cortinilla (final)",
+          "FILE_UPLOADED":"Archivo subido: ",
+          "DESCRIPTION":"Vídeo predefinido que se anexa al final de la grabación.",
+          "ACTIVE":"Activada",
+          "ENABLE":"Activar cortinilla",
+          "UPLOAD_LABEL":"Subir vídeo",
+          "UPLOAD_BUTTON":"Subir"
+        },
+        "TITLE":{
+          "CAPTION":"Título",
+          "FILE_UPLOADED":"Archivo subido: ",
+          "DESCRIPTION":"Diapositiva predefinida que se adjunta al principio o al final de las grabación y contiene metadatos descriptivos.",
+          "ACTIVE":"Activada",
+          "ENABLE":"Activar la diapositiva de título",
+          "BACKGROUND":"Fondo",
+          "EXTRACT":"Extraer fondo",
+          "UPLOAD":"Subir",
+          "UPLOAD_LABEL":"Subir imagen",
+          "UPLOAD_BUTTON":"Subir"
+        },
+        "WATERMARK":{
+          "CAPTION":"Marca de agua",
+          "FILE_UPLOADED":"Archivo subido: ",
+          "DESCRIPTION":"Imagen semitransparente que se superpone sobre cada fotograma de la grabación.",
+          "ACTIVE":"Activada",
+          "TOP_LEFT":"Esquina superior izquierda",
+          "TOP_RIGHT":"Esquina superior derecha",
+          "BOTTOM_LEFT":"Esquina inferior izquierda",
+          "BOTTOM_RIGHT":"Esquina inferior derecha",
+          "UPLOAD":"Subir",
+          "POSITION":"Posición y vista previa de la marca de agua",
+          "FILEUPLOAD_DESCRIPTION":"El archivo debería tener un canal alfa (fondo transparente). Los tipos de archivo soportados son: .PNG, .GIF, .SVG, .WEBP",
+          "UPLOAD_LABEL":"Subir imagen",
+          "UPLOAD_BUTTON":"Subir"
+        },
+        "SUMMARY":{
+          "CAPTION":"Resumen"
+        },
+        "USAGE":{
+          "CAPTION":"Usado en",
+          "SERIE":"Nombre de la serie",
+          "EMPTY":"No existen series para el estilo actual"
+        }
+      }
+    }
+  },
+  "SYSTEMS":{
+    "NAVIGATION":{
+      "JOBS":"Trabajos",
+      "SERVERS":"Servidores",
+      "SERVICES":"Servicios"
+    },
+    "JOBS":{
+      "TABLE":{
+        "CAPTION":"Trabajos",
+        "TITLE":"Título",
+        "SERIES":"Series",
+        "WORKFLOW":"Flujo de Trabajo",
+        "STATUS":"Estado",
+        "SUBMITTED":"Enviado",
+        "ACTION":"Acciones"
+      },
+      "DETAILS":{
+        "HEADER":"Detalles del trabajo {{resourceId}}",
+        "TABS":{
+          "GENERAL":"General",
+          "OPERATIONS":"Operaciones",
+          "INCIDENTS":"Incidencias"
+        }
+      }
+    },
+    "SERVERS":{
+      "TABLE":{
+        "CAPTION":"Servidores",
+        "STATUS":"Estado",
+        "HOST_NAME":"Nombre del equipo",
+        "CORES":"Núcleos",
+        "COMPLETED":"Trabajos completados",
+        "RUNNING":"Trabajos en ejecución",
+        "QUEUED":"Trabajos en cola",
+        "MEAN_RUN_TIME":"Tiempo medio de ejecución",
+        "MEAN_QUEUE_TIME":"Tiempo medio de espera en cola",
+        "MAINTENANCE":"Mantenimiento",
+        "ACTION":"Acciones",
+        "MAINTENANCE_OFF":"Activar el modo de mantenimiento",
+        "MAINTENANCE_ON":"Desactivar el modo de mantenimiento"
+      }
+    },
+    "SERVICES":{
+      "TABLE":{
+        "CAPTION":"Servicios",
+        "STATUS":"Estado",
+        "NAME":"Nombre del servicio",
+        "COMPLETED":"Trabajos completados",
+        "RUNNING":"Trabajos en ejecución",
+        "QUEUED":"Trabajos en cola",
+        "MEAN_RUN_TIME":"Tiempo medio de ejecución",
+        "MEAN_QUEUE_TIME":"Tiempo medio de espera en cola",
+        "SANITIZE":"Limpiar estado de error",
+        "ACTION":"Acciones"
+      }
+    }
+  },
+  "VIDEO_TOOL":{
+    "BUTTONS":{
+      "COMMENTS":"Ver",
+      "METADATA":"Modificar",
+      "CLOSE":"Cerrar",
+      "SAVE":"Guardar",
+      "PROCESS":"Guardar y procesar"
+    },
+    "TABS":{
+      "PLAY":"Reproducción",
+      "EDIT":"Editor",
+      "CAPTIONS":"Subtítulos",
+      "ANNOTATIONS":"Anotaciones"
+    },
+    "ACTIONS":{
+      "SPLIT":"Marcar",
+      "CUT":"Cortar",
+      "REPLAY_SEGMENT":"Reproducir segmento",
+      "UNDO":"Deshacer",
+      "REDO":"Rehacer",
+      "CLEAR_SEGMENTS":"Borrar segmentos"
+    }
+  },
+  "LOGIN":{
+    "WELCOME":"Bienvenidos a Opencast",
+    "REMEMBER":"Recordarme en este equipo",
+    "USERNAME":"Correo...",
+    "PASSWORD":"Contraseña...",
+    "LOGIN":"Identificarse",
+    "ERROR":"Correo electrónico y\/o contraseña incorrectos"
+  },
+  "TABLE_FILTERS":{
+    "CLEAR":"Borrar todos los filtros",
+    "REMOVE":"Quitar filtro",
+    "ADD":"Añadir filtros",
+    "PLACEHOLDER":"Buscar...",
+    "PROFILES":{
+      "FILTERS_HEADER":"Grupos de filtros guardados",
+      "EMPTY":"Aún no se ha guardado ningún filtro",
+      "SAVE_FILTERS":"Guardar",
+      "FILTER_HEADER":"Gardar grupo de filtros",
+      "NAME":"Nombre",
+      "NAME_PLACEHOLDER":"Nombre...",
+      "DESCRIPTION":"Descripción",
+      "DESCRIPTION_PLACEHOLDER":"Descripción..."
+    }
+  },
+  "FILTERS":{
+    "EVENTS":{
+      "STATUS":{
+        "LABEL":"Estado",
+        "SCHEDULED":"Programado",
+        "RECORDING":"Grabando",
+        "INGESTING":"Importando",
+        "PROCESSING":"Procesando",
+        "ARCHIVE":"Archivo",
+        "WAITINGFOR":"Esperando",
+        "UPLOAD":"Subida",
+        "ONHOLD":"En espera"
+      },
+      "PROGRESS":{
+        "LABEL":"Progreso"
+      },
+      "COMMENTS":{
+        "LABEL":"Comentarios"
+      },
+      "SERIES":{
+        "LABEL":"Serie"
+      },
+      "PRESENTERS":{
+        "LABEL":"Protagonistas"
+      },
+      "CONTRIBUTORS":{
+        "LABEL":"Colaboradores"
+      },
+      "START_DATE":{
+        "LABEL":"Fecha de inicio"
+      },
+      "SUBJECT":{
+        "LABEL":"Tema"
+      },
+      "LOCATION":{
+        "LABEL":"Ubicación"
+      },
+      "LANGUAGE":{
+        "LABEL":"Idioma"
+      },
+      "SOURCE":{
+        "LABEL":"Origen"
+      },
+      "CREATOR":{
+        "LABEL":"Creador"
+      },
+      "LICENSE":{
+        "LABEL":"Licencia"
+      },
+      "TRACK_TYPE":{
+        "LABEL":"Tipo"
+      },
+      "TRACK_MIMETYPE":{
+        "LABEL":"Tipo MIME"
+      },
+      "TRACK_RESOLUTION":{
+        "LABEL":"Resolución"
+      },
+      "ACCESS_POLICY":{
+        "LABEL":"Política de acceso"
+      },
+      "WORKFLOW_DEFINITION":{
+        "LABEL":"Definición del flujo de trabajo"
+      },
+      "WORKFLOW_STATE":{
+        "LABEL":"Estado del flujo de trabajo"
+      },
+      "PERIOD":{
+        "LABEL":"Periodo"
+      }
+    },
+    "SERIES":{
+      "TITLE":{
+        "LABEL":"Nombre"
+      },
+      "CONTRIBUTORS":{
+        "LABEL":"Colaboradores"
+      },
+      "ORGANIZERS":{
+        "LABEL":"Organizadores"
+      },
+      "SUBJECT":{
+        "LABEL":"Tema"
+      },
+      "LANGUAGE":{
+        "LABEL":"Idioma"
+      },
+      "CREATOR":{
+        "LABEL":"Creador"
+      },
+      "LICENSE":{
+        "LABEL":"Licencia"
+      },
+      "ACCESS_POLICY":{
+        "LABEL":"Política de acceso"
+      },
+      "CREATION_DATE":{
+        "LABEL":"Fecha de creación"
+      }
+    },
+    "THEMES":{
+      "NAME":{
+        "LABEL":"Nombre"
+      },
+      "DESCRIPTION":{
+        "LABEL":"Descripción"
+      },
+      "CREATOR":{
+        "LABEL":"Creador"
+      },
+      "CREATION_DATE":{
+        "LABEL":"Fecha de creación"
+      }
+    },
+    "USERS":{
+      "USERNAME":{
+        "LABEL":"Nombre de Usuario"
+      },
+      "NAME":{
+        "LABEL":"Nombre"
+      },
+      "USER_DIRECTORY":{
+        "LABEL":"Directorio de usuarios"
+      }
+    }
+  },
+  "TABLE_SUMMARY":"{{numberOfRows}} filas",
+  "TABLE_NO_RESULT":"No se han encontrado resultados.",
+  "TABLE_LOADING":"Cargando...",
+  "PM":{
+    "BLACKLIST":{
+      "REASONS":{
+        "SICK_LEAVE":"Baja por enfermedad",
+        "LEAVE":"Vacaciones",
+        "FAMILY_EMERGENCY":"Emergencia familiar",
+        "CONSTRUCTION":"En obras"
+      }
+    }
+  }
+}

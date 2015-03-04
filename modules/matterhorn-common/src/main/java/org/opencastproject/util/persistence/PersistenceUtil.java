@@ -17,7 +17,7 @@
 package org.opencastproject.util.persistence;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-import org.opencastproject.fn.juc.Immutables;
+import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;

@@ -15,14 +15,28 @@
  */
 package org.opencastproject.scheduler.impl.persistence;
 
+import static org.opencastproject.util.data.Arrays.array;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Monadics.mlist;
+
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.scheduler.impl.SchedulerServiceDatabase;
 import org.opencastproject.scheduler.impl.SchedulerServiceDatabaseException;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Function2;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.DateTimeFieldType;
+import org.joda.time.Partial;
+import org.joda.time.ReadableInstant;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +54,7 @@ import java.util.Properties;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.spi.PersistenceProvider;
 
@@ -173,11 +189,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     return caProperties;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceDatabase#deleteEvent(java.lang.String)
-   */
   @Override
   public void deleteEvent(long eventId) throws NotFoundException, SchedulerServiceDatabaseException {
     EntityManager em = null;
@@ -207,13 +218,23 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceDatabase#getAllEvents()
-   */
-  @SuppressWarnings("unchecked")
   @Override
+  public int countEvents() throws SchedulerServiceDatabaseException {
+    EntityManager em = emf.createEntityManager();
+    Query query = em.createNamedQuery("Event.countAll");
+    try {
+      Number total = (Number) query.getSingleResult();
+      return total.intValue();
+    } catch (Exception e) {
+      logger.error("Could not find the number of events.", e);
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
   public DublinCoreCatalog[] getAllEvents() throws SchedulerServiceDatabaseException {
     EntityManager em = null;
     Query query = null;
@@ -221,7 +242,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     try {
       em = emf.createEntityManager();
       query = em.createNamedQuery("Event.findAll");
-      eventEntities = (List<EventEntity>) query.getResultList();
+      eventEntities = query.getResultList();
     } catch (Exception e) {
       logger.error("Could not retrieve all events: {}", e.getMessage());
       throw new SchedulerServiceDatabaseException(e);
@@ -242,11 +263,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     return eventList.toArray(new DublinCoreCatalog[eventList.size()]);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceDatabase#getEventMetadata(long)
-   */
   @Override
   public Properties getEventMetadata(long eventId) throws NotFoundException, SchedulerServiceDatabaseException {
     EntityManager em = null;
@@ -272,13 +288,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * org.opencastproject.scheduler.impl.SchedulerServiceDatabase#updateEvent(org.opencastproject.metadata.dublincore
-   * .DublinCoreCatalog)
-   */
   @Override
   public void updateEvent(DublinCoreCatalog event) throws NotFoundException, SchedulerServiceDatabaseException {
     if (event == null) {
@@ -320,11 +329,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceDatabase#storeEvents(java.util.List)
-   */
   @Override
   public void storeEvents(DublinCoreCatalog... events) throws SchedulerServiceDatabaseException {
     EntityManager em = null;
@@ -362,12 +366,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceDatabase#updateEventWithMetadata(java.lang.String,
-   * java.util.Properties)
-   */
   @Override
   public void updateEventWithMetadata(long eventId, Properties caProperties) throws SchedulerServiceDatabaseException,
           NotFoundException {
@@ -408,4 +406,601 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
         em.close();
     }
   }
+
+  @Override
+  public void updateEventAccessControlList(long eventId, AccessControlList accessControlList) throws NotFoundException,
+          SchedulerServiceDatabaseException {
+    String aclSerialized = null;
+    try {
+      if (accessControlList != null)
+        aclSerialized = AccessControlParser.toJson(accessControlList);
+    } catch (IOException e) {
+      logger.error("Could not serialize access control list: {}", e);
+      throw new SchedulerServiceDatabaseException(e);
+    }
+
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      EventEntity event = em.find(EventEntity.class, eventId);
+      if (event == null)
+        throw new NotFoundException("Event " + eventId + " does not exist");
+
+      event.setAccessControl(aclSerialized);
+      em.merge(event);
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      logger.error("Could not update the access control list for event '{}': {}", eventId,
+              ExceptionUtils.getStackTrace(e));
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public void updateEventMediaPackageId(long eventId, String mediaPackageId) throws NotFoundException,
+          SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      EventEntity event = em.find(EventEntity.class, eventId);
+      if (event == null)
+        throw new NotFoundException("Event " + eventId + " does not exist");
+
+      event.setMediaPackageId(mediaPackageId);
+      em.merge(event);
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      logger.error("Could not update the mediapackage for event '{}': {}", eventId, ExceptionUtils.getStackTrace(e));
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public AccessControlList getAccessControlList(long eventId) throws NotFoundException,
+          SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      EventEntity event = em.find(EventEntity.class, eventId);
+      if (event == null)
+        throw new NotFoundException("Event " + eventId + " does not exist");
+
+      return event.getAccessControl() != null ? AccessControlParser.parseAcl(event.getAccessControl()) : null;
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not retrieve mediapackage for event '{}': {}", eventId, ExceptionUtils.getStackTrace(e));
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public String getMediaPackageId(long eventId) throws NotFoundException, SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      EventEntity event = em.find(EventEntity.class, eventId);
+      if (event == null)
+        throw new NotFoundException("Event " + eventId + " does not exist");
+
+      return event.getMediaPackageId();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not retrieve mediapackage for event '{}': {}", eventId, ExceptionUtils.getStackTrace(e));
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public Long getEventId(String mediaPackageId) throws NotFoundException, SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      EventEntity event = getEventEntityByMpId(mediaPackageId, em);
+      if (event == null)
+        throw new NotFoundException("Event with MP ID " + mediaPackageId + " does not exist");
+
+      return event.getEventId();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not retrieve event id for event with mediapackage '{}': {}", mediaPackageId,
+              ExceptionUtils.getStackTrace(e));
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public boolean isOptOut(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      EventEntity event = getEventEntityByMpId(mediapackageId, em);
+      if (event == null)
+        throw new NotFoundException("Event with MP ID " + mediapackageId + " does not exist");
+
+      return event.isOptOut();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not retrieve review status for event with mediapackage '{}': {}", mediapackageId,
+              ExceptionUtils.getStackTrace(e));
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public boolean isOptOut(Long eventid) throws NotFoundException, SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      EventEntity event = em.find(EventEntity.class, eventid);
+      if (event == null) {
+        throw new NotFoundException("Event with ID " + eventid + " does not exist");
+      }
+      return event.isOptOut();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not retrieve review status for event with mediapackage '{}': {}", eventid,
+              ExceptionUtils.getStackTrace(e));
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public void updateEventOptOutStatus(String mediapackageId, boolean optOut) throws NotFoundException,
+          SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      EventEntity entity = getEventEntityByMpId(mediapackageId, em);
+      if (entity == null) {
+        throw new NotFoundException("Event with MP ID " + mediapackageId + " does not exist");
+      }
+      entity.setOptOut(optOut);
+      em.merge(entity);
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      logger.error("Could not updated event opted out status: {}", e.getMessage());
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public void updateEventOptOutStatus(Long eventId, boolean optOut) throws NotFoundException,
+          SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      EventEntity entity = em.find(EventEntity.class, eventId);
+      if (entity == null) {
+        throw new NotFoundException("Event with ID " + eventId + " does not exist");
+      }
+      entity.setOptOut(optOut);
+      em.merge(entity);
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      logger.error("Could not updated event opted out status: {}", e.getMessage());
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public ReviewStatus getReviewStatus(String mediapackageId) throws NotFoundException,
+          SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      EventEntity event = getEventEntityByMpId(mediapackageId, em);
+      if (event == null)
+        throw new NotFoundException("Event with MP ID " + mediapackageId + " does not exist");
+
+      return event.getReviewStatus();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not retrieve review status for event with mediapackage '{}': {}", mediapackageId,
+              e.getMessage());
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public Date getReviewDate(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      EventEntity event = getEventEntityByMpId(mediapackageId, em);
+      if (event == null)
+        throw new NotFoundException("Event with MP ID " + mediapackageId + " does not exist");
+
+      return event.getReviewDate();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not retrieve review date for event with mediapackage '{}': {}", mediapackageId,
+              e.getMessage());
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public void updateEventReviewStatus(String mediapackageId, ReviewStatus reviewStatus, Date modificationDate)
+          throws NotFoundException, SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      EventEntity entity = getEventEntityByMpId(mediapackageId, em);
+      if (entity == null)
+        throw new NotFoundException("Event with MP ID " + mediapackageId + " does not exist");
+
+      entity.setReviewStatus(reviewStatus);
+      entity.setReviewDate(modificationDate);
+      em.merge(entity);
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      logger.error("Could not updated event review status: {}", e.getMessage());
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public boolean isBlacklisted(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      EventEntity event = getEventEntityByMpId(mediapackageId, em);
+      if (event == null)
+        throw new NotFoundException("Event with MP ID " + mediapackageId + " does not exist");
+
+      return event.isBlacklisted();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not retrieve blacklist status for event with mediapackage '{}': {}", mediapackageId,
+              e.getMessage());
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public boolean isBlacklisted(Long eventId) throws NotFoundException, SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      EventEntity event = em.find(EventEntity.class, eventId);
+      if (event == null) {
+        throw new NotFoundException("Event with ID " + eventId + " does not exist");
+      }
+      return event.isBlacklisted();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not retrieve review status for event with mediapackage '{}': {}", eventId,
+              ExceptionUtils.getStackTrace(e));
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public void updateEventBlacklistStatus(String mediapackageId, boolean blacklisted) throws NotFoundException,
+          SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      EventEntity entity = getEventEntityByMpId(mediapackageId, em);
+      if (entity == null)
+        throw new NotFoundException("Event with MP ID " + mediapackageId + " does not exist");
+
+      entity.setBlacklistStatus(blacklisted);
+      em.merge(entity);
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      logger.error("Could not updated event blacklist status: {}", e.getMessage());
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public void updateEventBlacklistStatus(Long eventId, boolean blacklisted) throws NotFoundException,
+          SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      EventEntity entity = em.find(EventEntity.class, eventId);
+      if (entity == null) {
+        throw new NotFoundException("Event with ID " + eventId + " does not exist");
+      }
+      entity.setBlacklistStatus(blacklisted);
+      em.merge(entity);
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      logger.error("Could not updated event blacklist status: {}", e.getMessage());
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public long countConfirmedResponses() throws SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("Event.countConfirmed");
+      Number countResult = (Number) q.getSingleResult();
+      return countResult.longValue();
+    } catch (Exception e) {
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public long countQuarterConfirmedResponses() throws SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("Event.countConfirmedByDateRange");
+      setDateForQuarterQuery(q);
+      Number countResult = (Number) q.getSingleResult();
+      return countResult.longValue();
+    } catch (Exception e) {
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public long countDailyConfirmedResponses() throws SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("Event.countConfirmedByDateRange");
+      setDateForDailyQuery(q);
+      Number countResult = (Number) q.getSingleResult();
+      return countResult.longValue();
+    } catch (Exception e) {
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public long countTotalResponses() throws SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("Event.countRespones");
+      Number countResult = (Number) q.getSingleResult();
+      return countResult.longValue();
+    } catch (Exception e) {
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public long countUnconfirmedResponses() throws SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("Event.countUnconfirmed");
+      Number countResult = (Number) q.getSingleResult();
+      return countResult.longValue();
+    } catch (Exception e) {
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public long countOptedOutResponses() throws SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("Event.countOptedOut");
+      Number countResult = (Number) q.getSingleResult();
+      return countResult.longValue();
+    } catch (Exception e) {
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * Gets an event by its mediapackage ID.
+   *
+   * @param mediaPackageId
+   *          the mediapackage identifier
+   * @param em
+   *          an open entity manager
+   * @return the event entity, or null if not found
+   */
+  protected EventEntity getEventEntityByMpId(String mediaPackageId, EntityManager em) {
+    Query q = em.createNamedQuery("Event.findByMpId").setParameter("mpId", mediaPackageId);
+    try {
+      return (EventEntity) q.getSingleResult();
+    } catch (NoResultException e) {
+      return null;
+    }
+  }
+
+  /** The beginnings of a quarter independent from the year. */
+  private final List<Partial> quarterBeginnings = list(partial(DateTimeConstants.JANUARY, 1),
+          partial(DateTimeConstants.APRIL, 1), partial(DateTimeConstants.JULY, 1),
+          partial(DateTimeConstants.OCTOBER, 1));
+
+  private DateTimeFieldType[] partialFields;
+
+  /**
+   * Add the correct start and end value for the given daily count query.
+   * <p/>
+   * Please note that the start instant is inclusive while the end instant is exclusive.
+   *
+   * @param query
+   *          The query where the parameters have to be added
+   * @return the same query instance
+   */
+  private Query setDateForDailyQuery(Query query) {
+    final DateTime today = new DateTime().withTimeAtStartOfDay();
+    return query.setParameter("start", today.toDate()).setParameter("end", today.plusDays(1).toDate());
+  }
+
+  /**
+   * Add the correct start and end value for the given quarter count query
+   * <p/>
+   * Please note that the start instant is inclusive while the end instant is exclusive.
+   *
+   * @param query
+   *          The query where the parameters have to be added
+   * @return the same query instance
+   */
+  private Query setDateForQuarterQuery(Query query) {
+    final DateTime today = new DateTime().withTimeAtStartOfDay();
+    final Partial partialToday = partialize(today);
+    final DateTime quarterBeginning = mlist(quarterBeginnings).foldl(quarterBeginnings.get(0),
+            new Function2<Partial, Partial, Partial>() {
+              @Override
+              public Partial apply(Partial sum, Partial quarterBeginning) {
+                return partialToday.isAfter(quarterBeginning) ? quarterBeginning : sum;
+              }
+            }).toDateTime(today);
+    return query.setParameter("start", quarterBeginning.toDate()).setParameter("end",
+            quarterBeginning.plusMonths(3).toDate());
+  }
+
+  /** Create a Partial from an Instant extracting month and day. */
+  private Partial partialize(ReadableInstant instant) {
+    return partial(instant.get(DateTimeFieldType.monthOfYear()), instant.get(DateTimeFieldType.dayOfMonth()));
+  }
+
+  private DateTimeFieldType[] getPartialFields() {
+    if (partialFields == null) {
+      partialFields = array(DateTimeFieldType.monthOfYear(), DateTimeFieldType.dayOfMonth());
+    }
+    return partialFields;
+  }
+
+  /** Create a Partial consisting of only month and day. */
+  private Partial partial(int month, int dayOfMonth) {
+    return new Partial(getPartialFields(), new int[] { month, dayOfMonth });
+  }
+
 }

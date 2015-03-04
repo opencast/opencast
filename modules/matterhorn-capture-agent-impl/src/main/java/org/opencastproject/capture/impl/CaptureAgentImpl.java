@@ -82,8 +82,6 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
@@ -648,7 +646,7 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
       MediaPackage mp = recording.getMediaPackage();
       for (MediaPackageElement element : mp.elements()) {
         if (element.getURI() != null) {
-          element.setURI(new URI(serializer.encodeURI(element.getURI())));
+          element.setURI(element.getURI());
         }
       }
       fos = new FileOutputStream(manifestFile);
@@ -660,10 +658,6 @@ public class CaptureAgentImpl implements CaptureAgent, StateService, ManagedServ
       return false;
     } catch (IOException e) {
       logger.error("I/O Exception: {}.", e);
-      setRecordingState(recording.getID(), RecordingState.MANIFEST_ERROR);
-      return false;
-    } catch (URISyntaxException e) {
-      logger.error("URI Syntax Exception: {}.", e);
       setRecordingState(recording.getID(), RecordingState.MANIFEST_ERROR);
       return false;
     } finally {

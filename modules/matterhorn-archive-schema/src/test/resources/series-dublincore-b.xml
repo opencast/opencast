@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:dcterms="http://purl.org/dc/terms/">
+
+  <dcterms:title xml:lang="en">
+    British literature
+  </dcterms:title>
+  <dcterms:identifier>
+    series-b
+  </dcterms:identifier>
+</dublincore>

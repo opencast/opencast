@@ -15,14 +15,16 @@
  */
 package org.opencastproject.scheduler.impl.persistence;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.util.NotFoundException;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import junit.framework.Assert;
 
 import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
@@ -90,10 +92,10 @@ public class SchedulerServiceDatabaseImplTest {
 
     schedulerDatabase.storeEvents(firstCatalog);
     schedulerDatabase.updateEvent(firstCatalog);
-    Assert.assertTrue("Should contain only one event", schedulerDatabase.getAllEvents().length == 1);
+    assertTrue("Should contain only one event", schedulerDatabase.getAllEvents().length == 1);
 
     schedulerDatabase.storeEvents(secondCatalog);
-    Assert.assertTrue("Should contain two events", schedulerDatabase.getAllEvents().length == 2);
+    assertTrue("Should contain two events", schedulerDatabase.getAllEvents().length == 2);
   }
 
   @Test
@@ -109,11 +111,11 @@ public class SchedulerServiceDatabaseImplTest {
     schedulerDatabase.updateEventWithMetadata(1, properties);
 
     Properties caProperties = schedulerDatabase.getEventMetadata(1);
-    Assert.assertNotNull("Metadata properties should be stored", caProperties);
+    assertNotNull("Metadata properties should be stored", caProperties);
 
     try {
       schedulerDatabase.updateEventWithMetadata(2, properties);
-      Assert.fail("Should fail with not found exception");
+      fail("Should fail with not found exception");
     } catch (NotFoundException e) {
     }
   }

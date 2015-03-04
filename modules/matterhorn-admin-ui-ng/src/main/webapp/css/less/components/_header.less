@@ -1,0 +1,484 @@
+// Main Header
+// ----------------------------------------
+
+.primary-header {
+    @height: 50px;
+    .size(100%, @height);
+    .box-shadow(0px 1px 3px 1px rgba(0,0,0,.3));
+    position: relative;
+    border-bottom: 1px solid #1d3041;
+    #gradient > .vertical(#388ed6, #2075b1);
+
+    .header-branding {
+        width: 200px;
+        float: left;
+        padding: 16px 20px 18px;
+    }
+
+    .logo {
+        float: left;
+        @width: @logo-width;
+        @height: @logo-height;
+        display: inline-block;
+        margin-left: @side-margin;
+        .size(@width, @height);
+        .retina-image("@{img-path}@{logo-file}", "@{img-path}@{logo-retina-file}", @width, @height);
+    }
+
+    .text-logo {
+        display: inline-block;
+        padding-bottom: 2px;
+        float: left;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 17px;
+        color: darken(@l-blue, 25%);
+        text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .logo-tag {
+        float: left;
+        margin-left: 8px;
+        margin-top: 1px;
+        background: darken(@l-blue, 15%);
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.1);
+        border-radius: 3px;
+        display: inline-block;
+        padding: 3px 5px;
+        color: lighten(@l-blue, 2%);
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        font-size: 10px;
+        font-weight: 400;
+        text-transform: uppercase;
+        cursor: default;
+    }
+}
+
+
+// Navigation Dropdown Container
+// ----------------------------------------
+
+.nav-dd-container {
+    float: right;
+    margin-right: @side-margin;
+    margin-top: 13px;
+
+    // Nav items
+    > div {
+        color: #fff;
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 12px;
+        position: relative;
+        margin-left: 15px;
+        cursor: pointer;
+
+        > ul {
+            .dd-ul-style(large);
+            position: absolute;
+            z-index: @max-z;
+            border-top: none;
+
+            // Top arrow.
+            &:after {
+                content: "";
+                position: absolute;
+                top: -7px;
+                right: 15px;
+                width: 0;
+                height: 0;
+                border-left: 7px solid transparent;
+                border-right: 7px solid transparent;
+                border-bottom: 7px solid @body-background;
+            }
+
+        } // > ul
+
+        &.active {
+            > ul {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            // Rotate icon.
+            > i {
+                .rotate(180deg);
+            }
+
+        } // &.active
+
+    } // > div
+
+    // Specific nav elements
+    .user {
+        display: inline-block;
+
+        ~ ul {
+            width: 150px;
+
+            top: 31px;
+            right: -17px;
+
+            i {
+                font-size: 15px;
+                vertical-align: middle;
+                position: static !important;
+
+            } // i
+        } // ~ ul
+    } // .user
+
+    .activity {
+
+        ~ ul {
+            width: 300px;
+        }
+
+        .build-icon(auto, auto, activity, 26px, 18px);
+    }
+
+    .help {
+        margin-top: 1px;
+        .build-icon(auto, auto, help, 18px, 18px);
+
+    }
+
+    .lang {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 10px;
+
+        // Specific style to each heading nav DD
+        ~ ul {
+            width: 150px;
+            top: 37px;
+            right: -10px;
+        }
+
+        @size: 24px;
+
+        &.en {
+            .build-icon(auto, auto, english, @size, @size);
+        }
+
+        &.de {
+            .build-icon(auto, auto, german, @size, @size);
+        }
+
+        &.fr {
+            .build-icon(auto, auto, french, @size, @size);
+        }
+
+        &.es {
+            .build-icon(auto, auto, spanish, @size, @size);
+        }
+
+        &.no {
+            .build-icon(auto, auto, norwegian, @size, @size);
+        }
+
+        &.ja {
+            .build-icon(auto, auto, japanese, @size, @size);
+        }
+
+    } // .lang
+} // > nav
+
+.dropdown-icon {
+    .fa-icon(@fa-chevron-down, after, inline-block, 0 0 0 5px);
+}
+
+
+// Action Navigation Bar
+// ----------------------------------------
+
+.action-nav-bar {
+
+    @height: 80px;
+
+    .size(100%, @height);
+    position: relative;
+
+    background: @d-blue;
+
+    .btn-group {
+         float: right;
+         margin-right: @side-margin;
+         margin-top: 18px;
+
+        // btn specific styles
+        .add {
+            .btn(green-dark-bg);
+
+            &.plus-icon {
+                .fa-icon(@fa-plus, before, inline-block, 0 10px 0 0);
+            }
+
+            &.user-icon {
+                .fa-icon(@fa-user, before, inline-block, 0 10px 0 0);
+            }
+
+            &.group-icon {
+                .fa-icon(@fa-users, before, inline-block, 0 10px 0 0);
+            }
+        }
+
+        .secondary {
+             .btn(blue-dark-bg);
+
+             margin-right: 20px;
+
+             &:first-child {
+                 margin-right: 0px;
+             }
+         } // secondary
+
+        .export {
+
+            // Overide DD container
+            line-height: 0;
+            padding: 0;
+            text-shadow: none;
+            color: #fff;
+
+            // Overide size
+            .size(115px, 39px);
+
+             > i {
+                vertical-align: middle;
+
+                &:first-child {
+                    .build-icon(auto, auto, export, 19px, 16px);
+                }
+
+                &.fa-chevron-down {
+                    margin-right: 0;
+                    font-size: 10px;
+                    position: static;
+                }
+
+             } // > i
+
+         } // export
+
+        .upload {
+            > i {
+                 vertical-align: middle;
+                 .build-icon(auto, auto, upload, 19px, 16px);
+             }
+
+         } // upload
+
+    } // btn-group
+
+    // Menu top
+    .menu-top {
+        .size(80px, 42px);
+        background: #243e55;
+        .border-top-radius(4px);
+        .border(darken(#1e364b, 3%));
+        border-bottom: none;
+        cursor: pointer;
+
+        position: absolute;
+        top: 36px; left: @side-margin;
+
+        &:after {
+           content: "";
+           position: absolute;
+
+           .build-icon(13px, 29px, menu-icon, 21px, 15px);
+
+        } // &:after
+
+        &:hover {
+            &:after {
+              .build-icon(13px, 29px, menu-icon-on, 21px, 15px);
+            }
+        } // &:hover
+
+    } // menu-top
+
+    > nav {
+
+        position: absolute;
+        top: 50px; left: 120px;
+
+        > a {
+            @link-color: #5d7589;
+
+            display: inline-block;
+            color: @link-color;
+            text-align: center;
+            position: relative;
+            padding: 0 20px;
+
+            &:hover {
+                color: lighten(@link-color, 20%);
+            }
+
+            &.active {
+                font-weight: 600;
+                color: #fafafa;
+
+                .nav-btm-arrow(small);
+
+            } // &.active
+
+        } // > a
+
+    } // > nav
+
+} // action-nav-bar
+
+
+
+// Page Navigation Bar
+// ----------------------------------------
+
+// Markup Example: https://gist.github.com/mattmischuk/5dc55fd276efe3ae6949
+
+.page-nav-bar {
+
+    @dark-blue: #24425d;
+    @mid-blue: #2b77b9;
+
+    margin-bottom: 20px;
+
+    nav {
+
+        // Grey and Default
+        // ------------------------------
+
+        &.grey a,
+        a {
+            .btn(grey);
+            border: 1px solid @main-border-color;
+
+            &:not(:last-child) {
+                border-right: 1px solid @main-border-color;
+            }
+        }
+
+
+        // Dark Blue
+        // ------------------------------
+
+        &.dark-blue a {
+            .btn(blue);
+            border: 1px solid darken(@dark-blue, 5%);
+            display: inline-block;
+            padding: 12px 15px;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+            border-radius: 0;
+
+            &.active {
+                border: darken(@mid-blue, 50%);
+
+                &:not(:first-child) {
+                    border-left: 1px solid @dark-blue;
+                }
+            }
+
+            &:not(:last-child) {
+                border-right: 1px solid @dark-blue;
+            }
+        }
+
+
+        // Global
+        // ------------------------------
+
+        a,
+        .grey a,
+        .dark-blue a {
+            display: inline-block;
+            font-size: 13px;
+            border-radius: 0;
+            padding: 12px 15px;
+            margin: 0;
+
+            &:not(:first-child) {
+                margin-left: -5px;
+            }
+
+            &:first-child {
+                border-top-left-radius: @main-border-radius;
+                border-bottom-left-radius: @main-border-radius;
+            }
+
+            &:last-child {
+                border-top-right-radius: @main-border-radius;
+                border-bottom-right-radius: @main-border-radius;
+            }
+
+            // Active Page
+            // ----------------------------------------
+
+            &.active {
+                color: #fff !important;
+                text-shadow: 0px 1px 0px rgba(0,0,0,0.2);
+                border: 1px solid @l-blue;
+
+                #gradient > .vertical(lighten(@mid-blue, 20%), lighten(@mid-blue, 10%));
+                box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.2), 0px 2px 3px 1px rgba(0,0,0,.05);
+
+                &:hover {
+                    #gradient > .vertical(lighten(@mid-blue, 20%), lighten(@mid-blue, 10%));
+                }
+
+                &:active {
+                    box-shadow: none;
+                }
+            }
+        } // a, .grey a, .dark-blue a
+
+    } // nav
+} // page-nav-bar
+
+
+// Page Navigation Bar Layout Options
+// ----------------------------------------
+
+// Floats Bar to Right when within ".action-nav-bar" container
+
+.action-nav-bar .page-nav-bar {
+    display: inline-block;
+    float: right;
+    margin-top: 20px;
+    margin-right: 20px;
+}
+
+
+// Page nav container is used when you are creating a new row that includes the page title
+// Example: https://gist.github.com/mattmischuk/b4dcb1e245f00b21c6a6
+
+.page-nav-container {
+    .clearfix();
+    width: 100%;
+
+    .page-nav-bar {
+        margin: 20px auto 0;
+        width: 100%;
+        text-align: center;
+
+        a {
+            box-shadow: none;
+        }
+
+        &.span-5 a {
+            width: 20%;
+            padding: 12px 0;
+
+            &:nth-child(even) { margin-left: -6px; }
+            &:nth-child(odd) { margin-left: -7px; }
+            &:first-child { margin-left: 0; }
+        }
+    }
+
+    .active {
+        position: relative;
+        z-index: 10;
+    }
+}

@@ -135,7 +135,7 @@ public class VideoSegmenterTest {
     });
     EasyMock.replay(workspace);
 
-    User anonymous = new JaxbUser("anonymous", new DefaultOrganization(), new JaxbRole(
+    User anonymous = new JaxbUser("anonymous", "test", new DefaultOrganization(), new JaxbRole(
             DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, new DefaultOrganization()));
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();

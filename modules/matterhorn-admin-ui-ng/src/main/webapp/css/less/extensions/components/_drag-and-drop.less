@@ -1,0 +1,77 @@
+.drag-drop-items {
+    .box-sizing();
+    padding: 15px 10px;
+
+    .drag-item {
+        .user-select(none);
+        height: 35px;
+        width: 100%;
+        border-radius: @main-border-radius;
+        cursor: move;
+        .border(@main-border-color);
+        #gradient > .vertical(#fff, #f3f5f6);
+        color: darken(#8c939b, 10%);
+        font-weight: 600;
+        text-shadow: 0px 1px 0px #fff;
+        font-size: 13px;
+        position: relative;
+        margin: 10px 0;
+        box-shadow: 0 0 0 rgba(0,0,0,0);
+        .transition(box-shadow .3s ease-in-out);
+        
+        .title {
+            padding: 10px;
+            padding-left: 32px;
+        }
+
+        &:hover {
+            #gradient > .vertical(#fff, darken(#f3f5f6, 2%));
+        }
+        
+        &:active,
+        &.being-dragged {
+            #gradient > .vertical(darken(#fff, 2%), darken(#f3f5f6, 3%)); 
+            cursor: move;
+            .border(darken(@main-border-color, 5%));
+            box-shadow: 0 0 4px rgba(0,0,0,0.1);
+        }
+            
+        &:first-child {
+           margin-top: 0; 
+        }
+        
+        &:last-child {
+           margin-bottom: 50px; 
+        }
+        
+        // Grip Dots
+        
+        &:before {
+            width: 13px;
+            height: 14px;
+            content: "";
+            position: absolute;
+            top: 12px;
+            left: 10px;
+            .retina-image("@{img-path}grip.png", "@{img-path}grip@2x.png", 13px, 14px);
+        }
+        
+        // Item Move Buttons
+        
+        .move-item {
+            height: 17px;
+            width: 17px;
+            position: absolute;
+            top: 9px;
+            right: 10px;
+
+            &.add {
+                .retina-image("@{img-path}plus-icon.png", "@{img-path}plus-icon@2x.png", 17px, 17px);
+            }
+        
+            &.remove {
+                .retina-image("@{img-path}remove-icon.png", "@{img-path}remove-icon@2x.png", 17px, 17px);
+            }
+        }
+    }
+}

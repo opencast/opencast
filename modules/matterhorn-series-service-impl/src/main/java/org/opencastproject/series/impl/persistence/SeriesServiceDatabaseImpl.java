@@ -15,26 +15,27 @@
  */
 package org.opencastproject.series.impl.persistence;
 
-import static org.opencastproject.series.api.SeriesService.CONTRIBUTE_CONTENT_PERMISSION;
-import static org.opencastproject.series.api.SeriesService.EDIT_SERIES_PERMISSION;
-import static org.opencastproject.series.api.SeriesService.READ_CONTENT_PERMISSION;
-
+import com.entwinemedia.fn.data.Opt;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
+import org.opencastproject.security.api.AccessControlParsingException;
 import org.opencastproject.security.api.AccessControlUtil;
-import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.series.impl.SeriesServiceDatabase;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,7 +172,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   *
+   * 
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#deleteSeries(java.lang.String)
    */
   @Override
@@ -190,7 +191,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, EDIT_SERIES_PERMISSION)) {
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
           throw new UnauthorizedException(currentUser + " is not authorized to update series " + seriesId);
         }
       }
@@ -211,7 +212,52 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   *
+   * 
+   * @see org.opencastproject.series.impl.SeriesServiceDatabase#deleteSeriesProperty(java.lang.String)
+   */
+  @Override
+  public void deleteSeriesProperty(String seriesId, String propertyName) throws SeriesServiceDatabaseException,
+          NotFoundException {
+    EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
+    try {
+      tx.begin();
+      SeriesEntity entity = getSeriesEntity(seriesId, em);
+      if (entity == null) {
+        throw new NotFoundException("Series with ID " + seriesId + " does not exist");
+      }
+      Map<String, String> properties = entity.getProperties();
+      String propertyValue = properties.get(propertyName);
+      if (propertyValue == null) {
+        throw new NotFoundException("Series with ID " + seriesId + " doesn't have a property with name '"
+                + propertyName + "'");
+      }
+
+      if (!userHasWriteAccess(entity)) {
+        throw new UnauthorizedException(securityService.getUser() + " is not authorized to delete series " + seriesId
+                + " property " + propertyName);
+      }
+
+      properties.remove(propertyName);
+      entity.setProperties(properties);
+      em.merge(entity);
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not delete series: {}", e.getMessage());
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw new SeriesServiceDatabaseException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#getAllSeries()
    */
   @SuppressWarnings("unchecked")
@@ -221,7 +267,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     Query query = em.createNamedQuery("Series.findAll");
     List<SeriesEntity> seriesEntities = null;
     try {
-      seriesEntities = (List<SeriesEntity>) query.getResultList();
+      seriesEntities = query.getResultList();
     } catch (Exception e) {
       logger.error("Could not retrieve all series: {}", e.getMessage());
       throw new SeriesServiceDatabaseException(e);
@@ -243,7 +289,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   *
+   * 
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#getAccessControlList(java.lang.String)
    */
   @Override
@@ -272,7 +318,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   *
+   * 
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#storeSeries(org.opencastproject.metadata.dublincore.
    * DublinCoreCatalog)
    */
@@ -311,7 +357,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
           User currentUser = securityService.getUser();
           Organization currentOrg = securityService.getOrganization();
-          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, EDIT_SERIES_PERMISSION)) {
+          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
             throw new UnauthorizedException(currentUser + " is not authorized to update series " + seriesId);
           }
         }
@@ -354,9 +400,10 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
         // There are several reasons a user may need to load a series: to read content, to edit it, or add content
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ_CONTENT_PERMISSION)
-                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, CONTRIBUTE_CONTENT_PERMISSION)
-                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, EDIT_SERIES_PERMISSION)) {
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
+                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg,
+                        Permissions.Action.CONTRIBUTE.toString())
+                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
           throw new UnauthorizedException(currentUser + " is not authorized to see series " + seriesId);
         }
       }
@@ -374,9 +421,113 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.series.impl.SeriesServiceDatabase#getSeriesProperties(java.lang.String)
+   */
+  @Override
+  public Map<String, String> getSeriesProperties(String seriesId) throws NotFoundException,
+          SeriesServiceDatabaseException {
+    EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
+    try {
+      tx.begin();
+      SeriesEntity entity = getSeriesEntity(seriesId, em);
+      if (entity == null) {
+        throw new NotFoundException("No series with id=" + seriesId + " exists");
+      }
+      if (!userHasReadAccess(entity)) {
+        throw new UnauthorizedException(securityService.getUser() + " is not authorized to see series " + seriesId
+                + " properties");
+      }
+      return entity.getProperties();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not update series: {}", e.getMessage());
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw new SeriesServiceDatabaseException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.series.impl.SeriesServiceDatabase#getSeriesProperty(java.lang.String, java.lang.String)
+   */
+  @Override
+  public String getSeriesProperty(String seriesId, String propertyName) throws NotFoundException,
+          SeriesServiceDatabaseException {
+    EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
+    try {
+      tx.begin();
+      SeriesEntity entity = getSeriesEntity(seriesId, em);
+      if (entity == null) {
+        throw new NotFoundException("No series with id=" + seriesId + " exists");
+      }
+      if (!userHasReadAccess(entity)) {
+        throw new UnauthorizedException(securityService.getUser() + " is not authorized to see series " + seriesId
+                + " properties");
+      }
+      if (entity.getProperties() == null || StringUtils.isBlank(entity.getProperties().get(propertyName))) {
+        throw new NotFoundException("No series property for series with id=" + seriesId + " and property name "
+                + propertyName);
+      }
+      return entity.getProperties().get(propertyName);
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not update series: {}", e.getMessage());
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw new SeriesServiceDatabaseException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  private boolean userHasWriteAccess(SeriesEntity entity) throws IOException, AccessControlParsingException {
+    // Ensure this user is allowed to write this series
+    String accessControlXml = entity.getAccessControl();
+    if (accessControlXml != null) {
+      AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
+      User currentUser = securityService.getUser();
+      Organization currentOrg = securityService.getOrganization();
+      if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean userHasReadAccess(SeriesEntity entity) throws IOException, AccessControlParsingException {
+    // Ensure this user is allowed to read this series
+    String accessControlXml = entity.getAccessControl();
+    if (accessControlXml != null) {
+      AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
+      User currentUser = securityService.getUser();
+      Organization currentOrg = securityService.getOrganization();
+      // There are several reasons a user may need to load a series: to read content, to edit it, or add content
+      if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
+              && !AccessControlUtil
+                      .isAuthorized(acl, currentUser, currentOrg, Permissions.Action.CONTRIBUTE.toString())
+              && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   /*
    * (non-Javadoc)
-   *
+   * 
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#storeSeriesAccessControl(java.lang.String,
    * org.opencastproject.security.api.AccessControlList)
    */
@@ -411,7 +562,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
           User currentUser = securityService.getUser();
           Organization currentOrg = securityService.getOrganization();
-          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, EDIT_SERIES_PERMISSION)) {
+          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
             throw new UnauthorizedException(currentUser + " is not authorized to update ACLs on series " + seriesId);
           }
         }
@@ -434,6 +585,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     }
   }
 
+  @Override
   public int countSeries() throws SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
     Query query = em.createNamedQuery("Series.getCount");
@@ -445,6 +597,103 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       throw new SeriesServiceDatabaseException(e);
     } finally {
       em.close();
+    }
+  }
+
+  @Override
+  public boolean isOptOut(String seriesId) throws NotFoundException, SeriesServiceDatabaseException {
+    EntityManager em = emf.createEntityManager();
+    try {
+      SeriesEntity entity = getSeriesEntity(seriesId, em);
+      if (entity == null) {
+        throw new NotFoundException("Could not found series with ID " + seriesId);
+      }
+      return entity.isOptOut();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not retrieve opt out status for series '{}': {}", seriesId, ExceptionUtils.getStackTrace(e));
+      throw new SeriesServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public void updateSeriesProperty(String seriesId, String propertyName, String propertyValue)
+          throws NotFoundException, SeriesServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      SeriesEntity entity = getSeriesEntity(seriesId, em);
+      if (entity == null) {
+        throw new NotFoundException("Series with ID " + seriesId + " doesn't exist");
+      }
+
+      if (!userHasWriteAccess(entity)) {
+        throw new UnauthorizedException(securityService.getUser() + " is not authorized to update series " + seriesId
+                + " property " + propertyName + " to " + propertyValue);
+      }
+
+      Map<String, String> properties = entity.getProperties();
+      properties.put(propertyName, propertyValue);
+      entity.setProperties(properties);
+      em.merge(entity);
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      logger.error("Couldn't update series {} with property: {}:{} because {}", new Object[] { seriesId, propertyName,
+              propertyValue, ExceptionUtils.getStackTrace(e) });
+      throw new SeriesServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * Updates a series' opt out status.
+   *
+   * @param seriesId
+   *          The id of the series to update the opt out status of.
+   * @param optOut
+   *          Whether to opt out this series or not.
+   */
+  @Override
+  public void updateOptOutStatus(String seriesId, boolean optOut) throws NotFoundException,
+          SeriesServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      SeriesEntity entity = getSeriesEntity(seriesId, em);
+      if (entity == null)
+        throw new NotFoundException("Series with ID " + seriesId + " does not exist");
+
+      entity.setOptOut(optOut);
+      em.merge(entity);
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      logger.error("Could not update series opted out status: {}", e.getMessage());
+      throw new SeriesServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
     }
   }
 
@@ -465,5 +714,121 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (NoResultException e) {
       return null;
     }
+  }
+
+  @Override
+  public boolean storeSeriesElement(String seriesId, String type, byte[] data) throws SeriesServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    final boolean success;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      SeriesEntity series = getSeriesEntity(seriesId, em);
+      if (series == null) {
+        success = false;
+      } else {
+        series.addElement(type, data);
+        em.merge(series);
+        tx.commit();
+        success = true;
+      }
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw new SeriesServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+    return success;
+  }
+
+  @Override
+  public boolean deleteSeriesElement(String seriesId, String type) throws SeriesServiceDatabaseException {
+    final boolean success;
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      SeriesEntity series = getSeriesEntity(seriesId, em);
+      if (series == null) {
+        success = false;
+      } else {
+        if (series.getElements().containsKey(type)) {
+          series.removeElement(type);
+          em.merge(series);
+          tx.commit();
+          success = true;
+        } else {
+          success = false;
+        }
+      }
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw new SeriesServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+    return success;
+  }
+
+  @Override
+  public Opt<byte[]> getSeriesElement(String seriesId, String type) throws SeriesServiceDatabaseException {
+    final Opt<byte[]> data;
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      SeriesEntity series = getSeriesEntity(seriesId, em);
+      if (series == null) {
+        data = Opt.none();
+      } else {
+        Map<String, byte[]> elements = series.getElements();
+        if (elements.containsKey(type))
+          data = Opt.some(elements.get(type));
+        else {
+          data = Opt.none();
+        }
+      }
+    } catch (Exception e) {
+      throw new SeriesServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+    return data;
+  }
+
+  @Override
+  public Opt<Map<String, byte[]>> getSeriesElements(String seriesId) throws SeriesServiceDatabaseException {
+    final Opt<Map<String, byte[]>> elements;
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      SeriesEntity series = getSeriesEntity(seriesId, em);
+      if (series == null) {
+        elements = Opt.none();
+      } else {
+        elements = Opt.some(series.getElements());
+      }
+    } catch (Exception e) {
+      throw new SeriesServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+    return elements;
+  }
+
+  @Override
+  public boolean existsSeriesElement(String seriesId, String type) throws SeriesServiceDatabaseException {
+    return (getSeriesElement(seriesId, type).isSome()) ? true : false;
   }
 }

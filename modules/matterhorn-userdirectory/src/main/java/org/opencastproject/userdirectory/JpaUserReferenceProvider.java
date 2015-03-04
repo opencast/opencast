@@ -22,6 +22,10 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -48,6 +53,8 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaUserReferenceProvider.class);
+
+  public static final String PROVIDER_NAME = "matterhorn-reference";
 
   /** Username constant used in JSON formatted users */
   public static final String USERNAME = "username";
@@ -65,6 +72,15 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
   protected SecurityService securityService = null;
 
   protected Map<String, Object> persistenceProperties;
+
+  /** The delimiter for the User cache */
+  private static final String DELIMITER = ";==;";
+
+  /** A cache of users, which lightens the load on the SQL server */
+  private LoadingCache<String, Object> cache = null;
+
+  /** A token to store in the miss cache */
+  protected final Object nullToken = new Object();
 
   /**
    * @param persistenceProvider
@@ -102,6 +118,17 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
   public void activate(ComponentContext cc) {
     logger.debug("activate");
 
+    // Setup the caches
+    cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, Object>() {
+      @Override
+      public Object load(String id) {
+        String[] key = id.split(DELIMITER);
+        logger.trace("Loading user '{}':'{}' from reference database", key[0], key[1]);
+        User user = loadUser(key[0], key[1]);
+        return user == null ? nullToken : user;
+      }
+    });
+
     // Set up persistence
     emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.userdirectory", persistenceProperties);
   }
@@ -113,6 +140,11 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
     if (emf != null && emf.isOpen()) {
       emf.close();
     }
+  }
+
+  @Override
+  public String getName() {
+    return PROVIDER_NAME;
   }
 
   /**
@@ -175,7 +207,25 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
   @Override
   public User loadUser(String userName) {
     String orgId = securityService.getOrganization().getId();
-    JpaUserReference userReference = findUserReference(userName, orgId, emf);
+    Object user = cache.getUnchecked(userName.concat(DELIMITER).concat(orgId));
+    if (user == nullToken) {
+      return null;
+    } else {
+      return (User) user;
+    }
+  }
+
+  /**
+   * Loads a user from persistence
+   *
+   * @param userName
+   *          the user name
+   * @param organization
+   *          the organization id
+   * @return the loaded user or <code>null</code> if not found
+   */
+  private User loadUser(String userName, String organization) {
+    JpaUserReference userReference = findUserReference(userName, organization, emf);
     if (userReference != null)
       return userReference.toUser();
     return null;
@@ -240,6 +290,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
         throw new IllegalStateException("User '" + user.getUsername() + "' already exists");
       }
       tx.commit();
+      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser());
     } finally {
       if (tx.isActive()) {
         tx.rollback();
@@ -270,6 +321,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
         em.merge(foundUserRef);
       }
       tx.commit();
+      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser());
     } finally {
       if (tx.isActive()) {
         tx.rollback();
@@ -376,6 +428,12 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
       if (em != null)
         em.close();
     }
+  }
+
+  @Override
+  public void invalidate(String userName) {
+    String orgId = securityService.getOrganization().getId();
+    cache.invalidate(userName.concat(DELIMITER).concat(orgId));
   }
 
 }

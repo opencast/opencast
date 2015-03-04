@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.adminui.endpoint.LanguageServiceEndpoint" immediate="true">
+  
+  <implementation class="org.opencastproject.adminui.endpoint.LanguageServiceEndpoint" />
+ 
+  <service>
+    <provide interface="org.opencastproject.adminui.endpoint.LanguageServiceEndpoint" />
+  </service>
+  
+  <property name="service.description" value="Translation File information, utilities about languages" />
+  <property name="opencast.service.type" value="org.opencastproject.adminui.i18n" />
+  <property name="opencast.service.path" value="/i18n" />
+  
+  <reference name="languageService" interface="org.opencastproject.adminui.api.LanguageService"
+    cardinality="1..1" policy="static" bind="setLanguageService" />
+    
+</scr:component>

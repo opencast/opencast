@@ -1,0 +1,103 @@
+.keyboard-shortcuts {
+    position: relative;
+}
+
+.shortcuts-popover {
+
+    // Floating Position
+    position: absolute;
+    top: -2px;
+    right: 30px;
+    z-index: @z-90;
+
+    // Dimensions
+    width: 250px;
+
+    .popover-container {
+        // Styling
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 5px 10px rgba(0,0,0,0.05);
+        border-radius: @main-border-radius;
+    }
+}
+
+.keyboard-shortcuts .shortcuts-popover::after {
+    content: "";
+    display: block;
+    margin: 0;
+    .transition(margin 350ms ease-in-out);
+}
+
+.keyboard-shortcuts.active .shortcuts-popover::after {
+    margin-bottom: 100px;
+}
+
+// Triangle Point
+
+@point-top-margin: 9px;
+@point-width: 10px;
+@point-height: 7px;
+@parent-border-stroke: 1px;
+
+
+.right-triangle-point-common {
+    content: "";
+    position: absolute;
+    top: @point-top-margin;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: @point-height 0 @point-height @point-width;
+}
+
+.popover-header {
+    &:extend(.popover-container);
+
+    #gradient > .vertical(#fff, #f7f7f7);
+    .border(@main-border-color);
+    .border-top-radius(@main-border-radius);
+    box-shadow: inset 0 1px 0px 0px #fff, 0 0 2px rgba(0,0,0,.05);
+    color: @grey;
+    text-shadow: 0 1px 0 #fff;
+    text-align: center;
+    padding: 8px;
+
+
+    p {
+        font-size: 12px;
+        font-weight: @weight-semibold;
+    }
+}
+
+
+.popover-table-column {
+    float: left;
+}
+
+.popover-body {
+    &:extend(.popover-container);
+    .border(@main-border-color);
+    .border-bottom-radius(@main-border-radius);
+    border-top: 0;
+    background: #fff;
+
+    color: @black-30;
+    font-weight: @weight-semibold;
+    font-size: 11px;
+
+    .row {
+        .clearfix();
+    }
+
+    .shortcut-description {
+        &:extend(.popover-table-column);
+        @gutter: 2.5%;
+        width: 72% - @gutter;
+        margin-right: @gutter;
+    }
+
+    .shortcut-input {
+        &:extend(.popover-table-column);
+        width: 28%;
+        text-align: right;
+    }
+}

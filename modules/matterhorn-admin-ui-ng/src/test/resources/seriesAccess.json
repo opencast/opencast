@@ -1,0 +1,30 @@
+{
+   "system_acls":[
+      {
+         "id":43,
+         "name":"Public"
+      },
+      {
+         "id":44,
+         "name":"Private"
+      }
+   ],
+   "series_access":{
+      "current_acl":43,
+      "transitions":[
+         {
+            "id":2,
+            "application_date":"2014-06-05T15:00:00Z",
+            "done":false,
+            "acl_id":43,
+            "override_episodes":true
+         }
+      ],
+      "acl":"{\"acl\":{\"ace\":{\"allow\":true,\"action\":\"read\",\"role\":\"ROLE_ANONYMOUS\"}}}",
+      "privileges":{
+         "ROLE_ANONYMOUS":{
+            "read":true
+         }
+      }
+   }
+}

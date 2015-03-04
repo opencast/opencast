@@ -1,0 +1,13 @@
+{
+    "id": 5,
+    "failed_attempts": 0,
+    "description": "Archive",
+    "name": "archive",
+    "state": "INSTANTIATED",
+    "execution_Host": "",
+    "job": 3,
+    "max_attempts": 1,
+    "fail_on_error": true,
+    "retry_strategy": "NONE",
+    "exception_handler_workflow": "error"
+}

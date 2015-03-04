@@ -1,0 +1,8 @@
+{
+   "readOnly":false,
+   "id":"endDate",
+   "label":"EVENTS.EVENTS.DETAILS.METADATA.END_DATE",
+   "type":"date",
+   "value":"2014-11-05",
+   "required":false
+}

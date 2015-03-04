@@ -38,6 +38,9 @@ public interface SolrFields {
   /** The key representing the roles that can read the series */
   String ACCESS_CONTROL_READ = "acl_read";
 
+  /** The key representing the opt out status */
+  String OPT_OUT = "opt_out";
+
   /** Dublin core fields */
   String TITLE_KEY = "dc_title";
   String SUBJECT_KEY = "dc_subject";

@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForCustomConfig;
 
 import org.opencastproject.rest.RestServiceTestEnv;
+import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.UrlSupport;
 
@@ -48,6 +49,9 @@ import javax.ws.rs.core.Response;
 
 public class OsgiAclServiceRestEndpointTest {
 
+  private static final String NEW_ROLE = "NEW_ROLE";
+  private static final String SERIES_10_INSTRUCTOR_ROLE = "SERIES_10_INSTRUCTOR";
+
   private static final int OK = Response.Status.OK.getStatusCode();
   private static final int NO_CONTENT = Response.Status.NO_CONTENT.getStatusCode();
   private static final int NOT_FOUND = Response.Status.NOT_FOUND.getStatusCode();
@@ -59,12 +63,11 @@ public class OsgiAclServiceRestEndpointTest {
 
   private static Long privateAclId;
   private static Long publicAclId;
+  private String publicAcl = "{\"acl\": {\"ace\": {\"allow\":true, \"action\":\"read\", \"role\":\"SERIES_10_INSTRUCTOR\" }}}";
+  private String privateAcl = "{\"acl\": {\"ace\": {\"allow\":false, \"action\":\"read\", \"role\":\"SERIES_10_INSTRUCTOR\" }}}";
 
   @Before
   public void setUpTest() throws Exception {
-    String publicAcl = "{\"acl\": {\"ace\": {\"allow\":true, \"action\":\"read\", \"role\":\"SERIES_10_INSTRUCTOR\" }}}";
-    String privateAcl = "{\"acl\": {\"ace\": {\"allow\":false, \"action\":\"read\", \"role\":\"SERIES_10_INSTRUCTOR\" }}}";
-
     publicAclId = extractAclId(given().formParam("name", "Public").formParam("acl", publicAcl).expect().statusCode(OK)
             .when().post(host("/acl")));
 
@@ -76,6 +79,121 @@ public class OsgiAclServiceRestEndpointTest {
   public void tearDownTest() throws Exception {
     given().pathParam("aclId", publicAclId).when().delete(host("/acl/{aclId}"));
     given().pathParam("aclId", privateAclId).when().delete(host("/acl/{aclId}"));
+  }
+
+  @Test
+  public void testAclExtendInputDifferentRoleExpectsAdded() {
+    given().formParam("acl", publicAcl).formParam("action", Action.READ.toString()).formParam("role", NEW_ROLE).formParam("allow", true)
+
+    .expect()
+    .body("ace[0].role", equalTo(SERIES_10_INSTRUCTOR_ROLE))
+    .body("ace[0].action", equalTo(Action.READ.toString()))
+    .body("ace[0].allow", equalTo(true))
+
+    .body("ace[1].role", equalTo(NEW_ROLE))
+    .body("ace[1].action", equalTo(Action.READ.toString()))
+    .body("ace[1].allow", equalTo(true))
+
+    .statusCode(OK).when().post(host("/acl/extend"));
+  }
+
+  @Test
+  public void testAclExtendInputDifferentActionExpectsAdded() {
+    given().formParam("acl", publicAcl).formParam("action", Action.WRITE.toString()).formParam("role", SERIES_10_INSTRUCTOR_ROLE).formParam("allow", true)
+
+    .expect()
+    .body("ace[0].role", equalTo(SERIES_10_INSTRUCTOR_ROLE))
+    .body("ace[0].action", equalTo(Action.READ.toString()))
+    .body("ace[0].allow", equalTo(true))
+
+    .body("ace[1].role", equalTo(SERIES_10_INSTRUCTOR_ROLE))
+    .body("ace[1].action", equalTo(Action.WRITE.toString()))
+    .body("ace[1].allow", equalTo(true))
+
+    .statusCode(OK).when().post(host("/acl/extend"));
+  }
+
+  @Test
+  public void testAclExtendInputDifferentAllowExpectsUpdated() {
+    given().formParam("acl", publicAcl).formParam("action", Action.READ.toString()).formParam("role", SERIES_10_INSTRUCTOR_ROLE).formParam("allow", false)
+    .expect()
+    .body("ace[0].role", equalTo(SERIES_10_INSTRUCTOR_ROLE))
+    .body("ace[0].action", equalTo(Action.READ.toString()))
+    .body("ace[0].allow", equalTo(false))
+    .statusCode(OK).when().post(host("/acl/extend"));
+  }
+
+  @Test
+  public void testAclExtendInputRoleAlreadyAddedExpectsSameAcl() {
+    given().formParam("acl", publicAcl).formParam("action", Action.READ.toString()).formParam("role", SERIES_10_INSTRUCTOR_ROLE).formParam("allow", true)
+    .expect()
+    .body("ace[0].role", equalTo(SERIES_10_INSTRUCTOR_ROLE))
+    .body("ace[0].action", equalTo(Action.READ.toString()))
+    .body("ace[0].allow", equalTo(true))
+    .statusCode(OK).when().post(host("/acl/extend"));
+  }
+
+  @Test
+  public void testAclExtendInputEmptyAclExpectsBadRequest() {
+    given().formParam("acl", "").formParam("action", "write").formParam("role", NEW_ROLE).expect()
+            .statusCode(BAD_REQUEST).when().post(host("/acl/extend"));
+  }
+
+  @Test
+  public void testAclExtendInputEmptyRoleExpectsBadRequest() {
+    given().formParam("acl", publicAcl).formParam("action", "write").formParam("role", "").expect()
+            .statusCode(BAD_REQUEST).when().post(host("/acl/extend"));
+  }
+
+  @Test
+  public void testAclExtendInputEmptyActionExpectsBadRequest() {
+    given().formParam("acl", publicAcl).formParam("action", "").formParam("role", NEW_ROLE).expect()
+            .statusCode(BAD_REQUEST).when().post(host("/acl/extend"));
+  }
+
+  @Test
+  public void testAclReduceInputExistingAceExpectsAceGone() {
+    given().formParam("acl", publicAcl).formParam("action", Action.READ.toString())
+            .formParam("role", SERIES_10_INSTRUCTOR_ROLE).expect().body(containsString("{\"ace\":[]}")).statusCode(OK)
+            .when().post(host("/acl/reduce"));
+  }
+
+  @Test
+  public void testAclReduceInputWrongRoleExpectsSameAcl() {
+    given().formParam("acl", publicAcl).formParam("action", Action.READ.toString()).formParam("role", NEW_ROLE)
+    .expect()
+    .body("ace[0].role", equalTo(SERIES_10_INSTRUCTOR_ROLE))
+    .body("ace[0].action", equalTo(Action.READ.toString()))
+    .body("ace[0].allow", equalTo(true))
+    .statusCode(OK).when().post(host("/acl/reduce"));
+  }
+
+  @Test
+  public void testAclReduceInputWrongActionExpectsSameAcl() {
+    given().formParam("acl", publicAcl).formParam("action", Action.WRITE.toString()).formParam("role", SERIES_10_INSTRUCTOR_ROLE)
+    .expect()
+    .body("ace[0].role", equalTo(SERIES_10_INSTRUCTOR_ROLE))
+    .body("ace[0].action", equalTo(Action.READ.toString()))
+    .body("ace[0].allow", equalTo(true))
+    .statusCode(OK).when().post(host("/acl/reduce"));
+  }
+
+  @Test
+  public void testAclReduceInputEmptyAclExpectsBadRequest() {
+    given().formParam("acl", "").formParam("action", "write").formParam("role", NEW_ROLE).expect()
+            .statusCode(BAD_REQUEST).when().post(host("/acl/reduce"));
+  }
+
+  @Test
+  public void testAclReduceInputEmptyRoleExpectsBadRequest() {
+    given().formParam("acl", publicAcl).formParam("action", "write").formParam("role", "").expect()
+            .statusCode(BAD_REQUEST).when().post(host("/acl/reduce"));
+  }
+
+  @Test
+  public void testAclReduceInputEmptyActionExpectsBadRequest() {
+    given().formParam("acl", publicAcl).formParam("action", "").formParam("role", NEW_ROLE).expect()
+            .statusCode(BAD_REQUEST).when().post(host("/acl/reduce"));
   }
 
   @Test
@@ -464,22 +582,19 @@ public class OsgiAclServiceRestEndpointTest {
   private static final RestServiceTestEnv env = testEnvForCustomConfig(TestRestService.BASE_URL,
           new ClassNamesResourceConfig(TestRestService.class, NotFoundExceptionMapper.class));
 
-  // CHECKSTYLE:OFF
   @BeforeClass
-  public static void setUp() throws Exception {
+  public static void oneTimeSetUp() throws Exception {
     env.setUpServer();
   }
 
   @AfterClass
-  public static void tearDownAfterClass() {
+  public static void oneTimeTearDown() {
     env.tearDownServer();
   }
 
   public static String host(String path) {
     return env.host(UrlSupport.concat("test", path));
   }
-
-  // CHECKSTYLE:ON
 
   public static class RegexMatcher extends BaseMatcher<String> {
     private final Pattern p;

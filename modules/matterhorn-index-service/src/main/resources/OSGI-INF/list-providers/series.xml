@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.index.service.resources.list.provider.SeriesListProvider" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.index.service.resources.list.provider.SeriesListProvider" />
+  <property name="service.description" value="Series list provider" />
+  <property name="opencast.service.type" value="org.opencastproject.index.service.resources.list.provider.SeriesListProvider" />
+
+  <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"
+          cardinality="1..1" policy="static" bind="setSeriesService"/>
+          
+  <service>
+     <provide interface="org.opencastproject.index.service.resources.list.api.ResourceListProvider"/>
+  </service>
+  
+</scr:component>

@@ -1,0 +1,23 @@
+<section class="action-nav-bar">
+    <admin-ng-nav></admin-ng-nav>
+    <nav>
+        <a href="#/systems/jobs" ng-class="{active: table.resource == 'jobs'}" translate="SYSTEMS.NAVIGATION.JOBS" with-role="ROLE_UI_JOBS_VIEW"><!--Jobs--></a>
+        <a href="#/systems/servers" ng-class="{active: table.resource == 'servers'}" translate="SYSTEMS.NAVIGATION.SERVERS" with-role="ROLE_UI_SERVERS_VIEW"><!--Servers--></a>
+        <a href="#/systems/services" ng-class="{active: table.resource == 'services'}" translate="SYSTEMS.NAVIGATION.SERVICES" with-role="ROLE_UI_SERVICES_VIEW"><!--Services--></a>
+    </nav>
+</section>
+
+<div class="main-view">
+    <div data-admin-ng-notifications=""></div>
+
+    <div class="controls-container">
+        <!--
+        <div data-admin-ng-table-filter="" data-filters="filters" data-namespace="table.resource"></div>
+        -->
+
+        <h1 translate="{{ table.caption }}"></h1>
+        <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.pagination.totalItems }}' }"></h4>
+
+    </div>
+    <div admin-ng-table="" table="table"></div>
+</div>

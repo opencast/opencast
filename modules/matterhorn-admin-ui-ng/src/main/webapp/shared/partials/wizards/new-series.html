@@ -1,0 +1,224 @@
+<div class="modal-content" ng-class="{active: isCurrentTab('metadata')}" data-modal-tab-content="metadata" data-level="1">
+    <p class="tab-description" translate="EVENTS.SERIES.NEW.METADATA.DESCRIPTION"></p>
+    <div class="modal-body">
+        <div class="full-col">
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="EVENTS.SERIES.NEW.METADATA.METADATA.TITLE"></header>
+                <div class="obj-container">
+                    <form novalidate name="outerForm">
+                        <table class="main-tbl">
+                            <tr ng-repeat="row in wizard.step.metadata['dublincore/series'].fields" >
+                                <td>{{ row.label | translate }} <i ng-show="row.required" class="required">*</i></td>
+                                <td ng-if="!row.readOnly" admin-ng-editable
+                                    class="editable" name="row.id"
+                                    params="row" save="$parent.wizard.save"></td>
+                                <td ng-if="row.readOnly">{{ row.value }}</td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" ng-if="wizard.step.visible" ng-class="{active: isCurrentTab('metadata-extended')}" data-modal-tab-content="metadata-extended" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div class="obj tbl-details" ng-repeat="(name, block) in wizard.step.ud">
+                <header>{{ name }}</header>
+                <div class="obj-container">
+                    <form novalidate name="outerForm">
+                        <table class="main-tbl">
+                            <tr ng-repeat="row in block.fields">
+                                <td>{{ row.label | translate }} <i ng-show="row.required" class="required">*</i></td>
+                                <td ng-if="!row.readOnly" admin-ng-editable
+                                    class="editable" name="row.id" target="{{name}}"
+                                    params="row" save="$parent.wizard.save"></td>
+                                <td ng-if="row.readOnly">{{ row.value }}</td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="access" data-level="1">
+    <p class="tab-description" translate="EVENTS.SERIES.NEW.ACCESS.DESCRIPTION"></p>
+    <div class="modal-body">
+        <div class="full-col">
+            <ul>
+                <li>
+                    <div class="obj list-obj">
+                        <header class="no-expand" translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.TITLE"></header>
+                        <div class="obj-container">
+                            <div class="obj tbl-list">
+
+                                <table class="main-tbl">
+                                <thead>
+                                    <tr>
+                                        <th translate="EVENTS.SERIES.NEW.ACCESS.TEMPLATES.TITLE"><!--Templates--></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="obj-container padded">
+                                                <p translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
+                                                <select chosen
+                                                    data-width="'200px'"
+                                                    data-disable-search-threshold="8"
+                                                    data-search_contains="true"
+                                                    ng-change="wizard.step.changeBaseAcl()"
+                                                    ng-model="wizard.step.ud.id"
+                                                    ng-options="id as name for (id, name) in wizard.step.acls"
+                                                    data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                                    no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
+                                                />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="obj-container">
+                            <div class="obj tbl-list">
+                                <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS"><!--Details--></header>
+                                <div class="obj-container">
+                                <table class="main-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ROLE"><!--Role--></th>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ACTION" class="fit"><!--Action--></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="policy in wizard.step.ud.policies">
+                                            <td>
+                                                <select chosen
+                                                    data-width="'200px'"
+                                                    data-disable-search-threshold="8"
+                                                    data-search_contains="true"
+                                                    ng-model="policy.role"
+                                                    ng-options="id as name for (id, name) in wizard.step.roles"
+                                                    data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}"
+                                                    no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
+                                                />
+                                            </td>
+                                            <td class="fit"><input type="checkbox"  ng-model="policy.read"/></td>
+                                            <td class="fit"><input type="checkbox"  ng-model="policy.write"/></td>
+                                            <td class="fit"><a ng-click="wizard.step.deletePolicy(policy)" class="remove"></a>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
+                                            <td colspan="4"><a ng-click="wizard.step.addPolicy()">+ {{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                                        <tr>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="theme" data-level="1">
+    <p class="tab-description" translate="EVENTS.SERIES.NEW.THEME.DESCRIPTION"></p>
+    <div class="modal-body">
+        <div class="full-col">
+            <div class="obj quick-actions">
+                <header class="no-expand" translate="EVENTS.SERIES.NEW.THEME.TITLE"></header>
+                <div class="obj-container padded">
+                    <p translate="EVENTS.SERIES.NEW.THEME.DESCRIPTION"></p>
+                    <select chosen
+                            allow-single-deselect="true"
+                            data-width="'200px'"
+                            data-disable-search-threshold="8"
+                            ng-model="wizard.step.ud.theme"
+                            ng-options="id as name for (id, name) in wizard.step.themes"
+                            data-placeholder="{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}"
+                            empty-
+                            no-results-text="'{{ 'EVENTS.SERIES.NEW.THEME.EMPTY' | translate }}'"
+                            >
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="summary" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div data-admin-ng-notifications="" context="series-form"></div>
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="EVENTS.SERIES.NEW.METADATA.CAPTION"></header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <tr ng-repeat="userEntry in wizard.states[0].stateController.getUserEntries()">
+                            <td>{{ userEntry.label | translate }}</td>
+                            <td>{{ userEntry.presentableValue }}</td>
+                        <tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('metadata-extended').visible">
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.METADATA_EXTENDED.CAPTION"><!--Metadata Extended--></header>
+                <div class="obj-container">
+                    <table class="main-tbl" ng-repeat="(name, block) in wizard.getStateControllerByName('metadata-extended').getUserEntries()">
+                        <tr ng-repeat="field in block.fields">
+                            <td>{{ field.label | translate }}</td>
+                            <td>{{ field.presentableValue }}</td>
+                        <tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="EVENTS.SERIES.NEW.ACCESS.CAPTION"></header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <thead>
+                            <tr>
+                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ROLE"><!--Role--></th>
+                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
+                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="policy in wizard.getStateControllerByName('access').ud.policies">
+                            <td>{{ policy.role }}</td>
+                            <td class="fit"><input type="checkbox" disabled ng-model="policy.read"/></td>
+                            <td class="fit"><input type="checkbox" disabled ng-model="policy.write"/></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="EVENTS.SERIES.NEW.THEME.CAPTION"></header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <tr>
+                            <td translate="EVENTS.SERIES.NEW.THEME.CAPTION"></td>
+                            <td ng-if="wizard.getStateControllerByName('theme').ud.theme">{{wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme]}}</td>
+                            <td ng-if="!wizard.getStateControllerByName('theme').ud.theme">-</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

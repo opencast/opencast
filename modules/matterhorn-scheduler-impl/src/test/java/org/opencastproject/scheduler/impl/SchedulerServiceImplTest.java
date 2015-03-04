@@ -48,11 +48,14 @@ import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.message.broker.api.BaseMessage;
+import org.opencastproject.message.broker.api.MessageReceiver;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -107,6 +110,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -118,6 +122,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -129,6 +135,8 @@ public class SchedulerServiceImplTest {
   private WorkflowService workflowService;
   private SeriesService seriesService;
   private Workspace workspace;
+  private MessageSender messageSender;
+  private MessageReceiver messageReceiver;
 
   private String persistenceStorage;
   private SchedulerServiceImpl schedSvc;
@@ -211,7 +219,22 @@ public class SchedulerServiceImplTest {
             workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andReturn(new URI("http://localhost:8080/test")).anyTimes();
 
-    EasyMock.replay(workflowService, seriesService, workspace);
+    messageSender = EasyMock.createNiceMock(MessageSender.class);
+
+    final BaseMessage baseMessageMock = EasyMock.createNiceMock(BaseMessage.class);
+
+    messageReceiver = EasyMock.createNiceMock(MessageReceiver.class);
+    EasyMock.expect(
+            messageReceiver.receiveSerializable(EasyMock.anyString(),
+                    EasyMock.anyObject(MessageSender.DestinationType.class))).andStubReturn(
+                            new FutureTask<Serializable>(new Callable<Serializable>() {
+                              @Override
+                              public Serializable call() throws Exception {
+                                return baseMessageMock;
+                              }
+                            }));
+
+    EasyMock.replay(workflowService, seriesService, workspace, messageSender, baseMessageMock, messageReceiver);
 
     schedSvc = new SchedulerServiceImpl();
 
@@ -221,6 +244,9 @@ public class SchedulerServiceImplTest {
     schedSvc.setIndex(index);
     schedSvc.setPersistence(schedulerDatabase);
     schedSvc.setWorkspace(workspace);
+    schedSvc.setMessageSender(messageSender);
+    schedSvc.setMessageReceiver(messageReceiver);
+    schedSvc.setDublinCoreCatalogService(new DublinCoreCatalogService());
 
     schedSvc.activate(null);
   }
@@ -529,8 +555,9 @@ public class SchedulerServiceImplTest {
     assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatus());
     Assert.assertNull(response.getEntity());
 
-    // Update the event
+    // Update the event and clear to cache to make sure it's reloaded
     schedSvc.updateEvent(eventId, event, wfPropertiesUpdated);
+    schedSvc.lastModifiedCache.invalidateAll();
 
     // Try using the same old etag. We should get a 200, since the event has changed
     response = restService.getCalendar(device, null, null, request);
@@ -571,6 +598,33 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
+  public void testEventStatus() throws Exception {
+    final long currentTime = System.currentTimeMillis();
+    final String initialTitle = "Recording 1";
+    final DublinCoreCatalog initalEvent = generateEvent("Device A", none(0L), some(initialTitle), new Date(
+            currentTime + 10 * 1000), new Date(currentTime + 3610000));
+    final Long eventId = schedSvc.addEvent(initalEvent, wfProperties);
+    schedSvc.updateCaptureAgentMetadata(
+            properties(tuple("org.opencastproject.workflow.config.archiveOp", "true"),
+                    tuple("org.opencastproject.workflow.definition", "full")), tuple(eventId, initalEvent));
+    final Properties initalCaProps = schedSvc.getEventCaptureAgentConfiguration(eventId);
+    System.out.println("Added event " + eventId);
+    checkEvent(eventId, initalCaProps, initialTitle);
+
+    String mediaPackageId = schedSvc.getMediaPackageId(eventId);
+    Assert.assertFalse(schedSvc.isOptOut(mediaPackageId));
+    Assert.assertFalse(schedSvc.isBlacklisted(mediaPackageId));
+
+    // do opt out update
+    schedSvc.updateOptOutStatus(mediaPackageId, true);
+    Assert.assertTrue(schedSvc.isOptOut(mediaPackageId));
+
+    // do blacklist update
+    schedSvc.updateBlacklistStatus(mediaPackageId, true);
+    Assert.assertTrue(schedSvc.isBlacklisted(mediaPackageId));
+  }
+
+  @Test
   /**
    * Test for failure updating past events
    *  This test construct new SchedulerService to mock the getCurrentDate method
@@ -593,8 +647,8 @@ public class SchedulerServiceImplTest {
     schedSvc2.setIndex(index);
     schedSvc2.setPersistence(schedulerDatabase);
     schedSvc2.setWorkspace(workspace);
-
-    schedSvc2.activate(null);
+    schedSvc2.setMessageSender(messageSender);
+    schedSvc2.setMessageReceiver(messageReceiver);
 
     final String initialTitle = "Recording 1";
     final DublinCoreCatalog initalEvent = generateEvent("Device A", none(0L), some(initialTitle), new Date(
@@ -644,12 +698,111 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
+  /**
+   * Test that opted out and blacklisted events don't end up in the calendar but regular events do.
+   * @throws Exception
+   */
+  public void testGetCalendarInputRegularOptedOutBlacklistedExpectsOnlyRegularEvents() throws Exception {
+    SchedulerServiceImpl schedulerServiceImpl = EasyMock.createMockBuilder(SchedulerServiceImpl.class)
+            .addMockedMethod("getCurrentDate").createMock();
+
+    // Mock the getCurrentDate method to skip to the future
+    long currentTime = System.currentTimeMillis();
+    Date futureSystemDate = new Date(currentTime + 6610000);
+    EasyMock.expect(schedulerServiceImpl.getCurrentDate()).andReturn(futureSystemDate).anyTimes();
+    EasyMock.replay(schedulerServiceImpl);
+
+    // Set the mocked interfaces
+    schedulerServiceImpl.setWorkflowService(workflowService);
+    schedulerServiceImpl.setSeriesService(seriesService);
+    schedulerServiceImpl.setIndex(index);
+    schedulerServiceImpl.setPersistence(schedulerDatabase);
+    schedulerServiceImpl.setWorkspace(workspace);
+    schedulerServiceImpl.setMessageSender(messageSender);
+    schedulerServiceImpl.setMessageReceiver(messageReceiver);
+    schedulerServiceImpl.setDublinCoreCatalogService(new DublinCoreCatalogService());
+
+    int optedOutCount = 3;
+    int blacklistedCount = 5;
+    int bothCount = 7;
+    int regularCount = 9;
+    String optedOutPrefix = "OptedOut";
+    String blacklistedPrefix = "Blacklisted";
+    String bothPrefix = "Both";
+    String regularPrefix = "Regular";
+
+    List<Long> optedOutEvents = createEvents(optedOutPrefix, optedOutCount, schedulerServiceImpl, true, false);
+    assertEquals(optedOutCount, optedOutEvents.size());
+    List<Long> blacklistedEvents = createEvents(blacklistedPrefix, blacklistedCount, schedulerServiceImpl, false, true);
+    assertEquals(blacklistedCount, blacklistedEvents.size());
+    List<Long> bothOptedOutEventsAndBlacklisted = createEvents(bothPrefix, bothCount, schedulerServiceImpl, true, true);
+    assertEquals(bothCount, bothOptedOutEventsAndBlacklisted.size());
+    List<Long> regularEvents = createEvents(regularPrefix, regularCount, schedulerServiceImpl, false, false);
+    assertEquals(regularCount, regularEvents.size());
+
+    checkEventStatus(schedulerDatabase, optedOutEvents, true, false);
+    checkEventStatus(schedulerDatabase, blacklistedEvents, false, true);
+    checkEventStatus(schedulerDatabase, bothOptedOutEventsAndBlacklisted, true, true);
+    checkEventStatus(schedulerDatabase, regularEvents, false, false);
+
+    SchedulerQuery query = new SchedulerQuery();
+    String calendar = schedulerServiceImpl.getCalendar(query);
+
+    assertEquals("There shouldn't be any events that are opted out.", -1, calendar.indexOf(optedOutPrefix));
+    assertEquals("There shouldn't be any events that are blacklisted.", -1, calendar.indexOf(blacklistedPrefix));
+    assertEquals("There shouldn't be any events that are both blacklisted and opted out.", -1,
+            calendar.indexOf(bothPrefix));
+    assertEquals("All of the regular events should be in the calendar.", regularCount,
+            getCountFromString(regularPrefix, calendar));
+  }
+
+  private int getCountFromString(String searchTerm, String value) {
+    int count = 0;
+    int index = 0;
+    while (value.indexOf(searchTerm, index) != -1) {
+      count++;
+      index = value.indexOf(searchTerm, index) + searchTerm.length();
+    }
+    return count;
+  }
+
+  private void checkEventStatus(SchedulerServiceDatabase schedulerServiceDatabase, List<Long> events, boolean optedOut,
+          boolean blacklisted) throws NotFoundException, SchedulerServiceDatabaseException {
+    for (Long eventId : events) {
+      assertEquals(optedOut, schedulerServiceDatabase.isOptOut(eventId));
+      assertEquals(blacklisted, schedulerServiceDatabase.isBlacklisted(eventId));
+    }
+  }
+
+  private List<Long> createEvents(String titlePrefix, int number, SchedulerServiceImpl schedulerServiceImpl,
+          boolean optedout, boolean blacklisted) {
+    List<Long> optedOutEvents = new ArrayList<Long>();
+    final long currentTime = System.currentTimeMillis();
+    for (int i = 0; i < number; i++) {
+
+      final DublinCoreCatalog event = generateEvent("Device A", none(0L), some(titlePrefix + "-" + i), new Date(
+              currentTime + 10 * 1000), new Date(currentTime + 3610000));
+      try {
+        long eventId = schedulerServiceImpl.addEvent(event, wfProperties);
+        String mediaPackageId = schedulerServiceImpl.getMediaPackageId(eventId);
+        schedulerServiceImpl.updateOptOutStatus(mediaPackageId, optedout);
+        schedulerServiceImpl.updateBlacklistStatus(mediaPackageId, blacklisted);
+        optedOutEvents.add(eventId);
+      } catch (Exception e) {
+        System.out.println("Exception " + e.getClass().getCanonicalName() + " message " + e.getMessage());
+      }
+    }
+    return optedOutEvents;
+  }
+
+  @Test
   public void getCutOffDateWorksForDaylightSavingsTime() {
     DateTimeZone zurichDateTimeZone = DateTimeZone.forID("Europe/Zurich");
-    /** Is a date and time that isn't around a daylight savings time Jan 1st, 2013 @ 3:00am.
-     * After the buffer is subtracted it should be Jan 1st, 2013 @ 2:00am local time, Jan 1st, 2013 1:00am GMT.
+    /**
+     * Is a date and time that isn't around a daylight savings time Jan 1st, 2013 @ 3:00am. After the buffer is
+     * subtracted it should be Jan 1st, 2013 @ 2:00am local time, Jan 1st, 2013 1:00am GMT.
      */
-    DateTime normalTime =  new DateTime(2013, 1, 2, 3, 7, zurichDateTimeZone);
+    DateTime normalTime = new DateTime(2013, 1, 2, 3, 7, zurichDateTimeZone);
     DateTime normalCutoff = SchedulerServiceImpl.getCutoffDate(3600, normalTime);
     assertEquals(2013, normalCutoff.getYear());
     assertEquals(01, normalCutoff.getMonthOfYear());
@@ -657,11 +810,12 @@ public class SchedulerServiceImplTest {
     assertEquals(01, normalCutoff.getHourOfDay());
     assertEquals(07, normalCutoff.getMinuteOfHour());
 
-    /** Sunday, March 31, 2013, 2:00:00 AM clocks were turned forward 1 hour to
-    Sunday, March 31, 2013, 3:00:00 AM local daylight time instead.
-    Therefore, March 31, 2013 @ 3:01am back 1 hour will be March 31, 2013 @ 1:01am Zurich time
-    and 0:01am GMT due to time zone difference of 1 hour. */
-    DateTime forwardTime =  new DateTime(2013, 03, 31, 3, 1, zurichDateTimeZone);
+    /**
+     * Sunday, March 31, 2013, 2:00:00 AM clocks were turned forward 1 hour to Sunday, March 31, 2013, 3:00:00 AM local
+     * daylight time instead. Therefore, March 31, 2013 @ 3:01am back 1 hour will be March 31, 2013 @ 1:01am Zurich time
+     * and 0:01am GMT due to time zone difference of 1 hour.
+     */
+    DateTime forwardTime = new DateTime(2013, 03, 31, 3, 1, zurichDateTimeZone);
     DateTime forwardCutOff = SchedulerServiceImpl.getCutoffDate(3600, forwardTime);
     assertEquals(2013, forwardCutOff.getYear());
     assertEquals(03, forwardCutOff.getMonthOfYear());
@@ -669,10 +823,11 @@ public class SchedulerServiceImplTest {
     assertEquals(00, forwardCutOff.getHourOfDay());
     assertEquals(01, forwardCutOff.getMinuteOfHour());
 
-    /** Sunday, October 27, 2013, 3:00:00 AM clocks were turned backward 1 hour to
-    Sunday, October 27, 2013, 2:00:00 AM local standard time instead.
-    Therefore, Oct. 27th, 2013 @ 2:01am back 1 hour is 1:01 am local time and 23:01 GMT.*/
-    DateTime backwardTime =  new DateTime(2013, 10, 27, 2, 1, zurichDateTimeZone);
+    /**
+     * Sunday, October 27, 2013, 3:00:00 AM clocks were turned backward 1 hour to Sunday, October 27, 2013, 2:00:00 AM
+     * local standard time instead. Therefore, Oct. 27th, 2013 @ 2:01am back 1 hour is 1:01 am local time and 23:01 GMT.
+     */
+    DateTime backwardTime = new DateTime(2013, 10, 27, 2, 1, zurichDateTimeZone);
     DateTime backwardCutoff = SchedulerServiceImpl.getCutoffDate(3600, backwardTime);
     assertEquals(2013, backwardCutoff.getYear());
     assertEquals(10, backwardCutoff.getMonthOfYear());
@@ -681,19 +836,24 @@ public class SchedulerServiceImplTest {
     assertEquals(01, backwardCutoff.getMinuteOfHour());
   }
 
-  @Test (expected = SchedulerException.class)
-  public void removeScheduledRecordingsBeforeBufferInputSchedulerExceptionExpectsIllegalStateException() throws SchedulerException, SchedulerServiceDatabaseException {
+  @Test(expected = SchedulerException.class)
+  public void removeScheduledRecordingsBeforeBufferInputSchedulerExceptionExpectsIllegalStateException()
+          throws SchedulerException, SchedulerServiceDatabaseException {
     SchedulerServiceIndex index = EasyMock.createMock(SchedulerServiceIndex.class);
-    EasyMock.expect(index.search(EasyMock.anyObject(SchedulerQuery.class))).andThrow(new SchedulerServiceDatabaseException("Mock exception"));
+    EasyMock.expect(index.search(EasyMock.anyObject(SchedulerQuery.class))).andThrow(
+            new SchedulerServiceDatabaseException("Mock exception"));
     EasyMock.replay(index);
 
     SchedulerServiceImpl service = new SchedulerServiceImpl();
     service.setIndex(index);
+    service.setMessageSender(messageSender);
+    service.setMessageReceiver(messageReceiver);
     service.removeScheduledRecordingsBeforeBuffer(0);
   }
 
   @Test
-  public void removeScheduledRecordingsBeforeBufferInputEmptyFinishedSchedulesExpectsNoException() throws SchedulerException, SchedulerServiceDatabaseException {
+  public void removeScheduledRecordingsBeforeBufferInputEmptyFinishedSchedulesExpectsNoException()
+          throws SchedulerException, SchedulerServiceDatabaseException {
     // Setup data
     LinkedList<DublinCoreCatalog> catalogs = new LinkedList<DublinCoreCatalog>();
     DublinCoreCatalogList list = new DublinCoreCatalogList(catalogs, catalogs.size());
@@ -708,7 +868,8 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
-  public void removeScheduledRecordingsBeforeBufferInputOneEventEmptyExpectsNoEventDeleted() throws SchedulerException, SchedulerServiceDatabaseException {
+  public void removeScheduledRecordingsBeforeBufferInputOneEventEmptyExpectsNoEventDeleted() throws SchedulerException,
+          SchedulerServiceDatabaseException {
     // Setup data
     DublinCoreCatalog catalog = EasyMock.createMock(DublinCoreCatalog.class);
     EasyMock.expect(catalog.getFirst(EasyMock.anyObject(EName.class))).andReturn(null);
@@ -722,6 +883,8 @@ public class SchedulerServiceImplTest {
     EasyMock.replay(index);
     // Run test
     SchedulerServiceImpl service = new SchedulerServiceImpl();
+    service.setMessageSender(messageSender);
+    service.setMessageReceiver(messageReceiver);
     service.setIndex(index);
     service.removeScheduledRecordingsBeforeBuffer(0);
   }
@@ -777,6 +940,7 @@ public class SchedulerServiceImplTest {
   private SchedulerServiceDatabase setupPersistence(long[] ids) throws NotFoundException,
           SchedulerServiceDatabaseException {
     SchedulerServiceDatabase persistence = EasyMock.createMock(SchedulerServiceDatabase.class);
+    EasyMock.expect(persistence.getMediaPackageId(EasyMock.anyLong())).andReturn("uuid").anyTimes();
     for (long id : ids) {
       persistence.deleteEvent(id);
       EasyMock.expectLastCall();
@@ -814,8 +978,10 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
-  public void removeScheduledRecordingsBeforeBufferInputOneEventOneIDExpectsEventDeleted() throws SchedulerException, NotFoundException, UnauthorizedException, SchedulerServiceDatabaseException, URISyntaxException, IOException, WorkflowException {
-    //Setup data
+  public void removeScheduledRecordingsBeforeBufferInputOneEventOneIDExpectsEventDeleted() throws SchedulerException,
+          NotFoundException, UnauthorizedException, SchedulerServiceDatabaseException, URISyntaxException, IOException,
+          WorkflowException {
+    // Setup data
     long[] ids = { 1L };
     URI[] uris = createMediapackageURIs(ids);
     // Run test
@@ -824,12 +990,15 @@ public class SchedulerServiceImplTest {
     service.setWorkspace(createWorkspace(uris, false));
     service.setWorkflowService(createWorkflowService(ids, uris));
     service.setPersistence(setupPersistence(ids));
+    service.setMessageSender(messageSender);
+    service.setMessageReceiver(messageReceiver);
     service.removeScheduledRecordingsBeforeBuffer(0);
   }
 
   @Test
-  public void scanInputMultipleEventOneIDExpectsEventsDeleted() throws SchedulerException, NotFoundException, UnauthorizedException, SchedulerServiceDatabaseException, URISyntaxException, IOException, WorkflowException {
-    //Setup data
+  public void scanInputMultipleEventOneIDExpectsEventsDeleted() throws SchedulerException, NotFoundException,
+          UnauthorizedException, SchedulerServiceDatabaseException, URISyntaxException, IOException, WorkflowException {
+    // Setup data
     long[] ids = { 4L, 5L, 6L };
     URI[] uris = createMediapackageURIs(ids);
     // Run test
@@ -838,6 +1007,8 @@ public class SchedulerServiceImplTest {
     service.setWorkspace(createWorkspace(uris, false));
     service.setWorkflowService(createWorkflowService(ids, uris));
     service.setPersistence(setupPersistence(ids));
+    service.setMessageSender(messageSender);
+    service.setMessageReceiver(messageReceiver);
     service.removeScheduledRecordingsBeforeBuffer(0);
   }
 
@@ -854,6 +1025,8 @@ public class SchedulerServiceImplTest {
     service.setWorkspace(createWorkspace(uris, true));
     service.setWorkflowService(createWorkflowService(ids, uris));
     service.setPersistence(setupPersistence(ids));
+    service.setMessageSender(messageSender);
+    service.setMessageReceiver(messageReceiver);
     service.removeScheduledRecordingsBeforeBuffer(0);
   }
 
@@ -917,7 +1090,7 @@ public class SchedulerServiceImplTest {
   private static Function<String, DublinCoreCatalog> parseDc = new Function<String, DublinCoreCatalog>() {
     @Override
     public DublinCoreCatalog apply(String s) {
-      return new DublinCoreCatalogImpl(IOUtils.toInputStream(s));
+      return DublinCores.read(IOUtils.toInputStream(s));
     }
   };
 
@@ -929,4 +1102,5 @@ public class SchedulerServiceImplTest {
       return p;
     }
   };
+
 }

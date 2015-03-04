@@ -15,6 +15,8 @@
  */
 package org.opencastproject.userdirectory;
 
+import static org.opencastproject.userdirectory.JpaUserReferenceProvider.PROVIDER_NAME;
+
 import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -56,7 +58,8 @@ import javax.persistence.UniqueConstraint;
 @NamedQueries({
         @NamedQuery(name = "UserReference.findByQuery", query = "select u from JpaUserReference u where UPPER(u.username) like :query and u.organization.id = :org"),
         @NamedQuery(name = "UserReference.findByUsername", query = "select u from JpaUserReference u where u.username=:u and u.organization.id = :org"),
-        @NamedQuery(name = "UserReference.findAll", query = "select u from JpaUserReference u where u.organization.id = :org") })
+        @NamedQuery(name = "UserReference.findAll", query = "select u from JpaUserReference u where u.organization.id = :org"),
+        @NamedQuery(name = "UserReference.countAll", query = "select COUNT(u) from JpaUserReference u where u.organization.id = :org") })
 public class JpaUserReference {
   @Id
   @GeneratedValue
@@ -93,7 +96,8 @@ public class JpaUserReference {
     for (JpaRole role : roles) {
       roleSet.add(JaxbRole.fromRole(role));
     }
-    return new JaxbUser(username, JaxbOrganization.fromOrganization(organization), roleSet);
+    return new JaxbUser(username, null, name, email, PROVIDER_NAME, JaxbOrganization.fromOrganization(organization),
+            roleSet);
   }
 
   /**

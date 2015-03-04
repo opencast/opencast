@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.workflow.handler.comments.CommentWorkflowOperationHandler" immediate="true"
+  activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.workflow.handler.comments.CommentWorkflowOperationHandler" />
+  <property name="service.description" value="Comment Workflow Operation Handler" />
+  <property name="workflow.operation" value="comment" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+
+  <reference name="event-comment-service" interface="org.opencastproject.comments.events.EventCommentService"
+    cardinality="1..1" policy="static" bind="setEventCommentService" />
+  <reference cardinality="1..1" interface="org.opencastproject.workflow.api.WorkflowService"
+    name="Workspace" policy="static" bind="setWorkflowService"/>
+  <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    policy="static" bind="setServiceRegistry" />
+
+</scr:component>

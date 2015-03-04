@@ -47,6 +47,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.workspace.api.Workspace;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -107,8 +108,6 @@ public class VideoSegmenterTest {
     track.setMimeType(MimeTypes.MJPEG);
     track.addStream(new VideoStreamImpl());
     track.setDuration(new Long(20000));
-    System.setProperty("java.awt.headless", "true");
-    System.setProperty("awt.toolkit", "sun.awt.HeadlessToolkit");
   }
 
   /**
@@ -126,6 +125,7 @@ public class VideoSegmenterTest {
     EasyMock.expect(
             workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {
+      @Override
       public URI answer() throws Throwable {
         InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
         IOUtils.copy(in, new FileOutputStream(tempFile));
@@ -134,7 +134,7 @@ public class VideoSegmenterTest {
     });
     EasyMock.replay(workspace);
 
-    User anonymous = new JaxbUser("anonymous", new DefaultOrganization(), new JaxbRole(
+    User anonymous = new JaxbUser("anonymous", "test", new DefaultOrganization(), new JaxbRole(
             DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, new DefaultOrganization()));
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();

@@ -1,0 +1,43 @@
+[{
+  "id":241,
+  "resource":{
+    "id":5,
+    "email":"hans@test.ch",
+    "name":"•mock• Hans",
+    "types":[{
+      "id":3,
+      "name":"ceo",
+      "function":"nothing"
+    }, {
+      "id":4,
+      "name":"employee",
+      "function":"everything"
+    }]
+  },
+  "start":"2014-07-21T13:24:31Z",
+  "end":"2014-07-20T13:30:00Z",
+  "purpose": "PM.BLACKLIST.REASONS.LEAVE",
+  "comment": "a comment",
+  "resourceType":"person"
+}, {
+  "id":242,
+  "resource":{
+    "id":5,
+    "email":"fritz@test.ch",
+    "name":"•mock• Fritz",
+    "types":[{
+      "id":3,
+      "name":"ceo",
+      "function":"nothing"
+    }, {
+      "id":4,
+      "name":"employee",
+      "function":"everything"
+    }]
+  },
+  "start":"2014-04-12T10:17:25Z",
+  "end":"2014-04-14T10:17:25Z",
+  "purpose": "PM.BLACKLIST.REASONS.FAMILY_EMERGENCY",
+  "comment": "another comment",
+  "resourceType":"person"
+}]

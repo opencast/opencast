@@ -1,0 +1,364 @@
+<section ng-form="theme-form" ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation ng-hide" ng-controller="ThemeFormCtrl">
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2 translate="CONFIGURATION.THEMES.DETAILS.{{ action === 'edit' ? 'EDIT':'NEW' }}CAPTION">Template</h2>
+    </header>
+    <nav id="modal-nav" ng-class="{'step-by-step': action === 'add', 'modal-nav': action === 'edit'}">
+        <a ng-click="navigateTo('generalForm', currentForm, [])" ng-class="{ active: currentForm === 'generalForm', 'not-complete': !generalForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.CAPTION' | translate }}</a>
+        <a ng-click="navigateTo('bumperForm', currentForm, [generalForm])" ng-class="{ active: currentForm === 'bumperForm', 'not-complete': !bumperForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.BUMPER.CAPTION' | translate }}</a>
+        <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm])" ng-class="{ active: currentForm === 'trailerForm', 'not-complete': !trailerForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION' | translate }}</a>
+<!--         <a ng-click="navigateTo('titleslideForm', currentForm, [generalForm, bumperForm, trailerForm])" ng-class="{ active: currentForm === 'titleslideForm', 'not-complete': !titleslideForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION' | translate }}</a>
+        <a ng-click="navigateTo('watermarkForm', currentForm, [generalForm, bumperForm, trailerForm, summaryForm])" ng-class="{ active: currentForm === 'watermarkForm', 'not-complete': !watermarkForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION' | translate }}</a> -->
+        <a ng-if="action === 'add'" ng-click="navigateTo('summary', currentForm, [generalForm, bumperForm, trailerForm])" ng-class="{ active: currentForm === 'summary'}">{{ 'CONFIGURATION.THEMES.DETAILS.SUMMARY.CAPTION' | translate }}</a>
+        <a ng-if="action === 'edit'" ng-click="navigateTo('usage', currentForm, [generalForm, bumperForm, trailerForm])" ng-class="{ active: currentForm === 'usage'}">{{ 'CONFIGURATION.THEMES.DETAILS.USAGE.CAPTION' | translate }}</a>
+    </nav>
+    
+    <div class="modal-content" ng-class="{active: currentForm === 'generalForm'}" data-modal-tab-content="general" data-level="1">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="form-container">
+                    <form name="generalForm">
+                        <div class="row">
+                            <div data-admin-ng-notifications="" context="new-theme-general"></div>
+                            <label class="required" for="generalName" translate="CONFIGURATION.THEMES.DETAILS.GENERAL.NAME">Name</label>
+                            <input type="text" id="generalName" ng-model="general.name" required
+                                unique-theme-name="" placeholder="{{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.NAME' | translate }}...">
+                        </div>
+                        <div class="row">
+                            <label for="description" translate="CONFIGURATION.THEMES.DETAILS.GENERAL.DESCRIPTION">Description</label>
+                            <textarea id="description" ng-model="general.description" 
+                                placeholder="{{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.DESCRIPTION' | translate }}..."></textarea>
+                        </div>
+                        <!--
+                        <div class="row">
+                            <div class="checkbox-container one-line">
+                                <input id="default" type="checkbox" ng-model="general.default" />
+                                <label for="default" translate="CONFIGURATION.THEMES.DETAILS.GENERAL.SET_DEFAULT_INFO"></label>
+                            </div>
+                        </div>
+                        -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer ng-if="action === 'edit' && currentForm === 'generalForm'">
+        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
+    </footer>
+    <footer ng-if="action === 'add' && currentForm === 'generalForm'">
+        <a ng-click="navigateTo('bumperForm', currentForm, [generalForm])"
+            data-modal-tab="next" class="submit"
+            ng-class="{active: generalForm.$valid, inactive: generalForm.$invalid}">
+            {{ 'WIZARD.NEXT_STEP' | translate }}
+        </a>
+    </footer>
+
+    <div class="modal-content" ng-class="{active: currentForm === 'bumperForm'}" data-modal-tab-content="bumper" data-level="1">
+        <div class="modal-body">
+            <div class="full-col">
+                <form name="bumperForm">
+                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.BUMPER.DESCRIPTION">Typically pre-defined slide or video that is appended to the beginning of the video.</p>
+                    <div data-admin-ng-notifications="" context="new-theme-bumper"></div>
+                    <div class="obj">
+                        <header translate="CONFIGURATION.THEMES.DETAILS.BUMPER.ACTIVE">Bumper</header>
+                        <div class="obj-container content-list padded">
+                            <div class="list-row">
+                                <div class="header-column">
+                                    <label class="large" for="bumper-toggle" translate="CONFIGURATION.THEMES.DETAILS.BUMPER.ENABLE">Enable</label>
+                                </div>
+                                <div class="content-column">
+                                    <div class="content-container">
+                                        <input id="bumper-toggle" type="checkbox" ng-model="bumper.active">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="obj" ng-if="bumper.active">
+                        <header translate="CONFIGURATION.THEMES.DETAILS.BUMPER.SELECT">Select</header>
+                        <div ng-messages="bumperForm.bumperfile.$error">
+                            <div ng-message="file-upload">Error uploading file</div>
+                            <div ng-message="required">You must upload a bumper</div>
+                        </div>
+                        <div class="obj-container padded" file-upload="" acceptable-types="video/*"
+                             ng-required="bumper.active" ng-model="bumper.file" existing="bumper.file"
+                             label-key="CONFIGURATION.THEMES.DETAILS.BUMPER.UPLOAD_LABEL"
+                             button-key="CONFIGURATION.THEMES.DETAILS.BUMPER.UPLOAD_BUTTON"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer ng-if="action === 'edit' && currentForm === 'bumperForm'">
+        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
+    </footer>
+    <footer ng-if="action === 'add' && currentForm === 'bumperForm'">
+        <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm])"
+            data-modal-tab="next" class="submit"
+            ng-class="{active: bumperForm.$valid, inactive: bumperForm.$invalid}">
+            {{ 'WIZARD.NEXT_STEP' | translate }}
+        </a>
+        <a ng-click="navigateTo('generalForm', currentForm, [generalForm])"
+            data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
+        </a>
+    </footer>
+    
+    <div class="modal-content" ng-class="{active: currentForm === 'trailerForm'}" data-modal-tab-content="trailer" data-level="1">
+        <div class="modal-body">
+            <div class="full-col">
+                <form name="trailerForm">
+                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.TRAILER.DESCRIPTION">Typically pre-defined slide or video that is appended to the beginning of the video.</p>
+                    <div data-admin-ng-notifications="" context="new-theme-trailer"></div>
+                    <div class="obj">
+                        <header translate="CONFIGURATION.THEMES.DETAILS.TRAILER.ACTIVE">Trailer</header>
+                        <div class="obj-container content-list padded">
+                            <div class="list-row">
+                                <div class="header-column">
+                                    <label class="large" for="trailer-toggle" translate="CONFIGURATION.THEMES.DETAILS.TRAILER.ENABLE">Enable Trailer</label>
+                                </div>
+                                <div class="content-column">
+                                    <div class="content-container">
+                                        <input id="trailer-toggle" type="checkbox" ng-model="trailer.active">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="obj" ng-if="trailer.active">
+                        <header>Select</header>
+                        <div class="obj-container padded" file-upload="" acceptable-types="video/*"
+                             ng-model="trailer.file" existing="trailer.file" ng-required="trailer.active"
+                             label-key="CONFIGURATION.THEMES.DETAILS.TRAILER.UPLOAD_LABEL"
+                             button-key="CONFIGURATION.THEMES.DETAILS.TRAILER.UPLOAD_BUTTON"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer ng-if="action === 'edit' && currentForm === 'trailerForm'">
+        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
+    </footer>
+    <footer ng-if="action === 'add' && currentForm === 'trailerForm'">
+        <a ng-click="navigateTo('summary', currentForm, [generalForm, bumperForm, trailerForm])"
+            data-modal-tab="next" class="submit"
+            ng-class="{active: trailerForm.$valid, inactive: trailerForm.$invalid}">
+            {{ 'WIZARD.NEXT_STEP' | translate }}
+        </a>
+        <a ng-click="navigateTo('bumperForm', currentForm, [generalForm, bumperForm])"
+            data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
+        </a>
+    </footer>
+    
+<!--     <div class="modal-content" ng-class="{active: currentForm === 'titleslideForm'}" data-modal-tab-content="titleslide" data-level="1">
+        <div class="modal-body">
+            <div class="full-col">
+                <form name="titleslideForm">
+                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.TITLE.DESCRIPTION">Add descriptive text about each video at either the beginning / end of video. Include the following metadata:</p>
+                    <div data-admin-ng-notifications="" context="new-theme-titleslide"></div>
+                    <div class="obj">
+                        <header translate="CONFIGURATION.THEMES.DETAILS.TITLE.ACTIVE">Active</header>
+                        <div class="obj-container content-list padded">
+                            <div class="list-row">
+                                <div class="header-column">
+                                    <label class="large" for="titleslide-toggle" translate="CONFIGURATION.THEMES.DETAILS.TITLE.ENABLE">Enable</label>
+                                </div>
+                                <div class="content-column">
+                                    <div class="content-container">
+                                        <input id="titleslide-toggle" type="checkbox" ng-model="titleslide.active">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="obj" ng-show="titleslide.active">
+                        <header translate="CONFIGURATION.THEMES.DETAILS.TITLE.BACKGROUND">Background</header>
+                        <div class="obj-container padded">
+    
+                            <div class="file-upload">
+    
+                                <div class="form-container">
+                                    <div class="row">
+                                        <input type="radio" ng-model="titleslide.mode" ng-required="titleslide.active" value="extract" id="background-extract">
+                                        <label for="background-extract" translate="CONFIGURATION.THEMES.DETAILS.TITLE.EXTRACT">Extract</label>
+                                    </div>
+                                    <div class="row">
+                                        <input type="radio" ng-model="titleslide.mode" ng-required="titleslide.active" value="upload" id="background-upload">
+                                        <label for="background-upload" translate="CONFIGURATION.THEMES.DETAILS.TITLE.UPLOAD">Upload</label>
+                                    </div>
+                                </div>
+                                <div file-upload="" acceptable-types="image/*" ng-if="titleslide.mode == 'upload'"
+                                     ng-model="titleslide.file" existing="titleslide.file" ng-required="titleslide.mode === 'upload'"
+                                     label-key="CONFIGURATION.THEMES.DETAILS.TITLE.UPLOAD_LABEL"
+                                     button-key="CONFIGURATION.THEMES.DETAILS.TITLE.UPLOAD_BUTTON"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer ng-if="action === 'edit' && currentForm === 'titleslideForm'">
+        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
+    </footer>
+    <footer ng-if="action === 'add' && currentForm === 'titleslideForm'">
+        <a ng-click="navigateTo('watermarkForm', [generalForm, bumperForm, trailerForm, titleslideForm])"
+            data-modal-tab="next" class="submit"
+            ng-class="{active: titleslideForm.$valid, inactive: titleslideForm.$invalid}">
+            {{ 'WIZARD.NEXT_STEP' | translate }}
+        </a>
+        <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm, trailerForm])"
+            data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
+        </a>
+    </footer> -->
+    
+<!--     <div class="modal-content" ng-class="{active: currentForm === 'watermarkForm'}" data-modal-tab-content="watermark" data-level="1">
+        <div class="modal-body">
+            <div class="full-col">
+                <form name="watermarkForm">
+                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.DESCRIPTION">Typically a transparent logo that is overlaid on every frame of the video.</p>
+                    <div data-admin-ng-notifications="" context="new-theme-watermark"></div>
+                    <div ng-show="watermarkForm.watermarkfile.$error.required || watermarkForm.watermarkfile.$error['file-upload']" ng-messages="watermarkForm.watermarkfile.$error" class="alert sticky error">
+                        <a ng-show="watermarkForm.watermarkfile.$error.required || watermarkForm.watermarkfile.$error['file-upload']" ng-click="hide = true" class="autonomous fa fa-times close"></a>
+                        <p ng-message="file-upload">Error uploading file</p>
+                        <p ng-message="required">You must upload a watermark</p>
+                    </div>
+                        
+                    <div class="obj">
+                        <header translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION">Watermark</header>
+                        <div class="obj-container content-list padded">
+                            <div class="list-row">
+                                <div class="header-column">
+                                    <label class="large" for="watermark-toggle">Enable Watermark</label>
+                                </div>
+                                <div class="content-column">
+                                    <div class="content-container">
+                                        <input id="watermark-toggle" type="checkbox" ng-model="watermark.active">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="obj" ng-if="watermark.active">
+                        <header translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD">Upload</header>
+                        <div class="obj-container padded" file-upload="" acceptable-types="image/*"
+                             ng-required="watermark.active" existing="watermark.file" ng-model="watermark.file" name="watermarkfile"
+                             label-key="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD_LABEL"
+                             description-key="CONFIGURATION.THEMES.DETAILS.WATERMARK.FILEUPLOAD_DESCRIPTION"
+                             button-key="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD_BUTTON"/>
+                    </div>
+                    <div class="obj" ng-if="watermark.file">
+                        <header  translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.POSITION">Position</header>
+                        <div class="obj-container padded">
+                            <div class="video-container">
+                                <div class="watermark-config">
+                                    <div class="position-selection">
+                                        <button class="position-button position-top-left" ng-click="watermark.position = 'topLeft'" ng-class="{active:watermark.position=='topLeft'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.TOP_LEFT">top left</button>
+                                        <button class="position-button position-top-right" ng-click="watermark.position = 'topRight'" ng-class="{active:watermark.position=='topRight'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.TOP_RIGHT">top right</button>
+                                        <button class="position-button position-bottom-left" ng-click="watermark.position = 'bottomLeft'" ng-class="{active:watermark.position=='bottomLeft'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.BOTTOM_LEFT">bottom left</button>
+                                        <button class="position-button position-bottom-right" ng-click="watermark.position = 'bottomRight'" ng-class="{active:watermark.position=='bottomRight'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.BOTTOM_RIGHT">bottom right</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer ng-if="action === 'edit' && currentForm === 'watermarkForm'">
+        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
+    </footer>
+    <footer ng-if="action === 'add' && currentForm === 'watermarkForm'">
+        <a ng-click="navigateTo('summary', [generalForm, bumperForm, trailerForm, titleslideForm, watermarkForm])"
+           data-modal-tab="next" class="submit"
+           ng-class="{active: watermarkForm.$valid, inactive: watermarkForm.$invalid}">
+            {{ 'WIZARD.NEXT_STEP' | translate }}
+        </a>
+        <a ng-click="navigateTo('titleslideForm', [generalForm, bumperForm, trailerForm, titleslideForm])"
+           data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
+        </a>
+    </footer> -->
+
+
+    <div class="modal-content" ng-class="{active: currentForm === 'summary'}" data-modal-tab-content="summary" data-level="1">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj">
+                    <header>{{'CONFIGURATION.THEMES.DETAILS.SUMMARY.CAPTION' | translate }}</header>
+                    <div class="obj-container summary-list padded">
+                        <ul>
+                            <li ng-if="bumper.file.id">
+                                <h4 translate="CONFIGURATION.THEMES.DETAILS.BUMPER.CAPTION">Bumper</h4>
+                                <p><span translate="CONFIGURATION.THEMES.DETAILS.BUMPER.FILE_UPLOADED">File Uploaded: </span>{{bumper.file.name}}</p>
+                            </li>
+                            <li ng-if="trailer.file.id">
+                                <h4 translate="CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION">Trailer</h4>
+                                <p><span translate="CONFIGURATION.THEMES.DETAILS.TRAILER.FILE_UPLOADED">File Uploaded: </span>{{trailer.file.name}}</p>
+                            </li>
+<!--                             <li ng-if="titleslide.file.id">
+                                <h4 translate="CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION">Title Slide</h4>
+                                <p><span translate="CONFIGURATION.THEMES.DETAILS.TITLE.FILE_UPLOADED">File Uploaded: </span>{{titleslide.file.name}}</p>
+                            </li>
+                            <li ng-if="watermark.file.id">
+                                <h4 translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION">Watermark</h4>
+                                <p><span translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.FILE_UPLOADED">File Uploaded: </span>{{watermark.file.name}}</p>
+                            </li> -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer ng-if="action === 'edit' && currentForm === 'summary'">
+        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
+    </footer>
+    <footer ng-if="action === 'add' && currentForm === 'summary'">
+        <a ng-click="submit()"
+           data-modal-tab="next" class="submit"
+           ng-class="{active: theme-form.$valid, inactive: theme-form.$invalid}">
+           {{ 'SUBMIT' | translate }}
+        </a>
+        <a ng-click="navigateTo('summary', [generalForm, bumperForm, trailerForm])"
+           data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
+        </a>
+    </footer>
+
+    <div class="modal-content" ng-class="{active: currentForm === 'usage'}" data-modal-tab-content="usage" data-level="1">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj">
+                    <div class="obj-container summary-list">
+                        <table class="main-tbl">
+                            <thead>
+                            <tr>
+                                <th translate="CONFIGURATION.THEMES.DETAILS.USAGE.SERIE">Serie</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="row in usage.series">
+                                <td ng-bind="row.title"></td>
+                            </tr>
+                            <tr ng-if="!usage.series.length">
+                                <td translate="CONFIGURATION.THEMES.DETAILS.USAGE.EMPTY"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer ng-if="currentForm === 'usage'">
+        <a class="submit inactive">{{ 'SUBMIT' | translate }}</a>
+        <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
+    </footer>
+
+    <div class="btm-spacer"></div>
+
+</section>

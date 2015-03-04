@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Policy PolicyId="mediapackage-1"
+	RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides"
+	Version="2.0"
+	xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os">
+	<Target>
+		<Resources>
+			<Resource>
+				<ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+					<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">mediapackage-1</AttributeValue>
+					<ResourceAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+						DataType="http://www.w3.org/2001/XMLSchema#string"/>
+				</ResourceMatch>
+			</Resource>
+		</Resources>
+	</Target>
+	<Rule RuleId="SERIES_2_STUDENT_read_Permit" 
+		<Target>
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+						<ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+							DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<Condition>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_STUDENT</AttributeValue>
+				<SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+					DataType="http://www.w3.org/2001/XMLSchema#string"/>
+			</Apply>
+		</Condition>
+	</Rule>
+	<Rule RuleId="SERIES_2_INSTRUCTOR_read_Permit" Effect="Permit">
+		<Target>
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+						<ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+							DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<Condition>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_INSTRUCTOR</AttributeValue>
+				<SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+					DataType="http://www.w3.org/2001/XMLSchema#string"/>
+			</Apply>
+		</Condition>
+	</Rule>
+	<Rule RuleId="SERIES_2_ADMIN_read_Permit" Effect="Permit">
+		<Target>
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+						<ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+							DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<Condition>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_ADMIN</AttributeValue>
+				<SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+					DataType="http://www.w3.org/2001/XMLSchema#string"/>
+			</Apply>
+		</Condition>
+	</Rule>
+	<Rule RuleId="SERIES_2_INSTRUCTOR_contribute_Permit" Effect="Permit">
+		<Target>
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">contribute</AttributeValue>
+						<ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+							DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<Condition>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_INSTRUCTOR</AttributeValue>
+				<SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+					DataType="http://www.w3.org/2001/XMLSchema#string"/>
+			</Apply>
+		</Condition>
+	</Rule>
+	<Rule RuleId="SERIES_2_ADMIN_contribute_Permit" Effect="Permit">
+		<Target>
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">contribute</AttributeValue>
+						<ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+							DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<Condition>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_ADMIN</AttributeValue>
+				<SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+					DataType="http://www.w3.org/2001/XMLSchema#string"/>
+			</Apply>
+		</Condition>
+	</Rule>
+	<Rule RuleId="SERIES_2_INSTRUCTOR_write_Permit" Effect="Permit">
+		<Target>
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">write</AttributeValue>
+						<ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+							DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<Condition>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_INSTRUCTOR</AttributeValue>
+				<SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+					DataType="http://www.w3.org/2001/XMLSchema#string"/>
+			</Apply>
+		</Condition>
+	</Rule>
+	<Rule RuleId="SERIES_2_ADMIN_write_Permit" Effect="Permit">
+		<Target>
+			<Actions>
+				<Action>
+					<ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">write</AttributeValue>
+						<ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+							DataType="http://www.w3.org/2001/XMLSchema#string"/>
+					</ActionMatch>
+				</Action>
+			</Actions>
+		</Target>
+		<Condition>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_ADMIN</AttributeValue>
+				<SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+					DataType="http://www.w3.org/2001/XMLSchema#string"/>
+			</Apply>
+		</Condition>
+	</Rule>
+	<Rule RuleId="DenyRule" Effect="Deny"/>
+</Policy>

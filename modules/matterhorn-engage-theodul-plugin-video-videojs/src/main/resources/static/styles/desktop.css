@@ -1,0 +1,43 @@
+.videojs_wrapper {
+    width: 100%;
+    position: relative;
+    margin: 0 auto;
+}
+
+.videoDisplay {
+    float: left;
+    width: 49%;
+    margin: 1px;
+}
+
+.audioDisplayError {
+    display: none;
+}
+
+.videoFrame {
+    width: 100%;
+    height: 100%;
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.video-js.auto-height {
+    height: 0 !important;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+    max-width: 100%;
+    width: auto !important;
+}
+
+.vjs-fullscreen-control {
+    visibility: hidden;
+}

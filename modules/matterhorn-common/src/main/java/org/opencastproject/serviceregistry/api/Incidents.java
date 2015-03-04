@@ -18,8 +18,8 @@ package org.opencastproject.serviceregistry.api;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.fn.juc.Immutables;
-import org.opencastproject.fn.juc.Mutables;
+import org.opencastproject.fun.juc.Immutables;
+import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentTree;

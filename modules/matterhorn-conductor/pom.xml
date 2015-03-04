@@ -21,17 +21,27 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-archive-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-archive-schema</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-series-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-search-service-api</artifactId>
+      <artifactId>matterhorn-distribution-workflowoperation</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-episode-service-api</artifactId>
+      <artifactId>matterhorn-search-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -45,9 +55,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <scope>test</scope>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-message-broker-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -58,9 +68,12 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-distribution-workflowoperation</artifactId>
-      <version>${project.version}</version>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -71,22 +84,15 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Include-Resource>
-	      {maven-resources},
-	      ui/operation/trim/common-data.tpl=../../shared-resources/templates/common-data.tpl,
-	      ui/operation/trim/additional-description.tpl=../../shared-resources/templates/additional-description.tpl
-	    </Include-Resource>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
               javax.xml.namespace;version=0,
-              *;resolution:=optional  
+              org.w3c.dom;version=0,
+              *;resolution:=optional
             </Import-Package>
             <Export-Package>
-              org.opencastproject.workflow.handler;version=${project.version}
-            </Export-Package>
-            <Private-Package>
               org.opencastproject.event.handler;version=${project.version}
-            </Private-Package>
+            </Export-Package>
             <Service-Component>
               OSGI-INF/events/series-updated.xml
             </Service-Component>

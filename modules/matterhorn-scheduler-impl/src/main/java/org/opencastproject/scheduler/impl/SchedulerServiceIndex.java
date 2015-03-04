@@ -19,8 +19,11 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Tuple;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -86,6 +89,34 @@ public interface SchedulerServiceIndex {
           SchedulerServiceDatabaseException;
 
   /**
+   * Index opt out status for existing event.
+   *
+   * @param eventId
+   *          ID of event to which properties will be added
+   * @param optOut
+   *          the opt out status
+   * @throws NotFoundException
+   *           if there is no event with specified ID
+   * @throws SchedulerServiceDatabaseException
+   *           if indexing failed
+   */
+  void indexOptOut(long eventId, boolean optOut) throws NotFoundException, SchedulerServiceDatabaseException;
+
+  /**
+   * Index blacklist status for existing event.
+   *
+   * @param eventId
+   *          ID of event to which properties will be added
+   * @param blacklisted
+   *          the blacklist status
+   * @throws NotFoundException
+   *           if there is no event with specified ID
+   * @throws SchedulerServiceDatabaseException
+   *           if indexing failed
+   */
+  void indexBlacklisted(long eventId, boolean blacklisted) throws NotFoundException, SchedulerServiceDatabaseException;
+
+  /**
    * Search over indexed events. Search parameters are specified with {@link SchedulerQuery} object.
    *
    * @param query
@@ -95,6 +126,17 @@ public interface SchedulerServiceIndex {
    *           if query cannot be performed
    */
   DublinCoreCatalogList search(SchedulerQuery query) throws SchedulerServiceDatabaseException;
+
+  /**
+   * Search over indexed events. Search parameters are specified with {@link SchedulerQuery} object.
+   *
+   * @param query
+   *          {@link SchedulerQuery} object representing query parameters
+   * @return list of all matching events as a {@link Tuple} of the serialized dublincore and CA properties
+   * @throws SchedulerServiceDatabaseException
+   *           if query cannot be performed
+   */
+  List<Tuple<String, String>> calendarSearch(SchedulerQuery query) throws SchedulerServiceDatabaseException;
 
   /**
    * Removes event from index.
@@ -133,13 +175,40 @@ public interface SchedulerServiceIndex {
   Properties getCaptureAgentProperties(long eventId) throws NotFoundException, SchedulerServiceDatabaseException;
 
   /**
-   * Returns date of last modification of event belonging to specified capture agent.
+   * Returns date of last modification of event belonging to specified scheduler query.
    *
    * @param filter
    *          filter of events
-   * @return Date of last modification
+   * @return the dates of last modification
    * @throws SchedulerServiceDatabaseException
    *           if exception occurred
    */
-  Date getLastModifiedDate(SchedulerQuery filter) throws SchedulerServiceDatabaseException;
+  Map<String, Date> getLastModifiedDate(SchedulerQuery filter) throws SchedulerServiceDatabaseException;
+
+  /**
+   * Returns the opt out status of an event with the given event id
+   *
+   * @param eventId
+   *          the event id
+   * @return the opt out status
+   * @throws NotFoundException
+   *           if there is no event with specified ID
+   * @throws SchedulerServiceDatabaseException
+   *           if exception occurred
+   */
+  boolean isOptOut(long eventId) throws NotFoundException, SchedulerServiceDatabaseException;
+
+  /**
+   * Returns the blacklist status of an event with the given event id
+   *
+   * @param eventId
+   *          the event id
+   * @return the blacklist status
+   * @throws NotFoundException
+   *           if there is no event with specified ID
+   * @throws SchedulerServiceDatabaseException
+   *           if exception occurred
+   */
+  boolean isBlacklisted(long eventId) throws NotFoundException, SchedulerServiceDatabaseException;
+
 }

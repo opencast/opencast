@@ -16,11 +16,13 @@
 
 package org.opencastproject.util.data;
 
-import org.opencastproject.util.data.functions.Functions;
-
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.functions.Misc.chuck;
+
+import org.opencastproject.util.data.functions.Functions;
+
+import com.entwinemedia.fn.Fn;
 
 /**
  * Function of arity 1.
@@ -86,6 +88,15 @@ public abstract class Function<A, B> {
     return Functions.toGuava(this);
   }
 
+  public Fn<A, B> toFn() {
+    return new Fn<A, B>() {
+      @Override
+      public B ap(A a) {
+        return Function.this.apply(a);
+      }
+    };
+  }
+
   /** Version of {@link Function} that allows for throwing a checked exception. */
   public abstract static class X<A, B> extends Function<A, B> {
     @Override
@@ -105,7 +116,8 @@ public abstract class Function<A, B> {
 
     public final Function<A, Either<Exception, B>> either() {
       return new Function<A, Either<Exception, B>>() {
-        @Override public Either<Exception, B> apply(A a) {
+        @Override
+        public Either<Exception, B> apply(A a) {
           try {
             return right(xapply(a));
           } catch (Exception e) {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.workflow.handler.workflow.DefaultsWorkflowOperationHandler" immediate="true"
+  activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.workflow.handler.workflow.DefaultsWorkflowOperationHandler" />
+  <property name="service.description" value="Defaults Operation Handler" />
+  <property name="workflow.operation" value="defaults" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+  <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    policy="static" bind="setServiceRegistry" />
+  <reference name="PresetProvider" cardinality="1..1" interface="org.opencastproject.presets.api.PresetProvider"
+    policy="static" bind="setPresetProvider" />
+</scr:component>

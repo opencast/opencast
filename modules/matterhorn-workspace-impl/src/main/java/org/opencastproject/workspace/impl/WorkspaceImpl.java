@@ -76,6 +76,9 @@ public class WorkspaceImpl implements Workspace {
   /** Configuration key for the workspace root directory */
   public static final String WORKSPACE_ROOTDIR_KEY = "org.opencastproject.workspace.rootdir";
 
+  /** Configuration key for the workspace cleanup period */
+  public static final String WORKSPACE_CLEANUP_PERIOD_KEY = "org.opencastproject.workspace.cleanup.period";
+
   /** Workspace JMX type */
   private static final String JMX_WORKSPACE_TYPE = "Workspace";
 
@@ -87,7 +90,7 @@ public class WorkspaceImpl implements Workspace {
 
   protected String wsRoot = null;
   protected int maxAgeInSeconds = -1;
-  protected int garbageCollectionPeriodInSeconds = -1;
+  protected int garbageCollectionPeriodInSeconds = 86400;
   protected Timer garbageFileCollector;
   protected boolean linkingEnabled = false;
 
@@ -149,14 +152,14 @@ public class WorkspaceImpl implements Workspace {
     }
 
     // Set up the garbage file collection timer
-    if (cc != null && cc.getBundleContext().getProperty("org.opencastproject.workspace.cleanup.period") != null) {
-      String period = cc.getBundleContext().getProperty("org.opencastproject.workspace.cleanup.period");
+    if (cc != null) {
+      String period = cc.getBundleContext().getProperty(WORKSPACE_CLEANUP_PERIOD_KEY);
       if (period != null) {
         try {
           garbageCollectionPeriodInSeconds = Integer.parseInt(period);
         } catch (NumberFormatException e) {
-          logger.warn("Workspace garbage collection period can not be set to {}. Please choose a valid number "
-                  + "for the 'org.opencastproject.workspace.cleanup.period' setting", period);
+          logger.error("Workspace garbage collection period can not be set to {}. Please choose a valid number "
+                  + "for the '{}' setting", period, WORKSPACE_CLEANUP_PERIOD_KEY);
         }
       }
     }

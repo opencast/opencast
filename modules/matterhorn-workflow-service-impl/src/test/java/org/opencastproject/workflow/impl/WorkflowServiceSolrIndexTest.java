@@ -16,15 +16,16 @@
 package org.opencastproject.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -85,6 +86,9 @@ public class WorkflowServiceSolrIndexTest {
     EasyMock.expect(serviceRegistry.getJob(123)).andReturn(job);
     EasyMock.replay(serviceRegistry);
 
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(messageSender);
+
     // Now create the dao
     dao = new WorkflowServiceSolrIndex();
     dao.solrRoot = PathSupport.concat("target", Long.toString(System.currentTimeMillis()));
@@ -107,7 +111,7 @@ public class WorkflowServiceSolrIndexTest {
   @Test
   public void testBuildSimpleQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withMediaPackage("123").withSeriesId("series1");
-    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
+    String solrQuery = dao.createQuery(q, Permissions.Action.READ.toString(), true);
     String expected = "oc_org:mh_default_org AND mediapackageid:123 AND seriesid:series1";
     assertEquals(expected, solrQuery);
   }
@@ -119,7 +123,7 @@ public class WorkflowServiceSolrIndexTest {
   public void testBuildMultiStateQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withState(WorkflowState.RUNNING)
             .withState(WorkflowState.PAUSED);
-    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
+    String solrQuery = dao.createQuery(q, Permissions.Action.READ.toString(), true);
     String expected = "oc_org:mh_default_org AND seriesid:series1 AND (state:running OR state:paused)";
     assertEquals(expected, solrQuery);
   }
@@ -131,7 +135,7 @@ public class WorkflowServiceSolrIndexTest {
   public void testBuildNegativeStatesQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withoutState(WorkflowState.RUNNING)
             .withoutState(WorkflowState.PAUSED);
-    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
+    String solrQuery = dao.createQuery(q, Permissions.Action.READ.toString(), true);
     String expected = "oc_org:mh_default_org AND seriesid:series1 AND (-state:running AND -state:paused AND *:*)";
     assertEquals(expected, solrQuery);
   }
@@ -142,7 +146,7 @@ public class WorkflowServiceSolrIndexTest {
   @Test
   public void testBuildNegativeStateQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withoutState(WorkflowState.RUNNING);
-    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
+    String solrQuery = dao.createQuery(q, Permissions.Action.READ.toString(), true);
     String expected = "oc_org:mh_default_org AND seriesid:series1 AND (-state:running AND *:*)";
     assertEquals(expected, solrQuery);
   }
@@ -153,7 +157,7 @@ public class WorkflowServiceSolrIndexTest {
   @Test
   public void testNonAdminQuery() throws Exception {
     String userRole = "ROLE_USER";
-    User nonAdminUser = new JaxbUser("noAdmin", new DefaultOrganization(), new JaxbRole(userRole,
+    User nonAdminUser = new JaxbUser("noAdmin", "test", new DefaultOrganization(), new JaxbRole(userRole,
             new DefaultOrganization()));
 
     // security service
@@ -164,7 +168,7 @@ public class WorkflowServiceSolrIndexTest {
     dao.setSecurityService(securityService);
 
     WorkflowQuery q = new WorkflowQuery().withMediaPackage("123").withSeriesId("series1");
-    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
+    String solrQuery = dao.createQuery(q, Permissions.Action.READ.toString(), true);
     String expected = "oc_org:mh_default_org AND mediapackageid:123 AND seriesid:series1 AND oc_org:"
             + DefaultOrganization.DEFAULT_ORGANIZATION_ID + " AND (oc_creator:" + nonAdminUser.getUsername()
             + " OR oc_acl_read:" + userRole + ")";

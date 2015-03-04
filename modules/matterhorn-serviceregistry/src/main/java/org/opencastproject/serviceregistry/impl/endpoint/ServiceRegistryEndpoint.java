@@ -97,7 +97,7 @@ public class ServiceRegistryEndpoint {
    *          OSGi component context
    */
   public void activate(ComponentContext cc) {
-    serverUrl = (String) cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+    serverUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
     servicePath = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
 
@@ -204,10 +204,14 @@ public class ServiceRegistryEndpoint {
   @Path("registerhost")
   @RestQuery(name = "registerhost", description = "Add a new server to the cluster.", returnDescription = "No content.", restParameters = {
           @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING),
+          @RestParameter(name = "address", isRequired = true, description = "The IP address", type = Type.STRING),
+          @RestParameter(name = "memory", isRequired = true, description = "The allocated memory", type = Type.STRING),
+          @RestParameter(name = "cores", isRequired = true, description = "The available cores", type = Type.STRING),
           @RestParameter(name = "maxJobs", isRequired = true, description = "The maximum number of concurrent jobs this host can run", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was registered successfully") })
-  public void register(@FormParam("host") String host, @FormParam("maxJobs") int maxJobs) {
+  public void register(@FormParam("host") String host, @FormParam("address") String address,
+          @FormParam("memory") long memory, @FormParam("cores") int cores, @FormParam("maxJobs") int maxJobs) {
     try {
-      serviceRegistry.registerHost(host, maxJobs);
+      serviceRegistry.registerHost(host, address, memory, cores, maxJobs);
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }
@@ -472,15 +476,18 @@ public class ServiceRegistryEndpoint {
           @RestParameter(name = "operation", isRequired = false, type = Type.STRING, description = "The job's operation") }, reponses = { @RestResponse(responseCode = SC_OK, description = "Job count returned.") })
   public long count(@QueryParam("serviceType") String serviceType, @QueryParam("status") Job.Status status,
           @QueryParam("host") String host, @QueryParam("operation") String operation) {
-    if (isBlank(serviceType)) {
-      throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
-    }
     try {
       if (isNotBlank(host) && isNotBlank(operation)) {
+        if (isBlank(serviceType))
+          throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
         return serviceRegistry.count(serviceType, host, operation, status);
       } else if (isNotBlank(host)) {
+        if (isBlank(serviceType))
+          throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
         return serviceRegistry.countByHost(serviceType, host, status);
       } else if (isNotBlank(operation)) {
+        if (isBlank(serviceType))
+          throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
         return serviceRegistry.countByOperation(serviceType, operation, status);
       } else {
         return serviceRegistry.count(serviceType, status);

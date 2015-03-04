@@ -1,0 +1,8 @@
+{
+    "seriesIds": ["uuid-1", "uuid-2", "uuid-3"], 
+    "eventIds": ["uuid-1", "uuid-2", "uuid-3"],    
+    "workflow": "full",
+    "configuration": {
+        "key": "value"
+    }
+}

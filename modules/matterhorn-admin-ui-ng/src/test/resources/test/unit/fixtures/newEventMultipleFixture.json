@@ -1,0 +1,777 @@
+{
+  "metadata": {
+    "metadata": {
+      "title": {
+        "id": "title",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+        "value": "eins",
+        "required": "true",
+        "type": "text",
+        "readOnly": false,
+        "$$hashKey": "06V",
+        "presentableValue": "eins"
+      },
+      "presenters": {
+        "id": "presenters",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTER",
+        "value": [
+          "a.morris",
+          "franz.kafka"
+        ],
+        "required": "true",
+        "type": "text",
+        "collection": "users",
+        "readOnly": false,
+        "$$hashKey": "06W",
+        "presentableValue": [
+          "a.morris",
+          "franz.kafka"
+        ]
+      },
+      "series": {
+        "id": "series",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
+        "value": "edu123",
+        "type": "text",
+        "collection": {
+          "phy325": "Physics325",
+          "edu123": "Education123"
+        },
+        "readOnly": false,
+        "$$hashKey": "06X",
+        "presentableValue": "Education123"
+      },
+      "contributors": {
+        "id": "contributors",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
+        "value": [
+          "chuck.norris",
+          "matt.smith"
+        ],
+        "type": "text",
+        "collection": "users",
+        "readOnly": false,
+        "$$hashKey": "06Y",
+        "presentableValue": [
+          "chuck.norris",
+          "matt.smith"
+        ]
+      },
+      "subject": {
+        "id": "subject",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
+        "value": [
+          "zwei"
+        ],
+        "required": "true",
+        "type": "text",
+        "readOnly": false,
+        "$$hashKey": "06Z",
+        "presentableValue": [
+          "zwei"
+        ]
+      },
+      "language": {
+        "id": "language",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE",
+        "value": "en",
+        "type": "text",
+        "collection": {
+          "en": "English",
+          "de": "German",
+          "fr": "French"
+        },
+        "readOnly": false,
+        "$$hashKey": "070",
+        "presentableValue": "English"
+      },
+      "copyright": {
+        "id": "copyright",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.COPYRIGHT",
+        "value": "?",
+        "type": "text",
+        "collection": {
+          "?": "No idea",
+          "??": "Specify please!",
+          "???": "copyright???"
+        },
+        "readOnly": false,
+        "$$hashKey": "072",
+        "presentableValue": "No idea"
+      }
+    }
+  },
+  "source": {
+    "upload": {
+      
+    },
+    "SCHEDULE_SINGLE": {
+      "device": {
+        "inputMethods": {
+          
+        }
+      }
+    },
+    "SCHEDULE_MULTIPLE": {
+      "device": {
+        "id": "\u2022mock\u2022 agent3",
+        "status": "ok",
+        "name": "\u2022mock\u2022 agent3",
+        "updated": "5:37 PM",
+        "inputs": [
+          {
+            "id": "video",
+            "value": "TRANSLATION.PATH.VIDEO",
+            "$$hashKey": "09O"
+          }
+        ],
+        "inputMethods": {
+          "TRANSLATION.PATH.VIDEO": true
+        }
+      },
+      "weekdays": {
+        "EVENTS.EVENTS.NEW.WEEKDAYS.MO": true,
+        "EVENTS.EVENTS.NEW.WEEKDAYS.TU": true,
+        "EVENTS.EVENTS.NEW.WEEKDAYS.WE": true
+      },
+      "repetitionOption": "WEEKLY",
+      "start": {
+        "date": "2014-07-17",
+        "hour": "10",
+        "minute": "0"
+      },
+      "end": "2014-07-24",
+      "duration": {
+        "hour": "1",
+        "minute": "45"
+      }
+    },
+    "type": "SCHEDULE_MULTIPLE"
+  },
+  "processing": {
+    "workflow": {
+      "id": "full",
+      "title": "Encode, Analyze, and Distribute",
+      "tags": {
+        "tag": [
+          "archive",
+          "schedule",
+          "upload"
+        ]
+      },
+      "description": "\n    A simple workflow that transcodes the media into distribution formats, then sends the resulting distribution files,\n    along with their associated metadata, to the distribution channels.\n  ",
+      "published": false,
+      "configuration_panel": "\n  \n    <fieldset>\n      <legend>Holds<\/legend>\n      <span>Processing should be paused to allow for:<\/span>\n      <ul class=\"oc-ui-checkbox-list-upload\">\n          <input id=\"videoPreview\" name=\"videoPreview\" type=\"checkbox\" class=\"configField holdCheckbox\" style=\"visibility:hidden\" value=\"true\"\/>\n        <li class=\"ui-helper-clearfix\">\n          <span id=\"trimholdconfig\">\n            <input id=\"trimHold\" name=\"trimHold\" type=\"checkbox\" class=\"configField holdCheckbox\" value=\"true\" \/>\n            <span id=\"i18n_hold_for_trim\">&nbsp;Review \/ Trim before encoding (with option to edit info)<\/span>\n          <\/span>\n        <\/li>\n        <li class=\"ui-helper-clearfix\">\n          <span id=\"captionconfig\">\n            <input id=\"captionHold\" name=\"captionHold\" type=\"checkbox\" class=\"configField holdCheckbox\" value=\"true\"\/>\n            <span id=\"i18n_hold_for_caption\">&nbsp;Captions file upload<\/span>\n          <\/span>\n        <\/li>\n      <\/ul>\n    <\/fieldset>\n    <fieldset>\n      <legend>Archive<\/legend>\n      <ul class=\"oc-ui-checkbox-list-upload\">\n        <li class=\"ui-helper-clearfix\">\n          <span id=\"archiveconfig\">\n            <input id=\"archiveOp\" name=\"archiveOp\" type=\"checkbox\" checked=\"checked\" class=\"configField holdCheckbox\" value=\"true\"\/>\n            <span id=\"i18n_activate_archive\">&nbsp;Archive the media package<\/span>\n          <\/span>\n        <\/li>\n      <\/ul>\n    <\/fieldset>  \n    <fieldset>\n      <legend>Publication<\/legend>\n      <ul class=\"oc-ui-checkbox-list-upload\">\n        <!-- field: License -->\n        <li class=\"ui-helper-clearfix\">\n          <span id=\"engageconfig\">\n            <input id=\"publishEngage\" name=\"publishEngage\" type=\"checkbox\" checked=\"checked\" class=\"configField\" value=\"true\" \/>\n            <span id=\"i18n_dist_mmm\">&nbsp;Matterhorn Media Module<\/span>\n\t\t  <\/span>\n        <\/li>\n        <li class=\"ui-helper-clearfix\">\n          <span id=\"harvestingconfig\">\n            <input id=\"publishHarvesting\" name=\"publishHarvesting\" type=\"checkbox\" checked=\"checked\" class=\"configField\" value=\"true\" \/>\n            <span id=\"i18n_dist_mmm\">&nbsp;Metadata Harvesting<\/span>\n          <\/span>\n        <\/li>\n        <!--\n\t    <li class=\"ui-helper-clearfix\">\n          <span id=\"youtubeconfig\">\n            <input id=\"publishYoutube\" name=\"publishYoutube\" type=\"checkbox\" disabled=\"disabled\" class=\"configField\" value=\"true\" \/>\n            <span id=\"i18n_dist_mmm\">&nbsp;Youtube<\/span>\n          <\/span>\n        <\/li>\n        -->\n      <\/ul>\n    <\/fieldset>\n\n    <script type=\"text\/javascript\">\n      var ocWorkflowPanel = ocWorkflowPanel || {};\n      var trimHold = $('input#trimHold');\n      var captionHold = $('input#captionHold');\n      var videoPreview = $('input#videoPreview');\n      \n      var checkVideoPreview = function(){\n        var checkValue = trimHold.is(':checked') || captionHold.is(':checked');\n        videoPreview.attr('checked', checkValue);\n      }\n      \n      trimHold.click(checkVideoPreview);\n      captionHold.click(checkVideoPreview);\n\n      ocWorkflowPanel.registerComponents = function(components){\n\n        \/* components with keys that begin with 'org.opencastproject.workflow.config' will be passed\n         * into the workflow. The component's nodeKey must match the components array key.\n         *\n         * Example:'org.opencastproject.workflow.config.myProperty' will be availible at ${my.property}\n         *\/\n\n        components['org.opencastproject.workflow.config.trimHold'] = new ocAdmin.Component(\n          ['trimHold'],\n          {key: 'org.opencastproject.workflow.config.trimHold'},\n          {getValue: function(){ return this.fields.trimHold.is(\":checked\"); }\n        });\n          \n        components['org.opencastproject.workflow.config.archiveOp'] = new ocAdmin.Component(\n          ['archiveOp'],\n          {key: 'org.opencastproject.workflow.config.archiveOp'},\n          {getValue: function(){ return this.fields.archiveOp.is(\":checked\");}\n        });\n          \n        components['org.opencastproject.workflow.config.captionHold'] = new ocAdmin.Component(\n          ['captionHold'],\n          {key: 'org.opencastproject.workflow.config.captionHold'},\n          {getValue: function(){ return this.fields.captionHold.is(\":checked\");}\n        });\n          \n        components['org.opencastproject.workflow.config.videoPreview'] = new ocAdmin.Component(\n          ['videoPreview'],\n          {key: 'org.opencastproject.workflow.config.videoPreview'},\n          {getValue: function(){ return this.fields.videoPreview.is(\":checked\");}\n        });\n          \n        ocScheduler.dublinCore.components['license'] = new ocAdmin.Component(\n          ['license'],\n          {label: 'licenseLabel', key: 'license'}\n        );\n\n        components['org.opencastproject.workflow.config.publishEngage'] = new ocAdmin.Component(\n          ['publishEngage'],\n          {key: 'org.opencastproject.workflow.config.publishEngage'},\n          {getValue: function(){ return this.fields.publishEngage.is(\":checked\");}\n        });\n\n        components['org.opencastproject.workflow.config.publishHarvesting'] = new ocAdmin.Component(\n          ['publishHarvesting'],\n          {key: 'org.opencastproject.workflow.config.publishHarvesting'},\n          {getValue: function(){ return this.fields.publishHarvesting.is(\":checked\");}\n        });\n\n      }\n      ocWorkflowPanel.setComponentValues = function(values, components){\n        components['org.opencastproject.workflow.config.captionHold'].setValue(values['org.opencastproject.workflow.config.captionHold']);\n        components['org.opencastproject.workflow.config.trimHold'].setValue(values['org.opencastproject.workflow.config.trimHold']);\n        components['org.opencastproject.workflow.config.videoPreview'].setValue(values['org.opencastproject.workflow.config.videoPreview']);\n        components['org.opencastproject.workflow.config.archiveOp'].setValue(values['org.opencastproject.workflow.config.archiveOp']);\n        components['org.opencastproject.workflow.config.publishEngage'].setValue(values['org.opencastproject.workflow.config.publishEngage']);\n        components['org.opencastproject.workflow.config.publishHarvesting'].setValue(values['org.opencastproject.workflow.config.publishHarvesting']);\n        components['license'].setValue(values['license']);\n      }\n    <\/script>\n  \n  ",
+      "operations": {
+        "operation": [
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "fail-on-error": "true",
+            "description": "Applying default configuration values",
+            "id": "defaults",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "publishHarvesting",
+                  "$": "true"
+                },
+                {
+                  "key": "publishEngage",
+                  "$": "true"
+                },
+                {
+                  "key": "trimHold",
+                  "$": "false"
+                },
+                {
+                  "key": "archiveOp",
+                  "$": "true"
+                },
+                {
+                  "key": "captionHold",
+                  "$": "false"
+                },
+                {
+                  "key": "videoPreview",
+                  "$": "false"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "fail-on-error": "true",
+            "description": "Ingesting external elements",
+            "id": "ingest-download",
+            "configurations": {
+              "configuration": {
+                "key": "delete-external",
+                "$": "true"
+              }
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "true",
+            "description": "Applying access control entries",
+            "id": "apply-acl"
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "fail-on-error": "true",
+            "description": "Tagging incoming source material for archival",
+            "id": "tag",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "source-flavors",
+                  "$": "*\/source,security\/*"
+                },
+                {
+                  "key": "target-tags",
+                  "$": "+archive"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "fail-on-error": "true",
+            "description": "Tagging metadata catalogs for archival and publication",
+            "id": "tag",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "source-flavors",
+                  "$": "dublincore\/*"
+                },
+                {
+                  "key": "target-tags",
+                  "$": "+archive,+engage-download"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "true",
+            "description": "Inspecting audio and video streams",
+            "id": "inspect",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "overwrite",
+                  "$": "false"
+                },
+                {
+                  "key": "accept-no-media",
+                  "$": "false"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "true",
+            "description": "Preparing presenter (camera) audio and video work versions",
+            "id": "prepare-av",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "target-flavor",
+                  "$": "presenter\/work"
+                },
+                {
+                  "key": "rewrite",
+                  "$": "false"
+                },
+                {
+                  "key": "promiscuous-audio-muxing",
+                  "$": "true"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "presenter\/source"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "true",
+            "description": "Preparing presentation (screen) audio and video work version",
+            "id": "prepare-av",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "target-flavor",
+                  "$": "presentation\/work"
+                },
+                {
+                  "key": "rewrite",
+                  "$": "false"
+                },
+                {
+                  "key": "promiscuous-audio-muxing",
+                  "$": "true"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "presentation\/source"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "if": "${videoPreview}",
+            "fail-on-error": "true",
+            "description": "Encoding presenter (camera) video for preview",
+            "id": "compose",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "target-flavor",
+                  "$": "*\/preview"
+                },
+                {
+                  "key": "encoding-profile",
+                  "$": "flash-preview.http"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "*\/work"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "if": "${trimHold}",
+            "fail-on-error": "true",
+            "description": "Waiting for user to review and trim",
+            "id": "trim",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "encoding-profile",
+                  "$": "trim.work"
+                },
+                {
+                  "key": "target-flavor-subtype",
+                  "$": "trimmed"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "*\/work"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "fail-on-error": "true",
+            "description": "Tagging media for archival",
+            "id": "tag",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "source-flavors",
+                  "$": "*\/trimmed"
+                },
+                {
+                  "key": "target-tags",
+                  "$": "+archive"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "fail-on-error": "true",
+            "description": "Tagging metadata catalogs for archival and publication",
+            "id": "tag",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "source-flavors",
+                  "$": "dublincore\/*"
+                },
+                {
+                  "key": "target-tags",
+                  "$": "+archive,+engage-download"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "if": "${captionHold}",
+            "fail-on-error": "true",
+            "description": "Waiting for user to upload captions",
+            "id": "caption",
+            "configurations": {
+              "configuration": {
+                "key": "target-tags",
+                "$": "engage-download,archive"
+              }
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "true",
+            "description": "Creating Engage search result thumbnails",
+            "id": "image",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "target-flavor",
+                  "$": "*\/search+preview"
+                },
+                {
+                  "key": "source-tags"
+                },
+                {
+                  "key": "time",
+                  "$": "1"
+                },
+                {
+                  "key": "encoding-profile",
+                  "$": "search-cover.http"
+                },
+                {
+                  "key": "target-tags",
+                  "$": "engage-download"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "*\/trimmed"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "true",
+            "description": "Creating Engage player preview image",
+            "id": "image",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "target-flavor",
+                  "$": "*\/player+preview"
+                },
+                {
+                  "key": "source-tags"
+                },
+                {
+                  "key": "time",
+                  "$": "1"
+                },
+                {
+                  "key": "encoding-profile",
+                  "$": "player-preview.http"
+                },
+                {
+                  "key": "target-tags",
+                  "$": "engage-download"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "*\/trimmed"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "true",
+            "description": "Encoding presenter (camera) to Flash video",
+            "id": "compose",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "target-flavor",
+                  "$": "presenter\/delivery"
+                },
+                {
+                  "key": "encoding-profile",
+                  "$": "flash.http"
+                },
+                {
+                  "key": "target-tags",
+                  "$": "engage-download,engage-streaming"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "presenter\/trimmed"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "true",
+            "description": "Encoding presentation (screen) to Flash video",
+            "id": "compose",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "target-flavor",
+                  "$": "presentation\/delivery"
+                },
+                {
+                  "key": "encoding-profile",
+                  "$": "flash-vga.http"
+                },
+                {
+                  "key": "target-tags",
+                  "$": "engage-download,engage-streaming"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "presentation\/trimmed"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "false",
+            "description": "Encoding presenter (camera) to Flash audio",
+            "id": "compose",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "target-flavor",
+                  "$": "presenter\/delivery"
+                },
+                {
+                  "key": "encoding-profile",
+                  "$": "flash-audio.http"
+                },
+                {
+                  "key": "target-tags",
+                  "$": "engage-download,engage-streaming"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "presenter\/trimmed"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "false",
+            "description": "Detecting slide transitions in presentation track",
+            "id": "segment-video",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "target-tags",
+                  "$": "engage-download"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "presentation\/trimmed"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "false",
+            "description": "Creating preview images for presentation segments",
+            "id": "segmentpreviews",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "target-flavor",
+                  "$": "presentation\/segment+preview"
+                },
+                {
+                  "key": "encoding-profile",
+                  "$": "player-slides.http"
+                },
+                {
+                  "key": "reference-flavor",
+                  "$": "presentation\/delivery"
+                },
+                {
+                  "key": "target-tags",
+                  "$": "engage-download"
+                },
+                {
+                  "key": "reference-tags",
+                  "$": "engage-download"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "presentation\/trimmed"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "fail-on-error": "false",
+            "description": "Extracting text from presentation segments",
+            "id": "extract-text",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "target-tags",
+                  "$": "engage-download,archive"
+                },
+                {
+                  "key": "source-flavor",
+                  "$": "presentation\/trimmed"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "2",
+            "exception-handler-workflow": "error",
+            "if": "${publishEngage}",
+            "fail-on-error": "true",
+            "description": "Publishing to Engage",
+            "id": "publish-engage",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "download-source-tags",
+                  "$": "engage-download,atom,rss,mobile"
+                },
+                {
+                  "key": "check-availability",
+                  "$": "true"
+                },
+                {
+                  "key": "streaming-source-tags",
+                  "$": "engage-streaming"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "if": "${publishHarvesting}",
+            "fail-on-error": "true",
+            "description": "Distribute and publish to OAI-PMH repository",
+            "id": "publish-oaipmh",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "streaming-tags",
+                  "$": "engage-streaming"
+                },
+                {
+                  "key": "repository",
+                  "$": "default"
+                },
+                {
+                  "key": "download-tags",
+                  "$": "engage-download,atom,rss"
+                },
+                {
+                  "key": "check-availability",
+                  "$": "true"
+                }
+              ]
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "exception-handler-workflow": "error",
+            "if": "${archiveOp}",
+            "fail-on-error": "true",
+            "description": "Archiving",
+            "id": "archive2",
+            "configurations": {
+              "configuration": {
+                "key": "source-tags",
+                "$": "archive"
+              }
+            }
+          },
+          {
+            "retry-strategy": "none",
+            "max-attempts": "1",
+            "fail-on-error": "false",
+            "description": "Cleaning up",
+            "id": "cleanup",
+            "configurations": {
+              "configuration": [
+                {
+                  "key": "preserve-flavors"
+                },
+                {
+                  "key": "delete-external",
+                  "$": "true"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "selection": {
+        "id": "full",
+        "configuration": {
+          "archiveOp": "true",
+          "publishEngage": "true",
+          "publishHarvesting": "true"
+        }
+      }
+    }
+  },
+  "access": {
+    "access": {
+      "acl": "1851"
+    }
+  },
+  "summary": {
+    
+  }
+}

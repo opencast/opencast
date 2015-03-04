@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ingest-prepare</id>
+  <title>Ingest and prepare</title>
+  <tags />
+  <description>Download from external ingest nodes, tag, inspect and and prepare source recording and metadata catalogs.</description>
+
+  <configuration_panel></configuration_panel>
+
+  <operations>
+
+    <!-- Ingest elements from external working file repositories and file servers -->
+
+    <operation
+      id="ingest-download"
+      description="Ingesting external elements">
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Apply access control lists from series to the mediapackage -->
+
+    <operation
+      id="apply-acl"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Applying access control entries">
+    </operation>
+
+    <!-- Tag the incoming source material for archival -->
+
+    <operation
+      id="tag"
+      description="Tagging incoming source material for archival">
+      <configurations>
+        <configuration key="source-flavors">*/source,security/*</configuration>
+        <configuration key="target-tags">+archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag the incoming metadata catalogs for publishing -->
+
+    <operation
+      id="tag"
+      description="Tagging metadata catalogs for archival and publication">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*</configuration>
+        <configuration key="target-tags">+archive,+engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Inspect the media -->
+
+    <operation
+      id="inspect"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Inspecting audio and video streams">
+      <configurations>
+        <configuration key="overwrite">false</configuration>
+        <configuration key="accept-no-media">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Prepare presenter track -->
+
+    <operation
+      id="prepare-av"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Preparing presenter (camera) audio and video work versions">
+      <configurations>
+        <configuration key="source-flavor">presenter/source</configuration>
+        <configuration key="target-flavor">presenter/work</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="promiscuous-audio-muxing">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Prepare presentation track -->
+
+    <operation
+      id="prepare-av"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Preparing presentation (screen) audio and video work version">
+      <configurations>
+        <configuration key="source-flavor">presentation/source</configuration>
+        <configuration key="target-flavor">presentation/work</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="promiscuous-audio-muxing">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag the resulting media (untrimmed) for archival -->
+
+    <operation
+      id="tag"
+      description="Tagging media for archival">
+      <configurations>
+        <configuration key="source-flavors">*/work</configuration>
+        <configuration key="target-tags">+archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag the dublin core catalogs created during trim operation for archival and publication -->
+
+    <operation
+      id="tag"
+      description="Tagging metadata catalogs for archival and publication">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*</configuration>
+        <configuration key="target-tags">+archive,+engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <operation id="compose" description="Transcode standard videos to video previews" fail-on-error="true">
+      <configurations>
+        <configuration key="source-flavors">*/work</configuration>
+        <configuration key="target-flavor">*/preview</configuration>
+        <configuration key="encoding-profile">mp4-preview.http</configuration>
+      </configurations>
+    </operation>
+
+    <operation id="tag" description="Tagging previews for publishing to internal publication channel">
+      <configurations>
+        <configuration key="source-flavors">*/preview</configuration>
+        <configuration key="target-tags">+internal,+archive</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+</definition>

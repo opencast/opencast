@@ -1,0 +1,35 @@
+// Popover Animation
+// ----------------------------------------
+
+.shortcuts-popover {
+
+    // Show and Hide Functionality
+    visibility: hidden;
+    opacity: 0;
+
+    @popover-transition-timing-function: ease-in-out;
+    @popover-transition-delay: 0ms;
+    @popover-transition-duration: 250ms;
+    @popover-visibility-transition-delay: @popover-transition-delay + 200ms;
+
+    // Variables Defined on Variable Parial
+
+    -webkit-transition:
+        visibility @popover-transition-duration @popover-transition-timing-function @popover-visibility-transition-delay,
+        opacity @popover-transition-duration @popover-transition-timing-function @popover-transition-delay
+    ;
+
+    transition:
+        visibility @popover-transition-duration @popover-transition-timing-function @popover-visibility-transition-delay,
+        opacity @popover-transition-duration @popover-transition-timing-function @popover-transition-delay
+    ;
+}
+
+.keyboard-shortcuts.active {
+
+    .shortcuts-popover {
+        visibility: visible;
+        opacity: 1;
+        .transition-delay(0ms);
+    }
+}

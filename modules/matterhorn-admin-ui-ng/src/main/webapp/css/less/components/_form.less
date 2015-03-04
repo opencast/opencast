@@ -1,0 +1,186 @@
+.form-container {
+    .clearfix();
+    max-width: 100%;
+    padding: 0;
+    margin: 15px 0;
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    label {
+        color: @black-50;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    input[type="date"],
+    input[type="time"],
+    input[type="checkbox"],
+    textarea {
+        width: 100%;
+        padding: 0 20px;
+        margin: 5px 0;
+    }
+
+    textarea {
+        padding: 15px 20px;
+        resize: none;
+    }
+
+    .row {
+        .clearfix();
+        display: block;
+        width: 100%;
+        margin: 15px 0;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        label,
+        input {
+            display: block;
+        }
+
+        input {
+            float: none;
+        }
+
+        input,
+        textarea,
+        .drop-down-container,
+        .chosen-container {
+            margin-top: 10px;
+        }
+
+
+        // Checkbox Content
+        // ----------------------------------------
+
+        // ## Todo: Update markup and require a block level container
+        // to split checkboxes and labels into groups and rows
+
+        .checkbox-container.one-line { // refactor out .one-line after markup change
+
+            input[type="checkbox"],
+            label {
+                display: inline-block;
+                width: auto;
+            }
+
+            input[type='checkbox'] {
+                margin-right: 5px;
+            }
+
+        }
+
+
+        // Inline Content
+        // ----------------------------------------
+
+        .inline-content {
+
+            > label {
+                float: left;
+                display: inline-block;
+                margin-top: 14px;
+                margin-right: 8px;
+                margin-left: 8px;
+            }
+
+            > input {
+                float: left;
+            }
+
+            &.inline-content-padded {
+                padding: 18px 0 0;
+            }
+        }
+
+        input[type="radio"] {
+            float: left;
+            margin: 1px 5px 0 0;
+        }
+
+        // Layout Options
+        // ----------------------------------------
+
+        &.no-padding {
+            margin-top: 0;
+        }
+
+        [class$="-column"] {
+            display: inline-block;
+        }
+
+        .small-column {
+            width: 25%;
+            padding-right: 10px;
+        }
+
+        .medium-column {
+            width: 40%;
+
+            > .inline-content > label {
+                width: 50%;
+            }
+        }
+
+    } // row
+
+    .button-container {
+        padding: 10px 0;
+
+        a {
+            padding: 10px 20px;
+        }
+
+        &.float-opposite {
+            a:first-child {
+                float: left;
+            }
+            a:last-child {
+                float: right;
+            }
+        }
+    }
+
+    &.tiny-form {
+        max-width: 150px;
+    }
+
+    &.smaller-form {
+        max-width: 280px;
+    }
+
+    &.small-form {
+        max-width: 500px;
+    }
+
+    &.medium-form {
+        max-width: 800px;
+    }
+
+    &.large-form {
+        max-width: 1000px;
+    }
+
+    &.compact {
+        margin: 0;
+    }
+
+    > .drop-down-container {
+        width: 100%;
+    }
+}

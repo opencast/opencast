@@ -23,6 +23,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -42,6 +43,8 @@ import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.SmilMediaAudioImpl;
 import org.opencastproject.smil.entity.media.element.SmilMediaVideoImpl;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
+import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -266,6 +269,93 @@ public class SmilServiceImplTest {
     SmilResponse smilResponse = smilService.createNewSmil();
     smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 0, 10);
     fail("SmilException schould be thrown if you try to add an invalid track.");
+  }
+
+  /**
+   * passing a previously created paramGroupId
+   */
+  @Test
+  public void testAddClipWithParamGroupId() throws Exception {
+    // first, create SMIL with 1 par, 1 video
+    TrackImpl videoTrack = new TrackImpl();
+    videoTrack.setIdentifier("presenter-track-1");
+    videoTrack.setFlavor(new MediaPackageElementFlavor("source", "presenter"));
+    videoTrack.setURI(new URI("http://hostname/video.mp4"));
+    videoTrack.addStream(new VideoStreamImpl());
+    videoTrack.setDuration(1000000000000L);
+
+    SmilResponse smilResponse = smilService.createNewSmil();
+    smilResponse = smilService.addParallel(smilResponse.getSmil());
+    SmilMediaContainer par = (SmilMediaContainer) smilResponse.getEntity();
+    // add video track into parallel element
+    smilResponse = smilService.addClip(smilResponse.getSmil(), par.getId(), videoTrack, 1000L, 1000000L);
+
+    SmilMediaObject media = null;
+    for (SmilObject entity : smilResponse.getEntities()) {
+      if (entity instanceof SmilMediaObject) {
+        media = (SmilMediaObject) entity;
+        break;
+      }
+    }
+    assertNotNull(media);
+    assertEquals(media.getId(), ((SmilMediaContainer) smilResponse.getSmil().getBody().getMediaElements().get(0))
+            .getElements().get(0).getId());
+    assertTrue(media instanceof SmilMediaVideoImpl);
+    assertSame(((SmilMediaElement) media).getMediaType(), SmilMediaElement.MediaType.VIDEO);
+    // 1000 milliseconds = 1 second
+    assertEquals(1000L, ((SmilMediaElement) media).getClipBeginMS());
+    // duration is 1000000 milliseconds = 1000 soconds
+    // start + duration = 1s + 1000s = 1001s
+    assertEquals(1001000L, ((SmilMediaElement) media).getClipEndMS());
+
+    // get param group id
+    List<SmilMediaParamGroup> groups = smilResponse.getSmil().getHead().getParamGroups();
+    assertEquals(1, groups.size());
+    String paramGroupId = groups.get(0).getId();
+
+    // then, create a 2nd par with 1 video with the same param group id
+    TrackImpl videoTrack2 = new TrackImpl();
+    videoTrack2.setIdentifier("presenter-track-2");
+    videoTrack2.setFlavor(new MediaPackageElementFlavor("source2", "presenter"));
+    videoTrack2.setURI(new URI("http://hostname/video2.mp4"));
+    videoTrack2.addStream(new VideoStreamImpl());
+    videoTrack2.setDuration(2000000000000L);
+
+    smilResponse = smilService.addParallel(smilResponse.getSmil());
+    SmilMediaContainer par2 = null;
+    for (SmilObject entity : smilResponse.getEntities()) {
+      if (entity instanceof SmilMediaContainer && !entity.getId().equals(par.getId())) {
+        par2 = (SmilMediaContainer) entity;
+        break;
+      }
+    }
+    // add video track into parallel element
+    smilResponse = smilService
+            .addClip(smilResponse.getSmil(), par2.getId(), videoTrack2, 2000L, 2000000L, paramGroupId);
+
+    SmilMediaObject media2 = null;
+    for (SmilObject entity : smilResponse.getEntities()) {
+      if (entity instanceof SmilMediaObject && !entity.getId().equals(media.getId())) {
+        media2 = (SmilMediaObject) entity;
+        break;
+      }
+    }
+    assertNotNull(media2);
+    SmilMediaElement mediaElement2 = (SmilMediaElement) ((SmilMediaContainer) smilResponse.getSmil().getBody()
+            .getMediaElements().get(1)).getElements().get(0);
+    assertEquals(media2.getId(), mediaElement2.getId());
+    assertTrue(media2 instanceof SmilMediaVideoImpl);
+    assertSame(((SmilMediaElement) media2).getMediaType(), SmilMediaElement.MediaType.VIDEO);
+    // 1000 milliseconds = 1 second
+    assertEquals(2000L, ((SmilMediaElement) media2).getClipBeginMS());
+    // duration is 2000000 milliseconds = 2000 seconds
+    // start + duration = 2s + 2000s = 2002s
+    assertEquals(2002000L, ((SmilMediaElement) media2).getClipEndMS());
+    // make sure there's still 1 param group
+    groups = smilResponse.getSmil().getHead().getParamGroups();
+    assertEquals(1, groups.size());
+    // make sure that the media element has the previous param groupo id
+    assertEquals(paramGroupId, mediaElement2.getParamGroup());
   }
 
   /**

@@ -18,7 +18,7 @@ package org.opencastproject.ingest.impl;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -42,7 +42,6 @@ import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
-import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -51,6 +50,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -186,11 +186,11 @@ public class IngestServiceImplTest {
     EasyMock.expect(schedulerService.getEventCaptureAgentConfiguration(EasyMock.anyLong())).andReturn(properties)
             .anyTimes();
     EasyMock.expect(schedulerService.getEventDublinCore(EasyMock.anyLong()))
-            .andReturn(new DublinCoreCatalogImpl(urlCatalog1.toURL().openStream())).anyTimes();
+            .andReturn(DublinCores.read(urlCatalog1.toURL().openStream())).anyTimes();
 
     EasyMock.replay(wfr, workflowInstance, workflowService, schedulerService);
 
-    User anonymous = new JaxbUser("anonymous", new DefaultOrganization(), new JaxbRole(
+    User anonymous = new JaxbUser("anonymous", "test", new DefaultOrganization(), new JaxbRole(
             DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, new DefaultOrganization()));
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();

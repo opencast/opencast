@@ -1,0 +1,35 @@
+// Triangle Point
+
+@point-top-margin: 9px;
+@point-width: 10px;
+@point-height: 7px;
+@parent-border-stroke: 1px;
+
+
+.right-triangle-point-common {
+    content: "";
+    position: absolute;
+    top: @point-top-margin;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: @point-height 0 @point-height @point-width;
+}
+
+.popover-header {
+
+    &::after {
+        @point-background-color: @main-border-color; // this is creating a faux border by using a background color
+        &:extend(.right-triangle-point-common);
+        right: @point-width - ((@point-width*2) - @parent-border-stroke);
+        border-color: transparent transparent transparent @point-background-color;
+    }
+
+    &::before {
+        @point-background-color: #fbfbfb; // mid point color from vertical gradient
+        &:extend(.right-triangle-point-common);
+        z-index: @z-100;
+        right: @point-width - ((@point-width*2) - (@parent-border-stroke+2));
+        border-color: transparent transparent transparent @point-background-color;
+    }
+}

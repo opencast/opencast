@@ -16,8 +16,18 @@
 
 package org.opencastproject.mediapackage;
 
-import org.opencastproject.util.Checksum;
-import org.opencastproject.util.MimeType;
+import static java.lang.String.format;
+import static javax.xml.XMLConstants.DEFAULT_NS_PREFIX;
+import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
+import static javax.xml.XMLConstants.XML_NS_URI;
+import static org.opencastproject.util.EqualsUtil.eq;
+import static org.opencastproject.util.EqualsUtil.hash;
+
+import com.entwinemedia.fn.data.ImmutableMapWrapper;
+import org.opencastproject.util.RequireUtil;
+import org.opencastproject.util.XmlNamespaceBinding;
+import org.opencastproject.util.XmlNamespaceContext;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
@@ -29,7 +39,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,7 +46,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.XMLConstants;
+import javax.annotation.Nonnull;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -77,21 +86,13 @@ import javax.xml.transform.stream.StreamResult;
  * However, reading of those documents is supported.
  */
 public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
-
-  /** Serial version UID */
-  private static final long serialVersionUID = -908525367616L;
-
-  protected static final int PREFIX = 0;
-  protected static final int LOCAL_NAME = 1;
+  private static final long serialVersionUID = -7580292199527168951L;
 
   /** Expanded name of the XML language attribute <code>xml:lang</code>. */
-  protected static final EName XML_LANG_ATTR = new EName(XMLConstants.XML_NS_URI, "lang");
+  public static final EName XML_LANG_ATTR = new EName(XML_NS_URI, "lang");
 
   /** Namespace prefix for XML schema instance. */
-  protected static final String XSI_NS_PREFIX = "xsi";
-
-  /** Namespace name for XML schema instance. */
-  protected static final String XSI_NS_URI = "http://www.w3.org/2001/XMLSchema-instance";
+  public static final String XSI_NS_PREFIX = "xsi";
 
   /**
    * Expanded name of the XSI type attribute.
@@ -99,59 +100,29 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    * See <a href="http://www.w3.org/TR/xmlschema-1/#xsi_type">http://www.w3.org/TR/xmlschema-1/#xsi_type</a> for the
    * definition.
    */
-  protected static final EName XSI_TYPE_ATTR = new EName(XSI_NS_URI, "type");
+  public static final EName XSI_TYPE_ATTR = new EName(W3C_XML_SCHEMA_INSTANCE_NS_URI, "type");
 
   /** Key (QName) value meta data */
-  protected Map<EName, List<CatalogEntry>> data = new HashMap<EName, List<CatalogEntry>>();
+  protected final Map<EName, List<CatalogEntry>> data = new HashMap<>();
 
   /** Namespace - prefix bindings */
-  protected Bindings bindings = new Bindings(false);
+  protected XmlNamespaceContext bindings;
 
-  /** Needed by JAXB */
+  /**
+   * Create an empty catalog and register the {@link javax.xml.XMLConstants#W3C_XML_SCHEMA_INSTANCE_NS_URI}
+   * namespace.
+   */
   protected XMLCatalogImpl() {
     super();
+    bindings = XmlNamespaceContext.mk(XSI_NS_PREFIX, W3C_XML_SCHEMA_INSTANCE_NS_URI);
   }
 
-  /**
-   * Creates an abstract metadata container.
-   *
-   * @param id
-   *          the element identifier withing the package
-   * @param flavor
-   *          the catalog flavor
-   * @param uri
-   *          the document location
-   * @param size
-   *          the catalog size in bytes
-   * @param checksum
-   *          the catalog checksum
-   * @param mimeType
-   *          the catalog mime type
-   */
-  protected XMLCatalogImpl(String id, MediaPackageElementFlavor flavor, URI uri, long size, Checksum checksum,
-          MimeType mimeType) {
-    super(id, flavor, uri, size, checksum, mimeType);
-    bindPrefix(XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
-    bindPrefix(XMLConstants.XMLNS_ATTRIBUTE, XMLConstants.XMLNS_ATTRIBUTE_NS_URI);
-    bindPrefix(XSI_NS_PREFIX, XSI_NS_URI);
+  protected void addBinding(XmlNamespaceBinding binding) {
+    bindings = bindings.add(binding);
   }
 
-  /**
-   * Creates an abstract metadata container.
-   *
-   * @param flavor
-   *          the catalog flavor
-   * @param uri
-   *          the document location
-   * @param size
-   *          the catalog size in bytes
-   * @param checksum
-   *          the catalog checksum
-   * @param mimeType
-   *          the catalog mime type
-   */
-  protected XMLCatalogImpl(MediaPackageElementFlavor flavor, URI uri, long size, Checksum checksum, MimeType mimeType) {
-    this(null, flavor, uri, size, checksum, mimeType);
+  protected XmlNamespaceContext getBindings() {
+    return bindings;
   }
 
   /**
@@ -159,18 +130,6 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    */
   protected void clear() {
     data.clear();
-  }
-
-  /**
-   * Bind a prefix to a namespace.
-   *
-   * @param prefix
-   *          the prefix
-   * @param namespaceName
-   *          the namespace
-   */
-  protected void bindPrefix(String prefix, String namespaceName) {
-    bindings.bindPrefix(prefix, namespaceName);
   }
 
   /**
@@ -199,12 +158,10 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    *          the language identifier (two letter ISO 639)
    */
   protected void addLocalizedElement(EName element, String value, String language) {
-    if (element == null)
-      throw new IllegalArgumentException("Expanded name must not be null");
-    if (language == null)
-      throw new IllegalArgumentException("Language must not be null");
+    RequireUtil.notNull(element, "expanded name");
+    RequireUtil.notNull(language, "language");
 
-    Map<EName, String> attributes = new HashMap<EName, String>(1);
+    Map<EName, String> attributes = new HashMap<>(1);
     attributes.put(XML_LANG_ATTR, language);
     addElement(new CatalogEntry(element, value, attributes));
   }
@@ -218,12 +175,10 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    *          the element type
    */
   protected void addTypedElement(EName element, String value, EName type) {
-    if (element == null)
-      throw new IllegalArgumentException("EName name must not be null");
-    if (type == null)
-      throw new IllegalArgumentException("Type must not be null");
+    RequireUtil.notNull(element, "expanded name");
+    RequireUtil.notNull(type, "type");
 
-    Map<EName, String> attributes = new HashMap<EName, String>(1);
+    Map<EName, String> attributes = new HashMap<>(1);
     attributes.put(XSI_TYPE_ATTR, toQName(type));
     addElement(new CatalogEntry(element, value, attributes));
   }
@@ -248,7 +203,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
     if (language == null)
       throw new IllegalArgumentException("Language must not be null");
 
-    Map<EName, String> attributes = new HashMap<EName, String>(2);
+    Map<EName, String> attributes = new HashMap<>(2);
     attributes.put(XML_LANG_ATTR, language);
     attributes.put(XSI_TYPE_ATTR, toQName(type));
     addElement(new CatalogEntry(element, value, attributes));
@@ -268,7 +223,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
     if (element == null)
       throw new IllegalArgumentException("Expanded name must not be null");
 
-    Map<EName, String> attributeMap = new HashMap<EName, String>();
+    Map<EName, String> attributeMap = new HashMap<>();
     if (attributes != null) {
       for (int i = 0; i < attributes.getLength(); i++) {
         attributeMap.put(new EName(attributes.getURI(i), attributes.getLocalName(i)), attributes.getValue(i));
@@ -288,7 +243,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
       return;
     List<CatalogEntry> values = data.get(element.getEName());
     if (values == null) {
-      values = new ArrayList<CatalogEntry>();
+      values = new ArrayList<>();
       data.put(element.getEName(), values);
     }
     values.add(element);
@@ -385,7 +340,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
     List<CatalogEntry> values = data.get(element);
 
     if (values != null) {
-      List<CatalogEntry> filtered = new ArrayList<CatalogEntry>();
+      List<CatalogEntry> filtered = new ArrayList<>();
       for (CatalogEntry value : values) {
         if (equal(language, value.getAttribute(XML_LANG_ATTR))) {
           filtered.add(value);
@@ -479,8 +434,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
     docBuilderFactory.setNamespaceAware(true);
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-    Document doc = docBuilder.newDocument();
-    return doc;
+    return docBuilder.newDocument();
   }
 
   /**
@@ -513,8 +467,20 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    */
   @Override
   public Node toManifest(Document document, MediaPackageSerializer serializer) {
-    Node node = super.toManifest(document, serializer);
-    return node;
+    return super.toManifest(document, serializer);
+  }
+
+  /**
+   * Get a prefix from {@link #bindings} but throw a {@link NamespaceBindingException} if none found.
+   */
+  @Nonnull
+  protected String getPrefix(@Nonnull String namespaceURI) {
+    final String prefix = bindings.getPrefix(namespaceURI);
+    if (prefix != null) {
+      return prefix;
+    } else {
+      throw new NamespaceBindingException(format("Namespace URI %s is not bound to a prefix", namespaceURI));
+    }
   }
 
   /**
@@ -526,12 +492,13 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    * @throws NamespaceBindingException
    *           if the namespace name is not bound to a prefix
    */
+  @Nonnull
   protected String toQName(EName eName) {
-    if (!eName.hasNamespace()) {
+    if (eName.hasNamespace()) {
+      return toQName(getPrefix(eName.getNamespaceURI()), eName.getLocalName());
+    } else {
       return eName.getLocalName();
     }
-    String prefix = bindings.lookupPrefix(eName.getNamespaceName());
-    return toQName(prefix, eName.getLocalName());
   }
 
   /**
@@ -546,13 +513,13 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    * @throws NamespaceBindingException
    *           if the namespace name is not bound to a prefix
    */
+  @Nonnull
   protected EName toEName(String prefix, String localName) {
-    String namespaceName = bindings.lookupNamespace(prefix);
-    return new EName(namespaceName, localName);
+    return new EName(bindings.getNamespaceURI(prefix), localName);
   }
 
   /**
-   * Transform an qualified name to an expanded name, based on the registered binding.
+   * Transform a qualified name to an expanded name, based on the registered binding.
    *
    * @param qName
    *          the qualified name, e.g. <code>dcterms:title</code> or <code>title</code>
@@ -562,7 +529,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    */
   protected EName toEName(String qName) {
     String[] parts = splitQName(qName);
-    return new EName(bindings.lookupNamespace(parts[0]), parts[1]);
+    return new EName(bindings.getNamespaceURI(parts[0]), parts[1]);
   }
 
   /**
@@ -572,13 +539,14 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    *          the qname to split
    * @return an array of prefix (0) and local part (1). The prefix is "" if the qname belongs to the default namespace.
    */
-  private String[] splitQName(String qName) {
-    String[] parts = qName.split(":", 3);
-    if (parts.length > 2)
-      throw new IllegalArgumentException("Local name must not contain ':'");
-    if (parts.length == 2)
-      return parts;
-    return new String[] { XMLConstants.DEFAULT_NS_PREFIX, parts[0] };
+  private static String[] splitQName(String qName) {
+    final String[] parts = qName.split(":", 3);
+    switch (parts.length) {
+      case 1: return new String[] { DEFAULT_NS_PREFIX, parts[0] };
+      case 2: return parts;
+      default:
+        throw new IllegalArgumentException("Local name must not contain ':'");
+    }
   }
 
   /**
@@ -590,9 +558,9 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    *          the local name
    * @return the "prefixed name" <code>prefix:localName</code>
    */
-  private String toQName(String prefix, String localName) {
-    StringBuilder b = new StringBuilder();
-    if (prefix != null && !XMLConstants.DEFAULT_NS_PREFIX.equals(prefix)) {
+  private static String toQName(String prefix, String localName) {
+    final StringBuilder b = new StringBuilder();
+    if (prefix != null && !DEFAULT_NS_PREFIX.equals(prefix)) {
       b.append(prefix);
       b.append(":");
     }
@@ -602,34 +570,22 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   // --------------------------------------------------------------------------------------------
 
+  private static final Map<EName, String> NO_ATTRIBUTES = new HashMap<>();
+
   /**
    * Element representation.
    */
-  protected class CatalogEntry implements XmlElement, Comparable<CatalogEntry>, Serializable {
+  public final class CatalogEntry implements XmlElement, Comparable<CatalogEntry>, Serializable {
+    private static final long serialVersionUID = 7195298081966562710L;
 
-    /**
-     * The serial version UID
-     */
-    private static final long serialVersionUID = 793064320233482150L;
+    private final EName name;
 
-    private EName name;
-
-    private String value = null;
+    private final String value;
 
     /**
      * The attributes of this element
      */
-    private Map<EName, String> attributes = null;
-
-    /**
-     * Creates a new catalog element representation.
-     *
-     * @param value
-     *          the element value
-     */
-    public CatalogEntry(EName name, String value) {
-      this(name, value, null);
-    }
+    private final Map<EName, String> attributes;
 
     /**
      * Creates a new catalog element representation with name, value and attributes.
@@ -646,12 +602,13 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
     }
 
     /**
-     * Returns the element namespace.
+     * Creates a new catalog element representation.
      *
-     * @return the namespace
+     * @param value
+     *          the element value
      */
-    public String lookupPrefix() {
-      return bindings.lookupPrefix(name.getNamespaceName());
+    public CatalogEntry(EName name, String value) {
+      this(name, value, NO_ATTRIBUTES);
     }
 
     /**
@@ -684,7 +641,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
      * @return <code>true</code> if the element contains attributes
      */
     public boolean hasAttributes() {
-      return attributes != null && attributes.size() > 0;
+      return attributes.size() > 0;
     }
 
     /**
@@ -693,7 +650,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
      * @return the attributes
      */
     public Map<EName, String> getAttributes() {
-      return attributes;
+      return new ImmutableMapWrapper<>(attributes);
     }
 
     /**
@@ -702,7 +659,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
      * @return <code>true</code> if the element contains the attribute
      */
     public boolean hasAttribute(EName name) {
-      return attributes != null && attributes.containsKey(name);
+      return attributes.containsKey(name);
     }
 
     /**
@@ -711,32 +668,20 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
      * @return the attribute or null
      */
     public String getAttribute(EName name) {
-      if (attributes == null)
-        return null;
       return attributes.get(name);
     }
 
-    /**
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
-      return name.hashCode();
+      return hash(name, value);
     }
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object obj) {
-      if (obj instanceof CatalogEntry) {
-        CatalogEntry entry = (CatalogEntry) obj;
-        boolean equal = name.equals(entry.name);
-        equal &= value.equals(entry.value);
-        equal &= (attributes == null && entry.attributes == null) || attributes.equals(entry.attributes);
-        return equal;
-      }
-      return super.equals(obj);
+    @Override public boolean equals(Object that) {
+      return (this == that) || (that instanceof CatalogEntry && eqFields((CatalogEntry) that));
+    }
+
+    private boolean eqFields(CatalogEntry that) {
+      return eq(name, that.name) && eq(value, that.value) && eq(attributes, that.attributes);
     }
 
     /**
@@ -746,29 +691,28 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
      *          the document
      * @return the xml node
      */
+    @Override
     public Node toXml(Document document) {
       Element node = document.createElement(toQName(name));
       // Write prefix binding to document root element
       bindNamespaceFor(document, name);
-      if (attributes != null) {
-        for (Map.Entry<EName, String> entry : attributes.entrySet()) {
-          EName attrEName = entry.getKey();
-          if (attrEName.hasNamespace()) {
-            // Write prefix binding to document root element
-            bindNamespaceFor(document, attrEName);
-            if (XSI_TYPE_ATTR.equals(attrEName)) {
-              // Special treatment for xsi:type attributes
-              try {
-                EName typeName = toEName(entry.getValue());
-                bindNamespaceFor(document, typeName);
-              } catch (NamespaceBindingException ignore) {
-                // Type is either not a QName or its namespace is not bound.
-                // We decide to gently ignore those cases.
-              }
+      for (Map.Entry<EName, String> entry : attributes.entrySet()) {
+        EName attrEName = entry.getKey();
+        if (attrEName.hasNamespace()) {
+          // Write prefix binding to document root element
+          bindNamespaceFor(document, attrEName);
+          if (XSI_TYPE_ATTR.equals(attrEName)) {
+            // Special treatment for xsi:type attributes
+            try {
+              EName typeName = toEName(entry.getValue());
+              bindNamespaceFor(document, typeName);
+            } catch (NamespaceBindingException ignore) {
+              // Type is either not a QName or its namespace is not bound.
+              // We decide to gently ignore those cases.
             }
           }
-          node.setAttribute(toQName(entry.getKey()), entry.getValue());
         }
+        node.setAttribute(toQName(entry.getKey()), entry.getValue());
       }
       if (value != null) {
         node.appendChild(document.createTextNode(value));
@@ -776,10 +720,8 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
       return node;
     }
 
-    /**
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
-    public int compareTo(CatalogEntry o) {
+    @Override
+    public int compareTo(@Nonnull CatalogEntry o) {
       return name.getLocalName().compareTo(name.getLocalName());
     }
 
@@ -789,19 +731,14 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
      */
     private void bindNamespaceFor(Document document, EName name) {
       Element root = (Element) document.getFirstChild();
-      String namespace = name.getNamespaceName();
+      String namespace = name.getNamespaceURI();
       // Do not bind the "xml" namespace. It is bound by default
-      if (!XMLConstants.XML_NS_URI.equals(namespace)) {
-        root.setAttribute(XMLConstants.XMLNS_ATTRIBUTE + ":" + bindings.lookupPrefix(name.getNamespaceName()),
-                name.getNamespaceName());
+      if (!XML_NS_URI.equals(namespace)) {
+        root.setAttribute(XMLNS_ATTRIBUTE + ":" + XMLCatalogImpl.this.getPrefix(name.getNamespaceURI()),
+                name.getNamespaceURI());
       }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
       return value;
@@ -810,100 +747,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   // --------------------------------------------------------------------------------------------
 
-  /**
-   * Manages the prefix - namespace bindings.
-   */
-  protected static class Bindings implements Serializable {
-
-    /** Serial version UID */
-    private static final long serialVersionUID = 45L;
-
-    private Map<String, String> prefix2Namespace = new HashMap<String, String>();
-    private Map<String, String> namespace2prefix = new HashMap<String, String>();
-    private boolean allowRebind;
-
-    /**
-     * @param allowRebind
-     *          true - prefixes may be rebound, false - an exception will be thrown
-     */
-    public Bindings(boolean allowRebind) {
-      this.allowRebind = allowRebind;
-    }
-
-    /**
-     * Bind a prefix to a namespace.
-     *
-     * @param prefix
-     *          the prefix
-     * @param namespace
-     *          the namespace
-     */
-    public void bindPrefix(String prefix, String namespace) {
-      if (prefix == null)
-        throw new IllegalArgumentException("Prefix must not be null");
-      if (namespace == null)
-        throw new IllegalArgumentException("Namespace must not be empty");
-
-      if (!allowRebind) {
-        String namespaceCurrent = prefix2Namespace.get(prefix);
-        if (namespaceCurrent != null && !namespaceCurrent.equals(namespace)) {
-          throw new NamespaceBindingException("Prefix '" + prefix + "' is already bound to namespace " + "'"
-                  + namespaceCurrent + "'");
-        }
-        String prefixCurrent = namespace2prefix.get(namespace);
-        if (prefixCurrent != null && !prefixCurrent.equals(prefix)) {
-          throw new NamespaceBindingException("Prefix '" + prefixCurrent + "' " + "is already bound to namespace '"
-                  + namespace + "'");
-        }
-      }
-      prefix2Namespace.put(prefix, namespace);
-      namespace2prefix.put(namespace, prefix);
-    }
-
-    /**
-     * Returns the bound namespace.
-     *
-     * @throws NamespaceBindingException
-     *           if the prefix is not bound
-     */
-    public String lookupNamespace(String prefix) {
-      String namespace = prefix2Namespace.get(prefix);
-      if (namespace == null) {
-        throw new NamespaceBindingException("Prefix '" + prefix + "' is not bound");
-      }
-      return namespace;
-    }
-
-    /**
-     * Returns the prefix bound to this namespace
-     *
-     * @throws NamespaceBindingException
-     *           if the namespace is not bound
-     */
-    public String lookupPrefix(String namespace) {
-      String prefix = namespace2prefix.get(namespace);
-      if (prefix == null) {
-        throw new NamespaceBindingException("Namespace '" + namespace + "' is not bound");
-      }
-      return prefix;
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.XMLCatalog#toXml()
-   */
-  @Override
-  public abstract Document toXml() throws ParserConfigurationException, TransformerException, IOException;
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.XMLCatalog#toJson()
-   */
-  @Override
-  public abstract String toJson() throws IOException;
+  // --
 
   /**
    * {@inheritDoc}

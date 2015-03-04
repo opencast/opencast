@@ -1,0 +1,38 @@
+{
+    "group" : {
+        "_source" : { "enabled" : true },
+        "_timestamp" : { "enabled" : true },
+        "dynamic": "true",
+        "properties" : {
+
+            "uid": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+
+            "organization": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+
+            "object": { "type" : "string", "index" : "no", "store" : "yes" },
+
+            "group_json": { "type" : "string", "index" : "no", "store" : "no" },
+
+            "name": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "roles": { "index_name" : "role", "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "members": { "index_name" : "member", "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "text": { "type" : "string", "index" : "analyzed", "store" : "no" },
+            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no" }
+
+        },
+        "dynamic_templates" : [
+             {
+             "text" : {
+                 "match" : "text_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
+                 }
+             }
+         ]
+    }
+}

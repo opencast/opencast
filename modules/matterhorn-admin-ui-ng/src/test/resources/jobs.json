@@ -1,0 +1,38 @@
+{
+    "count": 3,
+    "limit": 0,
+    "offset": 0,
+    "results": [
+        {
+            "creator": "testuser",
+            "id": 1,
+            "operation": "test",
+            "processingHost": "host",
+            "started": "2014-06-05T09:15:56Z",
+            "status": "RUNNING",
+            "submitted": "2014-06-05T09:15:56Z",
+            "type": "org.opencastproject.composer"
+        },
+        {
+            "creator": "testuser",
+            "id": 3,
+            "operation": "RESUME",
+            "processingHost": "host",
+            "started": "2014-06-05T09:15:56Z",
+            "status": "RUNNING",
+            "submitted": "2014-06-05T09:15:56Z",
+            "type": "org.opencastproject.workflow"
+        },
+        {
+            "creator": "testuser",
+            "id": 4,
+            "operation": "Inspect",
+            "processingHost": "host",
+            "started": "2014-06-05T09:15:56Z",
+            "status": "RUNNING",
+            "submitted": "2014-06-05T09:15:56Z",
+            "type": "org.opencastproject.inspection"
+        }
+    ],
+    "total": 4
+}

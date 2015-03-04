@@ -15,11 +15,11 @@
  */
 package org.opencastproject.composer.layout;
 
-import org.opencastproject.util.JsonObj;
-import org.opencastproject.util.Jsons;
-
 import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
+
+import org.opencastproject.util.JsonObj;
+import org.opencastproject.util.Jsons;
 
 public final class Serializer {
   private Serializer() {
@@ -94,5 +94,13 @@ public final class Serializer {
   public static HorizontalCoverageLayoutSpec horizontalCoverageLayoutSpec(JsonObj json) {
     return new HorizontalCoverageLayoutSpec(anchorOffset(json.getObj("anchorOffset")),
                                             json.get(Double.class, "horizontalCoverage"));
+  }
+
+  public static Jsons.Obj json(AbsolutePositionLayoutSpec a) {
+    return obj(p("anchorOffset", json(a.getAnchorOffset())));
+  }
+
+  public static AbsolutePositionLayoutSpec absolutePositionLayoutSpec(JsonObj json) {
+    return new AbsolutePositionLayoutSpec(anchorOffset(json.obj("anchorOffset")));
   }
 }

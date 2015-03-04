@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  * A tuple of role, action, and whether the combination is to be allowed.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ace", namespace = "http://org.opencastproject.security")
+@XmlType(name = "ace", namespace = "http://org.opencastproject.security", propOrder = { "action", "allow", "role" })
 @XmlRootElement(name = "ace", namespace = "http://org.opencastproject.security")
 public final class AccessControlEntry {
 

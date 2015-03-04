@@ -21,15 +21,29 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
+import org.opencastproject.index.IndexProducer;
 import org.opencastproject.kernel.security.persistence.JpaOrganization;
+import org.opencastproject.message.broker.api.MessageReceiver;
+import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.group.GroupItem;
+import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
+import org.opencastproject.message.broker.api.index.IndexRecreateObject;
+import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
+import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Group;
+import org.opencastproject.security.api.JaxbGroup;
+import org.opencastproject.security.api.JaxbGroupList;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -37,6 +51,7 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +96,7 @@ import javax.ws.rs.core.Response.Status;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
-public class JpaGroupRoleProvider implements RoleProvider {
+public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaGroupRoleProvider.class);
@@ -89,13 +104,42 @@ public class JpaGroupRoleProvider implements RoleProvider {
   /** The JPA provider */
   protected PersistenceProvider persistenceProvider = null;
 
+  /** The message broker service */
+  protected MessageSender messageSender;
+
+  /** The message broker receiver */
+  protected MessageReceiver messageReceiver;
+
   /** The security service */
   protected SecurityService securityService = null;
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
 
+  /** The persistence properties */
   protected Map<String, Object> persistenceProperties;
+
+  /** The organization directory service */
+  protected OrganizationDirectoryService organizationDirectoryService;
+
+  /** The component context */
+  private ComponentContext cc;
+
+  /**
+   * @param messageSender
+   *          The messageSender to set
+   */
+  public void setMessageSender(MessageSender messageSender) {
+    this.messageSender = messageSender;
+  }
+
+  /**
+   * @param messageReceiver
+   *          The messageReceiver to set
+   */
+  public void setMessageReceiver(MessageReceiver messageReceiver) {
+    this.messageReceiver = messageReceiver;
+  }
 
   /**
    * @param persistenceProvider
@@ -122,6 +166,14 @@ public class JpaGroupRoleProvider implements RoleProvider {
   }
 
   /**
+   * @param organizationDirectoryService
+   *          the organizationDirectoryService to set
+   */
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  /**
    * Callback for activation of this component.
    *
    * @param cc
@@ -129,15 +181,19 @@ public class JpaGroupRoleProvider implements RoleProvider {
    */
   public void activate(ComponentContext cc) {
     logger.debug("Activate group role provider");
+    this.cc = cc;
 
     // Set up persistence
     emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.userdirectory", persistenceProperties);
+    super.activate();
   }
 
   /**
    * Callback for deactivation of this component.
    */
+  @Override
   public void deactivate() {
+    super.deactivate();
     if (emf != null && emf.isOpen()) {
       emf.close();
     }
@@ -250,6 +306,8 @@ public class JpaGroupRoleProvider implements RoleProvider {
         em.merge(foundGroup);
       }
       tx.commit();
+      messageSender.sendObjectMessage(GroupItem.GROUP_QUEUE, MessageSender.DestinationType.Queue,
+              GroupItem.update(JaxbGroup.fromGroup(jpaGroup)));
     } finally {
       if (tx.isActive()) {
         tx.rollback();
@@ -257,6 +315,12 @@ public class JpaGroupRoleProvider implements RoleProvider {
       if (em != null)
         em.close();
     }
+  }
+
+  private void removeGroup(String groupId, String orgId) throws NotFoundException, Exception {
+    UserDirectoryPersistenceUtil.removeGroup(groupId, orgId, emf);
+    messageSender.sendObjectMessage(GroupItem.GROUP_QUEUE, MessageSender.DestinationType.Queue,
+            GroupItem.delete(groupId));
   }
 
   /**
@@ -273,6 +337,11 @@ public class JpaGroupRoleProvider implements RoleProvider {
       roles.addAll(group.getRoles());
     }
     return roles;
+  }
+
+  public Iterator<Group> getGroups() {
+    String orgId = securityService.getOrganization().getId();
+    return new ArrayList<Group>(UserDirectoryPersistenceUtil.findGroups(orgId, 0, 0, emf)).iterator();
   }
 
   private boolean like(final String str, final String expr) {
@@ -322,7 +391,7 @@ public class JpaGroupRoleProvider implements RoleProvider {
   public Response removeGroup(@PathParam("id") String groupId) throws NotFoundException {
     String orgId = securityService.getOrganization().getId();
     try {
-      UserDirectoryPersistenceUtil.removeGroup(groupId, orgId, emf);
+      removeGroup(groupId, orgId);
       return Response.noContent().build();
     } catch (Exception e) {
       throw new WebApplicationException(e);
@@ -335,7 +404,7 @@ public class JpaGroupRoleProvider implements RoleProvider {
           @RestParameter(name = "name", description = "The group name", isRequired = true, type = Type.STRING),
           @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, reponses = {
+          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = false, type = Type.TEXT) }, reponses = {
           @RestResponse(responseCode = SC_CREATED, description = "Group created"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long") })
   public Response createGroup(@FormParam("name") String name, @FormParam("description") String description,
@@ -343,12 +412,17 @@ public class JpaGroupRoleProvider implements RoleProvider {
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
 
     HashSet<JpaRole> roleSet = new HashSet<JpaRole>();
-    for (String role : StringUtils.split(roles, ",")) {
-      roleSet.add(new JpaRole(StringUtils.trim(role), organization));
+    if (roles != null) {
+      for (String role : StringUtils.split(roles, ",")) {
+        roleSet.add(new JpaRole(StringUtils.trim(role), organization));
+      }
     }
+
     HashSet<String> members = new HashSet<String>();
-    for (String member : StringUtils.split(users, ",")) {
-      members.add(StringUtils.trim(member));
+    if (users != null) {
+      for (String member : StringUtils.split(users, ",")) {
+        members.add(StringUtils.trim(member));
+      }
     }
 
     try {
@@ -396,8 +470,9 @@ public class JpaGroupRoleProvider implements RoleProvider {
       group.setRoles(new HashSet<JpaRole>());
     }
 
-    if (StringUtils.isNotBlank(users)) {
+    if (users != null) {
       HashSet<String> members = new HashSet<String>();
+
       for (String member : StringUtils.split(users, ",")) {
         members.add(StringUtils.trim(member));
       }
@@ -412,6 +487,54 @@ public class JpaGroupRoleProvider implements RoleProvider {
     }
 
     return Response.ok().build();
+  }
+
+  @Override
+  public void repopulate(final String indexName) {
+    final String destinationId = GroupItem.GROUP_QUEUE_PREFIX + WordUtils.capitalize(indexName);
+    for (final Organization organization : organizationDirectoryService.getOrganizations()) {
+      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
+        @Override
+        protected void run() {
+          final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
+          int total = groups.size();
+          int current = 1;
+          logger.info(
+                  "Re-populating index '{}' with groups of organization {}. There are {} group(s) to add to the index.",
+                  new Object[] { indexName, securityService.getOrganization().getId(), total });
+          for (JpaGroup group : groups) {
+            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                    GroupItem.update(JaxbGroup.fromGroup(group)));
+            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                    IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Groups, total, current));
+            current++;
+          }
+        }
+      });
+    }
+    Organization organization = new DefaultOrganization();
+    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
+      @Override
+      protected void run() {
+        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Groups));
+      }
+    });
+  }
+
+  @Override
+  public MessageReceiver getMessageReceiver() {
+    return messageReceiver;
+  }
+
+  @Override
+  public Service getService() {
+    return Service.Groups;
+  }
+
+  @Override
+  public String getClassName() {
+    return JpaGroupRoleProvider.class.getName();
   }
 
 }

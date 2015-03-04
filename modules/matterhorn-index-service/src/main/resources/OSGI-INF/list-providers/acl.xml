@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.index.service.resources.list.provider.AclListProvider" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.index.service.resources.list.provider.AclListProvider" />
+  <property name="service.description" value="Acl list provider" />
+  <property name="opencast.service.type" value="org.opencastproject.index.service.resources.list.provider.AclListProvider" />
+  
+  <reference name="aclServiceFactory" interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
+          cardinality="1..1" policy="dynamic" bind="setAclServiceFactory"/>
+
+  <service>
+     <provide interface="org.opencastproject.index.service.resources.list.api.ResourceListProvider"/>
+  </service>
+  
+</scr:component>

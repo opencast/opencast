@@ -1,0 +1,115 @@
+.cal {
+    display: block;
+    width: 216px;
+    margin: 20px 20px 15px;
+    
+    .border(#ccc);
+    
+    text-shadow: none;
+    
+    &.left {
+        float: left;
+    }
+    
+    &.right {
+        float: right;
+    }
+    
+    &.large-cal { 
+        .box-sizing();
+        
+        width: 100%; 
+        margin: 0;
+        border-bottom: none;
+        
+        table-layout: fixed;
+        
+        td { width: 1%; }
+
+    } // &.large-cal
+    
+    a { text-decoration: none; }
+    
+    caption {
+        display: block;
+        line-height: 32px;
+        font-weight: 600;
+        color: #fff;
+        text-align: center;
+        margin: -1px -1px 0px -1px;
+        
+        .border(darken(@l-blue, 10%));
+        
+        #gradient > .vertical(#388ed6, #2b77b9);
+        
+        a {
+            display: block;
+            line-height: 32px;
+            padding: 0 10px;
+            font-size: 15px;
+            color: #fff;
+            
+            &:hover { color: white; }
+        
+        } // a
+        
+        .prev { float: left; }
+        .next { float: right; }
+        
+    } // caption
+    
+    th, td {
+        width: 30px;
+        text-align: center;
+        
+        &:first-child { border-left: 0; }
+    
+    } // th, td
+    
+    th {
+        line-height: 20px;
+        font-size: 8px;
+        color: #696969;
+        text-transform: uppercase;
+        background: #f3f3f3;
+        border-left: 1px solid #f3f3f3;
+    
+    } // th
+    
+    td {
+        font-size: 11px;
+        font-weight: bold;
+        border-top: 1px solid #c2c2c2;
+        border-left: 1px solid #c2c2c2;
+        
+        a {
+            clear: both;
+            display: block;
+            position: relative;
+            width: 100%;
+            line-height: 28px;
+            color: #666;
+            background: #fff;
+        }
+    
+        a:hover, &.off a { background: #f3f3f3; }
+        
+        &.off a { color: #b3b3b3; }
+        
+        &.active a, a:active {
+            margin: -1px;
+            color: #f3f3f3;
+            background: @l-blue;
+            
+            .border(darken(@l-blue, 15%));
+        
+        } // active  
+    
+        &.active:first-child a, &:first-child a:active { border-left: 0; margin-left: 0; }
+        &.active:last-child a, &:last-child a:active { border-right: 0; margin-right: 0; }
+        
+    } // td
+    
+    tr:last-child { td.active a, td a:active { border-bottom: 0; margin-bottom: 0; } }
+
+} // cal

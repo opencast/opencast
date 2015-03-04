@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:event xmlns:ns2="http://ui.matterhorn.opencastproject.org">
+	<identifier>10.0000-1</identifier>
+	<title>Land and Vegetation: Key players on the Climate Scene</title>
+	<description>This is the description for this event.</description>
+	<subject>This is the subject</subject>
+	<presenters>
+		<presenter>presenter-one</presenter>
+		<presenter>presenter-two</presenter>
+		<presenter>presenter-three</presenter>
+	</presenters>
+	<contributors>
+		<contributor>contributor-one</contributor>
+		<contributor>contributor-two</contributor>
+		<contributor>contributor-three</contributor>
+	</contributors>
+	<location>arts143ca</location>
+</ns2:event>

@@ -1,0 +1,24 @@
+{
+  "concat":{
+    "segments":[
+      {
+        "start":0,
+        "end":2449
+      },
+      {
+        "start":4922,
+        "end":11284
+      },
+      {
+        "start":14721,
+        "end":15963
+      },
+      {
+        "start":15963,
+        "end":20132
+      }
+    ],
+    "tracks":["6ec443e7-b097-4470-a618-5e0d848f5252"]
+  },
+  "workflow": "cut-workflow"
+}

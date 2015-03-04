@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" ng-app="adminNg">
+    <head>
+        <meta charset="UTF-8">
+        <title>Opencast</title>
+        <link rel="stylesheet" href="css/main.css">
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+        <script>
+            window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>')
+        </script>
+    </head>
+
+    <body class="login-body" ng-controller="LoginCtrl" ng-cloak>
+        <section class="login-container">
+            <div class="login-form">
+                <div class="form-container">
+                    <form action="j_spring_security_check" method="post">
+                        <div class="row">
+                            <p>
+                                <span translate='LOGIN.WELCOME'></span><br />
+                                <span class="subtle-text">
+                                    Opencast Video Capture Software
+                                </span>
+                            </p>
+                        </div>
+
+                        <div ng-show="isError" class="error-container" translate-cloak="LOGIN.ERROR">
+                            Incorrect email and / or password
+                        </div>
+
+                        <div class="row">
+                            <input ng-class="{error: isError}" name="j_username" type="text" id="email" placeholder="{{ 'LOGIN.USERNAME' | translate }}" class="login-input" autofocus="autofocus">
+                        </div>
+                        <div class="row">
+                            <input ng-class="{error: isError}" name="j_password" type="password" id="password" placeholder="{{ 'LOGIN.PASSWORD' | translate }}" class="login-input">
+                        </div>
+
+                        <div class="row">
+                            <div class="remember-me-toggle">
+                                <div class="remember-me-content">
+                                    <div class="check-toggle">
+                                        <input type="checkbox" id="remember" name="_spring_security_remember_me" checked class="ios">
+                                    </div>
+                                    <label for="remember" translate="LOGIN.REMEMBER">Remember me on this computer</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button class="submit" translate-cloak="LOGIN.LOGIN">Login</button>
+                        </div>
+                    </form>
+                </div>
+
+                <nav class="nav-dd-container" id="nav-dd-container">
+                    <div class="nav-dd" id="lang-dd" old-admin-ng-dropdown>
+                        <div class="lang {{ currentLanguageCode }}"></div><span>{{ currentLanguageName }}</span>
+                            <ul class="dropdown-ul">
+                                <li>
+                                    <a href="#" ng-repeat="language in availableLanguages | orderBy:'displayLanguage'" ng-click="changeLanguage(language.code)">
+                                        <i class="lang {{ toLanguageClass(language) }}"></i>{{ language.displayLanguage }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </section>
+
+        <!-- shim must be placed BEFORE angular.js -->
+        <script src="lib/angular-file-upload/angular-file-upload-shim.js"></script>
+        <script src="lib/angular/angular.js"></script>
+        <script src="lib/angular/angular-translate.js"></script>
+        <script src="lib/angular/angular-route.js"></script>
+        <script src="lib/angular/angular-resource.js"></script>
+        <script src="lib/angular/angular-local-storage.js"></script>
+        <script src="lib/angular/angular-animate.js"></script>
+        <script src="lib/angular/angular-messages.js"></script>
+        <script src="lib/angular-file-upload/angular-file-upload.js"></script>
+        <script src="lib/angular-sortable.js"></script>
+        <script src="lib/chosen.js"></script>
+
+        <script src="app.js"></script>
+        <script src="shared/controllers/controllers.js"></script>
+        <script src="shared/controllers/navigationController.js"></script>
+        <script src="shared/services/services.js"></script>
+        <script src="shared/filters/filters.js"></script>
+        <script src="shared/directives/directives.js"></script>
+        <script src="shared/services/languageService.js"></script>
+        <script src="modules/login/controllers/loginController.js"></script>
+        <script src="shared/services/jsHelperService.js"></script>
+        <script src="shared/resources/resources.js"></script>
+        <script src="shared/resources/identityResource.js"></script>
+        <script src="shared/directives/oldDropdownDirective.js"></script>
+    </body>
+</html>

@@ -1,0 +1,81 @@
+// Alert Styles
+
+// Mixin
+.alert-variant(@background; @border; @text-color){
+
+    background: @background;
+    border: 1px solid @border;
+
+    p {
+        color: @text-color;
+    }
+
+    a {
+        color: lighten(@text-color, 10%);
+
+        &:hover { color: @text-color; }
+    }
+}
+
+// Alerts
+.alert {
+    min-height: 40px;
+    border-radius: @main-border-radius;
+    position: absolute;
+    top: 20px;
+    left: 0px;
+    right: 20px;
+    z-index: @z-10000;
+    font-weight: 600;
+    padding: 0 15px;
+    overflow: hidden;
+
+    &.sticky {
+        margin: 10px 0 20px;
+        position: relative;
+        top: auto;
+    }
+
+    a {
+        text-decoration: underline;
+    }
+
+    .close {
+        position: absolute;
+        right: 10px;
+        font-size: 20px;
+        margin-top: 9px;
+        .transition(@alert-transition);
+        text-decoration: none;
+    }
+
+    p {
+        color: #fff;
+        margin: 12px 0;
+        line-height: 16px;
+    }
+
+    // Alert Colors
+    // Color variables are located in assets/less/base/_variables.less
+
+    &.info {
+        .alert-variant(@state-info-bg, @state-info-border, @state-info-text);
+    }
+
+    &.warning {
+        .alert-variant(@state-warning-bg, @state-warning-border, @state-warning-text);
+    }
+
+    &.success {
+        .alert-variant(@state-success-bg, @state-success-border, @state-success-text);
+    }
+
+    &.danger {
+        .alert-variant(@state-danger-bg, @state-danger-border, @state-danger-text);
+    }
+
+} // alert
+
+.modal .alert.sticky {
+    margin: 0 0 20px;
+}
