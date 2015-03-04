@@ -26,12 +26,17 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.util.data.Effect0;
+import org.opencastproject.util.data.Effect2;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 
+import com.entwinemedia.fn.Fn;
+import com.entwinemedia.fn.FnX;
+import com.entwinemedia.fn.Prelude;
+import com.entwinemedia.fn.Unit;
 import com.google.common.io.Resources;
 import de.schlichtherle.io.FileWriter;
 import org.apache.commons.io.IOUtils;
@@ -40,20 +45,27 @@ import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Properties;
 
 /**
@@ -126,17 +138,10 @@ public final class IoSupport {
    */
   public static boolean closeQuietly(final Process process) {
     if (process != null) {
-      try {
-        if (process.getErrorStream() != null)
-          process.getErrorStream().close();
-        if (process.getInputStream() != null)
-          process.getInputStream().close();
-        if (process.getOutputStream() != null)
-          process.getOutputStream().close();
-        return true;
-      } catch (Throwable t) {
-        logger.trace("Error closing process streams: " + t.getMessage());
-      }
+      closeQuietly(process.getInputStream());
+      closeQuietly(process.getErrorStream());
+      closeQuietly(process.getOutputStream());
+      return true;
     }
     return false;
   }
@@ -226,6 +231,7 @@ public final class IoSupport {
    * @return A String containing the source data or null in the case of an error.
    * @deprecated this method doesn't support UTF8 or handle HTTP response codes
    */
+  @Deprecated
   public static String readFileFromURL(URL url) {
     return readFileFromURL(url, null);
   }
@@ -241,6 +247,7 @@ public final class IoSupport {
    * @return A String containing the source data or null in the case of an error.
    * @deprecated this method doesn't support UTF8 or handle HTTP response codes
    */
+  @Deprecated
   public static String readFileFromURL(URL url, TrustedHttpClient trustedClient) {
     StringBuilder sb = new StringBuilder();
     DataInputStream in = null;
@@ -308,7 +315,8 @@ public final class IoSupport {
   /** Load properties from a stream. Close the stream after reading. */
   public static Properties loadPropertiesFromStream(final InputStream stream) {
     return withResource(stream, new Function.X<InputStream, Properties>() {
-      @Override public Properties xapply(InputStream in) throws Exception {
+      @Override
+      public Properties xapply(InputStream in) throws Exception {
         final Properties p = new Properties();
         p.load(in);
         return p;
@@ -340,11 +348,27 @@ public final class IoSupport {
     return chuck(new FileNotFoundException(resource + " does not exist"));
   }
 
+  /** Load a text file from the class path using the class loader of the given class. */
+  public static Option<String> loadTxtFromClassPath(final String resource, final Class<?> clazz) {
+    return withResource(clazz.getResourceAsStream(resource), new Function<InputStream, Option<String>>() {
+      @Override
+      public Option<String> apply(InputStream is) {
+        try {
+          return some(IOUtils.toString(is));
+        } catch (Exception e) {
+          logger.warn("Cannot load resource " + resource + " from classpath");
+          return none();
+        }
+      }
+    });
+  }
+
   /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
    *
    * @deprecated use {@link #withResource(java.io.Closeable, org.opencastproject.util.data.Function)} instead
    */
+  @Deprecated
   public static <A> A withStream(InputStream s, Function<InputStream, A> f) {
     try {
       return f.apply(s);
@@ -359,6 +383,17 @@ public final class IoSupport {
   public static <A, B extends Closeable> A withResource(B b, Function<B, A> f) {
     try {
       return f.apply(b);
+    } finally {
+      IoSupport.closeQuietly(b);
+    }
+  }
+
+  /**
+   * Handle a closeable resource inside <code>f</code> and ensure it gets closed properly.
+   */
+  public static <A, B extends Closeable> A withResource(B b, Fn<? super B, ? extends A> f) {
+    try {
+      return f.ap(b);
     } finally {
       IoSupport.closeQuietly(b);
     }
@@ -382,6 +417,20 @@ public final class IoSupport {
     return openClassPathResource(resource, IoSupport.class);
   }
 
+  /** Get a classpath resource as a file using the class loader of {@link IoSupport}. */
+  public static Option<File> classPathResourceAsFile(String resource) {
+    try {
+      final URL res = IoSupport.class.getResource(resource);
+      if (res != null) {
+        return Option.some(new File(res.toURI()));
+      } else {
+        return Option.none();
+      }
+    } catch (URISyntaxException e) {
+      return Option.none();
+    }
+  }
+
   /**
    * Load a classpath resource into a string using UTF-8 encoding and the class loader of the given class.
    *
@@ -390,7 +439,8 @@ public final class IoSupport {
   public static Option<String> loadFileFromClassPathAsString(String resource, Class<?> clazz) {
     try {
       final URL url = clazz.getResource(resource);
-      return url != null ? some(Resources.toString(clazz.getResource(resource), Charset.forName("UTF-8"))) : none(String.class);
+      return url != null ? some(Resources.toString(clazz.getResource(resource), Charset.forName("UTF-8")))
+              : none(String.class);
     } catch (IOException e) {
       return none();
     }
@@ -427,6 +477,24 @@ public final class IoSupport {
   }
 
   /**
+   * Handle a stream inside <code>e</code> and ensure that <code>s</code> gets closed properly.
+   *
+   * @return true, if the file exists, false otherwise
+   */
+  public static boolean withFile(File file, Effect2<OutputStream, File> e) {
+    OutputStream s = null;
+    try {
+      s = new FileOutputStream(file);
+      e.apply(s, file);
+      return true;
+    } catch (FileNotFoundException ignore) {
+      return false;
+    } finally {
+      IoSupport.closeQuietly(s);
+    }
+  }
+
+  /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
    *
    * @param s
@@ -439,6 +507,7 @@ public final class IoSupport {
    *             {@link #withResource(org.opencastproject.util.data.Function0, org.opencastproject.util.data.Function, org.opencastproject.util.data.Function)}
    *             instead
    */
+  @Deprecated
   public static <A, Err> Either<Err, A> withStream(Function0<InputStream> s, Function<Exception, Err> toErr,
           Function<InputStream, A> f) {
     InputStream in = null;
@@ -480,6 +549,7 @@ public final class IoSupport {
    *
    * @deprecated use {@link #withResource(java.io.Closeable, org.opencastproject.util.data.Function)} instead
    */
+  @Deprecated
   public static <A> A withStream(OutputStream s, Function<OutputStream, A> f) {
     try {
       return f.apply(s);
@@ -513,7 +583,8 @@ public final class IoSupport {
 
   /** Function that reads an input stream into a string using utf-8 encoding. Stream does not get closed. */
   public static final Function<InputStream, String> readToString = new Function.X<InputStream, String>() {
-    @Override public String xapply(InputStream in) throws IOException {
+    @Override
+    public String xapply(InputStream in) throws IOException {
       return IOUtils.toString(in, "utf-8");
     }
   };
@@ -521,7 +592,8 @@ public final class IoSupport {
   /** Wrap function <code>f</code> to close the input stream after usage. */
   public static <A> Function<InputStream, A> closeAfterwards(final Function<InputStream, ? extends A> f) {
     return new Function<InputStream, A>() {
-      @Override public A apply(InputStream in) {
+      @Override
+      public A apply(InputStream in) {
         final A a = f.apply(in);
         IOUtils.closeQuietly(in);
         return a;
@@ -542,6 +614,14 @@ public final class IoSupport {
   /** Create a file from the list of path elements. */
   public static File file(String... pathElems) {
     return new File(path(pathElems));
+  }
+
+  /** Returns the given {@link File} back when it's ready for reading */
+  public static File waitForFile(File file) {
+    while (!Files.isReadable(file.toPath())) {
+      Prelude.sleep(100L);
+    }
+    return file;
   }
 
   /**
@@ -578,6 +658,32 @@ public final class IoSupport {
       };
     } catch (Exception e) {
       throw new RuntimeException("Error aquiring lock for " + file.getAbsolutePath(), e);
+    }
+  }
+
+  /**
+   * Serialize and deserialize an object. To test serializability.
+   */
+  public static <A extends Serializable> A serializeDeserialize(final A a) {
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    try {
+      withResource(
+              new ObjectOutputStream(out),
+              new FnX<ObjectOutputStream, Unit>() {
+                @Override public Unit apx(ObjectOutputStream out) throws Exception {
+                  out.writeObject(a);
+                  return Unit.unit;
+                }
+              });
+      return withResource(
+              new ObjectInputStream(new ByteArrayInputStream(out.toByteArray())),
+              new FnX<ObjectInputStream, A>() {
+                @Override public A apx(ObjectInputStream in) throws Exception {
+                  return (A) in.readObject();
+                }
+              });
+    } catch (IOException e) {
+      return Prelude.chuck(e);
     }
   }
 }

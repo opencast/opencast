@@ -101,7 +101,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param composerService
    *          the local composer service
    */
@@ -112,7 +112,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -122,7 +122,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -132,10 +132,11 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
+  @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     logger.debug("Running concat workflow operation on workflow {}", workflowInstance.getId());
@@ -329,10 +330,10 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
       Tuple<TrackSelector, Boolean> selectorTuple = trackSelectors.get(number);
       if (selectorTuple == null) {
-        selectorTuple = Tuple.tuple(new TrackSelector(), BooleanUtils.toBooleanDefaultIfNull(mandatory, true));
+        selectorTuple = Tuple.tuple(new TrackSelector(), BooleanUtils.toBooleanDefaultIfNull(mandatory, false));
       } else {
         selectorTuple = Tuple.tuple(selectorTuple.getA(),
-                selectorTuple.getB() && BooleanUtils.toBooleanDefaultIfNull(mandatory, true));
+                selectorTuple.getB() || BooleanUtils.toBooleanDefaultIfNull(mandatory, false));
       }
       TrackSelector trackSelector = selectorTuple.getA();
       if (StringUtils.isNotBlank(tags)) {

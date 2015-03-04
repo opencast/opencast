@@ -1,0 +1,61 @@
+[
+    {
+        "id": "title",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.TITLE",
+        "readOnly": false,
+        "type": "text",
+        "value": "My series"
+    },
+    {
+        "id": "uid",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.UID",
+        "readOnly": true,
+        "type": "text",
+        "value": "a5ceb2bf-9add-4e45-952e-83a055aecc65"
+    },
+    {
+        "id": "presenters",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.ORGANIZERS",
+        "readOnly": false,
+        "type": "text",
+        "value": [
+            "Organizer1",
+            "Organizer2"
+        ]
+    },
+    {
+        "id": "contributors",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.CONTRIBUTORS",
+        "readOnly": false,
+        "type": "text",
+        "value": ["New contributor"]
+    },
+    {
+        "id": "subject",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.SUBJECT",
+        "readOnly": false,
+        "type": "text",
+        "value": "Test series"
+    },
+    {
+        "id": "language",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.LANGUAGE",
+        "readOnly": false,
+        "type": "text",
+        "value": "German"
+    },
+    {
+        "id": "description",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.DESCRIPTION",
+        "readOnly": false,
+        "type": "text",
+        "value": "Simple series to test the series metadata"
+    },
+    {
+        "id": "license",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.LICENSE",
+        "readOnly": false,
+        "type": "text",
+        "value": "Creative Commons 3.0: Attribution-NonCommercial-NoDerivs"
+    }
+]

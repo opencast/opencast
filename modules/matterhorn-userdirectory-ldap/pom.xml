@@ -20,8 +20,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.guava-osgi</groupId>
-      <artifactId>guava-osgi</artifactId>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
@@ -104,7 +104,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Embed-Dependency>
               org.springframework.ldap;inline=true,
               org.springframework.beans;inline=true,

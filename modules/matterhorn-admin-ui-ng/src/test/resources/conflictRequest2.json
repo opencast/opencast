@@ -1,0 +1,7 @@
+{
+    "start"    : "2014-06-05T15:00:00Z",
+    "end"      : "2014-06-05T15:05:00Z",
+    "duration" : "360000",
+    "rrule"    : "FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR;COUNT=15",
+    "device"     : "abc"
+}

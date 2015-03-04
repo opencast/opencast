@@ -16,8 +16,8 @@
 
 package org.opencastproject.search.impl.solr;
 
-import static org.opencastproject.search.api.SearchService.READ_PERMISSION;
-import static org.opencastproject.search.api.SearchService.WRITE_PERMISSION;
+import static org.opencastproject.security.api.Permissions.Action.READ;
+import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Collections.flatMap;
 import static org.opencastproject.util.data.Collections.head;
@@ -634,9 +634,9 @@ public class SolrIndexManager {
 
     // Define containers for common permissions
     List<String> reads = new ArrayList<String>();
-    permissions.put(READ_PERMISSION, reads);
+    permissions.put(READ.toString(), reads);
     List<String> writes = new ArrayList<String>();
-    permissions.put(WRITE_PERMISSION, writes);
+    permissions.put(WRITE.toString(), writes);
 
     String adminRole = securityService.getOrganization().getAdminRole();
 
@@ -961,6 +961,7 @@ public class SolrIndexManager {
     SortedSet<TextAnnotation> sortedAnnotations = null;
     if (!"".equals(Schema.getOcKeywords(doc))) {
       sortedAnnotations = new TreeSet<TextAnnotation>(new Comparator<TextAnnotation>() {
+        @Override
         public int compare(TextAnnotation a1, TextAnnotation a2) {
           if ((RELEVANCE_BOOST * a1.getRelevance() + a1.getConfidence()) > (RELEVANCE_BOOST * a2.getRelevance() + a2
                   .getConfidence()))

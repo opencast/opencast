@@ -1,0 +1,23 @@
+{
+    "series_access": {
+        "acl": "{\"acl\":{\"ace\":[{\"allow\":true,\"action\":\"read\",\"role\":\"ROLE_ADMIN_UI\"},{\"allow\":true,\"action\":\"write\",\"role\":\"ROLE_ADMIN_UI\"}]}}",
+        "current_acl": 0,
+        "privileges": {
+            "ROLE_ADMIN_UI": {
+                "read": true,
+                "write": true
+            }
+        },
+        "transitions": []
+    },
+    "system_acls": [
+        {
+            "id": 351,
+            "name": "public"
+        },
+        {
+            "id": 352,
+            "name": "private"
+        }
+    ]
+}

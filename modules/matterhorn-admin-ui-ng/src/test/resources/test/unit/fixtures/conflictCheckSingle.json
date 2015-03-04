@@ -1,0 +1,47 @@
+{
+    "SCHEDULE_MULTIPLE": {
+        "device": {
+            "inputMethods": {}
+        },
+        "weekdays": {}
+    },
+    "SCHEDULE_SINGLE": {
+        "device": {
+            "id": "entwine-captureagent",
+            "inputMethods": {
+                "CAPTURE_AGENT.DEVICE.MICROPHONE": true
+            },
+            "inputs": [
+                {
+                    "$$hashKey": "0AP",
+                    "id": "Microphone",
+                    "value": "CAPTURE_AGENT.DEVICE.MICROPHONE"
+                },
+                {
+                    "$$hashKey": "0AQ",
+                    "id": "Camera",
+                    "value": "CAPTURE_AGENT.DEVICE.CAMERA"
+                },
+                {
+                    "$$hashKey": "0AR",
+                    "id": "Presentation",
+                    "value": "CAPTURE_AGENT.DEVICE.PRESENTATION"
+                }
+            ],
+            "name": "entwine-captureagent",
+            "status": "idle",
+            "updated": "11:41 AM"
+        },
+        "duration": {
+            "hour": 4,
+            "minute": 4
+        },
+        "start": {
+            "date": "2014-07-16",
+            "hour": 8,
+            "minute": 0
+        }
+    },
+    "type": "SCHEDULE_SINGLE",
+    "upload": {}
+}

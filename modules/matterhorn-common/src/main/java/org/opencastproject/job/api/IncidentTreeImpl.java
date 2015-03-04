@@ -18,7 +18,7 @@ package org.opencastproject.job.api;
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
-import org.opencastproject.fn.juc.Immutables;
+import org.opencastproject.fun.juc.Immutables;
 
 import java.util.List;
 

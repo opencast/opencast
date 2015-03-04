@@ -1,0 +1,51 @@
+<section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="group-modal" ng-controller="GroupCtrl">
+
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2 translate="{{ caption }}">Create New Group</h2>
+    </header>
+
+    <nav class="modal-nav" id="modal-nav">
+        <a ng-click="openTab('group')" data-modal-tab="group" ng-class="{ active: tab == 'group' }" translate="USERS.GROUPS.DETAILS.TABS.GROUP">Group</a>
+        <a ng-click="openTab('roles')" data-modal-tab="roles" ng-class="{ active: tab == 'roles' }" translate="USERS.GROUPS.DETAILS.TABS.ROLES">Roles</a>
+        <a ng-click="openTab('users')" data-modal-tab="users" ng-class="{ active: tab == 'users' }" translate="USERS.GROUPS.DETAILS.TABS.USERS">Users</a>
+    </nav>
+
+    <form name="groupForm">
+        <div class="modal-content" data-modal-tab-content="group">
+            <div class="modal-body">
+                <div class="form-container">
+                    <div class="row">
+                        <label class="required" translate="USERS.GROUPS.DETAILS.FORM.NAME">Group Name</label>
+                        <input ng-init="blurred.name = false" ng-model="group.name" type="text" ng-required="true" placeholder="{{ 'USERS.GROUPS.DETAILS.FORM.NAME' | translate }}..." name="name" ng-class="blurred.name == true && !groupForm.name.$valid ? 'error' : ''" ng-blur="blurred.name=true">
+                    </div>
+                    <div class="row">
+                        <label translate="USERS.GROUPS.DETAILS.FORM.DESCRIPTION">Description</label>
+                        <textarea ng-model="group.description" placeholder="Description..." rows="4" name="description"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-content" data-modal-tab-content="roles">
+            <div class="modal-body">
+                <div class="form-container">
+                    <admin-ng-select-box resource="role"></admin-ng-select-box>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-content" data-modal-tab-content="users">
+            <div class="modal-body">
+                <div class="form-container">
+                    <admin-ng-select-box resource="user" group-by="provider"></admin-ng-select-box>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <footer>
+        <a ng-click="submit()" ng-class="groupForm.$valid ? 'active' : 'disabled'" class="submit" translate="SUBMIT">Submit</a>
+        <a ng-click="close()" class="cancel" translate="CANCEL">Cancel</a>
+    </footer>
+</section>

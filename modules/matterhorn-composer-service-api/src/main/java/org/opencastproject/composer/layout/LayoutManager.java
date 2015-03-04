@@ -15,12 +15,12 @@
  */
 package org.opencastproject.composer.layout;
 
+import static org.opencastproject.util.data.Monadics.mlist;
+
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 
 import java.util.List;
-
-import static org.opencastproject.util.data.Monadics.mlist;
 
 public final class LayoutManager {
   private LayoutManager() {
@@ -63,6 +63,18 @@ public final class LayoutManager {
                        limitMin(anchorOfReference.getY() + dist.getOffset().getY() - anchorOfReferring.getY(), 0)));
   }
 
+  private static Layout calcLayout(Dimension canvas,
+                                   Dimension shape,
+                                   AbsolutePositionLayoutSpec posSpec) {
+    final AnchorOffset dist = posSpec.getAnchorOffset();
+    final Offset anchorOfReference = offset(dist.getReferenceAnchor(), canvas);
+    final Offset anchorOfReferring = offset(dist.getReferringAnchor(), shape);
+    return new Layout(
+            shape,
+            new Offset(limitMin(anchorOfReference.getX() + dist.getOffset().getX() - anchorOfReferring.getX(), 0),
+                       limitMin(anchorOfReference.getY() + dist.getOffset().getY() - anchorOfReferring.getY(), 0)));
+  }
+
   /**
    * Compose a list of shapes on a canvas.
    *
@@ -78,6 +90,27 @@ public final class LayoutManager {
             canvas,
             mlist(shapes).map(new Function<Tuple<Dimension, HorizontalCoverageLayoutSpec>, Layout>() {
               @Override public Layout apply(Tuple<Dimension, HorizontalCoverageLayoutSpec> a) {
+                return calcLayout(canvas, a.getA(), a.getB());
+              }
+            }).value());
+  }
+
+  /**
+   * Compose a list of shapes on a canvas.
+   *
+   * @param canvas
+   *         the dimension of the target canvas
+   * @param shapes
+   *         A list of shapes sorted in z-order with the first shape in the list being the lowermost one.
+   *         The list consists of the dimension of the source shape tupled with a layout specification.
+   */
+  public static MultiShapeLayout absoluteMultiShapeLayout(
+          final Dimension canvas,
+          final List<Tuple<Dimension, AbsolutePositionLayoutSpec>> shapes) {
+    return new MultiShapeLayout(
+            canvas,
+            mlist(shapes).map(new Function<Tuple<Dimension, AbsolutePositionLayoutSpec>, Layout>() {
+              @Override public Layout apply(Tuple<Dimension, AbsolutePositionLayoutSpec> a) {
                 return calcLayout(canvas, a.getA(), a.getB());
               }
             }).value());

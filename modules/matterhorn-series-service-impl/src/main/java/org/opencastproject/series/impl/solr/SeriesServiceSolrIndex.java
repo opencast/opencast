@@ -30,12 +30,12 @@ import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.series.impl.SeriesServiceIndex;
 import org.opencastproject.solr.SolrServerFactory;
@@ -46,7 +46,9 @@ import org.opencastproject.util.SolrUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -327,12 +329,45 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.series.impl.SeriesServiceIndex#index(java.lang.String,
-   * org.opencastproject.security.api.AccessControlList)
-   */
+  @Override
+  public void updateOptOutStatus(String seriesId, boolean optedOut) throws NotFoundException,
+          SeriesServiceDatabaseException {
+    SolrDocument seriesDoc = getSolrDocumentByID(seriesId);
+    if (seriesDoc == null) {
+      logger.debug("No series with ID " + seriesId + " found.");
+      throw new NotFoundException("Series with ID " + seriesId + " was not found.");
+    }
+
+    final SolrInputDocument inputDoc = ClientUtils.toSolrInputDocument(seriesDoc);
+    inputDoc.setField(SolrFields.OPT_OUT, optedOut);
+
+    if (synchronousIndexing) {
+      try {
+        synchronized (solrServer) {
+          solrServer.add(inputDoc);
+          solrServer.commit();
+        }
+      } catch (Exception e) {
+        throw new SeriesServiceDatabaseException("Unable to index opt out status", e);
+      }
+    } else {
+      indexingExecutor.submit(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            synchronized (solrServer) {
+              solrServer.add(inputDoc);
+              solrServer.commit();
+            }
+          } catch (Exception e) {
+            logger.warn("Unable to index opt out status for series {}: {}",
+                    inputDoc.getFieldValue(SolrFields.COMPOSITE_ID_KEY), ExceptionUtils.getStackTrace(e));
+          }
+        }
+      });
+    }
+  }
+
   @Override
   public void updateSecurityPolicy(String seriesId, AccessControlList accessControl) throws NotFoundException,
           SeriesServiceDatabaseException {
@@ -359,11 +394,11 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     inputDoc.removeField(SolrFields.ACCESS_CONTROL_EDIT);
     inputDoc.removeField(SolrFields.ACCESS_CONTROL_READ);
     for (AccessControlEntry ace : accessControl.getEntries()) {
-      if (SeriesService.CONTRIBUTE_CONTENT_PERMISSION.equals(ace.getAction()) && ace.isAllow()) {
+      if (Permissions.Action.CONTRIBUTE.toString().equals(ace.getAction()) && ace.isAllow()) {
         inputDoc.addField(SolrFields.ACCESS_CONTROL_CONTRIBUTE, ace.getRole());
-      } else if (SeriesService.EDIT_SERIES_PERMISSION.equals(ace.getAction()) && ace.isAllow()) {
+      } else if (Permissions.Action.WRITE.toString().equals(ace.getAction()) && ace.isAllow()) {
         inputDoc.addField(SolrFields.ACCESS_CONTROL_EDIT, ace.getRole());
-      } else if (SeriesService.READ_CONTENT_PERMISSION.equals(ace.getAction()) && ace.isAllow()) {
+      } else if (Permissions.Action.READ.toString().equals(ace.getAction()) && ace.isAllow()) {
         inputDoc.addField(SolrFields.ACCESS_CONTROL_READ, ace.getRole());
       }
     }
@@ -413,6 +448,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     } catch (IOException e1) {
       throw new IllegalArgumentException(e1);
     }
+    doc.addField(SolrFields.OPT_OUT, false);
 
     // single valued fields
     if (dc.hasValue(DublinCore.PROPERTY_TITLE)) {
@@ -917,6 +953,16 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     return accessControl;
   }
 
+  @Override
+  public boolean isOptOut(String seriesId) throws NotFoundException, SeriesServiceDatabaseException {
+    SolrDocument seriesDoc = getSolrDocumentByID(seriesId);
+    if (seriesDoc == null) {
+      logger.debug("No series exists with ID '{}'", seriesId);
+      throw new NotFoundException("No series with ID " + seriesId + " found.");
+    }
+    return BooleanUtils.toBoolean((Boolean) seriesDoc.get(SolrFields.OPT_OUT));
+  }
+
   /**
    * Returns SolrDocument corresponding to given ID or null if such document does not exist.
    *
@@ -988,7 +1034,12 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    *           if parsing fails
    */
   private DublinCoreCatalog parseDublinCore(String dcXML) throws IOException {
-    DublinCoreCatalog dc = dcService.load(IOUtils.toInputStream(dcXML, "UTF-8"));
-    return dc;
+    InputStream in = null;
+    try {
+      in = IOUtils.toInputStream(dcXML, "UTF-8");
+      return dcService.load(in);
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
   }
 }

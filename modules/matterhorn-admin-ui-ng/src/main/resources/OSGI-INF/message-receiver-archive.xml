@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.index.service.message.ArchiveMessageReceiverImpl-Adminui"
+  immediate="true" activate="activate" deactivate="deactivate">
+   <implementation
+	class="org.opencastproject.index.service.message.ArchiveMessageReceiverImpl" />
+   <property name="service.description" value="Archive Message Receiver" />
+   <property name="destinationId" value="ARCHIVE.Adminui"/>
+   <service>
+	<provide interface="org.opencastproject.index.service.message.ArchiveMessageReceiverImpl" />
+   </service>
+   
+    <reference name="message-broker-sender" 
+    		cardinality="1..1" 
+    		interface="org.opencastproject.message.broker.api.MessageSender"
+    		policy="static" 
+    		bind="setMessageSender" />
+  
+    <reference name="message-broker-receiver" 
+    		cardinality="1..1" 
+    		interface="org.opencastproject.message.broker.api.MessageReceiver"
+    		policy="static" 
+    		bind="setMessageReceiver" />   
+     
+    <reference name="search-index" 
+             cardinality="1..1" 
+    		interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
+             policy="static" 
+             bind="setSearchIndex" />  
+      
+	<reference bind="setWorkspace"
+	         cardinality="1..1"
+	         interface="org.opencastproject.workspace.api.Workspace"
+	         name="workspace"
+	         policy="static" />
+	         
+  <reference name="security-service" 
+  			 interface="org.opencastproject.security.api.SecurityService"
+    		 cardinality="1..1" 
+    		 policy="static" 
+    		 bind="setSecurityService" />
+    		 
+  <reference name="aclServiceFactory" 
+  			 interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
+			 cardinality="1..1" 
+			 policy="static" 
+			 bind="setAclServiceFactory"/>
+	         
+</scr:component>

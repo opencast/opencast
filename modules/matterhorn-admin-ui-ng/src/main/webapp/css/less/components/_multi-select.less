@@ -1,0 +1,89 @@
+.multi-select-container {
+    .clearfix();
+        
+    select[multiple] {
+        margin-top: 10px;
+    }
+    
+    select {
+        width: 100%;
+    }
+    
+    p {
+        font-size: 12px;
+        color: @black-40;
+        line-height: 22px;
+        
+    }
+    
+    strong {
+        color: @black-50;
+    }
+        
+    .button-container {
+        font-size: 12px;
+        display: block;
+    
+        a {
+            padding: 8px 15px !important;
+        }
+    
+        .submit {
+            .btn(grey);
+        }
+    
+        .remove {
+            .btn(red);
+        }
+    }
+}
+
+.multi-select-col {
+    width: 45%;
+    display: block;
+    float: left;
+    vertical-align: top;
+}
+
+.multi-select-search {
+    &:extend(.multi-select-col);
+    float: none;
+}
+
+// Used to indicate the correlation between multiple select columns
+.exchange-icon:after {
+    width: 10%;
+    display: block;
+    float: left;
+    position: relative;
+    top: 60px;
+    content: "\f0ec";
+    font-family: FontAwesome;
+    font-size: 18px;
+    color: @black-40;
+    text-align: center;
+}
+
+// Extra Input Offset
+
+.multi-select-container {
+
+    @icon-top-margin: 90px;
+    @multiple-select-expanded-height: 152px;
+    
+    &.offset-col-1,
+    &.offset-col-2 {
+        
+        .exchange-icon:after {
+            top: @icon-top-margin;
+        }
+    }
+    
+    &.offset-col-1 .multi-select-col:first-child select[multiple] {
+        height: @multiple-select-expanded-height;
+    }
+
+    &.offset-col-2 .multi-select-col:last-child select[multiple] {
+        height: @multiple-select-expanded-height;
+    }
+}

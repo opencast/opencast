@@ -1,0 +1,309 @@
+<section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="job-details-modal">
+
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2 translate="SYSTEMS.JOBS.DETAILS.HEADER" translate-values="{ resourceId: '{{ resourceId}}' }">Job Details {{resourceId}}</h2>
+    </header>
+
+    <nav class="modal-nav" id="modal-nav">
+        <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="SYSTEMS.JOBS.DETAILS.TABS.GENERAL">General</a>
+        <a ng-click="openTab('operations')" data-modal-tab="operations" ng-class="{ active: tab == 'operations' }" translate="SYSTEMS.JOBS.DETAILS.TABS.OPERATIONS">Operations</a>
+        <a ng-click="openTab('incidents')" data-modal-tab="incidents" ng-class="{ active: tab == 'incidents' }" translate="SYSTEMS.JOBS.DETAILS.TABS.INCIDENTS">Incidents</a>
+    </nav>
+
+    <nav id="breadcrumb"></nav>
+
+    <a ng-click="showAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
+    <a ng-click="showAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
+
+    <div class="modal-content" data-modal-tab-content="general">
+        <div class="full-col">
+            <div class="obj tbl-list">
+                <header class="no-expand">Workflow Instance Details</header>
+                <div class="obj-container">
+                    <p class="desc">Instructions on how to use this functionality goes here in this header space. Instructions on how to use this functionality goes here in this header space.</p>
+                    <table class="main-tbl">
+                        <tr>
+                            <td>ID</td>
+                            <td>917-38u23-45827423-57834yvbn472-23</td>
+                        </tr>
+                        <tr>
+                            <td>State</td>
+                            <td>Ingesting</td>
+                        </tr>
+                        <tr>
+                            <td>Source</td>
+                            <td>Capture</td>
+                        </tr>
+                        <tr>
+                            <td>Title</td>
+                            <td>This is a title</td>
+                        </tr>
+                        <tr>
+                            <td>Description</td>
+                            <td>This is the description here</td>
+                        </tr>
+                        <tr>
+                            <td>Start Date</td>
+                            <td>01/01/2014</td>
+                        </tr>
+                        <tr>
+                            <td>Completed Date</td>
+                            <td>01/01/2014</td>
+                        </tr>
+                        <tr>
+                            <td>Duration</td>
+                            <td>1:30:00</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj tbl-list">
+                <header class="no-expand">Workflow Instance Configuration</header>
+                <div class="obj-container">
+                    <p class="desc">Instructions on how to use this functionality goes here in this header space. Instructions on how to use this functionality goes here in this header space.</p>
+                    <table class="main-tbl">
+                        <tr>
+                            <td>workflowDefinitionID</td>
+                            <td>Full</td>
+                        </tr>
+                        <tr>
+                            <td>archiveOP</td>
+                            <td>True</td>
+                        </tr>
+                        <tr>
+                            <td>publishHarvesting</td>
+                            <td>Metadata Harvesting</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="operations">
+        <div class="full-col">
+            <div class="obj">
+                <header>Operations <i class="fa fa-chevron-down"></i></header>
+                <div class="obj-container">
+                    <p class="desc">Instructions on how to use this functionality goes here in this header space.</p>
+                    <table class="main-tbl">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Title <i></i></th>
+                                <th>Description <i></i></th>
+                                <th class="medium"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>SUCCEEDED</td>
+                                <td>ingest-download</td>
+                                <td>Ingesting external components</td>
+                                <td><a class="details-link" ng-click="openSubTab('operation-details')">Details</a></td>
+                            </tr>
+                            <tr>
+                                <td>SUCCEEDED</td>
+                                <td>apply-aci</td>
+                                <td>Applying access control entries</td>
+                                <td><a class="details-link" ng-click="openSubTab('operation-details')">Details</a></td>
+                            </tr>
+                            <tr>
+                                <td>SUCCEEDED</td>
+                                <td>tag</td>
+                                <td>Tagging access control lists for archival</td>
+                                <td><a class="details-link" ng-click="openSubTab('operation-details')">Details</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="incidents">
+        <div class="full-col">
+            <div class="obj">
+                <header class="no-expand">Errors & Warnings</header>
+                <div class="obj-container">
+                    <p class="desc">Instructions on how to use this functionality goes here in this header space.</p>
+                    <table class="main-tbl">
+                        <thead>
+                            <tr>
+                                <th class="small"></th>
+                                <th>Date / Time <i></i></th>
+                                <th>Title <i></i></th>
+                                <th class="medium"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="circle yellow"></div></td>
+                                <td>13/10/03 22:31:12</td>
+                                <td>Error while creating format "avi" could be worse</td>
+                                <td><a class="details-link" ng-click="openSubTab('error-details')">Details</a></td>
+                            </tr>
+                            <tr>
+                                <td><div class="circle green"></div></td>
+                                <td>13/10/03 22:31:12</td>
+                                <td>Applied access control entries</td>
+                                <td><a class="details-link" ng-click="openSubTab('error-details')">Details</a></td>
+                            </tr>
+                            <tr>
+                                <td><div class="circle red"></div></td>
+                                <td>13/10/03 22:31:12</td>
+                                <td>Fatal Error</td>
+                                <td><a class="details-link" ng-click="openSubTab('error-details')">Details</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="operation-details" data-level="2" data-parent="operations" data-label="Operations Details">
+        <div class="full-col">
+            <div class="obj">
+                <header>Operations Details <i class="fa fa-chevron-down"></i></header>
+                <div class="obj-container">
+                    <p class="headerless-tbl desc">Instructions on how to use this functionality goes here in this header space.</p>
+                    <table class="main-tbl">
+                        <tr>
+                            <td>Retry Strategy</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td>Exclusion Host</td>
+                            <td>http://google.com/</td>
+                        </tr>
+                        <tr>
+                            <td>Failed Attempts</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Max</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>Exception Handler Workflow</td>
+                            <td>Error</td>
+                        </tr>
+                        <tr>
+                            <td>Fail on Error</td>
+                            <td>True</td>
+                        </tr>
+                        <tr>
+                            <td>Description</td>
+                            <td>Applying access control entries</td>
+                        </tr>
+                        <tr>
+                            <td>State</td>
+                            <td>SUCCEEDED</td>
+                        </tr>
+                        <tr>
+                            <td>Job</td>
+                            <td>384</td>
+                        </tr>
+                        <tr>
+                            <td>ID</td>
+                            <td>apply-aci</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj collapsed">
+                <header>Parameters <i class="fa fa-chevron-down"></i></header>
+                <div class="obj-container">
+                    <p class="headerless-tbl desc">Instructions on how to use this functionality goes here in this header space.</p>
+                    <table class="main-tbl">
+                        <tr>
+                            <td>Retry Strategy</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td>Exclusion Host</td>
+                            <td>http://google.com/</td>
+                        </tr>
+                        <tr>
+                            <td>Failed Attempts</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Max</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>Exception Handler Workflow</td>
+                            <td>Error</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj collapsed">
+                <header>Sub Jobs <i class="fa fa-chevron-down"></i></header>
+                <div class="obj-container">
+                    <p class="headerless-tbl desc">Instructions on how to use this functionality goes here in this header space.</p>
+                    <table class="main-tbl">
+                        <tr>
+                            <td>Retry Strategy</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td>Exclusion Host</td>
+                            <td>http://google.com/</td>
+                        </tr>
+                        <tr>
+                            <td>Failed Attempts</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Max</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>Exception Handler Workflow</td>
+                            <td>Error</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="error-details" data-level="2" data-parent="incidents" data-label="Error Details">
+         <div class="full-col">
+            <div class="obj">
+                <header class="no-expand">Error Details</header>
+                <div class="obj-container">
+                    <p class="desc">Instructions on how to use this functionality goes here in this header space.</p>
+                    <table class="main-tbl">
+                        <tr>
+                            <td>Title</td>
+                            <td>Error while creating format "avi"</td>
+                        </tr>
+                        <tr>
+                            <td>Description</td>
+                            <td>Error while creating format "avi" for track "track-13" See the ffmpeg output to learn more about this error</td>
+                        </tr>
+                        <tr>
+                            <td>Link</td>
+                            <td>http://knoledgebase.entwinemedia.com/23476</td>
+                        </tr>
+                        <tr>
+                            <td>Technical Details</td>
+                            <td>1) FFmpeg command line ffmpeg -i ss 4 -f avi 1) FFmpeg command line ffmpeg -i ss 4 -f avi 1) FFmpeg command line ffmpeg -i ss 4 -f avi 1) FFmpeg command line ffmpeg -i ss 4 -f avi </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="btm-spacer"></div>
+</section>

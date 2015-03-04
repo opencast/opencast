@@ -16,8 +16,8 @@
 
 package org.opencastproject.search.impl.solr;
 
-import static org.opencastproject.search.api.SearchService.READ_PERMISSION;
-import static org.opencastproject.search.api.SearchService.WRITE_PERMISSION;
+import static org.opencastproject.security.api.Permissions.Action.READ;
+import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.util.data.Collections.filter;
 import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Option.option;
@@ -744,7 +744,7 @@ public class SolrRequester {
    * @throws SolrServerException
    */
   public SearchResult getForAdministrativeRead(SearchQuery q) throws SolrServerException {
-    SolrQuery query = getForAction(q, READ_PERMISSION, false);
+    SolrQuery query = getForAction(q, READ.toString(), false);
     return createSearchResult(query);
   }
 
@@ -757,7 +757,7 @@ public class SolrRequester {
    * @throws SolrServerException
    */
   public SearchResult getForRead(SearchQuery q) throws SolrServerException {
-    SolrQuery query = getForAction(q, READ_PERMISSION, true);
+    SolrQuery query = getForAction(q, READ.toString(), true);
     return createSearchResult(query);
   }
 
@@ -770,7 +770,7 @@ public class SolrRequester {
    * @throws SolrServerException
    */
   public SearchResult getForWrite(SearchQuery q) throws SolrServerException {
-    SolrQuery query = getForAction(q, WRITE_PERMISSION, true);
+    SolrQuery query = getForAction(q, WRITE.toString(), true);
     return createSearchResult(query);
   }
 

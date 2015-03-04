@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ingest-prepare-editor</id>
+  <title>Prepare Media Package for being used in the editor tool</title>
+  <tags>
+    <tag>upload-ng</tag>
+    <tag>schedule-ng</tag>
+  </tags>
+  <description>
+
+  </description>
+  <configuration_panel></configuration_panel>
+
+  <operations>
+
+	  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Ingest and prepare                                                -->
+    <!--                                                                   -->
+    <!-- Download from external ingest nodes, tag, inspect and and prepare -->
+    <!-- source recording and metadata catalogs.                           -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <operation
+	    id="include"
+      description="Ingest and prepare">
+      <configurations>
+         <configuration key="workflow-id">ingest-prepare</configuration>
+      </configurations>
+    </operation>
+
+    <operation id="compose" description="Extracting audio for waveform generation" fail-on-error="false">
+      <configurations>
+        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="target-flavor">*/audio</configuration>
+        <configuration key="encoding-profile">audio.wav</configuration>
+      </configurations>
+    </operation>
+
+    <operation id="waveform" description="Generating waveform" fail-on-error="false">
+      <configurations>
+        <configuration key="source-flavor">*/audio</configuration>
+        <configuration key="target-flavor">*/waveform</configuration>
+      </configurations>
+    </operation>
+
+    <operation id="tag" description="Tagging waveform for publishing to internal publication channel">
+      <configurations>
+        <configuration key="source-flavors">*/waveform</configuration>
+        <configuration key="target-tags">+internal</configuration>
+      </configurations>
+    </operation>
+
+    <operation id="publish-internal" description="Publish to internal publication channel" fail-on-error="true">
+      <configurations>
+        <configuration key="source-tags">internal</configuration>
+      </configurations>
+    </operation>
+
+    <operation id="archive" description="Archive content in media package" fail-on-error="true">
+      <configurations>
+        <configuration key="source-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <operation id="cleanup" description="Cleanup the working file repository" fail-on-error="false">
+      <configurations>
+        <configuration key="preserve-flavors"></configuration>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

@@ -1,0 +1,47 @@
+<div class="row">
+    <div class="multi-select-container offset-col-2">
+        <div class="multi-select-col">
+            <div class="row">
+                <label translate="{{ resource.i18n }}.LEFT"><i class="required">*</i></label>
+                <input type="search" id="search" class="search"
+                    placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate  }}"
+                    ng-show="resource.searchable"
+                    ng-disabled="disabled"
+                    ng-class="{ disabled: disabled }"
+                    ng-model="q.name">
+
+                <select multiple class="available"
+                    ng-model="markedForAddition"
+                    ng-disabled="disabled"
+                    ng-init="markedForAddition = []"
+                    ng-class="{ disabled: disabled }"
+                    ng-options="item.name group by item[groupBy] for item in resource.available | filter:q | orderBy: 'name' : false">
+                </select>
+            </div>
+            <div class="row">
+                <div class="button-container">
+                    <a ng-click="add()" ng-class="{ disabled: !markedForAddition.length }" class="submit" translate="{{ resource.i18n }}.ADD">Add</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="exchange-icon"></div>
+
+        <div class="multi-select-col">
+            <div class="row">
+                <label translate="{{ resource.i18n }}.RIGHT"></label>
+                <select multiple class="selected"
+                    ng-model="markedForRemoval"
+                    ng-init="markedForRemoval = []"
+                    ng-class="{ disabled: disabled }"
+                    ng-options="item.name group by item[groupBy] for item in resource.selected | orderBy: 'name' : false">
+                </select>
+            </div>
+            <div class="row">
+                <div class="button-container">
+                    <a ng-click="remove()" ng-class="{ disabled: !markedForRemoval.length }" class="remove" translate="{{ resource.i18n }}.REMOVE">Remove</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

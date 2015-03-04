@@ -35,17 +35,22 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_LICENS
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_PUBLISHER;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.TERMS_NS_URI;
-import static org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl.PROPERTY_PROMOTED;
+import static org.opencastproject.metadata.dublincore.DublinCores.OC_PROPERTY_PROMOTED;
+import static org.opencastproject.util.UrlSupport.uri;
 
+import com.entwinemedia.fn.data.Opt;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
 import org.opencastproject.mediapackage.NamespaceBindingException;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.util.UnknownFileTypeException;
+import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -139,13 +144,13 @@ public class DublinCoreTest {
   }
 
   /**
-   * Test method for {@link org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl#fromFile(java.io.File)} .
+   * Test method for {@link org.opencastproject.metadata.dublincore.DublinCoreCatalog#fromFile(java.io.File)} .
    */
   @Test
   public void testFromFile() throws Exception {
     DublinCoreCatalog dc = null;
     FileInputStream in = new FileInputStream(catalogFile);
-    dc = new DublinCoreCatalogImpl(in);
+    dc = DublinCores.read(in);
     IOUtils.closeQuietly(in);
 
     // Check if the fields are available
@@ -155,11 +160,11 @@ public class DublinCoreTest {
     assertNotNull(dc.getFirst(PROPERTY_TITLE));
     assertNull(dc.getFirst(PROPERTY_TITLE, "fr"));
     // Test custom metadata element
-    assertEquals("true", dc.getFirst(PROPERTY_PROMOTED));
+    assertEquals("true", dc.getFirst(OC_PROPERTY_PROMOTED));
   }
 
   /**
-   * Test method for {@link DublinCoreCatalogImpl#parse(String)} with an XML String
+   * Test method for {@link DublinCoreCatalogList#parse(String)} with an XML String
    */
   @Test
   public void testParseDublinCoreListXML() throws Exception {
@@ -171,7 +176,7 @@ public class DublinCoreTest {
   }
 
   /**
-   * Test method for {@link DublinCoreCatalogImpl#parse(String)} with a JSON String
+   * Test method for {@link DublinCoreCatalogList#parse(String)} with a JSON String
    */
   @Test
   public void testParseDublinCoreListJSON() throws Exception {
@@ -183,13 +188,13 @@ public class DublinCoreTest {
   }
 
   /**
-   * Test method for {@link DublinCoreCatalogImpl#toJson()} .
+   * Test method for {@link DublinCoreCatalog#toJson()} .
    */
   @Test
   public void testJson() throws Exception {
     DublinCoreCatalog dc = null;
     FileInputStream in = new FileInputStream(catalogFile);
-    dc = new DublinCoreCatalogImpl(in);
+    dc = DublinCores.read(in);
     IOUtils.closeQuietly(in);
 
     String jsonString = dc.toJson();
@@ -206,7 +211,7 @@ public class DublinCoreTest {
     JSONArray subjectArray = (JSONArray) dcTerms.get("subject");
     assertEquals("The subject should be present", 1, subjectArray.size());
 
-    DublinCoreCatalog fromJson = new DublinCoreCatalogImpl(IOUtils.toInputStream(jsonString));
+    DublinCoreCatalog fromJson = DublinCores.read(IOUtils.toInputStream(jsonString));
     assertEquals(2, fromJson.getLanguages(PROPERTY_TITLE).size());
     assertEquals("video/x-dv", fromJson.getFirst(PROPERTY_FORMAT));
     assertEquals("eng", fromJson.getFirst(PROPERTY_LANGUAGE));
@@ -223,14 +228,13 @@ public class DublinCoreTest {
   @Test
   public void testNewInstance() {
     try {
-
       // Read the sample catalog
       FileInputStream in = new FileInputStream(catalogFile);
-      DublinCoreCatalog dcSample = new DublinCoreCatalogImpl(in);
+      DublinCoreCatalog dcSample = DublinCores.read(in);
       IOUtils.closeQuietly(in);
 
       // Create a new catalog and fill it with a few fields
-      DublinCoreCatalog dcNew = DublinCoreCatalogImpl.newInstance();
+      DublinCoreCatalog dcNew = DublinCores.mkOpencast();
       dcTempFile1 = new File(FileSupport.getTempDirectory(), Long.toString(System.currentTimeMillis()));
 
       // Add the required fields
@@ -245,19 +249,21 @@ public class DublinCoreTest {
       try {
         dcNew.add(PROPERTY_CONTRIBUTOR, (String) null);
         fail();
-      } catch (IllegalArgumentException e) {
+      } catch (IllegalArgumentException ignore) {
       }
 
       // Add a field with an encoding scheme
-      dcNew.add(PROPERTY_LICENSE, new DublinCoreValue("http://www.opencastproject.org/license",
+      dcNew.add(PROPERTY_LICENSE, DublinCoreValue.mk("http://www.opencastproject.org/license",
               DublinCore.LANGUAGE_UNDEFINED, ENC_SCHEME_URI));
       // Don't forget to bind the namespace...
-      dcNew.bindPrefix("octest", "http://www.opencastproject.org/octest");
-      dcNew.add(PROPERTY_PROMOTED, new DublinCoreValue("true", DublinCore.LANGUAGE_UNDEFINED, new EName(
+      dcNew.addBindings(XmlNamespaceContext.mk("octest", "http://www.opencastproject.org/octest"));
+      dcNew.add(OC_PROPERTY_PROMOTED, DublinCoreValue.mk("true", DublinCore.LANGUAGE_UNDEFINED, new EName(
               "http://www.opencastproject.org/octest", "Boolean")));
       try {
-        dcNew.add(PROPERTY_PROMOTED, new DublinCoreValue("true", DublinCore.LANGUAGE_UNDEFINED, new EName(
-                "http://www.opencastproject.org/enc-scheme", "Boolean")));
+        dcNew.add(OC_PROPERTY_PROMOTED, DublinCoreValue.mk(
+                "true",
+                DublinCore.LANGUAGE_UNDEFINED,
+                EName.mk("http://www.opencastproject.org/enc-scheme", "Boolean")));
         fail();
       } catch (NamespaceBindingException e) {
         // Ok. This exception is expected to occur
@@ -274,53 +280,11 @@ public class DublinCoreTest {
       trans.transform(source, result);
 
       // Re-read the saved catalog and test for its content
-      DublinCoreCatalog dcNewFromDisk = new DublinCoreCatalogImpl(dcTempFile1.toURI().toURL().openStream());
+      DublinCoreCatalog dcNewFromDisk = DublinCores.read(dcTempFile1.toURI().toURL().openStream());
       assertEquals(dcSample.getFirst(PROPERTY_IDENTIFIER), dcNewFromDisk.getFirst(PROPERTY_IDENTIFIER));
       assertEquals(dcSample.getFirst(PROPERTY_TITLE, "en"), dcNewFromDisk.getFirst(PROPERTY_TITLE, "en"));
       assertEquals(dcSample.getFirst(PROPERTY_PUBLISHER), dcNewFromDisk.getFirst(PROPERTY_PUBLISHER));
 
-    } catch (IOException e) {
-      fail("Error creating the catalog: " + e.getMessage());
-    } catch (ParserConfigurationException e) {
-      fail("Error creating a parser for the catalog: " + e.getMessage());
-    } catch (TransformerException e) {
-      fail("Error saving the catalog: " + e.getMessage());
-    }
-  }
-
-  /**
-   * Test method for {@link org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl#save()} .
-   */
-  @Test(expected = IllegalStateException.class)
-  public void testRequiredFields() {
-    try {
-
-      // Read the sample catalog
-      FileInputStream in = new FileInputStream(catalogFile);
-      DublinCoreCatalog dcSample = new DublinCoreCatalogImpl(in);
-      IOUtils.closeQuietly(in);
-
-      // Create a new catalog and fill it with a few fields
-      dcTempFile2 = new File(FileSupport.getTempDirectory(), Long.toString(System.currentTimeMillis()));
-      DublinCoreCatalog dcNew = new DublinCoreCatalogImpl();
-
-      // Add the required fields but the title
-      dcNew.set(PROPERTY_IDENTIFIER, dcSample.getFirst(PROPERTY_IDENTIFIER));
-
-      // Add an additional field
-      dcNew.set(PROPERTY_PUBLISHER, dcSample.getFirst(PROPERTY_PUBLISHER));
-
-      // Store the catalog
-      TransformerFactory transfac = TransformerFactory.newInstance();
-      Transformer trans = transfac.newTransformer();
-      trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-      trans.setOutputProperty(OutputKeys.METHOD, "xml");
-      FileWriter sw = new FileWriter(dcTempFile2);
-      StreamResult result = new StreamResult(sw);
-      DOMSource source = new DOMSource(dcNew.toXml());
-      trans.transform(source, result);
-
-      fail("Required field was missing but not reported!");
     } catch (IOException e) {
       fail("Error creating the catalog: " + e.getMessage());
     } catch (ParserConfigurationException e) {
@@ -337,7 +301,7 @@ public class DublinCoreTest {
   public void testOverwriting() {
     // Create a new catalog and fill it with a few fields
     DublinCoreCatalog dcNew = null;
-    dcNew = DublinCoreCatalogImpl.newInstance();
+    dcNew = DublinCores.mkOpencast();
     dcNew.set(PROPERTY_TITLE, "Title 1");
     assertEquals("Title 1", dcNew.getFirst(PROPERTY_TITLE));
 
@@ -352,7 +316,7 @@ public class DublinCoreTest {
 
   @Test
   public void testVarious() throws NoSuchAlgorithmException, IOException, UnknownFileTypeException {
-    DublinCoreCatalog dc = DublinCoreCatalogImpl.newInstance();
+    DublinCoreCatalog dc = DublinCores.mkOpencast();
     // Add a title
     dc.add(PROPERTY_TITLE, "Der alte Mann und das Meer");
     assertEquals("Der alte Mann und das Meer", dc.getFirst(PROPERTY_TITLE));
@@ -400,7 +364,7 @@ public class DublinCoreTest {
 
   @Test
   public void testVarious2() throws NoSuchAlgorithmException, IOException, UnknownFileTypeException {
-    DublinCoreCatalog dc = DublinCoreCatalogImpl.newInstance();
+    DublinCoreCatalog dc = DublinCores.mkOpencast();
     dc.add(PROPERTY_TITLE, "The Lord of the Rings");
     dc.add(PROPERTY_TITLE, "Der Herr der Ringe", "de");
     assertEquals(2, dc.getLanguages(PROPERTY_TITLE).size());
@@ -418,7 +382,7 @@ public class DublinCoreTest {
 
   @Test
   public void testVarious3() throws NoSuchAlgorithmException, IOException, UnknownFileTypeException {
-    DublinCoreCatalog dc = DublinCoreCatalogImpl.newInstance();
+    DublinCoreCatalog dc = DublinCores.mkOpencast();
     dc.add(PROPERTY_CONTRIBUTOR, "Heinz Strunk");
     dc.add(PROPERTY_CONTRIBUTOR, "Rocko Schamoni");
     dc.add(PROPERTY_CONTRIBUTOR, "Jacques Palminger");
@@ -441,7 +405,7 @@ public class DublinCoreTest {
 
   @Test
   public void testVarious4() throws NoSuchAlgorithmException, IOException, UnknownFileTypeException {
-    DublinCoreCatalog dc = DublinCoreCatalogImpl.newInstance();
+    DublinCoreCatalog dc = DublinCores.mkOpencast();
     dc.add(PROPERTY_TITLE, "deutsch", "de");
     dc.add(PROPERTY_TITLE, "english", "en");
     assertNull(dc.getFirst(PROPERTY_TITLE, LANGUAGE_UNDEFINED));
@@ -456,9 +420,9 @@ public class DublinCoreTest {
 
   @Test
   public void testSet() {
-    DublinCoreCatalog dc = new DublinCoreCatalogImpl();
-    dc.set(PROPERTY_CREATOR, Arrays.asList(new DublinCoreValue("Klaus"), new DublinCoreValue("Peter"),
-            new DublinCoreValue("Carl", "en")));
+    DublinCoreCatalog dc = DublinCores.mkOpencast();
+    dc.set(PROPERTY_CREATOR, Arrays.asList(DublinCoreValue.mk("Klaus"), DublinCoreValue.mk("Peter"),
+                                           DublinCoreValue.mk("Carl", "en")));
     assertEquals(2, dc.get(PROPERTY_CREATOR, LANGUAGE_UNDEFINED).size());
     assertEquals(3, dc.get(PROPERTY_CREATOR).size());
     assertEquals("Klaus", dc.get(PROPERTY_CREATOR, LANGUAGE_UNDEFINED).get(0));
@@ -489,19 +453,19 @@ public class DublinCoreTest {
   @Ignore
   @Test
   public void testPreserveEncodingScheme() {
-    DublinCoreCatalog dc = DublinCoreCatalogImpl.newInstance();
-    DublinCoreValue val = new DublinCoreValue("http://www.opencastproject.org/license", "en", ENC_SCHEME_URI);
+    DublinCoreCatalog dc = DublinCores.mkOpencast();
+    DublinCoreValue val = DublinCoreValue.mk("http://www.opencastproject.org/license", "en", ENC_SCHEME_URI);
     dc.add(PROPERTY_LICENSE, val);
     assertEquals(1, dc.get(PROPERTY_LICENSE).size());
     assertEquals(val, dc.get(PROPERTY_LICENSE).get(0));
-    assertEquals(ENC_SCHEME_URI, dc.get(PROPERTY_LICENSE).get(0).getEncodingScheme());
+    assertEquals(Opt.some(ENC_SCHEME_URI), dc.get(PROPERTY_LICENSE).get(0).getEncodingScheme());
   }
 
   @Test
   public void testSerializeDublinCore() throws Exception {
     DublinCoreCatalog dc = null;
     FileInputStream in = new FileInputStream(catalogFile2);
-    dc = new DublinCoreCatalogImpl(in);
+    dc = DublinCores.read(in);
     IOUtils.closeQuietly(in);
 
     String inputXml = IOUtils.toString(new FileInputStream(catalogFile2), "UTF-8");
@@ -550,7 +514,7 @@ public class DublinCoreTest {
   // this test should verify serialization/deserialization works for a fairly minimal case
   // waiting on https://opencast.jira.com/browse/MH-9733
   public void testSerializationDeserializationOfCatalogs() throws Exception {
-    DublinCoreCatalogImpl impl = new DublinCoreCatalogImpl();
+    DublinCoreCatalog impl = DublinCores.mkOpencast();
     impl.addTag("bob");
     impl.set(impl.PROPERTY_PUBLISHER, "test");
     DublinCoreCatalogService service = new DublinCoreCatalogService();
@@ -559,65 +523,73 @@ public class DublinCoreTest {
   }
 
   @Test
-  // test for null values on various methods on the DublinCoreCatalogImpl, they should
+  // test for null values on various methods on the DublinCoreCatalog, they should
   // generally return an exception
   public void testForNullsInDublinCoreCatalogImpl() throws Exception {
-    DublinCoreCatalogImpl impl = new DublinCoreCatalogImpl();
+    DublinCoreCatalog dc = DublinCores.mkOpencast();
     try {
       DublinCoreValue val = null;
-      impl.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val);
+      dc.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val);
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
       Assert.assertFalse(e instanceof NullPointerException);
     }
     try {
-      DublinCoreValue val = null;
-      impl.add(null, EasyMock.createNiceMock(DublinCoreValue.class));
+      dc.add(null, EasyMock.createNiceMock(DublinCoreValue.class));
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
       Assert.assertFalse(e instanceof NullPointerException);
     }
     try {
-      DublinCoreValue val = null;
       String val2 = null;
-      impl.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val2);
+      dc.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val2);
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
       Assert.assertFalse(e instanceof NullPointerException);
     }
     try {
-      DublinCoreValue val = null;
-      String val2 = null;
-      impl.add(null, "");
+      dc.add(null, "");
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
       Assert.assertFalse(e instanceof NullPointerException);
     }
     try {
-      DublinCoreValue val = null;
       String val2 = null;
-      impl.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val2, val2);
+      dc.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val2, val2);
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
       Assert.assertFalse(e instanceof NullPointerException);
     }
     try {
-      DublinCoreValue val = null;
       String val2 = null;
-      impl.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), "", val2);
+      dc.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), "", val2);
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
       Assert.assertFalse(e instanceof NullPointerException);
     }
     try {
-      DublinCoreValue val = null;
-      String val2 = null;
-      impl.add(null, "", "");
+      dc.add(null, "", "");
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
       Assert.assertFalse(e instanceof NullPointerException);
     }
-
   }
 
+  @Test
+  public void testClone() {
+    final DublinCoreCatalog dc = DublinCores.mkOpencast();
+    final MimeType mimeType = MimeType.mimeType("text", "xml");
+    dc.setMimeType(MimeType.mimeType("text", "xml"));
+    dc.setReference(new MediaPackageReferenceImpl("type", "identifier"));
+    dc.setURI(uri("http://localhost"));
+    assertNotNull(dc.getMimeType());
+    assertEquals(mimeType, dc.getMimeType());
+    // clone
+    DublinCoreCatalog dcClone = (DublinCoreCatalog) dc.clone();
+    assertEquals("The mime type should be cloned", dc.getMimeType(), dcClone.getMimeType());
+    assertEquals("The flavor should be cloned", dc.getFlavor(), dcClone.getFlavor());
+    assertEquals("The values should be cloned", dc.getValues(), dcClone.getValues());
+    assertNull("The URI should not be cloned", dcClone.getURI());
+    assertNull("A media package reference should not be cloned.", dcClone.getReference());
+  }
 }

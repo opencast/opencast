@@ -11,6 +11,11 @@ work/*
 
 # ignore maven target directories
 target/
+target-grunt/
+node_modules/
+coverage/
+node/
+www/
 
 # ignore Eclipse project data
 .project

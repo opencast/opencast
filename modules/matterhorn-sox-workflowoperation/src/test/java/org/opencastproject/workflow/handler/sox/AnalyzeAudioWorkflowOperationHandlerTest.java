@@ -76,8 +76,8 @@ public class AnalyzeAudioWorkflowOperationHandlerTest {
     EasyMock.replay(instance);
 
     DefaultOrganization org = new DefaultOrganization();
-    User anonymous = new JaxbUser("anonymous", org, new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS,
-            org));
+    User anonymous = new JaxbUser("anonymous", "test", org, new JaxbRole(
+            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, org));
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);

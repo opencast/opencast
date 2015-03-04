@@ -15,31 +15,6 @@
  */
 package org.opencastproject.metadata.dublincore;
 
-import org.apache.commons.io.IOUtils;
-import org.opencastproject.mediapackage.Catalog;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.metadata.api.MetadataValue;
-import org.opencastproject.metadata.api.StaticMetadata;
-import org.opencastproject.metadata.api.StaticMetadataService;
-import org.opencastproject.metadata.api.util.Interval;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.NonEmptyList;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Predicate;
-import org.opencastproject.util.data.functions.Misc;
-import org.opencastproject.workspace.api.Workspace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_ACCESS_RIGHTS;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_AVAILABLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CONTRIBUTOR;
@@ -63,6 +38,32 @@ import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
+
+import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.metadata.api.MetadataValue;
+import org.opencastproject.metadata.api.StaticMetadata;
+import org.opencastproject.metadata.api.StaticMetadataService;
+import org.opencastproject.metadata.api.util.Interval;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.NonEmptyList;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Predicate;
+import org.opencastproject.util.data.functions.Misc;
+import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This service provides {@link org.opencastproject.metadata.api.StaticMetadata} for a given mediapackage,
@@ -305,7 +306,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
     try {
       File f = workspace.get(catalog.getURI());
       in = new FileInputStream(f);
-      return some((DublinCoreCatalog) new DublinCoreCatalogImpl(in));
+      return some((DublinCoreCatalog) DublinCores.read(in));
     } catch (Exception e) {
       logger.warn("Unable to load metadata from catalog '{}'", catalog);
       return Option.none();

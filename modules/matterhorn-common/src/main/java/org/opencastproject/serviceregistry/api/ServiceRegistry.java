@@ -29,12 +29,19 @@ public interface ServiceRegistry {
    *
    * @param host
    *          The base URL for this server
+   * @param address
+   *          The IP address of this host
+   * @param memory
+   *          The allocated memory of this host
+   * @param cores
+   *          The available cores of this host
    * @param maxConcurrentJobs
    *          the maximum number of concurrent jobs this server can execute
    * @throws ServiceRegistryException
    *           if communication with the service registry fails
    */
-  void registerHost(String host, int maxConcurrentJobs) throws ServiceRegistryException;
+  void registerHost(String host, String address, long memory, int cores, int maxConcurrentJobs)
+          throws ServiceRegistryException;
 
   /**
    * Removes a Matterhorn server from service.
@@ -277,7 +284,7 @@ public interface ServiceRegistry {
 
   /**
    * Deletes a job from the service registry
-   * 
+   *
    * @param id
    *          the job id
    */
@@ -286,7 +293,7 @@ public interface ServiceRegistry {
   /**
    * Removes all jobs which do not have a parent job (except workflow instance jobs) and which have passed their
    * lifetime.
-   * 
+   *
    * @param lifetime
    *          lifetime in days
    * @throws ServiceRegistryException
@@ -422,7 +429,7 @@ public interface ServiceRegistry {
   long countOfAbnormalServices() throws ServiceRegistryException;
 
   /**
-   * Count the number of jobs of this type in this {@link Status} across all hosts.
+   * Count the number of jobs that match the specified parameters.
    *
    * @param serviceType
    *          The jobs run by this type of service. If null, the returned count will refer to all types of jobs.

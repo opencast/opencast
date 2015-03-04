@@ -1,0 +1,8 @@
+{
+   "readOnly":false,
+   "id":"endTime",
+   "label":"EVENTS.EVENTS.DETAILS.METADATA.END_TIME",
+   "type":"date",
+   "value":"08-00-00",
+   "required":false
+}

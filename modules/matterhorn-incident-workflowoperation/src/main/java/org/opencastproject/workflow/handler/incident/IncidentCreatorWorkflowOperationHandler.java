@@ -19,7 +19,7 @@ import static org.opencastproject.util.EnumSupport.parseEnum;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.fn.juc.Immutables;
+import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;

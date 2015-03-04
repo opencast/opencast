@@ -15,13 +15,6 @@
  */
 package org.opencastproject.workflow.handler.videoeditor;
 
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Collection;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Catalog;
@@ -43,63 +36,72 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Collection;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 /**
- * workflowoperationhandler for silencedetection executes the silencedetection
- * and adds a SMIL document to the mediapackage containing the cutting points
+ * workflowoperationhandler for silencedetection executes the silencedetection and adds a SMIL document to the
+ * mediapackage containing the cutting points
  */
 public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
-  /**
-   * Logger
-   */
+  /** Logger */
   private static final Logger logger = LoggerFactory.getLogger(SilenceDetectionWorkflowOperationHandler.class);
-  /**
-   * Name of the configuration option that provides the source flavors we are looking for.
-   */
+
+  /** Name of the configuration option that provides the source flavors we are looking for. */
   private static final String SOURCE_FLAVORS_PROPERTY = "source-flavors";
-  /**
-   * Name of the configuration option that provides the smil flavor subtype we will produce.
-   */
+
+  /** Name of the configuration option that provides the source flavor we are looking for. */
+  private static final String SOURCE_FLAVOR_PROPERTY = "source-flavor";
+
+  /** Name of the configuration option that provides the smil flavor subtype we will produce. */
   private static final String SMIL_FLAVOR_SUBTYPE_PROPERTY = "smil-flavor-subtype";
-  /**
-   * Name of the configuration option for track flavors to reference in generated smil.
-   */
+
+  /** Name of the configuration option that provides the smil target flavor we will produce. */
+  private static final String SMIL_TARGET_FLAVOR_PROPERTY = "target-flavor";
+
+  /** Name of the configuration option for track flavors to reference in generated smil. */
   private static final String REFERENCE_TRACKS_FLAVOR_PROPERTY = "reference-tracks-flavor";
-  /**
-   * Name of the configuration option that provides the smil file name
-   */
+
+  /** Name of the configuration option that provides the smil file name */
   private static final String TARGET_FILE_NAME = "smil.smil";
-  /**
-   * The configuration options for this handler
-   */
+
+  /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(SOURCE_FLAVORS_PROPERTY, "The flavors for source files (tracks containing audio stream).");
+    CONFIG_OPTIONS.put(SOURCE_FLAVOR_PROPERTY, "The flavor for source files (tracks containing audio stream).");
     CONFIG_OPTIONS.put(SMIL_FLAVOR_SUBTYPE_PROPERTY, "The flavor subtype for target smil files.");
+    CONFIG_OPTIONS.put(SMIL_TARGET_FLAVOR_PROPERTY, "The flavor for target smil files.");
     CONFIG_OPTIONS.put(REFERENCE_TRACKS_FLAVOR_PROPERTY,
-            "The track flavors for referencing in smil as source files. If not set, fallback to " + SOURCE_FLAVORS_PROPERTY);
+            "The track flavors for referencing in smil as source files. If not set, fallback to "
+                    + SOURCE_FLAVORS_PROPERTY);
   }
-  /**
-   * The silence detection service.
-   */
+  /** The silence detection service. */
   private SilenceDetectionService detetionService;
-  /**
-   * The smil service for smil parsing.
-   */
+
+  /** The smil service for smil parsing. */
   private SmilService smilService;
+
+  /** The workspace. */
   private Workspace workspace;
 
   /**
    * {@inheritDoc}
    *
-   * @see
-   * org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
   public SortedMap<String, String> getConfigurationOptions() {
@@ -113,21 +115,46 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     MediaPackage mp = workflowInstance.getMediaPackage();
     logger.debug("Start silence detection workflow operation for mediapackage {}", mp.getIdentifier().compact());
 
-    String sourceFlavors = StringUtils.trimToNull(
-            workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVORS_PROPERTY));
-    String smilFlavorSubType = StringUtils.trimToNull(
-            workflowInstance.getCurrentOperation().getConfiguration(SMIL_FLAVOR_SUBTYPE_PROPERTY));
-    if (sourceFlavors == null) {
-      throw new WorkflowOperationException(String.format(
-              "No %s or %s have been specified", SOURCE_FLAVORS_PROPERTY, SMIL_FLAVOR_SUBTYPE_PROPERTY));
+    String sourceFlavors = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
+            SOURCE_FLAVORS_PROPERTY));
+    String sourceFlavor = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
+            SOURCE_FLAVOR_PROPERTY));
+    String smilFlavorSubType = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
+            SMIL_FLAVOR_SUBTYPE_PROPERTY));
+    String smilTargetFlavorString = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
+            SMIL_TARGET_FLAVOR_PROPERTY));
+
+    MediaPackageElementFlavor smilTargetFlavor = null;
+    if (smilTargetFlavorString != null)
+      smilTargetFlavor = MediaPackageElementFlavor.parseFlavor(smilTargetFlavorString);
+
+    if (sourceFlavor == null && sourceFlavors == null) {
+      throw new WorkflowOperationException(String.format("No %s or %s have been specified", SOURCE_FLAVOR_PROPERTY,
+              SOURCE_FLAVORS_PROPERTY));
     }
-    String referenceTracksFlavor = StringUtils.trimToNull(
-            workflowInstance.getCurrentOperation().getConfiguration(REFERENCE_TRACKS_FLAVOR_PROPERTY));
+    if (smilFlavorSubType == null && smilTargetFlavor == null) {
+      throw new WorkflowOperationException(String.format("No %s or %s have been specified",
+              SMIL_FLAVOR_SUBTYPE_PROPERTY, SMIL_TARGET_FLAVOR_PROPERTY));
+    }
+    if (sourceFlavors != null && smilTargetFlavor != null) {
+      throw new WorkflowOperationException(String.format("Can't use %s and %s together", SOURCE_FLAVORS_PROPERTY,
+              SMIL_TARGET_FLAVOR_PROPERTY));
+    }
+
+    final String finalSourceFlavors;
+    if (smilTargetFlavor != null) {
+      finalSourceFlavors = sourceFlavor;
+    } else {
+      finalSourceFlavors = sourceFlavors;
+    }
+
+    String referenceTracksFlavor = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
+            REFERENCE_TRACKS_FLAVOR_PROPERTY));
     if (referenceTracksFlavor == null)
-      referenceTracksFlavor = sourceFlavors;
+      referenceTracksFlavor = finalSourceFlavors;
 
     TrackSelector trackSelector = new TrackSelector();
-    for (String flavor : asList(sourceFlavors)) {
+    for (String flavor : asList(finalSourceFlavors)) {
       trackSelector.addFlavor(flavor);
     }
     Collection<Track> sourceTracks = trackSelector.select(mp, false);
@@ -143,15 +170,16 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     Collection<Track> referenceTracks = trackSelector.select(mp, false);
     if (referenceTracks.isEmpty()) {
       // REFERENCE_TRACKS_FLAVOR_PROPERTY was set to wrong value
-      throw new WorkflowOperationException(
-              String.format("No tracks found filtered by flavor(s) '%s'", referenceTracksFlavor));
+      throw new WorkflowOperationException(String.format("No tracks found filtered by flavor(s) '%s'",
+              referenceTracksFlavor));
     }
     MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
 
     for (Track sourceTrack : sourceTracks) {
       logger.info("Executing silence detection on track {}", sourceTrack.getIdentifier());
       try {
-        Job detectionJob = detetionService.detect(sourceTrack, referenceTracks.toArray(new Track[referenceTracks.size()]));
+        Job detectionJob = detetionService.detect(sourceTrack,
+                referenceTracks.toArray(new Track[referenceTracks.size()]));
         if (!waitForStatus(detectionJob).isSuccess()) {
           throw new WorkflowOperationException("Silence Detection failed");
         }
@@ -160,7 +188,9 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
         try {
           is = IOUtils.toInputStream(smil.toXML(), "UTF-8");
           URI smilURI = workspace.put(mp.getIdentifier().compact(), smil.getId(), TARGET_FILE_NAME, is);
-          MediaPackageElementFlavor smilFlavor = new MediaPackageElementFlavor(sourceTrack.getFlavor().getType(), smilFlavorSubType);
+          MediaPackageElementFlavor smilFlavor = smilTargetFlavor;
+          if (smilFlavor == null)
+            smilFlavor = new MediaPackageElementFlavor(sourceTrack.getFlavor().getType(), smilFlavorSubType);
           Catalog catalog = (Catalog) mpeBuilder.elementFromURI(smilURI, MediaPackageElement.Type.Catalog, smilFlavor);
           catalog.setIdentifier(smil.getId());
           mp.add(catalog);
@@ -174,8 +204,8 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
 
         logger.info("Finished silence detection on track {}", sourceTrack.getIdentifier());
       } catch (SilenceDetectionFailedException ex) {
-        throw new WorkflowOperationException(String.format(
-                "Failed to create silence detection job for track %s", sourceTrack.getIdentifier()));
+        throw new WorkflowOperationException(String.format("Failed to create silence detection job for track %s",
+                sourceTrack.getIdentifier()));
       } catch (SmilException ex) {
         throw new WorkflowOperationException(String.format(
                 "Failed to get smil from silence detection job for track %s", sourceTrack.getIdentifier()));

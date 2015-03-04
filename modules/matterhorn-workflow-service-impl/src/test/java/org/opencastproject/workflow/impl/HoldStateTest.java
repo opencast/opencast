@@ -22,6 +22,7 @@ import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -113,6 +114,7 @@ public class HoldStateTest {
 
     // instantiate a service implementation and its DAO, overriding the methods that depend on the osgi runtime
     service = new WorkflowServiceImpl() {
+      @Override
       public Set<HandlerRegistration> getRegisteredHandlers() {
         return handlerRegistrations;
       }
@@ -155,6 +157,9 @@ public class HoldStateTest {
     EasyMock.replay(mds);
     service.addMetadataService(mds);
 
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(messageSender);
+
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
             userDirectoryService, organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
@@ -166,6 +171,7 @@ public class HoldStateTest {
     dao.setOrgDirectory(organizationDirectoryService);
     dao.activate("System Admin");
     service.setDao(dao);
+    service.setMessageSender(messageSender);
     service.activate(null);
     service.setServiceRegistry(serviceRegistry);
 

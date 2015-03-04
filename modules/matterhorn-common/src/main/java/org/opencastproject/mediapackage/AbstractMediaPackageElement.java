@@ -81,7 +81,8 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   protected URI uri = null;
 
   /** Size in bytes */
-  protected long size = -1L;
+  @XmlElement(name = "size")
+  protected Long size = null;
 
   /** The element's checksum */
   @XmlElement(name = "checksum")
@@ -109,7 +110,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    *          the elements location
    */
   protected AbstractMediaPackageElement(Type elementType, MediaPackageElementFlavor flavor, URI uri) {
-    this(null, elementType, flavor, uri, -1, null, null);
+    this(null, elementType, flavor, uri, null, null, null);
   }
 
   /**
@@ -128,7 +129,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    * @param mimeType
    *          the element mime type
    */
-  protected AbstractMediaPackageElement(Type elementType, MediaPackageElementFlavor flavor, URI uri, long size,
+  protected AbstractMediaPackageElement(Type elementType, MediaPackageElementFlavor flavor, URI uri, Long size,
           Checksum checksum, MimeType mimeType) {
     this(null, elementType, flavor, uri, size, checksum, mimeType);
   }
@@ -152,7 +153,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    *          the element mime type
    */
   protected AbstractMediaPackageElement(String id, Type elementType, MediaPackageElementFlavor flavor, URI uri,
-          long size, Checksum checksum, MimeType mimeType) {
+          Long size, Checksum checksum, MimeType mimeType) {
     if (elementType == null)
       throw new IllegalArgumentException("Argument 'elementType' is null");
     this.id = id;
@@ -359,7 +360,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    */
   @Override
   public long getSize() {
-    return size;
+    return size != null ? size : -1;
   }
 
   /**
@@ -506,7 +507,8 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
 
     // Url
     Element urlNode = document.createElement("url");
-    String urlValue = (serializer != null) ? serializer.encodeURI(uri) : uri.toString();
+    String urlValue;
+    urlValue = (serializer != null) ? serializer.encodeURI(uri).toString() : uri.toString();
     urlNode.appendChild(document.createTextNode(urlValue));
     node.appendChild(urlNode);
 
@@ -518,7 +520,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
     }
 
     // Size
-    if (size != -1) {
+    if (size != null && size != -1) {
       Element sizeNode = document.createElement("size");
       sizeNode.appendChild(document.createTextNode(Long.toString(size)));
       node.appendChild(sizeNode);
@@ -545,8 +547,8 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   }
 
   /**
-   * Attention: The media package reference is not being cloned so that calling <code>getMediaPackage()</code>
-   * on the clone yields null.
+   * Attention: The media package reference is not being cloned so that calling <code>getMediaPackage()</code> on the
+   * clone yields null.
    */
   @Override
   public Object clone() {

@@ -22,6 +22,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -82,7 +83,7 @@ public class SearchServicePersistenceTest {
 
     securityService = EasyMock.createNiceMock(SecurityService.class);
     DefaultOrganization defaultOrganization = new DefaultOrganization();
-    User user = new JaxbUser("admin", defaultOrganization, new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
+    User user = new JaxbUser("admin", "test", defaultOrganization, new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
             defaultOrganization));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
@@ -98,7 +99,7 @@ public class SearchServicePersistenceTest {
 
     accessControlList = new AccessControlList();
     List<AccessControlEntry> acl = accessControlList.getEntries();
-    acl.add(new AccessControlEntry("admin", "write", true));
+    acl.add(new AccessControlEntry("admin", Permissions.Action.WRITE.toString(), true));
   }
 
   @Test

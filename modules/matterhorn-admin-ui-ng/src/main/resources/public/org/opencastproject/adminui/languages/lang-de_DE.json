@@ -1,0 +1,1196 @@
+{
+  "MATTERHORN":"Opencast",
+  "NAV_HOME":"Zur Startseite",
+  "NAV_ABOUT":"Über",
+  "SUBMIT":"Speichern",
+  "UPDATE":"Aktualisieren",
+  "CANCEL":"Abbrechen",
+  "SAVE":"Speichern",
+  "LOGOUT":"Ausloggen",
+  "RESET":"Zurücksetzen",
+  "PREFERENCES":{
+    "CAPTION":"Einstellungen",
+    "PROFILE":"Profil",
+    "NAME":"Name",
+    "REPLYTO":"Antwort-E-Mail-Adresse",
+    "SIGNATURE":"E-Mail-Signatur",
+    "TABLE":{
+      "CAPTION":"Tabellenansicht bearbeiten",
+      "SUBHEADING":"Wählen Sie die Standard-Daten, die Sie in der {{ tableName }}-Ansicht anzeigen möchten",
+      "AVAILABLE_COLUMNS":"Verfügbare Spalten",
+      "SELECTED_COLUMNS":"Ausgewählte Spalten",
+      "FOOTER_TEXT":"Die Reihenfolge und Auswahl werden automatisch gespeichert. Drücken Sie \"{{resetTranslation}}\", um die Standardansicht wiederzuherstellen."
+    }
+  },
+  "NOTIFICATIONS":{
+    "USER_ADDED":"Der Nutzer wurde angelegt",
+    "USER_UPDATED":"Die Nutzerdaten wurden aktualisiert",
+    "USER_NOT_SAVED":"Der Nutzer konnte nicht angelegt werden",
+    "USER_DELETED":"Der Nutzer wurde gelöscht",
+    "USER_NOT_DELETED":"Der Nutzer konnte nicht gelöscht werden",
+    "USER_NOT_MANAGEABLE":"Dieser Nutzer kann nicht verwaltet werden",
+    "GROUP_ADDED":"Die Gruppe wurde angelegt",
+    "GROUP_UPDATED":"Die Gruppe wurde aktualisiert",
+    "GROUP_NOT_SAVED":"Die Gruppe konnte nicht gespeichert werden",
+    "GROUP_DELETED":"Die Gruppe wurde gelöscht",
+    "GROUP_NOT_DELETED":"Die Gruppe konnte nicht gelöscht werden",
+    "ACCESS_DENIED":"Zugriff verweigert. Sie sind nicht berechtigt, diese Seite anzusehen.",
+    "SERIES_ADDED":"Die Serie wurde angelegt",
+    "SERIES_NOT_SAVED":"Die Serie konnte nicht gespeichert werden",
+    "EVENTS_CREATED":"Das Ereignis wurde angelegt",
+    "EVENTS_UPLOAD_STARTED":"Das Ereignis wird hochgeladen...",
+    "EVENTS_NOT_CREATED":"Das Ereignis konnte nicht angelegt werden",
+    "EVENTS_UPDATED":"Das Ereignis wurde aktualisiert",
+    "EVENTS_NOT_UPDATED":"Das Ereignis konnte nicht gespeichert werden",
+    "EVENTS_DELETED":"Das Ereignis wurde gelöscht",
+    "EVENTS_NOT_DELETED":"Das\/die Ereignis(se) konnte(n) nicht gelöscht werden",
+    "USER_BLACKLIST_CREATED":"Die Sperrliste wurde erstellt",
+    "USER_BLACKLIST_NOT_CREATED":"Die Sperrliste konnte nicht erstellt werden",
+    "USER_BLACKLIST_SAVED":"Die Sperrliste wurde gespeichert",
+    "USER_BLACKLIST_NOT_SAVED":"Die Sperrliste konnte nicht gespeichert werden",
+    "USER_BLACKLIST_DELETED":"Die Sperrliste wurde gelöscht",
+    "USER_BLACKLIST_NOT_DELETED":"Die Sperrliste konnte nicht gelöscht werden",
+    "LOCATION_BLACKLIST_CREATED":"Die Sperrliste wurde erstellt",
+    "LOCATION_BLACKLIST_NOT_CREATED":"Die Sperrliste konnte nicht erstellt werden",
+    "LOCATION_BLACKLIST_SAVED":"Die Sperrliste wurde gespeichert",
+    "LOCATION_BLACKLIST_NOT_SAVED":"Die Sperrliste konnte nicht gespeichert werden",
+    "LOCATION_BLACKLIST_DELETED":"Die Sperrliste wurde gelöscht",
+    "LOCATION_BLACKLIST_NOT_DELETED":"Die Sperrliste konnte nicht gelöscht werden",
+    "EMAIL_TEMPLATE_CREATED":"Die Vorlage wurde erstellt",
+    "EMAIL_TEMPLATE_NOT_CREATED":"Die Vorlage konnte nicht erstellt werden",
+    "EMAIL_TEMPLATE_SAVED":"Die Vorlage wurde gespeichert",
+    "EMAIL_TEMPLATE_NOT_SAVED":"Die Vorlage konnte nicht gespeichert werden",
+    "EMAIL_TEMPLATE_DELETED":"Die Vorlage wurde gelöscht",
+    "EMAIL_TEMPLATE_NOT_DELETED":"Die Vorlage konnte nicht gelöscht werden",
+    "EMAIL_TEMPLATE_NAME_TAKEN":"Dieser Name wird bereits verwendet",
+    "EMAIL_SENT":"Die Nachricht wurde gesendet",
+    "EMAIL_NOT_SENT":"Die Nachricht konnte nicht gesendet werden",
+    "CONFLICT_DETECTED":"Planungs-Konflikt: Die neue Aufzeichnung überlappt eine bestehende. Bitte ändern Sie den Aufnahmeort oder die Daten.",
+    "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Die vorhandenen Aufzeichnungen in dieser Serie müssen neu verarbeitet werden",
+    "THEME_NAME_ALREADY_TAKEN":"Dieser Name wird bereits verwendet",
+    "THEME_NAME_EMPTY":"Der Name darf nicht leer sein",
+    "BUMPER_UPLOAD_ERROR":"Fehler beim Hochladen von Medien",
+    "TRAILER_UPLOAD_ERROR":"Fehler beim Hochladen von Medien",
+    "TITLE_UPLOAD_ERROR":"Fehler beim Hochladen von Medien",
+    "LICENSE_UPLOAD_ERROR":"Fehler beim Hochladen von Medien",
+    "WATERMARK_UPLOAD_ERROR":"Fehler beim Hochladen von Medien",
+    "THEME_UPLOAD_STARTED":"Die Medien werden hochgeladen...",
+    "THEME_CREATED":"Das Branding wurde erstellt",
+    "THEME_NOT_CREATED":"Das Branding konnte nicht erstellt werden",
+    "THEME_DELETED":"Das Branding wurde gelöscht",
+    "THEME_NOT_DELETED":"Das Branding konnte nicht gelöscht werden",
+    "TASK_CREATED":"Der Task wurde erstellt",
+    "TASK_NOT_CREATED":"Der Task konnte nicht erstellt werden",
+    "VIDEO_CUT_NOT_SAVED":"Die Bearbeitungs-Informationen konnten nicht gespeichert werden",
+    "VIDEO_CUT_SAVED":"Die Bearbeitungs-Informationen wurde gespeichert",
+    "VIDEO_CUT_PROCESSING":"Das Video wird verarbeitet..."
+  },
+  "BULK_ACTIONS":{
+    "CAPTION":"Aktionen",
+    "SEND_MESSAGE":"Nachricht senden",
+    "EDIT_STATUS":{
+      "CAPTION":"Status bearbeiten",
+      "READY_FOR_RECORDING":"Bereit für die Aufnahme",
+      "OPTED_OUT":"Wird nicht aufgezeichnet"
+    },
+    "DELETE":{
+      "SERIES":{
+        "CAPTION":"Löschen"
+      },
+      "EVENTS":{
+        "CAPTION":"Löschen"
+      }
+    },
+    "DELETE_WARNING_LINE1":"Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",
+    "DELETE_WARNING_LINE2":"",
+    "SCHEDULE_TASK":{
+      "CAPTION":"Task starten",
+      "GENERAL":{
+        "SUMMARY":"({{ count }} Aufzeichnungen ausgewählt)",
+        "CANNOTSTART":"Markierte Aufzeichnungen können im Moment nicht verarbeitet werden. Entfernen Sie diese aus der Auswahl oder versuchen Sie es später erneut."
+      },
+      "TASKS":{
+        "CAPTION":"Tasks",
+        "SELECT":"Taks auswählen"
+      },
+      "SUMMARY":{
+        "CAPTION":"Zusammenfassung",
+        "EVENTS":"Aufzeichnungen",
+        "EVENTS_SUMMARY":"Sie haben {{numberOfEvents}} Aufzeichnungen ausgewählt",
+        "CONFIGURATION":"Konfiguration",
+        "WORKFLOW":"Task"
+      }
+    }
+  },
+  "DATES":{
+    "TODAY":"Heute",
+    "TOMORROW":"Morgen",
+    "YESTERDAY":"Gestern"
+  },
+  "DATETIMES":{
+    "TODAY":"Heute um {{ time }}",
+    "TOMORROW":"Morgen um {{ time }}",
+    "YESTERDAY":"Gestern um {{ time }}"
+  },
+  "WIZARD":{
+    "NEXT_STEP":"Weiter",
+    "BACK":"Zurück",
+    "CREATE":"Anlegen",
+    "UPDATE":"Aktualisieren",
+    "DURATION":{
+      "HOURS":"Stunden",
+      "MINUTES":"Minuten"
+    }
+  },
+  "CAPTURE_AGENT":{
+    "DEVICE":{
+      "MICROPHONE":"Mikrofon",
+      "CAMERA":"Kamera",
+      "PRESENTATION":"Präsentation"
+    }
+  },
+  "NAV":{
+    "DASHBOARD":{
+      "TITLE":"Dashboard"
+    },
+    "EVENTS":{
+      "TITLE":"Aufnahmen"
+    },
+    "SYSTEMS":{
+      "TITLE":"Systeme"
+    },
+    "CAPTUREAGENTS":{
+      "TITLE":"Aufnehmen"
+    },
+    "USERS":{
+      "TITLE":"Organisation"
+    },
+    "INTEGRATIONS":{
+      "TITLE":"Integrationen"
+    },
+    "CONFIGURATION":{
+      "TITLE":"Konfiguration"
+    }
+  },
+  "EVENTS":{
+    "LICENSE":{
+      "BSD":"BSD",
+      "CCND":"CCND",
+      "GPL":"GPL"
+    },
+    "SEND_MESSAGE":{
+      "CAPTION":"Nachricht senden",
+      "TABS":{
+        "RECIPIENTS":"Empfänger",
+        "MESSAGE":"Nachricht",
+        "SUMMARY":"Zusammenfassung"
+      },
+      "RECIPIENTS":{
+        "AUDIT_TRAIL_CAPTION":"Protokollieren",
+        "AUDIT_TRAIL_DESCRIPTION":"Auswählen, um Nachtricht zu protokollieren",
+        "AUDIT_TRAIL_LABEL":""
+      },
+      "MESSAGE":{
+        "EMAIL_TEMPLATE":"Wählen Sie eine E-Mail-Vorlage",
+        "SUBJECT":"Betreff",
+        "MESSAGE":"Nachricht",
+        "INCLUDE_SIGNATURE":"Signatur an E-Mail anhängen"
+      },
+      "SUMMARY":{
+        "MESSAGE_SUMMARY":"Zusammenfassung"
+      }
+    },
+    "EVENTS":{
+      "NEW":{
+        "CAPTION":"Aufzeichnung erstellen",
+        "METADATA":{
+          "CAPTION":"Metadaten"
+        },
+        "METADATA_EXTENDED":{
+          "CAPTION":"Erweiterte Metadaten",
+          "DESCRIPTION":"",
+          "METADATA":{
+            "TITLE":"Erweiterte Metadaten"
+          }
+        },
+        "SOURCE":{
+          "CAPTION":"Quelle",
+          "SELECT_SOURCE":"Quelle auswählen",
+          "PLACEHOLDER":{
+            "ROOM":"Raum",
+            "INPUTS":"Eingänge",
+            "HOUR":"Stunde",
+            "MINUTE":"Minute",
+            "REPEATS":"Wiederholt sich",
+            "START_DATE":"jjjj-mm-tt",
+            "END_DATE":"jjjj-mm-tt"
+          },
+          "UPLOAD":{
+            "CAPTION":"Hochladen",
+            "RECORDING_ELEMENTS":"Aufnahme-Elemente",
+            "SEGMENTABLE":{
+              "SHORT":"Folien",
+              "DETAIL":"Die Datei enthält eine Aufnahme von einer Präsentation (Keynote, Powerpoint, etc.)."
+            },
+            "NON_SEGMENTABLE":{
+              "SHORT":"Präsentator",
+              "DETAIL":"Die Datei enthält eine Aufnahme von einer zum Publikum sprechenden Person."
+            },
+            "AUDIO_ONLY":{
+              "SHORT":"Nur Audio",
+              "DETAIL":"Die Datei enthält nur Audio."
+            }
+          },
+          "DATE_TIME":{
+            "CAPTION":"Zeitplan",
+            "START_DATE":"Startdatum",
+            "START_TIME":"Startzeit",
+            "END_DATE":"Enddatum",
+            "DURATION":"Dauer"
+          },
+          "SCHEDULE_SINGLE":{
+            "CAPTION":"Einzelne Aufzeichnung planen"
+          },
+          "SCHEDULE_MULTIPLE":{
+            "CAPTION":"Mehrere Aufzeichnungen planen",
+            "REPEATS":"Wiederholt sich",
+            "REPEAT_ON":"Wiederholen am",
+            "WEEKDAYS":"Wochentage"
+          }
+        },
+        "PROCESSING":{
+          "CAPTION":"In Verarbeitung",
+          "SELECT_WORKFLOW":"Workflow wählen",
+          "SELECT_WORKFLOW_EMPTY":"Keinen Workflow gefunden",
+          "WORKFLOW":"Workflow"
+        },
+        "ACCESS":{
+          "CAPTION":"Zugriffsrechte",
+          "POLICY":"Zugriffs-Richtlinie",
+          "ACL":"ACL"
+        },
+        "SUMMARY":{
+          "CAPTION":"Zusammenfassung"
+        },
+        "WEEKDAYS":{
+          "MO":"Mo",
+          "TU":"Di",
+          "WE":"Mi",
+          "TH":"Do",
+          "FR":"Fr",
+          "SA":"Sa",
+          "SU":"So"
+        }
+      },
+      "NAVIGATION":{
+        "EVENTS":"Aufzeichnungen",
+        "SERIES":"Serien",
+        "OVERVIEW":"Übersicht"
+      },
+      "UPLOAD":"Hochladen",
+      "ADD_SERIES":"Serie hinzufügen",
+      "ADD_EVENT":"Aufzeichnung hinzufügen",
+      "TABLE":{
+        "CAPTION":"Aufzeichnungen",
+        "TITLE":"Titel",
+        "CREATORS":"Dozent(en)",
+        "SERIES":"Serien",
+        "DATE":"Datum",
+        "START":"Start",
+        "STOP":"Ende",
+        "STATUS":"Status",
+        "LOCATION":"Raum",
+        "AGENT":"Aufnahmegerät",
+        "ACTION":"Aktionen",
+        "FIRST":"Erste",
+        "LAST":"Letzte",
+        "NEXT":"weiter",
+        "MANAGED_ACL":"Zugriffsrechte",
+        "SCHEDULING_STATUS":"Status",
+        "WORKFLOW_STATE":"Fortschritt",
+        "REVIEW_STATUS":"Prüfstatus",
+        "PREVIOUS":"zurück",
+        "NOCONTENT":"Keine Daten verfügbar"
+      },
+      "SCHEDULING_STATUS":{
+        "READY_FOR_RECORDING":"Bereit für die Aufnahme",
+        "BLACKLISTED":"Gesperrt",
+        "OPTED_OUT":"Wird nicht aufgezeichnet"
+      },
+      "DETAILS":{
+        "HEADER":"Aufzeichnungs-Details {{resourceId}}",
+        "TABS":{
+          "GENERAL":"Allgemein",
+          "METADATA":"Metadaten",
+          "EXTENDED-METADATA":"Metadaten-II",
+          "MEDIA":"Medien",
+          "ATTACHMENTS":"Anhänge",
+          "WORKFLOWS":"Arbeitsabläufe",
+          "ACCESS":"Zugriffsrechte",
+          "COMMENTS":"Kommentare"
+        },
+        "GENERAL":{
+          "PUBLICATION_STATUS":"Publikations-Status",
+          "SCHEDULING_STATUS":"Status",
+          "READY_FOR_RECORDING":"Bereit zur Aufnahme",
+          "OPTED_OUT":"Wird nicht aufgezeichnet",
+          "CUSTOM":"Benutzerdefiniert",
+          "ENGAGE":"Engage",
+          "YOUTUBE":"YouTube"
+        },
+        "MEDIA":{
+          "TRIM_MEDIA":"Medien zuschneiden",
+          "MEDIA":"Medien",
+          "ID":"ID",
+          "TYPE":"Typ",
+          "MIMETYPE":"MIME-Type",
+          "URL":"URL",
+          "DETAILS":"Details"
+        },
+        "ATTACHMENTS":{
+          "CAPTION":"Anhänge",
+          "ID":"ID",
+          "TYPE":"Typ",
+          "MIMETYPE":"MIME-Type",
+          "TAGS":"Stichwörter",
+          "LINK":"Verknüpfung"
+        },
+        "ACCESS":{
+          "CAPTION":"Zugriffsrechte",
+          "SELECTPLACEHOLDER":"Zugriffsrichtlinie wählen"
+        },
+        "COMMENTS":{
+          "CAPTION":"Kommentare",
+          "PLACEHOLDER":"Kommentieren...",
+          "SELECTPLACEHOLDER":"Gründe wählen",
+          "RESOLVED":"Gelöst",
+          "REPLY":"Antworten",
+          "REPLY_TO":"Antworten",
+          "CANCEL_REPLY":"Verwerfen",
+          "DELETE":"Löschen",
+          "REASON":"Grund"
+        },
+        "METADATA":{
+          "TITLE":"Titel",
+          "UID":"UID",
+          "SERIES":"Serien",
+          "RECORDING_DATE":"Aufnahmedatum",
+          "SUBJECT":"Betreff",
+          "DESCRIPTION":"Beschreibung",
+          "START_DATE":"Startdatum",
+          "START_TIME":"Startzeit",
+          "DURATION":"Dauer",
+          "AGENT":"Aufnahmegerät",
+          "SOURCE":"Quelle",
+          "CREATED":"Erstellt am",
+          "CREATED_BY":"Erstellt von",
+          "LICENSE":"Lizenz",
+          "CONTRIBUTORS":"Author(en)",
+          "RIGHTS":"Rechte",
+          "PRESENTERS":"Präsentator(en)",
+          "LANGUAGE":"Sprache",
+          "COPYRIGHT":"Urheberrecht",
+          "VISIBILITY":"Sichtbarkeit",
+          "PUBLIC":"Public target",
+          "OS":"Verarbeitungs-Betriebssystem",
+          "LOCKED":{
+            "RUNNING":"Bearbeiten von Metadaten ist nicht zulässig, wenn Operationen auf einer Aufzeichnung ausgeführt werden"
+          }
+        },
+        "WORKFLOWS":{
+          "DETAILS":"Details",
+          "DESCRIPTION":"",
+          "ID":"ID",
+          "TYPE":"Typ",
+          "TITLE":"Titel",
+          "STATE":"Status",
+          "STARTED":"Gestartet",
+          "SERIES":"Series",
+          "SUBMITTED":"Übermittelt",
+          "MIMETYPE":"MIME-Type",
+          "URL":"URL"
+        },
+        "WORKFLOW_DETAILS":{
+          "TITLE":"Workflow-Details"
+        },
+        "WORKFLOW_OPERATIONS":{
+          "TITLE":"Workflow-Operationen"
+        },
+        "OPERATION_DETAILS":{
+          "TITLE":"Operations-Details"
+        },
+        "QUICKACTION_WORKFLOW_DETAILS":{
+          "TITLE":"Workflow-Details"
+        },
+        "MEDIA_DETAILS":{
+          "TITLE":"Medieninfo",
+          "ID":"ID",
+          "TYPE":"Typ",
+          "MIMETYPE":"MIME-Type",
+          "URL":"URL",
+          "RECORDING_DATE":"Aufnahmedatum",
+          "FLAVOR":"Flavor",
+          "TAGS":"Stichwörter",
+          "DURATION":"Dauer",
+          "STREAM_AUDIO":"Audio-Spuren",
+          "STREAM_VIDEO":"Video-Spuren",
+          "CHANNELS":"Kanäle",
+          "BITRATE":"Bitrate",
+          "FRAMERATE":"Framerate",
+          "RESOLUTION":"Auflösung"
+        },
+        "ERRORS_AND_WARNINGS":{
+          "HEADER":"Fehler & Warnungen",
+          "TITLE":"Fehler & Warnungen",
+          "DATE":"Datum",
+          "HOST":"Server",
+          "TYPE":"Typ",
+          "EMPTY":"Keine Fehler",
+          "DETAILS":{
+            "HEADER":"Fehlerdetails",
+            "SEVERITY":"Schweregrad",
+            "TITLE":"Titel",
+            "DESCRIPTION":"Beschreibung",
+            "JOB_ID":"Job ID",
+            "DATE":"Datum",
+            "HOST":"Verarbeitung-Server",
+            "TYPE":"Service-Typ",
+            "TECHNICAL_DETAILS":"Technische Details"
+          }
+        }
+      }
+    },
+    "SERIES":{
+      "NEW":{
+        "CAPTION":"Serie erstellen",
+        "METADATA":{
+          "CAPTION":"Metadaten",
+          "DESCRIPTION":"",
+          "METADATA":{
+            "TITLE":"Metadaten"
+          }
+        },
+        "METADATA_EXTENDED":{
+          "CAPTION":"Erweiterte Metadaten",
+          "DESCRIPTION":"",
+          "METADATA":{
+            "TITLE":"Erweiterte Metadaten"
+          }
+        },
+        "ACCESS":{
+          "CAPTION":"Zugriffsrechte",
+          "DESCRIPTION":"",
+          "TEMPLATES":{
+            "TITLE":"Vorlagen"
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Zugriffs-Richtlinie",
+            "DESCRIPTION":"",
+            "LABEL":"Vorlage auswählen",
+            "EMPTY":"Keine Vorlage gefunden",
+            "ROLE":"Rolle",
+            "WRITE":"Schreiben",
+            "READ":"Lesen",
+            "ACTION":"Aktionen",
+            "NEW":"New policy",
+            "DETAILS":"Details"
+          },
+          "ROLES":{
+            "LABEL":"Rolle auswählen",
+            "EMPTY":"Keine Rolle gefunden"
+          }
+        },
+        "THEME":{
+          "CAPTION":"Branding",
+          "DESCRIPTION":"",
+          "TITLE":"Branding",
+          "LABEL":"Kein Branding",
+          "EMPTY":"Kein Branding gefunden"
+        },
+        "SUMMARY":{
+          "CAPTION":"Zusammenfassung"
+        }
+      },
+      "TABLE":{
+        "CAPTION":"Serien",
+        "TITLE":"Serie",
+        "CREATORS":"Organisator(en)",
+        "CONTRIBUTORS":"Kontributoren(s)",
+        "CREATED":"Erstellt",
+        "MANAGED_ACL":"Zugriffsrechte",
+        "EVENTS":"Ereignisse",
+        "ACTION":"Aktionen"
+      },
+      "DETAILS":{
+        "TABS":{
+          "METADATA":"Metadaten",
+          "EXTENDED_METADATA":"Metadaten-II",
+          "EVENTS":"Ereignisse",
+          "PERMISSIONS":"Zugriffsrechte",
+          "THEME":"Branding"
+        },
+        "ACCESS":{
+          "CAPTION":"Zugriffs-Richtlinie",
+          "DESCRIPTION":"",
+          "TEMPLATES":{
+            "TITLE":"Vorlagen"
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Zugriffs-Richtlinie",
+            "DESCRIPTION":"",
+            "LABEL":"Vorlage auswählen",
+            "EMPTY":"Keine Vorlage gefunden",
+            "ROLE":"Rolle",
+            "WRITE":"Schreiben",
+            "READ":"Lesen",
+            "ACTION":"Aktionen",
+            "NEW":"Neue Richtlinie",
+            "DETAILS":"Details"
+          },
+          "ROLES":{
+            "LABEL":"Rolle auswählen",
+            "EMPTY":"Keine Rolle gefunden"
+          }
+        },
+        "METADATA":{
+          "TITLE":"Titel",
+          "UID":"UID",
+          "SERIES":"Serien",
+          "PUBLISHERS":"Herausgeber",
+          "ORGANIZERS":"Organisator(en)",
+          "CONTRIBUTORS":"Mitwirkende",
+          "RECORDING_DATE":"Aufnahmedatum",
+          "CREATED_BY":"Erstellt von",
+          "RIGHTS":"Rechte",
+          "SUBJECT":"Betreff",
+          "LANGUAGE":"Sprache",
+          "LICENSE":"Lizenz",
+          "DESCRIPTION":"Beschreibung"
+        },
+        "EVENTS":{
+          "TITLE":"Titel",
+          "PRESENTER":"Präsentatoren",
+          "CREATED":"Erstellt am",
+          "MODIFIED":"Geändert am",
+          "STATUS":"Status",
+          "LOCATION":"Raum",
+          "LINK":"Verknüpfung"
+        }
+      }
+    }
+  },
+  "RECORDINGS":{
+    "NAVIGATION":{
+      "LOCATIONS":"Räume",
+      "BLACKLISTS":"Sperrlisten"
+    },
+    "ACTIONS":{
+      "EXPORT":"Exportieren",
+      "ADD_BLACKLIST":"Sperrliste hinzufügen"
+    },
+    "RECORDINGS":{
+      "TABLE":{
+        "CAPTION":"Räume",
+        "TITLE":"UID",
+        "NAME":"Name",
+        "LOCATION":"Raum",
+        "UPDATED":"Zuletzt aktualisiert am",
+        "NEXT_DATE":"Nächste Aufzeichnung",
+        "NEXT_NAME":"Titel der nächsten Aufzeichnung",
+        "STATUS":"Status",
+        "VERSION":"Version",
+        "BLACKLIST_FROM":"Gesperrt von",
+        "BLACKLIST_TO":"Gesperrt bis",
+        "ACTION":"Aktionen"
+      }
+    },
+    "BLACKLISTS":{
+      "TABLE":{
+        "CAPTION":"Raum-Sperrliste",
+        "NAME":"Name",
+        "ACTIONS":"Aktionen"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Sperrliste erstellen",
+        "EDITCAPTION":"Sperrliste bearbeiten",
+        "TABS":{
+          "LOCATIONS":"Räume",
+          "DATES":"Termine",
+          "REASON":"Grund",
+          "SUMMARY":"Zusammenfassung"
+        },
+        "LOCATIONS":{
+          "REMOVE":"Entfernen",
+          "ADD_LOCATION":"Raum auswählen",
+          "ALL_LOCATIONS":"Alle Räume",
+          "SELECT_LOCATION":"Wählen Sie"
+        },
+        "DATES":{
+          "START_DATE":"Startdatum",
+          "END_DATE":"Enddatum"
+        },
+        "REASON":{
+          "SELECT_REASON":"Wählen Sie",
+          "REASON":"Grund",
+          "COMMENTS":"Kommentare"
+        },
+        "SUMMARY":{
+          "SUMMARY":"Zusammenfassung",
+          "LOCATION":"Raum",
+          "DATE_FROM":"Von",
+          "DATE_TO":"Bis",
+          "REASON":"Grund",
+          "COMMENTS":"Kommentare"
+        }
+      }
+    }
+  },
+  "USERS":{
+    "ACTIONS":{
+      "ADD_USER":"Anwender hinzufügen",
+      "ADD_GROUP":"Gruppe hinzufügen",
+      "ADD_ACL":"Zugriffsrichtlinie hinzufügen",
+      "ADD_BLACKLIST":"Sperrliste hinzufügen"
+    },
+    "NAVIGATION":{
+      "USERS":"Benutzer",
+      "GROUPS":"Gruppen",
+      "PERMISSIONS":"Zugriffsrechte",
+      "BLACKLISTS":"Sperrliste"
+    },
+    "USERS":{
+      "TABLE":{
+        "CAPTION":"Benutzer",
+        "NAME":"Name",
+        "USERNAME":"Benutzername",
+        "ROLES":"Rollen",
+        "TYPE":"Typ",
+        "BLACKLIST_FROM":"Gesperrt von",
+        "BLACKLIST_TO":"Gesperrt bis",
+        "ACTION":"Aktionen"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Anwender anlegen",
+        "EDITCAPTION":"Benutzer bearbeiten",
+        "TABS":{
+          "USER":"Benutzer",
+          "ROLES":"Rollen"
+        },
+        "FORM":{
+          "USERNAME":"Benutzername",
+          "NAME":"Name",
+          "EMAIL":"E-Mail",
+          "PASSWORD":"Passwort",
+          "REPEAT_PASSWORD":"Passwort wiederholen"
+        },
+        "ROLES":{
+          "LEFT":"Rollen",
+          "RIGHT":"Ausgewählten Rollen",
+          "REMOVE":"Rolle entfernen",
+          "ADD":"Rolle hinzufügen"
+        }
+      }
+    },
+    "GROUPS":{
+      "NEW":{
+        "CAPTION":"Gruppe erstellen"
+      },
+      "TABLE":{
+        "CAPTION":"Gruppen",
+        "NAME":"Name",
+        "DESCRIPTION":"Beschreibung",
+        "ROLE":"Rolle",
+        "ACTION":"Aktionen"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Gruppe erstellen",
+        "EDITCAPTION":"Gruppe bearbeiten",
+        "TABS":{
+          "GROUP":"Gruppe",
+          "ROLES":"Rollen",
+          "METADATA":"Metadaten",
+          "USERS":"Benutzer",
+          "SUMMARY":"Zusammenfassung"
+        },
+        "FORM":{
+          "NAME":"Name",
+          "DESCRIPTION":"Beschreibung",
+          "SUMMARY":"Zusammenfassung",
+          "ROLES":"Rollen",
+          "USERS":"Benutzer"
+        },
+        "USERS":{
+          "LEFT":"Benutzer",
+          "RIGHT":"Ausgewählte Anwender",
+          "REMOVE":"Benutzer entfernen",
+          "ADD":"Benutzer hinzufügen"
+        },
+        "ROLES":{
+          "LEFT":"Rollen",
+          "RIGHT":"Ausgewählte Rollen",
+          "REMOVE":"Rolle entfernen",
+          "ADD":"Rolle hinzufügen"
+        }
+      }
+    },
+    "ACLS":{
+      "TABLE":{
+        "CAPTION":"Zugriffsrechte",
+        "NAME":"Name",
+        "CREATED":"Erstellt am",
+        "CREATOR":"Author",
+        "IN_USE":"In Benutzung",
+        "ACTION":"Aktionen"
+      }
+    },
+    "BLACKLISTS":{
+      "TABLE":{
+        "CAPTION":"Anwender-Sperrliste",
+        "NAME":"Name",
+        "DATE_FROM":"Von",
+        "DATE_TO":"Bis",
+        "REASON":"Grund",
+        "ACTION":"Aktionen"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Sperrliste erstellen",
+        "EDITCAPTION":"Sperrliste bearbeiten",
+        "TABS":{
+          "USERS":"Benutzer",
+          "DATES":"Termine",
+          "REASON":"Grund",
+          "SUMMARY":"Zusammenfassung"
+        },
+        "USERS":{
+          "REMOVE":"Entfernen",
+          "ADD_USER":"Benutzer auswählen",
+          "ALL_USERS":"Alle Anwender",
+          "SELECT_USER":"Auswählen"
+        },
+        "DATES":{
+          "START_DATE":"Startdatum",
+          "END_DATE":"Enddatum"
+        },
+        "REASON":{
+          "SELECT_REASON":"Wählen Sie",
+          "REASON":"Grund",
+          "COMMENTS":"Kommentare"
+        },
+        "SUMMARY":{
+          "SUMMARY":"Zusammenfassung",
+          "USER":"Anwender",
+          "DATE_FROM":"Von",
+          "DATE_TO":"Bis",
+          "REASON":"Grund",
+          "COMMENTS":"Kommentare"
+        }
+      }
+    }
+  },
+  "THEMES":{
+    "THEMES":{
+      "DETAILS":{
+        "HEADER":"Branding-Details {{resourceId}}",
+        "TABS":{
+          "GENERAL":"Allgemein",
+          "BUMPER":"Vorspann",
+          "TRAILER":"Abspann",
+          "TITLE":"Titel",
+          "LICENSE":"Lizenz",
+          "WATERMARK":"Wasserzeichen",
+          "USAGE":"Verwendung"
+        },
+        "GENERAL":{
+          "CAPTION":"Allgemein",
+          "NAME":"Name",
+          "DESCRIPTION":"Beschreibung",
+          "DEFAULT":"Standard",
+          "SET_DEFAULT_INFO":"Als Standard-Branding für alle Serien und Aufzeichnungen festlegen",
+          "NAME_ERROR":"Name wird bereits verwendet",
+          "NAME_REQUIRED":"Erforderlich"
+        },
+        "BUMPER":{
+          "CAPTION":"Vorspann",
+          "DESCRIPTION":"Video, das an den Anfang einer Aufnahme angefügt wird.",
+          "ACTIVE":"Aktiv"
+        },
+        "TRAILER":{
+          "CAPTION":"Abspann",
+          "DESCRIPTION":"Video, das am Ende einer Aufnahme angefügt wird.",
+          "ACTIVE":"Aktiv"
+        },
+        "TITLE":{
+          "CAPTION":"Titel",
+          "DESCRIPTION":"Folie mit Metadaten die am Anfang oder am Ende einer Aufzeichnung angehängt wird.",
+          "ACTIVE":"Aktiv"
+        },
+        "WATERMARK":{
+          "CAPTION":"Wasserzeichen",
+          "DESCRIPTION":"Halbtransparentes Bild, das auf jedem Frame der Aufnahme überlagert ist.",
+          "ACTIVE":"Aktiv"
+        },
+        "USAGE":{
+          "CAPTION":"Verwendung",
+          "SERIES":"Serienname"
+        }
+      }
+    }
+  },
+  "CONFIGURATION":{
+    "ACTIONS":{
+      "ADD_MAIL_TEMPLATE":"Vorlage hinzufügen",
+      "ADD_THEME":"Branding hinzufügen"
+    },
+    "NAVIGATION":{
+      "MAIL_TEMPLATES":"E-Mail-Vorlagen",
+      "MAIL_SERVERS":"E-Mail-Einstellungen",
+      "THEMES":"Brandings"
+    },
+    "EMAIL_TEMPLATES":{
+      "TABLE":{
+        "CAPTION":"E-Mail-Vorlagen",
+        "NAME":"Name",
+        "CREATOR":"Ersteller",
+        "CREATED":"Erstellt am",
+        "ACTION":"Aktionen"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Vorlage erstellen",
+        "EDITCAPTION":"Vorlage bearbeiten",
+        "TABS":{
+          "MESSAGE":"Nachricht",
+          "SUMMARY":"Zusammenfassung"
+        },
+        "MESSAGE":{
+          "NAME":"Name",
+          "SUBJECT":"Betreff",
+          "MESSAGE":"Nachricht"
+        },
+        "SUMMARY":{
+          "MESSAGE_SUMMARY":"Zusammenfassung der Nachricht"
+        }
+      }
+    },
+    "THEMES":{
+      "TABLE":{
+        "CAPTION":"Brandings",
+        "NAME":"Name",
+        "DESCRIPTION":"Beschreibung",
+        "CREATOR":"Redner",
+        "CREATED":"Erstellt am",
+        "DEFAULT":"Standard",
+        "USAGE":"Verwendung",
+        "ACTION":"Aktionen"
+      },
+      "DETAILS":{
+        "NEWCAPTION":"Branding erstellen",
+        "EDITCAPTION":"Branding bearbeiten",
+        "GENERAL":{
+          "CAPTION":"Allgemein",
+          "NAME":"Name",
+          "DESCRIPTION":"Beschreibung",
+          "DEFAULT":"Standard",
+          "SET_DEFAULT_INFO":"Als Standard-Branding für alle Serien und Aufzeichnungen festlegen",
+          "NAME_REQUIRED":"Erforderlich"
+        },
+        "BUMPER":{
+          "CAPTION":"Vorspann",
+          "FILE_UPLOADED":"Datei hochgeladen: ",
+          "DESCRIPTION":"Video, das an den Anfang einer Aufnahme angefügt wird.",
+          "ACTIVE":"Aktiv",
+          "ENABLE":"Vorspann aktivieren",
+          "SELECT":"Wählen Sie",
+          "UPLOAD_LABEL":"Video hochladen",
+          "UPLOAD_BUTTON":"Hochladen"
+        },
+        "TRAILER":{
+          "CAPTION":"Abspann",
+          "FILE_UPLOADED":"Datei hochgeladen: ",
+          "DESCRIPTION":"Video, das am Ende einer Aufnahme angefügt wird.",
+          "ACTIVE":"Aktiv",
+          "ENABLE":"Abspann aktivieren",
+          "UPLOAD_LABEL":"Video hochladen",
+          "UPLOAD_BUTTON":"Hochladen"
+        },
+        "TITLE":{
+          "CAPTION":"Titel",
+          "FILE_UPLOADED":"Datei hochgeladen: ",
+          "DESCRIPTION":"Folie mit Metadaten die am Anfang oder am Ende einer Aufzeichnung angehängt wird.",
+          "ACTIVE":"Aktiv",
+          "ENABLE":"Titelfolie aktivieren",
+          "BACKGROUND":"Hintergrund",
+          "EXTRACT":"Hintergrund extrahieren",
+          "UPLOAD":"Hochladen",
+          "UPLOAD_LABEL":"Bild hochladen",
+          "UPLOAD_BUTTON":"Hochladen"
+        },
+        "WATERMARK":{
+          "CAPTION":"Wasserzeichen",
+          "FILE_UPLOADED":"Datei hochgeladen: ",
+          "DESCRIPTION":"Halbtransparentes Bild, das auf jedem Frame der Aufnahme überlagert ist.",
+          "ACTIVE":"Aktiv",
+          "TOP_LEFT":"Oben links",
+          "TOP_RIGHT":"Oben rechts",
+          "BOTTOM_LEFT":"Unten links",
+          "BOTTOM_RIGHT":"Unten rechts",
+          "UPLOAD":"Hochladen",
+          "POSITION":"Wasserzeichen-Position & -Vorschau",
+          "FILEUPLOAD_DESCRIPTION":"Die Datei sollten einen Alpha-Kanal (transparenten Hintergrund) haben. Zulässige Datei-Typen sind: .PNG, .GIF, .SVG & .WEBP",
+          "UPLOAD_LABEL":"Bild hochladen",
+          "UPLOAD_BUTTON":"Hochladen"
+        },
+        "SUMMARY":{
+          "CAPTION":"Zusammenfassung"
+        },
+        "USAGE":{
+          "CAPTION":"Verwendung",
+          "SERIE":"Serienname",
+          "EMPTY":"Keine Serie für das aktuelle Branding gefunden"
+        }
+      }
+    }
+  },
+  "SYSTEMS":{
+    "NAVIGATION":{
+      "JOBS":"Aufgaben",
+      "SERVERS":"Server",
+      "SERVICES":"Services"
+    },
+    "JOBS":{
+      "TABLE":{
+        "CAPTION":"Aufgaben",
+        "TITLE":"Titel",
+        "SERIES":"Serien",
+        "WORKFLOW":"Workflow",
+        "STATUS":"Status",
+        "SUBMITTED":"In Auftrag",
+        "ACTION":"Aktionen"
+      },
+      "DETAILS":{
+        "HEADER":"Job-Details {{resourceId}}",
+        "TABS":{
+          "GENERAL":"Allgemein",
+          "OPERATIONS":"Operationen",
+          "INCIDENTS":"Vorfälle"
+        }
+      }
+    },
+    "SERVERS":{
+      "TABLE":{
+        "CAPTION":"Server",
+        "STATUS":"Status",
+        "HOST_NAME":"Hostname",
+        "CORES":"Kerne",
+        "COMPLETED":"Jobs abgeschlossen",
+        "RUNNING":"Jobs in Bearbeitung",
+        "QUEUED":"Jobs in der Warteschlange",
+        "MEAN_RUN_TIME":"Mittlere Laufzeit",
+        "MEAN_QUEUE_TIME":"Mittlere Wartezeit",
+        "MAINTENANCE":"Wartungsarbeiten",
+        "ACTION":"Aktionen",
+        "MAINTENANCE_OFF":"Wartungsmodus aktivieren",
+        "MAINTENANCE_ON":"Wartungsmodus beenden"
+      }
+    },
+    "SERVICES":{
+      "TABLE":{
+        "CAPTION":"Services",
+        "STATUS":"Status",
+        "NAME":"Servicename",
+        "COMPLETED":"Jobs abgeschlossen",
+        "RUNNING":"Jobs in Bearbeitung",
+        "QUEUED":"Jobs in der Warteschlange",
+        "MEAN_RUN_TIME":"Mittlere Laufzeit",
+        "MEAN_QUEUE_TIME":"Mittlere Wartezeit",
+        "SANITIZE":"Fehlerhafte Services löschen",
+        "ACTION":"Aktionen"
+      }
+    }
+  },
+  "VIDEO_TOOL":{
+    "BUTTONS":{
+      "COMMENTS":"Anschauen",
+      "METADATA":"Bearbeiten",
+      "CLOSE":"Schliessen",
+      "SAVE":"Speichern",
+      "PROCESS":"Speichern & verarbeiten"
+    },
+    "TABS":{
+      "PLAY":"Abspielen",
+      "EDIT":"Editor",
+      "CAPTIONS":"Untertitel",
+      "ANNOTATIONS":"Anmerkungen"
+    },
+    "ACTIONS":{
+      "SPLIT":"Splitten",
+      "CUT":"Schneiden",
+      "REPLAY_SEGMENT":"Segment erneut abspielen",
+      "UNDO":"Widerrufen",
+      "REDO":"Wiederholen",
+      "CLEAR_SEGMENTS":"Segmente löschen"
+    }
+  },
+  "LOGIN":{
+    "WELCOME":"Willkommen bei Opencast",
+    "REMEMBER":"Automatisch anmelden",
+    "USERNAME":"E-Mail...",
+    "PASSWORD":"Passwort...",
+    "LOGIN":"anmelden",
+    "ERROR":"Falsche E-Mail-Adresse und\/oder falsches Passwort"
+  },
+  "TABLE_FILTERS":{
+    "CLEAR":"Alle Filter löschen",
+    "REMOVE":"Filter entfernen",
+    "ADD":"Filter hinzufügen",
+    "PLACEHOLDER":"Suchen...",
+    "PROFILES":{
+      "FILTERS_HEADER":"Gespeichertes Filter-Set",
+      "EMPTY":"Keine gespeicherten Filter gefunden",
+      "SAVE_FILTERS":"Speichern",
+      "FILTER_HEADER":"Filter-Set speichern",
+      "NAME":"Name",
+      "NAME_PLACEHOLDER":"Name...",
+      "DESCRIPTION":"Beschreibung",
+      "DESCRIPTION_PLACEHOLDER":"Beschreibung..."
+    }
+  },
+  "FILTERS":{
+    "EVENTS":{
+      "STATUS":{
+        "LABEL":"Status",
+        "SCHEDULED":"Geplant",
+        "RECORDING":"Zeichnet auf",
+        "INGESTING":"Wird importiert",
+        "PROCESSING":"In Verarbeitung",
+        "ARCHIVE":"Archiviert",
+        "WAITINGFOR":"Wartet auf",
+        "UPLOAD":"Hochladen",
+        "ONHOLD":"In der Warteschleife"
+      },
+      "PROGRESS":{
+        "LABEL":"Fortschritt"
+      },
+      "COMMENTS":{
+        "LABEL":"Kommentare"
+      },
+      "SERIES":{
+        "LABEL":"Serien"
+      },
+      "PRESENTERS":{
+        "LABEL":"Präsentator"
+      },
+      "CONTRIBUTORS":{
+        "LABEL":"Mitwirkende"
+      },
+      "START_DATE":{
+        "LABEL":"Startdatum"
+      },
+      "SUBJECT":{
+        "LABEL":"Betreff"
+      },
+      "LOCATION":{
+        "LABEL":"Raum"
+      },
+      "LANGUAGE":{
+        "LABEL":"Sprache"
+      },
+      "SOURCE":{
+        "LABEL":"Quelle"
+      },
+      "CREATOR":{
+        "LABEL":"Author"
+      },
+      "LICENSE":{
+        "LABEL":"Lizenz"
+      },
+      "TRACK_TYPE":{
+        "LABEL":"Typ"
+      },
+      "TRACK_MIMETYPE":{
+        "LABEL":"MIME-Type"
+      },
+      "TRACK_RESOLUTION":{
+        "LABEL":"Auflösung"
+      },
+      "ACCESS_POLICY":{
+        "LABEL":"Zugriffsrechte"
+      },
+      "WORKFLOW_DEFINITION":{
+        "LABEL":"Workflow-Definition"
+      },
+      "WORKFLOW_STATE":{
+        "LABEL":"Workflow-Status"
+      },
+      "PERIOD":{
+        "LABEL":"Zeitraum"
+      }
+    },
+    "SERIES":{
+      "TITLE":{
+        "LABEL":"Name"
+      },
+      "CONTRIBUTORS":{
+        "LABEL":"Mitwirkende"
+      },
+      "ORGANIZERS":{
+        "LABEL":"Organisatoren"
+      },
+      "SUBJECT":{
+        "LABEL":"Betreff"
+      },
+      "LANGUAGE":{
+        "LABEL":"Sprache"
+      },
+      "CREATOR":{
+        "LABEL":"Author"
+      },
+      "LICENSE":{
+        "LABEL":"Lizenz"
+      },
+      "ACCESS_POLICY":{
+        "LABEL":"Zugriffsrechte"
+      },
+      "CREATION_DATE":{
+        "LABEL":"Erstellungsdatum"
+      }
+    },
+    "THEMES":{
+      "NAME":{
+        "LABEL":"Name"
+      },
+      "DESCRIPTION":{
+        "LABEL":"Beschreibung"
+      },
+      "CREATOR":{
+        "LABEL":"Author"
+      },
+      "CREATION_DATE":{
+        "LABEL":"Erstellt am"
+      }
+    },
+    "USERS":{
+      "USERNAME":{
+        "LABEL":"Benutzername"
+      },
+      "NAME":{
+        "LABEL":"Name"
+      },
+      "USER_DIRECTORY":{
+        "LABEL":"Anwenderverzeichnis"
+      }
+    }
+  },
+  "TABLE_SUMMARY":"{{numberOfRows}} Zeilen",
+  "TABLE_NO_RESULT":"Keine Treffer gefunden.",
+  "TABLE_LOADING":"Wird geladen...",
+  "PM":{
+    "BLACKLIST":{
+      "REASONS":{
+        "SICK_LEAVE":"Krankheit",
+        "LEAVE":"Abwesenheit",
+        "FAMILY_EMERGENCY":"Familiärer Notfall",
+        "CONSTRUCTION":"Umbau"
+      }
+    }
+  }
+}

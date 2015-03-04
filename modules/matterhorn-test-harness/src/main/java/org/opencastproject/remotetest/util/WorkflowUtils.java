@@ -197,8 +197,7 @@ public final class WorkflowUtils {
   public static void unregisterWorkflowDefinition(String workflowDefinitionId) throws Exception {
     HttpDelete delete = new HttpDelete(BASE_URL + "/workflow/definition/" + workflowDefinitionId);
     TrustedHttpClient client = Main.getClient();
-    HttpResponse response = client.execute(delete);
+    client.execute(delete);
     Main.returnClient(client);
-    assertEquals(HttpStatus.SC_NO_CONTENT, response.getStatusLine().getStatusCode());
   }
 }

@@ -16,7 +16,7 @@
 package org.opencastproject.composer.impl;
 
 import static java.lang.String.format;
-import static org.opencastproject.fn.juc.Immutables.list;
+import static org.opencastproject.fun.juc.Immutables.list;
 import static org.opencastproject.serviceregistry.api.Incidents.NO_DETAILS;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
@@ -34,7 +34,7 @@ import org.opencastproject.composer.api.LaidOutElement;
 import org.opencastproject.composer.layout.Dimension;
 import org.opencastproject.composer.layout.Layout;
 import org.opencastproject.composer.layout.Serializer;
-import org.opencastproject.fn.juc.Mutables;
+import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;

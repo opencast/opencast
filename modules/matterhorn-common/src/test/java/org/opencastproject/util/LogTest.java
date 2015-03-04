@@ -36,9 +36,12 @@ public class LogTest {
     log.endUnitOfWork();
     log.endUnitOfWork();
     log.endUnitOfWork();
-    log.info("hello");
-    log.info("hello");
-    log.info("hello");
+    log.info("hello {}", "Peter");
+    log.info("hello %s", "world");
+    log.info("hello {}, {}, {}", "he", "she", "it");
+    log.info("hello a {} {}", 100, "times");
+    log.info("Decent number formatting looks like this: %.4f", 1970.114284121232);
+    log.info("Oh, an exception! {}", new RuntimeException("Panic!"));
   }
 
   @Test

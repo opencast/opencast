@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.index.service.resources.list.provider.JobsListProvider" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.index.service.resources.list.provider.JobsListProvider" />
+  <property name="service.description" value="Jobs list provider" />
+  <property name="opencast.service.type" value="org.opencastproject.index.service.resources.list.provider.JobsListProvider" />
+  
+    <reference name="workflowService" interface="org.opencastproject.workflow.api.WorkflowService"
+          cardinality="1..1" policy="static" bind="setWorkflowService"/>  
+            
+    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+          cardinality="1..1" policy="static" bind="setServiceRegistry"/>    
+
+  <service>
+     <provide interface="org.opencastproject.index.service.resources.list.api.ResourceListProvider"/>
+  </service>
+  
+</scr:component>

@@ -1,0 +1,28 @@
+.view-controller {
+    text-align: center;
+    padding: 12px 20px;
+    background: #fff;
+    .border(@main-border-color);
+
+    a {
+        font-size: 12px;
+        font-weight: @weight-semibold;
+        color: @grey;
+
+        &:not(:first-child) {
+            margin-left: 36px;
+        }
+
+        &:hover {
+            color: darken(@grey, 10%);
+        }
+
+        &.active {
+            color: @l-blue;
+
+            &:hover {
+                color: darken(@l-blue, 5%);
+            }
+        }
+    }
+}

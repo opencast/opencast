@@ -1,0 +1,85 @@
+describe('Schedule Task Controller', function () {
+    var $scope, $controller, $httpBackend, TableServiceMock, FormNavigatorServiceMock, NotificationsMock, TaskResourceMock, $timeout;
+
+    beforeEach(module('adminNg'));
+
+    // initiate mocks
+    TableServiceMock = jasmine.createSpyObj('TableService', ['fetch', 'getSelected']);
+    FormNavigatorServiceMock = jasmine.createSpyObj('FormNavigatorService', ['navigateTo']);
+    TaskResourceMock = jasmine.createSpyObj('TaskResource', ['save']);
+    NotificationsMock = jasmine.createSpyObj('Notifications', ['add']);
+    TableServiceMock.getSelected.and.returnValue([{id: 'row1'}, {id: 'row2'}]);
+    
+    beforeEach(module(function ($provide) {
+        $provide.value('FormNavigatorService', FormNavigatorServiceMock);
+        $provide.value('Notifications', NotificationsMock);
+        $provide.value('TaskResource', TaskResourceMock);
+        $provide.value('Table', TableServiceMock);
+    }));
+    // provide fake language service
+    beforeEach(module(function ($provide) {
+        var service = {
+            configureFromServer: function () {},
+            formatDate: function (val, date) { return date; },
+            formatTime: function (val, date) { return date; },
+            getLanguageCode: function () { return 'en'; }
+        };
+        $provide.value('Language', service);
+    }));
+    beforeEach(inject(function ($rootScope, _$controller_, _$timeout_, _$httpBackend_) {
+        $controller = _$controller_;
+        $scope = $rootScope.$new();
+        $scope.close = jasmine.createSpy('close');
+        $timeout = _$timeout_;
+        $httpBackend = _$httpBackend_;
+    }));
+
+    beforeEach(function () {
+        $controller('ScheduleTaskCtrl', {$scope: $scope});
+        $httpBackend.whenGET('/admin-ng/event/new/processing?tags=archive-ng').respond(getJSONFixture('admin-ng/event/new/processing'));
+    });
+
+    describe('basic functionality', function () {
+
+        it('instantiation', function () {
+            expect(TableServiceMock.getSelected).toHaveBeenCalled();
+        });
+
+        it('overwrites the navigateTo method', function () {
+            expect($scope.navigateTo).toBeDefined();
+            $scope.navigateTo('somewhere', 'hereIamNow', []);
+            expect(FormNavigatorServiceMock.navigateTo).toHaveBeenCalledWith('somewhere', 'hereIamNow', []);
+        });
+    });
+
+    describe('submit', function () {
+        beforeEach(function () {
+            $scope.processing.ud.workflow.id = 'my workflow';
+            $scope.processing.ud.workflow.selection = {
+                configuration: {
+                    opt1: true
+                }
+            };
+            $scope.submit();
+        });
+
+        it('saves the task', function () {
+            expect(TaskResourceMock.save).toHaveBeenCalled();
+        });
+
+        it('closes and notifies on success', function () {
+            TaskResourceMock.save.calls.mostRecent().args[1].call($scope);
+            $timeout.flush();
+            expect(NotificationsMock.add).toHaveBeenCalledWith('success', 'TASK_CREATED');
+            expect($scope.close).toHaveBeenCalled();
+        });
+
+        it('closes and notifies on failure', function () {
+            TaskResourceMock.save.calls.mostRecent().args[2].call($scope);
+            $timeout.flush();
+            expect(NotificationsMock.add).toHaveBeenCalledWith('error', 'TASK_NOT_CREATED', 'global', -1);
+            expect($scope.close).toHaveBeenCalled();
+        });
+        
+    });
+});

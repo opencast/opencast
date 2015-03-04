@@ -16,7 +16,22 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-workflow-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-series-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-scheduler-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-archive-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -41,6 +56,10 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-csv</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -71,7 +90,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Export-Package>
               org.opencastproject.dataloader;version=${project.version}
             </Export-Package>

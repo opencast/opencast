@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.archive.storage.FileSystemElementStore"
+               activate="activate"
+               immediate="true">
+  <implementation class="org.opencastproject.archive.storage.FileSystemElementStore" />
+  <property name="service.description" value="File system based element store" />
+  <service>
+    <provide interface="org.opencastproject.archive.base.storage.ElementStore" />
+  </service>
+  <reference name="trustedHttpClient"
+             interface="org.opencastproject.security.api.TrustedHttpClient"
+             cardinality="1..1"
+             policy="static"
+             bind="setHttpClient" />
+</scr:component>

@@ -1,0 +1,230 @@
+[
+    {
+        "template": {
+            "id": 1,
+            "creationDate": "2014-06-04T13:32:37Z",
+            "body": "Body 1",
+            "hidden": false,
+            "subject": "Titel 1",
+            "name": "template1",
+            "type": "INVITATION",
+            "comments": [
+                
+            ],
+            "creator": {
+                "username": "admin",
+                "email": "admin@test.com",
+                "name": "Admin"
+            }
+        },
+        "id": 1,
+        "creationDate": "2014-06-04T13:32:37Z",
+        "person": {
+            "id": 9,
+            "email": "staff1@manchester.ac.uk",
+            "name": "Staff 1",
+            "types": [
+                {
+                    "id": 33,
+                    "name": "group",
+                    "function": "open door"
+                }
+            ]
+        },
+        "errors": [
+            
+        ],
+        "signature": {
+            "sender": {
+                "address": "sender@test.com",
+                "name": "Sender Address"
+            },
+            "id": 11,
+            "creationDate": "2014-06-04T13:32:37Z",
+            "replyTo": {
+                
+            },
+            "name": "Default",
+            "comments": [
+                
+            ],
+            "signature": "Nothing",
+            "creator": {
+                "username": "admin",
+                "email": "admin@test.com",
+                "name": "Admin"
+            }
+        }
+    },
+    {
+        "template": {
+            "id": 2,
+            "creationDate": "2014-06-04T13:32:37Z",
+            "body": "Body 2",
+            "hidden": false,
+            "subject": "Titel 2",
+            "name": "template2",
+            "type": "INVITATION",
+            "comments": [
+                
+            ],
+            "creator": {
+                "username": "admin",
+                "email": "admin@test.com",
+                "name": "Admin"
+            }
+        },
+        "id": 2,
+        "creationDate": "2014-06-04T13:32:37Z",
+        "person": {
+            "id": 9,
+            "email": "staff1@manchester.ac.uk",
+            "name": "Staff 1",
+            "types": [
+                {
+                    "id": 33,
+                    "name": "group",
+                    "function": "open door"
+                }
+            ]
+        },
+        "errors": [
+            
+        ],
+        "signature": {
+            "sender": {
+                "address": "sender@test.com",
+                "name": "Sender Address"
+            },
+            "id": 11,
+            "creationDate": "2014-06-04T13:32:37Z",
+            "replyTo": {
+                
+            },
+            "name": "Default",
+            "comments": [
+                
+            ],
+            "signature": "Nothing",
+            "creator": {
+                "username": "admin",
+                "email": "admin@test.com",
+                "name": "Admin"
+            }
+        }
+    },
+    {
+        "template": {
+            "id": 3,
+            "creationDate": "2014-06-04T13:32:37Z",
+            "body": "Body 3",
+            "hidden": false,
+            "subject": "Titel 3",
+            "name": "template3",
+            "type": "INVITATION",
+            "comments": [
+                
+            ],
+            "creator": {
+                "username": "admin",
+                "email": "admin@test.com",
+                "name": "Admin"
+            }
+        },
+        "id": 3,
+        "creationDate": "2014-06-04T13:32:37Z",
+        "person": {
+            "id": 9,
+            "email": "staff1@manchester.ac.uk",
+            "name": "Staff 1",
+            "types": [
+                {
+                    "id": 33,
+                    "name": "group",
+                    "function": "open door"
+                }
+            ]
+        },
+        "errors": [
+            
+        ],
+        "signature": {
+            "sender": {
+                "address": "sender@test.com",
+                "name": "Sender Address"
+            },
+            "id": 11,
+            "creationDate": "2014-06-04T13:32:37Z",
+            "replyTo": {
+                
+            },
+            "name": "Default",
+            "comments": [
+                
+            ],
+            "signature": "Nothing",
+            "creator": {
+                "username": "admin",
+                "email": "admin@test.com",
+                "name": "Admin"
+            }
+        }
+    },
+    {
+        "template": {
+            "id": 4,
+            "creationDate": "2014-06-04T13:32:37Z",
+            "body": "Body 4",
+            "hidden": false,
+            "subject": "Titel 4",
+            "name": "template4",
+            "type": "INVITATION",
+            "comments": [
+                
+            ],
+            "creator": {
+                "username": "admin",
+                "email": "admin@test.com",
+                "name": "Admin"
+            }
+        },
+        "id": 4,
+        "creationDate": "2014-06-04T13:32:37Z",
+        "person": {
+            "id": 9,
+            "email": "staff1@manchester.ac.uk",
+            "name": "Staff 1",
+            "types": [
+                {
+                    "id": 33,
+                    "name": "group",
+                    "function": "open door"
+                }
+            ]
+        },
+        "errors": [
+            
+        ],
+        "signature": {
+            "sender": {
+                "address": "sender@test.com",
+                "name": "Sender Address"
+            },
+            "id": 11,
+            "creationDate": "2014-06-04T13:32:37Z",
+            "replyTo": {
+                
+            },
+            "name": "Default",
+            "comments": [
+                
+            ],
+            "signature": "Nothing",
+            "creator": {
+                "username": "admin",
+                "email": "admin@test.com",
+                "name": "Admin"
+            }
+        }
+    }
+]

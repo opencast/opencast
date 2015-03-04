@@ -1,0 +1,140 @@
+<section class="action-nav-bar">
+    <admin-ng-nav></admin-ng-nav>
+    <nav>
+        <a href="#/events/events" ng-class="{active: resource == 'events'}" translate-cloak="EVENTS.EVENTS.NAVIGATION.EVENTS" with-role="ROLE_UI_EVENTS_VIEW">Events</a>
+        <a href="#/events/series" ng-class="{active: resource == 'series'}" translate-cloak="EVENTS.EVENTS.NAVIGATION.SERIES" with-role="ROLE_UI_SERIES_VIEW">Series</a>
+    </nav>
+</section>
+
+<section class="main-content">
+    <nav id="roll-up-menu"></nav>
+
+    <div class="main-view" ng-controller="ToolsCtrl">
+
+        <div class="video-header">
+            <div class="main-video-details">
+                <h1 class="video-title">{{ video.title }}</h1>
+                <h4 class="video-upload-date">{{ video.date | localizeDate : 'date' : 'short'}}</h4>
+            </div>
+            <div class="video-more-options">
+                <a class="view-comments-btn" data-open-modal="event-details" data-resource-id="{{ id }}" data-tab="comments" translate>VIDEO_TOOL.BUTTONS.COMMENTS</a>
+                <a class="edit-video-btn" data-open-modal="event-details" data-resource-id="{{ id }}" data-tab="metadata" translate>VIDEO_TOOL.BUTTONS.METADATA</a>
+            </div>
+        </div>
+
+        <div class="video-container">
+            <div data-video-player data-player="player" data-video="video" data-adapter="html5" data-player-ref="player" data-controls="{{ tab === 'playback' }}"/>
+
+            <nav class="view-controller">
+                <a ng-class="{active: tab === 'playback'}"
+                    ng-click="openTab('playback')" translate>VIDEO_TOOL.TABS.PLAY</a>
+                <a ng-class="{active: tab === 'editor'}"
+                    ng-click="openTab('editor')" translate>VIDEO_TOOL.TABS.EDIT</a>
+                <!-- captions and annotations to come later
+                <a ng-class="{active: tab === 'captions'}"
+                    ng-click="openTab('captions')" translate>VIDEO_TOOL.TABS.CAPTIONS</a>
+                <a ng-class="{active: tab === 'annotations'}"
+                    ng-click="openTab('annotations')" translate>VIDEO_TOOL.TABS.ANNOTATIONS</a>
+                -->
+            </nav>
+
+            <div ng-if="tab === 'playback'">
+                <div class="video-editor-actions-toolbar">
+                    <div class="video-nav-controls">
+                        <a class="return-button" ng-click="navigateTo('/events/events')" translate>VIDEO_TOOL.BUTTONS.CLOSE</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-tab" ng-controller="VideoEditCtrl"
+                ng-if="tab === 'editor' && player.adapter">
+                <div class="video-toolbar">
+                    <div class="start-column">
+                        <div class="primary-functions function-buttons">
+                            <a class="split" ng-click="split()" translate>VIDEO_TOOL.ACTIONS.SPLIT</a>
+                            <a class="cut" ng-click="cut()" translate>VIDEO_TOOL.ACTIONS.CUT</a>
+                            <a class="replay" ng-click="replay()" translate>VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT</a>
+                            <!--
+                            <a class="switch-feed" translate>VIDEO_TOOL.ACTIONS.SWITCH_FEED</a>
+                            -->
+                        </div>
+                    </div>
+                    <div class="end-column">
+                        <div class="destructive-functions function-buttons">
+                            <!--
+                            <a class="undo" href="#" translate>VIDEO_TOOL.ACTIONS.UNDO</a>
+                            <a class="redo" href="#" translate>VIDEO_TOOL.ACTIONS.REDO</a>
+                            -->
+                            <a class="clear-segments" ng-click="clearSegments()" translate>VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS</a>
+                        </div>
+                        <!--
+                        <div class="keyboard-shortcuts">
+                            <a class="help-button" href="javascript:;"></a>
+                            <div class="shortcuts-popover">
+                                <div class="popover-header">
+                                    <p>Keyboard Shortcuts Help</p>
+                                </div>
+                                <div class="popover-body">
+                                    <div class="shortcuts-table">
+                                        <div class="row">
+                                            <div class="shortcut-description">Play/Pause</div>
+                                            <div class="shortcut-input">space</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="shortcut-description">Play/Pause</div>
+                                            <div class="shortcut-input">space</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="shortcut-description">Play/Pause</div>
+                                            <div class="shortcut-input">space</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="shortcut-description">Play/Pause</div>
+                                            <div class="shortcut-input">space</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        -->
+                    </div>
+                </div>
+                <div data-admin-ng-timeline="" data-video="video" data-player="player">
+                </div>
+
+                <div data-admin-ng-notifications="" context="video-tools"></div>
+
+                <div class="video-editor-actions-toolbar">
+                    <div class="video-nav-controls">
+                        <a class="return-button" ng-click="navigateTo('/events/events')" translate>VIDEO_TOOL.BUTTONS.CLOSE</a>
+                    </div>
+                    <div class="video-save-panel">
+                        <div class="buttons">
+                            <select chosen class="workflow"
+                                ng-disabled="!video.workflows || video.workflows.length === 0"
+                                data-width="'175px'"
+                                data-disable-search-threshold="8"
+                                ng-model="video.workflow"
+                                ng-options="workflow.id as workflow.name for workflow in video.workflows" />
+
+                            <a ng-click="submit()" class="save-and-close-button">
+                                {{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' | translate }}
+                            </a>
+                        </div>
+                        <!--
+                        <div class="video-meta-information">
+                            <p class="save-info">Last saved yesterday at 12:02 PM EST</p>
+                            <p class="author-edit-info">Last edit made by Julian Smith</p>
+                        </div>
+                        -->
+                    </div>
+                </div>
+            </div>
+            <!-- captions and annotations to come later
+            <div ng-if="tab === 'captions'">
+            </div>
+            <div ng-if="tab === 'annotations'">
+            </div>-->
+        </div>
+    </div>
+</section>

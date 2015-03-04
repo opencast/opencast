@@ -1,0 +1,45 @@
+.video-toolbar .function-buttons a {
+    .btn(white);
+    font-size: 12px;
+    font-weight: @weight-semibold;
+    padding: 6px;
+    display: inline-block;
+
+    // Function Icons
+    @pseudo-position: before;
+    @display-value: inline;
+    @margin: 0 4px 0 0;
+    @padding: 0;
+    @color: inherit;
+    @font-size: 12px;
+    @font-weight: normal;
+    @line-height: 1;
+
+    &.cut {
+        .fa-icon(@fa-trash, @pseudo-position, @display-value, @margin, @padding, @color, @font-size);
+    }
+
+    &.split {
+        .fa-icon(@fa-scissors, @pseudo-position, @display-value, @margin, @padding, @color, @font-size);
+    }
+
+    &.replay {
+        .fa-icon(@fa-refresh, @pseudo-position, @display-value, @margin, @padding, @color, @font-size);
+    }
+
+    &.switch-feed {
+        .fa-icon(@fa-exchange, @pseudo-position, @display-value, @margin, @padding, @color, @font-size);
+    }
+
+    &.undo {
+        .fa-icon(@fa-rotate-left, @pseudo-position, @display-value, @margin, @padding, @color, @font-size);
+    }
+
+    &.redo {
+        .fa-icon(@fa-rotate-right, @pseudo-position, @display-value, @margin, @padding, @color, @font-size);
+    }
+
+    &.clear-segments {
+        .fa-icon(@fa-trash, @pseudo-position, @display-value, @margin, @padding, @color, @font-size);
+    }
+}

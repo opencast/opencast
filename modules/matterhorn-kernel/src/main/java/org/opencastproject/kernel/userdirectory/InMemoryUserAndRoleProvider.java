@@ -29,6 +29,8 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.util.PasswordEncoder;
 
+import com.entwinemedia.fn.Stream;
+import com.entwinemedia.fn.StreamOp;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -52,6 +55,8 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /** The roles associated with the matterhorn system account */
   public static final String[] MH_SYSTEM_ROLES = new String[] { GLOBAL_ADMIN_ROLE };
+
+  public static final String PROVIDER_NAME = "matterhorn-in-memory";
 
   protected OrganizationDirectoryService orgDirectoryService;
 
@@ -100,6 +105,11 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
             "org.opencastproject.security.admin.roles"));
   }
 
+  @Override
+  public String getName() {
+    return PROVIDER_NAME;
+  }
+
   private List<User> getAdminUsers(Organization org) {
     List<User> users = new ArrayList<User>();
 
@@ -122,7 +132,8 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
       }
     }
 
-    User digestUser = new JaxbUser(digestUsername, digestUserPass, true, organization, roleList);
+    User digestUser = new JaxbUser(digestUsername, digestUserPass, "Digest User", null, getName(), true, organization,
+            roleList);
     users.add(digestUser);
 
     // Create the admin user with an encoded password for use in the UI, if necessary
@@ -131,7 +142,8 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
       // Encode the password
       String encodedPass = PasswordEncoder.encode(adminUserPass, adminUsername);
 
-      JaxbUser adminUser = new JaxbUser(adminUsername, encodedPass, true, organization, roleList);
+      JaxbUser adminUser = new JaxbUser(adminUsername, encodedPass, "Admin User", null, getName(), true, organization,
+              roleList);
       users.add(adminUser);
     }
 
@@ -150,9 +162,9 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public Iterator<Role> getRoles() {
-    Set<Role> roles = new HashSet<Role>();
+    Stream<Role> roles = Stream.empty();
     for (User user : getAdminUsers(securityService.getOrganization())) {
-      roles.addAll(user.getRoles());
+      roles = roles.append(user.getRoles()).sort(roleComparator);
     }
     return roles.iterator();
   }
@@ -198,45 +210,39 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public List<Role> getRolesForUser(String userName) {
-    return Collections.emptyList();
+    User user = loadUser(userName);
+    if (user == null)
+      return Collections.emptyList();
+    return Collections.unmodifiableList(new ArrayList<Role>(user.getRoles()));
   }
 
   @Override
   public Iterator<User> findUsers(String query, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
-    HashSet<User> foundUsers = new HashSet<User>();
+
+    // Find all users from the user providers
+    Stream<User> users = Stream.empty();
     for (User user : getAdminUsers(securityService.getOrganization())) {
       if (like(user.getUsername(), query))
-        foundUsers.add(user);
+        users = users.append(Stream.single(user)).sort(userComparator);
     }
-    return offsetLimitCollection(offset, limit, foundUsers).iterator();
+    return users.drop(offset).apply(limit > 0 ? StreamOp.<User>id().take(limit) : StreamOp.<User>id()).iterator();
   }
 
   @Override
   public Iterator<Role> findRoles(String query, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
-    HashSet<Role> foundRoles = new HashSet<Role>();
+
+    // Find all roles from the role providers
+    Stream<Role> roles = Stream.empty();
     for (Iterator<Role> it = getRoles(); it.hasNext();) {
       Role role = it.next();
       if (like(role.getName(), query) || like(role.getDescription(), query))
-        foundRoles.add(role);
+        roles = roles.append(Stream.single(role)).sort(roleComparator);
     }
-    return offsetLimitCollection(offset, limit, foundRoles).iterator();
-  }
-
-  private <T> HashSet<T> offsetLimitCollection(int offset, int limit, HashSet<T> entries) {
-    HashSet<T> result = new HashSet<T>();
-    int i = 0;
-    for (T entry : entries) {
-      if (limit != 0 && result.size() >= limit)
-        break;
-      if (i >= offset)
-        result.add(entry);
-      i++;
-    }
-    return result;
+    return roles.drop(offset).apply(limit > 0 ? StreamOp.<Role>id().take(limit) : StreamOp.<Role>id()).iterator();
   }
 
   private boolean like(String string, final String query) {
@@ -244,5 +250,24 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
     Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     return p.matcher(string).matches();
   }
+
+  @Override
+  public void invalidate(String userName) {
+    // nothing to do
+  }
+
+  private static final Comparator<Role> roleComparator = new Comparator<Role>() {
+    @Override
+    public int compare(Role role1, Role role2) {
+      return role1.getName().compareTo(role2.getName());
+    }
+  };
+
+  private static final Comparator<User> userComparator = new Comparator<User>() {
+    @Override
+    public int compare(User user1, User user2) {
+      return user1.getUsername().compareTo(user2.getUsername());
+    }
+  };
 
 }

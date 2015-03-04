@@ -142,11 +142,14 @@ public class UserEndpoint {
   @RestQuery(name = "createUser", description = "Create a new  user", returnDescription = "The location of the new ressource", restParameters = {
           @RestParameter(description = "The username.", isRequired = true, name = "username", type = STRING),
           @RestParameter(description = "The password.", isRequired = true, name = "password", type = STRING),
+          @RestParameter(description = "The name.", isRequired = false, name = "name", type = STRING),
+          @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
           @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]") }, reponses = {
           @RestResponse(responseCode = SC_CREATED, description = "User has been created."),
           @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.") })
   public Response createUser(@FormParam("username") String username, @FormParam("password") String password,
-          @FormParam("roles") String roles) throws NotFoundException {
+          @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles)
+          throws NotFoundException {
 
     User existingUser = jpaUserAndRoleProvider.loadUser(username);
     if (existingUser != null) {
@@ -168,7 +171,8 @@ public class UserEndpoint {
       rolesSet.add(new JpaRole(organization.getAnonymousRole(), organization));
     }
 
-    JpaUser user = new JpaUser(username, password, organization, rolesSet);
+    JpaUser user = new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider.getName(), true,
+            rolesSet);
     jpaUserAndRoleProvider.addUser(user);
 
     return Response.created(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
@@ -178,11 +182,14 @@ public class UserEndpoint {
   @Path("{username}.json")
   @RestQuery(name = "updateUser", description = "Update an user", returnDescription = "Status ok", restParameters = {
           @RestParameter(description = "The password.", isRequired = false, name = "password", type = STRING),
+          @RestParameter(description = "The name.", isRequired = false, name = "name", type = STRING),
+          @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
           @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]") }, pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
           @RestResponse(responseCode = SC_OK, description = "User has been updated."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
   public Response updateUser(@PathParam("username") String username, @FormParam("password") String password,
-          @FormParam("roles") String roles) throws NotFoundException {
+          @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles)
+          throws NotFoundException {
 
     User user = jpaUserAndRoleProvider.loadUser(username);
     if (user == null) {
@@ -205,7 +212,8 @@ public class UserEndpoint {
       }
     }
 
-    jpaUserAndRoleProvider.updateUser(new JpaUser(username, password, (JpaOrganization) organization, rolesSet));
+    jpaUserAndRoleProvider.updateUser(new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider
+            .getName(), true, rolesSet));
     return Response.status(SC_OK).build();
   }
 

@@ -1,0 +1,28 @@
+{
+    "recordings": [
+        {
+            "id": 1,
+            "title": "Test title A"
+        },
+        {
+            "id": 2,
+            "title": "Test title B"
+        },
+        {
+            "id": 3,
+            "title": "Test title C"
+        }
+    ],
+    "recipients": [
+        {
+            "id": 10,
+            "email": "staff2@manchester.ac.uk",
+            "name": "Staff 2"
+        },
+        {
+            "id": 9,
+            "email": "staff1@manchester.ac.uk",
+            "name": "Staff 1"
+        }
+    ]
+}

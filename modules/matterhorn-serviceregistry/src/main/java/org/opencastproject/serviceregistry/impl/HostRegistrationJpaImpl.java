@@ -55,8 +55,9 @@ public class HostRegistrationJpaImpl extends JaxbHostRegistration {
     super();
   }
 
-  public HostRegistrationJpaImpl(String baseUrl, int maxJobs, boolean online, boolean maintenance) {
-    super(baseUrl, maxJobs, online, maintenance);
+  public HostRegistrationJpaImpl(String baseUrl, String address, long memory, int cores, int maxJobs, boolean online,
+          boolean maintenance) {
+    super(baseUrl, address, memory, cores, maxJobs, online, maintenance);
   }
 
   @Id
@@ -71,6 +72,27 @@ public class HostRegistrationJpaImpl extends JaxbHostRegistration {
   @XmlElement(name = "base_url")
   public String getBaseUrl() {
     return super.getBaseUrl();
+  }
+
+  @Override
+  @Column(name = "address", nullable = false, length = 39)
+  @XmlElement(name = "address")
+  public String getIpAddress() {
+    return super.getIpAddress();
+  }
+
+  @Override
+  @Column(name = "memory", nullable = false)
+  @XmlElement(name = "memory")
+  public long getMemory() {
+    return super.getMemory();
+  }
+
+  @Override
+  @Column(name = "cores", nullable = false)
+  @XmlElement(name = "cores")
+  public int getCores() {
+    return super.getCores();
   }
 
   @Override

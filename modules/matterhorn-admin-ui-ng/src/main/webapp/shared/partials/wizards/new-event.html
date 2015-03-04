@@ -1,0 +1,523 @@
+<div class="modal-content" ng-class="{active: isCurrentTab('metadata')}" data-modal-tab-content="metadata" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.METADATA.CAPTION">
+                    <!--Metadata-->
+                </header>
+                <div class="obj-container">
+                    <form novalidate name="outerForm">
+                        <table class="main-tbl">
+                            <tr ng-repeat="row in wizard.step.metadata['dublincore/episode'].fields">
+                                <td>
+                                    <span translate="{{ row.label }}"></span>
+                                    <i ng-show="row.required" class="required">*</i>
+                                </td>
+                                <td ng-if="!row.readOnly" admin-ng-editable
+                                    class="editable" name="row.id"
+                                    target="dublincore/episode"
+                                    params="row" save="$parent.wizard.save"></td>
+                                <td ng-if="row.readOnly">{{ row.value }}</td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-content" ng-if="wizard.step.visible" ng-class="{active: isCurrentTab('metadata-extended')}" data-modal-tab-content="metadata-extended" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div class="obj tbl-details" ng-repeat="(name, block) in wizard.step.ud">
+                <header>{{ name }}</header>
+                <div class="obj-container">
+                    <form novalidate name="outerForm">
+                        <table class="main-tbl">
+                            <tr ng-repeat="row in block.fields">
+                                <td>{{ row.label | translate }} <i ng-show="row.required" class="required">*</i></td>
+                                <td ng-if="!row.readOnly" admin-ng-editable
+                                    class="editable" name="row.id" target="{{name}}"
+                                    params="row" save="$parent.wizard.save"></td>
+                                <td ng-if="row.readOnly">{{ row.value }}</td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="source" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div data-admin-ng-notifications="" context="events-form"></div>
+            <table ng-show="wizard.step.conflicts.length > 0" class="main-tbl">
+                <tr ng-repeat="conflict in wizard.step.conflicts">
+                    <td>{{ conflict.title }}</td>
+                    <td>{{ conflict.start }}</td>
+                    <td>{{ conflict.end }}</td>
+                </tr>
+            </table>
+
+
+            <div class="obj list-obj">
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.SOURCE.SELECT_SOURCE"><!--Select Source--></header>
+                <div class="obj-container">
+                    <ul>
+                        <li>
+                            <label>
+                                <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle" class="source-toggle" value="UPLOAD" data-upload-type="UPLOAD">
+                                <span translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.CAPTION"><!--Upload--></span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle" class="source-toggle" value="SCHEDULE_SINGLE" data-upload-type="SCHEDULE_SINGLE">
+                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION"><!--Schedule Single Event--></span>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle" class="source-toggle" value="SCHEDULE_MULTIPLE" data-upload-type="SCHEDULE_MULTIPLE">
+                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION"><!--Schedule Multiple Events--></span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="obj list-obj source-type-content" data-upload-type-content="UPLOAD" ng-class="{active: wizard.step.ud.type === 'UPLOAD'}">
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.RECORDING_ELEMENTS"><!--Recording Elements--></header>
+                <div class="obj-container">
+                    <ul>
+                        <li>
+                        <div class="file-upload">
+                            <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" file="wizard.step.ud.upload.segmentable"/>
+                        </div>
+                        <span translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE.SHORT"><!--File with segmentable video--></span>
+                        <p translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE.DETAIL"><!--Contains discrete images/slides/scenes (example: VGA output of presentation). Audio in this file will be ignored if file with non-segmentable video contains audio.--></p>
+                        </li>
+                        <li>
+                        <div class="file-upload">
+                            <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" type="file" file="wizard.step.ud.upload.nonSegmentable"/>
+                        </div>
+                        <span translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE.SHORT"><!--File with non-segmentable video--></span>
+                        <p translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE.DETAIL"><!--Has no clear changes that could identify new segments (example: video of the presenter).--></p>
+                        </li>
+                        <li>
+                           <div class="file-upload">
+                               <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" type="file" file="wizard.step.ud.upload.audioOnly"/>
+                           </div>
+                           <span translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY.SHORT"><!--Audio only--></span>
+                           <p translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY.DETAIL"><!--This ﬁles audio will only be used if no other files contain audio.--></p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="obj source-type-content" data-upload-type-content="SCHEDULE_SINGLE" ng-class="{active: wizard.step.ud.type === 'SCHEDULE_SINGLE'}">
+                <header translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.CAPTION"><!--Date / Time--></header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE' | translate }} <i class="required">*</i></td>
+                            <td>
+                                <input  type="text" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.date" ng-change="wizard.step.checkConflicts()">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME' | translate }} <i class="required">*</i></td>
+                            <td>
+                                <select chosen
+                                    data-width="'100px'"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.hour" ng-change="wizard.step.checkConflicts()"
+                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    ng-options="h.index as h.value for h in wizard.step.hours"
+                                />
+                                <select chosen
+                                    data-width="'100px'"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.minute" ng-change="wizard.step.checkConflicts()"
+                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    ng-options="m.index as m.value for m in wizard.step.minutes"
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION' | translate }} <i class="required">*</i></td>
+                            <td>
+                                <select chosen
+                                    data-width="'100px'"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.hour" ng-change="wizard.step.checkConflicts()"
+                                    data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
+                                    ng-options="h.index as h.value for h in wizard.step.hours"
+                                />
+
+                                <select chosen
+                                    data-width="'100px'"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.minute" ng-change="wizard.step.checkConflicts()"
+                                    data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
+                                    ng-options="m.index as m.value for m in wizard.step.minutes"
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.ROOM' | translate }} <i class="required">*</i></td>
+                            <td>
+                            <select chosen
+                                data-width="'200px'"
+                                ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
+                                data-disable-search-threshold="8"
+                                ng-model="wizard.step.ud.SCHEDULE_SINGLE.device"
+                                ng-options="value.name for (id, value) in wizard.step.captureAgents"
+                                data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.ROOM' | translate }}"
+                            />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
+                            <td>
+                                <label ng-repeat="inputMethod in wizard.step.ud.SCHEDULE_SINGLE.device.inputs">
+                                    <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_SINGLE.device.inputMethods[inputMethod.id]"> {{ inputMethod.id | translate }}
+                                    <br>
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj source-type-content" data-upload-type-content="SCHEDULE_MULTIPLE" ng-class="{active: wizard.step.ud.type === 'SCHEDULE_MULTIPLE'}">
+                <header translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.CAPTION"><!--Date / Time--></header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE' | translate }} <i class="required">*</i></td>
+                            <td>
+                                <input type="text"  placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.date" ng-change="wizard.step.checkConflicts()">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE' | translate }} <i class="required">*</i></td>
+                            <td>
+                                <input type="text" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.end" ng-change="wizard.step.checkConflicts()">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.REPEAT_ON' | translate }} <i class="required">*</i></td>
+                            <td>
+                                <div ng-repeat="weekday in wizard.step.weekdays" class="day-check-container">{{ weekday.translation | translate }}
+                                    <br>
+                                    <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.weekdays[weekday.key]"
+                                       ng-change="wizard.step.checkConflicts()"
+                                    />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME' | translate }} <i class="required">*</i></td>
+                            <td>
+                                <select chosen
+                                    data-width="'100px'"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.hour"
+                                    ng-change="wizard.step.checkConflicts()"
+                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    ng-options="h.index as h.value for h in wizard.step.hours"
+                                />
+                                <select chosen
+                                    data-width="'100px'"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.minute"
+                                    ng-change="wizard.step.checkConflicts()"
+                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    ng-options="m.index as m.value for m in wizard.step.minutes"
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION' | translate }} <i class="required">*</i></td>
+                            <td>
+                                <select chosen
+                                    data-width="'100px'"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.hour"
+                                    ng-change="wizard.step.checkConflicts()"
+                                    data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
+                                    ng-options="h.index as h.value for h in wizard.step.hours"
+                                />
+                                <select chosen
+                                    data-width="'100px'"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.minute"
+                                    ng-change="wizard.step.checkConflicts()"
+                                    data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
+                                    ng-options="m.index as m.value for m in wizard.step.minutes"
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.ROOM' | translate }} <i class="required">*</i></td>
+                            <td>
+                            <select chosen
+                                data-width="'100%'"
+                                ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
+                                data-disable-search-threshold="8"
+                                ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device"
+                                ng-options="value.name for (id, value) in wizard.step.captureAgents"
+                                data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.ROOM' | translate }}"
+                            />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
+                            <td>
+                                <label ng-repeat-start="inputMethod in wizard.step.ud.SCHEDULE_MULTIPLE.device.inputs">
+                                    <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputMethods[inputMethod.id]">{{ inputMethod.id | translate }}</input>
+                                     <br>
+                                </label>
+                                <br ng-repeat-end>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="processing" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div class="obj quick-actions">
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW"><!--Select Workflow--></header>
+                <div class="obj-container padded">
+                    <select chosen
+                        data-width="'100%'"
+                        ng-change="wizard.step.changeWorkflow()"
+                        data-disable-search-threshold="8"
+                        data-search_contains="true"
+                        ng-model="wizard.step.ud.workflow"
+                        ng-options="w.title for (obj, w) in wizard.step.workflows"
+                        data-placeholder="{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}"
+                        no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
+                    />
+
+                    <div id="new-event-workflow-configuration"
+                         class="checkbox-container"
+                         ng-click="wizard.step.save()"
+                         ng-bind-html="wizard.step.workflowConfiguration"
+                         class="obj-container">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="access" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <ul>
+                <li>
+                    <div class="obj list-obj">
+                        <header class="no-expand" translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.TITLE"></header>
+                        <div class="obj-container">
+                            <div class="obj tbl-list">
+
+                                <table class="main-tbl">
+                                <thead>
+                                    <tr>
+                                        <th translate="EVENTS.SERIES.NEW.ACCESS.TEMPLATES.TITLE"><!--Templates--></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="obj-container padded">
+                                                <p translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
+                                                <select chosen
+                                                    data-width="'200px'"
+                                                    data-disable-search-threshold="8"
+                                                    data-search_contains="true"
+                                                    ng-change="wizard.step.changeBaseAcl()"
+                                                    ng-model="wizard.step.ud.id"
+                                                    ng-options="id as name for (id, name) in wizard.step.acls"
+                                                    data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                                    no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
+                                                />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="obj-container">
+                            <div class="obj tbl-list">
+                                <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS"><!--Details--></header>
+                                <div class="obj-container">
+                                <table class="main-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ROLE"><!--Role--></th>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ACTION" class="fit"><!--Action--></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="policy in wizard.step.ud.policies">
+                                            <td>
+                                                <select chosen
+                                                    data-width="'200px'"
+                                                    data-disable-search-threshold="8"
+                                                    data-search_contains="true"
+                                                    ng-model="policy.role"
+                                                    ng-options="id as name for (id, name) in wizard.step.roles"
+                                                    data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}"
+                                                    no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
+                                                />
+                                            </td>
+                                            <td class="fit"><input type="checkbox"  ng-model="policy.read"/></td>
+                                            <td class="fit"><input type="checkbox"  ng-model="policy.write"/></td>
+                                            <td class="fit"><a ng-click="wizard.step.deletePolicy(policy)" class="remove"></a>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
+                                            <td colspan="4"><a ng-click="wizard.step.addPolicy()">+ {{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                                        <tr>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="summary" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div data-admin-ng-notifications="" context="events-form"></div>
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.METADATA.CAPTION"><!--Metadata--></header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <tr ng-repeat="userEntry in wizard.states[0].stateController.getUserEntries()">
+                            <td>{{ userEntry.label | translate }}</td>
+                            <td>{{ userEntry.presentableValue }}</td>
+                        <tr>
+                    </table>
+                </div>
+            </div>
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.METADATA_EXTENDED.CAPTION"><!--Metadata Extended--></header>
+                <div class="obj-container">
+                    <table class="main-tbl" ng-repeat="(name, block) in wizard.getStateControllerByName('metadata-extended').getUserEntries()">
+                        <tr ng-repeat="field in block.fields">
+                            <td>{{ field.label | translate }}</td>
+                            <td>{{ field.presentableValue }}</td>
+                        <tr>
+                    </table>
+                </div>
+            </div>
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.SOURCE.CAPTION"><!--Source--></header>
+                <div class="obj-container">
+                    <table class="main-tbl" ng-if="wizard.getStateControllerByName('source').getUserEntries().type === 'UPLOAD'">
+                        <tr>
+                            <td>File with segmentable video</td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().upload.segmentable.name }}</td>
+                        </tr>
+                        <tr>
+                            <td>File with non-segmentable video</td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().upload.nonSegmentable.name }}</td>
+                        </tr>
+                            <td>File with segmentable video</td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().upload.audioOnly.name}}</td>
+                        </tr>
+                    </table>
+                    <table class="main-tbl">
+                        <tr>
+                            <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE"><!--Start Date--></td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.date }}</td>
+                        </tr>
+                        <tr>
+                            <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME"><!--Start Time--></td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.hour }}:{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.minute }}</td>
+                        </tr>
+                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries().type === 'SCHEDULE_MULTIPLE'">
+                            <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE"><!--End Date--></td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.end }}</td>
+                        </tr>
+                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries().type === 'SCHEDULE_MULTIPLE'">
+                            <td translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.REPEAT_ON"><!--Repeat On--></td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.repetitionOption }}</td>
+                        </tr>
+                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries().type === 'SCHEDULE_MULTIPLE'">
+                            <td translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAYS"><!--Weekdays--></td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.weekdays }}</td>
+                        </tr>
+                        <tr>
+                            <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION"><!--Duration--></td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].duration.hour }} Hours {{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].duration.minute }} Minutes</td>
+                        </tr>
+                        <tr>
+                            <td translate="EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.ROOM"><!--Room--></td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].device.name }}</td>
+                        </tr>
+                        <tr ng-repeat="(key, value) in wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].SCHEDULE_SINGLE.device.inputs">
+                            <td>Input {{ key}}</td>
+                            <td>{{ value.value }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.PROCESSING.CAPTION"><!--Processing--></header>
+                <table class="main-tbl">
+                    <tr>
+                        <td translate="EVENTS.EVENTS.NEW.PROCESSING.WORKFLOW"><!--Workflow--></td>
+                        <td>{{ wizard.getStateControllerByName('processing').getUserEntries().selection.id }}</td>
+                    </tr>
+                    <tr ng-repeat="(key, value) in wizard.getStateControllerByName('processing').getUserEntries().selection.configuration">
+                        <td>{{ key }}</td>
+                        <td>{{ value }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.ACCESS.CAPTION" ><!--Access Policy--></header>
+                    <table class="main-tbl">
+                        <thead>
+                            <tr>
+                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ROLE" class="fit"><!--Role--></th>
+                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
+                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="policy in wizard.getStateControllerByName('access').ud.policies">
+                            <td>{{ policy.role }}</td>
+                            <td class="fit"><input type="checkbox" disabled ng-model="policy.read"/></td>
+                            <td class="fit"><input type="checkbox" disabled ng-model="policy.write"/></td>
+                        </tr>
+                    </table>
+            </div>
+        </div>
+    </div>
+</div>

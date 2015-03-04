@@ -1,0 +1,119 @@
+[ 
+   {
+        "flavor": "dublincore/episode",
+        "title": "EVENTS.EVENTS.DETAILS.CATALOG.EPISODE",
+        "fields": [
+            {
+                "id": "title",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+                "readOnly": false,
+                "type": "text",
+                "value": "\u2022mock\u2022 Test Title"
+            },
+            {
+                "id": "uid",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.UID",
+                "readOnly": true,
+                "type": "text",
+                "value": "78753d04-18a4-4327-9a61-b6d93816a7d2"
+            },
+            {
+                "collection": "users",
+                "id": "presenter",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTER",
+                "readOnly": false,
+                "type": "text",
+                "value": [
+                    "Matt Smith",
+                    "Chuck Norris"
+                ]
+            }
+        ]
+    },
+    {
+        "flavor": "dublincore/series",
+        "title": "EVENTS.EVENTS.DETAILS.CATALOG.SERIES",
+        "fields": [
+            {
+                "collection": {
+                    "edu123": "Education123",
+                    "phy325": "Physics325"
+                },
+                "id": "series",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
+                "readOnly": false,
+                "type": "text",
+                "value": "phy325"
+            },
+            {
+                "id": "recordingDate",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.RECORDING_DATE",
+                "readOnly": false,
+                "type": "date",
+                "value": "2012-11-20"
+            },
+            {
+                "collection": "users",
+                "id": "contributor",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
+                "readOnly": false,
+                "type": "text",
+                "value": [
+                    "Franz Kafka",
+                    "A. Morris"
+                ]
+            },
+            {
+                "id": "subject",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
+                "readOnly": false,
+                "type": "text",
+                "value": "Test Subject"
+            },
+            {
+                "collection": {
+                    "de": "German",
+                    "en": "English",
+                    "fr": "French"
+                },
+                "id": "language",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE",
+                "readOnly": false,
+                "type": "text",
+                "value": "fr"
+            }
+        ]
+    },
+    {
+        "flavor": "extended_dublincore/metadata",
+        "title": "EVENTS.EVENTS.DETAILS.CATALOG.EXTENDED_METADATA",
+        "fields": [
+            {
+                "id": "description",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.DESCRIPTION",
+                "readOnly": false,
+                "type": "text",
+                "value": "A mocked event description."
+            },
+            {
+                "id": "source",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.SOURCE",
+                "readOnly": true,
+                "type": "text",
+                "value": "Manual"
+            },
+            {
+                "collection": {
+                    "bsd": "BSD",
+                    "ccnd": "CCND",
+                    "gpl": "GPL"
+                },
+                "id": "license",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.LICENSE",
+                "readOnly": false,
+                "type": "text",
+                "value": "ccnd"
+            }
+        ]
+    }
+]

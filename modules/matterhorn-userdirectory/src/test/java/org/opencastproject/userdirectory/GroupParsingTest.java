@@ -18,6 +18,7 @@ package org.opencastproject.userdirectory;
 import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbGroup;
 import org.opencastproject.security.api.JaxbRole;
 
 import org.apache.commons.io.IOUtils;

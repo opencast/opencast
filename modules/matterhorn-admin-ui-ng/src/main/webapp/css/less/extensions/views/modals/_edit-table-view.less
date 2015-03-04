@@ -1,0 +1,60 @@
+#edit-table-view-modal {
+    
+    .modal-content {
+        
+        .row {
+            margin: 15px 0;
+        }
+    
+        .tab-description {
+            padding: 10px 0;
+            color: @black-50;
+            font-size: 12px;
+            line-height: 20px;
+            width: 100%;
+            margin-bottom: 0;
+            
+        &.for-header {
+            padding-top: 0;
+        }
+        
+        &.for-footer {
+            padding-bottom: 0;
+            margin-bottom: -5px;
+        }
+            
+            p:not(:last-child) {
+                margin-bottom: 10px;
+            }
+        }
+        
+        // Fix for Half Pixel Rounding Chrome
+        .col {
+            width: 48.72%;
+        }
+    }
+    
+    footer {
+        
+        a {
+            margin: 15px 5px 15px;
+        
+            &:first-child {
+                margin-left: 15px;
+            }
+            
+            &:last-child {
+                margin-right: 15px;
+            }
+        }
+    
+        .pull-right {
+            float: right;
+        }
+
+        a:first-child {
+            float: none;
+        }
+    }
+    
+}

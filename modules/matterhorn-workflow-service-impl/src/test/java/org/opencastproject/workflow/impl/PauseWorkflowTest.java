@@ -21,6 +21,7 @@ import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -42,6 +43,7 @@ import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration
 import org.opencastproject.workspace.api.Workspace;
 
 import junit.framework.Assert;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -107,6 +109,7 @@ public class PauseWorkflowTest {
 
     // instantiate a service implementation and its DAO, overriding the methods that depend on the osgi runtime
     service = new WorkflowServiceImpl() {
+      @Override
       public Set<HandlerRegistration> getRegisteredHandlers() {
         return handlerRegistrations;
       }
@@ -125,7 +128,8 @@ public class PauseWorkflowTest {
     service.setSecurityService(securityService);
 
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject())).andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
+    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
+            .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
@@ -155,6 +159,9 @@ public class PauseWorkflowTest {
     EasyMock.expect(workspace.getCollectionContents((String) EasyMock.anyObject())).andReturn(new URI[0]);
     EasyMock.replay(workspace);
 
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(messageSender);
+
     dao = new WorkflowServiceSolrIndex();
     dao.setServiceRegistry(serviceRegistry);
     dao.setAuthorizationService(authzService);
@@ -163,8 +170,9 @@ public class PauseWorkflowTest {
     dao.setOrgDirectory(organizationDirectoryService);
     dao.activate("System Admin");
     service.setDao(dao);
-    service.activate(null);
     service.setServiceRegistry(serviceRegistry);
+    service.setMessageSender(messageSender);
+    service.activate(null);
 
     is = PauseWorkflowTest.class.getResourceAsStream("/workflow-definition-pause.xml");
     def = WorkflowParser.parseWorkflowDefinition(is);

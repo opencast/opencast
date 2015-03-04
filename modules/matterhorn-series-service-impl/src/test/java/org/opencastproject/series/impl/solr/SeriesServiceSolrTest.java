@@ -24,6 +24,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -31,12 +32,11 @@ import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,8 +62,8 @@ public class SeriesServiceSolrTest {
   public void setUp() throws Exception {
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new JaxbUser("admin", new DefaultOrganization(), new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
-            new DefaultOrganization()));
+    User user = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
+            SecurityConstants.GLOBAL_ADMIN_ROLE, new DefaultOrganization()));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
@@ -193,12 +193,11 @@ public class SeriesServiceSolrTest {
     }
   }
 
-
   @Test
   public void testAccessControlManagmentRewrite() throws Exception {
     // sample access control list
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new JaxbUser("anonymous", new DefaultOrganization(), new JaxbRole("ROLE_ANONYMOUS",
+    User user = new JaxbUser("anonymous", "test", new DefaultOrganization(), new JaxbRole("ROLE_ANONYMOUS",
             new DefaultOrganization()));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
@@ -213,7 +212,7 @@ public class SeriesServiceSolrTest {
 
     AccessControlList accessControlList = new AccessControlList();
     List<AccessControlEntry> acl = accessControlList.getEntries();
-    acl.add(new AccessControlEntry("ROLE_ANONYMOUS", "read", true));
+    acl.add(new AccessControlEntry("ROLE_ANONYMOUS", Permissions.Action.READ.toString(), true));
 
     index.updateIndex(testCatalog);
     String seriesID = testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER);
@@ -223,11 +222,21 @@ public class SeriesServiceSolrTest {
     DublinCoreCatalogList result = index.search(q);
     Assert.assertTrue("Only one anomymous series", result.size() == 1);
 
-
     index.updateSecurityPolicy(seriesID, new AccessControlList());
     q = new SeriesQuery();
     result = index.search(q);
     Assert.assertTrue("No anomymous series", result.size() == 0);
+  }
+
+  @Test
+  public void testOptOut() throws Exception {
+    String seriesID = testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+
+    index.updateIndex(testCatalog);
+    Assert.assertFalse(index.isOptOut(seriesID));
+
+    index.updateOptOutStatus(seriesID, true);
+    Assert.assertTrue(index.isOptOut(seriesID));
   }
 
   /**

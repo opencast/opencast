@@ -1,0 +1,64 @@
+{
+    "theme" : {
+        "_source" : { "enabled" : true },
+        "_timestamp" : { "enabled" : true },
+        "dynamic": "true",
+        "properties" : {
+
+            "uid": { "type" : "long", "index" : "not_analyzed", "store" : "yes" },
+
+            "organization": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+
+            "object": { "type" : "string", "index" : "no", "store" : "yes" },
+
+            "creation_date": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "default": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+
+            "creator": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "name": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "bumper_active": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+
+            "bumper_file": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "trailer_active": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+
+            "trailer_file": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "title_slide_active": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+
+            "title_slide_metadata": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "title_slide_background": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "license_slide_active": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+
+            "license_slide_description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "license_slide_background": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "watermark_active": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+
+            "watermark_file": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "watermark_position": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "text": { "type" : "string", "index" : "analyzed", "store" : "no" },
+            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no" }
+
+        },
+        "dynamic_templates" : [
+             {
+             "text" : {
+                 "match" : "text_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
+                 }
+             }
+         ]
+    }
+}

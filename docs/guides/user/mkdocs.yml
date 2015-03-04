@@ -1,0 +1,37 @@
+
+
+site_name: Opencast - Users Guide
+repo_url: https://bitbucket.org/opencast-community/matterhorn/src/260e42177d62ad84bfcd4586aadf2be91007f5cd/docs/guides/user/
+
+# Default theme used is readthedocs
+theme: readthedocs
+
+# Some of the themes elements can be overridded by elements in this folder
+# Note: this is currently not working in on ReadTheDocs
+theme_dir: 'theme_override'
+
+# The directory that contain the source .md files
+docs_dir: 'docs'
+
+# The directory to which the site is built using mkdocs
+site_dir: 'site'
+
+# This needs to be listed in order to populate the left navigation and the TOC
+# Items will appear in this order
+
+pages:
+- ['index.md', 'Introduction']
+- ['login.md', 'Log-in']
+- ['events.md', 'Events']
+- ['series.md', 'Series']
+- ['systems.md', 'Systems']
+- ['users.md', 'Users']
+- ['groups.md', 'Groups']
+- ['accesspolicies.md', 'Access Policies']
+- ['themes.md', 'Themes']
+- ['processing.md', 'Processing']
+- ['videoeditor.md', 'Video Editor']
+- ['searchandfilter.md', 'Search & Filter']
+- ['configure.md', 'Configure the UI']
+- ['glossary.md', 'Glossary']
+- ['i18n.md', 'Internationalization']

@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * This interface is mainly intended to encapsulate Dublin Core metadata, but it is also capable of maintaining
  * proprietary metadata alongside the Dublin Core.
@@ -50,6 +53,7 @@ import java.util.Set;
  * <li>Encoding schemes aren't fully supported yet.
  * </ul>
  */
+@ParametersAreNonnullByDefault
 public interface DublinCore {
 
   /**
@@ -507,13 +511,16 @@ public interface DublinCore {
    * Get all values of a property no matter what language they have.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @return a list of values
    */
   List<DublinCoreValue> get(EName property);
 
   /** Get all contained values grouped by property. */
   Map<EName, List<DublinCoreValue>> getValues();
+
+  /** Get all values as a flat list. */
+  List<DublinCoreValue> getValuesFlat();
 
   /**
    * Like {@link #get(EName, String)} but returns only the first value of the list. This method is intended to be a
@@ -523,12 +530,12 @@ public interface DublinCore {
    * are returned preferably.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @param language
    *         a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
    * @return the value or null
    */
-  String getFirst(EName property, String language);
+  @Nullable String getFirst(EName property, String language);
 
   /**
    * Get the first value of a property, no matter what language it is in. Like a call of
@@ -536,11 +543,11 @@ public interface DublinCore {
    * language} are returned preferably.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @return the value or null
    * @see #getFirst(EName, String)
    */
-  String getFirst(EName property);
+  @Nullable String getFirst(EName property);
 
   /**
    * Get the first value of a property, no matter what language it is in. Like a call of
@@ -548,30 +555,30 @@ public interface DublinCore {
    * language} are returned preferably.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @return the value or null
    * @see #getFirst(EName, String)
    */
-  DublinCoreValue getFirstVal(EName property);
+  @Nullable DublinCoreValue getFirstVal(EName property);
 
   /**
    * Return all values separated by a delimiter.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @param language
    *         a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
    * @param delimiter
    *         a delimiter
-   * @return the concatenated values or null
+   * @return the concatenated values or null (FIXME bad API. Should not return null)
    */
-  String getAsText(EName property, String language, String delimiter);
+  @Nullable String getAsText(EName property, String language, String delimiter);
 
   /**
    * Return all languages this property has values in.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @return a set of languages which may be empty in case the property does not have any value. Note that the state of
    *         having no language defined ({@link #LANGUAGE_UNDEFINED}) is treated like a language.
    */
@@ -581,7 +588,7 @@ public interface DublinCore {
    * Check, if a property has multiple values assigned.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @param language
    *         a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
    */
@@ -591,7 +598,7 @@ public interface DublinCore {
    * Check if a property has multiple values, ignoring any language information.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    */
   boolean hasMultipleValues(EName property);
 
@@ -599,7 +606,7 @@ public interface DublinCore {
    * Check if a property has at least one value assigned.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @param language
    *         a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
    */
@@ -610,7 +617,7 @@ public interface DublinCore {
    * {@link #hasValue(EName)} with <code>language = {@link #LANGUAGE_ANY}</code>
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    */
   boolean hasValue(EName property);
 
@@ -620,40 +627,40 @@ public interface DublinCore {
    * Please note that it is not allowed to pass {@link #LANGUAGE_ANY} as <code>language</code>.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @param value
    *         the value or null to remove all values of the given language for this property
    * @param language
    *         a language code or {@link #LANGUAGE_UNDEFINED}
    */
-  void set(EName property, String value, String language);
+  void set(EName property, @Nullable String value, String language);
 
   /**
    * Set a value without language information to a property, overwriting an existing value. This is like calling
    * {@link #set(EName, String, String)} with <code>language = {@link #LANGUAGE_UNDEFINED}</code>
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @param value
    *         the value or null to remove all values of {@link #LANGUAGE_UNDEFINED} for this property
    */
-  void set(EName property, String value);
+  void set(EName property, @Nullable String value);
 
   /**
    * Set a property to a value, overwriting an existing value.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @param value
    *         the value or null to completely remove the property (all values in all languages)
    */
-  void set(EName property, DublinCoreValue value);
+  void set(EName property, @Nullable DublinCoreValue value);
 
   /**
    * Set a property to a list of values, overwriting any existing.
    *
    * @param property
-   *         the property name
+   *         the property's expanded name
    * @param values
    *         the values or an empty list
    */
@@ -665,7 +672,7 @@ public interface DublinCore {
    * Please note that it is not allowed to pass {@link #LANGUAGE_ANY} as <code>language</code>.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @param value
    *         the value
    * @param language
@@ -678,7 +685,7 @@ public interface DublinCore {
    * with <code>language = {@link #LANGUAGE_UNDEFINED}</code>
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @param value
    *         the value
    */
@@ -688,7 +695,7 @@ public interface DublinCore {
    * Add a value to a property.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @param value
    *         the value
    */
@@ -703,7 +710,7 @@ public interface DublinCore {
    * </ul>
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    * @param language
    *         a language code, {@link #LANGUAGE_UNDEFINED} or {@link #LANGUAGE_ANY}
    */
@@ -713,7 +720,7 @@ public interface DublinCore {
    * Remove a complete property.
    *
    * @param property
-   *         the property qname
+   *         the property's expanded name
    */
   void remove(EName property);
 
@@ -721,21 +728,9 @@ public interface DublinCore {
   void clear();
 
   /**
-   * Return all supported properties.
+   * Return all contained properties.
    *
    * @return a set of property names
    */
   Set<EName> getProperties();
-
-  /**
-   * Bind a prefix to a namespace name to support proprietary metadata properties. For further information about
-   * namespaces and their binding, please see <a
-   * href="http://www.w3.org/TR/xml-names">http://www.w3.org/TR/xml-names</a>
-   *
-   * @param prefix
-   *         the prefix
-   * @param namespaceName
-   *         the namespace name, usually a URI
-   */
-  void bindPrefix(String prefix, String namespaceName);
 }

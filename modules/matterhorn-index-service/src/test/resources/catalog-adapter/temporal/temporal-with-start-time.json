@@ -1,0 +1,8 @@
+{
+   "readOnly":false,
+   "id":"startTime",
+   "label":"EVENTS.EVENTS.DETAILS.METADATA.START_TIME",
+   "type":"time",
+   "value":"07-00-00",
+   "required":false
+}

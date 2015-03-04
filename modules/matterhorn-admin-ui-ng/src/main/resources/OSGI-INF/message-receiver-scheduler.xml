@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.index.service.message.SchedulerMessageReceiverImpl-Adminui"
+  immediate="true" activate="activate" deactivate="deactivate">
+  <implementation
+    class="org.opencastproject.index.service.message.SchedulerMessageReceiverImpl" />
+  <property name="service.description" value="Scheduler Message Receiver" />
+  <property name="destinationId" value="SCHEDULER.Adminui"/>
+  <service>
+    <provide interface="org.opencastproject.index.service.message.SchedulerMessageReceiverImpl" />
+  </service>
+  <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
+    cardinality="1..1" policy="static" bind="setMessageSender" />
+  <reference name="message-broker-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
+    cardinality="1..1" policy="static" bind="setMessageReceiver" />    
+  <reference name="search-index" interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
+    cardinality="1..1" policy="static" bind="setSearchIndex" />    
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+</scr:component>

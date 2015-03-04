@@ -18,8 +18,6 @@ package org.opencastproject.workflow.impl;
 import static org.apache.solr.client.solrj.util.ClientUtils.escapeQueryChars;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
-import static org.opencastproject.workflow.api.WorkflowService.WRITE_PERMISSION;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -28,6 +26,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -530,9 +529,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
     // Define containers for common permissions
     List<String> reads = new ArrayList<String>();
-    permissions.put(READ_PERMISSION, reads);
+    permissions.put(Permissions.Action.READ.toString(), reads);
     List<String> writes = new ArrayList<String>();
-    permissions.put(WRITE_PERMISSION, writes);
+    permissions.put(Permissions.Action.WRITE.toString(), writes);
 
     String adminRole = securityService.getOrganization().getAdminRole();
 
@@ -591,7 +590,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       query.append(" AND ");
     query.append(ORG_KEY).append(":").append(escapeQueryChars(orgId));
 
-    appendSolrAuthFragment(query, READ_PERMISSION);
+    appendSolrAuthFragment(query, Permissions.Action.READ.toString());
 
     try {
       QueryResponse response = solrServer.query(new SolrQuery(query.toString()));
@@ -624,7 +623,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     try {
       String orgId = securityService.getOrganization().getId();
       StringBuilder queryString = new StringBuilder().append(ORG_KEY).append(":").append(escapeQueryChars(orgId));
-      appendSolrAuthFragment(queryString, WRITE_PERMISSION);
+      appendSolrAuthFragment(queryString, Permissions.Action.WRITE.toString());
       SolrQuery solrQuery = new SolrQuery(queryString.toString());
       solrQuery.addFacetField(WORKFLOW_DEFINITION_KEY);
       solrQuery.addFacetField(OPERATION_KEY);
@@ -661,7 +660,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
               StringBuilder baseSolrQuery = new StringBuilder().append(ORG_KEY).append(":")
                       .append(escapeQueryChars(orgId));
-              appendSolrAuthFragment(baseSolrQuery, WRITE_PERMISSION);
+              appendSolrAuthFragment(baseSolrQuery, Permissions.Action.WRITE.toString());
               solrQuery = new SolrQuery(baseSolrQuery.toString());
               solrQuery.addFacetField(STATE_KEY);
               solrQuery.addFacetQuery(STATE_KEY + ":" + WorkflowState.FAILED);

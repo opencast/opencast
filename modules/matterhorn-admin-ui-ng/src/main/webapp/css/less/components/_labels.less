@@ -1,0 +1,38 @@
+label {
+    display: block;
+    color: @black-60;
+    
+    > small {
+        display: block;
+        color: @black-30;
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    &.required:after {
+        content: "*";
+        color: @red;
+        margin-left: 3px;
+    }
+    
+} // label
+
+
+// Warning Labels
+// ----------------------------------------
+
+label.warning {
+    color: @red !important;
+}
+
+
+// Text Variable Styling
+// ----------------------------------------
+
+.text-variables {
+    padding: 10px 0;
+    
+    label {
+        margin-bottom: 10px;
+    }
+}

@@ -20,7 +20,7 @@ import org.opencastproject.util.data.Option;
 /**
  * API that defines an entry of an scheduled episode ACL
  */
-public interface EpisodeACLTransition extends AclTransition {
+public interface EpisodeACLTransition extends ACLTransition {
   /**
    * Returns the episode identifier
    *

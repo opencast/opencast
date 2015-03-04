@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.index.service.message.SeriesMessageReceiverImpl-Adminui"
+  immediate="true" activate="activate" deactivate="deactivate">
+  <implementation
+    class="org.opencastproject.index.service.message.SeriesMessageReceiverImpl" />
+  <property name="service.description" value="Series Message Receiver" />
+  <property name="destinationId" value="SERIES.Adminui"/>
+  <service>
+    <provide interface="org.opencastproject.index.service.message.SeriesMessageReceiverImpl" />
+  </service>
+  <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
+    cardinality="1..1" policy="static" bind="setMessageSender" />
+  <reference name="message-broker-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
+    cardinality="1..1" policy="static" bind="setMessageReceiver" />    
+  <reference name="search-index" interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
+    cardinality="1..1" policy="static" bind="setSearchIndex" />
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="aclServiceFactory" interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
+      cardinality="1..1" policy="dynamic" bind="setAclServiceFactory"/>
+</scr:component>

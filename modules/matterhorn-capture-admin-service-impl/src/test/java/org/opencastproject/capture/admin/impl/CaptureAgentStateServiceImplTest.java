@@ -100,7 +100,7 @@ public class CaptureAgentStateServiceImplTest {
 
     HashSet<JaxbRole> roles = new HashSet<JaxbRole>();
     roles.add(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, organization, ""));
-    User user = new JaxbUser("testuser", organization, roles);
+    User user = new JaxbUser("testuser", "test", organization, roles);
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
@@ -491,7 +491,7 @@ public class CaptureAgentStateServiceImplTest {
     DefaultOrganization organization = new DefaultOrganization();
     HashSet<JaxbRole> roleSet = new HashSet<JaxbRole>();
     roleSet.add(new JaxbRole("ROLE_NOT_ADMIN", organization, ""));
-    User user = new JaxbUser("testuser", organization, roleSet);
+    User user = new JaxbUser("testuser", "test", organization, roleSet);
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();

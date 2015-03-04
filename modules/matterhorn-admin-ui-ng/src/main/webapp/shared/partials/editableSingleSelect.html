@@ -1,0 +1,18 @@
+<div ng-form="innerForm">
+    <span ng-show="!editMode" ng-click="editMode = true">{{ collection[params.value] }}</span>
+
+    <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-click="editMode = true"></i>
+    <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
+
+    <div ng-show="editMode">
+        <select ng-model="params.value" ng-change="submit()">
+            <option ng-repeat="(item, label) in collection"
+                ng-required="params.required"
+                name="{{ params.name }}"
+                ng-selected="item === params.value"
+                value="{{ item }}">
+                {{ label }}
+            </option>
+        </select>
+    </div>
+</div>

@@ -20,8 +20,8 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import org.opencastproject.fn.juc.Immutables;
-import org.opencastproject.fn.juc.Mutables;
+import org.opencastproject.fun.juc.Immutables;
+import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.serviceregistry.api.Incidents;

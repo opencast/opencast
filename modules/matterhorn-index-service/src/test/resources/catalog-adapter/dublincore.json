@@ -1,0 +1,63 @@
+[
+   {
+      "readOnly":false,
+      "id":"agentTimezone",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.AGENT.TIME.ZONE",
+      "type":"text",
+      "value":"0",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"license",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.LICENSE",
+      "collection":{
+         "Entry 1":"Value 1",
+         "Entry 3":"Value 3",
+         "Entry 2":"Value 2"
+      },
+      "type":"text",
+      "value":"Creative Commons 3.0:Attribution-NonCommercial-NoDerivs",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"duration",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.DURATION",
+      "type":"text",
+      "value":"01:00:00",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"startDate",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+      "type":"date",
+      "value":"2014-11-04",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"startTime",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.START_TIME",
+      "type":"time",
+      "value":"19:00:00",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"title",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+      "type":"text",
+      "value":"The Title of the Recording",
+      "required":true
+   },
+   {
+      "readOnly":true,
+      "id":"missing",
+      "label":"The Missing Label",
+      "type":"text",
+      "value":"",
+      "required":false
+   }
+]

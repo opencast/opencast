@@ -29,10 +29,9 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 
-import junit.framework.Assert;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -67,9 +66,10 @@ public class UserAndRoleDirectoryServiceImplTest {
     role2 = new JaxbRole("role2", org);
     role3 = new JaxbRole("role3", org);
 
-    User user1 = new JaxbUser(userName, org, role1, role2);
-    User user2 = new JaxbUser(userName, "secret", true, org, role2, role3);
-    User user3 = new JaxbUser("userSample", org, role2, role3);
+    JaxbUser user1 = new JaxbUser(userName, "matterhorn", org, role1, role2);
+    user1.setManageable(true);
+    User user2 = new JaxbUser(userName, "secret", "test", true, org, role2, role3);
+    User user3 = new JaxbUser("userSample", "test", org, role2, role3);
 
     List<User> users = new ArrayList<User>();
     users.add(user1);
@@ -80,6 +80,7 @@ public class UserAndRoleDirectoryServiceImplTest {
     EasyMock.expect(provider1.findUsers("%mple%", 0, 0)).andReturn(users.iterator()).once();
     EasyMock.expect(provider1.findUsers("%mple%", 0, 0)).andReturn(users.iterator()).once();
     EasyMock.expect(provider1.getUsers()).andReturn(users.iterator()).once();
+    EasyMock.expect(provider1.getName()).andReturn("test").once();
 
     List<User> users2 = new ArrayList<User>();
     users2.add(user3);
@@ -90,6 +91,7 @@ public class UserAndRoleDirectoryServiceImplTest {
     EasyMock.expect(provider2.findUsers("%mple%", 0, 0)).andReturn(users2.iterator()).once();
     EasyMock.expect(provider2.findUsers("%mple%", 0, 0)).andReturn(users2.iterator()).once();
     EasyMock.expect(provider2.getUsers()).andReturn(users2.iterator()).once();
+    EasyMock.expect(provider2.getName()).andReturn("matterhorn").once();
 
     List<Role> roles1 = new ArrayList<Role>();
     roles1.add(new JaxbRole("ROLE_ASTRO_2011", org));
@@ -158,6 +160,9 @@ public class UserAndRoleDirectoryServiceImplTest {
     assertNotNull(mergedUser.getPassword());
     assertEquals(org.getId(), mergedUser.getOrganization().getId());
     assertEquals(userName, mergedUser.getUsername());
+    assertEquals("matterhorn,test", mergedUser.getProvider());
+    assertTrue(mergedUser.isManageable());
+    assertTrue(((JaxbUser) mergedUser).isManageable());
   }
 
   @Test
@@ -179,10 +184,9 @@ public class UserAndRoleDirectoryServiceImplTest {
   public void testFindUsers() {
     List<User> users = IteratorUtils.toList(directory.findUsers("%mple%", 0, 0));
     Assert.assertEquals(2, users.size());
-    Assert.assertTrue(userName.equals(users.get(0).getUsername())
-        || userName.equals(users.get(1).getUsername()));
+    Assert.assertTrue(userName.equals(users.get(0).getUsername()) || userName.equals(users.get(1).getUsername()));
     Assert.assertTrue("userSample".equals(users.get(0).getUsername())
-        || "userSample".equals(users.get(1).getUsername()));
+            || "userSample".equals(users.get(1).getUsername()));
 
     // Test limit and offset
     users = IteratorUtils.toList(directory.findUsers("%mple%", 1, 1));
@@ -195,15 +199,15 @@ public class UserAndRoleDirectoryServiceImplTest {
     List<Role> roles = IteratorUtils.toList(directory.findRoles("%2012%", 0, 0));
     Assert.assertEquals(2, roles.size());
     Assert.assertTrue("ROLE_MATH_2012".equals(roles.get(0).getName())
-        || "ROLE_MATH_2012".equals(roles.get(1).getName()));
+            || "ROLE_MATH_2012".equals(roles.get(1).getName()));
     Assert.assertTrue("ROLE_ASTRO_2012".equals(roles.get(0).getName())
-        || "ROLE_ASTRO_2012".equals(roles.get(1).getName()));
+            || "ROLE_ASTRO_2012".equals(roles.get(1).getName()));
 
     // Test limit and offset
     roles = IteratorUtils.toList(directory.findRoles("%2012%", 1, 1));
     Assert.assertEquals(1, roles.size());
     Assert.assertTrue("ROLE_ASTRO_2012".equals(roles.get(0).getName())
-        || "ROLE_MATH_2012".equals(roles.get(0).getName()));
+            || "ROLE_MATH_2012".equals(roles.get(0).getName()));
   }
 
 }

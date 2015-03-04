@@ -80,7 +80,7 @@ public class XacmlSecurityTest {
     securityService = new SecurityService() {
       @Override
       public User getUser() {
-        return new JaxbUser(currentUser, organization, currentRoles);
+        return new JaxbUser(currentUser, "test", organization, currentRoles);
       }
 
       @Override

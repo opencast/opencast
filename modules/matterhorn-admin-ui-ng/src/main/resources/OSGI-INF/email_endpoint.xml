@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.adminui.endpoint.EmailEndpoint"
+               immediate="true" activate="activate">
+  <implementation class="org.opencastproject.adminui.endpoint.EmailEndpoint" />
+  <property name="service.description" value="Email service" />
+  <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.email" />
+  <property name="opencast.service.path" value="/email" />
+  <service>
+    <provide interface="org.opencastproject.adminui.endpoint.EmailEndpoint" />
+  </service>
+  <reference bind="setSecurityService"
+             cardinality="1..1"
+             interface="org.opencastproject.security.api.SecurityService"
+             name="securityService"
+             policy="static" />
+  <reference bind="setMailService"
+             cardinality="1..1"
+             interface="org.opencastproject.messages.MailService"
+             name="mailService"
+             policy="static" />
+  <reference bind="setParticipationDatabase"
+             cardinality="0..1"
+             interface="org.opencastproject.pm.api.persistence.ParticipationManagementDatabase"
+             name="participationDatabase"
+             policy="dynamic" />
+  <reference bind="setEmailSender"
+             cardinality="1..1"
+             interface="org.opencastproject.pm.api.EmailSender"
+             name="participationEmailSender"
+             policy="static" />
+  <reference bind="setSchedulerService"
+             cardinality="1..1"
+             interface="org.opencastproject.scheduler.api.SchedulerService"
+             name="schedulerService"
+             policy="static" />
+</scr:component>

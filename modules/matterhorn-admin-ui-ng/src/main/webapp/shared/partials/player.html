@@ -1,0 +1,86 @@
+<div class="video-player">
+    <div>
+        <video id="player" controls ng-if="controls === 'true'">
+            <source ng-repeat="preview in video.previews" ng-src="{{ preview.uri | trusted }}" type="video/mp4" />
+            Your browser does not support HTML5 video.
+        </video>
+        <video id="player" ng-if="controls === 'false'">
+            <source ng-repeat="preview in video.previews" ng-src="{{ preview.uri | trusted }}" type="video/mp4" />
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
+</div>
+
+<div class="video-controls">
+    <div class="volume-controls">
+    <!--
+        <div class="volume-toggle-button"></div>
+        <div class="volume-slider">
+            <input type="range" value="100">
+        </div>
+    -->
+    </div>
+    <div class="playback-controls">
+        <div class="playback-controls-wrapper">
+            <div class="playback-jump-to-start" ng-class="{disabled:positionStart}" ng-click="previousSegment()"></div>
+            <div class="playback-rewind" ng-class="{disabled:playing}" ng-click="previousFrame()"></div>
+            <div class="play" ng-class="{'playback-toggle-pause': playing, 'playback-toggle-play': !playing}" ng-click="play()"></div>
+            <div class="playback-fast-forward" ng-class="{disabled:playing}" ng-click="nextFrame()"></div>
+            <div class="playback-jump-to-end" ng-class="{disabled:positionEnd}" ng-click="nextSegment()"></div>
+        </div>
+    </div>
+    <div class="timecode-controls">
+        <div class="timecode-wrapper">
+            <div class="timecode-segments">
+
+                <div class="time-value">
+                    <div class="timecode-input">
+                        <input id="timecode-hour" name="hour" type="number"
+                            max="59" maxlength="2"
+                            ng-model="time.hours">
+                        <span class="colon-sep">:</span>
+                    </div>
+                    <div class="timecode-label">
+                        <label for="timecode-hour">Hr</label>
+                    </div>
+                </div>
+
+                <div class="time-value">
+                    <div class="timecode-input">
+                        <input id="timecode-minute" name="minute" type="number"
+                            max="59" maxlength="2"
+                            ng-model="time.minutes">
+                        <span class="colon-sep">:</span>
+                    </div>
+                    <div class="timecode-label">
+                        <label for="timecode-minute">Min</label>
+                    </div>
+                </div>
+
+                <div class="time-value">
+                    <div class="timecode-input">
+                        <input id="timecode-second" name="second" type="number"
+                            max="59" maxlength="2"
+                            ng-model="time.seconds">
+                        <span class="colon-sep">.</span>
+                    </div>
+                    <div class="timecode-label">
+                        <label for="timecode-second">Sec</label>
+                    </div>
+                </div>
+
+                <div class="time-value frame-value">
+                    <div class="timecode-input">
+                        <input id="timecode-frame" name="frame" type="number"
+                            max="999" maxlength="3"
+                            ng-model="time.milliseconds">
+                    </div>
+                    <div class="timecode-label">
+                        <label for="timecode-frame">Ms</label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,63 @@
+<div class="action-bar">
+    <ul>
+        <li><a data-open-modal="edit-table-view-modal" data-table="table">Edit</a></li>
+    </ul>
+</div>
+<div id="length-div" style="position: absolute; visibility: hidden; height: auto; width: auto; white-space: nowrap;">
+</div>
+<table class="main-tbl">
+    <thead>
+        <tr>
+            <th ng-if="table.multiSelect" class="small">
+                <input type="checkbox" ng-change="table.toggleAllSelectionFlags()" ng-model="table.all"/>
+            </th>
+
+            <th ng-init="calculateStyles()"
+                ng-repeat="column in table.columns"
+                ng-style="column.style"
+                ng-if="!column.deactivated"
+                ng-class="{ 'col-sort': table.predicate === column.name, 'no-sort': column.dontSort }"
+                ng-click="table.sortBy(column)">
+                <span translate="{{ column.label }}"></span>
+                <i ng-if="!column.dontSort" class="sort"
+                   ng-class="{ asc: table.predicate === column.name && !table.reverse, desc: table.predicate === column.name && table.reverse }"></i>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="row in table.rows track by $index" data-row-id="{{ row.id }}" >
+            <td ng-if="table.multiSelect"><input type="checkbox" ng-model="row.selected"></td>
+            <td ng-repeat-start="column in table.columns" ng-if="!column.template && !column.translate && !column.deactivated">
+                {{ row[column.name] }}
+            </td>
+            <td ng-if="!column.template && column.translate && !column.deactivated">
+                {{ row[column.name] | translate }}
+            </td>
+            <td ng-repeat-end ng-if="column.template && !column.deactivated" ng-include="column.template">
+            </td>
+        </tr>
+        <tr ng-if="table.rows.length === 0 && table.loading === false">
+            <td colspan="{{table.columns.length}}" translate="TABLE_NO_RESULT"></td>
+        </tr>
+    </tbody>
+</table>
+
+
+<div id="tbl-view-controls-container">
+    <div class="drop-down-container small flipped" old-admin-ng-dropdown fn="table.updatePageSize">
+        <span>{{ table.pagination.limit }}</span>
+        <ul class="dropdown-ul">
+            <li><a>10</a></li>
+            <li><a>20</a></li>
+            <li><a>30</a></li>
+        </ul>
+    </div>
+
+    <div class="pagination">
+       <a class="prev" ng-class="{disabled: !table.isNavigatePrevious()}" ng-click="table.goToPage(table.pagination.offset - 1)"></a>
+       <a ng-repeat-start="page in table.getDirectAccessiblePages()" ng-class="{wide: table.maxLabel.length > 2}" ng-if="page.active" class="active">{{ page.label }}</a>
+       <a ng-click="table.goToPage(page.number)" ng-class="{wide: table.maxLabel.length > 2}" ng-repeat-end ng-if="!page.active">{{ page.label }}</a>
+       <a class="next" ng-class="{disabled: !table.isNavigateNext()}" ng-click="table.goToPage(table.pagination.offset + 1)" ></a>
+    </div>
+</div>
+

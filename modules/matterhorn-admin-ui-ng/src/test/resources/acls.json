@@ -1,0 +1,46 @@
+{
+    "total": 2,
+    "limit": 100,
+    "count": 2,
+    "results": [
+        {
+            "id": 1,
+            "acl": {
+                "ace": [
+                    {
+                        "allow": true,
+                        "action": "read",
+                        "role": "ROLE_ADMIN"
+                    },
+                    {
+                        "allow": true,
+                        "action": "read",
+                        "role": "ROLE_ANONYMOUS"
+                    }
+                ]
+            },
+            "name": "public",
+            "organizationId": "mh_default_org"
+        },
+        {
+            "id": 2,
+            "acl": {
+                "ace": [
+                    {
+                        "allow": false,
+                        "action": "read",
+                        "role": "ROLE_ADMIN"
+                    },
+                    {
+                        "allow": false,
+                        "action": "read",
+                        "role": "ROLE_ANONYMOUS"
+                    }
+                ]
+            },
+            "name": "private",
+            "organizationId": "mh_default_org"
+        }
+    ],
+    "offset": 0
+}

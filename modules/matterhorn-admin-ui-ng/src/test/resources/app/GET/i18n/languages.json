@@ -1,0 +1,137 @@
+{
+   "bestLanguage": {
+      "code": "en_US",
+      "displayLanguage":"English",
+      "dateFormats": {
+        "dateTime": {
+            "short": "M/d/yy h:mm a",
+            "medium": "MMM d, yyyy h:mm:ss a",
+            "full": "EEEE, MMMM d, yyyy h:mm:ss a z"
+        },
+        "date": {
+            "short": "M/d/yy",
+            "medium": "MMM d, yyyy h:mm:ss a",
+            "full": "EEEE, MMMM d, yyyy"
+        },
+        "time": {
+            "short": "h:mm a",
+            "medium": "h:mm:ss a",
+            "full": "h:mm:ss a z"
+        }
+      }
+   },
+   "fallbackLanguage": {
+      "code": "en_US",
+      "displayLanguage":"English",
+      "dateFormats": {
+        "medium": "tt.MM.uuuu HH:mm:ss"
+      }
+   },
+   "availableLanguages":[
+      {
+         "dateFormats":{
+            "time":{
+               "short":"HH:mm",
+               "full":"HH:mm' Uhr 'z",
+               "medium":"HH:mm:ss"
+            },
+            "dateTime":{
+               "short":"dd.MM.yy HH:mm",
+               "full":"EEEE, d. MMMM yyyy HH:mm' Uhr 'z",
+               "medium":"dd.MM.yyyy HH:mm:ss"
+            },
+            "date":{
+               "short":"dd.MM.yy",
+               "full":"EEEE, d. MMMM yyyy",
+               "medium":"dd.MM.yyyy"
+            }
+         },
+         "displayLanguage":"German",
+         "code":"de_DE"
+      },
+      {
+         "dateFormats":{
+            "time":{
+               "short":"h:mm a",
+               "full":"h:mm:ss a z",
+               "medium":"h:mm:ss a"
+            },
+            "dateTime":{
+               "short":"M\/d\/yy h:mm a",
+               "full":"EEEE, MMMM d, yyyy h:mm:ss a z",
+               "medium":"MMM d, yyyy h:mm:ss a"
+            },
+            "date":{
+               "short":"M\/d\/yy",
+               "full":"EEEE, MMMM d, yyyy",
+               "medium":"MMM d, yyyy"
+            }
+         },
+         "displayLanguage":"English",
+         "code":"en_US"
+      },
+      {
+         "dateFormats":{
+            "time":{
+               "short":"h時mm分",
+               "full":"h時mm分ss秒 z",
+               "medium":"h時mm分ss秒"
+            },
+            "dateTime":{
+               "short":"yyyy年MM月dd日HH:mm:ss",
+               "full":"yyyy年MM月dd日火曜日HH時mm分ss秒 z",
+               "medium":"yyyy年MM月dd日火曜日HH時mm分ss秒"
+            },
+            "date":{
+               "short":"yyyy年MM月dd日",
+               "full":"yyyy年MM月dd日",
+               "medium":"yyyy年MM月dd日"
+            }
+         },
+         "displayLanguage":"Japanese",
+         "code":"ja_JP"
+      },
+      {
+         "dateFormats":{
+            "time":{
+               "short":"h:mm a",
+               "full":"h:mm:ss a z",
+               "medium":"h:mm:ss a"
+            },
+            "dateTime":{
+               "short":"M\/d\/yy h:mm a",
+               "full":"EEEE, MMMM d, yyyy h:mm:ss a z",
+               "medium":"MMM d, yyyy h:mm:ss a"
+            },
+            "date":{
+               "short":"M\/d\/yy",
+               "full":"EEEE, MMMM d, yyyy",
+               "medium":"MMM d, yyyy"
+            }
+         },
+         "displayLanguage":"Norsk",
+         "code":"no_NO"
+      },
+      {
+         "dateFormats":{
+            "time":{
+               "short":"h:mm a",
+               "full":"h:mm:ss a z",
+               "medium":"h:mm:ss a"
+            },
+            "dateTime":{
+               "short":"M\/d\/yy h:mm a",
+               "full":"EEEE, MMMM d, yyyy h:mm:ss a z",
+               "medium":"MMM d, yyyy h:mm:ss a"
+            },
+            "date":{
+               "short":"M\/d\/yy",
+               "full":"EEEE, MMMM d, yyyy",
+               "medium":"MMM d, yyyy"
+            }
+         },
+         "displayLanguage":"French",
+         "code":"fr_FR"
+      }
+   ]
+}

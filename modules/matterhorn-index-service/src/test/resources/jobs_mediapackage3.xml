@@ -1,0 +1,134 @@
+<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org"
+	id="10.0000/1" start="2007-12-05T13:40:00" duration="1004400000">
+	<oc:title>Mediapackage 3</oc:title>
+	<oc:series>serie1</oc:series>
+	<oc:seriestitle>Serie 1</oc:seriestitle>
+    <oc:contributors>
+            <oc:contributor>George</oc:contributor>
+    </oc:contributors>
+	<oc:media>
+		<oc:track id="publish-track-1" type="presentation/source">
+			<oc:mimetype>video/quicktime</oc:mimetype>
+			<oc:url>media.mov</oc:url>
+			<oc:checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</oc:checksum>
+			<oc:duration>1004400000</oc:duration>
+			<oc:tags>
+				<oc:tag>engage</oc:tag>
+			</oc:tags>
+			<oc:video>
+				<oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+				<oc:encoder type="H.264" version="7.4" vendor="Apple Inc" />
+				<oc:resolution>640x480</oc:resolution>
+				<oc:scanType type="progressive" />
+				<oc:bitrate>540520</oc:bitrate>
+				<oc:frameRate>2</oc:frameRate>
+			</oc:video>
+		</oc:track>
+		<oc:track id="publish-track-2" type="presentation/source">
+			<oc:mimetype>video/quicktime</oc:mimetype>
+			<oc:url>media.mov</oc:url>
+			<oc:checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</oc:checksum>
+			<oc:duration>1004400000</oc:duration>
+			<oc:tags>
+				<oc:tag>engage</oc:tag>
+				<oc:tag>publish</oc:tag>
+			</oc:tags>
+			<oc:video>
+				<oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+				<oc:encoder type="H.264" version="7.4" vendor="Apple Inc" />
+				<oc:resolution>640x480</oc:resolution>
+				<oc:scanType type="progressive" />
+				<oc:bitrate>540520</oc:bitrate>
+				<oc:frameRate>2</oc:frameRate>
+			</oc:video>
+		</oc:track>
+		<oc:track id="publish-track-3" ref="track:publish-track-1" type="presentation/source">
+			<oc:mimetype>video/quicktime</oc:mimetype>
+			<oc:url>media.mov</oc:url>
+			<oc:checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</oc:checksum>
+			<oc:duration>1004400000</oc:duration>
+			<oc:tags>
+				<oc:tag>engage</oc:tag>
+				<oc:tag>publish</oc:tag>
+			</oc:tags>
+			<oc:video>
+				<oc:device type="UFG03" version="30112007" vendor="Unigraf" />
+				<oc:encoder type="H.264" version="7.4" vendor="Apple Inc" />
+				<oc:resolution>640x480</oc:resolution>
+				<oc:scanType type="progressive" />
+				<oc:bitrate>540520</oc:bitrate>
+				<oc:frameRate>2</oc:frameRate>
+			</oc:video>
+		</oc:track>
+	</oc:media>
+	<oc:metadata>
+		<oc:catalog id="publish-catalog-1" type="dublincore/episode">
+			<oc:mimetype>text/xml</oc:mimetype>
+			<oc:url>dublincore.xml</oc:url>
+			<oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+		</oc:catalog>
+		<oc:catalog id="publish-catalog-2" type="metadata/mpeg-7">
+			<oc:mimetype>text/xml</oc:mimetype>
+			<oc:tags>
+				<oc:tag>engage</oc:tag>
+				<oc:tag>publish</oc:tag>
+			</oc:tags>
+			<oc:url>mpeg7.xml</oc:url>
+			<oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+		</oc:catalog>
+		<oc:catalog id="publish-catalog-3" ref="track:publish-track-1" type="presentation/source">
+			<oc:mimetype>text/xml</oc:mimetype>
+			<oc:tags>
+				<oc:tag>engage</oc:tag>
+				<oc:tag>publish</oc:tag>
+			</oc:tags>
+			<oc:url>mpeg7.xml</oc:url>
+			<oc:checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</oc:checksum>
+		</oc:catalog>
+		<oc:catalog id="publish-catalog-4" type="dublincore/series">
+			<oc:mimetype>text/xml</oc:mimetype>
+			<oc:url>dublincore2.xml</oc:url>
+		</oc:catalog>
+	</oc:metadata>
+	<oc:attachments>
+		<oc:attachment id="publish-attachment-1" type="attachment/notes">
+			<oc:mimetype>text/plain</oc:mimetype>
+			<oc:url>attachment.txt</oc:url>
+			<oc:tags>
+				<oc:tag>atom</oc:tag>
+				<oc:tag>rss</oc:tag>
+			</oc:tags>
+			<oc:checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</oc:checksum>
+		</oc:attachment>
+		<oc:attachment id="publish-attachment-2" type="attachment/notes">
+			<oc:mimetype>text/plain</oc:mimetype>
+			<oc:url>attachment.txt</oc:url>
+			<oc:tags>
+				<oc:tag>atom</oc:tag>
+				<oc:tag>rss</oc:tag>
+				<oc:tag>publish</oc:tag>
+			</oc:tags>
+			<oc:checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</oc:checksum>
+		</oc:attachment>
+		<oc:attachment id="publish-attachment-3" ref="track:publish-track-1" type="presentation/source">
+			<oc:mimetype>text/plain</oc:mimetype>
+			<oc:url>attachment.txt</oc:url>
+			<oc:tags>
+				<oc:tag>atom</oc:tag>
+				<oc:tag>rss</oc:tag>
+				<oc:tag>publish</oc:tag>
+			</oc:tags>
+			<oc:checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</oc:checksum>
+		</oc:attachment>
+	</oc:attachments>
+	<oc:publications>
+		<oc:publication id="presentation-1" channel="engage">
+			<oc:url>engage.html?e=p-1</oc:url>
+			<oc:mimetype>text/html</oc:mimetype>
+		</oc:publication>
+		<oc:publication id="presentation-2" channel="oai-pmh">
+			<oc:url>oaipmh.html?e=p-1</oc:url>
+			<oc:mimetype>text/html</oc:mimetype>
+		</oc:publication>
+	</oc:publications>
+</oc:mediapackage>

@@ -26,6 +26,13 @@ public interface UserProvider {
   String ALL_ORGANIZATIONS = "*";
 
   /**
+   * Gets the provider name
+   *
+   * @return the provider name
+   */
+  String getName();
+
+  /**
    * Gets all known users.
    *
    * @return the users
@@ -64,5 +71,13 @@ public interface UserProvider {
    *           if the query is <code>null</code>
    */
   Iterator<User> findUsers(String query, int offset, int limit);
+
+  /**
+   * Discards any cached value for given user name.
+   *
+   * @param userName
+   *          the user name
+   */
+  void invalidate(String userName);
 
 }

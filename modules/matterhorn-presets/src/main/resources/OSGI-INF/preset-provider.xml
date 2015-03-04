@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.presets.impl.PresetProviderImpl"
+  immediate="true">
+  <implementation class="org.opencastproject.presets.impl.PresetProviderImpl" />
+  <property name="service.description" value="Provides Series and Organization Presets" />
+  <service>
+    <provide interface="org.opencastproject.presets.api.PresetProvider" />
+  </service>
+  <reference name="SecurityService" interface="org.opencastproject.security.api.SecurityService"
+      cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
+          cardinality="1..1" policy="static" bind="setSeriesService"/>
+</scr:component>

@@ -1185,7 +1185,9 @@ public final class MediaPackageImpl implements MediaPackage {
       mediaPackageElementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
     }
     MediaPackageElement element = mediaPackageElementBuilder.elementFromURI(url);
+    integrate(element);
     addInternal(element);
+    fireElementAdded(element);
     return element;
   }
 
@@ -1205,7 +1207,9 @@ public final class MediaPackageImpl implements MediaPackage {
       mediaPackageElementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
     }
     MediaPackageElement element = mediaPackageElementBuilder.elementFromURI(uri, type, flavor);
+    integrate(element);
     addInternal(element);
+    fireElementAdded(element);
     return element;
   }
 

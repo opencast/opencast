@@ -36,6 +36,15 @@ public class JaxbHostRegistration implements HostRegistration {
   @XmlElement(name = "base_url")
   protected String baseUrl;
 
+  @XmlElement(name = "address")
+  protected String address;
+
+  @XmlElement(name = "memory")
+  protected long memory;
+
+  @XmlElement(name = "cores")
+  protected int cores;
+
   /**
    * The maximum number of concurrent jobs this host can run. Typically, this is the number of cores available to the
    * JVM.
@@ -66,6 +75,12 @@ public class JaxbHostRegistration implements HostRegistration {
    *
    * @param baseUrl
    *          the base URL for this host
+   * @param address
+   *          the IP address for this host
+   * @param memory
+   *          the allocated memory of this host
+   * @param cores
+   *          the available cores of this host
    * @param maxJobs
    *          the maximum number of concurrent jobs that this host can run.
    * @param online
@@ -73,8 +88,12 @@ public class JaxbHostRegistration implements HostRegistration {
    * @param online
    *          whether the host is in maintenance mode
    */
-  public JaxbHostRegistration(String baseUrl, int maxJobs, boolean online, boolean maintenance) {
+  public JaxbHostRegistration(String baseUrl, String address, long memory, int cores, int maxJobs, boolean online,
+          boolean maintenance) {
     this.baseUrl = baseUrl;
+    this.address = address;
+    this.memory = memory;
+    this.cores = cores;
     this.maxJobs = maxJobs;
     this.online = online;
     this.maintenanceMode = maintenance;
@@ -88,6 +107,9 @@ public class JaxbHostRegistration implements HostRegistration {
    */
   public JaxbHostRegistration(HostRegistration hostRegistration) {
     this.baseUrl = hostRegistration.getBaseUrl();
+    this.address = hostRegistration.getIpAddress();
+    this.memory = hostRegistration.getMemory();
+    this.cores = hostRegistration.getCores();
     this.maxJobs = hostRegistration.getMaxJobs();
     this.online = hostRegistration.isOnline();
     this.active = hostRegistration.isActive();
@@ -112,6 +134,66 @@ public class JaxbHostRegistration implements HostRegistration {
   @Override
   public void setBaseUrl(String baseUrl) {
     this.baseUrl = baseUrl;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#getIpAddress()
+   */
+  @Override
+  public String getIpAddress() {
+    return address;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#setIpAddress(String)
+   */
+  @Override
+  public void setIpAddress(String address) {
+    this.address = address;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#getMemory()
+   */
+  @Override
+  public long getMemory() {
+    return memory;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#setMemory(long)
+   */
+  @Override
+  public void setMemory(long memory) {
+    this.memory = memory;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#getCores()
+   */
+  @Override
+  public int getCores() {
+    return cores;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#setCores(int)
+   */
+  @Override
+  public void setCores(int cores) {
+    this.cores = cores;
   }
 
   /**

@@ -1,0 +1,15 @@
+{
+  "recordings": [{
+    "id": 2,
+    "title": "Test"
+  }],
+  "recipients": [{
+    "id": 2,
+    "email": "lukas@entwinemedia.com",
+    "name": "Lukas Rohner Entwine"
+  }, {
+    "id": 1,
+    "email": "xavier@entwinemedia.com",
+    "name": "Xavier Butty Entwine"
+  }]
+}

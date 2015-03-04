@@ -24,6 +24,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -49,6 +50,7 @@ import org.opencastproject.workflow.api.WorkflowStateListener;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 
 import junit.framework.Assert;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -112,6 +114,7 @@ public class CountWorkflowsTest {
 
     // instantiate a service implementation and its DAO, overriding the methods that depend on the osgi runtime
     service = new WorkflowServiceImpl() {
+      @Override
       public Set<HandlerRegistration> getRegisteredHandlers() {
         return handlerRegistrations;
       }
@@ -129,7 +132,8 @@ public class CountWorkflowsTest {
     service.setSecurityService(securityService);
 
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject())).andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
+    EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
+            .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
@@ -153,6 +157,9 @@ public class CountWorkflowsTest {
     EasyMock.replay(mds);
     service.addMetadataService(mds);
 
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(messageSender);
+
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
@@ -164,6 +171,7 @@ public class CountWorkflowsTest {
     dao.setOrgDirectory(organizationDirectoryService);
     dao.activate("System Admin");
     service.setDao(dao);
+    service.setMessageSender(messageSender);
     service.activate(null);
 
     service.setServiceRegistry(serviceRegistry);

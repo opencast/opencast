@@ -1,0 +1,150 @@
+[
+   {
+      "readOnly":false,
+      "id":"language",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE",
+      "collection":{
+         "Entry 1":"Value 1",
+         "Entry 3":"Value 3",
+         "Entry 2":"Value 2"
+      },
+      "type":"text",
+      "value":"en",
+      "required":false
+   },
+   {
+      "readOnly":true,
+      "id":"created",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.CREATED",
+      "type":"date",
+      "value":"2014-11-12T17:47:37Z",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"license",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.LICENSE",
+      "type":"text",
+      "value":"Creative Commons 3.0: Attribution-NonCommercial-NoDerivs",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"description",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.DESCRIPTION",
+      "type":"text",
+      "value":"The description of the Event",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"duration",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.DURATION",
+      "type":"text",
+      "value":"01:25:00",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"startDate",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+      "type":"date",
+      "value":"2015-03-24",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"startTime",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.START_TIME",
+      "type":"time",
+      "value":"14:15",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"rightsHolder",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.RIGHTS",
+      "type":"text",
+      "value":"The rights for the Event",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"subject",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
+      "type":"text",
+      "value":"The subject for the Event",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"title",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+      "type":"text",
+      "value":"The Title of the Event",
+      "required":true
+   },
+   {
+      "readOnly":false,
+      "id":"agent",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.AGENT",
+      "type":"text",
+      "value":"",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"contributors",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
+      "collection":{
+         "Entry 1":"Value 1",
+         "Entry 3":"Value 3",
+         "Entry 2":"Value 2"
+      },
+      "type":"text",
+      "value":"",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"presenters",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS",
+      "collection":{
+         "Entry 1":"Value 1",
+         "Entry 3":"Value 3",
+         "Entry 2":"Value 2"
+      },
+      "type":"text",
+      "value":"",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"series",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.SERIES",
+      "collection":{
+         "Entry 1":"Value 1",
+         "Entry 3":"Value 3",
+         "Entry 2":"Value 2"
+      },
+      "type":"text",
+      "value":"",
+      "required":false
+   },
+   {
+      "readOnly":false,
+      "id":"source",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.SOURCE",
+      "type":"text",
+      "value":"",
+      "required":false
+   },
+   {
+      "readOnly":true,
+      "id":"uid",
+      "label":"EVENTS.EVENTS.DETAILS.METADATA.UID",
+      "type":"text",
+      "value":"",
+      "required":false
+   }
+]

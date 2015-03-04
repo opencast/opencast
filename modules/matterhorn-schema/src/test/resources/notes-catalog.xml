@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<notes xmlns="http://notes.opencastproject.org">
+  <note-entry>
+    <key>org.opencastproject.audionormalization</key>
+    <type>Text</type>
+    <value>Hello world</value>
+  </note-entry>
+  <note-entry>
+    <key>org.opencastproject.mediarelease</key>
+    <type>Boolean</type>
+    <value>False</value>
+  </note-entry>
+</notes>
+
