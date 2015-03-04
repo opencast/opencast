@@ -15,9 +15,9 @@
  */
 package org.opencastproject.search.impl.persistence;
 
-import static org.opencastproject.search.api.SearchService.CONTRIBUTE_PERMISSION;
-import static org.opencastproject.search.api.SearchService.READ_PERMISSION;
-import static org.opencastproject.search.api.SearchService.WRITE_PERMISSION;
+import static org.opencastproject.security.api.Permissions.Action.CONTRIBUTE;
+import static org.opencastproject.security.api.Permissions.Action.READ;
+import static org.opencastproject.security.api.Permissions.Action.WRITE;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -191,7 +191,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE_PERMISSION))
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString()))
           throw new UnauthorizedException(currentUser + " is not authorized to delete media package " + mediaPackageId);
 
         searchEntity.setDeletionDate(deletionDate);
@@ -310,7 +310,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           AccessControlList accessList = AccessControlParser.parseAcl(accessControlXml);
           User currentUser = securityService.getUser();
           Organization currentOrg = securityService.getOrganization();
-          if (!AccessControlUtil.isAuthorized(accessList, currentUser, currentOrg, WRITE_PERMISSION)) {
+          if (!AccessControlUtil.isAuthorized(accessList, currentUser, currentOrg, WRITE.toString())) {
             throw new UnauthorizedException(currentUser + " is not authorized to update media package "
                     + mediaPackageId);
           }
@@ -359,9 +359,9 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
         // There are several reasons a user may need to load a episode: to read content, to edit it, or add content
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ_PERMISSION)
-                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, CONTRIBUTE_PERMISSION)
-                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE_PERMISSION)) {
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString())
+                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, CONTRIBUTE.toString())
+                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString())) {
           throw new UnauthorizedException(currentUser + " is not authorized to see episode " + mediaPackageId);
         }
       }
@@ -402,7 +402,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ_PERMISSION))
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString()))
           throw new UnauthorizedException(currentUser + " is not authorized to read media package " + mediaPackageId);
       }
       return searchEntity.getModificationDate();
@@ -443,7 +443,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ_PERMISSION))
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString()))
           throw new UnauthorizedException(currentUser + " is not authorized to read media package " + mediaPackageId);
       }
       return searchEntity.getDeletionDate();
@@ -483,7 +483,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ_PERMISSION))
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString()))
           throw new UnauthorizedException(currentUser + " is not authorized to read media package " + mediaPackageId);
       }
       return searchEntity.getOrganization();

@@ -1,0 +1,88 @@
+{
+   "bestLanguage":{
+      "dateFormats":{
+         "time":{
+            "short":"HH:mm",
+            "full":"HH:mm' Uhr 'z",
+            "medium":"HH:mm:ss"
+         },
+         "dateTime":{
+            "short":"dd.MM.yy HH:mm",
+            "full":"EEEE, d. MMMM yyyy HH:mm' Uhr 'z",
+            "medium":"dd.MM.yyyy HH:mm:ss"
+         },
+         "date":{
+            "short":"dd.MM.yy",
+            "full":"EEEE, d. MMMM yyyy",
+            "medium":"dd.MM.yyyy"
+         }
+      },
+      "displayLanguage":"German",
+      "code":"de_DE"
+   },
+   "fallbackLanguage":{
+      "dateFormats":{
+         "time":{
+            "short":"h:mm a",
+            "full":"h:mm:ss a z",
+            "medium":"h:mm:ss a"
+         },
+         "dateTime":{
+            "short":"M\/d\/yy h:mm a",
+            "full":"EEEE, MMMM d, yyyy h:mm:ss a z",
+            "medium":"MMM d, yyyy h:mm:ss a"
+         },
+         "date":{
+            "short":"M\/d\/yy",
+            "full":"EEEE, MMMM d, yyyy",
+            "medium":"MMM d, yyyy"
+         }
+      },
+      "displayLanguage":"English",
+      "code":"en"
+   },
+   "availableLanguages":[
+      {
+         "dateFormats":{
+            "time":{
+               "short":"HH:mm",
+               "full":"HH:mm' Uhr 'z",
+               "medium":"HH:mm:ss"
+            },
+            "dateTime":{
+               "short":"dd.MM.yy HH:mm",
+               "full":"EEEE, d. MMMM yyyy HH:mm' Uhr 'z",
+               "medium":"dd.MM.yyyy HH:mm:ss"
+            },
+            "date":{
+               "short":"dd.MM.yy",
+               "full":"EEEE, d. MMMM yyyy",
+               "medium":"dd.MM.yyyy"
+            }
+         },
+         "displayLanguage":"German",
+         "code":"de_DE"
+      },
+      {
+         "dateFormats":{
+            "time":{
+               "short":"h:mm a",
+               "full":"h:mm:ss a z",
+               "medium":"h:mm:ss a"
+            },
+            "dateTime":{
+               "short":"M\/d\/yy h:mm a",
+               "full":"EEEE, MMMM d, yyyy h:mm:ss a z",
+               "medium":"MMM d, yyyy h:mm:ss a"
+            },
+            "date":{
+               "short":"M\/d\/yy",
+               "full":"EEEE, MMMM d, yyyy",
+               "medium":"MMM d, yyyy"
+            }
+         },
+         "displayLanguage":"English",
+         "code":"en_US"
+      }
+   ]
+}

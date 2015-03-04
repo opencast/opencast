@@ -48,6 +48,11 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.archive.api.Archive;
+import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
+import org.opencastproject.archive.api.Query;
+import org.opencastproject.archive.api.ResultItem;
+import org.opencastproject.archive.base.QueryBuilder;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -60,10 +65,6 @@ import org.opencastproject.authorization.xacml.manager.api.TransitionResult;
 import org.opencastproject.authorization.xacml.manager.impl.AclTransitionDbDuplicatedException;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
 import org.opencastproject.authorization.xacml.manager.impl.Util;
-import org.opencastproject.episode.api.EpisodeQuery;
-import org.opencastproject.episode.api.EpisodeService;
-import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
-import org.opencastproject.episode.api.SearchResultItem;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
@@ -127,7 +128,7 @@ public abstract class AbstractAclServiceRestEndpoint {
 
   protected abstract AuthorizationService getAuthorizationService();
 
-  protected abstract EpisodeService getEpisodeService();
+  protected abstract Archive<?> getArchive();
 
   protected abstract SeriesService getSeriesService();
 
@@ -526,9 +527,8 @@ public abstract class AbstractAclServiceRestEndpoint {
 
   private Either<AccessControlList, Tuple<ManagedAcl, AclScope>> getActiveAclForEpisode(AclService aclService,
           String episodeId) {
-    final EpisodeQuery queryForEpisode = EpisodeQuery.query(getSecurityService()).id(episodeId).onlyLastVersion();
-    for (SearchResultItem sr : mlist(
-            getEpisodeService().find(queryForEpisode, getHttpMediaPackageElementProvider().getUriRewriter()).getItems())
+    final Query q = QueryBuilder.query().mediaPackageId(episodeId).onlyLastVersion(true);
+    for (ResultItem sr : mlist(getArchive().find(q, getHttpMediaPackageElementProvider().getUriRewriter()).getItems())
             .headOpt()) {
       // get active ACL of found media package
       final Tuple<AccessControlList, AclScope> activeAcl = getAuthorizationService().getActiveAcl(sr.getMediaPackage());
@@ -539,7 +539,7 @@ public abstract class AbstractAclServiceRestEndpoint {
       return left(activeAcl.getA());
     }
     // episode does not exist
-    logger.warn("Episode {} cannot be found in EpisodeService", episodeId);
+    logger.warn("Episode {} cannot be found in Archive", episodeId);
     return left(EMPTY_ACL);
   }
 
@@ -585,6 +585,47 @@ public abstract class AbstractAclServiceRestEndpoint {
       throw new NotFoundException();
     }
     return JsonConv.full(managedAcl.get()).toJson();
+  }
+
+  @POST
+  @Path("/acl/extend")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "extendacl", description = "Return the given ACL with a new role and action in JSON format", returnDescription = "Return the ACL with the new role and action in JSON format", restParameters = {
+          @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING),
+          @RestParameter(name = "action", isRequired = true, description = "The action for the ACL", type = STRING),
+          @RestParameter(name = "role", isRequired = true, description = "The role for the ACL", type = STRING),
+          @RestParameter(name = "allow", isRequired = true, description = "The allow status for the ACL", type = BOOLEAN) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been returned"),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The ACL, action or role was invalid or empty"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during returning the ACL") })
+  public String extendAcl(@FormParam("acl") String accessControlList, @FormParam("action") String action,
+          @FormParam("role") String role, @FormParam("allow") boolean allow) {
+    if (StringUtils.isBlank(accessControlList) || StringUtils.isBlank(action) || StringUtils.isBlank(role)) {
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
+
+    AccessControlList acl = AccessControlUtil.extendAcl(parseAcl.apply(accessControlList), role, action, allow);
+    return JsonConv.full(acl).toJson();
+  }
+
+  @POST
+  @Path("/acl/reduce")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "reduceacl", description = "Return the given ACL without a role and action in JSON format", returnDescription = "Return the ACL without the role and action in JSON format", restParameters = {
+          @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING),
+          @RestParameter(name = "action", isRequired = true, description = "The action for the ACL", type = STRING),
+          @RestParameter(name = "role", isRequired = true, description = "The role for the ACL", type = STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been returned"),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The ACL, role or action was invalid or empty"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during returning the ACL") })
+  public String reduceAcl(@FormParam("acl") String accessControlList, @FormParam("action") String action,
+          @FormParam("role") String role) {
+    if (StringUtils.isBlank(accessControlList) || StringUtils.isBlank(action) || StringUtils.isBlank(role)) {
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
+
+    AccessControlList acl = AccessControlUtil.reduceAcl(parseAcl.apply(accessControlList), role, action);
+    return JsonConv.full(acl).toJson();
   }
 
   @GET
@@ -691,10 +732,10 @@ public abstract class AbstractAclServiceRestEndpoint {
   @RestQuery(name = "applyAclToSeries", description = "Immediate application of an ACL to a series", returnDescription = "Status code", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series ID", type = STRING) }, restParameters = {
           @RestParameter(name = "aclId", isRequired = true, description = "The ID of the ACL to apply", type = INTEGER),
           @RestParameter(name = "override", isRequired = false, defaultValue = "false", description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING),
-          @RestParameter(name = "workflowDefinitionId", isRequired = false, description = "The optional workflow to apply to the episode after", type = STRING),
+          @RestParameter(name = "workflowDefinitionId", isRequired = false, description = "The optional workflow to apply to the series after", type = STRING),
           @RestParameter(name = "workflowParams", isRequired = false, description = "Parameters for the optional workflow", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL or the episode has not been found"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL or the series has not been found"),
           @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error") })
   public Response applyAclToSeries(@PathParam("seriesId") String seriesId, @FormParam("aclId") long aclId,
           @DefaultValue("false") @FormParam("override") boolean override,

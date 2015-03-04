@@ -68,6 +68,10 @@ public class SchedulerQuery {
   protected Date endsTo;
   /** Rights holder search */
   protected String rightsHolder;
+  /** Whether the event is opted out */
+  protected boolean optOut = false;
+  /** Whether the event is blacklisted */
+  protected boolean blacklisted = false;
   /** Sort by field */
   protected Sort sort = Sort.EVENT_START;
   /** Sort order */
@@ -301,6 +305,28 @@ public class SchedulerQuery {
   }
 
   /**
+   * Set search by opt out status
+   *
+   * @param optOut
+   * @return
+   */
+  public SchedulerQuery setOptOut(boolean optOut) {
+    this.optOut = optOut;
+    return this;
+  }
+
+  /**
+   * Set search by blacklist status
+   *
+   * @param blacklisted
+   * @return
+   */
+  public SchedulerQuery setBlacklisted(boolean blacklisted) {
+    this.blacklisted = blacklisted;
+    return this;
+  }
+
+  /**
    * Set search by title.
    *
    * @param title
@@ -338,6 +364,7 @@ public class SchedulerQuery {
     }
     return this;
   }
+
   /**
    * Set sort field with ascending order
    *
@@ -534,6 +561,24 @@ public class SchedulerQuery {
    */
   public String getRightsHolder() {
     return rightsHolder;
+  }
+
+  /**
+   * Get opt out status
+   *
+   * @return
+   */
+  public boolean isOptOut() {
+    return optOut;
+  }
+
+  /**
+   * Get blacklist status
+   *
+   * @return
+   */
+  public boolean isBlacklisted() {
+    return blacklisted;
   }
 
   public String getIdentifier() {

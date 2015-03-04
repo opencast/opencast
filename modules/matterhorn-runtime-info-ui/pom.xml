@@ -13,54 +13,6 @@
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-json</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-    </dependency>
-    <!-- Testing -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
   <build>
     <plugins>
       <plugin>
@@ -170,31 +122,10 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Bundle-Activator>org.opencastproject.runtimeinfo.Activator</Bundle-Activator>
-            <Import-Package>
-                org.opencastproject.rest,
-                javax.servlet,
-                javax.servlet.http,
-                javax.ws.rs,
-                org.apache.commons.lang,
-                org.opencastproject.security.api,
-                org.opencastproject.util,
-                org.opencastproject.util.doc.rest,
-                org.osgi.framework,
-                org.osgi.service.component,
-                org.slf4j,
-                org.json.simple,
-                org.json.simple.parser,
-                *;resolution:=optional
-            </Import-Package>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Private-Package>
-              org.opencastproject.runtimeinfo.rest, ui.*
+              ui.*
             </Private-Package>
-            <Export-Package>org.opencastproject.runtimeinfo</Export-Package>
-            <Service-Component>
-              OSGI-INF/info.xml
-            </Service-Component>
             <Http-Alias>/</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>
             <Http-Welcome>welcome.html</Http-Welcome>

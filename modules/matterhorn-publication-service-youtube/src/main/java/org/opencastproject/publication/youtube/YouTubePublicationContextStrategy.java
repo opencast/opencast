@@ -20,7 +20,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.publication.api.PublicationException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -165,7 +165,7 @@ public class YouTubePublicationContextStrategy {
     try {
       File dcFile = workspace.get(catalog.getURI());
       is = new FileInputStream(dcFile);
-      return new DublinCoreCatalogImpl(is);
+      return DublinCores.read(is);
     } catch (Exception e) {
       logger.error("Error loading Dublin Core metadata: {}", e.getMessage());
     } finally {

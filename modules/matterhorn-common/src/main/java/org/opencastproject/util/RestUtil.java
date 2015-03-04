@@ -70,6 +70,16 @@ public final class RestUtil {
     return b;
   }
 
+  /** Create a file response. */
+  public static Response.ResponseBuilder fileResponse(File f, Option<String> contentType, Option<String> fileName) {
+    final Response.ResponseBuilder b = Response.ok(f).header("Content-Length", f.length());
+    for (String t : contentType)
+      b.header("Content-Type", t);
+    for (String fn : fileName)
+      b.header("Content-Disposition", "attachment; filename=" + fn);
+    return b;
+  }
+
   /**
    * create a partial file response
    *
@@ -120,7 +130,14 @@ public final class RestUtil {
     return response;
   }
 
-  /** Create a stream response. */
+  /**
+   * Create a stream response.
+   *
+   * @deprecated use
+   *             {@link org.opencastproject.util.RestUtil.R#ok(java.io.InputStream, String, org.opencastproject.util.data.Option, org.opencastproject.util.data.Option)}
+   *             instead
+   */
+  @Deprecated
   public static Response.ResponseBuilder streamResponse(InputStream in, String contentType, Option<Long> streamLength,
           Option<String> fileName) {
     final Response.ResponseBuilder b = Response.ok(in).header("Content-Type", contentType);
@@ -136,6 +153,7 @@ public final class RestUtil {
    *
    * @deprecated use {@link #getResponseType(String)}
    */
+  @Deprecated
   public static MediaType getResponseFormat(String format) {
     return "json".equalsIgnoreCase(format) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
   }
@@ -187,6 +205,50 @@ public final class RestUtil {
       return Response.ok(entity, type).build();
     }
 
+    /**
+     * Create a response with status OK from a stream.
+     *
+     * @param in
+     *          the input stream to read from
+     * @param contentType
+     *          the content type to set the Content-Type response header to
+     * @param streamLength
+     *          an optional value for the Content-Length response header
+     * @param fileName
+     *          an optional file name for the Content-Disposition response header
+     */
+    public static Response ok(InputStream in, String contentType, Option<Long> streamLength, Option<String> fileName) {
+      return ok(in, option(contentType), streamLength, fileName);
+    }
+
+    /**
+     * Create a response with status OK from a stream.
+     *
+     * @param in
+     *          the input stream to read from
+     * @param contentType
+     *          the content type to set the Content-Type response header to
+     * @param streamLength
+     *          an optional value for the Content-Length response header
+     * @param fileName
+     *          an optional file name for the Content-Disposition response header
+     */
+    public static Response ok(InputStream in, Option<String> contentType, Option<Long> streamLength,
+            Option<String> fileName) {
+      final Response.ResponseBuilder b = Response.ok(in);
+      for (String t : contentType)
+        b.header("Content-Type", t);
+      for (Long l : streamLength)
+        b.header("Content-Length", l);
+      for (String fn : fileName)
+        b.header("Content-Disposition", "attachment; filename=" + fn);
+      return b.build();
+    }
+
+    public static Response created() {
+      return Response.status(Response.Status.CREATED).build();
+    }
+
     public static Response notFound() {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
@@ -218,5 +280,50 @@ public final class RestUtil {
     public static Response badRequest(String msg) {
       return Response.status(Response.Status.BAD_REQUEST).entity(msg).build();
     }
+
+    public static Response forbidden() {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
+
+    public static Response forbidden(String msg) {
+      return Response.status(Response.Status.FORBIDDEN).entity(msg).build();
+    }
+
+    /**
+     * create a partial file response
+     *
+     * @param f
+     *          the requested file
+     * @param contentType
+     *          the contentType to send
+     * @param fileName
+     *          the filename to send
+     * @param rangeHeader
+     *          the range header
+     * @return the Responsebuilder
+     * @throws IOException
+     *           if something goes wrong
+     */
+
+    /**
+     * Creates a precondition failed status response
+     *
+     * @return a precondition failed status response
+     */
+    public static Response preconditionFailed() {
+      return Response.status(Response.Status.PRECONDITION_FAILED).build();
+    }
+
+    /**
+     * Creates a precondition failed status response with a message
+     *
+     * @param message
+     *          The message body
+     * @return a precondition failed status response with a message
+     */
+    public static Response preconditionFailed(String message) {
+      return Response.status(Response.Status.PRECONDITION_FAILED).entity(message).build();
+    }
+
   }
 }

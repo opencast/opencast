@@ -15,11 +15,17 @@
     <provide interface="org.opencastproject.userdirectory.JpaGroupRoleProvider" />
   </service>
   
-  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
+    cardinality="1..1" policy="static" bind="setMessageSender" />
+  <reference name="message-broker-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
+    cardinality="1..1" policy="static" bind="setMessageReceiver" />
   <reference name="persistence" interface="javax.persistence.spi.PersistenceProvider"
     cardinality="1..1" policy="static" bind="setPersistenceProvider" />
   <reference name="props" interface="java.util.Map"
     cardinality="1..1" policy="static" target="(type=persistence)" bind="setPersistenceProperties" />
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="organization-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
   
 </scr:component>

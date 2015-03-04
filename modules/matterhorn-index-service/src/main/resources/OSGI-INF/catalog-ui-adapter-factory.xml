@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+	name="org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory" immediate="true" activate="activate" deactivate="deactivate">
+	
+	<implementation class="org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory" />
+  <property name="service.pid" value="org.opencastproject.ui.metadata.CatalogUIAdapterFactory" />
+	<property name="service.description" value="Admin UI - Catalog UI Adapter Factory" />
+	
+	<service>
+		<provide interface="org.osgi.service.cm.ManagedServiceFactory" />
+	</service>
+	
+  <reference name="listProvidersService" interface="org.opencastproject.index.service.resources.list.api.ListProvidersService"
+    cardinality="1..1" policy="static" bind="setListProvidersService" />
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+    cardinality="1..1" policy="static" bind="setWorkspace" />
+  <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
+    cardinality="1..1" policy="static" bind="setSeriesService" />
+</scr:component>

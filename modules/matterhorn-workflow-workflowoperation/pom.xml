@@ -31,6 +31,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-presets</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-working-file-repository-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -81,9 +86,11 @@
               OSGI-INF/operations/cleanup.xml,
               OSGI-INF/operations/cli.xml,
               OSGI-INF/operations/copy.xml,
+              OSGI-INF/operations/defaults.xml,
               OSGI-INF/operations/error-resolution.xml,
               OSGI-INF/operations/error-handler.xml,
               OSGI-INF/operations/failing.xml,
+              OSGI-INF/operations/include.xml,
               OSGI-INF/operations/tag.xml,
               OSGI-INF/operations/zip.xml
             </Service-Component>

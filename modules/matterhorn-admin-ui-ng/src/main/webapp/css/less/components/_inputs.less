@@ -1,0 +1,155 @@
+// Input's
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="time"],
+input[type="date"],
+textarea {
+
+    .box-sizing();
+    height: @input-height;
+    width: 130px;
+    width: 100%;
+
+    // ## Refactor this
+    // Hacked in a way to keep the login inputs
+    // bigger than standard.
+    &.login-input { .size(@login-input-width, 50px); padding-left: 50px; }
+
+    background: #fff;
+    .border(@main-border-color);
+    border-radius: @main-border-radius;
+    margin: 0 auto;
+    padding: 0 20px;
+
+    position: relative;
+    font-size: 13px;
+    font-weight: 600;
+    color: @black-50;
+    .placeholder(@black-30);
+
+    &:hover { .border(darken(@main-border-color, 20%)); }
+
+    &:focus { .border(@l-blue); }
+
+    // Error border
+    &.error { .border(@alt-red); color: @red; }
+
+    // Input icons
+    // ----------------------------------------
+
+    &#email {
+       .retina-image("@{img-path}user-input-icon.png", "@{img-path}user-input-icon@2x.png", 23px, 20px);
+       background-repeat: no-repeat;
+       background-position: 14px center;
+
+    }
+
+    &#password {
+        .retina-image("@{img-path}key-icon.png", "@{img-path}key-icon@2x.png", 16px, 20px);
+        background-repeat: no-repeat;
+        background-position: 19px center;
+
+    }
+
+    &.search,
+    &#search {
+        .retina-image("@{img-path}search.png", "@{img-path}search@2x.png", 13px, 13px);
+        background-repeat: no-repeat;
+        background-position: 14px center;
+        vertical-align: top;
+        padding: 0 20px 0 40px;
+
+        &.expand {
+            .transition(width 0.2s ease-in);
+            &:focus { width: 200px; }
+        }
+    }
+
+    &.small {
+        padding: 15px;
+        height: 30px;
+    }
+
+} // inputs
+
+textarea {
+    padding: 10px 20px;
+    height: auto;
+}
+
+select[multiple] {
+    background: #fff;
+    .border(@main-border-color);
+
+    border-radius: @main-border-radius;
+    padding: 10px;
+    color: @black-50;
+    font-size: 13px;
+
+    &:focus { .border(@l-blue); outline: none; }
+
+} // select[multiple]
+
+// Input made by Joshua Hibbert | http://codepen.io/joshnh/pen/hjbuH
+// INFO: It has been renamed as the following style are now more compatble with the latest version of safari
+input[type="checkbox"].ios-incompatible-safari , input[type="radio"].ios-incompatible-safari {
+
+
+    @white: #fff;
+    @grey: #d3d3d3;
+
+    background-color: darken(@white, 2%);
+    border: 1px solid @grey;
+    border-radius: 26px;
+    box-shadow: inset 0 0 0 1px @grey;
+    outline: none;
+    cursor: pointer;
+    height: 28px;
+    position: relative;
+    transition: border .25s .15s,
+              box-shadow .25s .3s,
+              padding .25s;
+    width: 44px;
+    vertical-align: top;
+
+    &:after {
+        background-color: @white;
+        border: 1px solid @grey;
+        border-radius: 24px;
+        box-shadow: inset 0 -3px 3px hsla(0,0%,0%,.025),
+                    0 1px 4px hsla(0,0%,0%,.15),
+                    0 4px 4px hsla(0,0%,0%,.1);
+        content: '';
+        display: block;
+        height: 24px;
+        left: 0;
+        position: absolute;
+        right: 16px;
+        top: 0;
+        transition: border .25s .15s,
+                    left .25s .1s,
+                    right .15s .175s;
+    }
+
+    &:checked {
+        border-color: @green;
+        box-shadow: inset 0 0 0 13px @green;
+        padding-left: 18px;
+        transition: border .25s,
+                    box-shadow .25s,
+                    padding .25s .15s;
+
+        &:after {
+              border-color: @green;
+              left: 16px;
+              right: 0;
+              transition: border .25s,
+                          left .15s .25s,
+                          right .25s .175s;
+        } // &:after
+
+    } // &:checked
+
+} // input[type="checkbox"]

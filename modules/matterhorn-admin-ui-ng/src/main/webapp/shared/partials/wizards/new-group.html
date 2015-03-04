@@ -1,0 +1,65 @@
+
+<div class="modal-content" ng-class="{ active: isCurrentTab('metadata') }"  data-modal-tab-content="metadata" data-level="1">
+    <form name="groupForm">
+        <div class="modal-body">
+            <div class="form-container">
+                <div class="row">
+                    <label translate="USERS.GROUPS.DETAILS.FORM.NAME" class="required">Group Name</label>
+                    <input ng-init="blurred.name = false" ng-model="wizard.step.metadata.name" type="text" ng-required="true" placeholder="{{ 'USERS.GROUPS.DETAILS.FORM.NAME' | translate }}..." name="name" ng-class="blurred.name == true && !groupForm.name.$valid ? 'error' : ''" ng-blur="blurred.name=true">
+                </div>
+                <div class="row">
+                    <label translate="USERS.GROUPS.DETAILS.FORM.DESCRIPTION">Group Description</label>
+                    <textarea ng-model="wizard.step.metadata.description" placeholder="{{ 'USERS.GROUPS.DETAILS.FORM.DESCRIPTION' | translate }}..." rows="4" name="description"></textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal-content" data-modal-tab-content="roles" data-level="1">
+    <div class="modal-body">
+        <div class="form-container">
+            <admin-ng-select-box resource="wizard.states[1].stateController.roles"></admin-ng-select-box>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="users" data-level="1">
+    <div class="modal-body">
+        <div class="form-container">
+            <admin-ng-select-box resource="wizard.states[2].stateController.users" group-by="provider"></admin-ng-select-box>
+        </div>
+    </div>
+</div> 
+
+<div class="modal-content" data-modal-tab-content="summary" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div data-admin-ng-notifications="" context="add-group-form"></div>
+
+            <div class="obj">
+                <header translate="USERS.GROUPS.DETAILS.FORM.SUMMARY">Summary</header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <tr>
+                            <td translate="USERS.GROUPS.DETAILS.FORM.NAME">Name</td>
+                            <td>{{ wizard.states[0].stateController.metadata.name }}</td>
+                        </tr>
+                        <tr>
+                            <td translate="USERS.GROUPS.DETAILS.FORM.DESCRIPTION">Description</td>
+                            <td>{{ wizard.states[0].stateController.metadata.description }}</td>
+                        </tr>
+                        <tr>
+                            <td translate="USERS.GROUPS.DETAILS.FORM.ROLES">Roles</td>
+                            <td>{{ wizard.states[1].stateController.getRolesList() }}</td>
+                        </tr>
+                        <tr>
+                            <td translate="USERS.GROUPS.DETAILS.FORM.USERS">Users</td>
+                            <td>{{ wizard.states[2].stateController.getUsersList() }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

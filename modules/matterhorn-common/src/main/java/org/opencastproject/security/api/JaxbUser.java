@@ -35,13 +35,29 @@ import javax.xml.bind.annotation.XmlType;
  * A simple user model.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "user", namespace = "http://org.opencastproject.security")
+@XmlType(name = "user", namespace = "http://org.opencastproject.security", propOrder = { "userName", "name", "email",
+        "provider", "isManageable", "roles", "organization" })
 @XmlRootElement(name = "user", namespace = "http://org.opencastproject.security")
 public final class JaxbUser implements User {
 
   /** The user name */
   @XmlElement(name = "username")
   protected String userName;
+
+  /** The user's name */
+  @XmlElement(name = "name")
+  protected String name;
+
+  /** The user's email address */
+  @XmlElement(name = "email")
+  protected String email;
+
+  /** The user's provider */
+  @XmlElement(name = "provider")
+  protected String provider;
+
+  @XmlElement(name = "manageable")
+  protected boolean isManageable = false;
 
   /** The roles */
   @XmlElement(name = "role")
@@ -70,6 +86,8 @@ public final class JaxbUser implements User {
    *
    * @param userName
    *          the username
+   * @param provider
+   *          the provider
    * @param organization
    *          the organization
    * @param roles
@@ -77,27 +95,9 @@ public final class JaxbUser implements User {
    * @throws IllegalArgumentException
    *           if <code>userName</code> or <code>organization</code> is <code>null</code>
    */
-  public JaxbUser(String userName, JaxbOrganization organization, JaxbRole... roles) throws IllegalArgumentException {
-    this(userName, null, organization, new HashSet<JaxbRole>(Arrays.asList(roles)));
-  }
-
-  /**
-   * Constructs a user which is a member of the given organization that has the specified roles.
-   *
-   * @param userName
-   *          the username
-   * @param password
-   *          the password
-   * @param organization
-   *          the organization
-   * @param roles
-   *          the set of roles for this user
-   * @throws IllegalArgumentException
-   *           if <code>userName</code> or <code>organization</code> is <code>null</code>
-   */
-  public JaxbUser(String userName, String password, JaxbOrganization organization, JaxbRole... roles)
+  public JaxbUser(String userName, String provider, JaxbOrganization organization, JaxbRole... roles)
           throws IllegalArgumentException {
-    this(userName, password, organization, new HashSet<JaxbRole>(Arrays.asList(roles)));
+    this(userName, provider, organization, new HashSet<JaxbRole>(Arrays.asList(roles)));
   }
 
   /**
@@ -107,6 +107,29 @@ public final class JaxbUser implements User {
    *          the username
    * @param password
    *          the password
+   * @param provider
+   *          the provider
+   * @param organization
+   *          the organization
+   * @param roles
+   *          the set of roles for this user
+   * @throws IllegalArgumentException
+   *           if <code>userName</code> or <code>organization</code> is <code>null</code>
+   */
+  public JaxbUser(String userName, String password, String provider, JaxbOrganization organization, JaxbRole... roles)
+          throws IllegalArgumentException {
+    this(userName, password, provider, organization, new HashSet<JaxbRole>(Arrays.asList(roles)));
+  }
+
+  /**
+   * Constructs a user which is a member of the given organization that has the specified roles.
+   *
+   * @param userName
+   *          the username
+   * @param password
+   *          the password
+   * @param provider
+   *          the provider
    * @param canLogin
    *          <code>true</code> if able to login
    * @param organization
@@ -116,9 +139,9 @@ public final class JaxbUser implements User {
    * @throws IllegalArgumentException
    *           if <code>userName</code> or <code>organization</code> is <code>null</code>
    */
-  public JaxbUser(String userName, String password, boolean canLogin, JaxbOrganization organization, JaxbRole... roles)
-          throws IllegalArgumentException {
-    this(userName, password, canLogin, organization, new HashSet<JaxbRole>(Arrays.asList(roles)));
+  public JaxbUser(String userName, String password, String provider, boolean canLogin, JaxbOrganization organization,
+          JaxbRole... roles) throws IllegalArgumentException {
+    this(userName, password, null, null, provider, canLogin, organization, new HashSet<JaxbRole>(Arrays.asList(roles)));
   }
 
   /**
@@ -128,6 +151,8 @@ public final class JaxbUser implements User {
    *          the username
    * @param password
    *          the password
+   * @param provider
+   *          the provider
    * @param canLogin
    *          <code>true</code> if able to login
    * @param organization
@@ -137,9 +162,36 @@ public final class JaxbUser implements User {
    * @throws IllegalArgumentException
    *           if <code>userName</code> or <code>organization</code> is <code>null</code>
    */
-  public JaxbUser(String userName, String password, JaxbOrganization organization, Set<JaxbRole> roles)
+  public JaxbUser(String userName, String password, String provider, JaxbOrganization organization, Set<JaxbRole> roles)
           throws IllegalArgumentException {
-    this(userName, password, true, organization, roles);
+    this(userName, password, null, null, provider, true, organization, roles);
+  }
+
+  /**
+   * Constructs a user which is a member of the given organization that has the specified roles.
+   *
+   * @param userName
+   *          the username
+   * @param password
+   *          the password
+   * @param name
+   *          the name
+   * @param email
+   *          the email
+   * @param provider
+   *          the provider
+   * @param canLogin
+   *          <code>true</code> if able to login
+   * @param organization
+   *          the organization
+   * @param roles
+   *          the set of roles for this user
+   * @throws IllegalArgumentException
+   *           if <code>userName</code> or <code>organization</code> is <code>null</code>
+   */
+  public JaxbUser(String userName, String password, String name, String email, String provider,
+          JaxbOrganization organization, Set<JaxbRole> roles) throws IllegalArgumentException {
+    this(userName, password, name, email, provider, true, organization, roles);
   }
 
   /**
@@ -147,6 +199,8 @@ public final class JaxbUser implements User {
    *
    * @param userName
    *          the username
+   * @param provider
+   *          the provider
    * @param organization
    *          the organization
    * @param roles
@@ -154,8 +208,9 @@ public final class JaxbUser implements User {
    * @throws IllegalArgumentException
    *           if <code>userName</code> or <code>organization</code> is <code>null</code>
    */
-  public JaxbUser(String userName, JaxbOrganization organization, Set<JaxbRole> roles) throws IllegalArgumentException {
-    this(userName, null, true, organization, roles);
+  public JaxbUser(String userName, String provider, JaxbOrganization organization, Set<JaxbRole> roles)
+          throws IllegalArgumentException {
+    this(userName, null, provider, organization, roles);
   }
 
   /**
@@ -165,6 +220,12 @@ public final class JaxbUser implements User {
    *          the username
    * @param password
    *          the password
+   * @param name
+   *          the name
+   * @param email
+   *          the email
+   * @param provider
+   *          the provider
    * @param canLogin
    *          <code>true</code> if able to login
    * @param organization
@@ -174,15 +235,18 @@ public final class JaxbUser implements User {
    * @throws IllegalArgumentException
    *           if <code>userName</code> or <code>organization</code> is <code>null</code>
    */
-  public JaxbUser(String userName, String password, boolean canLogin, JaxbOrganization organization, Set<JaxbRole> roles)
-          throws IllegalArgumentException {
+  public JaxbUser(String userName, String password, String name, String email, String provider, boolean canLogin,
+          JaxbOrganization organization, Set<JaxbRole> roles) throws IllegalArgumentException {
     if (StringUtils.isBlank(userName))
       throw new IllegalArgumentException("Username must be set");
     if (organization == null)
       throw new IllegalArgumentException("Organization must be set");
     this.userName = userName;
     this.password = password;
+    this.name = name;
+    this.email = email;
     this.canLogin = canLogin;
+    this.provider = provider;
     this.organization = organization;
     if (roles == null)
       this.roles = new HashSet<JaxbRole>();
@@ -209,8 +273,10 @@ public final class JaxbUser implements User {
         roles.add((JaxbRole) role);
       roles.add(JaxbRole.fromRole(role));
     }
-    return new JaxbUser(user.getUsername(), user.getPassword(), user.canLogin(), JaxbOrganization.fromOrganization(user
-            .getOrganization()), roles);
+    JaxbUser jaxbUser = new JaxbUser(user.getUsername(), user.getPassword(), user.getName(), user.getEmail(),
+            user.getProvider(), user.canLogin(), JaxbOrganization.fromOrganization(user.getOrganization()), roles);
+    jaxbUser.setManageable(user.isManageable());
+    return jaxbUser;
   }
 
   /**
@@ -275,7 +341,8 @@ public final class JaxbUser implements User {
     if (!(obj instanceof User))
       return false;
     User other = (User) obj;
-    return userName.equals(other.getUsername()) && organization.equals(other.getOrganization());
+    return userName.equals(other.getUsername()) && organization.equals(other.getOrganization())
+            && EqualsUtil.eq(provider, other.getProvider());
   }
 
   /**
@@ -285,7 +352,7 @@ public final class JaxbUser implements User {
    */
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(userName, organization);
+    return EqualsUtil.hash(userName, organization, provider);
   }
 
   /**
@@ -295,7 +362,35 @@ public final class JaxbUser implements User {
    */
   @Override
   public String toString() {
-    return new StringBuilder(userName).append(":").append(organization).toString();
+    return new StringBuilder(userName).append(":").append(organization).append(":").append(provider).toString();
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String getEmail() {
+    return email;
+  }
+
+  @Override
+  public String getProvider() {
+    return provider;
+  }
+
+  public void setProvider(String provider) {
+    this.provider = provider;
+  }
+
+  @Override
+  public boolean isManageable() {
+    return isManageable;
+  }
+
+  public void setManageable(boolean isManageable) {
+    this.isManageable = isManageable;
   }
 
 }

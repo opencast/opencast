@@ -21,6 +21,7 @@ import static org.opencastproject.util.data.Option.option;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
+import com.entwinemedia.fn.data.Opt;
 import org.joda.time.Duration;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
@@ -75,7 +76,7 @@ public final class EncodingSchemeUtils {
     if (precision == null)
       throw new IllegalArgumentException("The precision must not be null");
 
-    return new DublinCoreValue(formatDate(date, precision), DublinCore.LANGUAGE_UNDEFINED, DublinCore.ENC_SCHEME_W3CDTF);
+    return DublinCoreValue.mk(formatDate(date, precision), DublinCore.LANGUAGE_UNDEFINED, Opt.some(DublinCore.ENC_SCHEME_W3CDTF));
   }
 
   public static String formatDate(Date date, Precision precision) {
@@ -120,7 +121,7 @@ public final class EncodingSchemeUtils {
       b.append(" ").append("name=").append(period.getName().replace(";", "")).append(";");
     }
     b.append(" ").append("scheme=W3C-DTF;");
-    return new DublinCoreValue(b.toString(), DublinCore.LANGUAGE_UNDEFINED, DublinCore.ENC_SCHEME_PERIOD);
+    return DublinCoreValue.mk(b.toString(), DublinCore.LANGUAGE_UNDEFINED, Opt.some(DublinCore.ENC_SCHEME_PERIOD));
   }
 
   /**
@@ -135,8 +136,8 @@ public final class EncodingSchemeUtils {
    *          the duration in milliseconds
    */
   public static DublinCoreValue encodeDuration(long duration) {
-    return new DublinCoreValue(ISOPeriodFormat.standard().print(new Duration(duration).toPeriod()),
-            DublinCore.LANGUAGE_UNDEFINED, DublinCore.ENC_SCHEME_ISO8601);
+    return DublinCoreValue.mk(ISOPeriodFormat.standard().print(new Duration(duration).toPeriod()),
+            DublinCore.LANGUAGE_UNDEFINED, Opt.some(DublinCore.ENC_SCHEME_ISO8601));
   }
 
   /**
@@ -178,7 +179,7 @@ public final class EncodingSchemeUtils {
    * @return the duration in milliseconds or null, if the value cannot be parsed or is in a different encoding scheme
    */
   public static Long decodeDuration(DublinCoreValue value) {
-    if (value.getEncodingScheme() == null || value.getEncodingScheme().equals(DublinCore.ENC_SCHEME_ISO8601)) {
+    if (!value.hasEncodingScheme() || value.getEncodingScheme().get().equals(DublinCore.ENC_SCHEME_ISO8601)) {
       return decodeDuration(value.getValue());
     }
     return null;
@@ -204,7 +205,7 @@ public final class EncodingSchemeUtils {
    * @return the date or null if decoding fails
    */
   public static Date decodeDate(DublinCoreValue value) {
-    if (value.getEncodingScheme() == null || value.getEncodingScheme().equals(DublinCore.ENC_SCHEME_W3CDTF)) {
+    if (!value.hasEncodingScheme() || value.getEncodingScheme().get().equals(DublinCore.ENC_SCHEME_W3CDTF)) {
       try {
         return parseW3CDTF(value.getValue());
       } catch (IllegalArgumentException ignore) {

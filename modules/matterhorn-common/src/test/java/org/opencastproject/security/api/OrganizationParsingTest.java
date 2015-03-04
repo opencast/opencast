@@ -121,12 +121,37 @@ public class OrganizationParsingTest {
   }
 
   @Test
+  public void testMarshalOrganization2() throws Exception {
+    Organization org = new DefaultOrganization();
+
+    String expectedOutput = IOUtils.toString(getClass().getResourceAsStream(ORG_XML_FILE), "UTF-8");
+    String producedOutput = OrganizationParser.toXml(org);
+
+    boolean val = compareXMLTagsEqual(expectedOutput, producedOutput);
+    assertTrue("Organization XML not formed as expected", val);
+
+    StreamSource streamSource = new StreamSource(new StringReader(producedOutput));
+    JaxbOrganization organization = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbOrganization.class)
+            .getValue();
+    compareOrgs(org, organization);
+  }
+
+  @Test
   public void testUnmarshalOrganization() throws Exception {
     Organization org = new DefaultOrganization();
 
     StreamSource streamSource = new StreamSource(getClass().getResourceAsStream(ORG_XML_FILE));
     JaxbOrganization organization = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbOrganization.class)
             .getValue();
+    compareOrgs(org, organization);
+  }
+
+  @Test
+  public void testUnmarshalOrganization2() throws Exception {
+    Organization org = new DefaultOrganization();
+
+    String xml = IOUtils.toString(getClass().getResourceAsStream(ORG_XML_FILE), "UTF-8");
+    Organization organization = OrganizationParser.fromXml(xml);
     compareOrgs(org, organization);
   }
 

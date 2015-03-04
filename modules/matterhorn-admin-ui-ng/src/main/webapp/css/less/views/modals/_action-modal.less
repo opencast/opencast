@@ -1,0 +1,69 @@
+&#add-email-template-modal {
+        
+    // Different tabs
+    [data-modal-tab-content="recipients"] {
+        
+        .remove-btn-container {
+            height: 50px;
+            border-top: 1px solid @main-border-color;
+        }
+        
+        .red-btn {
+            margin: 10px 10px 0 0;
+            display: inline-block;
+            float: right;
+            padding: 7px 10px;
+        }
+        
+        .add-recip-input-container {
+            
+            margin-top: 10px;
+            
+            > input { 
+                margin: 0 10px 0 0; 
+                width: 200px;
+            }
+            
+            .add-btn { padding: 8px 20px; }
+            
+        } // add-recip-input-container
+        
+    } // recipients
+    
+    [data-modal-tab-content="message"] {
+    
+        .input-block {
+            margin-bottom: 15px;
+        }
+        
+        .drop-down-container,
+        input[type="text"],
+        textarea {
+            width: 360px;
+            margin-bottom: 0;
+        }
+        
+        .text-variables {
+            float: right;    
+            width: 190px;
+            
+        }
+        
+    } // message
+    
+    // Pager Container
+    .pager-container {
+        
+        height: 30px;
+        
+        .next { float: right; margin-right: 20px; }
+        
+    } // pager-container
+    
+} // send-message
+
+
+// Set sizes for action modals on event view
+&#send-message-modal, &#change-status-modal, &#delete-events, &#add-email-template-modal {
+    &:extend(.small-modal);
+}

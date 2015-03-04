@@ -15,27 +15,31 @@
  */
 package org.opencastproject.userdirectory;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import junit.framework.Assert;
-import org.apache.commons.collections.IteratorUtils;
-import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.data.Collections.set;
+
 import org.opencastproject.kernel.security.persistence.JpaOrganization;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
+import org.apache.commons.collections.IteratorUtils;
+import org.easymock.EasyMock;
+import org.eclipse.persistence.jpa.PersistenceProvider;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.opencastproject.util.data.Collections.set;
 
 public class JpaGroupRoleProviderTest {
 
@@ -66,8 +70,15 @@ public class JpaGroupRoleProviderTest {
     EasyMock.expect(securityService.getOrganization()).andReturn(org1).anyTimes();
     EasyMock.replay(securityService);
 
+    // Create the message sender service
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    messageSender.sendObjectMessage(EasyMock.anyObject(String.class), EasyMock.anyObject(MessageSender.DestinationType.class), EasyMock.anyObject(Serializable.class));
+    EasyMock.expectLastCall();
+    EasyMock.replay(messageSender);
+
     provider = new JpaGroupRoleProvider();
     provider.setSecurityService(securityService);
+    provider.setMessageSender(messageSender);
     provider.setPersistenceProperties(props);
     provider.setPersistenceProvider(new PersistenceProvider());
     provider.activate(null);

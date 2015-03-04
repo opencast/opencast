@@ -249,8 +249,8 @@ public final class AccessControlParser {
         AccessControlEntry singleEntry = entries.get(0);
         JSONObject singleJsonEntry = new JSONObject();
         jsonAcl.put(ACE, singleJsonEntry);
-        singleJsonEntry.put(ROLE, singleEntry.getRole());
         singleJsonEntry.put(ACTION, singleEntry.getAction());
+        singleJsonEntry.put(ROLE, singleEntry.getRole());
         singleJsonEntry.put(ALLOW, singleEntry.isAllow());
         break;
       default:
@@ -258,8 +258,8 @@ public final class AccessControlParser {
         jsonAcl.put(ACE, jsonEntryArray);
         for (AccessControlEntry entry : entries) {
           JSONObject jsonEntry = new JSONObject();
-          jsonEntry.put(ROLE, entry.getRole());
           jsonEntry.put(ACTION, entry.getAction());
+          jsonEntry.put(ROLE, entry.getRole());
           jsonEntry.put(ALLOW, entry.isAllow());
           jsonEntryArray.add(jsonEntry);
         }

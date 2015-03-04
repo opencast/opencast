@@ -1,0 +1,29 @@
+<!--
+<a class="remove"></a>
+<a class="play" ng-class="{ on: row.publications.Engage }"></a>
+-->
+<a data-open-modal="event-details"
+	data-resource-id="{{ row.id }}"
+	class="more"
+	with-role="ROLE_UI_EVENTS_DETAILS_VIEW">
+</a>
+
+<a ng-if="row.has_preview" href="#/events/events/{{row.id}}/tools/playback"
+	class="preview"
+	with-role="ROLE_UI_EVENTS_EDITOR_VIEW">
+</a>
+
+<a ng-if="row.has_comments && !row.has_open_comments"
+	data-open-modal="event-details"
+	data-resource-id="{{ row.id }}"
+	data-tab="comments"
+	class="fa fa-comment-o">
+  <!-- <i class="notification"></i> -->
+</a>
+
+<a ng-if="row.has_comments && row.has_open_comments"
+	data-open-modal="event-details"
+	data-resource-id="{{ row.id }}"
+	data-tab="comments"
+	class="fa fa-comment">
+</a>

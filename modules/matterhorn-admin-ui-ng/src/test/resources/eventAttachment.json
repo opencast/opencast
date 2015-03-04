@@ -1,0 +1,23 @@
+[
+    {
+        "tags": "atom,rss",
+        "id": "publish-attachment-1",
+        "mimetype": "text/plain",
+        "type": "Attachment",
+        "url": "http://episodes/10.0000/1/publish-attachment-1/1/attachment.txt"
+    },
+    {
+        "tags": "atom,publish,rss",
+        "id": "publish-attachment-2",
+        "mimetype": "text/plain",
+        "type": "Attachment",
+        "url": "http://episodes/10.0000/1/publish-attachment-2/1/attachment.txt"
+    },
+    {
+        "tags": "atom,publish,rss",
+        "id": "publish-attachment-3",
+        "mimetype": "text/plain",
+        "type": "Attachment",
+        "url": "http://episodes/10.0000/1/publish-attachment-3/1/attachment.txt"
+    }
+]

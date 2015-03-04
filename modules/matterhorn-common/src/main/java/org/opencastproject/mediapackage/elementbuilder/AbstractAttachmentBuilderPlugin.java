@@ -77,6 +77,7 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
    *      org.opencastproject.mediapackage.MediaPackageElement.Type ,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public boolean accept(URI uri, MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     return accept(type, flavor);
   }
@@ -87,6 +88,7 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.opencastproject.mediapackage.MediaPackageElement.Type
    *      , org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public boolean accept(MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     if (this.flavor != null && !this.flavor.equals(flavor))
       return false;
@@ -98,6 +100,7 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
    *
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.w3c.dom.Node)
    */
+  @Override
   public boolean accept(Node elementNode) {
     try {
       // Test for attachment
@@ -132,14 +135,18 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
    * @see org.opencastproject.mediapackage.MediaPackageElementBuilder#newElement(org.opencastproject.mediapackage.MediaPackageElement.Type
    *      , org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public MediaPackageElement newElement(MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
-    throw new UnsupportedOperationException("Creation of new attachments from scratch is unsupported");
+    Attachment attachment = new AttachmentImpl();
+    attachment.setFlavor(flavor);
+    return attachment;
   }
 
   /**
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#elementFromManifest(org.w3c.dom.Node,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
+  @Override
   public MediaPackageElement elementFromManifest(Node elementNode, MediaPackageSerializer serializer)
           throws UnsupportedElementException {
 
@@ -245,6 +252,7 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
    * @throws UnsupportedElementException
    *           if the attachment cannto be read
    */
+  @Override
   public MediaPackageElement elementFromURI(URI uri) throws UnsupportedElementException {
     logger.trace("Creating attachment from " + uri);
     return specializeAttachment(AttachmentImpl.fromURI(uri));

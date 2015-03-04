@@ -1,0 +1,192 @@
+// Login Page
+// ----------------------------------
+//
+
+.login-container {
+    @width: 490px;
+    background: #fff;
+    .border(@main-border-color);
+    border-radius: @main-border-radius;
+    margin: 0 auto;
+    text-align: center;
+    .size(@width, auto);
+    position: relative;
+    top: 150px;
+
+    .login-form form {
+        .box-sizing();
+        float: right;
+        margin: 0px 70px 0px 0px;
+        display: inline-block;
+        width: 350px;
+        padding: 35px 0;
+
+        input {
+            margin: 0;
+        }
+
+        p {
+            font-size: 25px;
+            font-weight: 100;
+            color: @black-50;
+            text-align: center;
+            padding-bottom: 30px;
+
+            .subtle-text {
+                font-size: 12px;
+                font-weight: 600;
+                color: @black-20;
+            }
+        }
+
+        .beta-flag {
+          display: inline-block;
+          vertical-align: top;
+          margin-top: 2px;
+          border: 1px solid @l-blue;
+          border-radius: 2px;
+          padding: 4px 5px 3px;
+          color: @l-blue;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: default;
+          text-transform: uppercase;
+        }
+
+        .error-container {
+            background: lighten(@red, 10%);
+            border-radius: @main-border-radius;
+            margin: -10px 0 20px;
+            padding: 10px 0;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .form-container {
+
+            label {
+                color: @black-40;
+                font-size: 13px;
+                line-height: 18px;
+                margin-left: 10px;
+                cursor: pointer;
+            }
+        }
+
+        .forgot-pwd {
+            display: block;
+            width: 88%;
+            text-align: right;
+            margin: -15px 0 20px;
+            font-size: 10px;
+            color: @black-20;
+
+            &:hover {
+                color: @black-40;
+            }
+        }
+
+        .submit {
+            display: block;
+            background: @l-blue;
+            color: #fff;
+            height: 48px;
+            width: 100%;
+            text-align: center;
+            border-radius: 4px;
+            border: none;
+            .transition(all .2s);
+
+            &:hover {
+                background: lighten(@l-blue, 5%);
+            }
+        }
+    }
+
+    // Customize language select for login view
+    #nav-dd-container {
+        position: absolute;
+        top: -60px;
+        right: -20px;
+
+        .nav-dd {
+            color: @black-50;
+            .fa-icon(@fa-chevron-down, after, inline-block, 0 0 0 5px);
+
+            span {
+                font-size: 14px;
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+            ul {
+                border-top: 1px solid @main-border-color;
+                .border-top-radius(@main-border-radius);
+                text-align: left;
+                right: -17px;
+
+                // Top arrow
+                &:before {
+                    content: "";
+                    position: absolute;
+                    top: -8px;
+                    right: 15px;
+                    width: 0;
+                    height: 0;
+                    border-left: 7px solid transparent;
+                    border-right: 7px solid transparent;
+                    border-bottom: 7px solid darken(@main-border-color, 5%);
+                }
+            }
+        }
+    }
+}
+
+
+// Remember Me Toggle and Label
+.remember-me-toggle {
+    display: table;
+    width: 100%;
+}
+
+.remember-me-content {
+    display: table-cell;
+    text-align: center;
+
+    .check-toggle,
+    input {
+        display: inline-block !important;
+    }
+
+    .check-toggle input {
+            margin: 0;
+            width: 10px;
+    }
+
+    label {
+        display: inline-block !important;
+        margin: 4px 0 0 10px;
+        line-height: 20px;
+    }
+
+    // If character count of label exceeds "var maxCharacterCount" (defined in main.js) add this class
+    &.split-layout {
+
+        .check-toggle,
+        label {
+            float: left;
+        }
+
+        .check-toggle {
+            margin-top: 7px;
+            width: 44px;
+        }
+
+        label {
+            margin-top: 0;
+            margin-left: 15px;
+            width: 291px;
+            text-align: left;
+        }
+    }
+}

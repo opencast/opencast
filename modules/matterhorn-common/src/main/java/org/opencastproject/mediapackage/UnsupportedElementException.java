@@ -38,6 +38,18 @@ public class UnsupportedElementException extends RuntimeException {
   }
 
   /**
+   * Creates a new exception with the given message and a cause.
+   *
+   * @param message
+   *          the error message
+   * @param cause
+   *          the cause
+   */
+  public UnsupportedElementException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  /**
    * Creates a new exception for the given element with the given message.
    *
    * @param element

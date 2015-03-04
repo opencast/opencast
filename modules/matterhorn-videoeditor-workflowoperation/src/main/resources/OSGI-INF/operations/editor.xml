@@ -14,8 +14,6 @@
     policy="static" bind="setSmilService" />
   <reference name="videoeditor-service" interface="org.opencastproject.videoeditor.api.VideoEditorService"
     cardinality="1..1" policy="static" bind="setVideoEditorService" />
-  <reference name="ingest-service" interface="org.opencastproject.ingest.api.IngestService"
-    cardinality="1..1" policy="static" bind="setIngestService" />
   <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
     cardinality="1..1" policy="static" bind="setWorkspace" />
 </scr:component>

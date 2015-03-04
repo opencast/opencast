@@ -36,12 +36,6 @@ public interface WorkflowService {
   /** Identifier for workflow jobs */
   String JOB_TYPE = "org.opencastproject.workflow";
 
-  /** Identifier for read permissions */
-  String READ_PERMISSION = "read";
-
-  /** Identifier for write permissions */
-  String WRITE_PERMISSION = "write";
-
   /**
    * Adds a workflow listener to be notified when workflows are updated.
    *

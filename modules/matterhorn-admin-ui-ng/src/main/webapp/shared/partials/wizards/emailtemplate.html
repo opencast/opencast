@@ -1,0 +1,49 @@
+<div class="modal-content" ng-class="{ active: isCurrentTab('message') }" data-modal-tab-content="message" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div data-admin-ng-notifications="" context="emailtemplate-form"></div>
+            <div class="form-container">
+                <div class="row">
+                    <label class="required" translate="CONFIGURATION.EMAIL_TEMPLATES.DETAILS.MESSAGE.NAME">Name</label>
+                    <input type="text" ng-model="wizard.step.ud.name"
+                        ng-class="{ error: !wizard.step.unique, disabled: action == 'edit' }"
+                        ng-disabled="action === 'edit'"
+                        placeholder="{{ 'CONFIGURATION.EMAIL_TEMPLATES.DETAILS.MESSAGE.NAME' | translate }}...">
+                </div>
+
+                <div class="row">
+                    <label class="required" translate="CONFIGURATION.EMAIL_TEMPLATES.DETAILS.MESSAGE.SUBJECT">Subject</label>
+                    <input type="text" ng-model="wizard.step.ud.subject"
+                        placeholder="{{ 'CONFIGURATION.EMAIL_TEMPLATES.DETAILS.MESSAGE.SUBJECT' | translate }}...">
+                </div>
+
+                <div class="row">
+                    <label class="required" translate="CONFIGURATION.EMAIL_TEMPLATES.DETAILS.MESSAGE.MESSAGE">Message</label>
+                    <div class="text-variables">
+                        <label ng-repeat="variable in wizard.step.variables" ng-click="wizard.step.insertVariable(variable.VARIABLE)">{{ variable.VARIABLE }}<small>{{ variable['DESCRIPTION.EN'] }}</small></label>
+                    </div>
+                    <textarea ng-model="wizard.step.ud.message"
+                        placeholder="%March 11, 2013% quis risus eget urna mollis ornare vel eu leo. %Andy Waskle% natoque penatibus et magnis dis parturient Matt Szibmiyontes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula ut id el." rows="10"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="summary" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div data-admin-ng-notifications="" context="emailtemplate-form"></div>
+            <div class="obj summary-view">
+                <header class="no-expand" translate="CONFIGURATION.EMAIL_TEMPLATES.DETAILS.SUMMARY.MESSAGE_SUMMARY">Message Summary</header>
+                <div class="obj-container padded">
+                    <span translate="CONFIGURATION.EMAIL_TEMPLATES.DETAILS.MESSAGE.SUBJECT">Subject</span>
+                    <p>{{ wizard.states[0].stateController.preview.subject }}</p>
+
+                    <span translate="CONFIGURATION.EMAIL_TEMPLATES.DETAILS.MESSAGE.MESSAGE">Message Body</span>
+                    <pre>{{ wizard.states[0].stateController.preview.body }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

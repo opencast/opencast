@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.adminui.endoint.ListProvidersEndpoint" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.adminui.endpoint.ListProvidersEndpoint" />
+  <property name="service.description" value="Admin UI - Resources list Endpoint" />
+  <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.ListProvidersEndpoint" />
+  <property name="opencast.service.path" value="/admin-ng/resources" />
+  
+  <service>
+    <provide interface="org.opencastproject.adminui.endpoint.ListProvidersEndpoint" />
+  </service>
+
+  <reference bind="setListProvidersService" cardinality="1..1" 
+		interface="org.opencastproject.index.service.resources.list.api.ListProvidersService"
+  		name="ListProvidersService" policy="static"/>
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+          cardinality="1..1" policy="static" bind="setSecurityService"/>
+
+</scr:component>

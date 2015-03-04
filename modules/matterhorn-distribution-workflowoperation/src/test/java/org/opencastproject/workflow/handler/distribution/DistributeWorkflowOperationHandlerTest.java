@@ -83,7 +83,7 @@ public class DistributeWorkflowOperationHandlerTest {
     service = new TestDistributionService();
 
     DefaultOrganization defaultOrganization = new DefaultOrganization();
-    User anonymous = new JaxbUser("anonymous", defaultOrganization, new JaxbRole(
+    User anonymous = new JaxbUser("anonymous", "test", defaultOrganization, new JaxbRole(
             DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, defaultOrganization));
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();

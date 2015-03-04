@@ -1,0 +1,55 @@
+<div id="timeline" class="video-timeline">
+    <div class="tracks-wrapper">
+        <div class="track-container tracks">
+            <div class="timeline-track" ng-repeat="track in video.tracks">
+
+                <div class="track-toolbar">
+                    <div class="track-label label">{{ track.flavor }}</div>
+                    <!--
+                    <div class="track-options">
+                        <div class="track-options-button">
+                            <div class="track-options-menu">
+                                <a class="delete-track-button" href="javascript:;" aria-label="Delete Track"></a>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                </div>
+
+                <div class="segments" ng-style="getSegmentStyle(track)">
+                    <div class="segment-container"
+                        ng-repeat="segment in video.segments | orderBy:'start'"
+                        ng-click="skipToSegment(segment)"
+                        ng-style="{ width: getSegmentWidth(segment) }">
+                        <div class="segment"
+                            ng-class="{ deleted: segment.deleted, selected: segment.selected }">
+                            <a title="remove segment" class="remove"
+                                ng-if="video.segments.length > 1"
+                                ng-click="mergeSegment(segment)">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cursor" ng-mousedown="drag($event)" ng-style="{ left: positionStyle }">
+                <div class="handle"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="zoom-control">
+        <div class="label">Zoom View</div>
+        <div class="field-of-vision">
+            <div class="field" ng-style="getZoomStyle()">
+                <div class="boundary from">{{ formatMilliseconds(from) }}</div>
+                <div class="boundary to">{{ formatMilliseconds(to) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="zoom-control">
+        <div class="label">Zoom Level</div>
+        <input type="range" class="zoom-level" ng-model="zoomLevel">
+    </div>
+</div>

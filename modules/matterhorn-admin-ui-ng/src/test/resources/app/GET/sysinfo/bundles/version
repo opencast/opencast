@@ -1,0 +1,9 @@
+{
+  "versions": [{
+    "buildNumber": "3fba397",
+    "version": "1.5.0.MOCKED-SNAPSHOT"
+  },{
+    "version": "1.5.0.MOCKED-SNAPSHOT"
+  }],
+  "consistent": false
+}

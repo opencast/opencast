@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.message.broker.endpoint.MessageBrokerServiceEndpoint"
+               immediate="true">
+  <implementation class="org.opencastproject.message.broker.endpoint.MessageBrokerServiceEndpoint" />
+  <property name="service.description" value="Message Broker" />
+  <property name="opencast.service.type" value="org.opencastproject.message.broker.endpoint" />
+  <property name="opencast.service.path" value="/broker" />
+  <service>
+    <!-- expose interface for MH REST publisher! -->
+    <provide interface="org.opencastproject.message.broker.endpoint.MessageBrokerServiceEndpoint" />
+  </service>
+</scr:component>

@@ -1,0 +1,11 @@
+<ul>
+    <li ng-repeat="notification in notifications">
+        <div data-admin-ng-notification=""
+            data-show="true"
+            data-type="{{ notification.type }}"
+            data-message="{{ notification.message }}"
+            data-duration="{{ notification.duration }}"
+            data-id="{{ notification.id }}">
+        </div>
+    </li>
+</ul>

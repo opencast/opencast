@@ -1,0 +1,38 @@
+{
+    "device": {
+        "id": "•mock• agent4",
+        "status": "ok",
+        "name": "•mock• agent4",
+        "updated": "5:37 PM",
+        "inputs": [
+        {
+            "id": "video",
+            "value": "CAPTURE_AGENT.DEVICE.CAMERA",
+            "$$hashKey": "0AA"
+        },
+        {
+            "id": "desktop",
+            "value": "CAPTURE_AGENT.DEVICE.PRESENTATION",
+            "$$hashKey": "0AB"
+        }
+        ],
+            "inputMethods": {
+                "CAPTURE_AGENT.DEVICE.PRESENTATION": true
+            }
+    },
+    "weekdays": {
+        "MO": true,
+        "WE": true,
+        "TH": true
+    },
+    "start": {
+        "date": "2014-07-08",
+        "hour": 17,
+        "minute": 0
+    },
+    "end": "2014-07-23",
+    "duration": {
+        "hour": 1,
+        "minute": 0
+    }
+}

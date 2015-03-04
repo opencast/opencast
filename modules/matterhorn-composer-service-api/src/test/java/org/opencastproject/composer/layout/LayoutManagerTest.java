@@ -15,8 +15,6 @@
  */
 package org.opencastproject.composer.layout;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.composer.layout.AnchorOffset.anchorOffset;
 import static org.opencastproject.composer.layout.Dimension.dimension;
@@ -25,6 +23,13 @@ import static org.opencastproject.composer.layout.LayoutManager.scaleToFit;
 import static org.opencastproject.composer.layout.Offset.offset;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Tuple.tuple;
+
+import org.opencastproject.util.JsonObj;
+import org.opencastproject.util.data.Tuple;
+
+import org.junit.Test;
+
+import java.util.List;
 
 public class LayoutManagerTest {
   private static final double TOLERANCE = 0.01;
@@ -217,5 +222,27 @@ public class LayoutManagerTest {
     assertEquals(dimension(50, 100), scaleToFit(dimension(100, 100), dimension(10, 20)));
     assertEquals(dimension(100, 50), scaleToFit(dimension(100, 100), dimension(20, 10)));
     assertEquals(dimension(100, 1), scaleToFit(dimension(100, 500), dimension(1000, 10)));
+  }
+
+  /** SWITCHP-337 */
+  @Test
+  public void testWatermarkLayout() {
+    final List<Tuple<Offset, String>> fixtures = list(
+            // top left
+            tuple(offset(20, 20), "{\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":0.0,\"top\":0.0}}}"),
+            // top right
+            tuple(offset(1340, 20), "{\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},\"offset\":{\"y\":20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":0.0}}}"),
+            // bottom left
+            tuple(offset(20, 340), "{\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":1.0},\"offset\":{\"y\":-20,\"x\":20},\"reference\":{\"left\":0.0,\"top\":1.0}}}"),
+            // bottom right
+            tuple(offset(1340, 340), "{\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}}"));
+    for (final Tuple<Offset, String> fixture : fixtures) {
+      final AbsolutePositionLayoutSpec spec = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(fixture.getB()));
+      final MultiShapeLayout layout = LayoutManager.absoluteMultiShapeLayout(
+              Dimension.dimension(1900, 1080),
+              list(tuple(Dimension.dimension(540, 720), spec)));
+      assertEquals(1, layout.getShapes().size());
+      assertEquals(fixture.getA(), layout.getShapes().get(0).getOffset());
+    }
   }
 }

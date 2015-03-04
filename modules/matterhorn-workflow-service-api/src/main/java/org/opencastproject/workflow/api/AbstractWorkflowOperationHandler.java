@@ -15,8 +15,12 @@
  */
 package org.opencastproject.workflow.api;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import static java.lang.String.format;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
+import com.entwinemedia.fn.data.Opt;
+import com.entwinemedia.fn.fns.Strings;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobContext;
@@ -27,6 +31,9 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.ComponentContext;
 
@@ -35,9 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Abstract base implementation for an operation handler, which implements a simple start operation that returns a
@@ -333,9 +337,50 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     return barrier.waitForJobs(timeout);
   }
 
-  /** Get a configuration option. */
+  /**
+   * Get a configuration option.
+   *
+   * @deprecated use {@link #getConfig(WorkflowInstance, String)} or {@link #getOptConfig(org.opencastproject.workflow.api.WorkflowInstance, String)}
+   */
   protected Option<String> getCfg(WorkflowInstance wi, String key) {
     return option(wi.getCurrentOperation().getConfiguration(key));
+  }
+
+  /**
+   * Get a mandatory configuration key. Values are returned trimmed.
+   *
+   * @throws WorkflowOperationException
+   *         if the configuration key is either missing or empty
+   */
+  protected String getConfig(WorkflowInstance wi, String key) throws WorkflowOperationException {
+    return getConfig(wi.getCurrentOperation(), key);
+  }
+
+  /**
+   * Get a mandatory configuration key. Values are returned trimmed.
+   *
+   * @throws WorkflowOperationException
+   *         if the configuration key is either missing or empty
+   */
+  protected String getConfig(WorkflowOperationInstance woi, String key) throws WorkflowOperationException {
+    for (final String cfg : getOptConfig(woi, key)) {
+      return cfg;
+    }
+    throw new WorkflowOperationException(format("Configuration key '%s' is either missing or empty", key));
+  }
+
+  /**
+   * Get an optional configuration key. Values are returned trimmed.
+   */
+  protected Opt<String> getOptConfig(WorkflowInstance wi, String key) {
+    return getOptConfig(wi.getCurrentOperation(), key);
+  }
+
+  /**
+   * Get an optional configuration key. Values are returned trimmed.
+   */
+  protected Opt<String> getOptConfig(WorkflowOperationInstance woi, String key) {
+    return Opt.nul(woi.getConfiguration(key)).flatMap(Strings.trimToNone);
   }
 
   /**
@@ -344,6 +389,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * Example usage: <code>getCfg(wi, "key").getOrElse(this.&lt;String&gt;cfgKeyMissing("key"))</code>
    *
    * @see #getCfg(WorkflowInstance, String)
+   * @deprecated see {@link #getCfg(WorkflowInstance, String)} for details
    */
   protected <A> Function0<A> cfgKeyMissing(final String key) {
     return new Function0<A>() {

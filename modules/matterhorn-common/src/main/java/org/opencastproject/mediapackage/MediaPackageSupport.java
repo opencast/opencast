@@ -15,7 +15,7 @@
  */
 package org.opencastproject.mediapackage;
 
-import org.opencastproject.fn.juc.Immutables;
+import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;

@@ -1,0 +1,6 @@
+<input type="checkbox" class="ios maintenance yellow"
+    ng-model="maintenance"
+    ng-init="maintenance = row.maintenance"
+    ng-change="table.setMaintenanceMode(row.name, !row.maintenance)"
+    with-role="ROLE_UI_SERVERS_MAINTENANCE_EDIT">
+</input>

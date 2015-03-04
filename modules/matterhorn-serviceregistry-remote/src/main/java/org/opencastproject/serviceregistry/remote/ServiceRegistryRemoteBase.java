@@ -164,11 +164,15 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
   }
 
   @Override
-  public void registerHost(String host, int maxConcurrentJobs) throws ServiceRegistryException {
+  public void registerHost(String host, String address, long memory, int cores, int maxConcurrentJobs)
+          throws ServiceRegistryException {
     final HttpPost post = post("registerhost");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("host", host));
+      params.add(new BasicNameValuePair("address", address));
+      params.add(new BasicNameValuePair("memory", Long.toString(memory)));
+      params.add(new BasicNameValuePair("cores", Integer.toString(cores)));
       params.add(new BasicNameValuePair("maxJobs", Integer.toString(maxConcurrentJobs)));
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
@@ -642,11 +646,23 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
 
   @Override
   public long countByHost(String serviceType, String host, Status status) throws ServiceRegistryException {
+    if (isBlank(serviceType))
+      throw new IllegalArgumentException("Service type must not be null");
+    if (isBlank(host))
+      throw new IllegalArgumentException("Host must not be null");
+    if (status == null)
+      throw new IllegalArgumentException("Status must not be null");
     return count(serviceType, host, null, status);
   }
 
   @Override
   public long countByOperation(String serviceType, String operation, Status status) throws ServiceRegistryException {
+    if (isBlank(serviceType))
+      throw new IllegalArgumentException("Service type must not be null");
+    if (isBlank(operation))
+      throw new IllegalArgumentException("Operation must not be null");
+    if (status == null)
+      throw new IllegalArgumentException("Status must not be null");
     return count(serviceType, null, operation, status);
   }
 

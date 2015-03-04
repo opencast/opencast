@@ -15,6 +15,12 @@
  */
 package org.opencastproject.series.impl.persistence;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -30,11 +36,9 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Tuple;
 
+import com.entwinemedia.fn.data.Opt;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mchange.v2.c3p0.DataSources;
-
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -59,6 +63,10 @@ public class SeriesServicePersistenceTest {
   private ComboPooledDataSource pooledDataSource;
   private SeriesServiceDatabaseImpl seriesDatabase;
   private String storage;
+
+  private static final String ELEMENT_TYPE = "testelement";
+  private static final byte[] ELEMENT_DATA_1 = "abcdefghijklmnopqrstuvwxyz".getBytes();
+  private static final byte[] ELEMENT_DATA_2 = "0123456789".getBytes();
 
   private DublinCoreCatalog testCatalog;
 
@@ -85,8 +93,8 @@ public class SeriesServicePersistenceTest {
 
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new JaxbUser("admin", new DefaultOrganization(), new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
-            new DefaultOrganization()));
+    User user = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
+            SecurityConstants.GLOBAL_ADMIN_ROLE, new DefaultOrganization()));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
@@ -140,10 +148,10 @@ public class SeriesServicePersistenceTest {
     seriesDatabase.storeSeries(testCatalog);
 
     Iterator<Tuple<DublinCoreCatalog, String>> series = seriesDatabase.getAllSeries();
-    Assert.assertTrue("Exactly one series should be returned", series.hasNext());
+    assertTrue("Exactly one series should be returned", series.hasNext());
     seriesDatabase.deleteSeries(testCatalog.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER));
     series = seriesDatabase.getAllSeries();
-    Assert.assertFalse("Exactly zero series should be returned", series.hasNext());
+    assertFalse("Exactly zero series should be returned", series.hasNext());
   }
 
   @Test
@@ -158,17 +166,33 @@ public class SeriesServicePersistenceTest {
     seriesDatabase.storeSeriesAccessControl(seriesID, accessControlList);
 
     AccessControlList retrievedACL = seriesDatabase.getAccessControlList(seriesID);
-    Assert.assertNotNull(retrievedACL);
+    assertNotNull(retrievedACL);
     acl = retrievedACL.getEntries();
-    Assert.assertEquals(acl.size(), 1);
-    Assert.assertEquals(acl.get(0).getRole(), "admin");
+    assertEquals(acl.size(), 1);
+    assertEquals(acl.get(0).getRole(), "admin");
 
     try {
       seriesDatabase.storeSeriesAccessControl("failid", accessControlList);
-      Assert.fail("Should fail when adding ACL to nonexistent series");
+      fail("Should fail when adding ACL to nonexistent series");
     } catch (NotFoundException e) {
       // expected
     }
+  }
+
+  @Test
+  public void testAddUpdateAndDeleteSeriesElement() throws Exception {
+    seriesDatabase.storeSeries(testCatalog);
+    final String seriesId = testCatalog.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER);
+
+    assertTrue(seriesDatabase.storeSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_1));
+    assertEquals(ELEMENT_DATA_1, seriesDatabase.getSeriesElement(seriesId, ELEMENT_TYPE).get());
+
+    assertTrue(seriesDatabase.storeSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_2));
+    assertEquals(ELEMENT_DATA_2, seriesDatabase.getSeriesElement(seriesId, ELEMENT_TYPE).get());
+
+    assertTrue(seriesDatabase.deleteSeriesElement(seriesId, ELEMENT_TYPE));
+    assertFalse(seriesDatabase.deleteSeriesElement(seriesId, ELEMENT_TYPE));
+    assertEquals(Opt.none(), seriesDatabase.getSeriesElement(seriesId, ELEMENT_TYPE));
   }
 
 }

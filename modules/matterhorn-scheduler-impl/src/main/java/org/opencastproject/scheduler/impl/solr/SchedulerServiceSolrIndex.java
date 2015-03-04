@@ -33,11 +33,14 @@ import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
+import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -60,8 +63,10 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -176,11 +181,6 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     deactivate();
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#activate()
-   */
   @Override
   public void activate() {
     // Set up the solr server
@@ -247,11 +247,6 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     solrServer = SolrServerFactory.newEmbeddedInstance(solrRoot, solrDataDir);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#deactivate()
-   */
   @Override
   public void deactivate() {
     SolrServerFactory.shutdown(solrServer);
@@ -275,32 +270,27 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#index(org.opencastproject.metadata.dublincore.
-   * DublinCoreCatalog)
-   */
   @Override
   public void index(DublinCoreCatalog dc) throws SchedulerServiceDatabaseException {
     index(dc, null);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#index(org.opencastproject.metadata.dublincore.
-   * DublinCoreCatalog)
-   */
+  @Override
   public void index(DublinCoreCatalog dc, Properties captureAgentProperties) throws SchedulerServiceDatabaseException {
-
     // See if we are updating
     SolrDocument retrievedDoc = retrieveDocumentById(getEventIdentifier(dc));
 
     // Prepare the new document
-    final SolrInputDocument doc;
+    final SolrInputDocument doc = createDocument(dc);
+
     String serializedCAProperties = null;
-    doc = createDocument(dc);
+    boolean optOut = false;
+    boolean blacklisted = false;
+    if (retrievedDoc != null) {
+      serializedCAProperties = (String) retrievedDoc.getFirstValue(SolrFields.CA_PROPERTIES);
+      optOut = BooleanUtils.toBoolean((Boolean) retrievedDoc.getFirstValue(SolrFields.OPT_OUT));
+      blacklisted = BooleanUtils.toBoolean((Boolean) retrievedDoc.getFirstValue(SolrFields.BLACKLISTED));
+    }
 
     // Use updated capture agent properties if available. Otherwise, read from the existing doc
     if (captureAgentProperties != null) {
@@ -310,10 +300,10 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
         logger.error("Error serializing capture agent properties: {}", e.getMessage());
         throw new SchedulerServiceDatabaseException(e);
       }
-    } else if (retrievedDoc != null) {
-      serializedCAProperties = (String) retrievedDoc.getFirstValue(SolrFields.CA_PROPERTIES);
     }
 
+    // doc.setField(SolrFields.OPT_OUT, optOut);
+    // doc.setField(SolrFields.BLACKLISTED, blacklisted);
     doc.setField(SolrFields.CA_PROPERTIES, serializedCAProperties);
     doc.setField(SolrFields.LAST_MODIFIED, new Date());
 
@@ -343,11 +333,6 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#index(java.lang.String, java.util.Properties)
-   */
   @Override
   public void index(final long eventId, Properties captureAgentProperties) throws NotFoundException,
           SchedulerServiceDatabaseException {
@@ -396,6 +381,84 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
             }
           } catch (Exception e) {
             logger.warn("Unable to update event {} capture agent metadata: {}", eventId, e.getMessage());
+          }
+        }
+      });
+    }
+  }
+
+  @Override
+  public void indexOptOut(final long eventId, boolean optOut) throws NotFoundException,
+          SchedulerServiceDatabaseException {
+    SolrDocument result = retrieveDocumentById(eventId);
+    if (result == null) {
+      logger.warn("No event exists with event ID {}", eventId);
+      throw new NotFoundException("Event with ID " + eventId + " does not exist.");
+    }
+
+    final SolrInputDocument doc = ClientUtils.toSolrInputDocument(result);
+    doc.setField(SolrFields.OPT_OUT, optOut);
+    doc.setField(SolrFields.LAST_MODIFIED, new Date());
+
+    if (synchronousIndexing) {
+      try {
+        synchronized (solrServer) {
+          solrServer.add(doc);
+          solrServer.commit();
+        }
+      } catch (Exception e) {
+        throw new SchedulerServiceDatabaseException("Unable to index event opt out status", e);
+      }
+    } else {
+      indexingExecutor.submit(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            synchronized (solrServer) {
+              solrServer.add(doc);
+              solrServer.commit();
+            }
+          } catch (Exception e) {
+            logger.warn("Unable to update event {} opt out status: {}", eventId, ExceptionUtils.getStackTrace(e));
+          }
+        }
+      });
+    }
+  }
+
+  @Override
+  public void indexBlacklisted(final long eventId, boolean blacklisted) throws NotFoundException,
+          SchedulerServiceDatabaseException {
+    SolrDocument result = retrieveDocumentById(eventId);
+    if (result == null) {
+      logger.warn("No event exists with event ID {}", eventId);
+      throw new NotFoundException("Event with ID " + eventId + " does not exist.");
+    }
+
+    final SolrInputDocument doc = ClientUtils.toSolrInputDocument(result);
+    doc.setField(SolrFields.BLACKLISTED, blacklisted);
+    doc.setField(SolrFields.LAST_MODIFIED, new Date());
+
+    if (synchronousIndexing) {
+      try {
+        synchronized (solrServer) {
+          solrServer.add(doc);
+          solrServer.commit();
+        }
+      } catch (Exception e) {
+        throw new SchedulerServiceDatabaseException("Unable to index event blacklist status", e);
+      }
+    } else {
+      indexingExecutor.submit(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            synchronized (solrServer) {
+              solrServer.add(doc);
+              solrServer.commit();
+            }
+          } catch (Exception e) {
+            logger.warn("Unable to update event {} blacklist status: {}", eventId, ExceptionUtils.getStackTrace(e));
           }
         }
       });
@@ -548,7 +611,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
 
   /*
    * (non-Javadoc)
-   *
+   * 
    * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#count()
    */
   @Override
@@ -608,6 +671,27 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
   }
 
   /**
+   * Appends query parameters to a solr query
+   *
+   * @param sb
+   *          The {@link StringBuilder} containing the query
+   * @param key
+   *          the key for this search parameter
+   * @param value
+   *          the value for this search parameter
+   * @return the appended {@link StringBuilder}
+   */
+  private StringBuilder append(StringBuilder sb, String key, boolean value) {
+    if (sb.length() > 0) {
+      sb.append(" AND ");
+    }
+    sb.append(key);
+    sb.append(":");
+    sb.append(value);
+    return sb;
+  }
+
+  /**
    * Appends query parameters to a solr query in a way that they are found even though they are not treated as a full
    * word in solr.
    *
@@ -661,7 +745,7 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
   }
 
   /**
-   * Builds a solr search query from a {@link org.opencastproject.series.api.SeriesQuery}.
+   * Builds a solr search query from a {@link SchedulerQuery}.
    *
    * @param query
    *          the series query
@@ -687,6 +771,8 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     append(sb, SolrFields.CREATED_KEY, query.getCreatedFrom(), query.getCreatedTo());
     append(sb, SolrFields.STARTS_KEY, query.getStartsFrom(), query.getStartsTo());
     append(sb, SolrFields.ENDS_KEY, query.getEndsFrom(), query.getEndsTo());
+    append(sb, SolrFields.OPT_OUT, query.isOptOut());
+    append(sb, SolrFields.BLACKLISTED, query.isBlacklisted());
 
     if (query.getIdsList() != null) {
       if (sb.length() > 0) {
@@ -769,14 +855,47 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * org.opencastproject.scheduler.impl.SchedulerServiceIndex#search(org.opencastproject.scheduler.api.SchedulerQuery)
-   */
   @Override
   public DublinCoreCatalogList search(SchedulerQuery query) throws SchedulerServiceDatabaseException {
+    List<DublinCoreCatalog> resultList;
+
+    try {
+      QueryResponse response = solrServer.query(getSolrQuery(query));
+      SolrDocumentList items = response.getResults();
+
+      resultList = new LinkedList<DublinCoreCatalog>();
+
+      // Iterate through the results
+      for (SolrDocument doc : items) {
+        DublinCoreCatalog dc = parseDublinCore((String) doc.get(SolrFields.XML_KEY));
+        resultList.add(dc);
+      }
+      return new DublinCoreCatalogList(resultList, response.getResults().getNumFound());
+    } catch (Exception e) {
+      throw new SchedulerServiceDatabaseException(e);
+    }
+  }
+
+  @Override
+  public List<Tuple<String, String>> calendarSearch(SchedulerQuery query) throws SchedulerServiceDatabaseException {
+    List<Tuple<String, String>> resultList = new LinkedList<Tuple<String, String>>();
+    try {
+      QueryResponse response = solrServer.query(getSolrQuery(query));
+      SolrDocumentList items = response.getResults();
+
+      // Iterate through the results
+      for (SolrDocument doc : items) {
+        String dc = (String) doc.get(SolrFields.XML_KEY);
+        String serializedCA = (String) doc.get(SolrFields.CA_PROPERTIES);
+        resultList.add(Tuple.tuple(dc, serializedCA));
+      }
+      return resultList;
+    } catch (Exception e) {
+      throw new SchedulerServiceDatabaseException(e);
+    }
+  }
+
+  private SolrQuery getSolrQuery(SchedulerQuery query) {
     SolrQuery solrQuery = new SolrQuery();
     if (query == null) {
       query = new SchedulerQuery();
@@ -793,31 +912,9 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     if (!SchedulerQuery.Sort.EVENT_START.equals(query.getSort())) {
       solrQuery.addSortField(getSortField(SchedulerQuery.Sort.EVENT_START) + "_sort", SolrQuery.ORDER.asc);
     }
-
-    List<DublinCoreCatalog> resultList;
-
-    try {
-      QueryResponse response = solrServer.query(solrQuery);
-      SolrDocumentList items = response.getResults();
-
-      resultList = new LinkedList<DublinCoreCatalog>();
-
-      // Iterate through the results
-      for (SolrDocument doc : items) {
-        DublinCoreCatalog dc = parseDublinCore((String) doc.get(SolrFields.XML_KEY));
-        resultList.add(dc);
-      }
-      return new DublinCoreCatalogList(resultList, response.getResults().getNumFound());
-    } catch (Exception e) {
-      throw new SchedulerServiceDatabaseException(e);
-    }
+    return solrQuery;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#delete(java.lang.String)
-   */
   @Override
   public void delete(final long id) throws SchedulerServiceDatabaseException {
 
@@ -863,11 +960,6 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#getDublinCore(java.lang.String)
-   */
   @Override
   public DublinCoreCatalog getDublinCore(long eventId) throws SchedulerServiceDatabaseException, NotFoundException {
     SolrDocument result = retrieveDocumentById(eventId);
@@ -887,11 +979,6 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#getCaptureAgentProperties(java.lang.String)
-   */
   @Override
   public Properties getCaptureAgentProperties(long eventId) throws SchedulerServiceDatabaseException, NotFoundException {
     SolrDocument result = retrieveDocumentById(eventId);
@@ -911,6 +998,26 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
       }
       return caProperties;
     }
+  }
+
+  @Override
+  public boolean isOptOut(long eventId) throws NotFoundException, SchedulerServiceDatabaseException {
+    SolrDocument result = retrieveDocumentById(eventId);
+    if (result == null) {
+      logger.info("No event exists with ID {}", eventId);
+      throw new NotFoundException("Event with ID " + eventId + " does not exist");
+    }
+    return BooleanUtils.toBoolean((Boolean) result.get(SolrFields.OPT_OUT));
+  }
+
+  @Override
+  public boolean isBlacklisted(long eventId) throws NotFoundException, SchedulerServiceDatabaseException {
+    SolrDocument result = retrieveDocumentById(eventId);
+    if (result == null) {
+      logger.info("No event exists with ID {}", eventId);
+      throw new NotFoundException("Event with ID " + eventId + " does not exist");
+    }
+    return BooleanUtils.toBoolean((Boolean) result.get(SolrFields.BLACKLISTED));
   }
 
   /**
@@ -957,19 +1064,14 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.opencastproject.scheduler.impl.SchedulerServiceIndex#getLastModifiedDate(java.lang.String)
-   */
   @Override
-  public Date getLastModifiedDate(SchedulerQuery filter) throws SchedulerServiceDatabaseException {
-    String solrQueryString = buildSolrQueryString(filter);
-    SolrQuery q = new SolrQuery(solrQueryString);
-    q.addSortField(SolrFields.LAST_MODIFIED + "_sort", SolrQuery.ORDER.desc);
-    q.setRows(1);
+  public Map<String, Date> getLastModifiedDate(SchedulerQuery filter) throws SchedulerServiceDatabaseException {
     QueryResponse response;
     try {
+      String solrQueryString = buildSolrQueryString(filter);
+      SolrQuery q = new SolrQuery(solrQueryString);
+      q.addSortField(SolrFields.LAST_MODIFIED + "_sort", SolrQuery.ORDER.desc);
+      q.setRows(Integer.MAX_VALUE);
       response = solrServer.query(q);
     } catch (SolrServerException e) {
       logger.error("Could not complete query request: {}", e);
@@ -977,10 +1079,23 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     }
     if (response.getResults().isEmpty()) {
       logger.debug("No events scheduled for {}", filter);
-      return null;
+      return new HashMap<String, Date>();
     }
 
-    return (Date) response.getResults().get(0).get(SolrFields.LAST_MODIFIED);
+    try {
+      // Iterate through the results
+      Map<String, Date> lastModifiedDates = new HashMap<String, Date>();
+      for (SolrDocument doc : response.getResults()) {
+        String agentId = (String) doc.get(SolrFields.SPATIAL_KEY);
+        if (agentId == null || lastModifiedDates.containsKey(agentId))
+          continue;
+        Date date = (Date) doc.get(SolrFields.LAST_MODIFIED);
+        lastModifiedDates.put(agentId, date);
+      }
+      return lastModifiedDates;
+    } catch (Exception e) {
+      throw new SchedulerServiceDatabaseException(e);
+    }
   }
 
   /**

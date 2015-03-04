@@ -1,0 +1,60 @@
+{
+    "count": 4,
+    "limit": 100,
+    "offset": 0,
+    "results": [
+        {
+            "blacklist": {
+                "end": "2025-12-24T12:12:12Z",
+                "start": "2012-12-12T12:12:12Z"
+            },
+            "personId":1,
+            "email": "email1",
+            "manageable": true,
+            "name": "user1",
+            "provider": "provider1",
+            "roles": [
+                "ADMIN",
+                "USER"
+            ],
+            "username": "user1"
+        },
+        {
+            "blacklist": "",
+            "personId":2,
+            "email": "email2",
+            "manageable": true,
+            "name": "user2",
+            "provider": "provider1",
+            "roles": [],
+            "username": "user2"
+        },
+        {
+            "blacklist": {
+                "end": "2029-12-24T12:12:12Z",
+                "start": "2028-12-12T12:12:12Z"
+            },
+            "personId":3,
+            "email": "email3",
+            "manageable": true,
+            "name": "user3",
+            "provider": "provider1",
+            "roles": [],
+            "username": "user3"
+        },
+        {
+            "blacklist": {
+                "end": "2029-12-24T12:12:12Z",
+                "start": "2028-12-12T12:12:12Z"
+            },
+            "personId":4,
+            "email": "email4",
+            "manageable": true,
+            "name": "user1",
+            "provider": "provider1",
+            "roles": [],
+            "username": "user4"
+        }
+    ],
+    "total": 4
+}

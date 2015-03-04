@@ -1,0 +1,46 @@
+.progress {
+    overflow: hidden;
+    height: 25px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border-radius: @main-border-radius;
+    border: 1px solid darken(#388ed6, 10%);
+
+    &.compact {
+        height: 8px;
+    }
+}
+
+.progress-bar {
+    float: left;
+    width: 0%;
+    height: 100%;
+    font-size: 12px;
+    line-height: 24px;
+    color: #fff;
+    text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    background-color: @progress-bar-color;
+    #gradient > .vertical(#388ed6, #2b77b9);
+    border-right: 1px solid darken(#388ed6, 15%);
+    .transition(width 600ms ease);
+
+    &[aria-valuenow="1"],
+    &[aria-valuenow="2"] {
+        min-width: 30px;
+    }
+
+    &[aria-valuenow="0"] {
+        color: #777777;
+        min-width: 30px;
+        background-color: transparent;
+        background-image: none;
+        box-shadow: none;
+    }
+
+    .sr-only {
+        visibility: hidden;
+        opacity: 0;
+    }
+}

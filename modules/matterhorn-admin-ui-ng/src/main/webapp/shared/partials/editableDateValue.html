@@ -1,0 +1,9 @@
+<div ng-click="enterEditMode()" ng-form="innerForm">
+    <span ng-show="!editMode">{{ params.value | localizeDate:'date':'short' }}</span>
+    <i class="edit fa fa-pencil-square" ng-show="!editMode"></i>
+    <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
+
+    <input ng-keyup="keyUp($event)" type="text" datepicker select="submit()"
+        ng-model="params.value" editMode = false"
+        ng-show="editMode" ng-required="params.required" name="{{ params.name }}"/>
+</div>

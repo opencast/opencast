@@ -55,7 +55,7 @@ public class UserTrackingRestServiceTest {
     SecurityService security = EasyMock.createMock(SecurityService.class);
     EasyMock.expect(security.getUser())
             .andReturn(
-                    new JaxbUser(MOCK_USER, new DefaultOrganization(), new JaxbRole("ROLE_USER",
+                    new JaxbUser(MOCK_USER, "test", new DefaultOrganization(), new JaxbRole("ROLE_USER",
                             new DefaultOrganization()))).anyTimes();
 
     BundleContext bc = EasyMock.createMock(BundleContext.class);

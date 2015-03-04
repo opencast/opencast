@@ -1,0 +1,43 @@
+.main-video-details {
+    &:extend(.page-title all);
+}
+
+// Video Header Layout
+.video-header {
+    .clearfix();
+    margin-bottom: 20px;
+
+    .main-video-details {
+        float: left;
+    }
+
+    .video-more-options {
+        float: right;
+    }
+}
+
+.video-more-options {
+
+    a:last-child {
+        margin-left: 5px;
+    }
+
+    @button-padding: 8px 18px;
+    @font-size: 14px;
+
+    .view-comments-btn {
+        .btn(white);
+        .fa-icon(@fa-comments, after, inline, 0 0 0 8px, 0, inherit, 16px);
+        font-size: @font-size;
+        padding: @button-padding;
+        display: inline-block;
+    }
+
+    .edit-video-btn {
+        .btn(white);
+        .fa-icon(@fa-file-video-o, after, inline, 0 0 0 8px, 0, inherit, 16px);
+        font-size: @font-size;
+        padding: @button-padding;
+        display: inline-block;
+    }
+}

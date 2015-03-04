@@ -1,0 +1,45 @@
+<section class="modal active modal-open" id="delete-series-status-modal" style="display: block;" ng-controller="BulkDeleteCtrl">
+    <header>
+        <a ng-click="close()" class="fa fa-times close-modal"></a>
+        <h2 translate="BULK_ACTIONS.DELETE.SERIES.CAPTION">Delete Series</h2>
+    </header>
+
+    <div class="modal-content">
+        <div class="important-message danger">
+            <div class="message-header">Warning</div>
+            <div class="message-body">
+                <p translate="BULK_ACTIONS.DELETE_WARNING_LINE1">You have chosen to delete an event. Once deleted all metadata, audio and video will be deleted and can not be retrieved.</p>
+                <p translate="BULK_ACTIONS.DELETE_WARNING_LINE2">By pressing delete you understand that these files are unrecoverable.</p>
+            </div>
+        </div>
+
+        <div class="full-col">
+            <div class="obj">
+                <header translate="EVENTS.SERIES.TABLE.CAPTION">Series</header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <thead>
+                            <tr>
+                                <th class="small"><input type="checkbox" ng-model="all" ng-change="toggleSelectAll()" class="select-all-cbox"></th>
+                                <th translate="EVENTS.SERIES.TABLE.TITLE">Series</th>
+                                <th translate="EVENTS.SERIES.TABLE.CREATORS">Organizer(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in rows">
+                                <td><input type="checkbox" ng-model="row.selected" class="child-cbox"></td>
+                                <td>{{ row.title }}</td>
+                                <td>{{ row.creator }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div><!-- obj-container -->
+            </div><!-- obj -->
+        </div><!-- full-col -->
+    </div><!-- modal-content -->
+
+    <footer>
+        <a ng-class="{danger: valid(), inactive: !valid()}" ng-click="submit()">Delete</a>
+        <a ng-click="close()" class="cancel">Cancel</a>
+    </footer>
+</section>

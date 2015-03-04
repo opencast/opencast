@@ -3,7 +3,8 @@
   <id>delete-archive</id>
   <title>Delete from Archive</title>
   <tags>
-	<tag>archive</tag>
+    <tag>archive</tag>
+    <tag>archive-ng</tag>
   </tags>
   <description>Delete a media packge from the archive on optianlly retract it from the engage distribution channel.
     WARNING! When retracting from the different publication channels is disabled, they can't be retracted anymore by the
@@ -18,7 +19,7 @@
         <li class="ui-helper-clearfix">
           <label>Publication Channels:</label>
           <span>
-            <input id="engage" name="engage" type="checkbox" checked="checked" class="configField" value="Matterhorn Engage Player" />
+            <input id="engage" name="engage" type="checkbox" checked="checked" class="configField" value="true" />
             <span>&nbsp;Matterhorn Engage Player</span>
             <input id="youtube" name="youtube" type="checkbox" checked="checked" class="configField" value="YouTube" />
             <span>&nbsp;Youtube</span>

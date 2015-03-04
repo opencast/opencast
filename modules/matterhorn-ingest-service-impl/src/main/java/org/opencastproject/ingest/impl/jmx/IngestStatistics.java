@@ -15,14 +15,13 @@
  */
 package org.opencastproject.ingest.impl.jmx;
 
-import com.google.common.collect.MapMaker;
-
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 public class IngestStatistics implements IngestStatisticsMXBean {
@@ -30,7 +29,7 @@ public class IngestStatistics implements IngestStatisticsMXBean {
   private long totalNumBytesRead = 0L;
   private int successful = 0;
   private int failed = 0;
-  private ConcurrentMap<Long, Long> bytesCounter = new MapMaker().expireAfterWrite(15, TimeUnit.MINUTES).makeMap();
+  private Cache<Long, Long> bytesCounter = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.MINUTES).build();
 
   /**
    * @see org.opencastproject.ingest.impl.jmx.IngestStatisticsMXBean#getSuccessfulIngestOperations()
@@ -62,7 +61,7 @@ public class IngestStatistics implements IngestStatisticsMXBean {
   @Override
   public long getBytesInLastMinute() {
     long key = getKeyByTime(new DateTime().minusMinutes(1).getMillis());
-    return key != 0 ? totalNumBytesRead - bytesCounter.get(key) : 0;
+    return key != 0 ? totalNumBytesRead - bytesCounter.getIfPresent(key) : 0;
   }
 
   /**
@@ -71,7 +70,7 @@ public class IngestStatistics implements IngestStatisticsMXBean {
   @Override
   public long getBytesInLastFiveMinutes() {
     long key = getKeyByTime(new DateTime().minusMinutes(5).getMillis());
-    return key != 0 ? totalNumBytesRead - bytesCounter.get(key) : 0;
+    return key != 0 ? totalNumBytesRead - bytesCounter.getIfPresent(key) : 0;
   }
 
   /**
@@ -80,12 +79,12 @@ public class IngestStatistics implements IngestStatisticsMXBean {
   @Override
   public long getBytesInLastFifteenMinutes() {
     long key = getKeyByTime(new DateTime().minusMinutes(15).getMillis());
-    return key != 0 ? totalNumBytesRead - bytesCounter.get(key) : 0;
+    return key != 0 ? totalNumBytesRead - bytesCounter.getIfPresent(key) : 0;
   }
 
   private long getKeyByTime(long timeBeforeFiveMinute) {
     long key = 0L;
-    List<Long> bytes = new ArrayList<Long>(bytesCounter.keySet());
+    List<Long> bytes = new ArrayList<Long>(bytesCounter.asMap().keySet());
     Collections.sort(bytes);
     for (Long milis : bytes) {
       if (milis > timeBeforeFiveMinute) {

@@ -74,6 +74,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -288,8 +289,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         }
       }
 
-      registerHost(hostName, maxJobs);
-    } catch (ServiceRegistryException e) {
+      String address = InetAddress.getByName(URI.create(hostName).getHost()).getHostAddress();
+      long maxMemory = Runtime.getRuntime().maxMemory();
+      int cores = Runtime.getRuntime().availableProcessors();
+
+      registerHost(hostName, address, maxMemory, cores, maxJobs);
+    } catch (Exception e) {
       throw new IllegalStateException("Unable to register host " + hostName + " in the service registry", e);
     }
 
@@ -934,10 +939,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(java.lang.String, int)
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(String, String, long, int, int)
    */
   @Override
-  public void registerHost(String host, int maxJobs) throws ServiceRegistryException {
+  public void registerHost(String host, String address, long memory, int cores, int maxConcurrentJobs)
+          throws ServiceRegistryException {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -947,14 +953,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       // Find the existing registrations for this host and if it exists, update it
       HostRegistrationJpaImpl hostRegistration = fetchHostRegistration(em, host);
       if (hostRegistration == null) {
-        hostRegistration = new HostRegistrationJpaImpl(host, maxJobs, true, false);
+        hostRegistration = new HostRegistrationJpaImpl(host, address, memory, cores, maxConcurrentJobs, true, false);
         em.persist(hostRegistration);
       } else {
-        hostRegistration.setMaxJobs(maxJobs);
+        hostRegistration.setIpAddress(address);
+        hostRegistration.setMemory(memory);
+        hostRegistration.setCores(cores);
+        hostRegistration.setMaxJobs(maxConcurrentJobs);
         hostRegistration.setOnline(true);
         em.merge(hostRegistration);
       }
-      logger.info("Registering {} with a maximum load of {}", host, maxJobs);
+      logger.info("Registering {} with a maximum load of {}", host, maxConcurrentJobs);
       tx.commit();
       hostsStatistics.updateHost(hostRegistration);
     } catch (Exception e) {

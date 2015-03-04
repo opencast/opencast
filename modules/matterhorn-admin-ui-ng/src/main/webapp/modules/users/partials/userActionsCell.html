@@ -1,0 +1,13 @@
+<a data-open-modal="user-modal"
+	data-action="edit"
+	data-resource-id="{{ row.id }}"
+	class="more"
+	with-role="ROLE_UI_USERS_EDIT">
+</a>
+<a data-confirmation-modal="confirm-modal"
+    data-callback="table.delete"
+    data-object="row.id"
+    class="remove"
+    ng-if="row.manageable"
+    with-role="ROLE_UI_USERS_DELETE">
+</a>

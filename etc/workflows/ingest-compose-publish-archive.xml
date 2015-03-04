@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ingest-compose-publish-archive</id>
+  <title>Ingest, Encode, Analyze, and Distribute</title>
+  <tags>
+    <tag>upload-ng</tag>
+    <tag>schedule-ng</tag>
+  </tags>
+  <description>
+    A simple workflow that transcodes the media into distribution formats, then sends the resulting distribution files,
+    along with their associated metadata, to the distribution channels.
+  </description>
+
+  <configuration_panel>
+  <![CDATA[
+    <fieldset>
+      <legend>Theme</legend>
+      <ul class="oc-ui-checkbox-list-upload">
+        <li class="ui-helper-clearfix">
+          <span id="themeconfig">
+            <input id="theme" name="theme" type="checkbox" class="configField holdCheckbox" value="true"/>
+            <span id="i18n_activate_theme">&nbsp;Apply the series theme</span>
+          </span>
+        </li>
+      </ul>
+    </fieldset>
+    <fieldset>
+      <legend>Publication</legend>
+      <ul class="oc-ui-checkbox-list-upload">
+        <li class="ui-helper-clearfix">
+          <span id="engageconfig">
+            <input id="publishEngage" name="publishEngage" type="checkbox" checked="checked" class="configField" value="true" />
+            <span id="i18n_dist_mmm">&nbsp;Matterhorn Media Module</span>
+          </span>
+        </li>
+        <li class="ui-helper-clearfix">
+          <span id="harvestingconfig">
+            <input id="publishHarvesting" name="publishHarvesting" type="checkbox" checked="checked" class="configField" value="true" />
+            <span id="i18n_dist_mmm">&nbsp;Metadata Harvesting</span>
+          </span>
+        </li>
+        <!--
+	      <li class="ui-helper-clearfix">
+          <span id="youtubeconfig">
+            <input id="publishYoutube" name="publishYoutube" type="checkbox" disabled="disabled" class="configField" value="true" />
+            <span id="i18n_dist_mmm">&nbsp;Youtube</span>
+          </span>
+        </li>
+        -->
+      </ul>
+    </fieldset>
+
+    <script type="text/javascript">
+      var ocWorkflowPanel = ocWorkflowPanel || {};
+
+      ocWorkflowPanel.registerComponents = function(components){
+
+        /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
+         * into the workflow. The new ocAdmin.Component key must match the components array key.
+         *
+         * Example:'org.opencastproject.workflow.config.myProperty' will be availible at ${my.property}
+         */
+
+        components['org.opencastproject.workflow.config.theme'] = new ocAdmin.Component(
+          ['theme'],
+          {key: 'org.opencastproject.workflow.config.theme'},
+          {getValue: function(){ return this.fields.theme.is(":checked");}
+        });
+
+        components['org.opencastproject.workflow.config.publishEngage'] = new ocAdmin.Component(
+          ['publishEngage'],
+          {key: 'org.opencastproject.workflow.config.publishEngage'},
+          {getValue: function(){ return this.fields.publishEngage.is(":checked");}
+        });
+
+        components['org.opencastproject.workflow.config.publishHarvesting'] = new ocAdmin.Component(
+          ['publishHarvesting'],
+          {key: 'org.opencastproject.workflow.config.publishHarvesting'},
+          {getValue: function(){ return this.fields.publishHarvesting.is(":checked");}
+        });
+
+      }
+      ocWorkflowPanel.setComponentValues = function(values, components){
+        components['org.opencastproject.workflow.config.theme'].setValue(values['org.opencastproject.workflow.config.theme']);
+        components['org.opencastproject.workflow.config.publishEngage'].setValue(values['org.opencastproject.workflow.config.publishEngage']);
+        components['org.opencastproject.workflow.config.publishHarvesting'].setValue(values['org.opencastproject.workflow.config.publishHarvesting']);
+        components['license'].setValue(values['license']);
+      }
+    </script>
+  ]]>
+  </configuration_panel>
+
+  <operations>
+
+	  <!-- Make sure the workflow contains at least a default configuration -->
+
+    <operation
+      id="defaults"
+      description="Applying default configuration values">
+      <configurations>
+        <configuration key="publishEngage">true</configuration>
+        <configuration key="publishHarvesting">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Apply the theme to the mediapackage -->
+
+    <operation
+      id="theme"
+      if="${theme}"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Apply the theme to the mediapackage">
+      <configurations>
+        <configuration key="bumper-flavor">branding/bumper</configuration>
+        <configuration key="bumper-tags">archive</configuration>
+        <configuration key="trailer-flavor">branding/trailer</configuration>
+        <configuration key="trailer-tags">archive</configuration>
+        <configuration key="title-slide-flavor">branding/title-slide</configuration>
+        <configuration key="title-slide-tags">archive</configuration>
+        <configuration key="license-slide-flavor">branding/license-slide</configuration>
+        <configuration key="license-slide-tags">archive</configuration>
+        <configuration key="watermark-flavor">branding/watermark</configuration>
+        <configuration key="watermark-tags">archive</configuration>
+        <configuration key="watermark-layout">
+					{"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":1.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":1.0}}};
+					{"horizontalCoverage":0.2,"anchorOffset":{"referring":{"left":0.0,"top":0.0},"offset":{"y":-20,"x":-20},"reference":{"left":0.0,"top":0.0}}};
+					{"anchorOffset":{"referring":{"left":1.0,"top":1.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":1.0}}}
+				</configuration>
+        <configuration key="watermark-layout-variable">layout</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Ingest and prepare                                                -->
+    <!--                                                                   -->
+    <!-- Download from external ingest nodes, tag, inspect and and prepare -->
+    <!-- source recording and metadata catalogs.                           -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <operation
+	    id="include"
+      description="Ingest and prepare">
+      <configurations>
+         <configuration key="workflow-id">ingest-prepare</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Reflavor the work videos to trimmed -->
+
+    <operation
+      id="tag"
+      description="Reflavor presenter work videos to trimm">
+      <configurations>
+        <configuration key="source-flavors">presenter/work</configuration>
+        <configuration key="target-flavor">presenter/trimmed</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="tag"
+      description="Reflavor presentation work videos to trimm">
+      <configurations>
+        <configuration key="source-flavors">presentation/work</configuration>
+        <configuration key="target-flavor">presentation/trimmed</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Encode for publication and archive                                -->
+    <!--                                                                   -->
+    <!-- Encode audio and video formats to the distribution formats that   -->
+    <!-- are required by the Engage publication channel.Apply the video    -->
+    <!-- segmentation algorithm to the presentation tracks and extract     -->
+    <!-- segment preview images and metadata. Send the encoded material    -->
+    <!-- along with the metadata to the publication channels. Store        -->
+    <!-- everything that has been tagged accordingly in the archive.       -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <operation
+      id="include"
+      description="Encode, publication and archive">
+      <configurations>
+        <configuration key="workflow-id">encode-publish-archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Cleanup                                                           -->
+    <!--                                                                   -->
+    <!-- Remove the recording's artefacts from the workspace and the       -->
+    <!-- working file repository.                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Cleanup the working file repository -->
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+      <configurations>
+        <configuration key="preserve-flavors"></configuration>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

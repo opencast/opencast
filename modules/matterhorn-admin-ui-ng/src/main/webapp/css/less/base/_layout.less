@@ -1,0 +1,40 @@
+html, body { 
+    .size(100%, 100%);
+    font-family: @font-stack;
+}
+
+body {
+    background: @body-background;
+    font-size: 14px;
+    font-family: @font-stack;
+    position: relative;
+    
+    &.login-body {
+        #gradient > .radial(#fafafa, #d8dfe4);
+    }
+}
+
+// Resets
+
+a {
+    color: @black-50;
+    text-decoration: none;
+    
+    &:hover {
+        color: @black-70;
+    }
+
+}
+
+
+strong {
+    font-weight: 600;
+}
+
+textarea,
+input,
+button {
+    &:focus {
+        outline: none;
+        }
+}

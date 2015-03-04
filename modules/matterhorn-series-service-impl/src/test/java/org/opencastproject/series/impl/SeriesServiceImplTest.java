@@ -15,21 +15,24 @@
  */
 package org.opencastproject.series.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Collections.list;
 
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -39,22 +42,19 @@ import org.opencastproject.series.impl.solr.SeriesServiceSolrIndex;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 
+import com.entwinemedia.fn.data.Opt;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mchange.v2.c3p0.DataSources;
-
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
 
 import java.io.File;
 import java.io.InputStream;
@@ -81,6 +81,10 @@ public class SeriesServiceImplTest {
   private DublinCoreCatalog testCatalog;
   private DublinCoreCatalog testCatalog2;
 
+  private static final String ELEMENT_TYPE = "testelement";
+  private static final byte[] ELEMENT_DATA_1 = "abcdefghijklmnopqrstuvwxyz".getBytes();
+  private static final byte[] ELEMENT_DATA_2 = "0123456789".getBytes();
+
   /**
    * @throws java.lang.Exception
    */
@@ -103,8 +107,8 @@ public class SeriesServiceImplTest {
 
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new JaxbUser("admin", new DefaultOrganization(), new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
-            new DefaultOrganization()));
+    User user = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
+            SecurityConstants.GLOBAL_ADMIN_ROLE, new DefaultOrganization()));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
@@ -123,14 +127,14 @@ public class SeriesServiceImplTest {
     index.setSecurityService(securityService);
     index.activate(null);
 
-    EventAdmin eventAdmin = EasyMock.createNiceMock(EventAdmin.class);
-    EasyMock.replay(eventAdmin);
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(messageSender);
 
     seriesService = new SeriesServiceImpl();
     seriesService.setPersistence(seriesDatabase);
     seriesService.setIndex(index);
-    seriesService.setEventAdmin(eventAdmin);
     seriesService.setSecurityService(securityService);
+    seriesService.setMessageSender(messageSender);
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bundleContext.getProperty((String) EasyMock.anyObject())).andReturn("System Admin");
@@ -271,7 +275,7 @@ public class SeriesServiceImplTest {
 
     acl = accessControlList.getEntries();
     acl.clear();
-    acl.add(new AccessControlEntry("student", "read", true));
+    acl.add(new AccessControlEntry("student", Permissions.Action.READ.toString(), true));
     seriesService.updateAccessControl(testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER), accessControlList);
     retrievedACL = seriesService.getSeriesAccessControl(testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
     Assert.assertNotNull(retrievedACL);
@@ -282,17 +286,17 @@ public class SeriesServiceImplTest {
 
   @Test
   public void testDublinCoreCatalogEquality1() {
-    DublinCoreCatalog a = DublinCoreCatalogImpl.newInstance();
-    DublinCoreCatalog b = DublinCoreCatalogImpl.newInstance();
+    DublinCoreCatalog a = DublinCores.mkOpencast();
+    DublinCoreCatalog b = DublinCores.mkOpencast();
     a.set(DublinCore.PROPERTY_IDENTIFIER, "123");
     assertFalse(SeriesServiceImpl.equals(a, b));
     b.set(DublinCore.PROPERTY_IDENTIFIER, "123");
     assertTrue(SeriesServiceImpl.equals(a, b));
-    a.set(DublinCore.PROPERTY_CONTRIBUTOR, list(new DublinCoreValue("Peter"), new DublinCoreValue("Paul")));
-    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(new DublinCoreValue("Paul"), new DublinCoreValue("Peter")));
+    a.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
+    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Paul"), DublinCoreValue.mk("Peter")));
     assertFalse(SeriesServiceImpl.equals(a, b));
     //
-    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(new DublinCoreValue("Peter"), new DublinCoreValue("Paul")));
+    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
     assertTrue(SeriesServiceImpl.equals(a, b));
     //
     a.set(DublinCore.PROPERTY_SPATIAL, "room1");
@@ -304,13 +308,13 @@ public class SeriesServiceImplTest {
 
   @Test
   public void testDublinCoreCatalogEquality2() {
-    DublinCoreCatalog a = DublinCoreCatalogImpl.newInstance();
-    DublinCoreCatalog b = DublinCoreCatalogImpl.newInstance();
+    DublinCoreCatalog a = DublinCores.mkOpencast();
+    DublinCoreCatalog b = DublinCores.mkOpencast();
     a.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     a.set(DublinCore.PROPERTY_SPATIAL, "room1");
     a.set(DublinCore.PROPERTY_IDENTIFIER, "123");
-    a.set(DublinCore.PROPERTY_CONTRIBUTOR, list(new DublinCoreValue("Peter"), new DublinCoreValue("Paul")));
-    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(new DublinCoreValue("Peter"), new DublinCoreValue("Paul")));
+    a.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
+    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
     b.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     b.set(DublinCore.PROPERTY_SPATIAL, "room1");
     b.set(DublinCore.PROPERTY_IDENTIFIER, "123");
@@ -328,10 +332,11 @@ public class SeriesServiceImplTest {
 
   @Test
   public void testACLEquality1() {
-    AccessControlList a = new AccessControlList(new AccessControlEntry("a", "read", true), new AccessControlEntry("b",
-            "write", false));
-    AccessControlList b = new AccessControlList(new AccessControlEntry("b", "write", false), new AccessControlEntry(
-            "a", "read", true));
+    AccessControlList a = new AccessControlList(new AccessControlEntry("a", Permissions.Action.READ.toString(), true),
+            new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false));
+    AccessControlList b = new AccessControlList(
+            new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false), new AccessControlEntry("a",
+                    Permissions.Action.READ.toString(), true));
     assertTrue(SeriesServiceImpl.equals(a, b));
   }
 
@@ -345,50 +350,34 @@ public class SeriesServiceImplTest {
   @Test
   public void testACLEquality3() {
     AccessControlList a = new AccessControlList();
-    AccessControlList b = new AccessControlList(new AccessControlEntry("b", "write", false));
+    AccessControlList b = new AccessControlList(new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false));
     assertFalse(SeriesServiceImpl.equals(a, b));
   }
 
   @Test
   public void testACLEquality4() {
-    AccessControlList a = new AccessControlList(new AccessControlEntry("b", "write", false));
-    AccessControlList b = new AccessControlList(new AccessControlEntry("b", "write", false), new AccessControlEntry(
-            "b", "read", false));
+    AccessControlList a = new AccessControlList(new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false));
+    AccessControlList b = new AccessControlList(
+            new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false), new AccessControlEntry("b",
+                    Permissions.Action.READ.toString(), false));
     assertFalse(SeriesServiceImpl.equals(a, b));
   }
 
   @Test
-  public void testUpdatingUnmodifiedDublinCore() throws Exception {
-    // setup mock (no nice mock since times(..) seems to be accepting just an upper bound value)
-    EventAdmin mock = EasyMock.createMock(EventAdmin.class);
-    seriesService.setEventAdmin(mock);
-    mock.postEvent(EasyMock.<Event> anyObject());
-    EasyMock.expectLastCall().times(2); // expect two update events, updating testCatalog a second time should result in
-                                        // a no-op
-    EasyMock.replay(mock);
-    // start testing
+  public void testSeriesElements() throws Exception {
     seriesService.updateSeries(testCatalog);
-    seriesService.updateSeries(testCatalog);
-    seriesService.updateSeries(testCatalog2);
-    // verify
-    EasyMock.verify(mock);
+    final String seriesId = testCatalog.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER);
+
+    assertTrue(seriesService.addSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_1));
+    assertFalse(seriesService.addSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_1));
+    assertEquals(ELEMENT_DATA_1, seriesService.getSeriesElementData(seriesId, ELEMENT_TYPE).get());
+
+    assertTrue(seriesService.updateSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_2));
+    assertEquals(ELEMENT_DATA_2, seriesService.getSeriesElementData(seriesId, ELEMENT_TYPE).get());
+
+    assertTrue(seriesService.deleteSeriesElement(seriesId, ELEMENT_TYPE));
+    assertFalse(seriesService.deleteSeriesElement(seriesId, ELEMENT_TYPE));
+    assertEquals(Opt.none(), seriesService.getSeriesElementData(seriesId, ELEMENT_TYPE));
   }
 
-  @Test
-  public void testUpdatingUnmodifiedAcl() throws Exception {
-    // setup mock (no nice mock since times(..) seems to be accepting just an upper bound value)
-    EventAdmin mock = EasyMock.createMock(EventAdmin.class);
-    seriesService.setEventAdmin(mock);
-    mock.postEvent(EasyMock.<Event> anyObject());
-    EasyMock.expectLastCall().times(2); // expect two update events, updating ACL a second time should result in a no-op
-    EasyMock.replay(mock);
-    // start testing
-    AccessControlList acl = new AccessControlList(new AccessControlEntry("a", "read", true), new AccessControlEntry(
-            "b", "write", false));
-    seriesService.updateSeries(testCatalog);
-    seriesService.updateAccessControl("10.0000/5819", acl);
-    seriesService.updateAccessControl("10.0000/5819", acl);
-    // verify
-    EasyMock.verify(mock);
-  }
 }

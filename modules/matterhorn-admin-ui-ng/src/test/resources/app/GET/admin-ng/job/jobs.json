@@ -1,0 +1,21 @@
+{
+  "count": 2,
+  "limit": 2,
+  "offset": 0,
+  "results": [{
+    "operation": "START_OPERATION",
+    "series": "",
+    "status": "SUCCEEDED",
+    "submitted": "2014-10-20T09:37:28Z",
+    "title": "•mock• New job",
+    "workflow": "Encode, Analyze, and Distribute"
+  }, {
+    "operation": "END_OPERATION",
+    "series": "test videos",
+    "status": "SUCCEEDED",
+    "submitted": "2014-10-20T09:37:28Z",
+    "title": "•mock• Job with serie",
+    "workflow": "Encode, Analyze, and Distribute"
+  }],
+  "total": 2
+}

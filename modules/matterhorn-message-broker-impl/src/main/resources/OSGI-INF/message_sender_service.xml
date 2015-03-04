@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.message.broker.impl.MessageSenderImpl"
+  immediate="true" activate="activate" deactivate="deactivate">
+  <implementation
+    class="org.opencastproject.message.broker.impl.MessageSenderImpl" />
+  <property name="service.description" value="Message Broker Sender" />
+  <property name="service.pid" value="org.opencastproject.message.broker.impl.MessageSenderImpl" />
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService" />
+    <provide interface="org.opencastproject.message.broker.api.MessageSender" />
+  </service>
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="config-admin" interface="org.osgi.service.cm.ConfigurationAdmin"
+    cardinality="1..1" policy="static" bind="setConfigurationAdmin" />
+</scr:component>

@@ -18,6 +18,7 @@ package org.opencastproject.series.endpoint;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -44,34 +45,52 @@ import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
+import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.entwinemedia.fn.Stream;
+import com.entwinemedia.fn.data.Opt;
+import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
+import com.entwinemedia.fn.data.json.SimpleSerializer;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 /**
  * REST endpoint for Series Service.
@@ -86,6 +105,8 @@ import javax.ws.rs.core.Response;
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class SeriesRestService {
+
+  private static final String SERIES_ELEMENT_CONTENT_TYPE_PREFIX = "series/";
 
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(SeriesRestService.class);
@@ -332,6 +353,24 @@ public class SeriesRestService {
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
 
+  @GET
+  @Path("{id}/optOut")
+  @RestQuery(name = "IsOptOut", description = "Returns true if the series is opted out", returnDescription = "True if opted out, false if not", pathParameters = { @RestParameter(name = "id", description = "ID of series", isRequired = true, type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The Series opt out status"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Series with specified ID does not exist") })
+  public Response getOptOut(@PathParam("id") String seriesId) {
+    try {
+      boolean optedOut = seriesService.isOptOut(seriesId);
+      return Response.ok(Boolean.toString(optedOut)).build();
+    } catch (NotFoundException e) {
+      logger.warn("Series with id '{}' does not exist.", seriesId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to get series opt out status with id '{}': {}", seriesId, ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @DELETE
   @Path("/{seriesID:.+}")
   @RestQuery(name = "delete", description = "Delete a series", returnDescription = "No content.", pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
@@ -460,6 +499,136 @@ public class SeriesRestService {
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
 
+  @SuppressWarnings("unchecked")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("{id}/properties.json")
+  @RestQuery(name = "getSeriesProperties", description = "Returns the series properties", returnDescription = "Returns the series properties as JSON", pathParameters = { @RestParameter(name = "id", description = "ID of series", isRequired = true, type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "The access control list."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+  public Response getSeriesPropertiesAsJson(@PathParam("id") String seriesId) throws UnauthorizedException,
+          NotFoundException {
+    if (StringUtils.isBlank(seriesId)) {
+      logger.warn("Series id parameter is blank '{}'.", seriesId);
+      return Response.status(BAD_REQUEST).build();
+    }
+    try {
+      Map<String, String> properties = seriesService.getSeriesProperties(seriesId);
+      JSONArray jsonProperties = new JSONArray();
+      for (String name : properties.keySet()) {
+        JSONObject property = new JSONObject();
+        property.put(name, properties.get(name));
+        jsonProperties.add(property);
+      }
+      return Response.ok(jsonProperties.toString()).build();
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Could not perform search query: {}", e.getMessage());
+    }
+    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("{seriesId}/property/{propertyName}.json")
+  @RestQuery(name = "getSeriesProperty", description = "Returns a series property value", returnDescription = "Returns the series property value", pathParameters = {
+          @RestParameter(name = "seriesId", description = "ID of series", isRequired = true, type = Type.STRING),
+          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true, type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "The access control list."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+  public Response getSeriesProperty(@PathParam("seriesId") String seriesId,
+          @PathParam("propertyName") String propertyName) throws UnauthorizedException, NotFoundException {
+    if (StringUtils.isBlank(seriesId)) {
+      logger.warn("Series id parameter is blank '{}'.", seriesId);
+      return Response.status(BAD_REQUEST).build();
+    }
+    if (StringUtils.isBlank(propertyName)) {
+      logger.warn("Series property name parameter is blank '{}'.", propertyName);
+      return Response.status(BAD_REQUEST).build();
+    }
+    try {
+      String propertyValue = seriesService.getSeriesProperty(seriesId, propertyName);
+      return Response.ok(propertyValue).build();
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+    }
+    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @POST
+  @Path("/{seriesId}/property")
+  @RestQuery(name = "updateSeriesProperty", description = "Updates a series property", returnDescription = "No content.", restParameters = {
+          @RestParameter(name = "name", isRequired = true, description = "The property's name", type = TEXT),
+          @RestParameter(name = "value", isRequired = true, description = "The property's value", type = TEXT) }, pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required path or form params were missing in the request.") })
+  public Response updateSeriesProperty(@PathParam("seriesId") String seriesId, @FormParam("name") String name,
+          @FormParam("value") String value) throws UnauthorizedException {
+    if (StringUtils.isBlank(seriesId)) {
+      logger.warn("Series id parameter is blank '{}'.", seriesId);
+      return Response.status(BAD_REQUEST).build();
+    }
+    if (StringUtils.isBlank(name)) {
+      logger.warn("Name parameter is blank '{}'.", name);
+      return Response.status(BAD_REQUEST).build();
+    }
+    if (StringUtils.isBlank(value)) {
+      logger.warn("Series id parameter is blank '{}'.", value);
+      return Response.status(BAD_REQUEST).build();
+    }
+    try {
+      seriesService.updateSeriesProperty(seriesId, name, value);
+      return Response.status(NO_CONTENT).build();
+    } catch (NotFoundException e) {
+      return Response.status(NOT_FOUND).build();
+    } catch (SeriesException e) {
+      logger.warn("Could not update series property for series {} property {}:{} : {}", new Object[] { seriesId, name,
+              value, ExceptionUtils.getStackTrace(e) });
+    }
+    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @DELETE
+  @Path("{seriesId}/property/{propertyName}")
+  @RestQuery(name = "deleteSeriesProperty", description = "Deletes a series property", returnDescription = "No Content", pathParameters = {
+          @RestParameter(name = "seriesId", description = "ID of series", isRequired = true, type = Type.STRING),
+          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true, type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "The series property has been deleted."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The series or property has not been found."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+  public Response deleteSeriesProperty(@PathParam("seriesId") String seriesId,
+          @PathParam("propertyName") String propertyName) throws UnauthorizedException, NotFoundException {
+    if (StringUtils.isBlank(seriesId)) {
+      logger.warn("Series id parameter is blank '{}'.", seriesId);
+      return Response.status(BAD_REQUEST).build();
+    }
+    if (StringUtils.isBlank(propertyName)) {
+      logger.warn("Series property name parameter is blank '{}'.", propertyName);
+      return Response.status(BAD_REQUEST).build();
+    }
+    try {
+      seriesService.deleteSeriesProperty(seriesId, propertyName);
+      return Response.status(NO_CONTENT).build();
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Could not delete series '{}' property '{}' query: {}", new Object[] { seriesId, propertyName,
+              ExceptionUtils.getStackTrace(e) });
+    }
+    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
   // CHECKSTYLE:OFF
   private DublinCoreCatalogList getSeries(String text, String seriesId, Boolean edit, String seriesTitle,
           String creator, String contributor, String publisher, String rightsHolder, String createdFrom,
@@ -563,6 +732,113 @@ public class SeriesRestService {
     }
 
     return seriesService.getSeries(q);
+  }
+
+  @GET
+  @Path("{seriesId}/elements.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getSeriesElements", description = "Returns all the element types of a series", returnDescription = "Returns a JSON array with all the types of elements of the given series.", pathParameters = { @RestParameter(name = "seriesId", description = "The series identifier", type = STRING, isRequired = true) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "Series found"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Series not found"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request") })
+  public Response getSeriesElements(@PathParam("seriesId") String seriesId) {
+    try {
+      Opt<Map<String, byte[]>> optSeriesElements = seriesService.getSeriesElements(seriesId);
+      if (optSeriesElements.isSome()) {
+        Map<String, byte[]> seriesElements = optSeriesElements.get();
+        JValue jsonArray = Jsons.a(Stream.$(seriesElements.keySet()).map(Jsons.stringToJValueFn));
+        return Response.ok(new SimpleSerializer().toJson(jsonArray)).build();
+      } else {
+        return R.notFound();
+      }
+    } catch (SeriesException e) {
+      logger.warn("Error while retrieving elements for sieres '{}': {}", seriesId, ExceptionUtils.getStackTrace(e));
+      return R.serverError();
+    }
+  }
+
+  @GET
+  @Path("{seriesId}/elements/{elementType}")
+  @RestQuery(name = "getSeriesElement", description = "Returns the series element", returnDescription = "The data of the series element", pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series identifier", type = STRING, isRequired = true),
+          @RestParameter(name = "elementType", description = "The element type. This is equal to the subtype of the media type of this element: series/<elementtype>", type = STRING, isRequired = true) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "Series element found"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Series element not found"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request") })
+  public Response getSeriesElement(@PathParam("seriesId") String seriesId, @PathParam("elementType") String elementType) {
+    try {
+      Opt<byte[]> data = seriesService.getSeriesElementData(seriesId, elementType);
+      if (data.isSome()) {
+        return Response.ok().entity(new ByteArrayInputStream(data.get()))
+                .type(SERIES_ELEMENT_CONTENT_TYPE_PREFIX + elementType).build();
+      } else {
+        return R.notFound();
+      }
+    } catch (SeriesException e) {
+      logger.warn("Error while returning element '{}' of series '{}': {}", new Object[] { elementType, seriesId,
+              ExceptionUtils.getStackTrace(e) });
+      return R.serverError();
+    }
+  }
+
+  @PUT
+  @Path("{seriesId}/elements/{elementType}")
+  @RestQuery(name = "updateSeriesElement", description = "Updates an existing series element", returnDescription = "An empty response", pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series identifier", type = STRING, isRequired = true),
+          @RestParameter(name = "elementType", description = "The element type", type = STRING, isRequired = true) }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Series element updated"),
+          @RestResponse(responseCode = SC_CREATED, description = "Series element created"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request") })
+  public Response putSeriesElement(@Context HttpServletRequest request, @PathParam("seriesId") String seriesId,
+          @PathParam("elementType") String elementType) {
+    InputStream is = null;
+    try {
+      is = request.getInputStream();
+      final byte[] data = IOUtils.toByteArray(is);
+      if (seriesService.getSeriesElementData(seriesId, elementType).isSome()) {
+        if (seriesService.updateSeriesElement(seriesId, elementType, data)) {
+          return R.noContent();
+        } else {
+          return R.serverError();
+        }
+      } else {
+        if (seriesService.addSeriesElement(seriesId, elementType, data)) {
+          return R.created();
+        } else {
+          return R.serverError();
+        }
+      }
+    } catch (IOException e) {
+      logger.error("Error while trying to read from request: {}", ExceptionUtils.getStackTrace(e));
+      return R.serverError();
+    } catch (SeriesException e) {
+      logger.warn("Error while adding element to series '{}': {}", seriesId, ExceptionUtils.getStackTrace(e));
+      return R.serverError();
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
+  }
+
+  @DELETE
+  @Path("{seriesId}/elements/{elementType}")
+  @RestQuery(name = "deleteSeriesElement", description = "Deletes a series element", returnDescription = "An empty response", pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series identifier", type = STRING, isRequired = true),
+          @RestParameter(name = "elementType", description = "The element type", type = STRING, isRequired = true) }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Series element deleted"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Series element not found"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request") })
+  public Response deleteSeriesElement(@PathParam("seriesId") String seriesId,
+          @PathParam("elementType") String elementType) {
+
+    try {
+      if (seriesService.deleteSeriesElement(seriesId, elementType)) {
+        return R.noContent();
+      } else {
+        return R.notFound();
+      }
+    } catch (SeriesException e) {
+      return R.serverError();
+    }
   }
 
   /**
