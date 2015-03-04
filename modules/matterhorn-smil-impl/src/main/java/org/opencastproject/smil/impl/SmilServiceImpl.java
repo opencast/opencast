@@ -103,11 +103,16 @@ public class SmilServiceImpl implements SmilService {
     return new SmilResponseImpl(smil, seq);
   }
 
+  @Override
+  public SmilResponse addClip(Smil smil, String parentId, Track track, long start, long duration) throws SmilException {
+     return addClip(smil, parentId, track, start, duration, null);
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public SmilResponse addClip(Smil smil, String parentId, Track track, long start, long duration) throws SmilException {
+  public SmilResponse addClip(Smil smil, String parentId, Track track, long start, long duration, String pgId) throws SmilException {
     if (start < 0) {
       throw new SmilException("Start position should be positive.");
     }
@@ -135,6 +140,11 @@ public class SmilServiceImpl implements SmilService {
 
     SmilMediaParamGroup trackParamGroup = null;
     for (SmilMediaParamGroup paramGroup : smil.getHead().getParamGroups()) {
+      // support for adding multiple tracks to the same param group
+      if (pgId != null && paramGroup.getId().equals(pgId)) {
+        trackParamGroup = paramGroup;
+        break;
+      }
       SmilMediaParam param = ((SmilMediaParamGroupImpl) paramGroup).getParamByName(SmilMediaParam.PARAM_NAME_TRACK_ID);
       if (param != null && param.getValue().equals(track.getIdentifier())) {
         trackParamGroup = paramGroup;
