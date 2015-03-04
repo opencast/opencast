@@ -1,0 +1,14 @@
+[
+    {
+        "id": "full",
+        "title": "Full",
+        "description": "",
+        "configuration_panel": ""
+    },
+    {
+        "id": "full-html5",
+        "title": "Full HTML5",
+        "description": "Test description",
+        "configuration_panel": "<h2>Test</h2>"
+    }
+]

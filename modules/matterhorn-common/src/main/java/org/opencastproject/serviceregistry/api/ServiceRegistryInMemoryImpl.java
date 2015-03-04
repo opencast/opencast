@@ -130,10 +130,11 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(java.lang.String, int)
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(String, String, long, int, int)
    */
   @Override
-  public void registerHost(String host, int maxConcurrentJobs) throws ServiceRegistryException {
+  public void registerHost(String host, String address, long memory, int cores, int maxConcurrentJobs)
+          throws ServiceRegistryException {
     hosts.put(host, new Long(maxConcurrentJobs));
   }
 

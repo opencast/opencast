@@ -1,0 +1,56 @@
+<!-- provide this additional template if the controls are below the video to have content above the video -->
+<% if((typeof plugin_path !== "undefined")
+   && (typeof logoLink !== "undefined")
+   && (typeof str_openMediaModule !== "undefined")
+   && (typeof str_embedButton !== "undefined")
+   && (typeof str_fullscreen !== "undefined")) { %>
+<div id="navigation_wrapper_top">
+    <div id="navigation_logo">
+        <% if(typeof logoLink !== "undefined") { %>
+        <a href="<%= logoLink %>" role="link" aria-label="<%= str_openMediaModule %>">
+        <% } %>
+        <img src="<%= plugin_path %>images/logo.png" />
+        <% if(typeof logoLink !== "undefined") { %>
+        </a>
+        <% } %>
+    </div>
+    <div id="menu">
+      <div class="btn-group">
+        <button id="embed_button" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" aria-label="<%= str_embedButton %>">
+          <span class="glyphicon glyphicon-share"></span>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+          <li role="presentation"><a id="embed0" role="menuitem" tabindex="-1" href="#"></a></li>
+          <li role="presentation"><a id="embed1" role="menuitem" tabindex="-1" href="#"></a></li>
+          <li role="presentation"><a id="embed2" role="menuitem" tabindex="-1" href="#"></a></li>
+          <li role="presentation"><a id="embed3" role="menuitem" tabindex="-1" href="#"></a></li>
+          <li role="presentation"><a id="embed4" role="menuitem" tabindex="-1" href="#"></a></li>
+        </ul>
+      </div>
+      <% if((typeof loggedIn !== "undefined")
+      && (typeof str_checkingStatus !== "undefined")
+      && (typeof str_loginLogout !== "undefined")) { %>
+        <div class="btn-group">
+            <button id="dropdownMenuLoginInfo" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_loginLogout %>">
+	        <span class="glyphicon glyphicon-user"></span>
+		<span id="loggedInNotLoggedIn"><%= str_checkingStatus %></span>
+		<span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation">
+		    <a id="loginlogout" role="menuitem" tabindex="-1" href="#">
+		        <% if((typeof loggedIn !== "undefined") && !loggedIn) { %>
+                        <span class="glyphicon glyphicon-log-in"></span>
+			<% } else { %>
+                        <span class="glyphicon glyphicon-log-out"></span>
+			<% } %>
+		        <span id="str_loginlogout"></span>
+		    </a>
+		</li>
+            </ul>
+	</div>
+        <% } %>
+    </div>
+</div>
+<% } %>

@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  * A list of {@link AccessControlEntry}s.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "acl", namespace = "http://org.opencastproject.security")
+@XmlType(name = "acl", namespace = "http://org.opencastproject.security", propOrder = { "entries" })
 @XmlRootElement(name = "acl", namespace = "http://org.opencastproject.security")
 public final class AccessControlList {
 

@@ -35,6 +35,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-message-broker-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -140,7 +145,7 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Export-Package>
               org.opencastproject.series.impl.solr;version=${project.version},
               org.opencastproject.series.impl.persistence;version=${project.version},
@@ -148,6 +153,7 @@
               org.opencastproject.series.endpoint;version=${project.version}
             </Export-Package>
             <Import-Package>
+              org.opencastproject.message.broker.api.index;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.metadata.dublincore;version=${project.version},
               org.opencastproject.solr;version=${project.version},

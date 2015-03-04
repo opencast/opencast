@@ -9,8 +9,8 @@
     $(document).ready(function() {
       $.getJSON("/info/components.json", function(data) {
         var contentDiv = $("#content");
-        var capt = false,
-        confMon = false;
+        var capt = false;
+        var confMon = false;
         $.each(data, function(section) {
             if("rest" == section) {
                $.each(data.rest, function(i) {

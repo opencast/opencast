@@ -15,7 +15,7 @@
  */
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
-import org.opencastproject.authorization.xacml.manager.api.AclTransition;
+import org.opencastproject.authorization.xacml.manager.api.ACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
@@ -181,7 +181,7 @@ public final class JsonConv {
     }
   };
 
-  private static Obj digestAclTransition(AclTransition t) {
+  private static Obj digestAclTransition(ACLTransition t) {
     return obj(p(KEY_TRANSITION_ID, t.getTransitionId()),
                p(KEY_ORGANIZATION_ID, t.getOrganizationId()),
                p(KEY_APPLICATION_DATE, DateTimeSupport.toUTC(t.getApplicationDate().getTime())),
@@ -189,7 +189,7 @@ public final class JsonConv {
             .append(workflowObj(t));
   }
 
-  private static Obj workflowObj(AclTransition t) {
+  private static Obj workflowObj(ACLTransition t) {
     final Tuple<Option<String>, Option<String>> ws = splitConfiguredWorkflowRef(t.getWorkflow());
     return obj(p(KEY_WORKFLOW_ID, ws.getA().map(stringVal).getOrElse(ZERO_VAL)),
                p(KEY_WORKFLOW_PARAMS, ws.getB().map(stringVal).getOrElse(ZERO_VAL)));

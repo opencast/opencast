@@ -1,0 +1,20 @@
+<mediapackage xmlns="http://mediapackage.opencastproject.org" id="781ED8AC-A300-11E4-A6E1-602B95DB5880" start="2007-12-05T13:40:00" duration="1004400000">
+	<media>
+		<track id="track" type="presentation/preview">
+			<mimetype>video/mp4</mimetype>
+			<url>media.mp4</url>
+			<checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</checksum>
+			<duration>1004400000</duration>
+		</track>
+	</media>
+	<attachments>
+		<attachment id="waveform" type="image/waveform">
+			<mimetype>image/png</mimetype>
+			<url>waveform.png</url>
+			<tags>
+				<tag>internal</tag>
+			</tags>
+			<checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>
+		</attachment>
+	</attachments>
+</mediapackage>

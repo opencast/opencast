@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence
+  version="2.0" 
+  xmlns="http://java.sun.com/xml/ns/persistence"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+    http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+  <persistence-unit name="org.opencastproject.messages" transaction-type="RESOURCE_LOCAL">
+    <class>org.opencastproject.messages.persistence.EmailConfigurationDto</class>
+    <class>org.opencastproject.messages.persistence.MessageSignatureDto</class>
+    <class>org.opencastproject.messages.persistence.MessageTemplateDto</class>
+    <class>org.opencastproject.comments.persistence.CommentDto</class>
+    <class>org.opencastproject.comments.persistence.CommentReplyDto</class>
+    <properties>
+      <property name="eclipselink.create-ddl-jdbc-file-name" value="create-matterhorn-messages-jpa.jdbc"/>
+      <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-matterhorn-messages-jpa.jdbc"/>
+    </properties>
+  </persistence-unit>
+</persistence>

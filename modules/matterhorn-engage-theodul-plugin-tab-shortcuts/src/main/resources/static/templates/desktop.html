@@ -1,0 +1,26 @@
+<% if((typeof str_noShortcutsAvailable !== "undefined")) { %>
+<div id="engage_shortcuts_tab_content">
+    <% if((typeof str_displayShortcuts !== "undefined")) { %>
+    <div class="shortcutsTab">
+      <% if((typeof shortcuts !== "undefined")
+	 && (typeof str_shortcutName !== "undefined")
+	 && (typeof str_shortcut !== "undefined")) { %>
+      <table class="table table-striped table-hover table-bordered">
+	<th>
+	  <%= str_shortcutName %>
+	</th>
+	<th>
+	  <%= str_shortcut %>
+	</th>
+	<% _.each(shortcuts, function(sc) { %>
+	<tr><td><%= sc.name %></td><td><%= sc.val %></td></tr>
+	<% }); %>
+      </table>
+      <% } %>
+    </div>
+    <div class="clear"></div>
+    <% } else { %>
+    <%= str_noShortcutsAvailable %>
+    <% } %>
+</div>
+<% } %>

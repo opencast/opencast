@@ -16,6 +16,11 @@
 
 package org.opencastproject.util.data.functions;
 
+import static org.opencastproject.util.data.Either.left;
+import static org.opencastproject.util.data.Either.right;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.option;
+
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Effect2;
@@ -27,22 +32,28 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
 import org.opencastproject.util.data.Tuple;
 
+import com.entwinemedia.fn.Fn;
+
 import java.util.List;
 import java.util.Map;
-
-import static org.opencastproject.util.data.Either.left;
-import static org.opencastproject.util.data.Either.right;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.option;
 
 /** General purpose functions, especially function transformations. */
 public final class Functions {
   private Functions() {
   }
 
+  /** Create a function from the matterhorn-fn module from a matterhorn-common function. */
+  public static <A, B> Fn<A, B> fn(final Function<A, B> f) {
+    return new Fn<A, B>() {
+      @Override
+      public B ap(A a) {
+        return f.apply(a);
+      }
+    };
+  }
+
   /** Function composition: <code>f . g = f(g(x)) = o(f, g)</code> */
-  public static <A, B, C> Function<A, C> o(
-          final Function<? super B, ? extends C> f,
+  public static <A, B, C> Function<A, C> o(final Function<? super B, ? extends C> f,
           final Function<? super A, ? extends B> g) {
     return new Function<A, C>() {
       @Override
@@ -53,9 +64,7 @@ public final class Functions {
   }
 
   /** Function composition: <code>f . g = f(g) = o(f, g)</code> */
-  public static <A, B> Function0<B> o(
-          final Function<? super A, ? extends B> f,
-          final Function0<? extends A> g) {
+  public static <A, B> Function0<B> o(final Function<? super A, ? extends B> f, final Function0<? extends A> g) {
     return new Function0<B>() {
       @Override
       public B apply() {
@@ -65,10 +74,8 @@ public final class Functions {
   }
 
   /** <code>f . g . h</code> */
-  public static <A, B, C, D> Function<A, D> o(
-          final Function<? super C, ? extends D> f,
-          final Function<? super B, ? extends C> g,
-          final Function<? super A, ? extends B> h) {
+  public static <A, B, C, D> Function<A, D> o(final Function<? super C, ? extends D> f,
+          final Function<? super B, ? extends C> g, final Function<? super A, ? extends B> h) {
     return new Function<A, D>() {
       @Override
       public D apply(A a) {
@@ -78,10 +85,8 @@ public final class Functions {
   }
 
   /** <code>f . g . h . i</code> */
-  public static <A, B, C, D, E> Function<A, E> o(
-          final Function<? super D, ? extends E> f,
-          final Function<? super C, ? extends D> g,
-          final Function<? super B, ? extends C> h,
+  public static <A, B, C, D, E> Function<A, E> o(final Function<? super D, ? extends E> f,
+          final Function<? super C, ? extends D> g, final Function<? super B, ? extends C> h,
           final Function<? super A, ? extends B> i) {
     return new Function<A, E>() {
       @Override
@@ -106,8 +111,7 @@ public final class Functions {
   }
 
   /** Left to right composition: <code>f then g = g(f(x))</code> */
-  public static <A, B, C> Function<A, C> then(
-          final Function<? super A, ? extends B> f,
+  public static <A, B, C> Function<A, C> then(final Function<? super A, ? extends B> f,
           final Function<? super B, ? extends C> g) {
     return new Function<A, C>() {
       @Override
@@ -118,9 +122,7 @@ public final class Functions {
   }
 
   /** Left to right composition: <code>f then g = g(f)</code> */
-  public static <A, B> Function0<B> then(
-          final Function0<? extends A> f,
-          final Function<? super A, ? extends B> g) {
+  public static <A, B> Function0<B> then(final Function0<? extends A> f, final Function<? super A, ? extends B> g) {
     return new Function0<B>() {
       @Override
       public B apply() {
@@ -144,8 +146,7 @@ public final class Functions {
    * Create a new function from <code>f</code> decorated with an exception transformer. Any exception that occurs during
    * application of <code>f</code> is passed to <code>transformer</code> whose return value is then being thrown.
    */
-  public static <A, B> Function<A, B> rethrow(
-          final Function<? super A, ? extends B> f,
+  public static <A, B> Function<A, B> rethrow(final Function<? super A, ? extends B> f,
           final Function<? super Exception, ? extends Exception> transformer) {
     return new Function<A, B>() {
       @Override
@@ -163,8 +164,7 @@ public final class Functions {
    * Create a new function from <code>f</code> decorated with an exception handler. Any exception that occurs during
    * application of <code>f</code> is passed to <code>handler</code> whose return value is then being returned.
    */
-  public static <A, B> Function<A, B> handle(
-          final Function<? super A, ? extends B> f,
+  public static <A, B> Function<A, B> handle(final Function<? super A, ? extends B> f,
           final Function<? super Exception, ? extends B> handler) {
     return new Function<A, B>() {
       @Override
@@ -183,8 +183,7 @@ public final class Functions {
    * value of <code>f</code> or in case of an exception being thrown on the application of <code>f</code> the return
    * value of <code>handler</code>.
    */
-  public static <A, B, C> Function<A, Either<C, B>> either(
-          final Function<? super A, ? extends B> f,
+  public static <A, B, C> Function<A, Either<C, B>> either(final Function<? super A, ? extends B> f,
           final Function<? super Exception, ? extends C> handler) {
     return new Function<A, Either<C, B>>() {
       @Override
@@ -360,7 +359,7 @@ public final class Functions {
    * Identity function.
    *
    * @param clazz
-   *         to describe the functions's type
+   *          to describe the functions's type
    */
   public static <A> Function<A, A> identity(Class<A> clazz) {
     return identity();
@@ -525,12 +524,11 @@ public final class Functions {
    * http://james-iry.blogspot.de/2010/08/on-removing-java-checked-exceptions-by.html
    */
   public static <A> A chuck(Throwable t) {
-    return Functions.<RuntimeException, A>castGeneric(t);
+    return Functions.<RuntimeException, A> castGeneric(t);
   }
 
   /** Kleisli composition of list monads. (a -> m b) -> (b -> m c) -> a -> m c */
-  public static <A, B, C> Function<A, List<C>> kleisliCompList(
-          final Function<? super A, List<B>> m,
+  public static <A, B, C> Function<A, List<C>> kleisliCompList(final Function<? super A, List<B>> m,
           final Function<? super B, List<C>> n) {
     return new Function<A, List<C>>() {
       @Override

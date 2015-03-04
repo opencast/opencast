@@ -113,7 +113,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Persist an user
-   * 
+   *
    * @param user
    *          the user to persist
    * @param emf
@@ -307,6 +307,33 @@ public final class UserDirectoryPersistenceUtil {
   }
 
   /**
+   * Returns the persisted user by the user id and organization id
+   *
+   * @param id
+   *          the user's unique id
+   * @param organizationId
+   *          the organization id
+   * @param emf
+   *          the entity manager factory
+   * @return the user or <code>null</code> if not found
+   */
+  public static JpaUser findUser(long id, String organizationId, EntityManagerFactory emf) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("User.findByIdAndOrg");
+      q.setParameter("id", id);
+      q.setParameter("org", organizationId);
+      return (JpaUser) q.getSingleResult();
+    } catch (NoResultException e) {
+      return null;
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
    * Returns a list of users by a search query if set or all users if search query is <code>null</code>
    *
    * @param orgId
@@ -446,7 +473,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Delete the user with given name in the given organization
-   * 
+   *
    * @param username
    *          the name of the user to delete
    * @param orgId

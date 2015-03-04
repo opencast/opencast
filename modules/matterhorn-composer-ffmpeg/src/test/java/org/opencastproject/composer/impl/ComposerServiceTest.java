@@ -340,6 +340,38 @@ public class ComposerServiceTest {
     }
   }
 
+  @Test
+  public void testParallelEncode() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+
+    assertTrue(sourceVideoOnly.isFile());
+    assertTrue(sourceAudioOnly.isFile());
+
+    // Need different media files
+    Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(sourceVideoOnly).anyTimes();
+    EasyMock.expect(
+            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (InputStream) EasyMock.anyObject())).andReturn(sourceVideoOnly.toURI()).anyTimes();
+    composerService.setWorkspace(workspace);
+    MediaInspectionService inspect = EasyMock.createNiceMock(MediaInspectionService.class);
+    EasyMock.expect(inspect.inspect((URI) EasyMock.anyObject()))
+            .andThrow(new MediaInspectionException("test complete")).anyTimes();
+    EasyMock.replay(workspace, inspect);
+
+    // build a single media package to test with
+    String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
+            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
+            + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
+    Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
+    try {
+      composerService.parallelEncode(sourceTrack, "parallel.http");
+    } catch (EncoderException e) {
+      assertTrue("test complete".equals(e.getMessage()));
+    }
+  }
+
   /**
    * Test method for
    * {@link ComposerServiceImpl#composite(Dimension, LaidOutElement, LaidOutElement, Option, String, String)}

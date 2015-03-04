@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.staticfiles.impl.StaticFileServiceImpl"
+  immediate="true" activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.staticfiles.impl.StaticFileServiceImpl" />
+  <property name="service.description" value="Static File Service" />
+  <property name="service.PID" value="org.opencastproject.staticfiles.impl.StaticFileServiceImpl" />
+  <service>
+    <provide interface="org.opencastproject.staticfiles.api.StaticFileService" />
+  </service>
+
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="OrganizationDirectoryService" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+</scr:component>

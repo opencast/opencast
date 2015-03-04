@@ -1,0 +1,29 @@
+{
+    "acl": {
+        "ace": [
+            {
+                "action": "read",
+                "allow": true,
+                "role": "ROLE_ADMIN"
+            },
+            {
+                "action": "write",
+                "allow": true,
+                "role": "ROLE_ADMIN"
+            },
+            {
+                "action": "read",
+                "allow": true,
+                "role": "ROLE_ANONYMOUS"
+            },
+            {
+                "action": "write",
+                "allow": false,
+                "role": "ROLE_ANONYMOUS"
+            }
+        ]
+    },
+    "id": 31151,
+    "name": "public",
+    "organizationId": "mh_default_org"
+}

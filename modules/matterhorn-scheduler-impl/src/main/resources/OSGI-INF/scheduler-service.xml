@@ -1,21 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
  name="org.opencastproject.scheduler.impl.SchedulerServiceImpl"
-  immediate="true" activate="activate">
+  immediate="true" activate="activate" deactivate="deactivate">
   <implementation
     class="org.opencastproject.scheduler.impl.SchedulerServiceImpl" />
   <property name="service.description" value="Scheduler Service" />
   <service>
+    <provide interface="org.osgi.service.cm.ManagedService" />
     <provide interface="org.opencastproject.scheduler.api.SchedulerService" />
   </service>
+  <reference name="message-broker-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
+    cardinality="1..1" policy="static" bind="setMessageReceiver" />
+  <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
+    cardinality="1..1" policy="static" bind="setMessageSender" />    
+  <reference name="organization-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
   <reference name="scheduler-persistence" interface="org.opencastproject.scheduler.impl.SchedulerServiceDatabase"
     cardinality="1..1" policy="static" bind="setPersistence" />    
   <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
     cardinality="1..1" policy="static" bind="setWorkspace" />
   <reference name="scheduler-index" interface="org.opencastproject.scheduler.impl.SchedulerServiceIndex"
     cardinality="1..1" policy="static" bind="setIndex" />
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
   <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"
     cardinality="1..1" policy="static" bind="setSeriesService" />
   <reference name="workflow-service" interface="org.opencastproject.workflow.api.WorkflowService"
     cardinality="1..1" policy="static" bind="setWorkflowService" />
+  <reference name="dublincore-service" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
+    cardinality="1..1" policy="static" bind="setDublinCoreCatalogService" />
 </scr:component>

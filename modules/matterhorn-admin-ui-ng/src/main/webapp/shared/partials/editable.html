@@ -1,0 +1,31 @@
+<span ng-if="mode === 'readOnly'">{{ params.value }}</span>
+
+<div ng-if="mode === 'singleValue'"
+    admin-ng-editable-single-value
+    save="save" params="params">
+</div>
+
+<div ng-if="mode === 'booleanValue'"
+     admin-ng-editable-boolean-value
+     save="save" params="params">
+</div>
+
+<div ng-if="mode === 'dateValue'"
+     admin-ng-editable-date-value
+     save="save" params="params">
+</div>
+
+<div ng-if="mode === 'multiValue'"
+    admin-ng-editable-multi-value
+    save="save" params="params">
+</div>
+
+<div ng-if="mode === 'singleSelect'"
+    admin-ng-editable-single-select
+    collection="collection" save="save" params="params">
+</div>
+
+<div ng-if="mode === 'multiSelect'"
+    admin-ng-editable-multi-select
+    collection="collection" save="save" params="params">
+</div>

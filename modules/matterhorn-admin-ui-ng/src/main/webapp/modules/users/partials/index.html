@@ -1,0 +1,25 @@
+<section class="action-nav-bar">
+    <ng-include src="'modules/' + table.category + '/partials/' + table.resource + 'Buttons.html'"></ng-include>
+
+    <admin-ng-nav></admin-ng-nav>
+    <nav>
+        <a href="#/users/users" ng-class="{active: table.resource == 'users'}" translate="USERS.NAVIGATION.USERS" with-role="ROLE_UI_USERS_VIEW"><!--Users--></a>
+        <a href="#/users/groups" ng-class="{active: table.resource == 'groups'}" translate="USERS.NAVIGATION.GROUPS" with-role="ROLE_UI_GROUPS_VIEW"><!--Groups--></a>
+        <a href="#/users/acls" ng-class="{active: table.resource == 'acls'}" translate="USERS.NAVIGATION.PERMISSIONS" with-role="ROLE_UI_ACLS_VIEW"><!--Permissions--></a>
+<!--         <a href="#/users/userblacklists" ng-class="{active: table.resource == 'userblacklists'}" translate="USERS.NAVIGATION.BLACKLISTS" with-role="ROLE_UI_USERSBLACKLISTS_VIEW">Blacklist</a> -->
+    </nav>
+</section>
+
+<div class="main-view">
+    <div data-admin-ng-notifications=""></div>
+
+    <div class="controls-container">
+
+        <div ng-if="table.resource !== 'acls'" data-admin-ng-table-filter="" data-filters="filters" data-namespace="table.resource"></div>
+
+        <h1 translate="{{ table.caption }}"></h1>
+        <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.pagination.totalItems }}' }"></h4>
+
+    </div>
+    <div admin-ng-table="" table="table"></div>
+</div>

@@ -115,7 +115,7 @@ public class SoxServiceTest {
     f = null;
 
     JaxbOrganization org = new DefaultOrganization();
-    User user = new JaxbUser("admin", org, new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, org));
+    User user = new JaxbUser("admin", "test", org, new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, org));
     OrganizationDirectoryService orgDirectory = EasyMock.createNiceMock(OrganizationDirectoryService.class);
     EasyMock.expect(orgDirectory.getOrganization((String) EasyMock.anyObject())).andReturn(org).anyTimes();
 

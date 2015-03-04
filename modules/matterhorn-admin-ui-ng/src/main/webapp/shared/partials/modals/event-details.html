@@ -1,0 +1,704 @@
+<section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide modal-open" id="event-details-modal" ng-controller="EventCtrl">
+
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2 translate="EVENTS.EVENTS.DETAILS.HEADER" translate-values="{ resourceId: '{{ resourceId}}' }">Event Details {{resourceId}}</h2>
+    </header>
+
+    <nav class="modal-nav" id="modal-nav">
+        <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="EVENTS.EVENTS.DETAILS.TABS.GENERAL" with-role="ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW">General</a>
+        <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">Metadata</a>
+        <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT">Ext-Metadata</a>
+        <a ng-click="openTab('media')" data-modal-tab="media" ng-class="{ active: tab == 'media' }" translate="EVENTS.EVENTS.DETAILS.TABS.MEDIA" with-role="ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW">Media</a>
+        <a ng-click="openTab('attachments')" data-modal-tab="attachments" ng-class="{ active: tab == 'attachments' }" translate="EVENTS.EVENTS.DETAILS.TABS.ATTACHMENTS" with-role="ROLE_UI_EVENTS_DETAILS_ATTACHMENTS_VIEW">Attachments</a>
+        <a ng-click="openTab('workflows')" data-modal-tab="workflows" ng-class="{ active: tab == 'workflows' }" translate="EVENTS.EVENTS.DETAILS.TABS.WORKFLOWS" with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW">Workflows</a>
+        <a ng-click="openTab('access')" data-modal-tab="access" ng-class="{ active: tab == 'access' }" translate="EVENTS.EVENTS.DETAILS.TABS.ACCESS" with-role="ROLE_UI_EVENTS_DETAILS_ACL_VIEW">Access</a>
+        <a ng-click="openTab('comments')" data-modal-tab="comments" ng-class="{ active: tab == 'comments' }" translate="EVENTS.EVENTS.DETAILS.TABS.COMMENTS" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW">Comments</a>
+    </nav>
+
+    <nav id="breadcrumb"></nav>
+
+    <a ng-click="showAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
+    <a ng-click="showAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
+
+    <div class="modal-content" data-modal-tab-content="general">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj list-obj">
+                    <header translate="EVENTS.EVENTS.DETAILS.GENERAL.PUBLICATION_STATUS">Publication Status</header>
+
+                    <div class="obj-container">
+                        <p></p>
+                        <ul ng-repeat="publication in general.publications track by $index">
+
+                            <li>
+                                <div class="icon-container"><i class="video-icon"></i></div>
+                                <span translate="{{ publication.name }}">{{ publication.name }}</span>
+                                <a href="{{ publication.url }}" class="play"></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="metadata">
+        <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
+            <div class="full-col">
+                <div class="obj tbl-details">
+                    <header><span tranlsate="EVENTS.EVENTS.DETAILS.HEADER">Event Details</span></header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr ng-repeat="row in episodeCatalog.fields track by $index">
+                                <td translate="{{ row.label }}"></td>
+                                <td admin-ng-editable
+                                    required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
+                                    params="row" save="getSaveFunction(episodeCatalog.flavor)"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="metadata.entries.length > 0">
+        <div class="modal-body">
+            <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
+            <div class="full-col">
+                <div class="obj tbl-details" ng-repeat="catalog in metadata.entries">
+                    <header><span>{{ catalog.title | translate }}</span></header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr ng-repeat="row in catalog.fields track by $index">
+                                <td translate="{{ row.label }}"></td>
+                                <td admin-ng-editable
+                                    required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
+                                    params="row" save="getSaveFunction(catalog.flavor)"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="media">
+        <div class="modal-body">
+            <div class="full-col">
+
+                <!--
+                <div class="obj stub trim-btn-container">
+                    <header>Trim Media</header>
+                    <div class="obj-container padded">
+                        <p>This allows you to trim or edit the clip to remove any unwanted sections, images or audio </p>
+                        <a href="javascript:;" class="trim-btn">Trim Media</a>
+                        <p>Note: Button will open a new window, once it's implemented.</p>
+                    </div>
+                </div>
+                -->
+
+                <div class="obj tbl-container">
+                    <header translate="EVENTS.EVENTS.DETAILS.MEDIA.MEDIA">Media</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th translate="EVENTS.EVENTS.DETAILS.MEDIA.ID">ID</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.MEDIA.TYPE">Type <i></i></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.MEDIA.MIMETYPE">Mimetype <i></i></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.MEDIA.URL">URL <i></i></th>
+                                    <th class="medium"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in media.entries track by $index">
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.type }}</td>
+                                    <td>{{ item.mimetype }}</td>
+                                    <td><a ng-href="{{item.url}}">{{ item.mediaFileName}}</a></td>
+                                    <td><a class="details-link" ng-click="openSubTab('media-details', 'EventMediaDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">Details</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="attachments">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-container operations-tbl">
+                    <header translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.CAPTION">Attachments</header>
+                    <div class="obj-container">
+                        <table cellpadding="0" cellspacing="0" class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.ID">ID</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.TYPE">Type</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.MIMETYPE">Mimetype</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.TAGS">Tags</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.LINK">Link</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in attachments track by $index">
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.type }}</td>
+                                    <td>{{ item.mimetype }}</td>
+                                    <td>{{ item.tags }}</td>
+                                    <td><a href="{{ item.url }}" class="fa fa-external-link"></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="workflows">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-container">
+                    <header>Workflow Instances</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID">ID</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TYPE">Type</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE">State</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED">Submitted</th>
+                                    <th class="medium"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in workflows.entries track by $index">
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.workflow }}</td>
+                                    <td>{{ item.status }}</td>
+                                    <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
+                                    <td><a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">Details</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="access">
+        <p class="tab-desc"></p>
+        <div class="modal-body">
+            <div data-admin-ng-notification="" type="warning" show="access.episode_access.locked" message="{{ metadata.locked }}"></div>
+            <div class="full-col">
+                <ul>
+                    <li>
+                        <div class="obj list-obj">
+                            <header translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS">Access Policy</header>
+                            <div class="obj-container">
+                                <div class="obj tbl-list">
+                                    <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
+                                    <thead>
+                                        <tr>
+                                            <th translate="EVENTS.SERIES.DETAILS.ACCESS.TEMPLATES.TITLE">Templates</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="obj-container padded">
+                                                    <p translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
+                                                    <select chosen
+                                                        data-width="'200px'"
+                                                        data-disable-search-threshold="8"
+                                                        data-search_contains="true"
+                                                        ng-change="changeBaseAcl()"
+                                                        ng-model="baseAclId"
+                                                        ng-options="id as name for (id, name) in acls"
+                                                        data-placeholder="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                                        no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
+                                                    />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- Work in progress: Here, we will fill in the currently set privileges. The backend will
+                            change the format of the response. -->
+                            <div class="obj-container">
+                                <div class="obj tbl-list">
+                                    <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">Details</header>
+                                    <div class="obj-container">
+                                    <table class="main-tbl">
+                                        <thead>
+                                            <tr>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ROLE">Role</th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">Read</th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">Write</th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ACTION" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" class="fit">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="policy in policies track by $index">
+                                                <td>
+                                                    <select chosen
+                                                        ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"
+                                                        data-width="'200px'"
+                                                        data-disable-search-threshold="8"
+                                                        data-search_contains="true"
+                                                        ng-model="policy.role"
+                                                        ng-change="accessSave(policy)"
+                                                        ng-options="id as name for (id, name) in roles"
+                                                        data-placeholder="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}"
+                                                        no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
+                                                    />
+                                                </td>
+                                                <td class="fit"><input type="checkbox" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
+                                                <td class="fit"><input type="checkbox" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
+                                                <td ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" class="fit"><a ng-click="deletePolicy(policy)" class="remove"></a>
+                                                </td>
+                                            </tr>
+                                            <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" >
+                                                <td colspan="4"><a ng-click="addPolicy()">+ {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                                            <tr>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="comments">
+        <div class="modal-body">
+            <div class="full-col">
+
+                <!--
+                <div class="alert sticky error">
+                    <a class="fa fa-times"></a>
+                    -->
+                    <!-- info icon
+                    <i class="fa fa-info-circle"></i>
+                    -->
+                    <!-- warning icon
+                    <i class="fa fa-exclamation-triangle"></i>
+                    -->
+                    <!-- success icon
+                    <i class="fa fa-check-circle-o"></i>
+                    -->
+                    <!-- error icon
+                    <i class="fa fa-minus-circle"></i>
+                    <p>The item update was rejected because 3 fields are missing or incomplete</p>
+                </div>-->
+                <div class="obj comments">
+                    <header class="no-expand" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CAPTION">Comments</header>
+                    <div class="obj-container">
+                        <div class="comment-container">
+                            <div class="comment" ng-class="{ active : $parent.replyToId === comment.id }"
+                                ng-repeat="comment in comments track by $index">
+                                <hr>
+                                <div class="date"><i class="fa fa-clock-o"></i>{{ comment.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
+                                <h4>{{ comment.author.name }}</h4>
+                                <span class="category">
+                                  <strong translate="EVENTS.EVENTS.DETAILS.COMMENTS.REASON">Reason: </strong>: {{ comment.reason | translate }}
+                                </span>
+                                <p>{{ comment.text }}</p>
+                                <a ng-click="deleteComment(comment.id)" class="delete">
+                                  <i class="fa fa-times-circle"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
+                                </a>
+                                <a ng-click="replyTo(comment)" class="reply" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY">
+                                  <i class="fa fa-share"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY' | translate }}
+                                </a>
+                                <span class="resolve" ng-class="{ resolved : comment.resolvedStatus }">
+                                    <i class="fa fa-check"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED' | translate }}
+                                </span>
+
+                                <div class="comment is-reply" ng-repeat="reply in comment.replies track by $index">
+                                    <hr>
+                                    <div class="date"><i class="fa fa-clock-o"></i>{{ reply.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
+                                    <h4>{{ reply.author.name }}</h4>
+                                    <span class="category">
+                                      <strong translate="EVENTS.EVENTS.DETAILS.COMMENTS.REASON">Reason: </strong>: {{ comment.reason | translate }}
+                                    </span>
+                                    <p>
+                                      <span>@{{ comment.author.name }}</span> {{ reply.text }}
+                                    </p>
+                                    <a ng-click="deleteCommentReply(comment.id, reply.id)" class="delete" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE">
+                                      <i class="fa fa-times-circle"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <form class="add-comment" ng-if="replyToId === null" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE">
+                          <textarea ng-model="myComment.text" placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER' | translate }}"></textarea>
+                          <div>
+                              <select chosen
+                                  data-width="'200px'"
+                                  data-disable-search-threshold="8"
+                                  ng-model="myComment.reason"
+                                  ng-options="value | translate for (id, value) in components.eventCommentReasons"
+                                  data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER' | translate }}"
+                              />
+                          </div>
+                          <button ng-class="{ disabled: !myComment.text.length || !myComment.reason.length || myComment.saving }" class="save green" ng-click="comment()" translate="SUBMIT">Submit</button>
+                        </form>
+
+                        <form class="add-comment reply" ng-if="replyToId !== null">
+                            <textarea ng-model="myComment.text"
+                                placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY_TO' | translate }} @{{ originalComment.author.name }}"></textarea>
+                            <button ng-class="{ disabled: !myComment.text.length || myComment.saving }" class="save green" ng-click="reply()"
+                                translate="EVENTS.EVENTS.DETAILS.COMMENTS.REPLY">Reply</button>
+                            <button class="cancel" ng-click="exitReplyMode()" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CANCEL_REPLY">Cancel</button>
+                            <input with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" type="checkbox" ng-model="myComment.resolved" id="resolved-checkbox" class="ios"/>
+                            <label with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" for="resolved-checkbox" translate="EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED">Resolved</label>
+                      </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="quick-actions-details" data-level="2" data-label="EVENTS.EVENTS.DETAILS.QUICKACTION_WORKFLOW_DETAILS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj workflow-options">
+                    <header translate="EVENTS.EVENTS.DETAILS.QUICKACTION_WORKFLOW_DETAILS.TITLE">Workflow Details</header>
+                    <div class="obj-container padded">
+                        <p>This is filler text, please ignore me and don't bother reading. This section will be used to describe the workflow options section. This is filler text, please ignore me and don't bother reading. This section will be used to describe the workflow options section.</p>
+                        <div class="checkbox-container">
+                            <label><input type="checkbox">Media Package</label><br>
+                            <label><input type="checkbox">Delete Distribution Files</label><br>
+                            <label><input type="checkbox">Delete Master Files</label><br>
+                        </div>
+                        <div class="btn-container">
+                            <a href="javascript:;" class="cancel-btn">Cancel</a>
+                            <a href="javascript:;" class="add-btn">Add</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="media-details" data-parent="media" data-level="2" data-label="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-details">
+                    <header translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TITLE">Media Details</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.ID">ID</td>
+                                <td>{{ subNavData.id }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TYPE">Type</td>
+                                <td>{{ subNavData.type }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.MIMETYPE">Mimetype</td>
+                                <td>{{ subNavData.mimetype }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.FLAVOR">Flavor</td>
+                                <td>{{ subNavData.flavor }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TAGS">Tags</td>
+                                <td>{{ subNavData.tags }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.URL">URL</td>
+                                <td>{{ subNavData.url }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.DURATION">Duration</td>
+                                <td>{{ subNavData.duration }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="obj tbl-container media-stream-details">
+                    <header>Streams</header>
+                    <div class="obj-container">
+                        <div class="table-series">
+                            <div class="wrapper">
+                                <header>{{ EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.STREAM_AUDIO | translate }}</header>
+                                <table class="main-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.ID">ID</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TYPE">Type</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.CHANNELS">Channels</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.BITRATE">Bitrate</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="stream in subNavData.streams.audio track by $index">
+                                            <td>{{ $index }}</td>
+                                            <td>{{ stream.type }}</td>
+                                            <td>{{ stream.channels }}</td>
+                                            <td>{{ stream.bitrate }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="wrapper">
+                                <header>{{ EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.STREAM_VIDEO | translate }}</header>
+                                <table class="main-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.ID">ID</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TYPE">Type</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.FRAMERATE">Framerate</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.RESOLUTION">Resolution</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="stream in subNavData.streams.video track by $index">
+                                            <td>{{ $index }}</td>
+                                            <td>{{ stream.type }}<i></i></td>
+                                            <td>{{ stream.framerate }}<i></i></td>
+                                            <td>{{ stream.resolution }}<i></i></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="errors-and-warnings" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-container">
+                    <header translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.HEADER">Errors &amp; Warnings</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th class="small"></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DATE">Date / Time <i></i></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">Title <i></i></th>
+                                    <th class="medium"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in subNavData.entries track by $index">
+                                    <td><div ng-if="angular.isDefined(item.severity)" class="circle {{ severityColor(item.severity) }}"></div></td>
+                                    <td>{{ item.timestamp | localizeDate : 'dateTime' : 'medium'}}</td>
+                                    <td>{{ item.title }}</td>
+                                    <td><a class="details-link" ng-click="openSubTab('error-details', 'EventErrorDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS" data-modal-tab="error-details">Details</a></td>
+                                </tr>
+                                <tr ng-if="subNavData.entries.length === 0">
+                                    <td colspan="4" translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.EMPTY">
+                                        No errors found.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="error-details" data-level="4" data-label="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HEADER">
+        <div class="modal-body">
+           <div class="full-col">
+               <div class="obj tbl-details">
+                   <header translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HEADER">Error Details</header>
+                   <div class="obj-container">
+                       <table class="main-tbl">
+                           <tr>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.SEVERITY">Title</td>
+                               <td>{{ subNavData.severity }}</td>
+                           </tr>
+                           <tr>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.TITLE">Title</td>
+                               <td>{{ subNavData.title }}</td>
+                           </tr>
+                           <tr>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.DESCRIPTION">Description</td>
+                               <td>{{ subNavData.description }}</td>
+                           </tr>
+                           <tr>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.JOB_ID">Job ID</td>
+                               <td>{{ subNavData.job_id }}</td>
+                           </tr>
+                           <tr>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.DATE">Date / Time</td>
+                               <td>{{ subNavData.timestamp | localizeDate : 'dateTime' : 'medium' }}</td>
+                           </tr>
+                           <tr>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HOST">processing_host</td>
+                               <td>{{ subNavData.processing_host }}</td>
+                           </tr>
+                           <tr>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.TYPE">service_type</td>
+                               <td>{{ subNavData.service_type }}</td>
+                           </tr>
+                           <tr>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.TECHNICAL_DETAILS">Technical Details</td>
+                               <td>
+                                 <div ng-repeat="item in subNavData.details track by $index">
+                                   <h3>{{ item.name }}</h3>
+                                   <pre>{{ item.value }}</pre>
+                                 </div>
+                               </td>
+                           </tr>
+                       </table>
+                   </div>
+               </div>
+           </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="workflow-details" data-parent="workflows" data-level="2" data-label="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-details">
+                    <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE">Workflow Details</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID">ID</td>
+                                <td>{{ subNavData.id }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TITLE">Title</td>
+                                <td>{{ subNavData.title }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TYPE">Type</td>
+                                <td>{{ subNavData.workflow }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE">State</td>
+                                <td>{{ subNavData.state }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STARTED">Started</td>
+                                <td>{{ subNavData.start | localizeDate : 'dateTime' : 'medium' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="obj tbl-container more-info-actions">
+                    <header>More Information &amp; Actions</header>
+                    <div class="obj-container">
+                        <ul>
+                            <li>Operations <a class="details-link" ng-click="openSubTab('workflow-operations', 'EventWorkflowOperationsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">Details</a></li>
+                            <li>Errors & Warnings <a class="details-link" ng-click="openSubTab('errors-and-warnings', 'EventErrorsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">Details</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="workflow-operations" data-parent="workflows" data-level="3" data-label="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-container">
+                    <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">Workflow Operations</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Title <i></i></th>
+                                    <th>Description <i></i></th>
+                                    <th class="medium"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in subNavData.entries track by $index">
+                                    <td>{{ item.status }}</td>
+                                    <td>{{ item.title }}</td>
+                                    <td>{{ item.description }}</td>
+                                    <td><a class="details-link" ng-click="openSubTab('operation-details', 'EventWorkflowOperationDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">Details</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="operation-details" data-parent="workflows" data-level="4" data-label="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-details">
+                    <header translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">Operation Details</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr>
+                                <td>Retry Strategy</td>
+                                <td>{{ subNavData.retry_strategy }}</td>
+                            </tr>
+                            <tr>
+                                <td>Execution Host</td>
+                                <td>{{ subNavData.execution_host }}</td>
+                            </tr>
+                            <tr>
+                                <td>Failed Attempts</td>
+                                <td>{{ subNavData.failed_attempts }}</td>
+                            </tr>
+                            <tr>
+                                <td>Max</td>
+                                <td>{{ subNavData.max_attempts }}</td>
+                            </tr>
+                            <tr>
+                                <td>Exception Handler Workflow</td>
+                                <td>{{ subNavData.exception_handler_workflow }}</td>
+                            </tr>
+                            <tr>
+                                <td>Fail on Error</td>
+                                <td>{{ subNavData.fail_on_error }}</td>
+                            </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>{{ subNavData.description }}</td>
+                            </tr>
+                            <tr>
+                                <td>State</td>
+                                <td>{{ subNavData.state }}</td>
+                            </tr>
+                            <tr>
+                                <td>Job</td>
+                                <td>{{ subNavData.job }}</td>
+                            </tr>
+                            <tr>
+                                <td>ID</td>
+                                <td>{{ subNavData.id }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="btm-spacer"></div>
+</section>

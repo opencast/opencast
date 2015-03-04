@@ -1,0 +1,13 @@
+<section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="confirm-modal">
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2>Confirm</h2>
+    </header>
+
+    <p>Are you sure you want to continue?</p>
+
+    <div class="btn-container">
+        <a class="cancel-btn close-modal" ng-click="close()"><i>Cancel</i></a>
+        <a class="danger-btn" ng-click="confirm()"><i>Confirm</i></a>
+    </div>
+</section>

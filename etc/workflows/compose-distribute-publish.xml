@@ -34,17 +34,6 @@
       </ul>
     </fieldset>
     <fieldset>
-      <legend>Archive</legend>
-      <ul class="oc-ui-checkbox-list-upload">
-    <li class="ui-helper-clearfix">
-      <span id="archiveconfig">
-        <input id="archiveOp" name="archiveOp" type="checkbox" checked="checked" class="configField holdCheckbox" value="true"/>
-        <span id="i18n_activate_archive">&nbsp;Archive the media package</span>
-      </span>
-    </li>
-      </ul>
-    </fieldset>
-    <fieldset>
       <legend>Distribution</legend>
       <ul class="oc-ui-form-list">
         <!-- field: License -->
@@ -53,6 +42,8 @@
           <span id="dist">
             <input id="distribution" name="distribution" type="checkbox" checked="checked" disabled="disabled" class="configField" value="Matterhorn Media Module" />
             <span id="i18n_dist_mmm">&nbsp;Matterhorn Media Module</span>
+            <input id="youtube" name="youtube" type="checkbox" class="configField" value="Youtube" />
+            <span id="i18n_dist_mmm">&nbsp;Youtube</span>
           </span>
         </li>
       </ul>
@@ -75,12 +66,6 @@
           {getValue: function(){ return this.fields.trimHold.is(":checked"); }
           });
 
-        components['org.opencastproject.workflow.config.archiveOp'] = new ocAdmin.Component(
-          ['archiveOp'],
-          {key: 'org.opencastproject.workflow.config.archiveOp'},
-          {getValue: function(){ return this.fields.archiveOp.is(":checked");}
-          });
-
         components['org.opencastproject.workflow.config.captionHold'] = new ocAdmin.Component(
           ['captionHold'],
           {key: 'org.opencastproject.workflow.config.captionHold'},
@@ -95,7 +80,6 @@
       ocWorkflowPanel.setComponentValues = function(values, components){
         components['org.opencastproject.workflow.config.captionHold'].setValue(values['org.opencastproject.workflow.config.captionHold']);
         components['org.opencastproject.workflow.config.trimHold'].setValue(values['org.opencastproject.workflow.config.trimHold']);
-        components['org.opencastproject.workflow.config.archiveOp'].setValue(values['org.opencastproject.workflow.config.archiveOp']);
         components['license'].setValue(values['license']);
       }
     </script>
@@ -500,6 +484,20 @@
       </configurations>
     </operation>
 
+    <!-- Publish to YouTube -->
+
+    <operation
+        id="publish-youtube"
+        if="${youtube}"
+        max-attempts="2"
+        fail-on-error="true"
+        exception-handler-workflow="error"
+        description="Publish to YouTube">
+      <configurations>
+        <configuration key="source-flavors">presentation/trimmed</configuration>
+      </configurations>
+    </operation>
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Archive                                                           -->
     <!--                                                                   -->
@@ -509,7 +507,6 @@
     <!-- Archive the current state of the mediapackage -->
 
     <operation
-      if="${archiveOp}"
       id="archive"
       fail-on-error="true"
       exception-handler-workflow="error"

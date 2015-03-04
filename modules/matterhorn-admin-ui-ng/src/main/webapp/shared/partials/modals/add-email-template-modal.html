@@ -1,0 +1,8 @@
+<section ng-show="open" id="add-email-template-modal" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation ng-hide" ng-controller="EmailtemplateCtrl">
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2 translate="CONFIGURATION.EMAIL_TEMPLATES.DETAILS.{{ action === 'edit' ? 'EDIT':'NEW' }}CAPTION">Template</h2>
+    </header>
+    <admin-ng-wizard data-name="emailtemplate" data-action="action" data-states="states" data-submit="submit" data-final-button-translation="{{ action === 'add' ? 'WIZARD.CREATE' : 'UPDATE' }}">
+   </admin-ng-wizard>
+</section>

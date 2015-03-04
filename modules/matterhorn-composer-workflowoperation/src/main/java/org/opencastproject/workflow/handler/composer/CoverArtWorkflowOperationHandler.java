@@ -27,7 +27,7 @@ import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
@@ -97,7 +97,7 @@ public class CoverArtWorkflowOperationHandler extends AbstractWorkflowOperationH
     }
 
     // TODO: Read this from iTunes U catalog
-    String category = catalog.getAsText(new EName(DublinCoreCatalogImpl.OC_NS_URI, "category"), LANGUAGE_ANY, null);
+    String category = catalog.getAsText(new EName(DublinCores.OC_PROPERTY_NS_URI, "category"), LANGUAGE_ANY, null);
     if (category == null) {
       return createResult(SKIP);
     }

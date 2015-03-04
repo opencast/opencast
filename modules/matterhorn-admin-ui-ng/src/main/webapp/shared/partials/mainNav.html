@@ -1,0 +1,21 @@
+<div class="menu-top" with-role="ROLE_UI_NAV" id="menu-toggle" ng-click="toggleMenu()">
+    <nav id="roll-up-menu">
+        <div id="nav-container" ng-controller="NavCtrl">
+            <a admin-ng-href-role="{'ROLE_UI_EVENTS_VIEW': '#/events/events', 'ROLE_UI_SERIES_VIEW': '#/events/series'}" ng-class="{ active: category == 'events' }" with-role="ROLE_UI_NAV_RECORDINGS_VIEW">
+                <i class="events" data-title="{{ 'NAV.EVENTS.TITLE' | translate }}"></i>
+            </a>
+            <a admin-ng-href-role="{'ROLE_UI_LOCATIONS_VIEW': '#/recordings/recordings', 'ROLE_UI_LOCATIONSBLACKLISTS_VIEW': '#/recordings/locationblacklists'}" ng-class="{ active: category == 'recordings' }" with-role="ROLE_UI_NAV_CAPTURE_VIEW">
+                <i class="recordings" data-title="{{ 'NAV.CAPTUREAGENTS.TITLE' | translate }}"></i>
+            </a>
+            <a admin-ng-href-role="{'ROLE_UI_JOBS_VIEW': '#/systems/jobs', 'ROLE_UI_SERVERS_VIEW': '#/systems/servers', 'ROLE_UI_SERVICES_VIEW': '#/systems/services'}" ng-class="{ active: category == 'systems' }" with-role="ROLE_UI_NAV_SYSTEMS_VIEW">
+                <i class="systems" data-title="{{ 'NAV.SYSTEMS.TITLE' | translate }}"></i>
+            </a>
+            <a admin-ng-href-role="{'ROLE_UI_USERS_VIEW': '#/users/users', 'ROLE_UI_GROUPS_VIEW': '#/users/groups', 'ROLE_UI_ACLS_VIEW': '#/users/acls', 'ROLE_UI_USERSBLACKLISTS_VIEW': '#/users/userblacklists'}" ng-class="{ active: category == 'users' }" with-role="ROLE_UI_NAV_ORGANIZATION_VIEW">
+                <i class="users" data-title="{{ 'NAV.USERS.TITLE' | translate }}"></i>
+            </a>
+            <a admin-ng-href-role="{'ROLE_UI_THEMES_VIEW': '#/configuration/themes'}" ng-class="{ active: category == 'configuration' }" with-role="ROLE_UI_NAV_CONFIGURATION_VIEW">
+                <i class="configuration" data-title="{{ 'NAV.CONFIGURATION.TITLE' | translate }}"></i>
+            </a>
+        </div>
+    </nav>
+</div>

@@ -120,6 +120,11 @@ public interface WorkflowInstance extends Configurable {
   void setState(WorkflowState state);
 
   /**
+   * @return True if the workflow has not finished, been stopped or failed.
+   */
+  boolean isActive();
+
+  /**
    * The {@link MediaPackage} being worked on by this workflow instance.
    */
   MediaPackage getMediaPackage();
@@ -147,4 +152,16 @@ public interface WorkflowInstance extends Configurable {
    *          the workflow definition
    */
   void extend(WorkflowDefinition workflowDefinition);
+
+  /**
+   * Insert the operations found in the workflow definition after the operation <code>after</code>.
+   * This allows to include a different workflow at any point. This method is a generalization
+   * of {@link #extend(org.opencastproject.workflow.api.WorkflowDefinition)}.
+   *
+   * @param workflowDefinition
+   *          the workflow to insert
+   * @param after
+   *          insert the given workflow after this operation
+   */
+  void insert(WorkflowDefinition workflowDefinition, WorkflowOperationInstance after);
 }

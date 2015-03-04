@@ -20,18 +20,22 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -41,6 +45,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,15 +79,11 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("dublincore", eventCatalog.toXmlString()));
 
-      String wfPropertiesString = "";
-      for (Map.Entry<String, String> entry : wfProperties.entrySet())
-        wfPropertiesString += entry.getKey() + "=" + entry.getValue() + "\n";
-
       // Add an empty agentparameters as it is required by the Rest Endpoint
       params.add(new BasicNameValuePair("agentparameters", "remote.scheduler.empty.parameter"));
-      params.add(new BasicNameValuePair("wfproperties", wfPropertiesString));
+      params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties)));
 
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new SchedulerException("Unable to assemble a remote scheduler request for adding an event " + eventCatalog,
               e);
@@ -122,15 +123,11 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("dublincore", eventCatalog.toXmlString()));
 
-      String wfPropertiesString = "";
-      for (Map.Entry<String, String> entry : wfProperties.entrySet())
-        wfPropertiesString += entry.getKey() + "=" + entry.getValue() + "\n";
-
       // Add an empty agentparameters as it is required by the Rest Endpoint
       params.add(new BasicNameValuePair("agentparameters", "remote.scheduler.empty.parameter"));
-      params.add(new BasicNameValuePair("wfproperties", wfPropertiesString));
+      params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties)));
 
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new SchedulerException("Unable to assemble a remote scheduler request for adding events " + eventCatalog, e);
     }
@@ -221,14 +218,8 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
 
       if (eventCatalog != null)
         params.add(new BasicNameValuePair("dublincore", eventCatalog.toXmlString()));
-
-      String wfPropertiesString = "";
-      for (Map.Entry<String, String> entry : wfProperties.entrySet())
-        wfPropertiesString += entry.getKey() + "=" + entry.getValue() + "\n";
-
-      params.add(new BasicNameValuePair("wfproperties", wfPropertiesString));
-
-      put.setEntity(new UrlEncodedFormEntity(params));
+      params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties)));
+      put.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new SchedulerException("Unable to assemble a remote scheduler request for updating event " + eventCatalog,
               e);
@@ -285,7 +276,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
           throw new NotFoundException("Event catalog '" + eventId + "' not found on remote scheduler service!");
         } else {
-          DublinCoreCatalog dublinCoreCatalog = new DublinCoreCatalogImpl(response.getEntity().getContent());
+          DublinCoreCatalog dublinCoreCatalog = DublinCores.read(response.getEntity().getContent());
           logger.info("Successfully get event dublincore {} from the remote scheduler service", eventId);
           return dublinCoreCatalog;
         }
@@ -351,7 +342,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public Date getScheduleLastModified(SchedulerQuery filter) throws SchedulerException {
+  public String getScheduleLastModified(String agentId) throws SchedulerException {
     throw new UnsupportedOperationException();
   }
 
@@ -359,6 +350,377 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   public void updateEvents(List<Long> eventIds, DublinCoreCatalog eventCatalog) throws NotFoundException,
           SchedulerException, UnauthorizedException {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void updateAccessControlList(long eventId, AccessControlList accessControlList) throws NotFoundException,
+          SchedulerException {
+    HttpPut put = new HttpPut(UrlSupport.concat(Long.toString(eventId), "acl"));
+
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("acl", AccessControlParser.toJson(accessControlList)));
+      put.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+    } catch (Exception e) {
+      throw new SchedulerException(
+              "Unable to assemble a remote scheduler request for updating the access control status", e);
+    }
+
+    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          logger.warn("Event with id {} was not found by the scheduler service", eventId);
+          throw new NotFoundException("Event with id '" + eventId + "' not found on remote scheduler service!");
+        } else if (SC_OK == response.getStatusLine().getStatusCode()) {
+          logger.info("Event with id {} successfully updated access control list.", eventId);
+          return;
+        } else {
+          throw new SchedulerException("Unexpected status code " + response.getStatusLine());
+        }
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to update event with id " + eventId + " to the scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to update  event with id " + eventId);
+  }
+
+  @Override
+  public AccessControlList getAccessControlList(long eventId) throws NotFoundException, SchedulerException {
+    HttpGet get = new HttpGet(Long.toString(eventId).concat("/acl"));
+    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          throw new NotFoundException("Event '" + eventId + "' not found on remote scheduler service!");
+        } else {
+          String aclString = EntityUtils.toString(response.getEntity(), "UTF-8");
+          AccessControlList accessControlList = AccessControlParser.parseAcl(aclString);
+          logger.info("Successfully get event {} access control list from the remote scheduler service", eventId);
+          return accessControlList;
+        }
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to get event access control list from remote scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to get event access control list from remote scheduler service");
+  }
+
+  @Override
+  public String getMediaPackageId(long eventId) throws NotFoundException, SchedulerException {
+    HttpGet get = new HttpGet(Long.toString(eventId).concat("/mediapackageId"));
+    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          throw new NotFoundException("Event '" + eventId + "' not found on remote scheduler service!");
+        } else {
+          String mediaPackageId = EntityUtils.toString(response.getEntity(), "UTF-8");
+          logger.info("Successfully get event  {} mediapackage id from the remote scheduler service", eventId);
+          return mediaPackageId;
+        }
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to get event mediapackage identifier from remote scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to get event mediapackage identifier from remote scheduler service");
+  }
+
+  @Override
+  public Long getEventId(String mediaPackageId) throws NotFoundException, SchedulerException {
+    HttpGet get = new HttpGet(mediaPackageId.concat("/eventId"));
+    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          throw new NotFoundException("Scheduled event from mediapackage '" + mediaPackageId
+                  + "' not found on remote scheduler service!");
+        } else {
+          Long eventId = Long.parseLong(EntityUtils.toString(response.getEntity(), "UTF-8"));
+          logger.info("Successfully get scheduled event id {} from the remote scheduler service", eventId);
+          return eventId;
+        }
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to get event identifier from remote scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to get event identifier from remote scheduler service");
+  }
+
+  @Override
+  public boolean isOptOut(String mediapackageId) throws NotFoundException, SchedulerException {
+    HttpGet get = new HttpGet(UrlSupport.concat(mediapackageId, "optOut"));
+    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          throw new NotFoundException("Event with mediapackage id '" + mediapackageId
+                  + "' not found on remote scheduler service!");
+        } else {
+          String optOutString = EntityUtils.toString(response.getEntity(), "UTF-8");
+
+          Boolean booleanObject = BooleanUtils.toBooleanObject(optOutString);
+          if (booleanObject == null)
+            throw new SchedulerException("Could not parse opt out status from the remote scheduler service: "
+                    + optOutString);
+
+          logger.info(
+                  "Successfully get opt out status of event with mediapackage id {} from the remote scheduler service",
+                  mediapackageId);
+          return booleanObject.booleanValue();
+        }
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to get event opt out status from remote scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to get event opt out status from remote scheduler service");
+  }
+
+  @Override
+  public void updateOptOutStatus(String mediapackageId, boolean optedOut) throws NotFoundException, SchedulerException {
+    HttpPut put = new HttpPut(UrlSupport.concat(mediapackageId, "optOut"));
+
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("optOut", Boolean.toString(optedOut)));
+      put.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to assemble a remote scheduler request for updating the opt out status", e);
+    }
+
+    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          logger.warn("Event with mediapackage id {} was not found by the scheduler service", mediapackageId);
+          throw new NotFoundException("Event with mediapackage id '" + mediapackageId
+                  + "' not found on remote scheduler service!");
+        } else if (SC_OK == response.getStatusLine().getStatusCode()) {
+          logger.info("Event with mediapackage id {} successfully updated with opt out status.", mediapackageId);
+          return;
+        } else {
+          throw new SchedulerException("Unexpected status code " + response.getStatusLine());
+        }
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to update event with mediapackage id " + mediapackageId
+              + " to the scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to update  event with mediapackage id " + mediapackageId);
+  }
+
+  @Override
+  public ReviewStatus getReviewStatus(String mediapackageId) throws NotFoundException, SchedulerException {
+    HttpGet get = new HttpGet(UrlSupport.concat(mediapackageId, "reviewStatus"));
+    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          throw new NotFoundException("Event with mediapackage id '" + mediapackageId
+                  + "' not found on remote scheduler service!");
+        } else {
+          String reviewStatusString = EntityUtils.toString(response.getEntity(), "UTF-8");
+
+          ReviewStatus reviewStatus;
+          try {
+            reviewStatus = ReviewStatus.valueOf(reviewStatusString);
+          } catch (Exception e) {
+            throw new SchedulerException("Could not parse review status from the remote scheduler service: "
+                    + reviewStatusString);
+          }
+          logger.info(
+                  "Successfully get review status of event with mediapackage id {} from the remote scheduler service",
+                  mediapackageId);
+          return reviewStatus;
+        }
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to get event review status from remote scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to get event review status from remote scheduler service");
+  }
+
+  @Override
+  public void updateReviewStatus(String mediapackageId, ReviewStatus reviewStatus) throws NotFoundException,
+          SchedulerException {
+    HttpPut put = new HttpPut(UrlSupport.concat(mediapackageId, "reviewStatus"));
+
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("reviewStatus", reviewStatus.toString()));
+      put.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to assemble a remote scheduler request for updating the review status", e);
+    }
+
+    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          logger.warn("Event with mediapackage id {} was not found by the scheduler service", mediapackageId);
+          throw new NotFoundException("Event with mediapackage id '" + mediapackageId
+                  + "' not found on remote scheduler service!");
+        } else if (SC_OK == response.getStatusLine().getStatusCode()) {
+          logger.info("Event with mediapackage id {} successfully updated with review status.", mediapackageId);
+          return;
+        } else {
+          throw new SchedulerException("Unexpected status code " + response.getStatusLine());
+        }
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to update event with mediapackage id " + mediapackageId
+              + " to the scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to update  event with mediapackage id " + mediapackageId);
+  }
+
+  @Override
+  public boolean isBlacklisted(String mediapackageId) throws NotFoundException, SchedulerException {
+    HttpGet get = new HttpGet(UrlSupport.concat(mediapackageId, "blacklisted"));
+    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          throw new NotFoundException("Event with mediapackage id '" + mediapackageId
+                  + "' not found on remote scheduler service!");
+        } else {
+          String blacklistString = EntityUtils.toString(response.getEntity(), "UTF-8");
+
+          Boolean booleanObject = BooleanUtils.toBooleanObject(blacklistString);
+          if (booleanObject == null)
+            throw new SchedulerException("Could not parse blacklist status from the remote scheduler service: "
+                    + blacklistString);
+
+          logger.info(
+                  "Successfully get blacklist status of event with mediapackage id {} from the remote scheduler service",
+                  mediapackageId);
+          return booleanObject.booleanValue();
+        }
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to get event blacklist status from remote scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to get event blacklist status from remote scheduler service");
+  }
+
+  @Override
+  public void updateBlacklistStatus(String mediapackageId, boolean blacklisted) throws NotFoundException,
+          SchedulerException {
+    HttpPut put = new HttpPut(UrlSupport.concat(mediapackageId, "blacklisted"));
+
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("blacklisted", Boolean.toString(blacklisted)));
+      put.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to assemble a remote scheduler request for updating the blacklist status", e);
+    }
+
+    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          logger.warn("Event with mediapackage id {} was not found by the scheduler service", mediapackageId);
+          throw new NotFoundException("Event with mediapackage id '" + mediapackageId
+                  + "' not found on remote scheduler service!");
+        } else if (SC_OK == response.getStatusLine().getStatusCode()) {
+          logger.info("Event with mediapackage id {} successfully updated with blacklist status.", mediapackageId);
+          return;
+        } else {
+          throw new SchedulerException("Unexpected status code " + response.getStatusLine());
+        }
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to update event with mediapackage id " + mediapackageId
+              + " to the scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to update event with mediapackage id " + mediapackageId);
+  }
+
+  @Override
+  public void updateWorkflowConfig(String mediapackageId, Map<String, String> properties) throws NotFoundException,
+          SchedulerException {
+    HttpPut put = new HttpPut(UrlSupport.concat(mediapackageId, "workflowConfig"));
+
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("workflowConfig", toPropertyString(properties)));
+      put.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+    } catch (Exception e) {
+      throw new SchedulerException(
+              "Unable to assemble a remote scheduler request for updating the workflow configuration", e);
+    }
+
+    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND);
+    try {
+      if (response != null) {
+        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+          logger.warn("Event with mediapackage id {} was not found by the scheduler service", mediapackageId);
+          throw new NotFoundException("Event with mediapackage id '" + mediapackageId
+                  + "' not found on remote scheduler service!");
+        } else if (SC_OK == response.getStatusLine().getStatusCode()) {
+          logger.info("Event with mediapackage id {} successfully updated with workflow configuration.", mediapackageId);
+          return;
+        } else {
+          throw new SchedulerException("Unexpected status code " + response.getStatusLine());
+        }
+      }
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to update event with mediapackage id " + mediapackageId
+              + " to the scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SchedulerException("Unable to update  event with mediapackage id " + mediapackageId);
+  }
+
+  private String toPropertyString(Map<String, String> properties) {
+    StringBuilder wfPropertiesString = new StringBuilder();
+    for (Map.Entry<String, String> entry : properties.entrySet())
+      wfPropertiesString.append(entry.getKey() + "=" + entry.getValue() + "\n");
+    return wfPropertiesString.toString();
   }
 
   @Override

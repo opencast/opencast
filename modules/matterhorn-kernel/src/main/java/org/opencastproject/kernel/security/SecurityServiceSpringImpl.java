@@ -97,7 +97,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
             roles.add(new JaxbRole(ga.getAuthority(), jaxbOrganization));
           }
         }
-        return new JaxbUser(userDetails.getUsername(), jaxbOrganization, roles);
+        return new JaxbUser(userDetails.getUsername(), null, jaxbOrganization, roles);
       } else {
         return SecurityUtil.createAnonymousUser(jaxbOrganization);
       }

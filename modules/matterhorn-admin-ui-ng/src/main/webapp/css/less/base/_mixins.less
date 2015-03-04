@@ -1,0 +1,86 @@
+.user-select(@value) {
+    -webkit-user-select: @value;
+    -khtml-user-select: @value;
+    -moz-user-select: @value;
+    -ms-user-select: @value;
+    user-select: @value;
+}
+
+.appearance(@value) {
+    -webkit-appearance: @value;
+    -moz-appearance: @value;
+    -ms-appearance: @value;
+    -o-appearance: @value;
+    appearance: @value;
+}
+
+.font-smoothing(@value) when (@value = on) {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.font-smoothing(@value) when (@value = off) {
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+}
+
+// Build icons mixin.
+.build-icon(@top, @left, @img, @w, @h) {
+
+    top: @top;
+    left: @left;
+
+    .size(@w, @h);
+
+    .retina-image("@{img-path}@{img}.png", "@{img-path}@{img}@2x.png", @w, @h);
+
+} // build-icon()
+
+
+
+// Mixin for removing the object padding
+// Easier to add this than add padding to every element
+.negate-padding(@col-width) {
+
+    .box-sizing();
+
+    // Re position
+    margin-left: -20px;
+    margin-bottom: -20px;
+
+    padding-left: 20px;
+
+    width: (@col-width - 2);
+
+} // negate-padding()
+
+
+
+// Mixin in that styles active link's bottom arrow in certian navs. Modal, view nav.
+.nav-btm-arrow(@size: small) {
+
+    // Set size
+    .px-size() when (@size = small) {
+        border-left: 7px solid transparent;
+        border-right: 7px solid transparent;
+        border-bottom: 7px solid @body-background;
+    }
+    .px-size() when (@size = large) {
+        border-left: 9px solid transparent;
+        border-right: 9px solid transparent;
+        border-bottom: 9px solid @body-background;
+    }
+
+    &:after {
+        content: "";
+        position: absolute;
+        top: 23px; left: 50%;
+        margin-left: -(14px / 2);
+
+     	width: 0; height: 0;
+
+        .px-size();
+
+    } // &:after
+
+} // nav-btm-arrow()

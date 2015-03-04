@@ -18,7 +18,7 @@ package org.opencastproject.authorization.xacml.manager.impl;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.authorization.xacml.manager.api.AclTransition;
+import org.opencastproject.authorization.xacml.manager.api.ACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
@@ -154,9 +154,9 @@ public abstract class AbstractAclScheduler {
             final TransitionQuery q = TransitionQuery.query().before(now).withDone(false);
             try {
               final TransitionResult r = aclMan.getTransitions(q);
-              final List<AclTransition> transitions = Collections.<AclTransition>concat(r.getEpisodeTransistions(), r.getSeriesTransistions());
+              final List<ACLTransition> transitions = Collections.<ACLTransition>concat(r.getEpisodeTransistions(), r.getSeriesTransistions());
               logger.debug("Found {} transition/s for organization {}", transitions.size(), org.getId());
-              for (final AclTransition t : transitions) {
+              for (final ACLTransition t : transitions) {
                 if (t instanceof EpisodeACLTransition) {
                   final EpisodeACLTransition et = (EpisodeACLTransition) t;
                   logger.info("Apply transition to episode {}", et.getEpisodeId());

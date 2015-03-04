@@ -15,31 +15,49 @@
  */
 package org.opencastproject.authorization.xacml.manager.impl;
 
+import org.opencastproject.archive.api.Archive;
+import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
+import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.distribution.api.DistributionService;
-import org.opencastproject.episode.api.EpisodeService;
-import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
+import org.opencastproject.index.IndexProducer;
+import org.opencastproject.message.broker.api.MessageReceiver;
+import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.acl.AclItem;
+import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
+import org.opencastproject.message.broker.api.index.IndexRecreateObject;
+import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.data.Effect0;
 import org.opencastproject.workflow.api.WorkflowService;
 
+import org.apache.commons.lang.WordUtils;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /** OSGi implementation of {@link org.opencastproject.authorization.xacml.manager.api.AclServiceFactory}. */
-public class OsgiAclServiceFactory implements AclServiceFactory {
-  /** Logging utility */
-  private static final Logger logger = LoggerFactory.getLogger(AclServiceImpl.class);
+public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclServiceFactory {
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(OsgiAclServiceFactory.class);
+
+  private final String clazzName = OsgiAclServiceFactory.class.getName();
 
   private AclTransitionDb transitionDb;
   private AclDb aclDb;
   private SeriesService seriesService;
-  private EpisodeService episodeService;
+  private Archive<?> archive;
   private AuthorizationService authorizationService;
   private SearchService searchService;
   private WorkflowService workflowService;
@@ -47,12 +65,17 @@ public class OsgiAclServiceFactory implements AclServiceFactory {
   private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
   private ServiceRegistry serviceRegistry;
   private DistributionService distributionService;
+  private MessageReceiver messageReceiver;
+  private MessageSender messageSender;
+  /** The organization directory service */
+  private OrganizationDirectoryService organizationDirectoryService;
+  private ComponentContext cc;
 
   @Override
   public AclService serviceFor(Organization org) {
-    return new AclServiceImpl(org, aclDb, transitionDb, seriesService, episodeService, searchService, workflowService,
+    return new AclServiceImpl(org, aclDb, transitionDb, seriesService, archive, searchService, workflowService,
             securityService, httpMediaPackageElementProvider, authorizationService, distributionService,
-            serviceRegistry);
+            serviceRegistry, messageSender);
   }
 
   /** OSGi DI callback. */
@@ -71,8 +94,8 @@ public class OsgiAclServiceFactory implements AclServiceFactory {
   }
 
   /** OSGi DI callback. */
-  public void setEpisodeService(EpisodeService episodeService) {
-    this.episodeService = episodeService;
+  public void setArchive(Archive<?> archive) {
+    this.archive = archive;
   }
 
   /** OSGi DI callback. */
@@ -109,4 +132,80 @@ public class OsgiAclServiceFactory implements AclServiceFactory {
   public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
     this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
   }
+
+  /** OSGi DI callback. */
+  public void setMessageSender(MessageSender messageSender) {
+    this.messageSender = messageSender;
+  }
+
+  /** OSGi DI callback. */
+  public void setMessageReceiver(MessageReceiver messageReceiver) {
+    this.messageReceiver = messageReceiver;
+  }
+
+  /** OSGi DI callback. */
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  @Override
+  public void repopulate(final String indexName) {
+    final String destinationId = AclItem.ACL_QUEUE_PREFIX + WordUtils.capitalize(indexName);
+    for (final Organization organization : organizationDirectoryService.getOrganizations()) {
+      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
+        @Override
+        protected void run() {
+          AclService aclService = serviceFor(organization);
+          List<ManagedAcl> acls = aclService.getAcls();
+          int total = aclService.getAcls().size();
+          logger.info("Re-populating index with acls. There are {} acls(s) to add to the index.", total);
+          int current = 1;
+          for (ManagedAcl acl : acls) {
+            logger.trace("Adding acl '{}' for org '{}'", acl.getName(), organization.getId());
+            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                    AclItem.create(acl.getName()));
+            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                    IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Acl, total, current));
+            current++;
+          }
+        }
+      });
+    }
+
+    Organization organization = new DefaultOrganization();
+    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
+      @Override
+      protected void run() {
+        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Acl));
+      }
+    });
+  }
+
+  @Override
+  public MessageReceiver getMessageReceiver() {
+    return messageReceiver;
+  }
+
+  /**
+   * Callback for activation of this component.
+   *
+   * @param cc
+   *          the component context
+   */
+  public void activate(ComponentContext cc) {
+    this.cc = cc;
+    super.activate();
+  }
+
+  @Override
+  public Service getService() {
+    return Service.Acl;
+  }
+
+  @Override
+  public String getClassName() {
+    return OsgiAclServiceFactory.class.getName();
+  }
+
 }

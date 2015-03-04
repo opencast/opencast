@@ -1,0 +1,93 @@
+<div class="modal-content" ng-class="{ active: isCurrentTab('recipients') }" data-modal-tab-content="recipients" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div class="obj">
+                <header class="no-expand" translate="EVENTS.SEND_MESSAGE.TABS.RECIPIENTS">Recipients</header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <tbody>
+                            <tr ng-repeat="recipient in wizard.step.ud.items.recipients">
+                                <td>{{ recipient.name }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj">
+                <header class="no-expand" translate="EVENTS.SEND_MESSAGE.RECIPIENTS.AUDIT_TRAIL_CAPTION">Add to Audit Trail</header>
+                <div class="obj-container padded">
+                    <p translate="EVENTS.SEND_MESSAGE.RECIPIENTS.AUDIT_TRAIL_DESCRIPTION"></p>
+                    <div class="form-container">
+                        <div class="row no-padding">
+                            <div class="inline-content pull-left">
+                                <input type="checkbox" id="audit_trail" ng-model="wizard.step.ud.audit_trail" class="ios">
+                                <label for="audit_trail" translate="EVENTS.SEND_MESSAGE.RECIPIENTS.AUDIT_TRAIL_LABEL"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" ng-class="{ active: isCurrentTab('message') }" data-modal-tab-content="message" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div class="form-container">
+                <div class="row">
+                    <label class="required" translate="EVENTS.SEND_MESSAGE.MESSAGE.EMAIL_TEMPLATE">Select Email Template</label>
+                    <select chosen
+                        data-width="'200px'"
+                        data-disable-search-threshold="8"
+                        ng-change="wizard.step.applyTemplate()"
+                        ng-model="wizard.step.ud.email_template"
+                        ng-options="template as template.name for template in wizard.step.templates"
+                        data-placeholder="{{ 'EVENTS.SEND_MESSAGE.MESSAGE.EMAIL_TEMPLATE' | translate }}..."
+                    />
+                </div>
+
+                <div class="row">
+                    <label class="required" translate="EVENTS.SEND_MESSAGE.MESSAGE.SUBJECT">Subject</label>
+                    <input type="text" ng-model="wizard.step.ud.subject"
+                        placeholder="{{ 'EVENTS.SEND_MESSAGE.MESSAGE.SUBJECT' | translate }}...">
+                </div>
+
+                <div class="row">
+                    <label class="required" translate="EVENTS.SEND_MESSAGE.MESSAGE.MESSAGE">Message</label>
+                    <div class="text-variables">
+                        <label ng-repeat="variable in wizard.step.variables" ng-click="wizard.step.insertVariable(variable.VARIABLE)">{{ variable.VARIABLE }}<small>{{ variable['DESCRIPTION.EN'] }}</small></label>
+                    </div>
+                    <textarea ng-model="wizard.step.ud.message"
+                        placeholder="%March 11, 2013% quis risus eget urna mollis ornare vel eu leo. %Andy Waskle% natoque penatibus et magnis dis parturient Matt Szibmiyontes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula ut id el." rows="10"></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="inline-content pull-left">
+                        <input type="checkbox" id="include_signature" ng-model="wizard.step.ud.include_signature" class="ios">
+                        <label for="include_signature" translate="EVENTS.SEND_MESSAGE.MESSAGE.INCLUDE_SIGNATURE">Include in my email signature</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="summary" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div data-admin-ng-notifications="" context="bulk-message-form"></div>
+            <div class="obj summary-view">
+                <header class="no-expand" translate="EVENTS.SEND_MESSAGE.SUMMARY.MESSAGE_SUMMARY">Message Summary</header>
+                <div class="obj-container padded">
+                    <span translate="EVENTS.SEND_MESSAGE.MESSAGE.SUBJECT">Subject</span>
+                    <p>{{ wizard.states[1].stateController.preview.subject }}</p>
+
+                    <span translate="EVENTS.SEND_MESSAGE.MESSAGE.MESSAGE">Message Body</span>
+                    <p>{{ wizard.states[1].stateController.preview.body }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

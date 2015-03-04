@@ -15,11 +15,18 @@
  */
 package org.opencastproject.util;
 
-import org.apache.commons.io.IOUtils;
+import static org.opencastproject.util.MimeType.mimeType;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.util.data.functions.Strings;
+
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -27,9 +34,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,12 +46,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.opencastproject.util.MimeType.mimeType;
-
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 /**
  * This class represents the mime type registry that is responsible for providing resolving mime types through all
@@ -60,7 +61,7 @@ public final class MimeTypes {
   private MimeTypes() {
   }
 
-  public static final Pattern MIME_TYPE_PATTERN = Pattern.compile("([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)");
+  public static final Pattern MIME_TYPE_PATTERN = Pattern.compile("([a-zA-Z0-9-]+)/([a-zA-Z0-9-+.]+)");
 
   /** Name of the mime type files */
   public static final String DEFINITION_FILE = "/org/opencastproject/util/MimeTypes.xml";
@@ -86,6 +87,7 @@ public final class MimeTypes {
   public static final MimeType CALENDAR;
   public static final MimeType ZIP;
   public static final MimeType JAR;
+  public static final MimeType SMIL;
 
   // Initialize common mime types
   static {
@@ -103,6 +105,7 @@ public final class MimeTypes {
     CALENDAR = MimeTypes.parseMimeType("text/calendar");
     ZIP = MimeTypes.parseMimeType("application/zip");
     JAR = MimeTypes.parseMimeType("application/java-archive");
+    SMIL = MimeTypes.parseMimeType("application/smil");
     // initialize from file
     InputStream is = null;
     InputStreamReader isr = null;
@@ -152,7 +155,8 @@ public final class MimeTypes {
 
   /** Get a mime type from the registry or create a new one if not available. */
   public static MimeType getOrCreate(String type, String subtype) {
-    for (MimeType t : get(type, subtype)) return t;
+    for (MimeType t : get(type, subtype))
+      return t;
     return mimeType(type, subtype);
   }
 
@@ -194,7 +198,8 @@ public final class MimeTypes {
       throw new IllegalArgumentException("Argument 'suffix' was null!");
 
     for (MimeType m : mimeTypes) {
-      if (m.supportsSuffix(suffix)) return m;
+      if (m.supportsSuffix(suffix))
+        return m;
     }
     throw new UnknownFileTypeException("File suffix '" + suffix + "' cannot be matched to any mime type");
   }
@@ -353,9 +358,8 @@ public final class MimeTypes {
       } else if ("MimeType".equals(name)) {
         String[] t = type.split("/");
         MimeType mimeType = mimeType(t[0].trim(), t[1].trim(),
-                                     mlist(extensions.split(",")).bind(Options.<String>asList().o(Strings.trimToNone)).value(),
-                                     Collections.<MimeType>nil(),
-                                     option(description), none(""), none(""));
+                mlist(extensions.split(",")).bind(Options.<String> asList().o(Strings.trimToNone)).value(),
+                Collections.<MimeType> nil(), option(description), none(""), none(""));
         registry.add(mimeType);
       }
     }

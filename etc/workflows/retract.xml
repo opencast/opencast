@@ -3,7 +3,8 @@
   <id>retract</id>
   <title>Retract Media</title>
   <tags>
-	<tag>archive</tag>
+    <tag>archive</tag>
+    <tag>archive-ng</tag>
   </tags>
   <description>Retract a media package from all distribution channels.</description>
   <configuration_panel>
@@ -14,7 +15,7 @@
         <li class="ui-helper-clearfix">
           <label>Publication Channels:</label>
           <span>
-            <input id="engage" name="engage" type="checkbox" checked="checked" class="configField" value="Matterhorn Engage Player" />
+            <input id="engage" name="engage" type="checkbox" checked="checked" class="configField" value="true" />
             <span>&nbsp;Matterhorn Engage Player</span>
             <input id="youtube" name="youtube" type="checkbox" checked="checked" class="configField" value="YouTube" />
             <span>&nbsp;Youtube</span>

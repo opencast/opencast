@@ -53,7 +53,6 @@ import javax.xml.xpath.XPathFactory;
  *
  */
 public class DublinCoreCatalogList {
-
   /** Array storing Dublin cores */
   private List<DublinCoreCatalog> catalogList = new LinkedList<DublinCoreCatalog>();
   private long totalCatalogCount = 0;
@@ -148,19 +147,14 @@ public class DublinCoreCatalogList {
         long totalCount = Long.parseLong((String) json.get("totalCount"));
         JSONArray catalogsArray = (JSONArray) json.get("catalogs");
         for (Object catalog : catalogsArray) {
-          InputStream is = null;
-          try {
-            is = IOUtils.toInputStream(((JSONObject) catalog).toJSONString(), "UTF-8");
-            catalogs.add(new DublinCoreCatalogImpl(is));
-          } finally {
-            IoSupport.closeQuietly(is);
-          }
+          catalogs.add(DublinCoreJsonFormat.read((JSONObject) catalog));
         }
         return new DublinCoreCatalogList(catalogs, totalCount);
       } catch (Exception e) {
         throw new IllegalStateException("Unable to load dublin core catalog list, json parsing failed.", e);
       }
     } else {
+      // XML
       InputStream is = null;
       try {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -179,7 +173,7 @@ public class DublinCoreCatalogList {
           InputStream nodeIs = null;
           try {
             nodeIs = nodeToString(nodes.item(i));
-            catalogs.add(new DublinCoreCatalogImpl(nodeIs));
+            catalogs.add(DublinCoreXmlFormat.read(nodeIs));
           } finally {
             IoSupport.closeQuietly(nodeIs);
           }
@@ -224,7 +218,7 @@ public class DublinCoreCatalogList {
     JSONObject jsonObj = new JSONObject();
     JSONArray jsonArray = new JSONArray();
     for (DublinCoreCatalog catalog : catalogList) {
-      jsonArray.add(((DublinCoreCatalogImpl) catalog).toJsonObject());
+      jsonArray.add(DublinCoreJsonFormat.writeJsonObject((DublinCoreCatalog) catalog));
     }
     jsonObj.put("totalCount", String.valueOf(totalCatalogCount));
     jsonObj.put("catalogs", jsonArray);

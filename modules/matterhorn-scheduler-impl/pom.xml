@@ -55,6 +55,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-message-broker-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -184,6 +189,7 @@
             <Import-Package>
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.metadata.dublincore;version=${project.version},
+              org.opencastproject.message.broker.api.index;version=${project.version},
               org.opencastproject.scheduler.api;version=${project.version},
               *;resolution:=optional
             </Import-Package>

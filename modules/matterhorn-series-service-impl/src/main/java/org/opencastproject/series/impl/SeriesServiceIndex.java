@@ -58,7 +58,22 @@ public interface SeriesServiceIndex {
    * @throws SeriesServiceDatabaseException
    *           if exception occurred and synchronous indexing is enabled
    */
-  void updateSecurityPolicy(String seriesId, AccessControlList accessControl) throws NotFoundException, SeriesServiceDatabaseException;
+  void updateSecurityPolicy(String seriesId, AccessControlList accessControl) throws NotFoundException,
+          SeriesServiceDatabaseException;
+
+  /**
+   * Index opt out status for existing series entry.
+   *
+   * @param seriesId
+   *          ID of series for which the opt out status will be updated
+   * @param optedOut
+   *          the opt out status
+   * @throws NotFoundException
+   *           if series with specified ID does not exist
+   * @throws SeriesServiceDatabaseException
+   *           if exception occurred and synchronous indexing is enabled
+   */
+  void updateOptOutStatus(String seriesId, boolean optedOut) throws NotFoundException, SeriesServiceDatabaseException;
 
   /**
    * Removes series from index.
@@ -97,6 +112,19 @@ public interface SeriesServiceIndex {
   AccessControlList getAccessControl(String seriesID) throws NotFoundException, SeriesServiceDatabaseException;
 
   /**
+   * Returns the opt out status of series with the given series id
+   *
+   * @param seriesId
+   *          the series id
+   * @return the opt out status
+   * @throws NotFoundException
+   *           if there is no series with specified series ID
+   * @throws SeriesServiceDatabaseException
+   *           if exception occurred
+   */
+  boolean isOptOut(String seriesId) throws NotFoundException, SeriesServiceDatabaseException;
+
+  /**
    * Search over indexed series with query.
    *
    * @param query
@@ -115,4 +143,5 @@ public interface SeriesServiceIndex {
    *           if count cannot be retrieved
    */
   long count() throws SeriesServiceDatabaseException;
+
 }

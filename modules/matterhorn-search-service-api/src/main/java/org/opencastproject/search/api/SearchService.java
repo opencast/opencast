@@ -34,24 +34,6 @@ public interface SearchService {
   String JOB_TYPE = "org.opencastproject.search";
 
   /**
-   * The {@link org.opencastproject.security.api.AccessControlEntry#getAction()} that allows a user in a particular role
-   * to see a mediapackage in the search index.
-   */
-  String READ_PERMISSION = "read";
-
-  /**
-   * The {@link org.opencastproject.security.api.AccessControlEntry#getAction()} that allows a user in a particular role
-   * to contribute a mediapackage from the search index.
-   */
-  String CONTRIBUTE_PERMISSION = "contribute";
-
-  /**
-   * The {@link org.opencastproject.security.api.AccessControlEntry#getAction()} that allows a user in a particular role
-   * to update or remove a mediapackage from the search index.
-   */
-  String WRITE_PERMISSION = "write";
-
-  /**
    * Adds the media package to the search index.
    *
    * @param mediaPackage

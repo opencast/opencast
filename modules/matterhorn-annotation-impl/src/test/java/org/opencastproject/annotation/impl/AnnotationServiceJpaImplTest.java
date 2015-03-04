@@ -65,7 +65,7 @@ public class AnnotationServiceJpaImplTest {
     JaxbRole role = new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, organization, "");
     HashSet<JaxbRole> roles = new HashSet<JaxbRole>();
     roles.add(role);
-    User me = new JaxbUser("me", organization, roles);
+    User me = new JaxbUser("me", "test", organization, roles);
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(me).anyTimes();
     EasyMock.replay(securityService);

@@ -16,102 +16,104 @@
 
 package org.opencastproject.mediapackage;
 
+import static java.lang.String.format;
+import static org.opencastproject.util.EqualsUtil.eq;
+import static org.opencastproject.util.EqualsUtil.hash;
+
+import org.opencastproject.util.RequireUtil;
+
 import java.io.Serializable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.concurrent.Immutable;
 import javax.xml.XMLConstants;
 
 /**
- * An XML <dfn>Expanded Name.</dfn>
- * <p>
- * Expanded names in XML consists of a namespace name and a local part. In opposite to <dfn>Qualified Names</dfn> -
+ * An XML <dfn>Expanded Name</dfn>, cf. <a href="http://www.w3.org/TR/xml-names11/#dt-expname">W3C definition</a>.
+ * <p/>
+ * Expanded names in XML consists of a namespace name (URI) and a local part.
+ * In opposite to <dfn>Qualified Names</dfn>,
+ * cf. <a href="http://www.w3.org/TR/xml-names11/#dt-qualname">W3C definition</a> -
  * which are made from an optional prefix and the local part - expanded names are <em>not</em> subject to
- * interpretation. Please see <a href="http://www.w3.org/TR/xml-names/">http://www.w3.org/TR/xml-names/</a> for a
+ * namespace interpretation.
+ * <p/>
+ * Please see <a href="http://www.w3.org/TR/xml-names/">http://www.w3.org/TR/xml-names/</a> for a
  * complete definition and reference.
  */
-public class EName implements Serializable {
+@Immutable
+@ParametersAreNonnullByDefault
+public final class EName implements Serializable {
+  private static final long serialVersionUID = -5494762745288614634L;
 
-  /** Serial version uid */
-  private static final long serialVersionUID = 1L;
-
-  private String namespaceName;
-  private String localName;
+  private final String namespaceURI;
+  private final String localName;
 
   /**
    * Create a new expanded name.
    *
-   * @param namespaceName
+   * @param namespaceURI
    *          the name of the namespace this EName belongs to. If set to {@link javax.xml.XMLConstants#NULL_NS_URI},
    *          this name does not belong to any namespace. Use this option with care.
    * @param localName
    *          the local part of the name. Must not be empty.
    */
-  public EName(String namespaceName, String localName) {
-    if (namespaceName == null)
-      throw new IllegalArgumentException("Namespace name must not be null");
-    if (localName == null || localName.length() == 0)
-      throw new IllegalArgumentException("Local name must not be empty");
+  public EName(String namespaceURI, String localName) {
+    RequireUtil.notNull(namespaceURI, "namespaceURI");
+    RequireUtil.notEmpty(localName, "localName");
 
-    this.namespaceName = namespaceName;
+    this.namespaceURI = namespaceURI;
     this.localName = localName;
   }
 
-  /**
-   * Creates a new expanded name which does not belong to a namespace. The namespace name is set to
-   * {@link javax.xml.XMLConstants#NULL_NS_URI}.
-   */
-  public EName(String localName) {
-    this(XMLConstants.NULL_NS_URI, localName);
+  public static EName mk(String namespaceURI, String localName) {
+    return new EName(namespaceURI, localName);
   }
 
   /**
-   * Returns the namespace name. Usually the name will be a URI.
+   * Create a new expanded name which does not belong to a namespace. The namespace name is set to
+   * {@link javax.xml.XMLConstants#NULL_NS_URI}.
+   */
+  public static EName mk(String localName) {
+    return new EName(XMLConstants.NULL_NS_URI, localName);
+  }
+
+  /**
+   * Return the namespace name. Usually the name will be a URI.
    *
    * @return the namespace name or {@link javax.xml.XMLConstants#NULL_NS_URI} if the name does not belong to a namespace
    */
-  public String getNamespaceName() {
-    return namespaceName;
+  public String getNamespaceURI() {
+    return namespaceURI;
   }
 
-  /**
-   * Returns the local part of the name.
-   */
+  /** Return the local part of the name. */
   public String getLocalName() {
     return localName;
   }
 
   /**
-   * Checks, if this name belongs to a namespace.
+   * Check, if this name belongs to a namespace, i.e. its namespace URI
+   * is not {@link javax.xml.XMLConstants#NULL_NS_URI}.
    */
   public boolean hasNamespace() {
-    return !XMLConstants.NULL_NS_URI.equals(namespaceName);
+    return !XMLConstants.NULL_NS_URI.equals(namespaceURI);
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
-
-    EName eName = (EName) o;
-
-    if (!localName.equals(eName.localName))
-      return false;
-    if (!namespaceName.equals(eName.namespaceName))
-      return false;
-
-    return true;
+  @Override public int hashCode() {
+    return hash(namespaceURI, localName);
   }
 
-  @Override
-  public int hashCode() {
-    int result = namespaceName.hashCode();
-    result = 31 * result + localName.hashCode();
-    return result;
+  @Override public boolean equals(Object that) {
+    return (this == that) || (that instanceof EName && eqFields((EName) that));
   }
 
+  private boolean eqFields(EName that) {
+    return eq(localName, that.localName) && eq(namespaceURI, that.namespaceURI);
+  }
+
+  /** Return a W3C compliant string representation <code>{namespaceURI}localname</code>. */
   @Override
   public String toString() {
-    return "EName{" + "namespaceName='" + namespaceName + '\'' + ", localName='" + localName + '\'' + '}';
+    return format("{%s}%s", namespaceURI, localName);
   }
 }

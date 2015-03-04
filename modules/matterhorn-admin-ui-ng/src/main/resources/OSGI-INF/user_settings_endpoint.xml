@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+	name="org.opencastproject.adminui.endpoint.UserSettingsEndpoint" immediate="true"
+	activate="activate">
+	<implementation class="org.opencastproject.adminui.endpoint.UserSettingsEndpoint" />
+	<property name="service.description" value="Admin UI - Users Settings facade Endpoint" />
+
+	<property name="opencast.service.type"
+		value="org.opencastproject.adminui.endpoint.UserSettingsEndpoint" />
+	<property name="opencast.service.path" value="/admin-ng/user-settings" />
+	<service>
+		<provide interface="org.opencastproject.adminui.endpoint.UserSettingsEndpoint" />
+	</service>
+
+	
+		
+	<reference name="mailService" 
+		interface="org.opencastproject.messages.MailService"
+		cardinality="1..1" 
+		policy="static" 
+		bind="setMailService" />
+		
+	<reference bind="setSecurityService"
+		cardinality="1..1"
+        interface="org.opencastproject.security.api.SecurityService"
+        name="securityService"
+        policy="static" />
+        
+     <reference name="userSettingsService" 
+		interface="org.opencastproject.adminui.usersettings.UserSettingsService"
+		cardinality="1..1" 
+		policy="static" 
+		bind="setUserSettingsService" />
+</scr:component>

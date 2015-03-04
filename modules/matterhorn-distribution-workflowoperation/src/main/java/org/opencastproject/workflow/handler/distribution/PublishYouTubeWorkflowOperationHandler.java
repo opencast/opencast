@@ -119,7 +119,7 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
     try {
       // Look for elements matching the tag
-      Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, true);
+      final Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, true);
       if (elements.size() > 1) {
         logger.warn("More than one element has been found for publishing to youtube: {}", elements);
         return createResult(mediaPackage, Action.SKIP);

@@ -118,6 +118,7 @@ public interface MediaPackageElements {
    *
    * @deprecated use {@link #XACML_POLICY_SERIES} instead.
    */
+  @Deprecated
   MediaPackageElementFlavor XACML_POLICY = new MediaPackageElementFlavor("security", "xacml",
           "Security policy for the mediapackage");
 
@@ -138,7 +139,13 @@ public interface MediaPackageElements {
   /** OAI-PMH subtype flavor */
   MediaPackageElementFlavor OAIPMH = new MediaPackageElementFlavor("*", "oaipmh");
 
+  /** Comments metadata flavor */
+  MediaPackageElementFlavor COMMENTS = new MediaPackageElementFlavor("metadata", "comments");
+
   /** Notes metadata flavor */
   MediaPackageElementFlavor NOTES = new MediaPackageElementFlavor("metadata", "notes");
+
+  /** Partial SMIL flavor */
+  MediaPackageElementFlavor SMIL = new MediaPackageElementFlavor("smil", "source+partial");
 
 }

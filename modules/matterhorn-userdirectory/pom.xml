@@ -25,6 +25,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-message-broker-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
@@ -37,8 +42,8 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.guava-osgi</groupId>
-      <artifactId>guava-osgi</artifactId>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
     <!-- Testing -->
     <dependency>
@@ -111,12 +116,11 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${build.number}</Build-Number>
-            <Mh-Db-Version>${mh.db.version}</Mh-Db-Version>
             <Export-Package>
               org.opencastproject.userdirectory;version=${project.version},
             </Export-Package>
             <Import-Package>
+              org.opencastproject.message.broker.api.index;version=${project.version},
               org.opencastproject.kernel.security.persistence;version=${project.version},
               org.json.simple,
 			  org.json.simple.parser,
@@ -126,7 +130,8 @@
               OSGI-INF/userdirectory-service.xml,
               OSGI-INF/group-role-provider.xml,
               OSGI-INF/user-reference-provider.xml,
-              OSGI-INF/user_endpoint.xml
+              OSGI-INF/user_endpoint.xml,
+              OSGI-INF/userid-role-provider.xml
             </Service-Component>
             <JPA-PersistenceUnits>
               org.opencastproject.userdirectory

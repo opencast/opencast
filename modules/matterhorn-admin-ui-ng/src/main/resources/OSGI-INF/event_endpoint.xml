@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.adminui.endpoint.OsgiEventEndpoint"
+               immediate="true" activate="activate">
+  <implementation class="org.opencastproject.adminui.endpoint.OsgiEventEndpoint" />
+  <property name="service.description" value="Admin UI - Event facade Endpoint" />
+  <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.event" />
+  <property name="opencast.service.path" value="/admin-ng/event" />
+  <property name="service.pid" value="org.opencastproject.adminui" />
+  
+  <service>
+	<provide interface="org.osgi.service.cm.ManagedService" />
+    <!-- expose interface for MH REST publisher! -->
+    <provide interface="org.opencastproject.adminui.endpoint.OsgiEventEndpoint" />
+  </service>
+  <reference bind="setWorkflowService"
+             cardinality="1..1"
+             interface="org.opencastproject.workflow.api.WorkflowService"
+             name="workflowService"
+             policy="static" />
+  <reference bind="setWorkspace"
+             cardinality="1..1"
+             interface="org.opencastproject.workspace.api.Workspace"
+             name="workspace"
+             policy="static" />
+  <reference bind="setArchive"
+             cardinality="1..1"
+             interface="org.opencastproject.archive.opencast.OpencastArchive"
+             name="archive"
+             policy="static" />
+  <reference name="httpMediaPackageElementProvider"
+             interface="org.opencastproject.archive.api.HttpMediaPackageElementProvider"
+             cardinality="1..1"
+             policy="static"
+             bind="setHttpMediaPackageElementProvider" />
+  <reference name="jobService"
+             interface="org.opencastproject.adminui.endpoint.JobEndpoint"
+             cardinality="1..1"
+             policy="static"
+             bind="setJobService" />
+  <reference name="ListProvidersService"
+             interface="org.opencastproject.index.service.resources.list.api.ListProvidersService"
+             cardinality="1..1"
+             policy="static"
+             bind="setListProviderService" />
+  <reference name="AclServiceFactory"
+             interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
+             cardinality="1..1"
+             policy="static"
+             bind="setAclServiceFactory" />
+  <reference name="SeriesService"
+             interface="org.opencastproject.series.api.SeriesService"
+             cardinality="1..1"
+             policy="static"
+             bind="setSeriesService" />
+  <reference name="ParticipationPersistence"
+             interface="org.opencastproject.pm.api.persistence.ParticipationManagementDatabase"
+             cardinality="0..1"
+             policy="dynamic"
+             bind="setParticipationPersistence" />
+  <reference name="DublinCoreCatalogServcie"
+             interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
+             cardinality="1..1"
+             policy="static"
+             bind="setDublinCoreCatalogService" />
+  <reference name="EventCommentService"
+             interface="org.opencastproject.comments.events.EventCommentService"
+             cardinality="1..1"
+             policy="static"
+             bind="setEventCommentService" />
+  <reference name="SecurityService"
+             interface="org.opencastproject.security.api.SecurityService"
+             cardinality="1..1"
+             policy="static"
+             bind="setSecurityService" />
+  <reference name="AuthorizationService"
+             interface="org.opencastproject.security.api.AuthorizationService"
+             cardinality="1..1"
+             policy="static"
+             bind="setAuthorizationService" />
+  <reference name="SchedulerService"
+             interface="org.opencastproject.scheduler.api.SchedulerService"
+             cardinality="1..1"
+             policy="static"
+             bind="setSchedulerService" />
+  <reference name="CaptureAgentStateService"
+             interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
+             cardinality="1..1"
+             policy="static"
+             bind="setCaptureAgentStateService" />
+  <reference name="IndexService"
+             interface="org.opencastproject.index.service.api.IndexService"
+             cardinality="1..1"
+             policy="static"
+             bind="setIndexService" />
+ <reference name="IngestService" 
+             interface="org.opencastproject.ingest.api.IngestService"
+             cardinality="1..1" 
+             policy="static" 
+             bind="setIngestService" />
+ <reference name="AdminUISearchIndex" 
+             interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
+             cardinality="1..1" 
+             policy="static" 
+             bind="setIndex" />
+ <reference name="CommonEventCatalogUIAdapter" 
+             interface="org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter"
+             cardinality="1..1" 
+             policy="static" 
+             bind="setCommonEventCatalogUIAdapter" />
+ <reference name="EventCatalogUIAdapter" 
+             interface="org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter"
+             cardinality="0..n" 
+             policy="dynamic"
+             bind="addCatalogUIAdapter"
+             unbind="removeCatalogUIAdapter" />
+</scr:component>

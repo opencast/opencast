@@ -18,7 +18,7 @@ package org.opencastproject.authorization.xacml.manager.api;
 /**
  * API that defines an entry of an scheduled series ACL
  */
-public interface SeriesACLTransition extends AclTransition {
+public interface SeriesACLTransition extends ACLTransition {
   /**
    * Returns the series identifier
    *

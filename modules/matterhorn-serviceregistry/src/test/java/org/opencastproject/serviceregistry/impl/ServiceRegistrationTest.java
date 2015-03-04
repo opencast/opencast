@@ -90,8 +90,8 @@ public class ServiceRegistrationTest {
     serviceRegistry.setOrganizationDirectoryService(organizationDirectoryService);
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-    User anonymous = new JaxbUser("anonymous", jaxbOrganization, new JaxbRole(jaxbOrganization.getAnonymousRole(),
-            jaxbOrganization));
+    User anonymous = new JaxbUser("anonymous", "test", jaxbOrganization, new JaxbRole(
+            jaxbOrganization.getAnonymousRole(), jaxbOrganization));
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(anonymous).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
@@ -103,9 +103,9 @@ public class ServiceRegistrationTest {
     serviceRegistry.unregisterHost(LOCALHOST);
 
     // register the hosts
-    serviceRegistry.registerHost(LOCALHOST, 1);
-    serviceRegistry.registerHost(REMOTEHOST_1, 1);
-    serviceRegistry.registerHost(REMOTEHOST_2, 1);
+    serviceRegistry.registerHost(LOCALHOST, "127.0.0.1", 1024, 1, 1);
+    serviceRegistry.registerHost(REMOTEHOST_1, "127.0.0.1", 1024, 1, 1);
+    serviceRegistry.registerHost(REMOTEHOST_2, "127.0.0.1", 1024, 1, 1);
 
     // register some service instances
     regType1Localhost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_1, LOCALHOST, PATH_1);

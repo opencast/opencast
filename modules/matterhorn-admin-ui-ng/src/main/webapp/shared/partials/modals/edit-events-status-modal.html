@@ -1,0 +1,64 @@
+<section class="modal active modal-open" ng-keyup="keyUp($event)" id="edit-events-status-modal" style="display: block;" ng-controller="EditStatusCtrl">
+    <header>
+        <a ng-click="close()" class="fa fa-times close-modal"></a>
+        <h2 translate="BULK_ACTIONS.EDIT_STATUS.CAPTION">Edit Status</h2>
+    </header>
+    
+    <div class="modal-content active">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj">
+                    <header translate="EVENTS.EVENTS.TABLE.CAPTION">Events</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th class="small"><input type="checkbox" ng-model="all" ng-change="toggleSelectAll()" class="select-all-cbox"></th>
+                                    <th translate="EVENTS.EVENTS.TABLE.TITLE">Title</th>
+                                    <th translate="EVENTS.EVENTS.TABLE.CREATORS">Presenter</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="row in rows">
+                                <td><input type="checkbox" ng-model="row.selected" class="child-cbox"></td>
+                                <td>{{ row.title }}</td>
+                                <td>{{ row.presenters }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                
+                    </div><!-- obj-container -->
+                
+                </div><!-- obj -->
+                
+                <div class="obj quick-actions">
+                        
+                    <header class="no-expand">Change Status</header>
+                    
+                    <div class="obj-container padded">
+                        <div class="form-container">
+    
+                            <div old-admin-ng-dropdown="" class="drop-down-container">
+                                <span>Select</span>
+                                <ul class="dropdown-ul">
+                                    <li><a ng-click=changeStatus(false) translate="BULK_ACTIONS.EDIT_STATUS.READY_FOR_RECORDING">Ready for Recording</a></li>
+                					<li><a ng-click=changeStatus(true) translate="BULK_ACTIONS.EDIT_STATUS.OPTED_OUT">Opted-out</a></li>
+                				</ul>
+                            </div>
+                        
+                        </div>
+                        
+                    </div><!-- obj-container -->
+                    
+                </div><!-- obj -->
+            
+            </div><!-- full-col -->
+        </div>
+        
+    </div><!-- modal-content -->
+    
+    <footer>
+        <a ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()" class="submit">Update</a>
+        <a ng-click="close()" class="cancel">Cancel</a>
+    </footer>
+</section>

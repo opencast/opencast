@@ -1,0 +1,14 @@
+[
+  {
+    "id": 9371,
+    "timestamp": "2014-10-24T16:35:45+02:00",
+    "severity": "FAILURE",
+    "title": "Error message 100"
+  },
+  {
+    "id": 101,
+    "timestamp": "2014-10-24T08:15:52+02:00",
+    "severity": "WARNING",
+    "title": "Warning message 101"
+  }
+]

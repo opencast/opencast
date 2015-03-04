@@ -23,9 +23,12 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PasswordEncoder;
+import org.opencastproject.util.data.Monadics;
+import org.opencastproject.util.data.Option;
 
-import com.google.common.base.Function;
-import com.google.common.collect.MapMaker;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -37,7 +40,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
@@ -52,6 +54,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaUserAndRoleProvider.class);
+
+  /** The user provider name */
+  public static final String PROVIDER_NAME = "matterhorn";
 
   /** Username constant used in JSON formatted users */
   public static final String USERNAME = "username";
@@ -72,7 +77,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   protected SecurityService securityService = null;
 
   /** A cache of users, which lightens the load on the SQL server */
-  private ConcurrentMap<String, Object> cache = null;
+  private LoadingCache<String, Object> cache = null;
 
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
@@ -116,8 +121,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     logger.debug("activate");
 
     // Setup the caches
-    cache = new MapMaker().expireAfterWrite(1, TimeUnit.MINUTES).makeComputingMap(new Function<String, Object>() {
-      public Object apply(String id) {
+    cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, Object>() {
+      @Override
+      public Object load(String id) {
         String[] key = id.split(DELIMITER);
         logger.trace("Loading user '{}':'{}' from database", key[0], key[1]);
         User user = loadUser(key[0], key[1]);
@@ -163,8 +169,8 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
     String orgId = securityService.getOrganization().getId();
-    List<JpaUser> usersIterator = UserDirectoryPersistenceUtil.findUsersByQuery(orgId, query, limit, offset, emf);
-    return new ArrayList<User>(usersIterator).iterator();
+    List<JpaUser> users = UserDirectoryPersistenceUtil.findUsersByQuery(orgId, query, limit, offset, emf);
+    return Monadics.mlist(users).map(addProviderName).iterator();
   }
 
   /**
@@ -189,7 +195,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   @Override
   public User loadUser(String userName) {
     String orgId = securityService.getOrganization().getId();
-    Object user = cache.get(userName.concat(DELIMITER).concat(orgId));
+    Object user = cache.getUnchecked(userName.concat(DELIMITER).concat(orgId));
     if (user == nullToken) {
       return null;
     } else {
@@ -200,8 +206,8 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   @Override
   public Iterator<User> getUsers() {
     String orgId = securityService.getOrganization().getId();
-    List<JpaUser> usersIterator = UserDirectoryPersistenceUtil.findUsers(orgId, 0, 0, emf);
-    return new ArrayList<User>(usersIterator).iterator();
+    List<JpaUser> users = UserDirectoryPersistenceUtil.findUsers(orgId, 0, 0, emf);
+    return Monadics.mlist(users).map(addProviderName).iterator();
   }
 
   /**
@@ -246,7 +252,22 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @return the loaded user or <code>null</code> if not found
    */
   public User loadUser(String userName, String organization) {
-    return UserDirectoryPersistenceUtil.findUser(userName, organization, emf);
+    JpaUser user = UserDirectoryPersistenceUtil.findUser(userName, organization, emf);
+    return Option.option(user).map(addProviderName).getOrElseNull();
+  }
+
+  /**
+   * Loads a user from persistence
+   *
+   * @param userId
+   *          the user's id
+   * @param organization
+   *          the organization id
+   * @return the loaded user or <code>null</code> if not found
+   */
+  public User loadUser(long userId, String organization) {
+    JpaUser user = UserDirectoryPersistenceUtil.findUser(userId, organization, emf);
+    return Option.option(user).map(addProviderName).getOrElseNull();
   }
 
   /**
@@ -261,7 +282,8 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(user.getRoles(), emf);
     JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganization(
             (JpaOrganization) user.getOrganization(), emf);
-    user = new JpaUser(user.getUsername(), encodedPassword, organization, roles);
+    user = new JpaUser(user.getUsername(), encodedPassword, organization, user.getName(), user.getEmail(),
+            user.getProvider(), true, roles);
 
     // Then save the user
     EntityManager em = null;
@@ -272,8 +294,8 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       tx.begin();
       em.persist(user);
       tx.commit();
-    } finally {
       cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user);
+    } finally {
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -284,7 +306,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Updates a user to the persistence
-   * 
+   *
    * @param user
    *          the user to save
    * @throws NotFoundException
@@ -299,8 +321,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganization(
             (JpaOrganization) user.getOrganization(), emf);
 
-    user = UserDirectoryPersistenceUtil.saveUser(new JpaUser(user.getUsername(), encodedPassword, organization, roles),
-            emf);
+    user = UserDirectoryPersistenceUtil.saveUser(
+            new JpaUser(user.getUsername(), encodedPassword, organization, user.getName(), user.getEmail(), user
+                    .getProvider(), true, roles), emf);
     cache.put(user.getUsername() + DELIMITER + organization.getId(), user);
 
     return user;
@@ -308,7 +331,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /**
    * Delete the given user
-   * 
+   *
    * @param username
    *          the name of the user to delete
    * @param orgId
@@ -318,7 +341,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   public void deleteUser(String username, String orgId) throws NotFoundException, Exception {
     UserDirectoryPersistenceUtil.deleteUser(username, orgId, emf);
-    cache.remove(username + DELIMITER + orgId);
+    cache.invalidate(username + DELIMITER + orgId);
   }
 
   /**
@@ -332,4 +355,24 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     roles.add(jpaRole);
     UserDirectoryPersistenceUtil.saveRoles(roles, emf);
   }
+
+  @Override
+  public String getName() {
+    return PROVIDER_NAME;
+  }
+
+  private static org.opencastproject.util.data.Function<JpaUser, User> addProviderName = new org.opencastproject.util.data.Function<JpaUser, User>() {
+    @Override
+    public User apply(JpaUser a) {
+      a.setProvider(PROVIDER_NAME);
+      return a;
+    }
+  };
+
+  @Override
+  public void invalidate(String userName) {
+    String orgId = securityService.getOrganization().getId();
+    cache.invalidate(userName + DELIMITER + orgId);
+  }
+
 }

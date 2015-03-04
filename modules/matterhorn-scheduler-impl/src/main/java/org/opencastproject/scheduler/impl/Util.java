@@ -17,7 +17,6 @@ package org.opencastproject.scheduler.impl;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 
 public final class Util {
   private Util() {
@@ -33,12 +32,13 @@ public final class Util {
 
   /** Sets the dcterms:identifier property of a copy of dc. */
   public static DublinCoreCatalog setEventIdentifierImmutable(long eventId, DublinCoreCatalog dc) {
-    if (!(dc instanceof DublinCoreCatalogImpl)) {
-      throw new IllegalArgumentException("Dublin core catalog must be of type DublinCoreCatalogImpl");
+    if (dc instanceof DublinCoreCatalog) {
+      final DublinCoreCatalog copy = (DublinCoreCatalog) dc.clone();
+      copy.set(DublinCore.PROPERTY_IDENTIFIER, Long.toString(eventId));
+      return copy;
+    } else {
+      throw new IllegalArgumentException("Dublin core catalog must be of type DublinCoreCatalog");
     }
-    final DublinCoreCatalog copy = (DublinCoreCatalog) ((DublinCoreCatalogImpl) dc).clone();
-    copy.set(DublinCore.PROPERTY_IDENTIFIER, Long.toString(eventId));
-    return copy;
   }
 
   /** Mutates the dcterms:identifier property of dc. */

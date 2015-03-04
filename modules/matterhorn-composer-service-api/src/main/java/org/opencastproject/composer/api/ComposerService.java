@@ -39,7 +39,7 @@ public interface ComposerService {
    *          The profile to use for encoding
    * @return The receipt for this encoding job. The receipt can be used with {@link ComposerService#getJob(long)} to
    *         obtain the status of an encoding job.
-   * @throws EncoderException
+   * @throws EncoderException, MediaPackageException
    */
   Job encode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
 
@@ -226,5 +226,19 @@ public interface ComposerService {
    * @return The encoding profile, or null if no profile is registered with that ID
    */
   EncodingProfile getProfile(String profileId);
+
+  /**
+   * Encode one track to multiple other tracks in one encoding operation, using that track's audio and video streams.
+   * 
+   * @param sourceTrack
+   *          The source track
+   * @param profileId
+   *          The profile to use for encoding
+   * @return The receipt for this encoding job. The receipt can be used with {@link ComposerService#getJob(long)} to
+   *         obtain the status of an encoding job.
+   * @throws EncoderException, MediaPackageException
+   */
+  Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
+
 
 }

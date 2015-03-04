@@ -4,7 +4,7 @@
 	xmlns:ns2="http://mediapackage.opencastproject.org">
 	<ns2:title>Compose workflow operation handler test</ns2:title>
 	<ns2:media>
-		<ns2:track type="presentation/source" id="compose-workflow-operation-test-source-track-id">
+		<ns2:track transport="FILE" type="presentation/source" id="compose-workflow-operation-test-source-track-id">
 			<ns2:mimetype>video/msvideo</ns2:mimetype>
 			<ns2:tags />
 			<ns2:url>fooVideo.avi</ns2:url>

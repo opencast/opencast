@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>theodulmp4</id>
+  <title>Theodul Player: MP4 only</title>
+  <tags>
+    <tag>upload</tag>
+    <tag>schedule</tag>
+    <tag>archive</tag>
+  </tags>
+  <description>
+    A simple workflow that transcodes the media into distribution formats, then sends the resulting distribution files,
+    along with their associated metadata, to the distribution channels.
+  </description>
+
+  <configuration_panel>
+  <![CDATA[
+    <fieldset>
+      <legend>Holds</legend>
+      <span>Processing should be paused to allow for:</span>
+      <ul class="oc-ui-checkbox-list-upload">
+          <input id="videoPreview" name="videoPreview" type="checkbox" class="configField holdCheckbox" style="visibility:hidden" value="true"/>
+        <li class="ui-helper-clearfix">
+          <span id="trimholdconfig">
+            <input id="trimHold" name="trimHold" type="checkbox" class="configField holdCheckbox" value="true" />
+            <span id="i18n_hold_for_trim">&nbsp;Review / Trim before encoding (with option to edit info)</span>
+          </span>
+        </li>
+        <li class="ui-helper-clearfix">
+          <span id="captionconfig">
+            <input id="captionHold" name="captionHold" type="checkbox" class="configField holdCheckbox" value="true"/>
+            <span id="i18n_hold_for_caption">&nbsp;Captions file upload</span>
+          </span>
+        </li>
+      </ul>
+    </fieldset>
+    <fieldset>
+      <legend>Archive</legend>
+      <ul class="oc-ui-checkbox-list-upload">
+    <li class="ui-helper-clearfix">
+      <span id="archiveconfig">
+        <input id="archiveOp" name="archiveOp" type="checkbox" checked="checked" class="configField holdCheckbox" value="true"/>
+        <span id="i18n_activate_archive">&nbsp;Archive the media package</span>
+      </span>
+    </li>
+      </ul>
+    </fieldset>  
+    <fieldset>
+      <legend>Distribution</legend>
+      <ul class="oc-ui-form-list">
+        <!-- field: License -->
+        <li class="ui-helper-clearfix">
+          <label class="scheduler-label"><span class="color-red">* </span><span id="i18n_dist_label">Distribution Channel(s)</span>:</label>
+          <span id="dist">
+            <input id="distribution" name="distribution" type="checkbox" checked="checked" disabled="disabled" class="configField" value="Matterhorn Media Module" />
+            <span id="i18n_dist_mmm">&nbsp;Matterhorn Media Module</span>
+            <input id="youtube" name="youtube" type="checkbox" disabled="disabled" class="configField" value="Youtube" />
+            <span id="i18n_dist_mmm">&nbsp;Youtube</span>
+          </span>
+        </li>
+      </ul>
+    </fieldset>
+    <script type="text/javascript">
+      var ocWorkflowPanel = ocWorkflowPanel || {};
+
+      var trimHold = $('input#trimHold');
+      var captionHold = $('input#captionHold');
+      var videoPreview = $('input#videoPreview');
+      
+      // Make sure video preview are created if one of caption hold, trim hold, is selected
+      var checkVideoPreview = function() {
+        var checkValue = trimHold.is(':checked') || captionHold.is(':checked');
+        videoPreview.attr('checked', checkValue);
+      }
+      trimHold.click(checkVideoPreview);
+      captionHold.click(checkVideoPreview);
+      
+      ocWorkflowPanel.registerComponents = function(components){
+        /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
+         * into the workflow. The component's nodeKey must match the components array key.
+         *
+         * Example:'org.opencastproject.workflow.config.myProperty' will be availible at ${my.property}
+         */
+        components['org.opencastproject.workflow.config.trimHold'] = new ocAdmin.Component(
+          ['trimHold'],
+          {key: 'org.opencastproject.workflow.config.trimHold'},
+          {getValue: function(){ return this.fields.trimHold.is(":checked"); }
+          });
+          
+        components['org.opencastproject.workflow.config.archiveOp'] = new ocAdmin.Component(
+          ['archiveOp'],
+          {key: 'org.opencastproject.workflow.config.archiveOp'},
+          {getValue: function(){ return this.fields.archiveOp.is(":checked");}
+          });
+          
+        components['org.opencastproject.workflow.config.captionHold'] = new ocAdmin.Component(
+          ['captionHold'],
+          {key: 'org.opencastproject.workflow.config.captionHold'},
+          {getValue: function(){ return this.fields.captionHold.is(":checked");}
+          });
+          
+        components['org.opencastproject.workflow.config.videoPreview'] = new ocAdmin.Component(
+          ['videoPreview'],
+          {key: 'org.opencastproject.workflow.config.videoPreview'},
+          {getValue: function(){ return this.fields.videoPreview.is(":checked");}
+          });
+          
+        ocScheduler.dublinCore.components['license'] = new ocAdmin.Component(
+          ['license'],
+          {label: 'licenseLabel', key: 'license'}
+          );
+          
+          //etc...
+      }
+      ocWorkflowPanel.setComponentValues = function(values, components){
+        components['org.opencastproject.workflow.config.captionHold'].setValue(values['org.opencastproject.workflow.config.captionHold']);
+        components['org.opencastproject.workflow.config.trimHold'].setValue(values['org.opencastproject.workflow.config.trimHold']);
+        components['org.opencastproject.workflow.config.videoPreview'].setValue(values['org.opencastproject.workflow.config.videoPreview']);
+        components['org.opencastproject.workflow.config.archiveOp'].setValue(values['org.opencastproject.workflow.config.archiveOp']);
+        components['license'].setValue(values['license']);
+      }
+    </script>
+  ]]>
+  </configuration_panel>
+
+  <operations>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Ingest and prepare                                                -->
+    <!--                                                                   -->
+    <!-- Download from external ingest nodes, tag, inspect and and prepare -->
+    <!-- source recording and metadata catalogs.                           -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  
+    <!-- Ingest elements from external working file repositories and file servers -->
+
+    <operation
+      id="ingest-download"
+      description="Ingesting external elements">
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+  
+    <!-- Apply ACL from series to the mediapackage -->
+
+    <operation
+      id="apply-acl"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Applying access control entries">
+    </operation>
+    
+    <!-- Tag the incoming source material for archival -->
+
+    <operation
+      id="tag"
+      description="Tagging access control lists for archival">
+      <configurations>
+        <configuration key="source-flavors">security/*</configuration>
+        <configuration key="target-tags">+archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag the incoming metadata catalogs for publishing -->
+
+    <operation
+      id="tag"
+      description="Tagging metadata catalogs for archival and publication">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*</configuration>
+        <configuration key="target-tags">+archive,+engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Inspect the media -->
+    
+    <operation
+      id="inspect"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Inspecting audio and video streams">
+      <configurations>
+        <configuration key="overwrite">false</configuration>
+        <configuration key="accept-no-media">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Prepare presenter track -->
+
+    <operation
+      id="prepare-av"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Preparing presenter (camera) audio and video work versions">
+      <configurations>
+        <configuration key="source-flavor">presenter/source</configuration>
+        <configuration key="target-flavor">presenter/work</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="promiscuous-audio-muxing">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Prepare presentation track -->
+
+    <operation
+      id="prepare-av"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Preparing presentation (screen) audio and video work version">
+      <configurations>
+        <configuration key="source-flavor">presentation/source</configuration>
+        <configuration key="target-flavor">presentation/work</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="promiscuous-audio-muxing">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="prepare-av"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Preparing presentation (screen) audio and video work version">
+      <configurations>
+        <configuration key="source-flavor">audience/source</configuration>
+        <configuration key="target-flavor">audience/work</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="promiscuous-audio-muxing">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="prepare-av"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Preparing presentation (screen) audio and video work version">
+      <configurations>
+        <configuration key="source-flavor">data/source</configuration>
+        <configuration key="target-flavor">data/work</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="promiscuous-audio-muxing">true</configuration>
+      </configurations>
+    </operation>
+
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Preview, trimming and captions                                    -->
+    <!--                                                                   -->
+    <!-- Encode audio and video formats necessary for review and trimming. -->
+    <!-- Finally, allow for uploading of captions.                         -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- encode to hold preview player formats -->
+
+    <operation
+      id="compose"
+      if="${videoPreview}"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Encoding presenter (camera) video for preview">
+      <configurations>
+        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="target-flavor">*/preview</configuration>
+        <configuration key="encoding-profile">mp4-preview.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- hold for review and trimming --> 
+
+    <operation
+      id="trim"
+      if="${trimHold}"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Waiting for user to review and trim">
+      <configurations>
+        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="target-flavor-subtype">trimmed</configuration>
+        <configuration key="encoding-profile">trim.work</configuration>
+        <!-- configuration key="duration-threshold">1000</configuration -->
+      </configurations>
+    </operation>
+
+    <!-- tag the resulting media (trimmed or untrimmed) for archival -->
+
+    <operation
+      id="tag"
+      description="Tagging media for archival">
+      <configurations>
+        <configuration key="source-flavors">*/trimmed</configuration>
+        <configuration key="target-tags">+archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- tag the dublin core catalogs created during trim operation for archival and publication -->
+
+    <operation
+      id="tag"
+      description="Tagging metadata catalogs for archival and publication">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*</configuration>
+        <configuration key="target-tags">+archive,+engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- hold for captions upload -->
+
+    <operation
+      id="caption"
+      if="${captionHold}"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Waiting for user to upload captions">
+      <configurations>
+        <configuration key="target-tags">engage-download,archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Encode for publication to Engage                                  -->
+    <!--                                                                   -->
+    <!-- Encode audio and video formats to the distribution formats that   -->
+    <!-- are required by the Engage publication channel.                   -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- encode to engage search result thumbnails -->
+
+    <operation
+      id="image"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Creating Engage search result thumbnails">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="source-tags"></configuration>
+        <configuration key="target-flavor">*/search+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">search-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode to engage player preview images -->
+
+    <operation
+      id="image"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Creating Engage player preview image">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="source-tags"></configuration>
+        <configuration key="target-flavor">*/player+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-preview.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode to Engage player MP4 format -->
+
+    <operation
+      id="compose"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Encoding MP4 video">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,rss,atom</configuration>
+        <configuration key="encoding-profile">mp4-medium.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode to Engage player audio only format -->
+
+    <operation
+      id="compose"
+      fail-on-error="false"
+      exception-handler-workflow="error"
+      description="Encoding to MP3 audio">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,rss,atom</configuration>
+        <configuration key="encoding-profile">mp3.http</configuration>
+      </configurations>
+    </operation>   
+    
+    <!-- encode to feed preview images -->
+
+    <operation
+      id="image"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Creating feed preview images">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="target-flavor">*/feed+preview</configuration>
+        <configuration key="target-tags">rss,atom</configuration>
+        <configuration key="encoding-profile">feed-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Segment video streams and extract metadata                        -->
+    <!--                                                                   -->
+    <!-- Apply the video segmentation algorithm to the presentation tracks -->
+    <!-- and extract segment preview images and metadata.                  -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- run the videosegmentation -->
+    
+    <operation
+      id="segment-video"
+      fail-on-error="false"
+      exception-handler-workflow="error"
+      description="Detecting slide transitions in presentation track">
+      <configurations>
+        <configuration key="source-flavor">presentation/trimmed</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Generate segment preview images -->
+    
+    <operation
+      id="segmentpreviews"
+      fail-on-error="false"
+      exception-handler-workflow="error"
+      description="Creating presentation segments preview image">
+      <configurations>
+        <configuration key="source-flavor">presentation/trimmed</configuration>
+        <configuration key="target-flavor">presentation/segment+preview</configuration>
+        <configuration key="reference-flavor">presentation/delivery</configuration>
+        <configuration key="reference-tags">engage-download</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-slides.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Extract text form slide preview images -->
+
+    <operation
+      id="extract-text"
+      fail-on-error="false"
+      exception-handler-workflow="error"
+      description="Extracting text from presentation segments">
+      <configurations>
+        <configuration key="source-flavor">presentation/trimmed</configuration>
+        <configuration key="target-tags">engage-download,archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Publish to publication channels                                   -->
+    <!--                                                                   -->
+    <!-- Send the encoded material along with the metadata to the          -->
+    <!-- publication channels.                                             -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Publish to engage player -->
+
+    <operation
+      id="publish-engage"
+      max-attempts="2"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Publishing to Engage">
+      <configurations>
+        <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
+        <configuration key="streaming-source-tags">engage-streaming</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Archive                                                           -->
+    <!--                                                                   -->
+    <!-- Store everything that has been tagged accordingly in the archive. -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+      if="${archiveOp}"
+      id="archive"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Archiving">
+      <configurations>
+        <configuration key="source-tags">archive</configuration>
+      </configurations>
+    </operation>
+ 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Cleanup                                                           -->
+    <!--                                                                   -->
+    <!-- Remove the recording's artefacts from the workspace and the       -->
+    <!-- working file repository.                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Cleanup the working file repository -->
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+      <configurations>
+        <configuration key="preserve-flavors"></configuration>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

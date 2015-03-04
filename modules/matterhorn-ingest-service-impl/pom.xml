@@ -129,8 +129,8 @@
       <artifactId>commons-collections</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.guava-osgi</groupId>
-      <artifactId>guava-osgi</artifactId>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
     <dependency>
       <groupId>net.sourceforge.htmlunit</groupId>
@@ -198,6 +198,31 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <skip>${checkstyle.skip}</skip>
+          <configLocation>${matterhorn.basedir}/docs/checkstyle/matterhorn-checkstyle.xml</configLocation>
+          <headerLocation>${matterhorn.basedir}/docs/checkstyle/matterhorn-header.txt</headerLocation>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <consoleOutput>true</consoleOutput>
+          <logViolationsToConsole>true</logViolationsToConsole>
+          <excludes>
+            **/MockHttpServletRequest.java
+          </excludes>
+          <failOnViolation>true</failOnViolation>
+          <failsOnError>true</failsOnError>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

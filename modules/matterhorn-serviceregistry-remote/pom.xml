@@ -75,6 +75,7 @@
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
             <Service-Component>
+              OSGI-INF/incident-service-remote.xml,
               OSGI-INF/serviceregistry-remote.xml
             </Service-Component>
           </instructions>

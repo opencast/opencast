@@ -17,7 +17,7 @@ package org.opencastproject.job.api;
 
 import static org.opencastproject.util.data.Monadics.mlist;
 
-import org.opencastproject.fn.juc.Mutables;
+import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.util.data.Function2;
 
 import java.util.List;

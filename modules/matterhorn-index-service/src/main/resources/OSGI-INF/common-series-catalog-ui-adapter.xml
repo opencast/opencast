@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+	name="org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter" immediate="true">
+	
+	<implementation class="org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter" />
+	<property name="service.description" value="Common Series Catalog UI Adapter" />
+	
+	<service>
+		<provide interface="org.osgi.service.cm.ManagedService" />
+		<provide interface="org.opencastproject.index.service.catalog.adapter.series.SeriesCatalogUIAdapter" />
+		<provide interface="org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter" />
+	</service>
+	
+  <reference name="listProvidersService" interface="org.opencastproject.index.service.resources.list.api.ListProvidersService"
+    cardinality="1..1" policy="static" bind="setListProvidersService" />
+  <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
+    cardinality="1..1" policy="static" bind="setSeriesService" />
+  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+</scr:component>

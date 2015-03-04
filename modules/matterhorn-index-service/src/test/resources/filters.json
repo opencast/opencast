@@ -1,0 +1,15 @@
+{
+    "contributors": {
+        "label": "FILTERS.SERIES.CONTRIBUTORS.LABEL",
+        "type": "select",
+        "options": {
+            "contributor1": "My first contributor",
+            "contributor2": "My second contributor",
+            "contributor3": "My third contributor"
+        }
+    },
+    "textFilter": {
+        "label": "FREETEXT.LABEL",
+        "type": "freetext"
+    }
+}

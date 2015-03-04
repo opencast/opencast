@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workflow.api;
 
+import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.FAILED;
 import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.INSTANTIATED;
 import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.RETRY;
@@ -27,6 +28,8 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
+
+import com.entwinemedia.fn.Fn;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -271,6 +274,11 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   @Override
   public void setState(WorkflowState state) {
     this.state = state;
+  }
+
+  @Override
+  public boolean isActive() {
+   return WorkflowUtil.isActive(getState());
   }
 
   /**
@@ -640,23 +648,25 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    */
   @Override
   public void extend(WorkflowDefinition workflowDefinition) {
-    if (workflowDefinition.getOperations().size() == 0) {
-      return;
+    if (!workflowDefinition.getOperations().isEmpty()) {
+      setOperations($(operations).append($(workflowDefinition.getOperations()).map(mkInstanceFn)).toList());
+      setTemplate(workflowDefinition.getId());
     }
-    List<WorkflowOperationInstance> operations = new ArrayList<WorkflowOperationInstance>(this.operations);
-    for (WorkflowOperationDefinition operationDefintion : workflowDefinition.getOperations()) {
-      WorkflowOperationInstanceImpl op = new WorkflowOperationInstanceImpl(operationDefintion, -1);
-      String cond = op.getExecutionCondition();
-      if (cond != null && cond.startsWith("${") && cond.endsWith("}")) {
-        String val = this.getConfiguration(cond.substring(2, cond.length() - 1));
-        if (val != null) {
-          op.setExecutionCondition(val);
-        }
-      }
-      operations.add(op);
-    }
-    setOperations(operations);
-    setTemplate(workflowDefinition.getId());
   }
 
+  @Override
+  public void insert(WorkflowDefinition workflowDefinition, WorkflowOperationInstance after) {
+    if (!workflowDefinition.getOperations().isEmpty() && after.getPosition() >= 0) {
+      setOperations($(operations).take(after.getPosition() + 1)
+              .append($(workflowDefinition.getOperations()).map(mkInstanceFn))
+              .append($(operations).drop(after.getPosition() + 1)).toList());
+    }
+  }
+
+  private final Fn<WorkflowOperationDefinition, WorkflowOperationInstance> mkInstanceFn = new Fn<WorkflowOperationDefinition, WorkflowOperationInstance>() {
+    @Override
+    public WorkflowOperationInstance ap(WorkflowOperationDefinition wod) {
+      return new WorkflowOperationInstanceImpl(wod, -1);
+    }
+  };
 }

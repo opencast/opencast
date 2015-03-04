@@ -15,16 +15,36 @@
  */
 package org.opencastproject.util;
 
-import org.apache.commons.io.IOUtils;
+import static org.opencastproject.util.data.Either.left;
+import static org.opencastproject.util.data.Either.right;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
+import com.entwinemedia.fn.data.ImmutableIteratorBase;
 import org.opencastproject.util.data.Either;
+
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import static org.opencastproject.util.data.Either.left;
-import static org.opencastproject.util.data.Either.right;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 /** XML utility functions. */
 public final class XmlUtil {
@@ -67,7 +87,110 @@ public final class XmlUtil {
     }
   }
 
+  /**
+   * Writes an xml representation to a stream.
+   *
+   * @param doc
+   *          the document
+   * @param out
+   *          the output stream
+   * @throws IOException
+   *           if there is an error transforming the dom to a stream
+   */
+  public static void toXml(Document doc, OutputStream out) throws IOException {
+    try {
+      DOMSource domSource = new DOMSource(doc);
+      StreamResult result = new StreamResult(out);
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(OutputKeys.VERSION, doc.getXmlVersion());
+      transformer.transform(domSource, result);
+    } catch (TransformerException e) {
+      throw new IOException("unable to transform dom to a stream");
+    }
+  }
+
+  /**
+   * Writes an xml representation to an input stream and return it.
+   *
+   * @param document
+   *          the document
+   * @return the input stream containing the serialized xml representation
+   * @throws IOException
+   *           if there is an error transforming the dom to a stream
+   */
+  public static InputStream serializeDocument(Document document) throws IOException {
+    ByteArrayOutputStream out = null;
+    try {
+      out = new ByteArrayOutputStream();
+      XmlUtil.toXml(document, out);
+      return new ByteArrayInputStream(out.toByteArray());
+    } finally {
+      IoSupport.closeQuietly(out);
+    }
+  }
+
+  /**
+   * Serializes the document to a XML string
+   *
+   * @param document
+   *          the document
+   * @return the serialized XML string
+   * @throws IOException
+   *           if there is an error transforming the dom to a stream
+   */
+  public static String toXmlString(Document document) throws IOException {
+    InputStream inputStream = null;
+    try {
+      inputStream = serializeDocument(document);
+      return IOUtils.toString(inputStream, "UTF-8");
+    } finally {
+      IoSupport.closeQuietly(inputStream);
+    }
+  }
+
+  /** Create an {@link org.xml.sax.InputSource} from an XML string. */
   public static InputSource fromXmlString(String xml) {
     return new InputSource(IOUtils.toInputStream(xml));
+  }
+
+  /**
+   * Creates an xml document root and returns it.
+   *
+   * @return the document
+   */
+  public static Document newDocument() {
+    try {
+      return nsDbf.newDocumentBuilder().newDocument();
+    } catch (ParserConfigurationException e) {
+      return chuck(e);
+    }
+  }
+
+  /** Make a {@link org.w3c.dom.NodeList} iterable. */
+  public static <A extends Node> Iterable<A> iterable(final NodeList nl) {
+    return new Iterable<A>() {
+      @Override
+      public Iterator<A> iterator() {
+        return new ImmutableIteratorBase<A>() {
+          private int index = 0;
+
+          @Override
+          public boolean hasNext() {
+            return index < nl.getLength();
+          }
+
+          @Override
+          public A next() {
+            if (hasNext()) {
+              final Node next = nl.item(index);
+              index = index + 1;
+              return (A) next;
+            } else {
+              throw new NoSuchElementException();
+            }
+          }
+        };
+      }
+    };
   }
 }

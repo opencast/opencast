@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.index.service.resources.list.provider.BlacklistsListProvider" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.index.service.resources.list.provider.BlacklistsListProvider" />
+  <property name="service.description" value="Blacklists list provider" />
+  <property name="opencast.service.type" value="org.opencastproject.index.service.resources.list.provider.BlacklistsListProvider" />
+  
+  <service>
+    <provide interface="org.opencastproject.index.service.resources.list.api.ResourceListProvider"/>
+  </service>
+  
+  <reference name="ParticipationDatabase" interface="org.opencastproject.pm.api.persistence.ParticipationManagementDatabase"
+    cardinality="1..1" policy="static" bind="setDatabase"/>
+</scr:component>

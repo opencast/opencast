@@ -1,0 +1,28 @@
+    var initCount = 2;
+
+    function initPlugin() {
+	// initialize the plugin in here
+    }
+
+    Engage.log(PLUGIN_NAME + ": Init");
+    var relative_plugin_path = Engage.getPluginPath(PLUGIN_NAME);
+    
+    // load example lib
+    require([relative_plugin_path + "lib/example.lib.js"], function() {
+        Engage.log(PLUGIN_NAME + ": Example lig load done");
+        initCount -= 1;
+        if (initCount === 0) {
+            initPlugin();
+        }
+    });
+        
+    // all plugins loaded
+    Engage.on(plugin.events.plugin_load_done.getName(), function() {
+        initCount -= 1;
+        if (initCount === 0) {
+            initPlugin();
+        }
+    });
+
+    return plugin;
+});

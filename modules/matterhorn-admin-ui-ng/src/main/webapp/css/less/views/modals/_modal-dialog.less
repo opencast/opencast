@@ -1,0 +1,49 @@
+.modal {
+
+    // Server Details View
+    // ----------------------------------------
+    
+    &#server-details-modal {
+    
+        // Modal Size
+        &:extend(.large-modal);
+        
+        .modal-ios {
+            margin: 0;
+        }    
+    }
+
+
+    // Confirm Modal View
+    // ----------------------------------------
+    
+    &#confirm-modal {
+        
+        // Modal Size
+        &:extend(.extra-small-modal);
+        
+        top: 35%;
+        height: 200px;
+    
+        p {
+            text-align: center;
+            color: @black-60;
+            margin:20px auto 30px;
+        }
+    
+        .btn-container {
+            margin: 20px auto;
+            text-align: center;
+    
+            a {
+                padding: 15px 40px;
+                display: inline-block;
+                margin: 0 10px;
+    
+                i {
+                    margin: 0 !important;
+                }
+            }
+        }
+    }
+}

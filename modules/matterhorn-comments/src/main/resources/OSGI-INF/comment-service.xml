@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+  <scr:component name="org.opencastproject.comments.CommentServiceImpl" immediate="true" activate="activate">
+    <implementation class="org.opencastproject.comments.CommentServiceImpl" />
+    <property name="service.description" value="Comment Service" />
+    <service>
+      <provide interface="org.opencastproject.comments.CommentService" />
+    </service>
+    <reference name="persistence" interface="org.opencastproject.comments.persistence.CommentDatabase"
+      cardinality="1..1" policy="static" bind="setPersistence" />
+    <reference name="userDirectory" interface="org.opencastproject.security.api.UserDirectoryService"
+      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+  </scr:component>
+</scr:components>

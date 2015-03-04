@@ -22,13 +22,16 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
@@ -44,7 +47,10 @@ import org.opencastproject.util.doc.rest.RestService;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.DateTime;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -281,7 +287,7 @@ public class SchedulerRestService {
     }
 
     try {
-      if (eventCatalog.hasValue(DublinCoreCatalogImpl.PROPERTY_RECURRENCE)) {
+      if (eventCatalog.hasValue(DublinCores.OC_PROPERTY_RECURRENCE)) {
         // try to create event and it's recurrences
         Long[] createdIDs = service.addReccuringEvent(eventCatalog, wfProperties);
         for (long id : createdIDs) {
@@ -895,40 +901,287 @@ public class SchedulerRestService {
           @RestParameter(name = "agentid", description = "Filter events by capture agent", isRequired = false, type = Type.STRING),
           @RestParameter(name = "seriesid", description = "Filter events by series", isRequired = false, type = Type.STRING),
           @RestParameter(name = "cutoff", description = "A cutoff date at which the number of events returned in the calendar are limited.", isRequired = false, type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "No calendar for agent found"),
           @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified since last request"),
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar is in the body") })
   public Response getCalendar(@QueryParam("agentid") String captureAgentId, @QueryParam("seriesid") String seriesId,
-          @QueryParam("cutoff") String cutoff, @Context HttpServletRequest request) {
-    SchedulerQuery filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId);
+          @QueryParam("cutoff") String cutoff, @Context HttpServletRequest request) throws NotFoundException {
 
+    Date endDate = null;
     if (StringUtils.isNotEmpty(cutoff)) {
       try {
-        Date endDate = new Date(Long.valueOf(cutoff));
-        filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId)
-                .setEndsFrom(new Date(System.currentTimeMillis())).setStartsTo(endDate);
+        endDate = new Date(Long.valueOf(cutoff));
       } catch (NumberFormatException e) {
         return Response.status(Status.BAD_REQUEST).build();
       }
     }
 
     try { // If the etag matches the if-not-modified header,return a 304
-      Date lastModified = service.getScheduleLastModified(filter);
-      if (lastModified == null) {
-        lastModified = new Date();
-      }
+      String lastModified = service.getScheduleLastModified(captureAgentId);
       String ifNoneMatch = request.getHeader(HttpHeaders.IF_NONE_MATCH);
-      if (StringUtils.isNotBlank(ifNoneMatch) && ifNoneMatch.equals("mod" + Long.toString(lastModified.getTime()))) {
-        return Response.notModified("mod" + Long.toString(lastModified.getTime())).expires(null).build();
+      if (StringUtils.isNotBlank(ifNoneMatch) && ifNoneMatch.equals(lastModified)) {
+        return Response.notModified(lastModified).expires(null).build();
       }
+      SchedulerQuery filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId);
+      if (endDate != null)
+        filter.setEndsFrom(DateTime.now().minusHours(1).toDate()).setStartsTo(endDate);
+
       String result = service.getCalendar(filter);
       if (!result.isEmpty()) {
-        return Response.ok(result).header(HttpHeaders.ETAG, "mod" + Long.toString(lastModified.getTime()))
+        return Response.ok(result).header(HttpHeaders.ETAG, lastModified)
                 .header(HttpHeaders.CONTENT_TYPE, "text/calendar; charset=UTF-8").build();
       } else {
-        throw new NotFoundException();
+        throw new NotFoundException("No calendar for agent " + captureAgentId + " found!");
       }
+    } catch (NotFoundException e) {
+      throw e;
     } catch (Exception e) {
-      logger.error("Unable to get calendar for capture agent '{}': {}", captureAgentId, e.getMessage());
+      logger.error("Unable to get calendar for capture agent '{}': {}", captureAgentId, ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("{id}/acl")
+  @RestQuery(name = "updateaccesscontrollist", description = "Updates the access control list of the event with the given id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = { @RestParameter(name = "id", description = "ID of event", isRequired = true, type = Type.STRING) }, restParameters = { @RestParameter(name = "acl", isRequired = false, description = "The access control list", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "access control list could not be parsed") })
+  public Response updateAccessControlList(@PathParam("id") long eventId, @FormParam("acl") String aclString) {
+    AccessControlList acl;
+    try {
+      acl = AccessControlParser.parseAcl(aclString);
+    } catch (Exception e) {
+      logger.debug("Unable to parse acl '{}': {}", aclString, ExceptionUtils.getStackTrace(e));
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    try {
+      service.updateAccessControlList(eventId, acl);
+      return Response.ok().build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with id '{}' does not exist.", eventId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to update access control list of event with id '{}': {}", eventId,
+              ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("{id}/acl")
+  @RestQuery(name = "getaccesscontrollist", description = "Retrieves the access control list for specified event", returnDescription = "The access control list", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of event for which the access control list will be retrieved", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The access control list as JSON "),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  public Response getAccessControlList(@PathParam("id") long eventId) {
+    try {
+      AccessControlList accessControlList = service.getAccessControlList(eventId);
+      return Response.ok(AccessControlParser.toJson(accessControlList)).type(MediaType.APPLICATION_JSON_TYPE).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with id '{}' does not exist.", eventId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve access control list of event with id '{}': {}", eventId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("{id}/mediapackageId")
+  @RestQuery(name = "recordingmediapackageid", description = "Retrieves the mediapackage identifier for specified event", returnDescription = "The mediapackage identifier", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of event for which the mediapackage identifier will be retrieved", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The mediapackage identifier of event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  public Response getMediaPackageId(@PathParam("id") long eventId) {
+    try {
+      String mediaPackageId = service.getMediaPackageId(eventId);
+      return Response.ok(mediaPackageId).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with id '{}' does not exist.", eventId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve event with id '{}': {}", eventId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("{id}/eventId")
+  @RestQuery(name = "recordingeventid", description = "Retrieves the event identifier of the event with the given mediapackage", returnDescription = "The event identifier", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage identifier", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The mediapackage identifier of event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  public Response getEventId(@PathParam("id") String mediaPackageId) {
+    try {
+      long eventId = service.getEventId(mediaPackageId);
+      return Response.ok(Long.toString(eventId)).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mediaPackageId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("{id}/optOut")
+  @RestQuery(name = "recordingoptoutstatus", description = "Retrieves the opt out status for specified event", returnDescription = "The opt out status", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the opt out status will be retrieved", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The opt out status of event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
+  public Response getOptOut(@PathParam("id") String mediaPackageId) {
+    try {
+      boolean optOut = service.isOptOut(mediaPackageId);
+      return Response.ok(Boolean.toString(optOut)).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mediaPackageId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("{id}/optOut")
+  @RestQuery(name = "updateoptoutstatus", description = "Updates the opt out status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = { @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = { @RestParameter(name = "optOut", isRequired = false, description = "The opt out status to set", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "opt out value could not be parsed") })
+  public Response updateOptOut(@PathParam("id") String mpId, @FormParam("optOut") String optOutString) {
+    Boolean optedOut = BooleanUtils.toBooleanObject(optOutString);
+    if (optedOut == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    try {
+      service.updateOptOutStatus(mpId, optedOut);
+      return Response.ok().build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mpId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to update event with mediapackage id '{}': {}", mpId, ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("{id}/reviewStatus")
+  @RestQuery(name = "recordingreviewstatus", description = "Retrieves the review status for specified event", returnDescription = "The review status", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the review status will be retrieved", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The review status of event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
+  public Response getReviewStatus(@PathParam("id") String mediaPackageId) {
+    try {
+      ReviewStatus reviewStatus = service.getReviewStatus(mediaPackageId);
+      return Response.ok(reviewStatus.toString()).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mediaPackageId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("{id}/reviewStatus")
+  @RestQuery(name = "updatereviewstatus", description = "Updates the review status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = { @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = { @RestParameter(name = "reviewStatus", isRequired = false, description = "The review status to set: [UNSENT, UNCONFIRMED, CONFIRMED]", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "review status could not be parsed") })
+  public Response updateReviewStatus(@PathParam("id") String mpId, @FormParam("reviewStatus") String reviewStatusString) {
+
+    ReviewStatus reviewStatus;
+    try {
+      reviewStatus = ReviewStatus.valueOf(reviewStatusString);
+    } catch (Exception e) {
+      logger.warn("Unable to parse review status {}", reviewStatusString);
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    try {
+      service.updateReviewStatus(mpId, reviewStatus);
+      return Response.ok().build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mpId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to update event with mediapackage id '{}': {}", mpId, ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("{id}/blacklisted")
+  @RestQuery(name = "recordingblackliststatus", description = "Retrieves the blacklist status for specified event", returnDescription = "The blacklist status", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the blacklist status will be retrieved", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The blacklist status of event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
+  public Response getBlacklistStatus(@PathParam("id") String mediaPackageId) {
+    try {
+      boolean blacklisted = service.isBlacklisted(mediaPackageId);
+      return Response.ok(Boolean.toString(blacklisted)).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mediaPackageId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("{id}/blacklisted")
+  @RestQuery(name = "updateblackliststatus", description = "Updates the blacklist status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = { @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = { @RestParameter(name = "blacklisted", isRequired = false, description = "The blacklist status to set", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "blacklist status could not be parsed") })
+  public Response updateBlacklistStatus(@PathParam("id") String mpId, @FormParam("blacklisted") String blacklistString) {
+    Boolean blacklisted = BooleanUtils.toBooleanObject(blacklistString);
+    if (blacklisted == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    try {
+      service.updateBlacklistStatus(mpId, blacklisted);
+      return Response.ok().build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mpId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to update event with mediapackage id '{}': {}", mpId, ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("{id}/workflowConfig")
+  @RestQuery(name = "updateworkflowconfig", description = "Updates the worklfow config of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = { @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = { @RestParameter(name = "workflowConfig", isRequired = false, description = "The workflow config to add", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "workflow config could not be parsed") })
+  public Response updateWorkflowConfig(@PathParam("id") String mpId,
+          @FormParam("workflowConfig") String workflowConfigString) {
+    Map<String, String> wfProperties = new HashMap<String, String>();
+    try {
+      Properties prop = parseProperties(workflowConfigString);
+      wfProperties.putAll((Map) prop);
+    } catch (IOException e) {
+      logger.warn("Could not parse workflow configuration properties: {}", workflowConfigString);
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    try {
+      service.updateWorkflowConfig(mpId, wfProperties);
+      return Response.ok().build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mpId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to update event with mediapackage id '{}': {}", mpId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }

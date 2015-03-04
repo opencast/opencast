@@ -93,7 +93,7 @@ public class JpaUserProviderTest {
     Set<JpaRole> authorities = new HashSet<JpaRole>();
     authorities.add(new JpaRole("ROLE_ASTRO_101_SPRING_2011_STUDENT", org1));
 
-    JpaUser user = new JpaUser("user1", "pass1", org1, authorities);
+    JpaUser user = new JpaUser("user1", "pass1", org1, provider.getName(), true, authorities);
     provider.addUser(user);
 
     User loadUser = provider.loadUser("user1");
@@ -138,10 +138,10 @@ public class JpaUserProviderTest {
     Set<JpaRole> authorities = new HashSet<JpaRole>();
     authorities.add(new JpaRole("ROLE_ASTRO_101_SPRING_2011_STUDENT", org1));
 
-    JpaUser user1 = new JpaUser("user1", "pass1", org1, authorities);
-    JpaUser user2 = new JpaUser("user2", "pass1", org1, authorities);
-    JpaUser user3 = new JpaUser("user3", "pass1", org1, authorities);
-    JpaUser user4 = new JpaUser("user4", "pass1", org1, authorities);
+    JpaUser user1 = new JpaUser("user1", "pass1", org1, provider.getName(), true, authorities);
+    JpaUser user2 = new JpaUser("user2", "pass1", org1, provider.getName(), true, authorities);
+    JpaUser user3 = new JpaUser("user3", "pass1", org1, provider.getName(), true, authorities);
+    JpaUser user4 = new JpaUser("user4", "pass1", org1, provider.getName(), true, authorities);
     provider.addUser(user1);
     provider.addUser(user2);
     provider.addUser(user3);
@@ -173,7 +173,7 @@ public class JpaUserProviderTest {
     Set<JpaRole> authorities = new HashSet<JpaRole>();
     authorities.add(new JpaRole("ROLE_ASTRO_101_SPRING_2011_STUDENT", org1));
 
-    JpaUser user = new JpaUser("user1", "pass1", org1, authorities);
+    JpaUser user = new JpaUser("user1", "pass1", org1, provider.getName(), true, authorities);
     provider.addUser(user);
 
     User loadUser = provider.loadUser("user1");
@@ -182,7 +182,7 @@ public class JpaUserProviderTest {
 
     authorities.add(new JpaRole("ROLE_ASTRO_101_SPRING_2013_STUDENT", org1));
     String newPassword = "newPassword";
-    JpaUser updateUser = new JpaUser(user.getUsername(), newPassword, org1, authorities);
+    JpaUser updateUser = new JpaUser(user.getUsername(), newPassword, org1, provider.getName(), true, authorities);
 
     User loadUpdatedUser = provider.updateUser(updateUser);
     // User loadUpdatedUser = provider.loadUser(user.getUsername());
@@ -208,13 +208,13 @@ public class JpaUserProviderTest {
     Set<JpaRole> authorities = new HashSet<JpaRole>();
     authorities.add(new JpaRole("ROLE_ONE", org1));
 
-    JpaUser userOne = new JpaUser("user1", "pass1", org1, authorities);
+    JpaUser userOne = new JpaUser("user1", "pass1", org1, provider.getName(), true, authorities);
     provider.addUser(userOne);
 
     Set<JpaRole> authoritiesTwo = new HashSet<JpaRole>();
     authoritiesTwo.add(new JpaRole("ROLE_ONE", org1));
     authoritiesTwo.add(new JpaRole("ROLE_TWO", org1));
-    JpaUser userTwo = new JpaUser("user2", "pass2", org1, authoritiesTwo);
+    JpaUser userTwo = new JpaUser("user2", "pass2", org1, provider.getName(), true, authoritiesTwo);
     provider.addUser(userTwo);
 
     assertEquals("There should be two roles", 2, IteratorUtils.toList(provider.getRoles()).size());
@@ -225,10 +225,10 @@ public class JpaUserProviderTest {
     Set<JpaRole> authorities = new HashSet<JpaRole>();
     authorities.add(new JpaRole("ROLE_COOL_ONE", org1));
 
-    JpaUser userOne = new JpaUser("user_test_1", "pass1", org1, authorities);
-    JpaUser userTwo = new JpaUser("user2", "pass2", org1, authorities);
-    JpaUser userThree = new JpaUser("user3", "pass3", org1, authorities);
-    JpaUser userFour = new JpaUser("user_test_4", "pass4", org1, authorities);
+    JpaUser userOne = new JpaUser("user_test_1", "pass1", org1, provider.getName(), true, authorities);
+    JpaUser userTwo = new JpaUser("user2", "pass2", org1, provider.getName(), true, authorities);
+    JpaUser userThree = new JpaUser("user3", "pass3", org1, provider.getName(), true, authorities);
+    JpaUser userFour = new JpaUser("user_test_4", "pass4", org1, provider.getName(), true, authorities);
     provider.addUser(userOne);
     provider.addUser(userTwo);
     provider.addUser(userThree);
@@ -241,11 +241,11 @@ public class JpaUserProviderTest {
   public void testDuplicateUser() {
     Set<JpaRole> authorities1 = set(new JpaRole("ROLE_COOL_ONE", org1));
     Set<JpaRole> authorities2 = set(new JpaRole("ROLE_COOL_ONE", org2));
-    provider.addUser(new JpaUser("user1", "pass1", org1, authorities1));
-    provider.addUser(new JpaUser("user2", "pass2", org1, authorities1));
-    provider.addUser(new JpaUser("user1", "pass3", org2, authorities2));
+    provider.addUser(new JpaUser("user1", "pass1", org1, provider.getName(), true, authorities1));
+    provider.addUser(new JpaUser("user2", "pass2", org1, provider.getName(), true, authorities1));
+    provider.addUser(new JpaUser("user1", "pass3", org2, provider.getName(), true, authorities2));
     try {
-      provider.addUser(new JpaUser("user1", "pass4", org1, authorities1));
+      provider.addUser(new JpaUser("user1", "pass4", org1, provider.getName(), true, authorities1));
       fail("Duplicate user");
     } catch (Exception ignore) {
     }
@@ -261,7 +261,7 @@ public class JpaUserProviderTest {
     authorities.add(new JpaRole("ROLE_ONE", org1));
     authorities.add(new JpaRole("ROLE_TWO", org1));
 
-    JpaUser userOne = new JpaUser("user1", "pass1", org1, authorities);
+    JpaUser userOne = new JpaUser("user1", "pass1", org1, provider.getName(), true, authorities);
     provider.addUser(userOne);
 
     assertEquals("There should be three roles", 3, IteratorUtils.toList(provider.getRoles()).size());
@@ -277,10 +277,10 @@ public class JpaUserProviderTest {
     Set<JpaRole> authorities = new HashSet<JpaRole>();
     authorities.add(new JpaRole("ROLE_COOL_ONE", org1));
 
-    JpaUser userOne = new JpaUser("user_test_1", "pass1", org1, authorities);
-    JpaUser userTwo = new JpaUser("user2", "pass2", org1, authorities);
-    JpaUser userThree = new JpaUser("user3", "pass3", org1, authorities);
-    JpaUser userFour = new JpaUser("user_test_4", "pass4", org1, authorities);
+    JpaUser userOne = new JpaUser("user_test_1", "pass1", org1, provider.getName(), true, authorities);
+    JpaUser userTwo = new JpaUser("user2", "pass2", org1, provider.getName(), true, authorities);
+    JpaUser userThree = new JpaUser("user3", "pass3", org1, provider.getName(), true, authorities);
+    JpaUser userFour = new JpaUser("user_test_4", "pass4", org1, provider.getName(), true, authorities);
     provider.addUser(userOne);
     provider.addUser(userTwo);
     provider.addUser(userThree);
@@ -302,7 +302,7 @@ public class JpaUserProviderTest {
     authorities.add(new JpaRole("ROLE_COOL_ONE", org1));
     authorities.add(new JpaRole("ROLE_COOL_TWO", org1));
 
-    JpaUser userOne = new JpaUser("user1", "pass1", org1, authorities);
+    JpaUser userOne = new JpaUser("user1", "pass1", org1, provider.getName(), true, authorities);
     provider.addUser(userOne);
 
     assertEquals(2, IteratorUtils.toList(provider.findRoles("%coOL%", 0, 0)).size());

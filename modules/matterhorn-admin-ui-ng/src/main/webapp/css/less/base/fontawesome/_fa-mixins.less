@@ -1,0 +1,57 @@
+// Code Sample:
+// .fa-icon(@fa-plus, null, null, inline-block);
+
+.fa-icon(
+
+    // Required Values
+    @fa-icon;
+
+    // Optional Values
+    //    Due to the lack of a 'null' value if you cannot skip over values
+    //    eg: .fa-icon(@fa-plus, after, 10px 20px); instead do this ~ .fa-icon(@fa-plus, after, inline-block, 10px 20px);
+    @pseudo-position: before;
+    @display-value: inline;
+    @margin: 0;
+    @padding: 0;
+    @color: inherit;
+    @font-size: 12px;
+    @font-weight: normal;
+    @line-height: 1;
+
+) {
+
+    @pseudo-position-value: ~":@{pseudo-position}"; // Workaround for this bug (https://github.com/less/less.js/issues/1294) remove when fixed
+
+    &@{pseudo-position-value} {
+        content: @fa-icon;
+        color: @color;
+        font-family: FontAwesome;
+        font-size: @font-size;
+        font-style: normal;
+        font-weight: @font-weight;
+        line-height: @line-height;
+        display: @display-value;
+        margin: @margin;
+        padding: @padding;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+.fa-icon-color(@pseudo-position, @color) {
+
+    @pseudo-position-value: ~":@{pseudo-position}";
+
+    &@{pseudo-position-value} {
+        color: @color;
+    }
+}
+
+.fa-icon-float(@pseudo-position, @float) {
+
+    @pseudo-position-value: ~":@{pseudo-position}";
+
+    &@{pseudo-position-value} {
+        float: @float;
+    }
+}

@@ -17,9 +17,9 @@ package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 
+import org.opencastproject.archive.api.Archive;
+import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.episode.api.EpisodeService;
-import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesService;
@@ -44,7 +44,7 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   private SecurityService securityService;
   private AuthorizationService authorizationService;
   private String endpointBaseUrl;
-  private EpisodeService episodeService;
+  private Archive<?> archive;
   private SeriesService seriesService;
   private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
 
@@ -81,8 +81,8 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   }
 
   /** OSGi DI callback. */
-  public void setEpisodeService(EpisodeService episodeService) {
-    this.episodeService = episodeService;
+  public void setArchive(Archive<?> archive) {
+    this.archive = archive;
   }
 
   /** OSGi DI callback. */
@@ -93,11 +93,6 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   @Override
   protected AclServiceFactory getAclServiceFactory() {
     return aclServiceFactory;
-  }
-
-  @Override
-  protected HttpMediaPackageElementProvider getHttpMediaPackageElementProvider() {
-    return httpMediaPackageElementProvider;
   }
 
   @Override
@@ -116,12 +111,17 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   }
 
   @Override
-  protected EpisodeService getEpisodeService() {
-    return episodeService;
+  protected Archive<?> getArchive() {
+    return archive;
   }
 
   @Override
   protected SeriesService getSeriesService() {
     return seriesService;
+  }
+
+  @Override
+  protected HttpMediaPackageElementProvider getHttpMediaPackageElementProvider() {
+    return httpMediaPackageElementProvider;
   }
 }

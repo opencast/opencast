@@ -1,0 +1,108 @@
+{
+  "mediapackage": {
+    "id"             : "•mock• 40518",
+    "title"          : "•mock• Test Title",
+    "presenters"     : ["Matt Smith", "Chuck Norris"],
+    "contributors"   : ["Franz Kafka", "A. Morris" ],
+    "series"         : {
+      "id"    : "78753d04-18a4-4327-9a61-b6d93816a7d2",
+      "title" : "Physics325"
+    },
+    "subjects"       : ["Test Subject"],
+    "language"       : "English",
+    "start_date"     : "2012-12-01",
+    "duration"       : "01:05:00",
+    "license"        : "Creative Commons 3.0: Attribution-NonCommercial-NoDerivs",
+    "source"         : "Manual",
+    "metadata": [{
+      "id"             : "0f145b44-67c5-4ba9-bec8-59f2b3a02e4e",
+      "type"           : "dublincore/episode",
+      "mimetype"       : "text/xml",
+      "tags"           : ["archive", "recording"],
+      "url"            : "ttp://localhost:8080/episode/archive/mediapackage/aea5cebf-4d4b-4f7b-9f32-8dc35f3b45e7/de0e7224-8d3c-4ac0-9581-d72dc90531ed/0/catalog.xml",
+      "content": {
+        "creator"     : "Xavier presenter",
+        "isPartOf"    : "78753d04-18a4-4327-9a61-b6d93816a7d2",
+        "license"     : "Creative Commons 3.0: Attribution-NonCommercial-NoDerivs",
+        "rightsHolder": "no copyright",
+        "title"       : "Test full",
+        "contributor" : "Xavier contributor",
+        "language"    : "English",
+        "subject"     : "Test Subject",
+        "description" : "Description here, this will grow with text",
+        "recordDate"  : "2012-12-01",
+        "start_time"  : "12:00",
+        "created"     : "2012-01-01",
+        "author"      : "Admin",
+        "spatial"     : "mh-ca-cab-g61",
+        "temporal"    : "start=2014-02-20T15:10:00Z; end=2014-02-20T17:05:00Z"
+      }
+    }],
+    "tracks": [{
+      "id"       : "da62a03a-5de9-4f52-9843-498a7f5e9c2a",
+      "type"     : "presentation/source",
+      "mimetype" : "video/mp4",
+      "tags"     : ["archive", "recording"],
+      "url"      : "http://mh01.ethz.ch/archive/archive/mediapackage/e977a215-223b-4364-a49a-d8ae9b7bfce9/da62a03a-5de9-4f52-9843-498a7f5e9c2a/0/track.mp4",
+      "checksum" : "5fd2a5cd15d9f329b8933de0cdddb4b0",
+      "duration" : 6904800,
+      "audio"    : {
+        "encoder"  : "AAC",
+        "channels" : 2,
+        "bitrate"  : 2
+      },
+      "video"    : {
+        "encoder"    : "AAC",
+        "bitrate"    : 2,
+        "framerate"  : 10.0,
+        "resolution" : "1024x768",
+        "scantype"   : "Progressive"
+      }
+    }],
+    "attachements": [{
+      "id": "security-policy-series",
+      "mimetype": "text/xml",
+      "tags": ["archive"],
+      "url": "http://localhost:8080/episode/archive/mediapackage/aea5cebf-4d4b-4f7b-9f32-8dc35f3b45e7/security-policy-series/0/attachment.xml",
+      "content": {
+        "acl"  : [{
+          "action": "read",
+          "allow": true,
+          "role": "ROLE_ADMIN"
+        }, {
+          "action": "write",
+          "allow": true,
+          "role": "ROLE_ADMIN"
+        }, {
+          "action": "analyze",
+          "allow": false,
+          "role": "ROLE_ADMIN"
+        }, {
+          "action": "read",
+          "allow": true,
+          "role": "ROLE_ANONYMOUS"
+        }]
+      }
+    }],
+    "comments": {
+      "resolved": "5",
+      "unresolved": "2"
+    }
+  },
+  "autcomplete": {
+    "languages": [{
+      "id": "fr",
+      "name": "French"
+    }, {
+      "id": "de",
+      "name": "German"
+    }],
+    "acls": [ {
+      "id": "acltest1",
+      "name": "ACL test 1"
+    }, {
+      "id": "acltest2",
+      "name": "ACL test 2"
+    }]
+  }
+}

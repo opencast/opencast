@@ -1,0 +1,24 @@
+<section class="action-nav-bar">
+    <ng-include src="'modules/' + table.category + '/partials/' + table.resource + 'Buttons.html'"></ng-include>
+
+    <admin-ng-nav></admin-ng-nav>
+    <nav>
+        <!-- <a href="#/configuration/emailtemplates" ng-class="{active: table.resource == 'emailtemplates'}" translate="CONFIGURATION.NAVIGATION.MAIL_TEMPLATES" with-role="ROLE_UI_EMAILTEMPLATES_VIEW"> Mail templates </a> -->
+        <a href="#/configuration/themes" ng-class="{active: table.resource == 'themes'}" translate="CONFIGURATION.NAVIGATION.THEMES" with-role="ROLE_UI_THEMES_VIEW"><!--Themes--></a>
+    </nav>
+</section>
+
+<div class="main-view">
+    <div data-admin-ng-notifications=""></div>
+
+    <div class="controls-container">
+        <div class="filters-container">
+            <div data-admin-ng-table-filter="" data-filters="filters" data-namespace="table.resource"></div>
+        </div>
+
+        <h1 translate="{{ table.caption }}"><!--Themes--></h1>
+        <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.rows.length }}' }"></h4>
+
+    </div>
+    <div class="table-container top-addon" admin-ng-table="" table="table"></div>
+</div>

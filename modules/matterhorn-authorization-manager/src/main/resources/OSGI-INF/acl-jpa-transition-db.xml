@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-        name="org.opencastproject.authorization.xacml.manager.impl.persistence.OsgiJpaAclTransitionDb">
+        name="org.opencastproject.authorization.xacml.manager.impl.persistence.OsgiJpaAclTransitionDb" immediate="true" activate="activate">
   <implementation class="org.opencastproject.authorization.xacml.manager.impl.persistence.OsgiJpaAclTransitionDb" />
   <property name="service.description" value="ACL transition database" />
   <service>

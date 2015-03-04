@@ -17,6 +17,7 @@ package org.opencastproject.scheduler.api;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
+import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
@@ -32,6 +33,10 @@ import java.util.Properties;
  * and generating calendar for capture agent.
  */
 public interface SchedulerService {
+
+  public enum ReviewStatus {
+    UNSENT, UNCONFIRMED, CONFIRMED
+  }
 
   /**
    * Identifier for service registration and location
@@ -223,19 +228,19 @@ public interface SchedulerService {
   String getCalendar(SchedulerQuery filter) throws SchedulerException;
 
   /**
-   * Returns date of last modification of event belonging to specified capture agent.
+   * Returns hash of last modification of event belonging to specified capture agent.
    *
-   * @param filter
-   *          filter for events to be checked
-   * @return last modification date
+   * @param agentId
+   *          the agent id
+   * @return the last modification hash
    * @throws SchedulerException
    *           if exception occurred
    */
-  Date getScheduleLastModified(SchedulerQuery filter) throws SchedulerException;
+  String getScheduleLastModified(String agentId) throws SchedulerException;
 
   /** Update all events with metadata from eventCatalog. */
   void updateEvents(List<Long> eventIds, final DublinCoreCatalog eventCatalog) throws NotFoundException,
-  SchedulerException, UnauthorizedException;
+          SchedulerException, UnauthorizedException;
 
   /**
    * Remove all of the scheduled events before a buffer.
@@ -246,4 +251,156 @@ public interface SchedulerService {
    * @throws SchedulerException
    */
   void removeScheduledRecordingsBeforeBuffer(long buffer) throws SchedulerException;
+
+  /**
+   * Returns the access control list of the event with the id
+   *
+   * @param eventId
+   *          the event ID
+   * @return the access control list or <code>null</code> if no acces control list has been set
+   * @throws NotFoundException
+   *           if there is no event with the same ID
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  AccessControlList getAccessControlList(long eventId) throws NotFoundException, SchedulerException;
+
+  /**
+   * Update the access control list of the event with the id
+   *
+   * @param eventId
+   *          the event ID
+   * @param accessControlList
+   *          the access control list
+   * @throws NotFoundException
+   *           if there is no event with the same ID
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  void updateAccessControlList(long eventId, AccessControlList accessControlList) throws NotFoundException,
+          SchedulerException;
+
+  /**
+   * Returns the mediapackage of the event with the id
+   *
+   * @param eventId
+   *          the event ID
+   * @return the mediapackage identifier
+   * @throws NotFoundException
+   *           if there is no event with the same ID
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  String getMediaPackageId(long eventId) throws NotFoundException, SchedulerException;
+
+  /**
+   * Returns the event identifier of the event with the given mediapackage id
+   *
+   * @param mediaPackageId
+   *          the event's mediapackage id
+   * @return the event identifier
+   * @throws NotFoundException
+   *           if there is no event with the given mediapackage id
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  Long getEventId(String mediaPackageId) throws NotFoundException, SchedulerException;
+
+  /**
+   * Returns the opt out status of an event with the given mediapackage id
+   *
+   * @param mediapackageId
+   *          the mediapackage id
+   * @return the opt out status
+   * @throws NotFoundException
+   *           if there is no event with specified mediapackage ID
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  boolean isOptOut(String mediapackageId) throws NotFoundException, SchedulerException;
+
+  /**
+   * Updates the opted out status of the event with the given ID
+   *
+   * @param mediapackageId
+   *          ID of event's mediapackage for which opted out status will be changed
+   * @param optedOut
+   *          the opted out status
+   * @throws NotFoundException
+   *           if event with specified ID cannot be found
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  void updateOptOutStatus(String mediapackageId, boolean optedOut) throws NotFoundException, SchedulerException;
+
+  /**
+   * Returns the review status of an event with the given mediapackage id
+   *
+   * @param mediapackageId
+   *          the mediapackage id
+   * @return the review status
+   * @throws NotFoundException
+   *           if there is no event with specified mediapackage ID
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  ReviewStatus getReviewStatus(String mediapackageId) throws NotFoundException, SchedulerException;
+
+  /**
+   * Updates the review status of the event with the given mediapackage ID
+   *
+   * @param mediapackageId
+   *          ID of event's mediapackage for which review status will be changed
+   * @param reviewStatus
+   *          the review status
+   * @throws NotFoundException
+   *           if event with specified ID cannot be found
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  void updateReviewStatus(String mediapackageId, ReviewStatus reviewStatus) throws NotFoundException,
+          SchedulerException;
+
+  /**
+   * Updates the workflow properties of the event with the given mediapackage ID
+   *
+   * @param mediapackageId
+   *          ID of event's mediapackage for which the workflow properties will be changed
+   * @param properties
+   *          the workflow properties
+   * @throws NotFoundException
+   *           if there is no event with specified mediapackage ID
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  void updateWorkflowConfig(String mediapackageId, Map<String, String> properties) throws NotFoundException,
+          SchedulerException;
+
+  /**
+   * Returns the blacklist status of an event with the given mediapackage id
+   *
+   * @param mediapackageId
+   *          the mediapackage id
+   * @return the blacklist status
+   * @throws NotFoundException
+   *           if there is no event with specified mediapackage ID
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  boolean isBlacklisted(String mediapackageId) throws NotFoundException, SchedulerException;
+
+  /**
+   * Updates the blacklist status of the event with the given mediapackage ID
+   *
+   * @param mediapackageId
+   *          ID of event's mediapackage for which blacklist status will be changed
+   * @param blacklisted
+   *          the blacklist status
+   * @throws NotFoundException
+   *           if event with specified ID cannot be found
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  void updateBlacklistStatus(String mediapackageId, boolean blacklisted) throws NotFoundException, SchedulerException;
+
 }

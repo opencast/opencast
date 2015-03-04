@@ -1,0 +1,452 @@
+// Overrides for main.less
+//
+// Should be incorporated into main.less sooner than later.
+@import "main.less";
+@import "../custom/custom";
+
+// JQuery UI Datepicker custom style
+@import "../vendor/datepicker";
+
+#menu-toggle {
+  #roll-up-menu {
+      margin-left: 0px;
+      position: absolute;
+      left: -1px;
+  }
+}
+
+.filters-container {
+    div.chosen-container {
+      width: 230px !important;
+      ul.chosen-choices {
+        line-height: 34px;
+      }
+    }
+}
+
+[data-title]:hover:after {
+  white-space: nowrap;
+}
+
+// All anchors should behave clickable (even without href attributes)
+a {
+    cursor: pointer;
+}
+
+// Mark mockups as stubs
+div.main-view.stub, div.full-col > div.stub {
+    margin-right: 20px;
+    -webkit-background-size: 50px 50px;
+    -moz-background-size: 50px 50px;
+    background-size: 50px 50px;
+
+    background-color: rgba(236, 233, 207, 0.62);
+    background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, rgba(255, 255, 255, .2)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255, 255, 255, .2)), color-stop(.75, rgba(255, 255, 255, .2)), color-stop(.75, transparent), to(transparent));
+    background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+    background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+    background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+    background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+    background-image: linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+}
+
+
+.modal {
+  top: 30px;
+  outline: 0;
+  input[readonly] {
+    border: none;
+  }
+  &#group-modal, &#add-acl-modal, &#user-modal {
+    input[type="text"], input[type="password"], [type="email"] {
+      width: 100%;
+      padding-left: 15px;
+    }
+  }
+  .select-container > p {
+    margin-bottom: 10px;
+  }
+}
+
+.modal-animation {
+  -webkit-transition: all linear 0.2s;
+  transition: all linear 0.2s;
+  opacity: 1;
+  visibility: visible;
+  display: block;
+
+  &.ng-hide-add,
+  &.ng-hide-remove {
+    display: block!important;
+  }
+
+  &.ng-hide {
+    opacity: 0;
+  }
+}
+
+// A disabled button (cannot use the btn mixin because of specificity)
+a.disabled, button.disabled, div.disabled {
+  opacity: 0.5 !important;
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+.ng-multi-value {
+  display: inline-block;
+  padding: 0px 5px;
+  margin: 1px 5px 1px 0;
+  font-size: 11px;
+  background: @l-blue;
+  color: #fff;
+  border-radius: 4px;
+
+  a {
+    color: white;
+    font-weight: bold;
+  }
+}
+
+span.editable {
+  border-bottom: 1px dashed #999;
+}
+td.editable {
+  cursor: text;
+
+  &> div {
+    overflow: auto;
+  }
+
+  input {
+    padding: 0 0 0 10px;
+    width: 100%;
+    height: auto;
+    margin: 0;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+  }
+
+  ul {
+    float: left;
+
+    li {
+      display: inline-block;
+      padding-right: 7px;
+    }
+  }
+
+  span {
+    border-bottom: 1px dashed #999;
+  }
+
+  i.saved, i.edit {
+    float: right;
+    cursor: pointer;
+
+    &.edit {
+      margin: 5px;
+      font-size: 14px;
+    }
+  }
+}
+
+textarea.editable {
+    width: 100%;
+    height: auto;
+}
+
+button.green {
+  .btn(green-dark-bg);
+}
+
+div[data-modal-tab-content="metadata"], div[data-modal-tab-content="extended-metadata"] {
+  & button.save {
+    float: right;
+  }
+  & td:first-child {
+    width: 200px;
+    max-width: 200px;
+  }
+}
+
+.modal .obj.comments {
+  .add-comment .chosen-container {
+    float: left;
+  }
+  .comment-container {
+    height: 300px;
+    .comment .resolve {
+      cursor: default;
+    }
+  }
+  .comment.active {
+      background: #BDDAF1;
+  }
+  .add-comment {
+      button {
+          float: right;
+      }
+
+      label, input[type=checkbox] {
+          float: left;
+      }
+
+      label, input[type=checkbox] {
+          margin-top: 10px;
+          display: inline-block;
+          margin: 4px;
+          line-height: 2em;
+      }
+      label {
+          margin-right: 20px;
+      }
+      input[type=text] {
+          padding-left: 20px;
+          color: #919FA5;
+      }
+      button.cancel {
+          .btn(grey);
+          height: 40px;
+      }
+      button.save{
+        margin-left: 5px;
+      }
+  }
+}
+// Chosen CSS fix for custom height select fields
+.chosen-container-multi .chosen-choices li.search-field input {
+  height: auto !important;
+}
+
+// Visual search replacements
+.filters-container > input[type="search"] {
+  float: left;
+  margin-right: 0;
+}
+
+input[type="text"].small-search {
+    height: 100%;
+    width: 120px;
+    margin: 0;
+    padding: 1px;
+    text-align: center;
+}
+
+div.table-filter {
+  float: right;
+  border: 1px solid #c9d0d3;
+  border-radius: 4px;
+  margin-left: 10px;
+
+  .filters {
+    border: 0;
+    border-radius: 4px;
+    float: left;
+    cursor: text;
+    background: #fff;
+    background-color: #fafafa;
+    min-height: 23px;
+    min-width: 100px;
+    padding: 7px;
+
+    &>i {
+      font-size: 18px;
+      padding: 2px;
+    }
+
+    span a i {
+      color: white;
+    }
+
+    select, input, div {
+      display: inline-block;
+    }
+
+    select, input {
+      border: 1px solid #c9d0d3;
+      border-radius: 3px;
+      background-color: white;
+      outline: 0;
+    }
+
+    .ng-multi-value {
+      padding: 5px;
+    }
+  }
+
+  i {
+    color: #8a8f99;
+    cursor: pointer;
+
+    &.clear {
+      font-size: 20px;
+      float: left;
+      padding: 8px 8px 8px 0;
+    }
+  }
+
+  .filter-settings-dd {
+    margin-left: 0px;
+    border: 0;
+    float: left;
+    height: 38px;
+
+    .filters-list {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+
+// Generic select fields
+select {
+  border: 1px solid #c9d0d3;
+  border-radius: 3px;
+  background-color: white;
+  outline: 0;
+}
+
+// Disabled input field
+input.disabled, select.disabled {
+  background: #eeeff0;
+}
+
+// Make filter profile dialog work
+.filters-container {
+  .filter-settings-dd .filter-details {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.quick-actions {
+  p {
+    padding: 10px 0;
+  }
+  select {
+    width: 200px;
+  }
+}
+
+// Use HTML5 input field for file upload
+.file-upload > input[type="file"] {
+    width: inherit !important;
+    visibility: visible !important;
+    hidden: false !important;
+}
+
+#user-blacklist-modal,
+#location-blacklist-modal {
+  [data-modal-tab-content="dates"] input {
+    width: initial;
+    float: left;
+    margin-right: 10px;
+  }
+}
+
+// Notification alias error to danger
+.alert {
+  &.error {
+    .alert-variant(@state-danger-bg, @state-danger-border, @state-danger-text);
+  }
+  & .autonomous {
+    padding-right: 20px; /* fixes a design bug */
+  }
+}
+
+// pagination of tables
+.main-view {
+  #tbl-view-controls-container {
+
+    .pagination {
+
+        a {
+          width: 1em;
+          padding: 7px 10px;
+        }
+
+        a.wide {
+          width: 2em;
+        }
+
+        a:hover:not(.active) {
+            background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fefefe), to(#f0f0f0));
+            background: -moz-linear-gradient(0% 0% 270deg, #fefefe, #f0f0f0);
+        }
+
+        &.prev {
+          //override right margin with 0
+          .fa-icon(@fa-chevron-left, before, inline-block, 0 0 0 0, 0, inherit, 10px);
+        }
+
+        &.next {
+          //override left margin with 0
+          .fa-icon(@fa-chevron-right, after, inline-block, 0 0 0 0, 0, inherit, 10px);
+        }
+
+        .active {
+          border: 1px solid #616161;
+        }
+      }
+  }
+}
+
+table.main-tbl {
+  /* we don't want to let the angular animation show up*/
+  .ng-hide-add, .ng-hide-remove {
+    display: none !important;
+  }
+
+  td{
+    .fa-check {
+      float: right;
+      color: @green;
+      margin-top: 3px;
+      font-size: 18px;
+      opacity: 0;
+      visibility: hidden;
+      .transition(all .2s);
+
+      &.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+    } // fa-check
+  }
+}
+
+//we introduced a separate layer in file-upload to support directive
+.modal .obj .obj-container > div.file-upload > p{
+  font-size: 11px;
+  color: #999999;
+  line-height: 18px;
+  margin-bottom: 15px;
+}
+
+.hidden{
+  visibility: hidden;
+}
+
+tr.error {
+  background: @state-warning-bg !important;
+}
+
+/*
+* ----------------------------------------------------------------
+* THE FOLLOWING SECTION NEEDS TO BE DELEGATED TO THE DESIGNERS!!!
+* ----------------------------------------------------------------
+*/
+.playback-toggle-pause {
+  .fa-icon(@fa-pause,@playback-icon-pseudo-position, @playback-icon-display-value, @playback-icon-margin, @playback-icon-padding, @playback-icon-color, @playback-icon-font-size);
+  .fa-icon-float(@playback-icon-pseudo-position, @playback-icon-float);
+  &:extend(.playback-control-icon all);
+  &:hover {
+    color: darken(@grey, 15%);
+  }
+}
+// Allow for slightly wider icons
+.playback-controls-wrapper {
+  width: 280px;
+}

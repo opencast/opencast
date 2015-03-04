@@ -1,0 +1,238 @@
+<section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="series-details-modal" ng-controller="SerieCtrl">
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2>Series Details {{resourceId}}</h2>
+    </header>
+
+    <nav class="modal-nav" id="modal-nav">
+        <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.METADATA" with-role="ROLE_UI_SERIES_DETAILS_METADATA_VIEW">Metadata</a>
+        <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.EXTENDED_METADATA" with-role="ROLE_UI_SERIES_DETAILS_EXTMETADATA_VIEW">Metadata</a>
+<!--         <a ng-click="openTab('events')" data-modal-tab="events" ng-class="{ active: tab == 'events' }" translate="EVENTS.SERIES.DETAILS.TABS.EVENTS">Events</a> -->
+        <a ng-click="openTab('permissions')" data-modal-tab="permissions" ng-class="{ active: tab == 'permissions' }" translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS" with-role="ROLE_UI_SERIES_DETAILS_ACL_VIEW">Access Policy</a>
+        <a ng-click="openTab('theme')" data-modal-tab="theme" ng-class="{ active: tab == 'theme' }" translate="EVENTS.SERIES.DETAILS.TABS.THEME" with-role="ROLE_UI_SERIES_DETAILS_THEMES_VIEW">Theme</a>
+    </nav>
+
+    <a ng-click="showAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
+    <a ng-click="showAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
+
+    <div class="modal-content" data-modal-tab-content="metadata">
+        <p class="tab-desc"></p>
+        <div class="modal-body">
+            <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
+            <div class="full-col">
+                <div class="obj tbl-list">
+                    <header class="no-expand" translate="EVENTS.SERIES.DETAILS.TABS.METADATA">Metadata</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr ng-repeat="row in seriesCatalog.fields">
+                                <td translate="{{ row.label }}"></td>
+                                <td admin-ng-editable
+                                    required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
+                                    params="row" save="getSaveFunction(seriesCatalog.flavor)"></td>
+                            </tr> </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="metadata.entries.length > 0">
+        <p class="tab-desc"></p>
+        <div class="modal-body">
+            <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
+            <div class="full-col">
+                <div class="obj tbl-list" ng-repeat="catalog in metadata.entries">
+                    <header>{{ catalog.title }}</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr ng-repeat="row in catalog.fields">
+                                <td translate="{{ row.label }}"></td>
+                                <td admin-ng-editable
+                                    required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
+                                    params="row" save="getSaveFunction(catalog.flavor)"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--     <div class="modal-content" data-modal-tab-content="events">
+        <p class="tab-desc"></p>
+        <div class="full-col">
+            <div class="obj">
+                <header class="no-expand" translate="EVENTS.SERIES.DETAILS.TABS.EVENTS">Events</header>
+                <div class="obj-container">
+                    <table cellpadding="0" cellspacing="0" class="main-tbl">
+                        <thead>
+                            <tr>
+                                <th>{{ 'EVENTS.SERIES.DETAILS.EVENTS.TITLE' | translate }} <i></i></th>
+                                <th>{{ 'EVENTS.SERIES.DETAILS.EVENTS.PRESENTER' | translate }} <i></i></th>
+                                <th>{{ 'EVENTS.SERIES.DETAILS.EVENTS.CREATED' | translate }} <i></i></th>
+                                <th>{{ 'EVENTS.SERIES.DETAILS.EVENTS.MODIFIED' | translate }} <i></i></th>
+                                <th>{{ 'EVENTS.SERIES.DETAILS.EVENTS.STATUS' | translate }} <i></i></th>
+                                <th>{{ 'EVENTS.SERIES.DETAILS.EVENTS.LOCATION' | translate }} <i></i></th>
+                                <th>{{ 'EVENTS.SERIES.DETAILS.EVENTS.LINK' | translate }} <i></i></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in events.entries">
+                                <td>{{ item.title }}</td>
+                                <td>{{ item.presenters }}</td>
+                                <td>{{ item.created }}</td>
+                                <td>{{ item.modified }}</td>
+                                <td>{{ item.status }}</td>
+                                <td>{{ item.location }}</td>
+                                <td><a href="{{ item.link }}">{{ item.link }}</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="modal-content" data-modal-tab-content="permissions" data-level="1">
+        <p class="tab-desc"></p>
+        <div class="modal-body">
+            <div class="full-col">
+                <ul>
+                    <li>
+                        <div class="obj list-obj">
+                            <header translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS">Access Policy</header>
+                            <div class="obj-container">
+                                <div class="obj tbl-list">
+                                    <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
+                                    <thead>
+                                        <tr>
+                                            <th translate="EVENTS.SERIES.DETAILS.ACCESS.TEMPLATES.TITLE">Templates</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="obj-container padded">
+                                                    <p translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
+                                                    <select chosen
+                                                        data-width="'200px'"
+                                                        data-disable-search-threshold="8"
+                                                        data-search_contains="true"
+                                                        ng-change="changeBaseAcl()"
+                                                        ng-model="baseAclId"
+                                                        ng-options="id as name for (id, name) in acls"
+                                                        data-placeholder="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                                        no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
+                                                    />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- Work in progress: Here, we will fill in the currently set privileges. The backend will
+                            change the format of the response. -->
+                            <div class="obj-container">
+                                <div class="obj tbl-list">
+                                    <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">Details</header>
+                                    <div class="obj-container">
+                                    <table class="main-tbl">
+                                        <thead>
+                                            <tr>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ROLE">Role</th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">Read</th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">Write</th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ACTION" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" class="fit">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="policy in policies">
+                                                <td>
+                                                    <select chosen
+                                                        ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"
+                                                        data-width="'200px'"
+                                                        data-disable-search-threshold="8"
+                                                        data-search_contains="true"
+                                                        ng-model="policy.role"
+                                                        ng-change="accessSave(policy)"
+                                                        ng-options="id as name for (id, name) in roles"
+                                                        data-placeholder="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}"
+                                                        no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
+                                                    />
+                                                </td>
+                                                <td class="fit"><input type="checkbox" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
+                                                <td class="fit"><input type="checkbox" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
+                                                <td class="fit" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"><a ng-click="deletePolicy(policy)" class="remove"></a>
+                                                </td>
+                                            </tr>
+                                            <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" >
+                                                <td colspan="4"><a ng-click="addPolicy()">+ {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                                            <tr>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="theme" data-level="1">
+        <div class="modal-body">
+            <div data-admin-ng-notifications="" type="warning" context="series-theme"></div>
+            <p class="tab-desc"></p>
+            <div class="full-col">
+                <div class="obj quick-actions">
+                    <header>Theme</header>
+                    <div class="obj-container padded">
+                        <p ng-if="!$root.userIs('ROLE_UI_SERIES_DETAILS_THEMES_EDIT')">
+                            <span ng-if="theme.current">{{themes[theme.current]}}</span>
+                            <span ng-if="!theme.current" translate="EVENTS.SERIES.NEW.THEME.LABEL"></span>
+                        </p>
+                        <select chosen
+                                allow-single-deselect="true"
+                                ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_THEMES_EDIT')"
+                                data-width="'200px'"
+                                data-disable-search-threshold="8"
+                                ng-change="themeSave()"
+                                ng-model="theme.current"
+                                ng-options="id as name for (id, name) in themes"
+                                data-placeholder="{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}"
+                                no-results-text="'{{ 'EVENTS.SERIES.NEW.THEME.EMPTY' | translate }}'"
+                                >
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="workflow-options" data-level="2">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj workflow-options">
+                    <header>Workflow Options</header>
+                    <div class="obj-container padded">
+                        <p>This is filler text, please ignore me and don't bother reading. This section will be used to describe the workflow options section. This is filler text, please ignore me and don't bother reading. This section will be used to describe the workflow options section.</p>
+                        <div class="checkbox-container">
+                            <label><input type="checkbox">Media Package</label><br>
+                            <label><input type="checkbox">Delete Distribution Files</label><br>
+                            <label><input type="checkbox">Delete Master Files</label><br>
+                        </div>
+                        <div class="btn-container">
+                            <a href="javascript:;" class="cancel-btn">Cancel</a>
+                            <a href="javascript:;" class="add-btn">Add</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="btm-spacer"></div>
+</section>

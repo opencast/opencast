@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.index.service.resources.list.impl.ListProvidersScanner" immediate="true" activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.index.service.resources.list.impl.ListProvidersScanner" />
+  <property name="service.description" value="List Providers Scanner" />
+  <service>
+    <provide interface="org.apache.felix.fileinstall.ArtifactInstaller" />
+    <provide interface="org.opencastproject.index.service.resources.list.impl.ListProvidersScanner" />
+  </service>
+
+  <reference name="listProvidersService"
+		interface="org.opencastproject.index.service.resources.list.api.ListProvidersService"
+		cardinality="1..1" 
+		policy="static" 
+		bind="setListProvidersService" />
+</scr:component>

@@ -17,17 +17,6 @@
   <configuration_panel>
   <![CDATA[
     <fieldset>
-      <legend>Archive</legend>
-      <ul class="oc-ui-checkbox-list-upload">
-    <li class="ui-helper-clearfix">
-      <span id="archiveconfig">
-        <input id="archiveOp" name="archiveOp" type="checkbox" checked="checked" class="configField holdCheckbox" value="true"/>
-        <span id="i18n_activate_archive">&nbsp;Archive the media package</span>
-      </span>
-    </li>
-      </ul>
-    </fieldset>
-    <fieldset>
       <legend>Distribution</legend>
       <ul class="oc-ui-form-list">
         <!-- field: License -->
@@ -50,12 +39,6 @@
          * Example:'org.opencastproject.workflow.config.myProperty' will be availible at ${my.property}
          */
 
-        components['org.opencastproject.workflow.config.archiveOp'] = new ocAdmin.Component(
-          ['archiveOp'],
-          {key: 'org.opencastproject.workflow.config.archiveOp'},
-          {getValue: function(){ return this.fields.archiveOp.is(":checked");}
-          });
-
         ocScheduler.dublinCore.components['license'] = new ocAdmin.Component(
           ['license'],
           {label: 'licenseLabel', key: 'license'}
@@ -64,7 +47,6 @@
           //etc...
       }
       ocWorkflowPanel.setComponentValues = function(values, components){
-        components['org.opencastproject.workflow.config.archiveOp'].setValue(values['org.opencastproject.workflow.config.archiveOp']);
         components['license'].setValue(values['license']);
       }
     </script>
@@ -193,7 +175,6 @@
     <!-- Archive the current state of the mediapackage -->
 
     <operation
-      if="${archiveOp}"
       id="archive"
       fail-on-error="true"
       exception-handler-workflow="error"
