@@ -15,12 +15,20 @@
  */
 package org.opencastproject.series.impl.persistence;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -60,6 +68,26 @@ public class SeriesEntity {
   @Lob
   @Column(name = "access_control", length = 65535)
   protected String accessControl;
+
+  /** Opt-out status */
+  @Column(name = "opt_out")
+  protected boolean optOut = false;
+
+  @ElementCollection
+  @MapKeyColumn(name = "name")
+  @Column(name = "value")
+  @CollectionTable(name = "mh_series_property", joinColumns = {
+          @JoinColumn(name = "series", referencedColumnName = "id"),
+          @JoinColumn(name = "organization", referencedColumnName = "organization") })
+  protected Map<String, String> properties;
+
+  @ElementCollection
+  @MapKeyColumn(name = "type")
+  @Column(name = "data")
+  @CollectionTable(name = "mh_series_elements", joinColumns = {
+          @JoinColumn(name = "series", referencedColumnName = "id"),
+          @JoinColumn(name = "organization", referencedColumnName = "organization") })
+  protected Map<String, byte[]> elements;
 
   /**
    * Default constructor without any import.
@@ -140,5 +168,40 @@ public class SeriesEntity {
    */
   public void setOrganization(String organization) {
     this.organization = organization;
+  }
+
+  /**
+   * @return the opt out status
+   */
+  public boolean isOptOut() {
+    return optOut;
+  }
+
+  /**
+   * @param optOut
+   *          the opt out status to set
+   */
+  public void setOptOut(boolean optOut) {
+    this.optOut = optOut;
+  }
+
+  public Map<String, String> getProperties() {
+    return new TreeMap<String, String>(properties);
+  }
+
+  public void setProperties(Map<String, String> properties) {
+    this.properties = properties;
+  }
+
+  public Map<String, byte[]> getElements() {
+    return Collections.unmodifiableMap(elements);
+  }
+
+  public void addElement(String type, byte[] data) {
+    elements.put(type, data);
+  }
+
+  public void removeElement(String type) {
+    elements.remove(type);
   }
 }

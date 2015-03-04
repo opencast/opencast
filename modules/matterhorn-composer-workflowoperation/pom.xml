@@ -101,6 +101,7 @@
               OSGI-INF/operations/concat.xml,
               OSGI-INF/operations/coverart.xml,
               OSGI-INF/operations/embed.xml,
+              OSGI-INF/operations/encode.xml,
               OSGI-INF/operations/image-to-video.xml,
               OSGI-INF/operations/image.xml,
               OSGI-INF/operations/prepare-av.xml,

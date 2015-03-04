@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.message.broker.impl.MessageReceiverImpl"
+  immediate="true" activate="activate" deactivate="deactivate">
+  <implementation
+    class="org.opencastproject.message.broker.impl.MessageReceiverImpl" />
+  <property name="service.description" value="Message Broker Receiver" />
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService" />
+    <provide interface="org.opencastproject.message.broker.api.MessageReceiver" />
+  </service>
+  <reference name="config-admin" interface="org.osgi.service.cm.ConfigurationAdmin"
+    cardinality="1..1" policy="static" bind="setConfigurationAdmin" />
+</scr:component>

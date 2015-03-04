@@ -15,48 +15,111 @@
  */
 package org.opencastproject.event.handler;
 
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
+import org.opencastproject.message.broker.api.BaseMessage;
+import org.opencastproject.message.broker.api.MessageReceiver;
+import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.series.SeriesItem;
+import org.opencastproject.security.api.SecurityService;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static org.opencastproject.event.EventAdminConstants.ID;
+import java.util.concurrent.FutureTask;
 
 /**
- * Very simple approach to serialize the work of all three dependend update handlers.
- * Todo: Merge all handlers into one to avoid unnecessary distribution updates etc.
+ * Very simple approach to serialize the work of all three dependend update handlers. Todo: Merge all handlers into one
+ * to avoid unnecessary distribution updates etc.
  */
-public class ConductingSeriesUpdatedEventHandler implements EventHandler {
+public class ConductingSeriesUpdatedEventHandler {
+
   private static final Logger logger = LoggerFactory.getLogger(SeriesUpdatedEventHandler.class);
-  private EpisodesPermissionsUpdatedEventHandler episodesPermissionsUpdatedEventHandler;
+  private static final String QUEUE_ID = "SERIES.Conductor";
+
+  private SecurityService securityService;
+  private MessageReceiver messageReceiver;
+
+  private ArchivePermissionsUpdatedEventHandler archivePermissionsUpdatedEventHandler;
   private SeriesUpdatedEventHandler seriesUpdatedEventHandler;
   private WorkflowPermissionsUpdatedEventHandler workflowPermissionsUpdatedEventHandler;
+
   // Use a single thread executor to ensure that only one update is handled at a time.
   // This is because Matterhorn lacks a distributed synchronization model on media packages and/or series.
   // Note that this measure only _reduces_ the chance of data corruption cause by concurrent modifications.
-  private final ExecutorService executor = Executors.newSingleThreadExecutor();
+  private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
 
-  @Override public void handleEvent(final Event event) {
-    // Handle events in a separate thread to return immediately because
-    // long running event handlers get black listed by the event admin.
-    // See http://felix.apache.org/site/apache-felix-event-admin.html for details.
-    executor.execute(new Runnable() {
-      @Override public void run() {
-        final String seriesId = (String) event.getProperty(ID);
-        logger.debug("Handling event for series " + seriesId);
-        seriesUpdatedEventHandler.handleEvent(event);
-        episodesPermissionsUpdatedEventHandler.handleEvent(event);
-        workflowPermissionsUpdatedEventHandler.handleEvent(event);
+  private MessageWatcher messageWatcher;
+
+  public void activate(ComponentContext cc) {
+    logger.info("Activating {}", ConductingSeriesUpdatedEventHandler.class.getName());
+    messageWatcher = new MessageWatcher();
+    singleThreadExecutor.execute(messageWatcher);
+  }
+
+  public void deactivate(ComponentContext cc) {
+    logger.info("Deactivating {}", ConductingSeriesUpdatedEventHandler.class.getName());
+    if (messageWatcher != null)
+      messageWatcher.stopListening();
+
+    singleThreadExecutor.shutdown();
+  }
+
+  private class MessageWatcher implements Runnable {
+
+    private final Logger logger = LoggerFactory.getLogger(MessageWatcher.class);
+
+    private boolean listening = true;
+    private FutureTask<Serializable> future;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    public void stopListening() {
+      this.listening = false;
+      future.cancel(true);
+    }
+
+    @Override
+    public void run() {
+      logger.info("Starting to listen for series update Messages");
+      while (listening) {
+        future = messageReceiver.receiveSerializable(QUEUE_ID, MessageSender.DestinationType.Queue);
+        executor.execute(future);
+        try {
+          BaseMessage baseMessage = (BaseMessage) future.get();
+          securityService.setOrganization(baseMessage.getOrganization());
+          securityService.setUser(baseMessage.getUser());
+          SeriesItem seriesItem = (SeriesItem) baseMessage.getObject();
+
+          if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())
+                  || SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())
+                  || SeriesItem.Type.Delete.equals(seriesItem.getType())) {
+            seriesUpdatedEventHandler.handleEvent(seriesItem);
+            archivePermissionsUpdatedEventHandler.handleEvent(seriesItem);
+            workflowPermissionsUpdatedEventHandler.handleEvent(seriesItem);
+          }
+        } catch (InterruptedException e) {
+          logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
+        } catch (ExecutionException e) {
+          logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
+        } catch (Throwable t) {
+          logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(t));
+        } finally {
+          securityService.setOrganization(null);
+          securityService.setUser(null);
+        }
       }
-    });
+      logger.info("Stopping listening for series update Messages");
+    }
+
   }
 
   /** OSGi DI callback. */
-  public void setEpisodesPermissionsUpdatedEventHandler(EpisodesPermissionsUpdatedEventHandler h) {
-    this.episodesPermissionsUpdatedEventHandler = h;
+  public void setArchivePermissionsUpdatedEventHandler(ArchivePermissionsUpdatedEventHandler h) {
+    this.archivePermissionsUpdatedEventHandler = h;
   }
 
   /** OSGi DI callback. */
@@ -68,4 +131,15 @@ public class ConductingSeriesUpdatedEventHandler implements EventHandler {
   public void setWorkflowPermissionsUpdatedEventHandler(WorkflowPermissionsUpdatedEventHandler h) {
     this.workflowPermissionsUpdatedEventHandler = h;
   }
+
+  /** OSGi DI callback. */
+  public void setMessageReceiver(MessageReceiver messageReceiver) {
+    this.messageReceiver = messageReceiver;
+  }
+
+  /** OSGi DI callback. */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
 }

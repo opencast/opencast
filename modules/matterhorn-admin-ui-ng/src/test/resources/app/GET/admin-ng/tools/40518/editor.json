@@ -1,0 +1,37 @@
+{
+  "date": "2015-01-27",
+  "title": "Opencast Community",
+  "previews": [{
+    "uri": "\/videos\/sintel_trailer.mp4"
+  }, {
+    "uri": "\/videos\/sintel_trailer.ogv"
+  }],
+  "tracks": [{
+    "id": "id-1",
+    "flavor": "presenter\/audio",
+    "mimetype": "audio\/mp3",
+    "waveform": "img\/waveform.jpg"
+  }, {
+    "id": "id-2",
+    "flavor": "presenter\/video",
+    "mimetype": "video\/mpeg"
+  }],
+  "segments": [{
+    "start": 0,
+    "end": 17003
+  }, {
+    "start": 17003,
+    "end": 28009
+  }, {
+    "start": 28009,
+    "end": 52125
+  }],
+  "duration": 52125,
+  "workflows": [{
+    "id": "cut-workflow",
+    "name": "Cut Workflow"
+  }, {
+    "id": "other-workflow",
+    "name": "Other Workflow"
+  }]
+}

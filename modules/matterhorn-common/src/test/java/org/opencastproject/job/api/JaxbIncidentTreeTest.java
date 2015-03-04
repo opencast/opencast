@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.ReflectionUtil.run;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.fn.juc.Immutables;
+import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.job.api.Incident.Severity;
 
 import org.junit.Test;

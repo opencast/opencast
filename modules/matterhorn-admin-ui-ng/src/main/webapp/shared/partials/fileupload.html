@@ -1,0 +1,37 @@
+<div class="list-row file-upload">
+    <p class="description" translate="{{descriptionKey}}" ng-if="descriptionKey">
+        Description
+    </p>
+
+    <div class="list-sub-row">
+        <div class="header-column">
+            <label class="large">{{labelKey | translate}}</label>
+        </div>
+        <div class="content-column">
+            <div class="content-container">
+                <div class="upload-file-info" ng-show="file.id">
+                    <p><a ng-href="{{file.url}}" target="_blank">{{file.name}}</a></p>
+                    <div class="button-container">
+                        <button id="remove-bumper-file-1" class="remove-file-button" ng-click="remove()">
+                            <div class="remove-icon"></div>
+                        </button>
+                    </div>
+                </div>
+                <button ng-show="!file.id" class="upload-button" ng-file-select="" ng-model="files" ng-multiple="false"
+                        ng-multiple="false" allow-dir="false" accept="{{acceptableTypes}}" ng-file-change="upload(files)">
+                    {{buttonKey | translate}}
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="list-sub-row file-management" ng-show="file.inprogress">
+        <div class="progress-container">
+            <div class="progress compact">
+                <div class="progress-bar" role="progressbar" aria-valuenow="{{file.progress.value}}" aria-valuemin="0"
+                     aria-valuemax="100" style="width: {{file.progress.value}}%;">
+                    <span class="sr-only">{{file.progress.value}}% Complete</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,18 @@
+{
+	"optout":false,
+    "publications": [
+        {
+            "name": "engage",
+            "url": "engage.html?e=p-1"
+        }
+    ],
+    "actions": [
+        {
+            "id": "full-html5",
+            "title": "Full HTML5",
+            "description": "Test description",
+            "configuration_panel": "<h2>Test</h2>"
+        }
+    ],
+    "review-status":"UNSENT"
+}

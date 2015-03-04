@@ -17,9 +17,9 @@ package org.opencastproject.util;
 
 import static java.lang.String.format;
 
-import org.opencastproject.fn.juc.Immutables;
-import org.opencastproject.fn.juc.Iterables;
-import org.opencastproject.fn.juc.Mutables;
+import org.opencastproject.fun.juc.Immutables;
+import org.opencastproject.fun.juc.Iterables;
+import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.util.data.Prelude;
 
 import org.apache.commons.lang.StringUtils;
@@ -191,7 +191,7 @@ public final class Log {
 
   /** <code>t</code> maybe null */
   private void log(int level, Throwable t, String format, Object... args) {
-    final String msg = current.get() + format(format, args);
+    final String msg = current.get() + format(convertCurlyBraces(format), args);
     if (isLocationAware) {
       ((LocationAwareLogger) logger).log(null, FQCN, level, msg, null, t);
     } else {
@@ -209,5 +209,9 @@ public final class Log {
           Prelude.unexhaustiveMatch();
       }
     }
+  }
+
+  private static String convertCurlyBraces(String format) {
+    return format.replaceAll("\\{\\}", "%s");
   }
 }

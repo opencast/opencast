@@ -1,0 +1,59 @@
+{
+   "total":3,
+   "offset":0,
+   "count":3,
+   "limit":0,
+   "results":[
+      {
+         "events":{
+           "READY":0,
+           "OPTED_OUT":2,
+           "BLACKLISTED":1
+         },
+         "optedOut":false,
+         "organizers":[
+            "organizer 3"
+         ],
+         "id":"3",
+         "contributors":[
+            "contributor 3"
+         ],
+         "creation_date":"2014-04-29T14:35:50Z",
+         "title":"title 3"
+      },
+      {
+         "events":{
+           "READY":0,
+           "OPTED_OUT":0,
+           "BLACKLISTED":0
+         },
+         "optedOut":false,
+         "organizers":[
+            "organizer 2"
+         ],
+         "id":"2",
+         "contributors":[
+            "contributor 2"
+         ],
+         "creation_date":"2014-04-28T14:35:50Z",
+         "title":"title 2"
+      },
+      {
+         "events":{
+           "READY":1,
+           "OPTED_OUT":1,
+           "BLACKLISTED":1
+         },
+         "optedOut":false,
+         "organizers":[
+            "organizer 1"
+         ],
+         "id":"1",
+         "contributors":[
+            "contributor 1"
+         ],
+         "creation_date":"2014-04-27T14:35:50Z",
+         "title":"title 1"
+      }
+   ]
+}

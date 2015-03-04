@@ -1,0 +1,18 @@
+{
+  "results": [{
+      "id": "4581",
+      "title": "•mock• serie 1",
+      "organizers": ["Teaching Assistant"],
+      "contributors": ["Heinz Heinzmann", "Lars Larsson"],
+      "creation_date": "2012-12-01T08:59:00Z"
+  }, {
+      "id": "4582",
+      "title": "•mock• series 2",
+      "organizers": ["Luke"],
+      "contributors": ["Xavier", "Wan"],
+      "creation_date": "2012-12-01T08:59:00Z"
+  }],
+  "offset": 0,
+  "count": 7,
+  "total": 2
+}

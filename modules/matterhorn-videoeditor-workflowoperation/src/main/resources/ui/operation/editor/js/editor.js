@@ -62,7 +62,7 @@ var continueProcessing = false;
 var jQMsg = undefined;
 var messageShown = false;
 var timeout_canplay = undefined;
-var timeout_canplay_delay = 5000; // ms
+var timeout_canplay_delay = 10000; // ms
 
 // key codes
 var KEY_ENTER = 13;
@@ -2439,7 +2439,7 @@ function cancelCanplayTimeout() {
 function setCanplayTimeout() {
     timeout_canplay = window.setTimeout(function() {
         $("#loadingDisplayText").html("The media source could not be loaded.\n Please refresh the page or try another browser.");
-        displayMsg("The media source could not be loaded.\n Please refresh the page or try another browser.", "Media source not loaded", false);
+        displayMsg("The media source could not be loaded.<br> Please refresh the page or try another browser.", "Media source not loaded", false);
     }, timeout_canplay_delay);
 }
 
@@ -2485,7 +2485,7 @@ $(document).ready(function() {
 
     editor.player = $('#videoPlayer');
     setCanplayTimeout();
-    editor.player.on("canplay", playerReady);
+    editor.player.on("loadeddata", playerReady);
 
     $('.video-split-button').click(splitButtonClick);
     $('#okButton').click(okButtonClick);

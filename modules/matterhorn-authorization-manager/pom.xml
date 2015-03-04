@@ -36,7 +36,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-episode-service-api</artifactId>
+      <artifactId>matterhorn-archive-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -52,6 +52,11 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-authorization-xacml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-message-broker-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -164,11 +169,10 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${build.number}</Build-Number>
-            <Mh-Db-Version>${mh.db.version}</Mh-Db-Version>
             <Import-Package>
               org.slf4j,
               javax.xml.namespace;version=0,
+              org.opencastproject.message.broker.api.index;version=${project.version},
               org.opencastproject.security.api;version=${project.version},
               org.opencastproject.workspace.api;version=${project.version},
               org.opencastproject.authorization.xacml;version=${project.version},
@@ -184,6 +188,7 @@
               OSGI-INF/acl-jpa-db.xml,
               OSGI-INF/acl-jpa-transition-db.xml,
               OSGI-INF/acl-service-factory.xml,
+              OSGI-INF/acl-scanner.xml,
               OSGI-INF/acl-service-rest.xml,
               OSGI-INF/acl-scheduler.xml
             </Service-Component>

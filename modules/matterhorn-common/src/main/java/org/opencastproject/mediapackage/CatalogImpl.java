@@ -43,7 +43,7 @@ public class CatalogImpl extends AbstractMediaPackageElement implements Catalog 
   /** Needed by JAXB */
   protected CatalogImpl() {
     // default to text/xml mimetype
-    super(Type.Catalog, null, null, -1, null, MimeTypes.parseMimeType("text/xml"));
+    super(Type.Catalog, null, null, null, null, MimeTypes.parseMimeType("text/xml"));
   }
 
   /**

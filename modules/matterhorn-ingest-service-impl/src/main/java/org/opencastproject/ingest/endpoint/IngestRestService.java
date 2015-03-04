@@ -17,7 +17,6 @@ package org.opencastproject.ingest.endpoint;
 
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.job.api.JobProducer;
-import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -31,8 +30,8 @@ import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
@@ -43,6 +42,8 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -61,10 +62,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -141,10 +146,15 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   private HashMap<String, UploadJob> jobs;
   // The number of ingests this service can handle concurrently.
   private int ingestLimit = -1;
+  /* Stores a map workflow ID and date to update the ingest start times post-hoc */
+  private Cache<String, Date> startCache = null;
+  /* Formatter to for the date into a string */
+  private DateFormat formatter = new SimpleDateFormat(IngestService.UTC_DATE_FORMAT);
 
   public IngestRestService() {
     factory = MediaPackageBuilderFactory.newInstance();
     jobs = new HashMap<String, UploadJob>();
+    startCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).build();
   }
 
   /**
@@ -226,6 +236,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     MediaPackage mp;
     try {
       mp = ingestService.createMediaPackage();
+      startCache.put(mp.getIdentifier().toString(), new Date());
       return Response.ok(mp).build();
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
@@ -735,7 +746,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    *          InputStream containing the episode DublinCore catalog
    */
   private void updateMediaPackageID(MediaPackage mp, InputStream is) throws IOException {
-    DublinCoreCatalog dc = new DublinCoreCatalogImpl(is);
+    DublinCoreCatalog dc = DublinCores.read(is);
     EName en = new EName(DublinCore.TERMS_NS_URI, "identifier");
     String id = dc.getFirst(en);
     if (id != null) {
@@ -821,6 +832,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       logger.debug("An ingest has started so remaining ingest limit is " + getIngestLimit());
     }
     InputStream in = null;
+    Date started = new Date();
 
     logger.info("Received new request from {} to ingest a zipped mediapackage", request.getRemoteHost());
 
@@ -858,6 +870,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         logger.debug("Processing file item");
         in = request.getInputStream();
       }
+
+      DateFormat formatter = new SimpleDateFormat(IngestService.UTC_DATE_FORMAT);
+      workflowConfig.put(IngestService.START_DATE_KEY, formatter.format(started));
 
       /* Try to convert the workflowId to integer */
       if (!StringUtils.isBlank(workflowIdAsString)) {
@@ -969,6 +984,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
       WorkflowInstance workflow = null;
 
+      wfConfig.put(IngestService.START_DATE_KEY,
+              formatter.format(startCache.asMap().get(mp.getIdentifier().toString())));
+
       // a workflow instance has been specified
       if (StringUtils.isNotBlank(workflowInstance)) {
         Long workflowInstanceId = null;
@@ -996,6 +1014,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       else {
         workflow = ingestService.ingest(mp, null, wfConfig, null);
       }
+      startCache.asMap().remove(mp.getIdentifier().toString());
       return Response.ok(WorkflowParser.toXml(workflow)).build();
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);

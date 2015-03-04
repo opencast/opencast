@@ -1,0 +1,37 @@
+{
+  "location": {
+    "label": "FILTERS.EVENTS.LOCATION.LABEL",
+    "type": "select",
+    "options": {
+      "location_1": "FILTERS.EVENTS.LOCATION.LOCATION1",
+      "location_2": "FILTERS.EVENTS.LOCATION.LOCATION2",
+      "location_3": "FILTERS.EVENTS.LOCATION.LOCATION3"
+    }
+  },
+  "source": {
+    "label": "FILTERS.EVENTS.SOURCE.LABEL",
+    "type": "select",
+    "options": {
+      "twitter":  "FILTERS.EVENTS.SOURCE.TWITTER",
+      "github":   "FILTERS.EVENTS.SOURCE.GITHUB",
+      "facebook": "FILTERS.EVENTS.SOURCE.FACEBOOK"
+    }
+  },
+  "status": {
+    "label": "FILTERS.EVENTS.STATUS.LABEL",
+    "type": "select",
+    "options": {
+      "scheduled":  "FILTERS.EVENTS.STATUS.SCHEDULED",
+      "recording":  "FILTERS.EVENTS.STATUS.RECORDING",
+      "ingesting":  "FILTERS.EVENTS.STATUS.INGESTING",
+      "processing": "FILTERS.EVENTS.STATUS.PROCESSING",
+      "archive":    "FILTERS.EVENTS.STATUS.ARCHIVE",
+      "upload":     "FILTERS.EVENTS.STATUS.UPLOAD",
+      "on_hold":    "FILTERS.EVENTS.STATUS.ONHOLD"
+    }
+  },
+  "period": {
+    "label": "FILTERS.EVENTS.PERIOD.LABEL",
+    "type": "period"
+  }
+}

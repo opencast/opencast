@@ -1,0 +1,135 @@
+<div class="modal-content" ng-class="{ active: isCurrentTab('items') }" data-modal-tab-content="items" data-level="1">
+    <div class="full-col">
+        <div class="form-container">
+            <div class="row">
+                <label translate="RECORDINGS.BLACKLISTS.DETAILS.LOCATIONS.ADD_LOCATION">Add Location</label>
+                <select chosen
+                    ng-disabled="wizard.step.ud.items.length"
+                    data-width="'200px'"
+                    data-disable-search-threshold="8"
+                    ng-model="wizard.step.ud.itemToAdd"
+                    ng-change="wizard.step.addItem()"
+                    ng-options="item as item.name for item in wizard.step.items | filter:{ roomId: '!-1' }"
+                />
+            </div>
+        </div>
+
+        <div ng-if="wizard.step.ud.items.length > 0" class="obj">
+            <header translate="RECORDINGS.BLACKLISTS.DETAILS.TABS.LOCATIONS">Locations</header>
+            <div class="obj-container">
+                <table class="main-tbl">
+                    <!--
+                    <thead>
+                        <tr>
+                            <th class="small">
+                                <input type="checkbox" ng-change="wizard.step.selectAll()" ng-model="wizard.step.all">
+                            </th>
+                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.LOCATIONS.ALL_LOCATIONS">All Locations</th>
+                        </tr>
+                    </thead>
+                    -->
+                    <tbody>
+                        <tr ng-repeat="item in wizard.step.ud.items">
+                            <!--
+                            <td><input type="checkbox" ng-model="item.selected"></td>
+                            -->
+                            <td>{{ item.name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!--
+                <div class="remove-btn-container">
+                    <a class="red-btn" ng-click="wizard.step.removeItem()"
+                        translate="RECORDINGS.BLACKLISTS.DETAILS.LOCATIONS.REMOVE">Remove</a>
+                </div>
+                -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="dates" data-level="1">
+    <div class="full-col">
+        <div class="form-container">
+            <div class="row">
+                <label translate="RECORDINGS.BLACKLISTS.DETAILS.DATES.START_DATE">Start Date</label>
+                <input type="date" ng-model="wizard.step.ud.fromDate"
+                    ng-change="wizard.step.updateBlacklistCount()"
+                    placeholder="{{ 'RECORDINGS.BLACKLISTS.DETAILS.DATES.START_DATE' | translate }}...">
+                <input type="time" ng-model="wizard.step.ud.fromTime"
+                    ng-change="wizard.step.updateBlacklistCount()"
+                    placeholder="{{ 'RECORDINGS.BLACKLISTS.DETAILS.DATES.START_DATE' | translate }}...">
+            </div>
+            <div class="row">
+                <label translate="RECORDINGS.BLACKLISTS.DETAILS.DATES.END_DATE">End Date</label>
+                <input type="date" ng-model="wizard.step.ud.toDate"
+                    ng-change="wizard.step.updateBlacklistCount()"
+                    placeholder="{{ 'RECORDINGS.BLACKLISTS.DETAILS.DATES.END_DATE' | translate }}...">
+                <input type="time" ng-model="wizard.step.ud.toTime"
+                    ng-change="wizard.step.updateBlacklistCount()"
+                    placeholder="{{ 'RECORDINGS.BLACKLISTS.DETAILS.DATES.END_DATE' | translate }}...">
+            </div>
+            <div class="row">
+                <label class="warning">The selected date range will blacklist {{ wizard.step.blacklistCount.eventsCount || '0' }} events</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="reason" data-level="1">
+    <div class="full-col">
+        <div class="form-container">
+            <div class="row">
+                <label translate="RECORDINGS.BLACKLISTS.DETAILS.REASON.REASON">Reason</label>
+                <select chosen
+                    data-width="'200px'"
+                    data-disable-search-threshold="8"
+                    ng-model="wizard.step.ud.reason"
+                    ng-options="reason as reason | translate for (reason, label) in wizard.step.reasons"
+                />
+            </div>
+            <div class="row">
+                <label translate="RECORDINGS.BLACKLISTS.DETAILS.REASON.COMMENTS">Comments</label>
+                <textarea ng-model="wizard.step.ud.comment"
+                    placeholder="{{ 'RECORDINGS.BLACKLISTS.DETAILS.REASON.COMMENTS' | translate }}..." rows="5"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="summary" data-level="1">
+    <div class="full-col">
+        <div data-admin-ng-notifications="" context="blacklist-form"></div>
+        <div class="obj">
+            <header translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.SUMMARY">Summary</header>
+            <div class="obj-container">
+                <table class="main-tbl">
+                    <thead>
+                        <tr>
+                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.LOCATION">Location</th>
+                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.DATE_FROM">From</th>
+                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.DATE_TO">Until</th>
+                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.REASON">Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in wizard.states[0].stateController.ud.items">
+                            <td>{{ item.name }}</td>
+                            <td>{{ wizard.states[1].stateController.ud.fromDate }}</td>
+                            <td>{{ wizard.states[1].stateController.ud.toDate }}</td>
+                            <td>{{ wizard.states[2].stateController.ud.reason | translate }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="obj summary-view">
+            <header translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.COMMENTS">Comments</header>
+            <div class="obj-container padded">
+                <p>{{ wizard.states[2].stateController.ud.comment }}</p>
+            </div>
+        </div>
+    </div>
+</div>

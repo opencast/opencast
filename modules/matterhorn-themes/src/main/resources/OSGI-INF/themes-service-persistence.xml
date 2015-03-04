@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl"
+  immediate="true" activate="activate" deactivate="deactivate">
+  <implementation
+    class="org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl" />
+  <property name="service.description" value="Themes Database Service" />
+  <service>
+    <provide interface="org.opencastproject.themes.ThemesServiceDatabase" />
+  </service>
+  <reference name="messageReceiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
+    cardinality="1..1" policy="static" bind="setMessageReceiver" />
+  <reference name="messageSender" interface="org.opencastproject.message.broker.api.MessageSender"
+    cardinality="1..1" policy="static" bind="setMessageSender" />
+  <reference name="organization-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+  <reference name="persistence" interface="javax.persistence.spi.PersistenceProvider"
+    cardinality="1..1" policy="static" bind="setPersistenceProvider" />    
+  <reference name="props" interface="java.util.Map"
+    cardinality="1..1" policy="static" target="(type=persistence)" bind="setPersistenceProperties" />
+  <reference name="userDirectoryService" interface="org.opencastproject.security.api.UserDirectoryService"
+    cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+</scr:component>

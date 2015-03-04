@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 /** Utility functions for DublinCores. */
@@ -84,7 +83,7 @@ public final class DublinCoreUtil {
     InputStream in = null;
     try {
       in = new FileInputStream(workspace.get(mpe.getURI()));
-      return new DublinCoreCatalogImpl(in);
+      return DublinCores.read(in);
     } catch (Exception e) {
       logger.error("Unable to load metadata from catalog '{}': {}", mpe, e);
       return chuck(e);
@@ -93,13 +92,15 @@ public final class DublinCoreUtil {
     }
   }
 
-  /** Parse an XML string into a DublinCore catalog. Returns none in case of an error. */
+  /**
+   * Parse an XML string into a DublinCore catalog. Returns none if the xml cannot be parsed into a catalog.
+   */
   public static Option<DublinCoreCatalog> fromXml(String xml) {
     InputStream in = null;
     try {
       in = IOUtils.toInputStream(xml, "UTF-8");
-      return Option.<DublinCoreCatalog> some(new DublinCoreCatalogImpl(in));
-    } catch (IOException e) {
+      return Option.<DublinCoreCatalog>some(DublinCores.read(in));
+    } catch (Exception e) {
       return none();
     } finally {
       IOUtils.closeQuietly(in);

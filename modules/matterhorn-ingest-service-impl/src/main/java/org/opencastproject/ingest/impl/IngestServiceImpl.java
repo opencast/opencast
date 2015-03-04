@@ -15,6 +15,8 @@
  */
 package org.opencastproject.ingest.impl;
 
+import static java.util.Map.Entry;
+
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
@@ -31,6 +33,7 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.identifier.HandleException;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -42,6 +45,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -50,6 +54,7 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.ProgressInputStream;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -58,6 +63,7 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
+import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
@@ -66,6 +72,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.jdom.Document;
@@ -86,6 +93,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -109,19 +119,31 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The configuration key that defines the default workflow definition */
   protected static final String WORKFLOW_DEFINITION_DEFAULT = "org.opencastproject.workflow.default.definition";
 
+  /** The workflow configuration property prefix **/
+  protected static final String WORKFLOW_CONFIGURATION_PREFIX = "org.opencastproject.workflow.config.";
+
   public static final String JOB_TYPE = "org.opencastproject.ingest";
 
-  /** Methods that ingest streams create jobs with this operation type */
-  public static final String INGEST_STREAM = "zip";
+  /** Methods that ingest zips create jobs with this operation type */
+  public static final String INGEST_ZIP = "zip";
+
+  /** Methods that ingest tracks directly create jobs with this operation type */
+  public static final String INGEST_TRACK = "track";
 
   /** Methods that ingest tracks from a URI create jobs with this operation type */
-  public static final String INGEST_TRACK_FROM_URI = "track";
+  public static final String INGEST_TRACK_FROM_URI = "uri-track";
+
+  /** Methods that ingest attachments directly create jobs with this operation type */
+  public static final String INGEST_ATTACHMENT = "attachment";
 
   /** Methods that ingest attachments from a URI create jobs with this operation type */
-  public static final String INGEST_ATTACHMENT_FROM_URI = "attachment";
+  public static final String INGEST_ATTACHMENT_FROM_URI = "uri-attachment";
+
+  /** Methods that ingest catalogs directly create jobs with this operation type */
+  public static final String INGEST_CATALOG = "catalog";
 
   /** Methods that ingest catalogs from a URI create jobs with this operation type */
-  public static final String INGEST_CATALOG_FROM_URI = "catalog";
+  public static final String INGEST_CATALOG_FROM_URI = "uri-catalog";
 
   /** Ingest can only occur for a workflow currently in one of these operations. */
   public static final String[] PRE_PROCESSING_OPERATIONS = new String[] { "schedule", "capture", "ingest" };
@@ -174,6 +196,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   public IngestServiceImpl() {
     super(JOB_TYPE);
   }
+
+  /** The formatter for reading in dates provided by the rest wrapper around this service */
+  protected DateFormat formatter = new SimpleDateFormat(UTC_DATE_FORMAT);
 
   /**
    * OSGI callback for activating this component
@@ -299,7 +324,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
       // QUEUED state but set it to INSTANTIATED in the beginning and then manually switch it to RUNNING.
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_ZIP, null, null, false);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
 
@@ -567,7 +592,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           MediaPackage mediaPackage) throws IOException, IngestException {
     Job job = null;
     try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_TRACK, null, null, false);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -693,7 +718,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           MediaPackage mediaPackage) throws IOException, IngestException {
     Job job = null;
     try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG, null, null, false);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -769,7 +794,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           MediaPackage mediaPackage) throws IOException, IngestException {
     Job job = null;
     try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_STREAM, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT, null, null, false);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -872,7 +897,30 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         try {
           workflow = workflowService.getWorkflowById(workflowInstanceId.longValue());
         } catch (NotFoundException e) {
-          logger.warn("Failed to find a workflow with id '{}'", workflowInstanceId);
+          logger.warn("Failed to find a workflow with id '{}', try to find a matching scheduled event...",
+                  workflowInstanceId);
+          if (schedulerService != null) {
+            try {
+              String mediaPackageId = schedulerService.getMediaPackageId(workflowInstanceId);
+              mp.setIdentifier(new IdImpl(mediaPackageId));
+              logger.info("Found matching scheduled event for id '{}', overriding mediapackage id to {}",
+                      workflowInstanceId, mediaPackageId);
+              AccessControlList accessControlList = schedulerService.getAccessControlList(workflowInstanceId);
+              if (accessControlList != null) {
+                authorizationService.setAcl(mp, AclScope.Episode, accessControlList);
+                logger.info("Found matching scheduled event for id '{}', overriding access control list",
+                        workflowInstanceId);
+              }
+            } catch (NotFoundException e1) {
+              logger.warn("No matching scheduled event for id '{}' found", workflowInstanceId);
+            } catch (SchedulerException e1) {
+              logger.error("Unable to get event dublin core from scheduler event {}: {}", workflowInstanceId,
+                      ExceptionUtils.getStackTrace(e1));
+              throw new IngestException(e1);
+            }
+          } else {
+            logger.warn("No scheduler service available");
+          }
         }
       }
 
@@ -881,6 +929,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
       // Get the final set of workflow properties
       properties = mergeWorkflowConfiguration(properties, workflowInstanceId);
+
+      // Remove potential workflow configuration prefixes from the workflow properties
+      properties = removePrefixFromProperties(properties);
 
       // If the indicated workflow does not exist, start a new workflow with the given workflow definition
       if (workflow == null) {
@@ -1012,6 +1063,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
         // Ingest succeeded
         currentOperation.setState(OperationState.SUCCEEDED);
+        try {
+          ((WorkflowOperationInstanceImpl) currentOperation).setDateStarted(formatter.parse(properties.get(START_DATE_KEY)));
+        } catch (ParseException e) {
+          logger.warn("Parsing exception when attempting to set ingest start time.");
+        }
 
         // Update
         workflowService.update(workflow);
@@ -1034,7 +1090,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     AccessControlList activeAcl = authorizationService.getActiveAcl(mp).getA();
     if (activeAcl.getEntries().size() == 0) {
       String anonymousRole = securityService.getOrganization().getAnonymousRole();
-      activeAcl = new AccessControlList(new AccessControlEntry(anonymousRole, "read", true));
+      activeAcl = new AccessControlList(new AccessControlEntry(anonymousRole, Permissions.Action.READ.toString(), true));
       authorizationService.setAcl(mp, AclScope.Series, activeAcl);
     }
   }
@@ -1062,6 +1118,28 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     return mergedProperties;
+  }
+
+  /**
+   * Removes the workflow configuration file prefix from all properties in a map.
+   *
+   * @param properties
+   *          The properties to remove the prefixes from
+   * @return A Map with the same collection of properties without the prefix
+   */
+  private Map<String, String> removePrefixFromProperties(Map<String, String> properties) {
+    Map<String, String> fixedProperties = new HashMap<String, String>();
+    if (properties != null) {
+      for (Entry<String, String> entry : properties.entrySet()) {
+        if (entry.getKey().startsWith(WORKFLOW_CONFIGURATION_PREFIX)) {
+          logger.debug("Removing prefix from key '" + entry.getKey() + " with value '" + entry.getValue() + "'");
+          fixedProperties.put(entry.getKey().replace(WORKFLOW_CONFIGURATION_PREFIX, ""), entry.getValue());
+        } else {
+          fixedProperties.put(entry.getKey(), entry.getValue());
+        }
+      }
+    }
+    return fixedProperties;
   }
 
   private WorkflowDefinition getWorkflowDefinition(String workflowDefinitionID, Long workflowId,

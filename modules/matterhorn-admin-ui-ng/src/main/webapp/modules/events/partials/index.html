@@ -1,0 +1,34 @@
+<section class="action-nav-bar">
+    <ng-include src="'modules/' + table.category + '/partials/' + table.resource + 'Buttons.html'"></ng-include>
+
+    <admin-ng-nav></admin-ng-nav>
+    <nav>
+        <a href="#/events/events" ng-class="{active: table.resource == 'events'}" translate-cloak="EVENTS.EVENTS.NAVIGATION.EVENTS" with-role="ROLE_UI_EVENTS_VIEW">Events</a>
+        <a href="#/events/series" ng-class="{active: table.resource == 'series'}" translate-cloak="EVENTS.EVENTS.NAVIGATION.SERIES" with-role="ROLE_UI_SERIES_VIEW">Series</a>
+    </nav>
+</section>
+
+<div class="main-view">
+    <div data-admin-ng-notifications=""></div>
+
+    <div class="controls-container">
+        <div class="filters-container">
+            <div old-admin-ng-dropdown="" class="drop-down-container">
+                <span translate-cloak="BULK_ACTIONS.CAPTION">Actions</span>
+                <ul class="dropdown-ul">
+                    <!-- <li with-role="ROLE_UI_{{ table.resource | uppercase }}_MESSAGES_CREATE"><a href="#" data-open-modal="send-message-modal">{{ 'BULK_ACTIONS.SEND_MESSAGE' | translate}}</a></li> -->
+                    <!-- <li with-role="ROLE_UI_{{ table.resource | uppercase }}_STATUS_EDIT"><a href="#" data-open-modal="edit-{{table.resource}}-status-modal">{{ 'BULK_ACTIONS.EDIT_STATUS.CAPTION' | translate}}</a></li> -->
+                    <li with-role="ROLE_UI_{{ table.resource | uppercase }}_DELETE"><a href="#" data-open-modal="delete-{{table.resource}}-modal">{{ 'BULK_ACTIONS.DELETE.' + table.resource.toUpperCase() + '.CAPTION' | translate}}</a></li>
+                    <!-- TODO: Find out which role may do this -->
+                    <li ng-if="table.resource == 'events'" with-role="ROLE_UI_{{ table.resource | uppercase }}_DELETE"><a href="#" data-open-modal="schedule-task-modal">{{ 'BULK_ACTIONS.SCHEDULE_TASK.CAPTION' | translate}}</a></li>
+                </ul>
+            </div>
+            <div data-admin-ng-table-filter="" data-filters="filters" data-namespace="table.resource"></div>
+        </div>
+
+        <h1 translate="{{table.caption}}"><!--Mail Templates--></h1>
+        <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.pagination.totalItems }}' }"></h4>
+
+    </div>
+    <div class="table-container top-addon" admin-ng-table="" table="table"></div>
+</div>

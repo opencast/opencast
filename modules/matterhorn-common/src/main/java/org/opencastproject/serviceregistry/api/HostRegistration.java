@@ -32,6 +32,39 @@ public interface HostRegistration {
   void setBaseUrl(String baseUrl);
 
   /**
+   * @return the IP address for this host
+   */
+  String getIpAddress();
+
+  /**
+   * @param address
+   *          the IP address to set
+   */
+  void setIpAddress(String address);
+
+  /**
+   * @return the allocated memory of this host
+   */
+  long getMemory();
+
+  /**
+   * @param memory
+   *          the memory to set
+   */
+  void setMemory(long memory);
+
+  /**
+   * @return the available cores of this host
+   */
+  int getCores();
+
+  /**
+   * @param cores
+   *          the cores to set
+   */
+  void setCores(int cores);
+
+  /**
    * @return the maxJobs
    */
   int getMaxJobs();

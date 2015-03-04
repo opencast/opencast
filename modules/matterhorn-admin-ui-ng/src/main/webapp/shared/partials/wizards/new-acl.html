@@ -1,0 +1,151 @@
+<div class="modal-content"  ng-class="{ active: isCurrentTab('metadata') }" data-modal-tab-content="metadata" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <ul>
+                <li>
+                    <div class="obj tbl-details">
+                            <header translate="USERS.ACLS.NEW.METADATA.TITLE"><!-- Name --></header>
+                            <div class="obj-container">
+                                <table class="main-tbl">
+                                    <tr>
+                                        <td>{{ 'USERS.ACLS.NEW.METADATA.NAME.CAPTION' | translate }}<i class="required">*</i></td>
+                                        <td>
+                                            <input 
+                                            class="hidden-input"
+                                            ng-model="wizard.step.metadata.name"
+                                            placeholder="{{ 'USERS.ACLS.NEW.METADATA.NAME.PLACEHOLDER' | translate }}">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="access" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <ul>
+                <li>
+                    <div class="obj list-obj">
+                        <header class="no-expand" translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.TITLE"></header>
+                        <div class="obj-container">
+                            <div class="obj tbl-list">
+
+                                <table class="main-tbl">
+                                <thead>
+                                    <tr>
+                                        <th translate="USERS.ACLS.NEW.ACCESS.TEMPLATES.TITLE"><!--Templates--></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="obj-container padded">
+                                                <p translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
+                                                <select chosen
+                                                    data-width="'200px'"
+                                                    data-disable-search-threshold="8"
+                                                    data-search_contains="true"
+                                                    ng-change="wizard.step.changeBaseAcl()"
+                                                    ng-model="wizard.step.ud.id"
+                                                    ng-options="id as name for (id, name) in wizard.step.acls"
+                                                    data-placeholder="{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                                    no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
+                                                />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="obj-container">
+                            <div class="obj tbl-list">
+                                <header translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.DETAILS"><!--Details--></header>
+                                <div class="obj-container">
+                                <table class="main-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ROLE"><!--Role--></th>
+                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
+                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
+                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ACTION" class="fit"><!--Action--></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="policy in wizard.step.ud.policies">
+                                            <td>
+                                                <select chosen
+                                                    data-width="'200px'"
+                                                    data-disable-search-threshold="8"
+                                                    data-search_contains="true"
+                                                    ng-model="policy.role"
+                                                    ng-options="id as name for (id, name) in wizard.step.roles"
+                                                    data-placeholder="{{ 'USERS.ACLS.NEW.ACCESS.ROLES.LABEL' | translate }}"
+                                                    no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
+                                                />
+                                            </td>
+                                            <td class="fit"><input type="checkbox"  ng-model="policy.read"/></td>
+                                            <td class="fit"><input type="checkbox"  ng-model="policy.write"/></td>
+                                            <td class="fit"><a ng-click="wizard.step.deletePolicy(policy)" class="remove"></a>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
+                                            <td colspan="4"><a ng-click="wizard.step.addPolicy()">+ {{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                                        <tr>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal-content" data-modal-tab-content="summary" data-level="1">
+    <div class="modal-body">
+        <div class="full-col">
+            <div data-admin-ng-notifications="" context="acl-form"></div>
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="USERS.ACLS.NEW.METADATA.TITLE"><!--Metadata--></header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <tr>
+                            <td translate="USERS.ACLS.NEW.METADATA.NAME.CAPTION"><!-- Name --></td>
+                            <td>{{ wizard.states[0].stateController.metadata.name }}</td>
+                        <tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj tbl-list">
+                <header class="no-expand" translate="USERS.ACLS.NEW.ACCESS.CAPTION" ><!--Access Policy--></header>
+                    <table class="main-tbl">
+                        <thead>
+                            <tr>
+                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ROLE" class="fit"><!--Role--></th>
+                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
+                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="policy in wizard.getStateControllerByName('access').ud.policies">
+                            <td>{{ policy.role }}</td>
+                            <td class="fit"><input type="checkbox" disabled ng-model="policy.read"/></td>
+                            <td class="fit"><input type="checkbox" disabled ng-model="policy.write"/></td>
+                        </tr>
+                    </table>
+            </div>
+        </div>
+    </div>
+</div>
+

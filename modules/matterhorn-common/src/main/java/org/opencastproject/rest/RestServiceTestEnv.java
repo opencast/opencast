@@ -61,15 +61,13 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
  *   // use rt.host("/path/to/service") to wrap all URL creations for HTTP request methods
  *   private static final RestServiceTestEnv rt = testEnvScanAllPackages(localhostRandomPort());
  *
- *   // CHECKSTYLE:OFF
- *   \@BeforeClass public static void setUp() {
+ *   \@BeforeClass public static void oneTimeSetUp() {
  *   env.setUpServer();
  *   }
  *
- *   \@AfterClass public static void tearDown() {
+ *   \@AfterClass public static void oneTimeTearDown() {
  *   env.tearDownServer();
  *   }
- *   // CHECKSTYLE:ON
  *   }
  * </pre>
  * Add the following dependencies to your pom

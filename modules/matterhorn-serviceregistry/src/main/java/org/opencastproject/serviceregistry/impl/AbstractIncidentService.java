@@ -19,7 +19,7 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 
-import org.opencastproject.fn.juc.Mutables;
+import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentImpl;
 import org.opencastproject.job.api.IncidentTree;

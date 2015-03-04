@@ -1,0 +1,17 @@
+[{
+  "NAME":"OPT.OUT.LINK",
+  "VARIABLE":"${optOutLink}",
+  "DESCRIPTION.EN":"Inserts a link for instructors to opt out of having their lectures recorded."
+}, {
+  "NAME":"STAFF.NAME",
+  "VARIABLE":"${staff}",
+  "DESCRIPTION.EN":"Inserts the staff member's name."
+}, {
+  "NAME":"MODULE.NAME",
+  "VARIABLE":"<#list modules as module>${module.name}<\/#list>",
+  "DESCRIPTION.EN":"Inserts the list of module names the staff member is involved in into the email."
+}, {
+  "NAME":"MODULE.DESCRIPTION",
+  "VARIABLE":"<#list modules as module>${module.description}<\/#list>",
+  "DESCRIPTION.EN":"Inserts the list of module descriptions into the email."
+}]

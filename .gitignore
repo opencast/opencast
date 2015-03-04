@@ -4,12 +4,18 @@
 # ignore runtime artifacts
 lib/matterhorn/*
 lib/ext/*
+lib/build-information/*
 inbox/*
 logs/*
 work/*
 
 # ignore maven target directories
 target/
+target-grunt/
+node_modules/
+coverage/
+node/
+www/
 
 # ignore Eclipse project data
 .project
@@ -33,3 +39,6 @@ target/
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked
 Makefile
+
+# Ignore phantomjs logs
+phantomjsdriver.log

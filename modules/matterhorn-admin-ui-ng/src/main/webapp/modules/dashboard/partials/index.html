@@ -1,0 +1,339 @@
+<section class="action-nav-bar">
+    <admin-ng-nav></admin-ng-nav>
+    <nav>
+        <a href="#/dashboard/dashboard" class="active">Overview</a>
+        <a href="#/dashboard/documentation">Documentation</a>
+    </nav>
+</section>
+
+<div class="main-view stub dashboard-container">
+    <div data-admin-ng-notifications=""></div>
+
+    <div class="main-stats-container">
+        <h1>Todays Statistics</h1>
+        <div class="stat">
+            <h1>37</h1>
+            <span>Events Scheduled</span>
+            <a href="#">Details</a>
+        </div><!-- stat -->
+
+        <div class="stat">
+            <h1>3</h1>
+            <span>Events Capturing</span>
+            <a href="#">Details</a>
+        </div>
+
+        <div class="stat">
+            <h1>5</h1>
+            <span>Events Ingesting</span>
+            <a href="#">Details</a>
+        </div>
+
+        <div class="stat">
+            <h1>17</h1>
+            <span>Events Distributed</span>
+            <a href="#">Details</a>
+        </div>
+
+        <div class="stat">
+            <h1>1</h1>
+            <span>Errors</span>
+            <a href="#">Details</a>
+        </div>
+    </div>
+
+    <div class="col-container">
+        <div class="col">
+            <div class="date-picker">
+                <table class="cal large-cal">
+                    <caption>
+                        <span class="prev"><a href="#">&larr;</a></span>
+                        <span class="next"><a href="#">&rarr;</a></span>
+                        February 2013
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th>Mon</th>
+                            <th>Tue</th>
+                            <th>Wed</th>
+                            <th>Thu</th>
+                            <th>Fri</th>
+                            <th>Sat</th>
+                            <th>Sun</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="off"><a href="#">26</a></td>
+                        <td class="off"><a href="#">27</a></td>
+                        <td class="off"><a href="#">28</a></td>
+                        <td class="off"><a href="#">29</a></td>
+                        <td class="off"><a href="#">30</a></td>
+                        <td class="off"><a href="#">31</a></td>
+                        <td><a href="#">1</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">2</a></td>
+                        <td><a href="#">3</a></td>
+                        <td><a href="#">4</a></td>
+                        <td><a href="#">5</a></td>
+                        <td><a href="#">6</a></td>
+                        <td><a href="#">7</a></td>
+                        <td><a href="#">8</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">9</a></td>
+                        <td><a href="#">10</a></td>
+                        <td><a href="#">11</a></td>
+                        <td><a href="#">12</a></td>
+                        <td><a href="#">13</a></td>
+                        <td><a href="#">14</a></td>
+                        <td><a href="#">15</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">16</a></td>
+                        <td><a href="#">17</a></td>
+                        <td><a href="#">18</a></td>
+                        <td><a href="#">19</a></td>
+                        <td class="active"><a href="#">20</a></td>
+                        <td><a href="#">21</a></td>
+                        <td><a href="#">22</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">23</a></td>
+                        <td><a href="#">24</a></td>
+                        <td><a href="#">25</a></td>
+                        <td><a href="#">26</a></td>
+                        <td><a href="#">27</a></td>
+                        <td><a href="#">28</a></td>
+                        <td><a href="#">29</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">30</a></td>
+                        <td><a href="#">31</a></td>
+                        <td class="off"><a href="#">1</a></td>
+                        <td class="off"><a href="#">2</a></td>
+                        <td class="off"><a href="#">3</a></td>
+                        <td class="off"><a href="#">4</a></td>
+                        <td class="off"><a href="#">5</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div><!-- date-picker -->
+
+            <div class="tbl-container schedule">
+
+                <header>Schedule <i class="fa fa-chevron-down"></i></header>
+
+                <div class="obj-container">
+
+                    <table cellpadding="0" cellspacing="0" class="main-tbl accordion-tbl">
+                        <thead>
+                            <tr>
+                                <th class="small"></th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><a href="javascript: void(0);" class="fa fa-chevron-right tbl-row-toggle"></a></td>
+                            <td><strong>Yesterday - 01/14</strong></td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript: void(0);" class="fa fa-chevron-right tbl-row-toggle"></a></td>
+                            <td><strong>Today - 01/15</strong></td>
+                        </tr>
+                        <tr class="sub-tbl-container">
+                            <td colspan="2">
+
+                                <table class="main-tbl sub-tbl">
+                                    <tr>
+                                        <td>8:00-10:15</td>
+                                        <td><p>Physics100B - Marco - 1134B</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td>9:00-10:15</td>
+                                        <td><p>English430 - Advanced Yavapi Office Facility - 1134B</p></td>
+                                    </tr>
+                                </table>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a href="javascript: void(0);" class="fa fa-chevron-right tbl-row-toggle"></a></td>
+                            <td><strong>7 Days</strong></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div><!-- obj-container -->
+
+            </div><!-- tbl-container -->
+
+        </div><!-- col -->
+
+        <div class="col">
+
+            <div class="obj tbl-details status">
+
+                <header>Server Status <i class="fa fa-chevron-down"></i></header>
+
+                <div class="obj-container">
+
+                    <table class="main-tbl">
+                        <tr>
+                            <td><div class="circle green"></div></td>
+                            <td>http://ingest <img src="img/temp-graph.png" class="graph"></td>
+                        </tr>
+                        <tr>
+                            <td><div class="circle green"></div></td>
+                            <td>http://core <img src="img/temp-graph.png" class="graph"></td>
+                        </tr>
+                        <tr>
+                            <td><div class="circle green"></div></td>
+                            <td>http://worker1 <img src="img/temp-graph.png" class="graph"></td>
+                        </tr>
+                        <tr>
+                            <td><div class="circle green"></div></td>
+                            <td>http://worker2 <img src="img/temp-graph.png" class="graph"></td>
+                        </tr>
+                    </table>
+
+                </div><!-- obj-container -->
+
+            </div><!-- tbl-details -->
+
+            <div class="obj tbl-details status">
+
+                <header>Services <i class="fa fa-chevron-down"></i></header>
+
+                <div class="obj-container">
+
+                    <table class="main-tbl">
+                        <tr>
+                            <td><div class="circle green"></div></td>
+                            <td>Captioning</td>
+                        </tr>
+                        <tr>
+                            <td><div class="circle yellow"></div></td>
+                            <td>Encoding</td>
+                        </tr>
+                        <tr>
+                            <td><div class="circle red"></div></td>
+                            <td>Image Extraction</td>
+                        </tr>
+                        <tr>
+                            <td><div class="circle green"></div></td>
+                            <td>Text Analysis</td>
+                        </tr>
+                        <tr>
+                            <td><div class="circle green"></div></td>
+                            <td>Video Segmentation</td>
+                        </tr>
+                        <tr>
+                            <td><div class="circle green"></div></td>
+                            <td>Media Distribution</td>
+                        </tr>
+                        <tr>
+                            <td><div class="circle green"></div></td>
+                            <td>Media Inspection</td>
+                        </tr>
+                        <tr>
+                            <td><div class="circle green"></div></td>
+                            <td>Engage</td>
+                        </tr>
+                        <tr>
+                            <td><div class="circle green"></div></td>
+                            <td>Workflow</td>
+                        </tr>
+                    </table>
+
+                </div><!-- obj-container -->
+            </div><!-- tbl-details -->
+
+        </div><!-- col -->
+
+        <div class="col">
+
+            <div class="obj tbl-details review">
+
+                <header>Needs Review <i class="fa fa-chevron-down"></i></header>
+
+                <div class="obj-container">
+
+                    <h1>4 Events on hold</h1>
+
+                    <ul>
+                        <li><label><input type="checkbox"> Event name 1</label></li>
+                        <li><label><input type="checkbox"> Event name 2</label></li>
+                        <li><label><input type="checkbox"> Event name 3</label></li>
+                        <li><label><input type="checkbox"> Event name 4</label></li>
+                        <li><a href="#" class="btn">Publish</a> <a href="#">Review All</a></li>
+                    </ul>
+
+                </div><!-- obj-container -->
+            </div><!-- tbl-details -->
+
+            <div class="obj tbl-details system-activity">
+
+                <header>Recent System Activity <i class="fa fa-chevron-down"></i></header>
+
+                <div class="obj-container">
+
+                    <div class="icon-container">
+                        <a href="#" class="active">All</a>
+                        <a href="#" class="fa fa-envelope"></a>
+                        <a href="#" class="fa fa-minus-circle"></a>
+                        <a href="#" class="fa fa-comments"></a>
+                        <a href="#" class="fa fa-calendar-o"></a>
+                        <a href="#" class="fa fa-exclamation-triangle"></a>
+                    </div>
+
+                    <table class="main-tbl">
+                        <tr>
+                            <td>8:30</td>
+                            <td>
+                                <i class="activity-icon fa fa-envelope"></i>
+                                Alert - Matterhorn - NodeA
+                                <a href="#" class="fa fa-external-link-square"></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>13:52-Yesterday</td>
+                            <td>
+                                <i class="activity-icon fa fa-minus-circle"></i>
+                                Error - NodeB
+                                <a href="#" class="fa fa-external-link-square"></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12:19</td>
+                            <td>
+                                <i class="activity-icon fa fa-comments"></i>
+                                Remarks Added - Physics321B
+                                <a href="#" class="fa fa-external-link-square"></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>22:00-01/8</td>
+                            <td>
+                                <i class="activity-icon fa fa-calendar-o"></i>
+                                Episodes Added
+                                <a href="#" class="fa fa-external-link-square"></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>19:06</td>
+                            <td>
+                                <i class="activity-icon fa fa-exclamation-triangle"></i>
+                                Storage 85% - NodeA
+                                <a href="#" class="fa fa-external-link-square"></a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

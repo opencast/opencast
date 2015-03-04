@@ -1,0 +1,20 @@
+{
+  "titleSlideMetadata": "new-title-metadata",
+  "watermarkPosition": "new-watermark-position",
+  "watermarkFile": "new-watermark-file",
+  "licenseSlideActive": true,
+  "watermarkActive": true,
+  "creator": "Test User",
+  "id": 1,
+  "bumperActive": true,
+  "licenseSlideBackground": "new-license-background",
+  "default": true,
+  "titleSlideActive": true,
+  "licenseSlideDescription": "new-license-description",
+  "trailerFile": "new-trailer-file",
+  "description": "new-description",
+  "name": "new-name",
+  "titleSlideBackground": "new-title-background",
+  "trailerActive": true,
+  "bumperFile": "new-bumper-file"
+}

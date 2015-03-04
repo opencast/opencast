@@ -1,0 +1,153 @@
+<!-- theodul controls plugin desktop mode -->
+<% if((typeof plugin_path !== "undefined")
+   && (typeof logoLink !== "undefined")
+   && (typeof str_prevChapter !== "undefined")
+   && (typeof str_nextChapter !== "undefined")
+   && (typeof str_playPauseVideo !== "undefined")
+   && (typeof str_playVideo !== "undefined")
+   && (typeof str_pauseVideo !== "undefined")
+   && (typeof str_volumeSlider !== "undefined")
+   && (typeof str_muteVolume !== "undefined")
+   && (typeof str_unmuteVolume !== "undefined")
+   && (typeof str_message_inputField !== "undefined")
+   && (typeof str_totalVideoLength !== "undefined")
+   && (typeof str_openMediaModule !== "undefined")
+   && (typeof str_playbackRateButton !== "undefined")
+   && (typeof str_playbackRate !== "undefined")
+   && (typeof str_remainingTime !== "undefined")
+   && (typeof str_embedButton !== "undefined")
+   && (typeof str_fullscreen !== "undefined")) { %>
+<div id="navigation_wrapper">
+    <div id="navigation_control">
+        <div id="backward_button" class="controlbutton" role="button" aria-label="<%= str_prevChapter %>">
+            <img src="<%= plugin_path %>images/backward.png" aria-label="<%= str_prevChapter %>" title="<%= str_prevChapter %>" alt="<%= str_prevChapter %>" />
+        </div>
+        <div id="playpause_controls" class="controlbutton" role="button" aria-label="<%= str_playPauseVideo %>">
+            <img id="play_button" class="playpause_btn" src="<%= plugin_path %>images/play.png" aria-label="<%= str_playVideo %>" title="<%= str_playVideo %>" alt="<%= str_playVideo %>" /> 
+            <img id="pause_button" class="playpause_btn" style="display: none;" src="<%= plugin_path %>images/pause.png" aria-label="<%= str_pauseVideo %>" title="<%= str_pauseVideo %>" alt="<%= str_pauseVideo %>"  />
+        </div>
+        <div id="forward_button" class="controlbutton" role="button" aria-label="<%= str_nextChapter %>">
+            <img src="<%= plugin_path %>images/forward.png" aria-label="<%= str_nextChapter %>" title="<%= str_nextChapter %>" alt="<%= str_nextChapter %>" />
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div id="volume" role="slider" aria-label="<%= str_volumeSlider %>"></div>
+    <div class="volume_icon" id="volumeIcon">
+        <img id="unmute_button" class="mute_btn" src="<%= plugin_path %>images/volume.png" role="button" aria-label="<%= str_muteVolume %>" title="<%= str_muteVolume %>" alt="<%= str_muteVolume %>" />
+        <img id="mute_button" class="mute_btn" style="display: none;" src="<%= plugin_path %>images/volumeMuted.png" role="button" aria-label="<%= str_unmuteVolume %>" title="<%= str_unmuteVolume %>" alt="<%= str_unmuteVolume %>" /> 
+    </div>
+    <div id="navigation_time">
+        <% if((typeof startTime !== "undefined") && (typeof duration !== "undefined")) { %>
+        <input id="navigation_time_current" class="form-control" type="text" value="<%= startTime %>" role="timer" aria-label="<%= str_message_inputField %>" /><span id="navigation_time_current_overview"> / <span id="navigation_time_duration" aria-label="<%= str_totalVideoLength %> <%= duration %>"><%= duration %></span></span>
+        <% } else { %>
+        <input id="navigation_time_current" type="text" value="00:00:00" /><span> / <span id="navigation_time_duration">00:00:00</span></span>
+        <% } %>
+    </div>
+    <!-- ##### Logo ##### -->
+    <div id="navigation_logo">
+        <% if(typeof logoLink !== "undefined") { %>
+        <a href="<%= logoLink %>" role="link" aria-label="<%= str_openMediaModule %>">
+        <% } %>
+        <img src="<%= plugin_path %>images/logo.png" />
+        <% if(typeof logoLink !== "undefined") { %>
+        </a>
+        <% } %>
+    </div>
+    <!-- ##### Navigation ##### -->
+    <div id="menu">
+        <div class="btn-group">
+	  <% if((typeof hasqualities !== "undefined") && hasqualities
+	     && (typeof str_qualityButton !== "undefined")
+	     && (typeof str_quality !== "undefined")
+	     && (typeof str_qualityLow !== "undefined")
+	     && (typeof str_qualityMedium !== "undefined")
+	     && (typeof str_qualityHigh !== "undefined")) { %>
+            <div class="btn-group">
+                <button id="dropdownMenuQuality" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_qualityButton %>">
+                <span class="glyphicon glyphicon-wrench"></span>
+                <span id="qualityIndicator"><%= str_quality %></span>
+                <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li class="disabled" role="presentation"><a id="qualityDescription" role="menuitem" tabindex="-1" href="#"><b><%= str_quality %></b></a></li>
+                    <li class="divider"></li>
+                    <li role="presentation"><a id="qualityLow" role="menuitem" tabindex="-1" href="#"><b><%= str_qualityLow %></b></a></li>
+                    <li role="presentation"><a id="qualityMedium" role="menuitem" tabindex="-1" href="#"><b><%= str_qualityMedium %></b></a></li>
+                    <li role="presentation"><a id="qualityHigh" role="menuitem" tabindex="-1" href="#"><b><%= str_qualityHigh %></b></a></li>
+                </ul>
+            </div>
+	    <% } %>
+            <div class="btn-group">
+                <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_playbackRateButton %>">
+                <span class="glyphicon glyphicon-time"></span>
+                <span id="playbackRateIndicator">100%</span>
+                <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li class="disabled" role="presentation"><a id="playbackDescription" role="menuitem" tabindex="-1" href="#"><b><%= str_playbackRate %></b> (<%= str_remainingTime %>)</a></li>
+                    <li class="divider"></li>
+                    <li role="presentation"><a id="playback050" role="menuitem" tabindex="-1" href="#"><b>50%</b> (<span id="playbackRemTime050"></span>)</a></li>
+                    <li role="presentation"><a id="playback075" role="menuitem" tabindex="-1" href="#"><b>75%</b> (<span id="playbackRemTime075"></span>)</a></li>
+                    <li role="presentation"><a id="playback100" role="menuitem" tabindex="-1" href="#"><b>100%</b> (<span id="playbackRemTime100"></span>)</a></li>
+                    <li role="presentation"><a id="playback125" role="menuitem" tabindex="-1" href="#"><b>125%</b> (<span id="playbackRemTime125"></span>)</a></li>
+                    <li role="presentation"><a id="playback150" role="menuitem" tabindex="-1" href="#"><b>150%</b> (<span id="playbackRemTime150"></span>)</a></li>
+                </ul>
+            </div>
+            <button id="fullscreen_button" type="button" class="btn btn-default disabled" role="button" aria-label="<%= str_fullscreen %>">
+            <span class="glyphicon glyphicon-fullscreen"></span>
+            </button>
+        </div>
+        <div class="btn-group">
+          <div class="btn-group">
+            <button id="embed_button" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" aria-label="<%= str_embedButton %>">
+              <span class="glyphicon glyphicon-share"></span>
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li role="presentation"><a id="embed0" role="menuitem" tabindex="-1" href="#"></a></li>
+              <li role="presentation"><a id="embed1" role="menuitem" tabindex="-1" href="#"></a></li>
+              <li role="presentation"><a id="embed2" role="menuitem" tabindex="-1" href="#"></a></li>
+              <li role="presentation"><a id="embed3" role="menuitem" tabindex="-1" href="#"></a></li>
+              <li role="presentation"><a id="embed4" role="menuitem" tabindex="-1" href="#"></a></li>
+            </ul>
+          </div>
+        </div>
+      <% if((typeof loggedIn !== "undefined")
+      && (typeof str_checkingStatus !== "undefined")
+      && (typeof str_loginLogout !== "undefined")) { %>
+        <div class="btn-group">
+            <button id="dropdownMenuLoginInfo" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_loginLogout %>">
+	        <span class="glyphicon glyphicon-user"></span>
+		<span id="loggedInNotLoggedIn"><%= str_checkingStatus %></span>
+		<span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation">
+		    <a id="loginlogout" role="menuitem" tabindex="-1" href="#">
+		        <% if((typeof loggedIn !== "undefined") && !loggedIn) { %>
+                        <span class="glyphicon glyphicon-log-in"></span>
+			<% } else { %>
+                        <span class="glyphicon glyphicon-log-out"></span>
+			<% } %>
+		        <span id="str_loginlogout"></span>
+		    </a>
+		</li>
+            </ul>
+	</div>
+        <% } %>
+    </div>
+    <div class="clear"></div>
+    <!-- ##### Slider ##### -->
+    <div id="slider" role="progressbar"></div>
+    <div id="segment_wrapper">
+        <% if((typeof durationMS !== "undefined") && (typeof segments !== "undefined") && (segments.length > 0)) { var i = 0; %>
+        <% _.each(segments, function(segment) { %>
+        <div id="segment_<%= i %>" class="segment" style="width: <%= parseFloat((segment.duration) / durationMS * 100).toFixed(2) %>%">
+            <span id="segment_<%= i %>_span" class="segmentspan"><%= segment.time %></span>
+        </div>
+        <% ++i; }); %>
+        <% } %>
+    </div>
+</div>
+<% } %>
+<!-- end Navigation -->

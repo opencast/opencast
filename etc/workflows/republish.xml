@@ -4,6 +4,7 @@
   <title>Republish metadata</title>
   <tags>
     <tag>archive</tag>
+    <tag>archive-ng</tag>
   </tags>
   <description>Republish the recording metadata</description>
   <operations>

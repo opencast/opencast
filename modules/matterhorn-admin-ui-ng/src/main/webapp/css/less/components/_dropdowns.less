@@ -1,0 +1,427 @@
+// Mixin that styles dropdowns and other button inputs (date picker)
+.dd-btn-style(@size) {
+    .box-sizing();
+    
+    .btn-size() when (@size = small) {
+        .size(65px, (@input-height - 12));
+        line-height: (@input-height - 14);  
+    }
+    
+    .btn-size() when (@size = large) {
+        .size(140px, @input-height);
+        line-height: @input-height;
+    }
+    
+    .btn-size() when (@size = square) {
+        .size(42px, @input-height);
+        line-height: @input-height;
+    }
+    
+    .btn-size();
+    
+    display: inline-block;
+    .border(@light-border-color);
+    border-radius: 4px;
+    padding-left: 15px;
+    font-weight: 600;
+    font-size: 12px;
+    color: @black-40;
+    text-shadow: 0px 1px 0px #fff;
+    cursor: pointer;
+    position: relative;
+    vertical-align: middle;
+    .user-select(none);
+    
+    #gradient > .vertical(#fafafa, #ebeded);
+    
+    &:hover {
+        .border(darken(@light-border-color, 5%));
+        #gradient > .vertical(#fafafa, darken(#ebeded, 5%)); 
+    }
+    
+    &:active {
+        .box-shadow(inset 0px 1px 6px 2px rgba(0,0,0,.05));
+    }
+    
+    &:focus {
+        outline: none;
+    }
+
+} // dd-btn-style()
+
+
+// Mixin that styles UL dropdown components
+.dd-ul-style(@size) {
+    position: absolute;
+    
+    .transition(all .2s);
+
+    background: @body-background;
+    list-style: none;
+    
+    .border-bottom-radius(@main-border-radius);
+    .border(@main-border-color);
+
+    opacity: 0;
+    pointer-events: none;
+    
+    z-index: (@max-z + 10);
+    
+    @icon-color: @black-40;
+    @icon-font-size: 15px;
+    @icon-display-value: inline-block;
+    @icon-pesudo-position: before;
+    
+    .cogs-icon {
+        .fa-icon(@fa-cogs, @icon-pesudo-position, @icon-display-value, 0 10px 0 0, 0, @icon-color, @icon-font-size);
+    }
+    
+    .logout-icon {
+        .fa-icon(@fa-power-off, @icon-pesudo-position, @icon-display-value, 0 14px 0 0, 0, @icon-color, @icon-font-size);
+    }    
+    
+    > li {
+        text-decoration: none;
+        text-shadow: 0px 1px 0px #fff;
+        color: @black-40;
+        font-size: 12px;
+        line-height: 20px;
+        font-weight: 600;
+        cursor: default;
+        
+        display: block;
+        position: relative;        
+       
+        .transition(all .2s);
+        
+        // Used for non LI links (activity items)
+        > span {
+            padding: 3px 15px 3px 45px; 
+            display: block;
+           
+            // Date 
+            > span {
+                display: block;
+                font-size: 10px;
+                color: @black-20;
+                margin-top: -20px;
+            }
+        
+        } 
+        
+        a {
+            display: block;
+            padding: 12px 15px;        
+        
+            &:hover {
+                color: @black-60;
+                background: darken(#fafafa, 3%);
+            }
+            
+            &.more-link {
+                text-align: center;
+                color: @l-blue;
+            }
+                    
+        }
+        
+        &:last-child a {
+            .border-bottom-radius(@main-border-radius);
+        }
+    
+    } // > li
+
+} // dd-ul-style();
+
+
+// Arrows For drop downs 
+.arrow-styles() {
+
+    .styles() {
+        bottom: 100%;
+        left: 50%;
+    	border: solid transparent;
+    	content: " ";
+    	height: 0;
+    	width: 0;
+    	position: absolute;
+    	pointer-events: none;
+    }
+	
+    &:after {
+        .styles();
+        
+    	border-color: rgba(255, 255, 255, 0);
+    	border-bottom-color: #fff;
+    	border-width: 8px;
+    	margin-left: -8px;
+    	
+    } // &:after
+    
+    &:before {
+        .styles();
+    
+    	border-color: rgba(201, 208, 211, 0);
+    	border-bottom-color: darken(@main-border-color, 10%);
+    	border-width: 9px;
+    	margin-left: -9px;
+    	
+    } // &:before
+	
+} // arrow-styles
+
+.btn-dd {
+    .dd-btn-style(square);
+    position: relative;
+}
+
+.btn-dd-content-mixin(@width) {
+    
+    // Base styles
+    position: absolute;
+    top: 52px; left: -(@width / 2 - 20);
+    z-index: @max-z - 9;
+    
+    visibility: hidden;
+    opacity: 0;
+    
+    .transition(all .2s);
+    
+    background: #fff;
+    .border(@main-border-color);
+    border-radius: @main-border-radius;
+    
+    width: @width;
+    
+    .arrow-styles();
+    
+    // Common Elements
+    header {
+         
+         #gradient > .vertical(#fff, #f7f7f7);
+         .border-top-radius(@main-border-radius);
+         border-bottom: 1px solid @main-border-color;
+         height: 30px;
+         
+         > h4 { 
+            line-height: 30px;
+            padding-left: 10px;
+        }
+         
+    } // header
+    
+    .footer-btn {
+        
+        #gradient > .vertical(#fafafa, #f0f2f5);
+        border-top: 1px solid darken(#f0f2f5, 10%);
+        .border-bottom-radius(@main-border-radius);
+        display: block;
+        line-height: 30px;
+        
+        text-align: center;
+        
+    } // footer-btn
+    
+} // btn-dd-content
+
+.filter-settings-dd {
+    
+    // Merge button to input
+    margin-left: -4px;
+    .border-left-radius(0);
+    
+    // Button Icon
+    > i {
+       position: absolute;
+       right: 12px;
+       
+       .build-icon(12px, auto, cog, 16px, 17px); 
+           
+    } // > i
+    
+    // Global styles for the filters dropdowns
+    .filter-dd-mixin() {
+        @width: 200px;
+    
+        .btn-dd-content-mixin(@width);
+        
+        // Adjust window and arrow positions
+        left: -160px;
+        &:after, &:before { left: 180px; }
+        
+    } // filter-dd-mixin
+    
+    .filters-list {
+        .filter-dd-mixin();
+        
+        // Content styles
+        ul {
+            padding: 5px 15px 0;
+            line-height: 35px;
+            cursor: default;
+        
+        } // ul
+        
+        li {
+            > .icon { margin-top: 10px; }
+        
+            .remove { 
+                .build-icon(auto, auto, remove-icon, 17px, 17px); 
+                float: right;
+            } // remove
+            
+            .edit {
+                .build-icon(auto, auto, edit-icon, 17px, 17px); 
+                float: right;
+                margin-right: 8px;
+            }
+            
+            > a { &.active { color: @l-blue; } }
+            
+        } // li
+    
+    } // filters-list
+    
+    .filter-details {
+        .filter-dd-mixin();
+         
+        .input-container {
+            
+            padding: 10px;
+            
+            > label { 
+                display: block; 
+                line-height: 20px;
+            }
+            
+            > input, textarea {
+                padding-left: 10px;
+                width: 100%;
+                margin-bottom: 10px;
+                resize: none;
+                font-size: 12px;
+            }
+            
+            > input {
+                height: 30px;
+            }
+            
+        } // input-container
+        
+        &.active { 
+            opacity: 1;
+            visibility: visible;
+        }
+        
+    } // filter-details
+    
+    // Contains buttons and inputs
+    .input-container {
+        padding: 10px;
+        
+        .btn-container { float: right; margin: -5px 0 5px; }
+    
+        .cancel {
+            .btn(grey);
+            margin-right: 5px;
+        
+        } // cancel
+        
+        .save {
+            .btn(green);
+            text-shadow: none;
+        
+        } // save
+
+    } // input-container
+    
+    &.active { .filters-list {
+        opacity: 1;
+        visibility: visible;
+    
+    } } // filters-list active
+
+} // filter-settings-dd
+
+.drop-down-container {
+    .dd-btn-style(large);
+    
+    .fa-icon(@fa-chevron-down, after);
+    
+    // Arrow Icon
+    &:after {
+        position: absolute;
+        top: 13px;
+        right: 10px;
+    }
+
+    > ul {
+       
+       .dd-ul-style(large);
+       top: 100%;
+       left: -1px;
+       right: -1px;
+           
+    } // > ul
+    
+    // Style overide for small DD's
+    &.small {
+        .dd-btn-style(small);  
+        
+        // Arrow Icon
+        &:after {
+            position: absolute;
+            top: 7px;
+            right: 10px;
+        }
+        
+        > ul {
+            .dd-ul-style(small);
+        
+            > li {
+                
+                > a {
+                    padding: 4px 15px;
+                }
+                
+                &:first-child > a {
+                    .border-top-radius(@main-border-radius);
+                }
+            }
+        }
+    }
+    
+    &.flipped {
+        
+        
+        &.active {
+            .border-top-radius(0);
+            .border-bottom-radius(@main-border-radius);
+        }
+        
+        > ul {
+            top: auto;
+            bottom: 100%;
+            .border-bottom-radius(0);
+            .border-top-radius(@main-border-radius);
+        }
+    }
+    
+    &.active {
+        .border-bottom-radius(0px);
+    
+        // Rotate icon.
+        &:after {
+            .rotate(180deg);
+        }
+        
+        > ul {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    
+    } // &.active
+    
+    
+    
+} // drop-down-container

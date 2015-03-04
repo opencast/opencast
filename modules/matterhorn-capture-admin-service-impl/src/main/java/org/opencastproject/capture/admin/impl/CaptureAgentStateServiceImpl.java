@@ -37,9 +37,9 @@ import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.google.common.base.Function;
-import com.google.common.collect.MapMaker;
-
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
@@ -58,7 +58,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
@@ -104,7 +103,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   protected Map<String, String> pidMap = new ConcurrentHashMap<String, String>();
 
   /** A cache of CA properties, which lightens the load on the SQL server */
-  private ConcurrentMap<String, Object> agentCache = null;
+  private LoadingCache<String, Object> agentCache = null;
 
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
@@ -153,8 +152,8 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
             "org.opencastproject.capture.admin.impl.CaptureAgentStateServiceImpl", persistenceProperties);
 
     // Setup the agent cache
-    agentCache = new MapMaker().expireAfterWrite(1, TimeUnit.HOURS).makeComputingMap(new Function<String, Object>() {
-      public Object apply(String id) {
+    agentCache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build(new CacheLoader<String, Object>() {
+      @Override public Object load(String id) {
         String[] key = id.split(DELIMITER);
         AgentImpl agent;
         try {
@@ -168,7 +167,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   }
 
   public void deactivate() {
-    agentCache.clear();
+    agentCache.invalidateAll();
     if (emf != null)
       emf.close();
   }
@@ -223,7 +222,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    *
    * @param name
    *          the unique agent name
-   * @param org
+   * @param organization
    *          the organization
    * @param em
    *          the entity manager
@@ -251,7 +250,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   protected Agent updateCachedLastHeardFrom(Agent agent, String org) {
     String agentKey = agent.getName().concat(DELIMITER).concat(org);
-    Tuple3<String, Properties, Long> cachedAgent = (Tuple3) agentCache.get(agentKey);
+    Tuple3<String, Properties, Long> cachedAgent = (Tuple3) agentCache.getUnchecked(agentKey);
     if (cachedAgent != null) {
       agent.setLastHeardFrom(cachedAgent.getC());
     }
@@ -406,7 +405,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   @SuppressWarnings("unchecked")
   private Tuple3<String, Properties, Long> getAgentFromCache(String agentName, String orgId) throws NotFoundException {
-    Object agent = agentCache.get(agentName.concat(DELIMITER).concat(orgId));
+    Object agent = agentCache.getUnchecked(agentName.concat(DELIMITER).concat(orgId));
     if (agent == nullToken) {
       throw new NotFoundException();
     } else {
@@ -515,7 +514,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         throw new NotFoundException();
       em.remove(existing);
       tx.commit();
-      agentCache.remove(agentName.concat(DELIMITER).concat(org));
+      agentCache.invalidate(agentName.concat(DELIMITER).concat(org));
     } catch (RollbackException e) {
       logger.warn("Unable to commit to DB in deleteAgent.");
     } finally {

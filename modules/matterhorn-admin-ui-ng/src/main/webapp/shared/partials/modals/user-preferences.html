@@ -1,0 +1,82 @@
+<section class="modal active modal-open" id="user-preferences-modal" ng-controller="UserPreferencesCtrl" style="display: block;">
+    <header>
+        <a ng-click="close()" class="fa fa-times close-modal"></a>
+        <h2 translate="PREFERENCES.CAPTION">Preferences</h2>
+    </header>
+    
+    <nav class="modal-nav" id="modal-nav" style="display: block;">
+        <a data-modal-tab="profile" translate="PREFERENCES.PROFILE">Profile</a>
+        <!--
+        This is not yet ready.
+        <a href="javascript:;" data-modal-tab="views">Views</a>
+        -->
+    </nav>
+    
+    <nav id="breadcrumb"></nav>
+    
+    <form name="userPrefForm" novalidate>
+    <div class="modal-content" data-modal-tab-content="profile">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="form-container">
+                    <div class="row">
+                        <label>{{ 'PREFERENCES.NAME' | translate }}<i class="required">*</i></label>
+                        <input required name="name" ng-model="userprefs.name" type="text" placeholder="{{ 'PREFERENCES.NAME' | translate }}...">
+                    </div>
+                    <div class="row">
+                        <label>{{ 'PREFERENCES.REPLYTO' | translate }}<i class="required">*</i></label>
+                        <input required name="replyTo" ng-model="userprefs.sender.address" type="email" placeholder="yourname@company.com">
+                    </div>
+                    <div class="row">
+                        <label required translate="PREFERENCES.SIGNATURE">Email Signature</label>
+                        <textarea ng-model="userprefs.signature" placeholder="{{ 'PREFERENCES.SIGNATURE' | translate }}..." rows="8"></textarea>
+                    </div>
+                </div><!-- form-container -->
+            </div><!-- full-col -->
+        </div>
+    </div>
+    
+    <!-- modal-content [profile] not yet active -->
+    <!--
+    <div class="modal-content" data-modal-tab-content="views">
+        <div class="full-col">
+            <div class="obj">
+                <header>Default Log-in View</header>
+                <div class="obj-container padded">
+                    <p>Define what you want to see when you log-in into the account.</p>
+                    <div class="form-container">
+                        <div class="row">
+                            <input type="radio" name="default-view-toggle" id="events-view-toggle" checked="1">
+                            <label for="events-view-toggle">Events</label>
+                        </div>
+                        
+                        <div class="row">
+                            <input type="radio" name="default-view-toggle" id="series-view-toggle">
+                            <label for="series-view-toggle">Series</label>
+                        </div>
+                        
+                        <div class="row">
+                            <input type="radio" name="default-view-toggle" id="jobs-view-toggle">
+                            <label for="jobs-view-toggle">Jobs</label>
+                        </div>
+                        
+                        <div class="row">
+                            <input type="radio" name="default-view-toggle" id="servers-view-toggle">
+                            <label for="servers-view-toggle">Servers</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+    
+        <footer>
+            <a ng-class="{active: userPrefForm.$valid, inactive: userPrefForm.$invalid}" ng-if="userprefs.existsOnServer" ng-click="update()" class="submit" translate="UPDATE">Update</a>
+            <a ng-class="{active: userPrefForm.$valid, inactive: userPrefForm.$invalid}" ng-if="!userprefs.existsOnServer" ng-click="save()" class="submit" translate="SAVE">Save</a>
+            <a ng-click="close()" class="cancel" translate="CANCEL">Cancel</a>
+        </footer>
+    
+    </form>
+    <div class="btm-spacer"></div></section>
+</section>

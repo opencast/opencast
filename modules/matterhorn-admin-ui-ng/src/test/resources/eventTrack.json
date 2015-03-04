@@ -1,0 +1,23 @@
+{
+    "tags": "engage,publish",
+    "id": "publish-track-2",
+    "mimetype": "video/quicktime",
+    "duration": "1004400000",
+    "description": "",
+    "flavor": "presentation/source",
+    "streams": {
+        "audio": [
+            
+        ],
+        "video": [
+            {
+                "bitrate": 540520.0,
+                "resolution": "640x480",
+                "type": "H.264",
+                "framerate": ""
+            }
+        ]
+    },
+    "type": "Track",
+    "url": "http://episodes/10.0000/1/publish-track-2/1/track.mov"
+}

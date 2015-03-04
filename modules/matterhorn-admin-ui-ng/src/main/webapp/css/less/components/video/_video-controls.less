@@ -1,0 +1,268 @@
+.video-controls {
+    .clearfix();
+    .box-sizing(border-box);
+    #gradient > .vertical(#fff, #f7f7f7);
+    .border(@main-border-color);
+    border-bottom: none;
+    height: 50px;
+    padding: 0 15px;
+}
+
+// Volume Controls
+// ----------------------------------------
+
+.volume-controls {
+    float: left;
+    width: 20%;
+    padding: 9px 0;
+
+    .volume-toggle-button {
+        .fa-icon(@fa-volume-up, after, inline-block, 0 10px 0 0, 0, @grey, 16px);
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 8px;
+    }
+
+    .volume-slider {
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 4px;
+    }
+
+    input {
+        .appearance(none);
+        background: @bright-blue;
+        border-radius: 4px;
+        height: 2px;
+    }
+}
+
+
+// Playback Controls
+// ----------------------------------------
+
+.playback-controls {
+    float: left;
+    width: 60%;
+    height: 30px;
+    padding: 10px 0;
+
+    .control {
+        display: inline-block;
+        float: left;
+        margin-left: 10px;
+        text-align: center;
+
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+}
+
+.playback-controls-wrapper {
+    margin: 0 auto;
+    width: 280px;
+}
+
+.playback-control-icon {
+    color: @grey;
+    font-size: 22px;
+    text-shadow: 0 1px 0 #fff;
+    cursor: pointer;
+}
+
+@playback-icon-pseudo-position: after;
+@playback-icon-display-value: inline-block;
+@playback-icon-margin: 7px 20px;
+@playback-icon-padding: 0;
+@playback-icon-float: left;
+@playback-icon-color: @grey;
+@playback-icon-font-size: 16px;
+
+.playback-jump-to-start {
+    .fa-icon(@fa-fast-backward, @playback-icon-pseudo-position, @playback-icon-display-value, @playback-icon-margin, @playback-icon-padding, @playback-icon-color, @playback-icon-font-size);
+    .fa-icon-float(@playback-icon-pseudo-position, @playback-icon-float);
+    &:extend(.playback-control-icon all);
+    &:hover {
+        color: darken(@grey, 15%);
+    }
+}
+
+.playback-rewind {
+    .fa-icon(@fa-backward, @playback-icon-pseudo-position, @playback-icon-display-value, @playback-icon-margin, @playback-icon-padding, @playback-icon-color, @playback-icon-font-size);
+    .fa-icon-float(@playback-icon-pseudo-position, @playback-icon-float);
+    &:extend(.playback-control-icon all);
+    &:hover {
+        color: darken(@grey, 15%);
+    }
+}
+
+.playback-toggle-play {
+    .fa-icon(@fa-play,@playback-icon-pseudo-position, @playback-icon-display-value, @playback-icon-margin, @playback-icon-padding, @playback-icon-color, @playback-icon-font-size);
+    .fa-icon-float(@playback-icon-pseudo-position, @playback-icon-float);
+    &:extend(.playback-control-icon all);
+    &:hover {
+        color: darken(@grey, 15%);
+    }
+}
+
+.playback-toggle-pause {
+  .fa-icon(@fa-pause,@playback-icon-pseudo-position, @playback-icon-display-value, @playback-icon-margin, @playback-icon-padding, @playback-icon-color, @playback-icon-font-size);
+  .fa-icon-float(@playback-icon-pseudo-position, @playback-icon-float);
+  &:extend(.playback-control-icon all);
+  &:hover {
+    color: darken(@grey, 15%);
+  }
+}
+
+.playback-fast-forward {
+    .fa-icon(@fa-forward, @playback-icon-pseudo-position, @playback-icon-display-value, @playback-icon-margin, @playback-icon-padding, @playback-icon-color, @playback-icon-font-size);
+    .fa-icon-float(@playback-icon-pseudo-position, @playback-icon-float);
+    &:extend(.playback-control-icon all);
+    &:hover {
+        color: darken(@grey, 15%);
+    }
+}
+
+.playback-jump-to-end {
+    .fa-icon(@fa-fast-forward, @playback-icon-pseudo-position, @playback-icon-display-value, @playback-icon-margin, @playback-icon-padding, @playback-icon-color, @playback-icon-font-size);
+    .fa-icon-float(@playback-icon-pseudo-position, @playback-icon-float);
+    &:extend(.playback-control-icon all);
+    &:hover {
+        color: darken(@grey, 15%);
+    }
+}
+
+
+
+// Timecode
+// ----------------------------------------
+
+
+.timecode-controls {
+    .clearfix();
+    .box-sizing(border-box);
+    float: right;
+    width: 20%;
+
+    label {
+        display: block;
+        text-align: right;
+        margin-right: 4px;
+        margin-top: 2px;
+        font-size: 10px;
+        color: @grey;
+        font-weight: @weight-light;
+        text-transform: uppercase;
+    }
+
+    .colon-sep {
+        font-size: 22px;
+        font-weight: 100;
+        color: @grey;
+    }
+
+    .timecode-segments {
+        .clearfix();
+        float: right;
+    }
+
+    .time-value {
+        float: left;
+    }
+
+    input[type="number"] {
+        .box-sizing(border-box);
+        .appearance(none);
+        .font-smoothing(on);
+        background: none;
+        border: 0;
+        height: 29px;
+        border-bottom: 1px dashed @main-border-color;
+        color: @grey;
+        font-size: 22px;
+        font-weight: @weight-regular;
+        text-align: right;
+        width: 30px;
+
+        -moz-appearance: textfield; // Hides Spinner on FF
+
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+            -webkit-appearance: none; // Hides Spinner on Chrome and Safari
+            margin: 0;
+        }
+    }
+
+    input#timecode-frame {
+        width: 40px;
+    }
+}
+
+// Video Editor Actions
+
+.video-editor-actions-toolbar {
+    .clearfix();
+    margin: 40px 0;
+
+    .video-nav-controls {
+        float: left;
+    }
+
+    .video-save-panel {
+        float: right;
+        text-align: right;
+    }
+
+    .save-button {
+        .btn(brightblue);
+        margin-right: 10px;
+    }
+
+    .save-and-close-button {
+        .btn(green);
+        min-width: 110px !important;
+    }
+
+    .return-button {
+        .btn(grey);
+    }
+
+    .save-button,
+    .save-and-close-button,
+    .return-button {
+        font-size: 12px;
+        font-weight: @weight-semibold;
+        display: inline-block;
+        padding: 12px 15px;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .workflow + .chosen-container {
+        a.chosen-single {
+            height: 36px;
+            line-height: 35px;
+            div {
+                top: 5px;
+                height: 50%;
+            }
+        }
+    }
+}
+
+.video-meta-information {
+    margin: 10px 0;
+    color: @black-40;
+    font-size: 10px;
+    font-weight: @weight-semibold;
+
+    .save-info {
+
+    }
+
+    .author-edit-info {
+        margin-top: 2px;
+        color: @black-30;
+    }
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.index.service.resources.list.provider.AgentsListProvider" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.index.service.resources.list.provider.AgentsListProvider" />
+  <property name="service.description" value="Capture-agents list provider" />
+  <property name="opencast.service.type" value="org.opencastproject.index.service.resources.list.provider.AgentsListProvider" />
+  
+  <reference name="captureAgentService" interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
+    cardinality="1..1" policy="static" bind="setCaptureAgentService" />
+
+  <service>
+     <provide interface="org.opencastproject.index.service.resources.list.api.ResourceListProvider"/>
+  </service>
+  
+</scr:component>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Matterhorn Theodul Pass Player">
+    <meta name="author" content="Opencast Matterhorn">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Matterhorn Theodul Pass Player</title>
+    <link rel="stylesheet" type="text/css" href="css/core_global_style.css" />
+    <script data-main="engage_init" src="js/lib/require.js"></script>
+  </head>
+  <body>
+    <noscript>
+      <div class="noJavaScript">
+        <img src="img/MatterhornLogo_loading.png" id="loadingImg" />
+        <h1>Error</h1>
+        <p id="noJavaScript-container">
+          JavaScript is not enabled in your browser.
+          <br />
+          Please <a href="http://www.enable-javascript.com" class="noJavaScriptLink" target="_blank">enable JavaScript</a> to display the content of this site correctly.
+        </p>
+      </div>
+    </noscript>
+    <div id="browserWarning" class="alert alert-danger" role="alert">
+      <h1>Browser not supported</h1>
+      <p>
+        Your browser is not supported by Matterhorn. Please download a recent version of one of the following browsers to get all of the provided features:
+      </p>
+      <ul>
+        <li>
+          <a href="https://www.mozilla.org/firefox" class="alert-link" target="_blank">Mozilla Firefox</a>
+        </li>
+        <li>
+          <a href="https://www.google.com/chrome" class="alert-link" target="_blank">Google Chrome</a>
+        </li>
+        <li>
+          <a href="http://www.opera.com/download" class="alert-link" target="_blank">Opera</a>
+        </li>
+        <li>
+          <a href="https://www.apple.com/safari" class="alert-link" target="_blank">Safari</a>
+        </li>
+      </ul>
+      <p id="customError_btn-container">
+        <button id="btn_tryAnyway" type="button" class="btn btn-primary btn-lg">
+          <span class="glyphicon glyphicon-eye-open"></span>&nbsp;Try it anyway
+        </button>
+      </p>
+    </div>
+    <div id="customError" class="alert alert-danger" role="alert">
+      <img src="img/MatterhornLogo_loading.png" id="loadingImg" />
+      <h1 id="str_error">Error</h1>
+      <p>
+        <span id="customError_str">An error occurred. Please reload the page.</span>
+      </p>
+      <p id="customError_btn-container">
+        <button id="btn_reloadPage" type="button" class="btn btn-primary btn-lg">
+          <span class="glyphicon glyphicon-repeat"></span>&nbsp;<span id="str_reloadPage">Reload page</span>
+        </button>
+        <button id="btn_login" type="button" class="btn btn-primary btn-lg">
+          <span class="glyphicon glyphicon-log-in"></span>&nbsp;<span id="str_login">Log in</span>
+        </button>
+      </p>
+    </div>
+    <!-- loading animation container -->
+    <div class="loading">
+      <img src="img/MatterhornLogo_loading.png" id="loadingImg" />
+      <div id="loading1">
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped active" id="loadingProgressbar1" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%"></div>
+        </div>
+      </div>
+      <div id="loading2">
+        <div class="progress">
+          <div class="progress-bar active" id="loadingProgressbar2" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+    <div id="page-cover">
+      <button id="btn_fullscreenCancel" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></button>
+    </div>
+    <!-- global main view -->
+    <div id="engage_view"></div>
+  </body>
+</html>

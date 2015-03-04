@@ -17,14 +17,14 @@ package org.opencastproject.job.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.opencastproject.fn.juc.Immutables.list;
-import static org.opencastproject.fn.juc.Immutables.map;
+import static org.opencastproject.fun.juc.Immutables.list;
+import static org.opencastproject.fun.juc.Immutables.map;
 import static org.opencastproject.util.IoSupport.loadFileFromClassPathAsString;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.xmlmatchers.XmlMatchers.similarTo;
 import static org.xmlmatchers.transform.XmlConverters.the;
 
-import org.opencastproject.fn.juc.Immutables;
+import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.job.api.Incident.Severity;
 
 import org.apache.commons.io.IOUtils;

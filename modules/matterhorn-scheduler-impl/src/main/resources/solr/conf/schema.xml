@@ -258,6 +258,11 @@
    
    <field name="event_start" type="string" indexed="true" stored="true" omitNorms="true" multiValued="false"/>
    <field name="event_end" type="string" indexed="true" stored="true" omitNorms="true" multiValued="false"/>
+   
+   <!-- Status of the event -->
+   
+   <field name="event_opt_out" type="boolean" indexed="true" stored="true" omitNorms="true" multiValued="false" default="false"/>
+   <field name="event_blacklisted" type="boolean" indexed="true" stored="true" omitNorms="true" multiValued="false" default="false"/>
       
    <!-- Time of last modification of event -->
    

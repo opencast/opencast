@@ -1,0 +1,33 @@
+{
+  "name": {
+    "label": "FILTERS.THEMES.NAME.LABEL",
+    "type": "select",
+    "options": {"Entwine Private":"Entwine Private", "Entwine Public": "Entwine Public"}
+  },
+  "description": {
+    "label": "FILTERS.THEMES.DESCRIPTION.LABEL",
+    "type": "select",
+    "options": {
+      "Private Theme of Entwine":"Private Theme of Entwine",
+      "Public Theme of Entwine":"Public Theme of Entwine"
+    }
+  },
+  "creator": {
+    "label": "FILTERS.THEMES.CREATOR.LABEL",
+    "type": "select",
+    "options": {
+      "Digest User": "Digest User",
+      "User1 Name": "User1 Name",
+      "tesst": "tesst",
+      "Test Producer": "Test Producer",
+      "adminui": "adminui",
+      "Admin User": "Admin User",
+      "Guest User": "Guest User"
+    }
+  },
+  "creationDate": {
+    "label": "FILTERS.THEMES.CREATION_DATE.LABEL",
+    "type": "period",
+    "options": {}
+  }
+}

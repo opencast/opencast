@@ -21,6 +21,9 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.EqualsUtil;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
@@ -37,20 +40,21 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * JPA-annotated user object.
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "mh_user", uniqueConstraints = {@UniqueConstraint(columnNames = {"username", "organization"})})
+@Table(name = "mh_user", uniqueConstraints = { @UniqueConstraint(columnNames = { "username", "organization" }) })
 @NamedQueries({
         @NamedQuery(name = "User.findByQuery", query = "select u from JpaUser u where UPPER(u.username) like :query and u.organization.id = :org"),
+        @NamedQuery(name = "User.findByIdAndOrg", query = "select u from JpaUser u where u.id=:id and u.organization.id = :org"),
         @NamedQuery(name = "User.findByUsername", query = "select u from JpaUser u where u.username=:u and u.organization.id = :org"),
-        @NamedQuery(name = "User.findAll", query = "select u from JpaUser u where u.organization.id = :org") })
+        @NamedQuery(name = "User.findAll", query = "select u from JpaUser u where u.organization.id = :org"),
+        @NamedQuery(name = "User.countAll", query = "select COUNT(u) from JpaUser u where u.organization.id = :org") })
 public class JpaUser implements User {
   @Id
   @GeneratedValue
@@ -59,6 +63,18 @@ public class JpaUser implements User {
 
   @Column(name = "username", length = 128)
   protected String username;
+
+  @Column(name = "name")
+  protected String name;
+
+  @Column(name = "email")
+  protected String email;
+
+  @Transient
+  protected String provider;
+
+  @Transient
+  protected boolean manageable = true;
 
   @Lob
   @Column(name = "password", length = 65535)
@@ -69,10 +85,8 @@ public class JpaUser implements User {
   protected JpaOrganization organization;
 
   @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
-  @JoinTable(name = "mh_user_role",
-             joinColumns = {@JoinColumn(name = "user_id")},
-             inverseJoinColumns = {@JoinColumn(name = "role_id")},
-             uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "role_id"})})
+  @JoinTable(name = "mh_user_role", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "role_id") }, uniqueConstraints = { @UniqueConstraint(columnNames = {
+          "user_id", "role_id" }) })
   protected Set<JpaRole> roles;
 
   /**
@@ -82,7 +96,7 @@ public class JpaUser implements User {
   }
 
   /**
-   * Constructs a user with the specified username and password.
+   * Constructs a user with the specified username, password, name, email and provider.
    *
    * @param username
    *          the username
@@ -90,17 +104,30 @@ public class JpaUser implements User {
    *          the password
    * @param organization
    *          the organization
+   * @param name
+   *          the name
+   * @param email
+   *          the email
+   * @param provider
+   *          the provider
+   * @param manageable
+   *          whether the user is manageable
    */
-  public JpaUser(String username, String password, JpaOrganization organization) {
+  public JpaUser(String username, String password, JpaOrganization organization, String name, String email,
+          String provider, boolean manageable) {
     super();
     this.username = username;
     this.password = password;
     this.organization = organization;
+    this.name = name;
+    this.email = email;
+    this.provider = provider;
+    this.manageable = manageable;
     this.roles = new HashSet<JpaRole>();
   }
 
   /**
-   * Constructs a user with the specified username, password, and roles.
+   * Constructs a user with the specified username, password, provider and roles.
    *
    * @param username
    *          the username
@@ -108,11 +135,46 @@ public class JpaUser implements User {
    *          the password
    * @param organization
    *          the organization
+   * @param provider
+   *          the provider
+   * @param manageable
+   *          whether the user is manageable
    * @param roles
    *          the roles
    */
-  public JpaUser(String username, String password, JpaOrganization organization, Set<JpaRole> roles) {
-    this(username, password, organization);
+  public JpaUser(String username, String password, JpaOrganization organization, String provider, boolean manageable,
+          Set<JpaRole> roles) {
+    this(username, password, organization, null, null, provider, manageable);
+    for (Role role : roles) {
+      if (role.getOrganization() == null || !organization.getId().equals(role.getOrganization().getId()))
+        throw new IllegalArgumentException("Role " + role + " is not from the same organization!");
+    }
+    this.roles = roles;
+  }
+
+  /**
+   * Constructs a user with the specified username, password, name, email, provider and roles.
+   *
+   * @param username
+   *          the username
+   * @param password
+   *          the password
+   * @param organization
+   *          the organization
+   * @param name
+   *          the name
+   * @param email
+   *          the email
+   * @param provider
+   *          the provider
+   * @param manageable
+   *          whether the user is manageable
+   * @param roles
+   *          the roles
+   */
+  public JpaUser(String username, String password, JpaOrganization organization, String name, String email,
+          String provider, boolean manageable, Set<JpaRole> roles) {
+    this(username, password, organization, name, email, provider, manageable);
     for (Role role : roles) {
       if (role.getOrganization() == null || !organization.getId().equals(role.getOrganization().getId()))
         throw new IllegalArgumentException("Role " + role + " is not from the same organization!");
@@ -125,6 +187,7 @@ public class JpaUser implements User {
    *
    * @return the user account's password
    */
+  @Override
   public String getPassword() {
     return password;
   }
@@ -183,7 +246,8 @@ public class JpaUser implements User {
     if (!(obj instanceof User))
       return false;
     User other = (User) obj;
-    return username.equals(other.getUsername()) && organization.equals(other.getOrganization());
+    return username.equals(other.getUsername()) && organization.equals(other.getOrganization())
+            && EqualsUtil.eq(provider, other.getProvider());
   }
 
   /**
@@ -193,7 +257,7 @@ public class JpaUser implements User {
    */
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(username, organization);
+    return EqualsUtil.hash(username, organization, provider);
   }
 
   /**
@@ -203,6 +267,30 @@ public class JpaUser implements User {
    */
   @Override
   public String toString() {
-    return new StringBuilder(username).append(":").append(organization).toString();
+    return new StringBuilder(username).append(":").append(organization).append(":").append(provider).toString();
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String getEmail() {
+    return email;
+  }
+
+  @Override
+  public String getProvider() {
+    return provider;
+  }
+
+  public void setProvider(String provider) {
+    this.provider = provider;
+  }
+
+  @Override
+  public boolean isManageable() {
+    return manageable;
   }
 }

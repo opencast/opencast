@@ -1,0 +1,92 @@
+.modal .list-obj .obj-container {
+    
+    // Main Properties
+    // ----------------------------------------
+    
+    padding: @modal-container-padding;
+    
+    .obj-container {
+        padding: 0;
+    }
+
+    li {
+        position: relative;
+        line-height: 30px;
+
+        p {
+            width: 70%;
+            font-size: 11px;
+            color: @black-40;
+        }
+        
+        > ul li {
+            margin: 0;
+            line-height: 16px;
+            font-size: 11px;
+            color: @black-40; 
+        }
+
+    }
+
+    // Left side icons
+    // ----------------------------------------
+
+    .icon-container {
+        width: 50px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    i {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .video-icon {
+        .build-icon(auto, auto, video, 34px, 24px);
+    }
+
+    .engage {
+        .build-icon(auto, auto, engage, 18px, 26px);
+        margin-left: 7px; // Center icon
+    }
+
+    .youtube {
+        .build-icon(auto, auto, youtube, 30px, 36px);
+        margin-left: 3px; // Center icon
+    }
+
+
+    // Right side icons / elements
+    // ----------------------------------------
+    
+    .play {
+        display: inline-block;
+        float: right;
+        margin-top: 8px;
+        .build-icon(auto, auto, play-icon-on, 17px, 17px);
+    }
+
+    .file-select-btn {
+        padding: 3px 5px;
+        font-size: 12px;
+        margin-top: 8px;
+        float: right;
+    }
+
+    .file-upload input[type="file"] {
+        float: right;
+        visibility: hidden;
+        width: 0;
+    }
+
+    &.rs-radio input[type="radio"] {
+        height: 50px;
+        float: left;
+    }
+    
+    input[type="radio"] {
+        margin-right: 10px;
+    }
+        
+}

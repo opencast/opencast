@@ -41,6 +41,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-message-broker-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-solr</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -53,6 +58,10 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-json</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.entwinemedia.common</groupId>
+      <artifactId>functional</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
@@ -158,11 +167,12 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
               org.opencastproject.workflow.api;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.mediapackage;version=${project.version},
+              org.opencastproject.message.broker.api.index;version=${project.version},
               org.opencastproject.workspace.api;version=${project.version},
               *;resolution:=optional
             </Import-Package>

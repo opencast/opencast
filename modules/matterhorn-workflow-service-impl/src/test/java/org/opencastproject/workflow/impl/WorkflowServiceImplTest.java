@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -206,6 +207,9 @@ public class WorkflowServiceImplTest {
     serviceRegistry.registerService(REMOTE_SERVICE, REMOTE_HOST, "/path", true);
     service.setWorkspace(workspace);
 
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(messageSender);
+
     dao = new WorkflowServiceSolrIndex();
     dao.setServiceRegistry(serviceRegistry);
     dao.setSecurityService(securityService);
@@ -215,6 +219,7 @@ public class WorkflowServiceImplTest {
     dao.activate("System Admin");
     service.setDao(dao);
     service.setServiceRegistry(serviceRegistry);
+    service.setMessageSender(messageSender);
     service.activate(null);
 
     InputStream is = null;
@@ -865,10 +870,14 @@ public class WorkflowServiceImplTest {
 
     OrganizationDirectoryService orgDirService = setupMockOrganizationDirectoryService();
 
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(messageSender);
+
     workflowServiceImpl.setDao(mockIndex);
     workflowServiceImpl.setServiceRegistry(mockServiceRegistry);
     workflowServiceImpl.setSecurityService(securityService);
     workflowServiceImpl.setOrganizationDirectoryService(orgDirService);
+    workflowServiceImpl.setMessageSender(messageSender);
     workflowServiceImpl.activate(null);
     workflowServiceImpl.failJobs(WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, true);
 

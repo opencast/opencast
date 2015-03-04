@@ -18,7 +18,14 @@ before_install:
   - curl -s $(curl -s http://johnvansickle.com/ffmpeg/ | grep 64bit-static.tar.xz | grep -v git | cut -d'"' -f2) -o /tmp/ffmpeg.tar.xz
   - tar -xf /tmp/ffmpeg.tar.xz
   - mv ffmpeg-*-64bit-static/ff* /usr/bin/
+  - if [[ $SHIPPABLE_JDK_VERSION == "openjdk7" ]] ; then export JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64"; export PATH="$PATH:/usr/lib/jvm/java-7-openjdk-amd64/bin"; export java_path="/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java"; fi
+  - if [[ $SHIPPABLE_JDK_VERSION == "oraclejdk8" ]] ; then export JAVA_HOME="/usr/lib/jvm/java-8-oracle"; export PATH="$PATH:/usr/lib/jvm/java-8-oracle/bin"; export java_path="/usr/lib/jvm/java-8-oracle/jre/bin/java"; fi
+  - update-alternatives --set java $java_path
 
-install: mvn --batch-mode clean install -DskipTests=true -Dall -P '!capture'
+install:
+  - java -version
+  - javac -version
+  - echo $JAVA_HOME
+  - mvn --batch-mode clean install -DskipTests=true -Dall -P '!capture'
 
 script: mvn --batch-mode test -Dall -P '!capture'

@@ -1,0 +1,50 @@
+{
+  "count": 4,
+  "limit": 0,
+  "offset": 0,
+  "total": 4,
+  "results": [{
+    "completed": 2,
+    "cores": 2,
+    "maintenance": false,
+    "meanQueueTime": 498,
+    "meanRunTime": 390201,
+    "name": "•mock• host3",
+    "online": true,
+    "queued": 4,
+    "running": 2
+  },
+  {
+    "completed": 2,
+    "cores": 8,
+    "maintenance": true,
+    "meanQueueTime": 3600,
+    "meanRunTime": 200,
+    "name": "•mock• host1",
+    "online": true,
+    "queued": 2,
+    "running": 2
+  },
+  {
+    "completed": 2,
+    "cores": 4,
+    "maintenance": false,
+    "meanQueueTime": 4,
+    "meanRunTime": 200,
+    "name": "•mock• host2",
+    "online": false,
+    "queued": 4,
+    "running": 4
+  },
+  {
+    "completed": 2,
+    "cores": 6,
+    "maintenance": false,
+    "meanQueueTime": 4,
+    "meanRunTime": 200,
+    "name": "•mock• host4",
+    "online": true,
+    "queued": 4,
+    "running": 2
+  }]
+}

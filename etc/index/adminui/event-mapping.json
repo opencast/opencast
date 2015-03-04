@@ -1,0 +1,120 @@
+{
+    "event" : {
+        "_source" : { "enabled" : true },
+        "_timestamp" : { "enabled" : true },
+        "dynamic": "true",
+        "properties" : {
+
+            "uid": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+
+            "organization": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+
+            "object": { "type" : "string", "index" : "no", "store" : "yes" },
+
+            "title": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "start_date": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "end_date": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "duration" : { "type" : "long", "index": "not_analyzed", "store" : "no" },
+
+            "contributor": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "presenter": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "subject": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "location": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "language": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "series_id": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "series_name": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "source": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "created": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "creator": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "license": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "rights": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "track_mimetype": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "track_stream_resolution": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "track_flavor": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "metadata_mimetype": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "metadata_flavor": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "attachment_flavor": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "access_policy": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "managed_acl": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "workflow_state": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "workflow_id": { "type" : "long", "store" : "no" },
+
+            "workflow_definition": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "workflow_scheduled_datetime": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "review_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "review_date": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "opted_out": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+
+            "blacklisted": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+
+            "has_comments": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+
+            "has_open_comments": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+
+            "scheduling_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "archive_version": { "type" : "long", "store" : "no" },
+
+            "publication": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "publication_flavor": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "text": { "type" : "string", "index" : "analyzed", "store" : "no" },
+            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no" }
+
+        },
+        "dynamic_templates" : [
+             {
+             "title_template" : {
+                 "match" : "title_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "text" : {
+                 "match" : "text_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "permission_template" : {
+                 "match" : "acl_permission_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             }
+         ]
+    }
+}

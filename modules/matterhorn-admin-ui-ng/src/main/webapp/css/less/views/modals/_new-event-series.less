@@ -1,0 +1,49 @@
+.modal {
+
+    &#add-event-modal,
+    &#user-blacklist-modal,
+    &#location-blacklist-modal,
+    &#add-series-modal {
+
+        // Modal Size
+        &:extend(.medium-modal);
+
+        .day-check-container {
+            display: inline-block;
+            text-align: center;
+            line-height: 15px;
+            margin-right: 10px;
+        }
+
+        .fa-calendar-o,
+        .fa-plus-circle {
+            font-size: 14px;
+            margin: 0;
+            margin-left: 5px;
+            display: inline-block;
+            float: none;
+
+            &:hover {
+                color: @l-blue;
+            }
+        }
+
+        .fa-plus-circle {
+            color: @green;
+
+            &:hover {
+                color: lighten(@green, 5%);
+            }
+        }
+
+        // Show and Hide sections
+        .source-type-content {
+            display: none;
+
+            &.active {
+                display: block;
+            }
+        }
+
+    } // new event & series modals
+} // modal

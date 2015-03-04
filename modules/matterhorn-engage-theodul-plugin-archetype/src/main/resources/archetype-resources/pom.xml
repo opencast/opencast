@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${groupId}</groupId>
+  <artifactId>${artifactId}</artifactId>
+  <packaging>bundle</packaging>
+  <name>${artifactId}</name>
+
+  <parent>
+    <groupId>org.opencastproject</groupId>
+    <artifactId>base</artifactId>
+    <version>1.5-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <properties>
+    <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
+    <checkstyle.skip>false</checkstyle.skip>
+  </properties>
+
+  <version>${version}</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-engage-theodul-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Export-Package>${package};version=${project.version}</Export-Package>
+            <Import-Package>org.opencastproject.engage.theodul.api;version=${project.version},
+              *;resolution:=optional</Import-Package>
+            <Service-Component>OSGI-INF/engage-plugin.xml</Service-Component>
+          </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- Further plugin parameter information http://searls.github.io/jasmine-maven-plugin/bdd-mojo.html -->
+        <groupId>com.github.searls</groupId>
+        <artifactId>jasmine-maven-plugin</artifactId>
+        <version>1.3.1.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <preloadSources>
+            <source>${project.basedir}/src/test/resources/js/lib/require.js</source>
+          </preloadSources>
+          <jsSrcDir>${project.basedir}/src/main/resources/static</jsSrcDir>
+          <sourceIncludes>
+            <include>**/*.js</include>
+            <include>**/*.coffee</include>
+          </sourceIncludes>
+          <jsTestSrcDir>${project.basedir}/src/test/resources/js/spec</jsTestSrcDir>
+          <specIncludes>
+            <include>**/spec_helper.js</include>
+            <include>**/*.js</include>
+            <include>**/*.coffee</include>
+          </specIncludes>
+          <specRunnerTemplate>REQUIRE_JS</specRunnerTemplate>
+          <format>progress</format>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

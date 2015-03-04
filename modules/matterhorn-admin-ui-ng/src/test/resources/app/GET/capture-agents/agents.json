@@ -1,0 +1,36 @@
+{
+    "count": 4,
+    "limit": 0,
+    "offset": 0,
+    "results": [
+        {
+            "Name": "agent4",
+            "Status": "ok",
+            "Update": "2014-05-26T15:37:02Z",
+            "blacklist": ""
+        },
+        {
+            "Name": "agent3",
+            "Status": "ok",
+            "Update": "2014-05-26T15:37:02Z",
+            "blacklist": ""
+        },
+        {
+            "Name": "agent2",
+            "Status": "ok",
+            "Update": "2014-05-26T15:37:02Z",
+            "blacklist": ""
+        },
+        {
+            "Name": "agent1",
+            "Status": "ok",
+            "Update": "2014-05-26T15:37:02Z",
+            "blacklist": {
+                "end": "2025-12-24T12:12:12Z",
+                "start": "2025-12-12T12:12:12Z"
+            }
+        }
+    ],
+    "total": 4
+}
+

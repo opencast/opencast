@@ -21,6 +21,7 @@
   activate="activate">
     <implementation class="org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl" />
     <property name="service.description" value="Static Metadata Service, dublin core based" />
+    <property name="metadata.source" value="dublincore" />
     <property name="priority" value="1" />
     <service>
       <provide interface="org.opencastproject.metadata.api.StaticMetadataService" />

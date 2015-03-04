@@ -32,4 +32,8 @@
     cardinality="1..1" policy="static" bind="addWorkflowDefinitionScanner" />
   <reference name="profilesReadyIndicator" policy="static" cardinality="1..1"
       interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=workflowdefinition)" />
+  <reference name="message-broker-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
+    cardinality="1..1" policy="static" bind="setMessageReceiver" />
+  <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
+    cardinality="1..1" policy="static" bind="setMessageSender" />
 </scr:component>

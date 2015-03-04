@@ -77,7 +77,7 @@ public final class SecurityUtil {
    */
   public static User createSystemUser(String systemUserName, Organization org) {
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
-    return new JaxbUser(systemUserName, jaxbOrganization, new JaxbRole(GLOBAL_ADMIN_ROLE, jaxbOrganization),
+    return new JaxbUser(systemUserName, null, jaxbOrganization, new JaxbRole(GLOBAL_ADMIN_ROLE, jaxbOrganization),
             new JaxbRole(org.getAdminRole(), jaxbOrganization));
   }
 
@@ -90,8 +90,8 @@ public final class SecurityUtil {
    */
   public static User createAnonymousUser(Organization org) {
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
-    return new JaxbUser(GLOBAL_ANONYMOUS_USERNAME, jaxbOrganization, new JaxbRole(jaxbOrganization.getAnonymousRole(),
-            jaxbOrganization));
+    return new JaxbUser(GLOBAL_ANONYMOUS_USERNAME, null, jaxbOrganization, new JaxbRole(
+            jaxbOrganization.getAnonymousRole(), jaxbOrganization));
   }
 
   /**

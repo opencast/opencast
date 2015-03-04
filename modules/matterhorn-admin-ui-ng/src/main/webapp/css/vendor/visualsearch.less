@@ -1,0 +1,283 @@
+
+// Icons
+.VS-search {
+
+    .VS-icon-cancel {
+        cursor: pointer;
+        .build-icon(auto, auto, cross, 8px, 8px);
+        margin-top: 8px;
+        
+        &:hover {
+            .build-icon(8px, auto, cross-on, 8px, 8px);
+            right: 9px;
+        }
+        
+    } // cancel 
+    
+    // Position cancel icon in search facets
+    .VS-search-inner { .VS-icon-cancel {
+        margin-top: 2px;
+    } }
+    
+    .VS-icon-search { .build-icon(auto, auto, filter-icon, 15px, 13px); }
+
+} // vs-search
+
+/* ===================== */
+/* = General and Reset = */
+/* ===================== */
+
+#vs-filter {
+    display: inline-block;
+    vertical-align: top;
+    max-width: 550px;
+    margin-bottom: 20px;
+}
+
+.VS-search {
+  color: #373737;
+  font-size: 12px;
+}
+.VS-search input {
+  border: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  outline: none;
+  margin: 0; padding: 4px;
+  background: transparent;
+  font-size: 16px;
+  line-height: 38px;
+  width: 100%;
+}
+
+/* ========== */
+/* = Layout = */
+/* ========== */
+
+.VS-search .VS-search-box {
+    cursor: text;
+    position: relative;
+    background: #fff;
+    border: 1px solid @main-border-color;
+    background-color: #fafafa;
+    min-height: 38px;
+    min-width: 100px;
+    height: auto;
+    display: inline-block;
+    
+    border-radius: @main-border-radius;
+    .border-right-radius(0);
+  
+  
+}
+  .VS-search.VS-readonly .VS-search-box {
+    cursor: default;
+    }
+  .VS-search .VS-placeholder {
+      position: absolute;
+      top: 7px;
+      left: 4px;
+      margin: 0 20px 0 22px;
+      color: #808080;
+      font-size: 14px;
+  }
+  .VS-search .VS-search-box.VS-focus .VS-placeholder,
+  .VS-search .VS-search-box .VS-placeholder.VS-hidden {
+      display: none;
+  }
+  .VS-search .VS-search-inner {
+    position: relative;
+    margin: 0 20px 0 22px;
+    overflow: hidden;
+  }
+  .VS-search input {
+    width: 100px;
+  }
+  .VS-search input,
+  .VS-search .VS-input-width-tester {
+    padding: 6px 0;
+    float: left;
+    color: #808080;
+    font: 13px/17px Helvetica, Arial;
+  }
+  .VS-search.VS-focus input {
+    color: #606060;
+  }
+  .VS-search .VS-icon-search {
+    position: absolute;
+    left: 9px; top: 13px;
+  }
+  .VS-search .VS-icon-cancel {
+    position: absolute;
+    right: 9px; top: 8px;
+  }
+    .VS-search.VS-readonly .VS-icon-cancel {
+      display: none;
+    }
+
+/* ================ */
+/* = Search Facet = */
+/* ================ */
+
+.VS-search .search_facet {
+    float: left;
+    margin: 0;
+    padding: 0 0 0 17px;
+    position: relative;
+    height: 20px;
+    margin: 8px -5px 3px 0;
+    
+    border-radius: 16px;
+    
+    #gradient > .vertical(lighten(#d2e6fd, 5%), lighten(#b0d1f9, 5%));
+    border: 1px solid lighten(#6eadf5, 5%);
+}
+
+  .VS-search .search_facet .category {
+    float: left;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 10px;
+    color: #4d72a0;
+    line-height: 13px;
+    cursor: pointer;
+    padding: 4px 3px 0 0; 
+  }
+    .VS-search.VS-readonly .search_facet .category {
+      cursor: default;
+    }
+  .VS-search .search_facet .search_facet_input_container {
+    float: left;
+  }
+  .VS-search .search_facet input {
+    margin: 0;
+    padding: 0;
+    color: #4d72a0;
+    font-size: 11px;
+    line-height: 16px;
+    height: 22px;
+    width: auto;
+    z-index: 100;
+    position: relative;
+    padding-top: 1px;
+    padding-bottom: 2px;
+    padding-right: 3px;
+    border: none !important;
+
+  }
+  .VS-search.VS-readonly .search_facet .search_facet_remove {
+    display: none;
+  }
+  .VS-search .search_facet .search_facet_remove {
+    position: absolute;
+    left: 5px;
+    top: 4px;
+  }
+  .VS-search .search_facet.search_facet_maybe_delete .category,
+  .VS-search .search_facet.search_facet_maybe_delete input {
+    color: @red;
+  }
+
+/* ================ */
+/* = Search Input = */
+/* ================ */
+
+.VS-search .search_input {
+  height: 28px;
+  float: left;
+  margin-left: -1px;
+  
+}
+  .VS-search .search_input input {
+    padding: 6px 5px;
+    line-height: 10px;
+    height: 22px;
+    margin-top: 5px;
+    width: 10px;
+    z-index: 100;
+    min-width: 7px;
+    position: relative;
+    
+    border: none !important;
+    
+  }
+  .VS-search .search_input.is_editing input {
+    color: #202020;
+  }
+
+/* ================ */
+/* = Autocomplete = */
+/* ================ */
+
+.ui-helper-hidden-accessible {
+    display: none;
+}
+
+.VS-interface.ui-autocomplete {
+
+    position: absolute;
+    
+    cursor: pointer;
+    z-index: 10000;
+    margin: 0;
+    width: auto;
+    min-width: 100px;
+    max-width: 220px;
+    max-height: 240px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 12px;
+    top: 10px;
+    
+    border: 1px solid @main-border-color;
+    border-radius: @main-border-radius;
+}
+  .VS-interface.ui-autocomplete .ui-autocomplete-category {
+    text-transform: capitalize;
+    font-size: 11px;
+    padding: 4px 4px 4px;
+    border-top: 1px solid #A2A2A2;
+    border-bottom: 1px solid #A2A2A2;
+    background-color: #B7B7B7;
+    text-shadow: 0 -1px 0 #999;
+    font-weight: bold;
+    color: white;
+    cursor: default;
+  }
+  .VS-interface.ui-autocomplete .ui-menu-item {
+      float: none;
+  }
+  .VS-interface.ui-autocomplete .ui-menu-item a {
+    color: @black-60;
+    outline: none;
+    display: block;
+    padding: 6px 4px;
+    border-radius: none;
+    line-height: 1;
+    
+    background: #fff;
+    
+    border-top: 1px solid #FAFAFA;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .VS-interface.ui-autocomplete .ui-menu-item a:active {
+    outline: none;
+  }
+  .VS-interface.ui-autocomplete .ui-menu-item .ui-state-hover, .VS-interface.ui-autocomplete .ui-menu-item .ui-state-focus {
+    background-color: @l-blue;
+
+    border-top: 1px solid darken(@l-blue, 7%);
+    border-bottom: 1px solid darken(@l-blue, 7%);
+    border-left: none;
+    border-right: none;
+    color: white;
+    margin: 0;
+  }
+  .VS-interface.ui-autocomplete .ui-corner-all {
+    border-radius: 0;
+  }
+  .VS-interface.ui-autocomplete li {
+    list-style: none;
+    width: auto;
+  }

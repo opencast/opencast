@@ -1,0 +1,23 @@
+<section class="action-nav-bar">
+    <ng-include src="'modules/' + table.category + '/partials/' + table.resource + 'Buttons.html'"></ng-include>
+
+    <admin-ng-nav></admin-ng-nav>
+    <nav>
+        <a href="#/recordings/recordings" ng-class="{ active: table.resource == 'recordings' }" translate-cloak="RECORDINGS.NAVIGATION.LOCATIONS" with-role="ROLE_UI_LOCATIONS_VIEW"/>
+        <a href="#/recordings/locationblacklists" ng-class="{ active: table.resource == 'locationblacklists' }" translate-cloak="RECORDINGS.NAVIGATION.BLACKLISTS" with-role="ROLE_UI_LOCATIONSBLACKLISTS_VIEW"/>
+    </nav>
+</section>
+
+<div class="main-view">
+    <div data-admin-ng-notifications=""></div>
+
+    <div class="controls-container">
+
+        <div data-admin-ng-table-filter="" data-filters="filters" data-namespace="table.resource"></div>
+
+        <h1 translate="{{ table.caption }}"></h1>
+        <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.pagination.totalItems }}' }"></h4>
+
+    </div>
+    <div admin-ng-table="" table="table"></div>
+</div>

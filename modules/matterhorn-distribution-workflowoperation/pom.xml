@@ -77,6 +77,7 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/operations/publish-engage.xml,
+              OSGI-INF/operations/publish-internal.xml,
               OSGI-INF/operations/publish-youtube.xml,
               OSGI-INF/operations/retract-engage.xml,
               OSGI-INF/operations/retract-youtube.xml,

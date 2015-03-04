@@ -1,0 +1,166 @@
+.modal {
+    &#event-details-modal,
+    &#series-details-modal,
+    &#task-details-modal {
+
+        // Modal Size
+        &:extend(.large-modal);
+
+        .status {
+            line-height: 40px;
+            padding: 2px 20px;// Overide padding
+
+            > input[type="checkbox"] {
+                float: right;
+                margin: 5px -10px 0 0;
+            }
+        }
+
+        .edit-trim {
+
+            > .obj-container {
+                padding: 0px 20px 20px;
+
+                > p {
+                    padding-bottom: 20px;
+                }
+
+                > a {
+                    .btn(grey);
+                }
+            }
+        } // edit-trim
+
+        .media-content {
+
+            .desc {
+                margin-bottom: 0;
+            }
+
+            .action-container {
+                border-top: 1px solid @main-border-color;
+                padding: 20px;
+                margin: 0 auto;
+                text-align: center;
+
+                .drop-down-container {
+                    text-align: left;
+                }
+
+                > a {
+                    .btn(grey);
+                    margin-left: 5px;
+                    vertical-align: middle;
+                }
+            }
+
+        } // media-content
+
+        .access-control {
+
+            .desc {
+                border-bottom: none;
+            }
+
+            .obj-container {
+                padding-bottom: 15px;
+            }
+
+            .main-tbl {
+                border-top: 1px solid @main-border-color;
+                margin-top: 0;
+                .border-top-radius(0);
+            }
+
+            .add-remove-container {
+                .box-sizing();
+                border-top: 1px solid @main-border-color;
+                padding: 20px;
+                width: 100%;
+
+                .left  { float: left; }
+                .right { float: right; }
+
+                .fa {
+                    font-size: 20px;
+                    vertical-align: middle;
+                    margin-right: 10px;
+                }
+
+                .fa-plus-circle { color: @green; }
+                .fa-minus-circle { color: @red; }
+
+                .btn {
+                    .btn(green);
+                }
+
+            } // add-remove-continer
+
+        } // access-control
+
+        .trim-btn-container {
+            .trim-btn {
+                .btn(lightblue);
+                display: inline-block;
+                padding: 10px 25px;
+                margin-bottom: 10px;
+            }
+        }
+
+        .media-stream-details {
+            .main-tbl {
+                border-bottom: 1px solid @main-border-color;
+            }
+        }
+
+        .more-info-actions {
+
+            ul {
+                padding: @modal-container-padding;
+                font-size: 12px;
+
+                li {
+                    border: none;
+                }
+
+                a {
+                    float: right;
+                }
+            }
+
+        } // more-info-actions
+
+        .access-control {
+            
+            span {
+                font-size: 12px;
+            }
+
+            .fa-plus-circle {
+                color: @green;
+            }
+
+            .cancel {
+                .btn(grey);
+                margin-right: 5px;
+            }
+
+            .apply {
+                .btn(green);
+            }
+
+            .btn-container {
+                padding: 10px;
+            }
+
+        } // access-control
+
+        .current-privilege {
+            .sel-dd {
+                width: 200px;
+                margin-top: 10px;
+            }
+        }
+
+    } // events & series modal
+} // modal

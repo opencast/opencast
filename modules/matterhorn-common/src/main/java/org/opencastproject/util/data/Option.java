@@ -19,6 +19,8 @@ package org.opencastproject.util.data;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
+import com.entwinemedia.fn.data.Opt;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -164,6 +166,8 @@ public abstract class Option<A> implements Iterable<A> {
    */
   public abstract <B> Either<B, A> right(B left);
 
+  public abstract Opt<A> toOpt();
+
   /** Inversion. If some return none. If none return some(zero). */
   public Option<A> inv(A zero) {
     return isSome() ? Option.<A> none() : some(zero);
@@ -252,6 +256,11 @@ public abstract class Option<A> implements Iterable<A> {
       @Override
       public <B> Either<B, A> right(B left) {
         return Either.right(a);
+      }
+
+      @Override
+      public Opt<A> toOpt() {
+        return Opt.some(a);
       }
 
       @Override
@@ -349,6 +358,11 @@ public abstract class Option<A> implements Iterable<A> {
       @Override
       public <B> Either<B, A> right(B left) {
         return Either.left(left);
+      }
+
+      @Override
+      public Opt<A> toOpt() {
+        return Opt.none();
       }
 
       @Override

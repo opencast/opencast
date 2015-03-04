@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+	name="org.opencastproject.adminui.endpoint.CaptureAgentsEndpoint" immediate="true">
+	<implementation class="org.opencastproject.adminui.endpoint.CaptureAgentsEndpoint" />
+	<property name="service.description" value="Admin UI - Capture agents facade Endpoint" />
+
+	<property name="opencast.service.type"
+		value="org.opencastproject.adminui.endpoint.UsersEndpoint" />
+	<property name="opencast.service.path" value="/admin-ng/capture-agents" />
+	<service>
+		<provide interface="org.opencastproject.adminui.endpoint.CaptureAgentsEndpoint" />
+	</service>
+	
+  <reference name="captureAgentService" interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
+    cardinality="1..1" policy="static" bind="setCaptureAgentService" unbind="unsetService" />
+   <reference bind="setParticipationPersistence"
+             cardinality="0..1"
+             interface="org.opencastproject.pm.api.persistence.ParticipationManagementDatabase"
+             name="participationPersistence"
+             policy="dynamic" />
+</scr:component>

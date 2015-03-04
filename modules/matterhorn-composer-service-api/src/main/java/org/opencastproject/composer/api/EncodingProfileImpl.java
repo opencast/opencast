@@ -61,9 +61,10 @@ public class EncodingProfileImpl implements EncodingProfile {
   @XmlElement(name = "outputmediatype")
   protected MediaType outputType = null;
 
-  /** Suffix */
+  /** Suffix
   @XmlElement(name = "suffix")
   protected String suffix = null;
+  */
 
   /** Mime type */
   @XmlElement(name = "mimetype")
@@ -77,6 +78,9 @@ public class EncodingProfileImpl implements EncodingProfile {
   @XmlElement(name = "extension")
   @XmlElementWrapper(name = "extensions")
   protected List<Extension> extensions = new ArrayList<Extension>();
+
+  @XmlElementWrapper(name = "suffixes")
+  protected HashMap<String,String> suffixes = new HashMap<String, String>();
 
   /**
    * Private, since the profile should be created using the static factory method.
@@ -173,7 +177,12 @@ public class EncodingProfileImpl implements EncodingProfile {
    */
   @Override
   public String getSuffix() {
-    return suffix;
+    if (suffixes.keySet().size() == 0) return null;
+    if (suffixes.containsKey("default")) {
+      return suffixes.get("default");
+    } else {
+      return suffixes.get(suffixes.values().toArray()[0]);
+    }
   }
 
   /**
@@ -183,7 +192,17 @@ public class EncodingProfileImpl implements EncodingProfile {
    *          the file suffix
    */
   public void setSuffix(String suffix) {
-    this.suffix = suffix;
+    setSuffix("default", suffix);
+  }
+
+  /**
+   * Sets the suffix for encoded file names.
+   *
+   * @param suffix
+   *          the file suffix
+   */
+  public void setSuffix(String tag ,String suffix) {
+    this.suffixes.put(tag, suffix);
   }
 
   /**
@@ -355,6 +374,17 @@ public class EncodingProfileImpl implements EncodingProfile {
   @Override
   public String toString() {
     return identifier;
+  }
+
+  @Override
+  public String getSuffix(String tag) {
+    if (suffixes.containsKey(tag)) return suffixes.get(tag);
+    else return null;
+  }
+
+  @Override
+  public List<String> getTags() {
+    return new ArrayList<String>(suffixes.keySet());
   }
 
   /**
