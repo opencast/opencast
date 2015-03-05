@@ -61,11 +61,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +87,7 @@ import java.util.concurrent.ExecutionException;
  * run a text analysis on the associated still images. The resulting <code>VideoText</code> elements will then be added
  * to the segments.
  */
-public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
+public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperationHandler implements ManagedService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(TextAnalysisWorkflowOperationHandler.class);
@@ -104,14 +101,11 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
   /** Name of the constant used to retreive the stability threshold */
   public static final String OPT_STABILITY_THRESHOLD = "stabilitythreshold";
 
-  /** Pid of the videosegmenter */
-  private static final String VIDEOSEGMENTER_PID = "org.opencastproject.analysis.vsegmenter.VideoSegmenter";
-
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
-  /** The operation handler's bundle context */
-  private BundleContext bundleContext = null;
+  /** The stability threshold */
+  private int stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
 
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
@@ -176,16 +170,6 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
-   */
-  public void activate(ComponentContext cc) {
-    super.activate(cc);
-    bundleContext = cc.getBundleContext();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -240,11 +224,6 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
       return createResult(mediaPackage, Action.CONTINUE);
     }
 
-    // We need the videosegmenter's stability threshold in order to do proper work. If we can't get it, the default is
-    // most probably ok, but certainly suboptimal.
-    int stabilityThreshold = getStabilityThreshold();
-    logger.debug("Using stability threshold {}s for slide extraction", stabilityThreshold);
-
     // Loop over all existing segment catalogs
     for (Entry<Catalog, Mpeg7Catalog> mapEntry : catalogs.entrySet()) {
       Map<VideoSegment, Job> jobs = new HashMap<VideoSegment, Job>();
@@ -266,7 +245,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
         // Create a copy that will contain the segments enriched with the video text elements
         Mpeg7Catalog textCatalog = mapEntry.getValue().clone();
-        Track sourceTrack = (Track) mediaPackage.getTrack(catalogRef.getIdentifier());
+        Track sourceTrack = mediaPackage.getTrack(catalogRef.getIdentifier());
 
         // Load the temporal decomposition (segments)
         Video videoContent = textCatalog.videoContent().next();
@@ -524,36 +503,24 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
   }
 
   /**
-   * Determine the stability threshold used to select the slide extraction timepoint.
-   *
-   * @return the stability threshold in seconds
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  private int getStabilityThreshold() {
-    logger.debug("Looking up the videosegmenter's service configuration");
-
-    ServiceReference ref = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
-    if (ref == null)
-      return DEFAULT_STABILITY_THRESHOLD;
-    ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(ref);
-    if (configAdmin == null)
-      return DEFAULT_STABILITY_THRESHOLD;
-    try {
-      Configuration config = configAdmin.getConfiguration(VIDEOSEGMENTER_PID);
-      if (config == null)
-        return DEFAULT_STABILITY_THRESHOLD;
-      Dictionary<?, ?> properties = config.getProperties();
-      if (properties.get(OPT_STABILITY_THRESHOLD) != null) {
-        String threshold = (String) properties.get(OPT_STABILITY_THRESHOLD);
-        try {
-          return Integer.parseInt(threshold);
-        } catch (Exception e) {
-          logger.warn("Found illegal value '{}' for videosegmenter's stability threshold", threshold);
-        }
+  @SuppressWarnings("rawtypes")
+  @Override
+  public void updated(Dictionary properties) throws ConfigurationException {
+    if (properties != null && properties.get(OPT_STABILITY_THRESHOLD) != null) {
+      String threshold = StringUtils.trimToNull((String)properties.get(OPT_STABILITY_THRESHOLD));
+      try {
+        stabilityThreshold = Integer.parseInt(threshold);
+        logger.info("The videosegmenter's stability threshold has been set to {} frames", stabilityThreshold);
+      } catch (Exception e) {
+        stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
+        logger.warn("Found illegal value '{}' for the videosegmenter stability threshold. Falling back to default value of {} frames", threshold, DEFAULT_STABILITY_THRESHOLD);
       }
-    } catch (IOException e) {
-      logger.warn("Error reading the videosegmenter's service configuration");
+    } else {
+      stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
+      logger.warn("Using the default value of {} frames for the videosegmenter stability threshold", DEFAULT_STABILITY_THRESHOLD);
     }
-    return DEFAULT_STABILITY_THRESHOLD;
   }
 
   /**
@@ -561,7 +528,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    *
    * @param composerService
    */
-  public void setComposerService(ComposerService composerService) {
+  void setComposerService(ComposerService composerService) {
     this.composer = composerService;
   }
 
