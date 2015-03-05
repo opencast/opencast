@@ -103,7 +103,6 @@ public class Main {
     options.addOption(new Option("help", false, "print this message"));
     options.addOption(new Option("withperf", false, "run the performance tests"));
     options.addOption(new Option("withserver", false, "run the tests for the server side components"));
-    options.addOption(new Option("withcapture", false, "run the tests for the capture agent"));
     options.addOption(new Option("withff", false, "run the selenium user interface tests with the firefox browser"));
     options.addOption(new Option("withchrome", false, "run the selenium user interface tests with the chrome browser"));
     options.addOption(new Option("withsafari", false, "run the selenium user interface tests with the safari browser"));
@@ -144,14 +143,6 @@ public class Main {
       if (line.hasOption("withperf")) {
         System.out.println("Running with the server performance test suite enabled");
         testClasses.add(ServerPerformanceTests.class);
-      }
-    }
-    if (line.hasOption("withcapture")) {
-      System.out.println("Running 'capture' test suite");
-      testClasses.add(CaptureAgentTests.class);
-      if (line.hasOption("withperf")) {
-        // TODO: Add capture agent performance tests
-        // System.out.println("Running with the 'capture' performance test suite enabled");
       }
     }
 
