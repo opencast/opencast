@@ -15,6 +15,8 @@
  */
 package org.opencastproject.security.shibboleth;
 
+import org.opencastproject.security.api.UserDirectoryService;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter;
@@ -55,6 +57,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
    * @param request
    *          the incoming request
    */
+  @Override
   protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
     String o = (String) (super.getPreAuthenticatedPrincipal(request));
     if (debug)
@@ -66,6 +69,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
         }
       } catch (UsernameNotFoundException e) {
         loginHandler.newUserLogin(o, request);
+        ((UserDirectoryService) userDetailsService).invalidate(o);
       }
     }
     return o;
