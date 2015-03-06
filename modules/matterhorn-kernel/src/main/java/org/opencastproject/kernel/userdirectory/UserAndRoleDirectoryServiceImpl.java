@@ -29,10 +29,10 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.api.UserProvider;
-import org.opencastproject.util.Cache;
-import org.opencastproject.util.Caches;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
+
+import com.google.common.collect.MapMaker;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.slf4j.Logger;
@@ -48,6 +48,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Federates user and role providers, and exposes a spring UserDetailsService so user lookups can be used by spring
@@ -70,7 +72,19 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   /** The security service */
   protected SecurityService securityService = null;
 
-  private Cache<Tuple<String, String>, User> cache = Caches.lru(200, 60000);
+  /** A token to store in the miss cache */
+  private Object nullToken = new Object();
+
+  /** A cache of users, which lightens the load on the LDAP server */
+  private ConcurrentMap<Tuple<String, String>, Object> cache = new MapMaker().maximumSize(1000)
+          .expireAfterWrite(1, TimeUnit.MINUTES)
+          .makeComputingMap(new com.google.common.base.Function<Tuple<String, String>, Object>() {
+            @Override
+            public Object apply(Tuple<String, String> orgUser) {
+              User user = loadUser.apply(orgUser);
+              return user == null ? nullToken : user;
+            }
+          });
 
   /**
    * Adds a user provider.
@@ -174,7 +188,15 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     if (org == null) {
       throw new IllegalStateException("No organization is set");
     }
-    return cache.get(tuple(org.getId(), userName), loadUser);
+
+    Object user = cache.get(tuple(org.getId(), userName));
+    if (user == nullToken) {
+      logger.debug("Returning null user from Cache");
+      return null;
+    } else {
+      logger.debug("Returning user " + userName + " from cache");
+      return (User) user;
+    }
   }
 
   /** Load a user of an organization. */
@@ -308,6 +330,16 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       roles.addAll(IteratorUtils.toList(roleProvider.findRoles(query, 0, 0)));
     }
     return offsetLimitCollection(offset, limit, roles).iterator();
+  }
+
+  @Override
+  public void invalidate(String userName) {
+    Organization org = securityService.getOrganization();
+    if (org == null)
+      throw new IllegalStateException("No organization is set");
+
+    cache.remove(tuple(org.getId(), userName));
+    logger.trace("Invalidated user {} from user directories", userName);
   }
 
   private <T> HashSet<T> offsetLimitCollection(int offset, int limit, HashSet<T> entries) {
