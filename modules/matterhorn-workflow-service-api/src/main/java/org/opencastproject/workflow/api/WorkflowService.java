@@ -279,10 +279,13 @@ public interface WorkflowService {
    *           if no paused workflow with this identifier exists
    * @throws WorkflowException
    *           if there is a problem processing the workflow
+   * @throws IllegalStateException
+   *           if the workflow with this identifier is not in the paused state
    * @throws UnauthorizedException
    *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
    */
-  WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowException, UnauthorizedException;
+  WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowException, IllegalStateException,
+          UnauthorizedException;
 
   /**
    * Resumes a suspended workflow instance, applying new properties to the workflow.

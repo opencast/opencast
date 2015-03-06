@@ -20,6 +20,7 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -29,6 +30,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
+import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowListener;
@@ -476,7 +478,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    * @see org.opencastproject.workflow.api.WorkflowService#resume(long)
    */
   @Override
-  public WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowDatabaseException {
+  public WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, UnauthorizedException,
+          WorkflowException {
     return resume(workflowInstanceId, null);
   }
 
@@ -487,7 +490,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public WorkflowInstance resume(long workflowInstanceId, Map<String, String> properties) throws NotFoundException,
-          WorkflowDatabaseException {
+          UnauthorizedException, WorkflowException {
     HttpPost post = new HttpPost("/resume");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("id", Long.toString(workflowInstanceId)));
@@ -498,11 +501,13 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     } catch (UnsupportedEncodingException e) {
       throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
     }
-    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND);
+    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
         if (response.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
           throw new NotFoundException("Workflow instance with id='" + workflowInstanceId + "' not found");
+        } else if (response.getStatusLine().getStatusCode() == SC_UNAUTHORIZED) {
+          throw new UnauthorizedException("You do not have permission to resume");
         } else {
           logger.info("Workflow '{}' resumed", workflowInstanceId);
           return WorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
@@ -510,12 +515,14 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
       }
     } catch (NotFoundException e) {
       throw e;
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
-      throw new WorkflowDatabaseException(e);
+      throw new WorkflowException(e);
     } finally {
       closeConnection(response);
     }
-    throw new WorkflowDatabaseException("Unable to resume workflow instance " + workflowInstanceId);
+    throw new WorkflowException("Unable to resume workflow instance " + workflowInstanceId);
   }
 
   /**
