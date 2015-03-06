@@ -273,10 +273,13 @@ public interface WorkflowService {
    *           if no paused workflow with this identifier exists
    * @throws WorkflowException
    *           if there is a problem processing the workflow
+   * @throws IllegalStateException
+   *           if the workflow with this identifier is not in the paused state
    * @throws UnauthorizedException
    *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
    */
-  WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowException, UnauthorizedException;
+  WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowException, IllegalStateException,
+          UnauthorizedException;
 
   /**
    * Resumes a suspended workflow instance, applying new properties to the workflow.
@@ -322,13 +325,17 @@ public interface WorkflowService {
 
   /**
    * Move workflows where the capture should have started from upcoming into failure status.
-   * @param buffer The amount of time in seconds to wait for a capture to move from Upcoming to Capturing
+   * 
+   * @param buffer
+   *          The amount of time in seconds to wait for a capture to move from Upcoming to Capturing
    */
   void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException;
 
   /**
    * Move workflows where the ingest has not been successful or is taking longer than expected into a failure status.
-   * @param buffer The amount of time in seconds to wait for an ingest to notify the workflow service.
+   * 
+   * @param buffer
+   *          The amount of time in seconds to wait for an ingest to notify the workflow service.
    */
   void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException;
 

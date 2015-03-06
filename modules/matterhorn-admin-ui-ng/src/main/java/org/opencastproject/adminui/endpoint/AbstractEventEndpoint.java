@@ -417,10 +417,8 @@ public abstract class AbstractEventEndpoint {
       if (workflowSet.size() == 0)
         notFoundWorkflow = true;
       for (WorkflowInstance instance : workflowSet.getItems()) {
-        synchronized (this) {
-          getWorkflowService().stop(instance.getId());
-          getWorkflowService().remove(instance.getId());
-        }
+        getWorkflowService().stop(instance.getId());
+        getWorkflowService().remove(instance.getId());
       }
     } catch (NotFoundException e) {
       notFoundWorkflow = true;

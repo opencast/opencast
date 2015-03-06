@@ -63,6 +63,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.Log;
+import org.opencastproject.util.MultiResourceLock;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function0;
@@ -97,6 +98,7 @@ import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.FnX;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
@@ -257,6 +259,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   /** List of initially delayed workflows */
   private final List<Long> delayedWorkflows = new ArrayList<Long>();
+
+  /** Concurrent maps for lock objects */
+  private final MultiResourceLock lock = new MultiResourceLock();
+  private final MultiResourceLock updateLock = new MultiResourceLock();
 
   static {
     YES = new HashSet<String>(Arrays.asList(new String[] { "yes", "true", "on" }));
@@ -984,15 +990,20 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public WorkflowInstance stop(long workflowInstanceId) throws WorkflowException, NotFoundException,
           UnauthorizedException {
-    WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
-    instance.setState(STOPPED);
+    return lock.synchronize(workflowInstanceId, new FnX<Long, WorkflowInstance>() {
+      @Override
+      public WorkflowInstance apx(Long workflowInstanceId) throws Exception {
+        WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
+        instance.setState(STOPPED);
 
-    // Update the workflow instance
-    update(instance);
+        // Update the workflow instance
+        update(instance);
 
-    removeTempFiles(instance);
+        removeTempFiles(instance);
 
-    return instance;
+        return instance;
+      }
+    });
   }
 
   private void removeTempFiles(WorkflowInstance workflowInstance) throws WorkflowDatabaseException,
@@ -1018,74 +1029,82 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public void remove(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException,
           UnauthorizedException, WorkflowParsingException, WorkflowStateException {
-    WorkflowQuery query = new WorkflowQuery();
-    query.withId(Long.toString(workflowInstanceId));
-    WorkflowSet workflows = index.getWorkflowInstances(query, Permissions.Action.READ.toString(), false);
-    if (workflows.size() == 1) {
-      WorkflowInstance instance = workflows.getItems()[0];
+    lock.synchronize(workflowInstanceId, new FnX<Long, Void>() {
+      @Override
+      public Void apx(Long workflowInstanceId) throws Exception {
+        WorkflowQuery query = new WorkflowQuery();
+        query.withId(Long.toString(workflowInstanceId));
+        WorkflowSet workflows = index.getWorkflowInstances(query, Permissions.Action.READ.toString(), false);
+        if (workflows.size() == 1) {
+          WorkflowInstance instance = workflows.getItems()[0];
 
-      WorkflowInstance.WorkflowState state = instance.getState();
-      if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED && state != WorkflowState.STOPPED)
-        throw new WorkflowStateException("Workflow instance with state '" + state
-                + "' cannot be removed. Only states SUCCEEDED, FAILED & STOPPED are allowed");
+          WorkflowInstance.WorkflowState state = instance.getState();
+          if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED && state != WorkflowState.STOPPED)
+            throw new WorkflowStateException("Workflow instance with state '" + state
+                                                     + "' cannot be removed. Only states SUCCEEDED, FAILED & STOPPED are allowed");
 
-      try {
-        assertPermission(instance, Permissions.Action.WRITE.toString());
-      } catch (MediaPackageException e) {
-        throw new WorkflowParsingException(e);
-      }
+          try {
+            assertPermission(instance, Permissions.Action.WRITE.toString());
+          } catch (MediaPackageException e) {
+            throw new WorkflowParsingException(e);
+          }
 
-      // First, remove temporary files DO THIS BEFORE REMOVING FROM INDEX
-      try {
-        removeTempFiles(instance);
-      } catch (NotFoundException e) {
-        // If the files aren't their anymore, we don't have to cleanup up them :-)
-        logger.debug("Temporary files of workflow instance %d seem to be gone already...", workflowInstanceId);
-      }
+          // First, remove temporary files DO THIS BEFORE REMOVING FROM INDEX
+          try {
+            removeTempFiles(instance);
+          } catch (NotFoundException e) {
+            // If the files aren't their anymore, we don't have to cleanup up them :-)
+            logger.debug("Temporary files of workflow instance %d seem to be gone already...", workflowInstanceId);
+          }
 
-      // Second, remove jobs related to a operation which belongs to the workflow instance
-      List<WorkflowOperationInstance> operations = instance.getOperations();
-      for (WorkflowOperationInstance op : operations) {
-        if (op.getId() != null) {
-          long workflowOpId = op.getId();
-          if (workflowOpId != workflowInstanceId) {
-            try {
-              serviceRegistry.removeJob(workflowOpId);
-            } catch (ServiceRegistryException e) {
-              logger.warn("Problems while removing jobs related to workflow operation '%d': %s", workflowOpId,
-                      e.getMessage());
-            } catch (NotFoundException e) {
-              logger.debug("No jobs related to the workflow operation '%d' found in the service registry", workflowOpId);
+          // Second, remove jobs related to a operation which belongs to the workflow instance
+          List<WorkflowOperationInstance> operations = instance.getOperations();
+          for (WorkflowOperationInstance op : operations) {
+            if (op.getId() != null) {
+              long workflowOpId = op.getId();
+              if (workflowOpId != workflowInstanceId) {
+                try {
+                  serviceRegistry.removeJob(workflowOpId);
+                } catch (ServiceRegistryException e) {
+                  logger.warn("Problems while removing jobs related to workflow operation '%d': %s", workflowOpId,
+                              e.getMessage());
+                } catch (NotFoundException e) {
+                  logger.debug("No jobs related to the workflow operation '%d' found in the service registry",
+                               workflowOpId);
+                }
+              }
             }
           }
+
+          // Third, remove workflow instance job itself
+          try {
+            serviceRegistry.removeJob(workflowInstanceId);
+            messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
+                                            WorkflowItem.deleteInstance(workflowInstanceId, instance));
+          } catch (ServiceRegistryException e) {
+            logger.warn("Problems while removing workflow instance job '%d': %s", workflowInstanceId,
+                        ExceptionUtils.getStackTrace(e));
+          } catch (NotFoundException e) {
+            logger.info("No workflow instance job '%d' found in the service registry", workflowInstanceId);
+          }
+
+          // At last, remove workflow instance from the index
+          try {
+            index.remove(workflowInstanceId);
+          } catch (NotFoundException e) {
+            // This should never happen, because we got workflow instance by querying the index...
+            logger.warn("Workflow instance could not be removed from index: %s", ExceptionUtils.getStackTrace(e));
+          }
+        } else if (workflows.size() == 0) {
+          throw new NotFoundException("Workflow instance with id '" + Long.toString(workflowInstanceId)
+                                              + "' could not be found");
+        } else {
+          throw new WorkflowDatabaseException("More than one workflow found with id: "
+                                                      + Long.toString(workflowInstanceId));
         }
+        return null;
       }
-
-      // Third, remove workflow instance job itself
-      try {
-        serviceRegistry.removeJob(workflowInstanceId);
-        messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
-                WorkflowItem.deleteInstance(workflowInstanceId, instance));
-      } catch (ServiceRegistryException e) {
-        logger.warn("Problems while removing workflow instance job '%d': %s", workflowInstanceId,
-                ExceptionUtils.getStackTrace(e));
-      } catch (NotFoundException e) {
-        logger.info("No workflow instance job '%d' found in the service registry", workflowInstanceId);
-      }
-
-      // At last, remove workflow instance from the index
-      try {
-        index.remove(workflowInstanceId);
-      } catch (NotFoundException e) {
-        // This should never happen, because we got workflow instance by querying the index...
-        logger.warn("Workflow instance could not be removed from index: %s", ExceptionUtils.getStackTrace(e));
-      }
-    } else if (workflows.size() == 0) {
-      throw new NotFoundException("Workflow instance with id '" + Long.toString(workflowInstanceId)
-              + "' could not be found");
-    } else {
-      throw new WorkflowDatabaseException("More than one workflow found with id: " + Long.toString(workflowInstanceId));
-    }
+    });
   }
 
   /**
@@ -1096,10 +1115,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public WorkflowInstance suspend(long workflowInstanceId) throws WorkflowException, NotFoundException,
           UnauthorizedException {
-    WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
-    instance.setState(PAUSED);
-    update(instance);
-    return instance;
+    return lock.synchronize(workflowInstanceId, new FnX<Long, WorkflowInstance>() {
+      @Override
+      public WorkflowInstance apx(Long workflowInstanceId) throws Exception {
+        WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
+        instance.setState(PAUSED);
+        update(instance);
+        return instance;
+      }
+    });
   }
 
   /**
@@ -1108,7 +1132,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.workflow.api.WorkflowService#resume(long)
    */
   @Override
-  public WorkflowInstance resume(long id) throws WorkflowException, NotFoundException, UnauthorizedException {
+  public WorkflowInstance resume(long id) throws WorkflowException, NotFoundException, IllegalStateException,
+          UnauthorizedException {
     return resume(id, null);
   }
 
@@ -1119,13 +1144,35 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public WorkflowInstance resume(long workflowInstanceId, Map<String, String> properties) throws WorkflowException,
-          NotFoundException, UnauthorizedException {
-
+          NotFoundException, IllegalStateException, UnauthorizedException {
     WorkflowInstance workflowInstance = getWorkflowById(workflowInstanceId);
+    if (!WorkflowState.PAUSED.equals(workflowInstance.getState()))
+      throw new IllegalStateException("Can not resume a workflow where the current state is not in paused");
+
     workflowInstance = updateConfiguration(workflowInstance, properties);
     update(workflowInstance);
 
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
+
+    // Is the workflow done?
+    if (currentOperation == null) {
+      // Let's make sure we didn't miss any failed operation, since the workflow state could have been
+      // switched to paused while processing the error handling workflow extension
+      workflowInstance.setState(SUCCEEDED);
+      for (WorkflowOperationInstance op : workflowInstance.getOperations()) {
+        if (op.getState().equals(WorkflowOperationInstance.OperationState.FAILED)) {
+          if (op.isFailWorkflowOnException()) {
+            workflowInstance.setState(FAILED);
+            break;
+          }
+        }
+      }
+
+      // Save the resumed workflow to the database
+      logger.debug("%s has %s", workflowInstance, workflowInstance.getState());
+      update(workflowInstance);
+      return workflowInstance;
+    }
 
     // We can resume workflows when they are in either the paused state, or they are being advanced manually passed
     // certain operations. In the latter case, there is no current paused operation.
@@ -1155,9 +1202,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
 
     Long operationJobId = workflowInstance.getCurrentOperation().getId();
-    if (operationJobId == null) {
+    if (operationJobId == null)
       throw new IllegalStateException("Can not resume a workflow where the current operation has no associated id");
-    }
 
     // Set the current operation's job to queued, so it gets picked up again
     Job workflowJob;
@@ -1229,121 +1275,128 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public void update(final WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException {
-    WorkflowInstance originalWorkflowInstance = null;
-    try {
-      originalWorkflowInstance = getWorkflowById(workflowInstance.getId());
-    } catch (NotFoundException e) {
-      // That's fine, it's a new workflow instance
-    }
+    updateLock.synchronize(workflowInstance.getId(), new FnX<Long, Void>() {
+      @Override
+      public Void apx(Long a) throws Exception {
+        WorkflowInstance originalWorkflowInstance = null;
+        try {
+          originalWorkflowInstance = getWorkflowById(workflowInstance.getId());
+        } catch (NotFoundException e) {
+          // That's fine, it's a new workflow instance
+        }
 
-    if (originalWorkflowInstance != null) {
-      try {
-        assertPermission(originalWorkflowInstance, Permissions.Action.WRITE.toString());
-      } catch (MediaPackageException e) {
-        throw new WorkflowParsingException(e);
+        if (originalWorkflowInstance != null) {
+          try {
+            assertPermission(originalWorkflowInstance, Permissions.Action.WRITE.toString());
+          } catch (MediaPackageException e) {
+            throw new WorkflowParsingException(e);
+          }
+        }
+
+        // Before we persist this, extract the metadata
+        final MediaPackage updatedMediaPackage = workflowInstance.getMediaPackage();
+        populateMediaPackageMetadata(updatedMediaPackage);
+        String seriesId = updatedMediaPackage.getSeries();
+        if (seriesId != null && workflowInstance.getCurrentOperation() != null) {
+          // If the mediapackage contains a series, find the series ACLs and add the security information to the
+          // mediapackage
+          try {
+            AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
+            Option<AccessControlList> activeSeriesAcl = authorizationService.getAcl(updatedMediaPackage,
+                    AclScope.Series);
+            if (activeSeriesAcl.isNone() || !AccessControlUtil.equals(activeSeriesAcl.get(), acl))
+              authorizationService.setAcl(updatedMediaPackage, AclScope.Series, acl);
+          } catch (SeriesException e) {
+            throw new WorkflowDatabaseException(e);
+          } catch (NotFoundException e) {
+            logger.warn("Series %s not found, unable to set ACLs", seriesId);
+          } catch (Exception e) {
+            logger.error("Error reading ACL from series {}: {}", seriesId, e);
+          }
+        }
+
+        // Synchronize the job status with the workflow
+        WorkflowState workflowState = workflowInstance.getState();
+        String xml;
+        try {
+          xml = WorkflowParser.toXml(workflowInstance);
+        } catch (Exception e) {
+          // Can't happen, since we are converting from an in-memory object
+          throw new IllegalStateException("In-memory workflow instance could not be serialized", e);
+        }
+
+        Job job = null;
+        try {
+          job = serviceRegistry.getJob(workflowInstance.getId());
+          job.setPayload(xml);
+
+          // Synchronize workflow and job state
+          switch (workflowState) {
+            case FAILED:
+              job.setStatus(Status.FAILED);
+              break;
+            case FAILING:
+              break;
+            case INSTANTIATED:
+              job.setDispatchable(true);
+              job.setStatus(Status.QUEUED);
+              break;
+            case PAUSED:
+              job.setStatus(Status.PAUSED);
+              break;
+            case RUNNING:
+              job.setStatus(Status.RUNNING);
+              break;
+            case STOPPED:
+              job.setStatus(Status.DELETED);
+              break;
+            case SUCCEEDED:
+              job.setStatus(Status.FINISHED);
+              break;
+            default:
+              throw new IllegalStateException("Found a workflow state that is not handled");
+          }
+        } catch (ServiceRegistryException e) {
+          logger.error(e, "Unable to read workflow job %s from service registry", workflowInstance.getId());
+          throw new WorkflowDatabaseException(e);
+        } catch (NotFoundException e) {
+          logger.error("Job for workflow %s not found in service registry", workflowInstance.getId());
+          throw new WorkflowDatabaseException(e);
+        }
+
+        // Update both workflow and workflow job
+        try {
+          serviceRegistry.updateJob(job);
+          messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
+                  WorkflowItem.updateInstance(workflowInstance));
+          index(workflowInstance);
+        } catch (ServiceRegistryException e) {
+          logger.error(
+                  "Update of workflow job %s in the service registry failed, service registry and workflow index may be out of sync",
+                  workflowInstance.getId());
+          throw new WorkflowDatabaseException(e);
+        } catch (NotFoundException e) {
+          logger.error("Job for workflow %s not found in service registry", workflowInstance.getId());
+          throw new WorkflowDatabaseException(e);
+        } catch (Exception e) {
+          logger.error(
+                  "Update of workflow job %s in the service registry failed, service registry and workflow index may be out of sync",
+                  job.getId());
+          throw new WorkflowException(e);
+        }
+
+        workflowsStatistics.updateWorkflow(getBeanStatistics(), getHoldWorkflows());
+
+        try {
+          WorkflowInstance clone = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(workflowInstance));
+          fireListeners(originalWorkflowInstance, clone);
+        } catch (Exception e) {
+          // Can't happen, since we are converting from an in-memory object
+          throw new IllegalStateException("In-memory workflow instance could not be serialized", e);
+        }
+        return null;
       }
-    }
-
-    // Before we persist this, extract the metadata
-    final MediaPackage updatedMediaPackage = workflowInstance.getMediaPackage();
-    populateMediaPackageMetadata(updatedMediaPackage);
-    String seriesId = updatedMediaPackage.getSeries();
-    if (seriesId != null && workflowInstance.getCurrentOperation() != null) {
-      // If the mediapackage contains a series, find the series ACLs and add the security information to the
-      // mediapackage
-      try {
-        AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
-        Option<AccessControlList> activeSeriesAcl = authorizationService.getAcl(updatedMediaPackage, AclScope.Series);
-        if (activeSeriesAcl.isNone() || !AccessControlUtil.equals(activeSeriesAcl.get(), acl))
-          authorizationService.setAcl(updatedMediaPackage, AclScope.Series, acl);
-      } catch (SeriesException e) {
-        throw new WorkflowDatabaseException(e);
-      } catch (NotFoundException e) {
-        logger.warn("Series %s not found, unable to set ACLs", seriesId);
-      } catch (Exception e) {
-        logger.error("Error reading ACL from series {}: {}", seriesId, e);
-      }
-    }
-
-    // Synchronize the job status with the workflow
-    WorkflowState workflowState = workflowInstance.getState();
-    String xml;
-    try {
-      xml = WorkflowParser.toXml(workflowInstance);
-    } catch (Exception e) {
-      // Can't happen, since we are converting from an in-memory object
-      throw new IllegalStateException("In-memory workflow instance could not be serialized", e);
-    }
-
-    Job job = null;
-    try {
-      job = serviceRegistry.getJob(workflowInstance.getId());
-      job.setPayload(xml);
-
-      // Synchronize workflow and job state
-      switch (workflowState) {
-        case FAILED:
-          job.setStatus(Status.FAILED);
-          break;
-        case FAILING:
-          break;
-        case INSTANTIATED:
-          job.setDispatchable(true);
-          job.setStatus(Status.QUEUED);
-          break;
-        case PAUSED:
-          job.setStatus(Status.PAUSED);
-          break;
-        case RUNNING:
-          job.setStatus(Status.RUNNING);
-          break;
-        case STOPPED:
-          job.setStatus(Status.DELETED);
-          break;
-        case SUCCEEDED:
-          job.setStatus(Status.FINISHED);
-          break;
-        default:
-          throw new IllegalStateException("Found a workflow state that is not handled");
-      }
-    } catch (ServiceRegistryException e) {
-      logger.error(e, "Unable to read workflow job %s from service registry", workflowInstance.getId());
-      throw new WorkflowDatabaseException(e);
-    } catch (NotFoundException e) {
-      logger.error("Job for workflow %s not found in service registry", workflowInstance.getId());
-      throw new WorkflowDatabaseException(e);
-    }
-
-    // Update both workflow and workflow job
-    try {
-      index(workflowInstance);
-      serviceRegistry.updateJob(job);
-      messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
-              WorkflowItem.updateInstance(workflowInstance));
-    } catch (ServiceRegistryException e) {
-      logger.error(
-              "Update of workflow job %s in the service registry failed, service registry and workflow index may be out of sync",
-              workflowInstance.getId());
-      throw new WorkflowDatabaseException(e);
-    } catch (NotFoundException e) {
-      logger.error("Job for workflow %s not found in service registry", workflowInstance.getId());
-      throw new WorkflowDatabaseException(e);
-    } catch (Exception e) {
-      logger.error(
-              "Update of workflow job %s in the service registry failed, service registry and workflow index may be out of sync",
-              job.getId());
-      throw new WorkflowException(e);
-    }
-
-    workflowsStatistics.updateWorkflow(getBeanStatistics(), getHoldWorkflows());
-
-    try {
-      WorkflowInstance clone = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(workflowInstance));
-      fireListeners(originalWorkflowInstance, clone);
-    } catch (Exception e) {
-      // Can't happen, since we are converting from an in-memory object
-      throw new IllegalStateException("In-memory workflow instance could not be serialized", e);
-    }
+    });
   }
 
   /**
@@ -2468,8 +2521,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *          The operation type the job was in when this occurred
    * @param buffer
    *          The amount of buffer time the job was given before it was expected to move onto the next operation.
-   * @param job
-   *          The job associated with this incident.
    */
   private void recordFailedOperationIncident(String operation, long buffer, Job job) {
     int failedCode;
@@ -2513,7 +2564,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.workflow.api.WorkflowService#moveMissingCapturesFromUpcomingToFailedStatus(long)
    */
   @Override
-  public void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
+  public synchronized void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
     failJobs(SCHEDULE_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, true);
   }
 
@@ -2523,13 +2574,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.workflow.api.WorkflowService#moveMissingIngestsFromUpcomingToFailedStatus(long)
    */
   @Override
-  public void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
+  public synchronized void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
     failJobs(CAPTURE_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, false);
     failJobs(INGEST_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, false);
   }
 
   @Override
-  public void cleanupWorkflowInstances(int buffer, WorkflowState state) throws UnauthorizedException,
+  public synchronized void cleanupWorkflowInstances(int buffer, WorkflowState state) throws UnauthorizedException,
           WorkflowDatabaseException {
     logger.info("Start cleaning up workflow instances older than {} days with status '{}'", buffer, state);
 

@@ -39,6 +39,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.LocalHashMap;
+import org.opencastproject.util.MultiResourceLock;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.UrlSupport;
@@ -69,6 +70,7 @@ import org.opencastproject.workflow.impl.WorkflowServiceImpl;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.FnX;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONArray;
@@ -133,6 +135,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   protected ServiceRegistry serviceRegistry = null;
   /** The workspace */
   private Workspace workspace;
+
+  /** Resource lock */
+  private final MultiResourceLock lock = new MultiResourceLock();
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
@@ -646,21 +651,12 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "resume", description = "Resumes a suspended workflow instance.", returnDescription = "An XML representation of the resumed workflow instance", restParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the resumed workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists.") })
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Can not resume workflow not in paused state"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate.") })
   public Response resume(@FormParam("id") long workflowInstanceId, @FormParam("properties") LocalHashMap properties)
           throws NotFoundException, UnauthorizedException {
-    Map<String, String> map;
-    if (properties == null) {
-      map = new HashMap<String, String>();
-    } else {
-      map = properties.getMap();
-    }
-    try {
-      WorkflowInstance workflow = service.resume(workflowInstanceId, map);
-      return Response.ok(workflow).build();
-    } catch (WorkflowException e) {
-      throw new WebApplicationException(e);
-    }
+    return resume(workflowInstanceId, null, properties);
   }
 
   @POST
@@ -671,45 +667,62 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "mediapackage", isRequired = false, description = "The new Mediapackage", type = TEXT),
           @RestParameter(name = "properties", isRequired = false, description = "Properties", type = TEXT) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the updated and resumed workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists.") })
-  public Response resume(@FormParam("id") long workflowInstanceId, @FormParam("mediapackage") String mediaPackage,
-          @FormParam("properties") LocalHashMap properties) throws NotFoundException, UnauthorizedException {
-    Map<String, String> map;
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Can not resume workflow not in paused state"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate.") })
+  public Response resume(@FormParam("id") long workflowInstanceId,
+          @FormParam("mediapackage") final String mediaPackage, @FormParam("properties") LocalHashMap properties)
+          throws NotFoundException, UnauthorizedException {
+    final Map<String, String> map;
     if (properties == null) {
       map = new HashMap<String, String>();
     } else {
       map = properties.getMap();
     }
-    try {
-      WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
-      if (mediaPackage != null) {
-        MediaPackage newMp = MediaPackageParser.getFromXml(mediaPackage);
-        MediaPackage oldMp = workflow.getMediaPackage();
-
-        // Delete removed elements from workspace
-        for (MediaPackageElement elem : oldMp.getElements()) {
-          if (MediaPackageSupport.contains(elem.getIdentifier(), newMp))
-            continue;
-          try {
-            workspace.delete(elem.getURI());
-            logger.info("Deleted removed mediapackge element {}", elem);
-          } catch (NotFoundException e) {
-            logger.info("Removed mediapackage element {} is already deleted", elem);
+    return lock.synchronize(workflowInstanceId, new FnX<Long, Response>() {
+      @Override
+      public Response apx(Long workflowInstanceId) throws Exception {
+        try {
+          WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
+          if (!WorkflowState.PAUSED.equals(workflow.getState())) {
+            logger.warn("Can not resume workflow '{}', not in state paused but {}", workflow, workflow.getState());
+            return Response.status(Status.BAD_REQUEST).build();
           }
-        }
 
-        workflow.setMediaPackage(newMp);
-        service.update(workflow);
+          if (mediaPackage != null) {
+            MediaPackage newMp = MediaPackageParser.getFromXml(mediaPackage);
+            MediaPackage oldMp = workflow.getMediaPackage();
+
+            // Delete removed elements from workspace
+            for (MediaPackageElement elem : oldMp.getElements()) {
+              if (MediaPackageSupport.contains(elem.getIdentifier(), newMp))
+                continue;
+              try {
+                workspace.delete(elem.getURI());
+                logger.info("Deleted removed mediapackge element {}", elem);
+              } catch (NotFoundException e) {
+                logger.info("Removed mediapackage element {} is already deleted", elem);
+              }
+            }
+
+            workflow.setMediaPackage(newMp);
+            service.update(workflow);
+          }
+          workflow = service.resume(workflowInstanceId, map);
+          return Response.ok(workflow).build();
+        } catch (NotFoundException e) {
+          return Response.status(Status.NOT_FOUND).build();
+        } catch (UnauthorizedException e) {
+          return Response.status(Status.UNAUTHORIZED).build();
+        } catch (WorkflowException e) {
+          logger.error(e.getMessage(), e);
+          return Response.serverError().build();
+        } catch (Exception e) {
+          logger.error(e.getMessage(), e);
+          return Response.serverError().build();
+        }
       }
-      service.resume(workflowInstanceId, map);
-      return Response.ok(workflow).build();
-    } catch (WorkflowException e) {
-      logger.error(e.getMessage(), e);
-      throw new WebApplicationException(e);
-    } catch (Exception e) {
-      logger.error(e.getMessage(), e);
-      throw new WebApplicationException(e);
-    }
+    });
   }
 
   @POST
@@ -795,8 +808,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("/failMissedCaptures")
   @RestQuery(name = "failMissedCaptures", description = "Find workflows that should have started capturing but haven't and move them to a failed status.", returnDescription = "No return value", reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Failed missing captures successfully"), @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.")}, restParameters = {
-          @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a capturing status update before marking a workflow as failed. It must be 0 or greater.")})
+          @RestResponse(responseCode = SC_OK, description = "Failed missing captures successfully"),
+          @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.") }, restParameters = { @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a capturing status update before marking a workflow as failed. It must be 0 or greater.") })
   public Response failMissedCaptures(@FormParam("buffer") long buffer) {
     if (buffer < 0) {
       return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
@@ -814,8 +827,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("/failMissedIngests")
   @RestQuery(name = "failMissedIngests", description = "Find workflows that should have started ingesting but haven't and move them to a failed status.", returnDescription = "No return value", reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Failed missing ingests successfully"), @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.")}, restParameters = {
-          @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a ingest status update before marking a workflow as failed. It must be 0 or greater.")})
+          @RestResponse(responseCode = SC_OK, description = "Failed missing ingests successfully"),
+          @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.") }, restParameters = { @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a ingest status update before marking a workflow as failed. It must be 0 or greater.") })
   public Response failMissedIngests(@FormParam("buffer") long buffer) {
     if (buffer < 0) {
       return Response.status(Status.BAD_REQUEST).build();
