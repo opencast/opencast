@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Synchronization utility to concurrently access a variable set of resources.
  */
 public class MultiResourceLock {
-  private final ConcurrentHashMap<Object, AtomicInteger> lockMap = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<Object, AtomicInteger> lockMap = new ConcurrentHashMap<Object, AtomicInteger>();
 
   public MultiResourceLock() {
   }

@@ -43,7 +43,7 @@ public class MultiResourceLockTest {
   @Before
   public void setUp() {
     taskCounter = new AtomicInteger();
-    data = new HashMap<>();
+    data = new HashMap<Long, Double>();
     multipleIdsInParallel = false;
     lock = new MultiResourceLock();
   }
@@ -92,7 +92,7 @@ public class MultiResourceLockTest {
       public Void apply(Long id) {
         final Double value = Math.random();
         data.put(id, value);
-        final Map<Long, Double> dataCopy = new HashMap<>(data);
+        final Map<Long, Double> dataCopy = new HashMap<Long, Double>(data);
         sleep((long) (Math.random() * (maxSleep - minSleep) + minSleep));
         long seconds = TimeUnit.NANOSECONDS.toSeconds(System.nanoTime());
         System.out.println(format("%s, id: %s, time %s", taskName, id, seconds));
