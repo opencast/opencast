@@ -2326,24 +2326,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
-   * @param workflowQuery
-   *          A workflow query to run to retrieve results.
-   * @return A WorkflowSet that has all of the workflow instances.
-   * @throws WorkflowDatabaseException
-   *           Thrown if there is a problem getting the WorkflowInstances.
-   */
-  public WorkflowSet getAllWorkflowInstances(WorkflowQuery workflowQuery) throws WorkflowDatabaseException {
-    WorkflowSet workflowSet = getWorkflowInstances(workflowQuery);
-    long total = workflowSet.getTotalCount();
-    long sofar = workflowSet.getItems().length;
-    if (sofar < total) {
-      workflowQuery.withCount(total);
-      workflowSet = getWorkflowInstances(workflowQuery);
-    }
-    return workflowSet;
-  }
-
-  /**
    * Find and fail jobs due to their status still being in effect after their start or end capture date and time.
    *
    * @param operation
@@ -2361,16 +2343,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throws WorkflowDatabaseException {
     Date now = new Date();
     Date cutoffTime;
-    int failedInstances = 0;
-    int cleaningFailed = 0;
 
     logger.info(
             "Starting to look for workflows that in operation '%s' that have failed to start if now is %s after their start time.",
             operation, Log.getHumanReadableTimeString(buffer));
-    WorkflowQuery query = new WorkflowQuery().withState(workflowState);
-    WorkflowInstance[] workflowInstances = getAllWorkflowInstances(query).getItems();
-    if (workflowInstances != null) {
-      for (WorkflowInstance workflowInstance : workflowInstances) {
+    // Note: getWorkflowInstances will only return a given number of results (default 20)
+    WorkflowQuery query = new WorkflowQuery().withState(workflowState).withDateBefore(now);
+    WorkflowSet result = getWorkflowInstances(query);
+    Integer offset = 0;
+
+    List<WorkflowInstance> workflowInstances = new ArrayList<WorkflowInstance>();
+    while (result.size() > 0) {
+      for (WorkflowInstance workflowInstance : result.getItems()) {
         Date startTime = workflowInstance.getMediaPackage().getDate();
         if (useCaptureStartTime) {
           cutoffTime = new Date(startTime.getTime() + (buffer * MILLISECONDS_IN_SECONDS));
@@ -2385,67 +2369,55 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                   (now.getTime() - cutoffTime.getTime()));
           continue;
         }
+        workflowInstances.add(workflowInstance);
+      }
+      offset++;
+      query = query.withStartPage(offset);
+      result = getWorkflowInstances(query);
+    }
 
-        WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
-
+    int failedInstances = 0;
+    int cleaningFailed = 0;
+    for (WorkflowInstance workflowInstance : workflowInstances) {
+      WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
+      if (currentOperation == null) {
+        currentOperation = findIfFailedState(workflowInstance, operation);
         if (currentOperation == null) {
-          currentOperation = findIfFailedState(workflowInstance, operation);
-          if (currentOperation == null) {
-            logger.debug("Ignoring %d as it seems to have no current operation and it has the wrong failed operation.",
-                    workflowInstance.getId());
-            continue;
-          }
-        }
-
-        if (currentOperation != null && !operation.equals(currentOperation.getTemplate())) {
-          logger.debug("Ignoring %d as it is the wrong operation. It is '%s' instead of '%s'.",
-                  workflowInstance.getId(), currentOperation.getTemplate(), operation);
+          logger.debug("Ignoring %d as it seems to have no current operation and it has the wrong failed operation.",
+                  workflowInstance.getId());
           continue;
         }
+      }
 
-        try {
-          if (workflowInstance != null && currentOperation != null) {
-            Job job = null;
-            if (currentOperation.getId() != null) {
-              job = serviceRegistry.getJob(currentOperation.getId());
-            }
-            if (job != null) {
-              job.setStatus(Job.Status.FAILED);
-            }
-            currentOperation.setState(WorkflowOperationInstance.OperationState.FAILED);
-            workflowInstance.setState(WorkflowState.FAILED);
-            update(workflowInstance);
-            removeTempFiles(workflowInstance);
-            recordFailedOperationIncident(operation, buffer, job);
-            failedInstances++;
-          } else {
-            logger.warn("Can't get current operation for workflow %s so it won't be put in a failed status.",
-                    workflowInstance);
-            cleaningFailed++;
-          }
-        } catch (WorkflowException e) {
-          logger.warn("Unable to update workflow %d: %s", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
-          cleaningFailed++;
-        } catch (UnauthorizedException e) {
-          logger.warn("Unable to update workflow %d: %s", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
-          cleaningFailed++;
-        } catch (IllegalStateException e) {
-          logger.warn("Unable to fail job %s: %s", workflowInstance.getCurrentOperation().getId(),
-                  ExceptionUtils.getStackTrace(e));
-          cleaningFailed++;
-        } catch (NotFoundException e) {
-          logger.warn("Unable to fail job %d: %s", workflowInstance.getCurrentOperation().getId(),
-                  ExceptionUtils.getStackTrace(e));
-          cleaningFailed++;
-        } catch (ServiceRegistryException e) {
-          logger.warn("Unable to fail job %d: %s", workflowInstance.getCurrentOperation().getId(),
-                  ExceptionUtils.getStackTrace(e));
-          cleaningFailed++;
-        } catch (NullPointerException e) {
-          logger.warn("Unable to update workflow %d: %s", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
-          cleaningFailed++;
-        }
+      if (!operation.equals(currentOperation.getTemplate())) {
+        logger.debug("Ignoring %d as it is the wrong operation. It is '%s' instead of '%s'.", workflowInstance.getId(),
+                currentOperation.getTemplate(), operation);
+        continue;
+      }
+
+      try {
+        currentOperation.setState(WorkflowOperationInstance.OperationState.FAILED);
+        workflowInstance.setState(WorkflowState.FAILED);
+        update(workflowInstance);
+        removeTempFiles(workflowInstance);
+        recordFailedOperationIncident(currentOperation, operation, buffer);
+        failedInstances++;
         logger.info("Setting %d to failed as it should have started.", workflowInstance.getId());
+      } catch (WorkflowException e) {
+        logger.warn("Unable to update workflow %d: %s", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
+        cleaningFailed++;
+      } catch (UnauthorizedException e) {
+        logger.warn("Unable to update workflow %d: %s", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
+        cleaningFailed++;
+      } catch (IllegalStateException e) {
+        logger.warn("Unable to fail job %s: %s", currentOperation.getId(), ExceptionUtils.getStackTrace(e));
+        cleaningFailed++;
+      } catch (NotFoundException e) {
+        logger.warn("Unable to fail job %d: %s", currentOperation.getId(), ExceptionUtils.getStackTrace(e));
+        cleaningFailed++;
+      } catch (ServiceRegistryException e) {
+        logger.warn("Unable to fail job %d: %s", currentOperation.getId(), ExceptionUtils.getStackTrace(e));
+        cleaningFailed++;
       }
     }
 
@@ -2464,6 +2436,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /**
    * Records a failed incident for a capture or ingest operation.
    *
+   * @param currentOperation
+   *          The current operation insteance
    * @param operation
    *          The operation type the job was in when this occurred
    * @param buffer
@@ -2471,7 +2445,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param job
    *          The job associated with this incident.
    */
-  private void recordFailedOperationIncident(String operation, long buffer, Job job) {
+  private void recordFailedOperationIncident(WorkflowOperationInstance currentOperation, String operation, long buffer)
+          throws NotFoundException, ServiceRegistryException {
+    Job job = serviceRegistry.getJob(currentOperation.getId());
     int failedCode;
     if (operation.equalsIgnoreCase(SCHEDULE_OPERATION_TEMPLATE)) {
       failedCode = FAILED_CAPTURE_CODE;
