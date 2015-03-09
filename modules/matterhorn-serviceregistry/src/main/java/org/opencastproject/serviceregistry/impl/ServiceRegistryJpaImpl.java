@@ -1732,6 +1732,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
         // The statistics query returns a cartesian product, so we need to iterate over them to build up the objects
         JaxbServiceStatistics stats = statsMap.get(serviceRegistrationId.longValue());
+        if (stats == null)
+          continue;
 
         // the status will be null if there are no jobs at all associated with this service registration
         if (status != null) {
