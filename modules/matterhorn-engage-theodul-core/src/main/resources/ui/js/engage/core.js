@@ -261,8 +261,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     function bindShortcutsToEvents() {
         // disable scrolling when pressing the space bar
         $(document).keydown(function(e) {
-            // space = 32, backspace = 8, page up = 73, page down = 81, enter = 10, carriage return = 13
-            if ((e.keyCode == 32) || (e.keyCode == 8) || (e.keyCode == 73) || (e.keyCode == 81) || (e.keyCode == 10)) {
+            // space = 32, backspace = 8, page up = 73, page down = 33, enter = 13
+            if (((e.keyCode == 32) || (e.keyCode == 8) || (e.keyCode == 73) || (e.keyCode == 33) || (e.keyCode == 13)) && (e.originalEvent.target == $(document.body)[0])) {
                 return false;
             }
         });
@@ -349,7 +349,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         });
         return all_plugins_loaded;
     }
-    
+
     function loadTemplate(plugin, plugin_name, plugin_path) {
         if (plugin.template !== "none") {
             // load template asynchronously
