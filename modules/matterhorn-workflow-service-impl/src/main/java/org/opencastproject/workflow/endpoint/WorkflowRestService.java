@@ -73,6 +73,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
@@ -714,11 +715,14 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           return Response.status(Status.NOT_FOUND).build();
         } catch (UnauthorizedException e) {
           return Response.status(Status.UNAUTHORIZED).build();
+        } catch (IllegalStateException e) {
+          logger.warn(ExceptionUtils.getMessage(e));
+          return Response.status(Status.BAD_REQUEST).build();
         } catch (WorkflowException e) {
-          logger.error(e.getMessage(), e);
+          logger.error(ExceptionUtils.getMessage(e), e);
           return Response.serverError().build();
         } catch (Exception e) {
-          logger.error(e.getMessage(), e);
+          logger.error(ExceptionUtils.getMessage(e), e);
           return Response.serverError().build();
         }
       }
