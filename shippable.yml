@@ -35,4 +35,4 @@ install:
   - mvn --version
   - mvn --batch-mode clean install -DskipTests=true -Dall
 
-script: mvn --batch-mode test -Dall -Dsurefire.rerunFailingTestsCount=2
+script: mvn --batch-mode test -Dall -Dsurefire.rerunFailingTestsCount=2 -DskipJasmineTests=True
