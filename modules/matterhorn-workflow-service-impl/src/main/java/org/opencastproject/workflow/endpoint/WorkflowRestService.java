@@ -439,14 +439,14 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           sortField = Sort.valueOf(enumKey);
           q.withSort(sortField, false);
         } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
+          logger.debug("No sort enum matches '{}'", enumKey);
         }
       } else {
         try {
           sortField = Sort.valueOf(sort);
           q.withSort(sortField);
         } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
+          logger.debug("No sort enum matches '{}'", sort);
         }
       }
     }
