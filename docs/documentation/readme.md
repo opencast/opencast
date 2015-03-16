@@ -37,6 +37,8 @@ for each release. It contains:
 Development Documentation
 -------------------------
 
+ - Change Log
+ - [Proposal Log](development/proposal-log.md)
  - Development Process
  - [Packaging Guidelines](development/packaging.md)
 
