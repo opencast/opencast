@@ -36,6 +36,9 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
   /** Spring security's user details manager */
   private UserDetailsService userDetailsService = null;
 
+  /** The user directory service */
+  private UserDirectoryService userDirectoryService = null;
+
   /** The implementation that is taking care of extracting user attributes from the request */
   private ShibbolethLoginHandler loginHandler = null;
 
@@ -47,6 +50,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
     super.afterPropertiesSet();
     Assert.notNull(userDetailsService, "A UserDetailsService must be set");
     Assert.notNull(loginHandler, "A ShibbolethLoginHandler must be set");
+    Assert.notNull(userDirectoryService, "A UserDirectoryService must be set");
   }
 
   /**
@@ -69,7 +73,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
         }
       } catch (UsernameNotFoundException e) {
         loginHandler.newUserLogin(o, request);
-        ((UserDirectoryService) userDetailsService).invalidate(o);
+        userDirectoryService.invalidate(o);
       }
     }
     return o;
@@ -117,6 +121,16 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
    */
   public void setUserDetailsService(UserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;
+  }
+
+  /**
+   * Sets the user directory service which allows to invalidate the cache of a new created user.
+   *
+   * @param userDirectoryService
+   *          the user directory service
+   */
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
   }
 
   /**
