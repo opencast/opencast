@@ -15,6 +15,7 @@
  */
 package org.opencastproject.workflow.remote;
 
+import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
@@ -59,6 +60,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -479,7 +481,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, UnauthorizedException,
-          WorkflowException {
+          WorkflowException, IllegalStateException {
     return resume(workflowInstanceId, null);
   }
 
@@ -490,24 +492,22 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public WorkflowInstance resume(long workflowInstanceId, Map<String, String> properties) throws NotFoundException,
-          UnauthorizedException, WorkflowException {
+          UnauthorizedException, WorkflowException, IllegalStateException {
     HttpPost post = new HttpPost("/resume");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("id", Long.toString(workflowInstanceId)));
     if (properties != null)
       params.add(new BasicNameValuePair("properties", mapToString(properties)));
-    try {
-      post.setEntity(new UrlEncodedFormEntity(params));
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
-    }
-    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
+    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_CONFLICT);
     try {
       if (response != null) {
         if (response.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
           throw new NotFoundException("Workflow instance with id='" + workflowInstanceId + "' not found");
         } else if (response.getStatusLine().getStatusCode() == SC_UNAUTHORIZED) {
           throw new UnauthorizedException("You do not have permission to resume");
+        } else if (response.getStatusLine().getStatusCode() == SC_CONFLICT) {
+          throw new IllegalStateException("Can not resume a workflow where the current state is not in paused");
         } else {
           logger.info("Workflow '{}' resumed", workflowInstanceId);
           return WorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
@@ -516,6 +516,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     } catch (NotFoundException e) {
       throw e;
     } catch (UnauthorizedException e) {
+      throw e;
+    } catch (IllegalStateException e) {
       throw e;
     } catch (Exception e) {
       throw new WorkflowException(e);

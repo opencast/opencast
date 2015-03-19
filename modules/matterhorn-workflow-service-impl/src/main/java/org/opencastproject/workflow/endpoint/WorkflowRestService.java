@@ -16,6 +16,7 @@
 package org.opencastproject.workflow.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -71,6 +72,7 @@ import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.FnX;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -652,7 +654,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "resume", description = "Resumes a suspended workflow instance.", returnDescription = "An XML representation of the resumed workflow instance", restParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the resumed workflow instance."),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Can not resume workflow not in paused state"),
+          @RestResponse(responseCode = SC_CONFLICT, description = "Can not resume workflow not in paused state"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate.") })
   public Response resume(@FormParam("id") long workflowInstanceId, @FormParam("properties") LocalHashMap properties)
@@ -668,7 +670,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "mediapackage", isRequired = false, description = "The new Mediapackage", type = TEXT),
           @RestParameter(name = "properties", isRequired = false, description = "Properties", type = TEXT) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the updated and resumed workflow instance."),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Can not resume workflow not in paused state"),
+          @RestResponse(responseCode = SC_CONFLICT, description = "Can not resume workflow not in paused state"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate.") })
   public Response resume(@FormParam("id") long workflowInstanceId,
@@ -687,7 +689,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
           if (!WorkflowState.PAUSED.equals(workflow.getState())) {
             logger.warn("Can not resume workflow '{}', not in state paused but {}", workflow, workflow.getState());
-            return Response.status(Status.BAD_REQUEST).build();
+            return Response.status(Status.CONFLICT).build();
           }
 
           if (mediaPackage != null) {
@@ -717,7 +719,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           return Response.status(Status.UNAUTHORIZED).build();
         } catch (IllegalStateException e) {
           logger.warn(ExceptionUtils.getMessage(e));
-          return Response.status(Status.BAD_REQUEST).build();
+          return Response.status(Status.CONFLICT).build();
         } catch (WorkflowException e) {
           logger.error(ExceptionUtils.getMessage(e), e);
           return Response.serverError().build();
@@ -813,7 +815,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Path("/failMissedCaptures")
   @RestQuery(name = "failMissedCaptures", description = "Find workflows that should have started capturing but haven't and move them to a failed status.", returnDescription = "No return value", reponses = {
           @RestResponse(responseCode = SC_OK, description = "Failed missing captures successfully"),
-          @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.") }, restParameters = { @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a capturing status update before marking a workflow as failed. It must be 0 or greater.") })
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse buffer.") }, restParameters = { @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a capturing status update before marking a workflow as failed. It must be 0 or greater.") })
   public Response failMissedCaptures(@FormParam("buffer") long buffer) {
     if (buffer < 0) {
       return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
@@ -832,7 +834,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Path("/failMissedIngests")
   @RestQuery(name = "failMissedIngests", description = "Find workflows that should have started ingesting but haven't and move them to a failed status.", returnDescription = "No return value", reponses = {
           @RestResponse(responseCode = SC_OK, description = "Failed missing ingests successfully"),
-          @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.") }, restParameters = { @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a ingest status update before marking a workflow as failed. It must be 0 or greater.") })
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse buffer.") }, restParameters = { @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a ingest status update before marking a workflow as failed. It must be 0 or greater.") })
   public Response failMissedIngests(@FormParam("buffer") long buffer) {
     if (buffer < 0) {
       return Response.status(Status.BAD_REQUEST).build();
