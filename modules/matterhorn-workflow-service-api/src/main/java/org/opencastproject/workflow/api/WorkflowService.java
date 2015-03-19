@@ -325,19 +325,25 @@ public interface WorkflowService {
 
   /**
    * Move workflows where the capture should have started from upcoming into failure status.
-   * 
+   *
    * @param buffer
    *          The amount of time in seconds to wait for a capture to move from Upcoming to Capturing
+   * @throws IllegalArgumentException
+   *           invalid buffer value, it must be equal or greater than 0
    */
-  void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException;
+  void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException,
+          IllegalArgumentException;
 
   /**
    * Move workflows where the ingest has not been successful or is taking longer than expected into a failure status.
-   * 
+   *
    * @param buffer
    *          The amount of time in seconds to wait for an ingest to notify the workflow service.
+   * @throws IllegalArgumentException
+   *           invalid buffer value, it must be equal or greater than 0
    */
-  void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException;
+  void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException,
+          IllegalArgumentException;
 
   /**
    *

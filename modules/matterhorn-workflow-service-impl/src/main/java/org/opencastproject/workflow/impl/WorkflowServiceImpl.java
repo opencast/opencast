@@ -99,6 +99,7 @@ import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.FnX;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
@@ -2409,9 +2410,17 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param useCaptureStartTime
    *          Whether to use the start time or the end time of the capture to calculate if it is overdue.
    * @throws WorkflowDatabaseException
+   *           if there is a problem reading the workflows from persistence
+   * @throws IllegalArgumentException
+   *           invalid buffer value, it must be equal or greater than 0
    */
   public void failJobs(String operation, WorkflowState workflowState, long buffer, boolean useCaptureStartTime)
-          throws WorkflowDatabaseException {
+          throws WorkflowDatabaseException, IllegalArgumentException {
+    if (buffer < 0) {
+      throw new IllegalArgumentException("Buffer '" + buffer
+              + "' is not a valid value, it must be equal or greater than 0.");
+    }
+
     Date now = new Date();
     Date cutoffTime;
     int failedInstances = 0;
@@ -2564,7 +2573,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.workflow.api.WorkflowService#moveMissingCapturesFromUpcomingToFailedStatus(long)
    */
   @Override
-  public synchronized void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
+  public synchronized void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException,
+          IllegalArgumentException {
     failJobs(SCHEDULE_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, true);
   }
 
@@ -2574,7 +2584,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.workflow.api.WorkflowService#moveMissingIngestsFromUpcomingToFailedStatus(long)
    */
   @Override
-  public synchronized void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
+  public synchronized void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException,
+          IllegalArgumentException {
     failJobs(CAPTURE_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, false);
     failJobs(INGEST_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, false);
   }

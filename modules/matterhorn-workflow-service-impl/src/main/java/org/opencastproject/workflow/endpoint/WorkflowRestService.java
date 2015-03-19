@@ -817,13 +817,11 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestResponse(responseCode = SC_OK, description = "Failed missing captures successfully"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse buffer.") }, restParameters = { @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a capturing status update before marking a workflow as failed. It must be 0 or greater.") })
   public Response failMissedCaptures(@FormParam("buffer") long buffer) {
-    if (buffer < 0) {
-      return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
-    }
-
     try {
       service.moveMissingCapturesFromUpcomingToFailedStatus(buffer);
       return Response.ok().build();
+    } catch (IllegalArgumentException e) {
+      return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
     } catch (WorkflowDatabaseException e) {
       logger.error("Error while trying to fail missed ingests", e);
       throw new WebApplicationException(e);
@@ -836,13 +834,11 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestResponse(responseCode = SC_OK, description = "Failed missing ingests successfully"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse buffer.") }, restParameters = { @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "30", isRequired = true, description = "The amount of seconds to wait for a ingest status update before marking a workflow as failed. It must be 0 or greater.") })
   public Response failMissedIngests(@FormParam("buffer") long buffer) {
-    if (buffer < 0) {
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
     try {
       service.moveMissingIngestsFromUpcomingToFailedStatus(buffer);
       return Response.ok().build();
+    } catch (IllegalArgumentException e) {
+      return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
     } catch (WorkflowDatabaseException e) {
       logger.error("Error while trying to fail missed ingests", e);
       throw new WebApplicationException(e);
