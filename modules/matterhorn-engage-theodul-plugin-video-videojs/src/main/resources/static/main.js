@@ -1141,6 +1141,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             });
 
             var videodisplayMaster = videojs(videoDisplay);
+            var paddingTop = $('#' + videoDisplay).css("padding-top");
 
             if (numberOfVideodisplays == 1) {
                 videodisplayMaster.on("play", function() {
@@ -1164,6 +1165,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             Engage.on(plugin.events.fullscreenEnable.getName(), function() {
                 if (numberOfVideodisplays == 1) {
                     videodisplayMaster.requestFullscreen();
+                    $('#' + videoDisplay).css("padding-top", "0%");
                 } else if (!fullscreen) {
                     var viewer = document.getElementById(id_engage_video_fullsceen_wrapper);
                     if (viewer.mozRequestFullScreen) {
@@ -1188,6 +1190,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
             });
             Engage.on(plugin.events.fullscreenCancel.getName(), function() {
+                if (numberOfVideodisplays == 1) {
+                    $('#' + videoDisplay).css("padding-top", paddingTop);
+                };
                 if (fullscreen && (numberOfVideodisplays > 1)) {
                     var viewer = document.getElementById(id_engage_video);
                     if (document.mozCancelFullScreen) {
@@ -1511,12 +1516,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     /* usage:
             var tuples = getSortedVideosourcesArray(videoSources);
-    	for (var i = 0; i < tuples.length; ++i) {
-    	    var key = tuples[i][0];
-    	    var value = tuples[i][1];
+        for (var i = 0; i < tuples.length; ++i) {
+            var key = tuples[i][0];
+            var value = tuples[i][1];
 
-    	    // do something with key and value
-    	}
+            // do something with key and value
+        }
     */
     function getSortedVideosourcesArray(videoSources) {
         var tuples = [];
