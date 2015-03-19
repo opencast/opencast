@@ -16,6 +16,7 @@
 package org.opencastproject.workflow.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -652,7 +653,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "resume", description = "Resumes a suspended workflow instance.", returnDescription = "An XML representation of the resumed workflow instance", restParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the resumed workflow instance."),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Can not resume workflow not in paused state"),
+          @RestResponse(responseCode = SC_CONFLICT, description = "Can not resume workflow not in paused state"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate.") })
   public Response resume(@FormParam("id") long workflowInstanceId, @FormParam("properties") LocalHashMap properties)
@@ -668,7 +669,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "mediapackage", isRequired = false, description = "The new Mediapackage", type = TEXT),
           @RestParameter(name = "properties", isRequired = false, description = "Properties", type = TEXT) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the updated and resumed workflow instance."),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Can not resume workflow not in paused state"),
+          @RestResponse(responseCode = SC_CONFLICT, description = "Can not resume workflow not in paused state"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate.") })
   public Response resume(@FormParam("id") long workflowInstanceId,
@@ -687,7 +688,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
           if (!WorkflowState.PAUSED.equals(workflow.getState())) {
             logger.warn("Can not resume workflow '{}', not in state paused but {}", workflow, workflow.getState());
-            return Response.status(Status.BAD_REQUEST).build();
+            return Response.status(Status.CONFLICT).build();
           }
 
           if (mediaPackage != null) {
@@ -717,7 +718,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           return Response.status(Status.UNAUTHORIZED).build();
         } catch (IllegalStateException e) {
           logger.warn(ExceptionUtils.getMessage(e));
-          return Response.status(Status.BAD_REQUEST).build();
+          return Response.status(Status.CONFLICT).build();
         } catch (WorkflowException e) {
           logger.error(ExceptionUtils.getMessage(e), e);
           return Response.serverError().build();
