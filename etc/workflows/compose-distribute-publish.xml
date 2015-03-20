@@ -412,6 +412,33 @@
       </configurations>
     </operation>
 
+    <!-- Create a cover image with the default template -->
+
+    <operation
+      id="cover-image"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Create a cover image">
+      <configurations>
+        <configuration key="stylesheet">file:///opt/matterhorn/etc/branding/coverimage.xsl</configuration>
+        <configuration key="width">1920</configuration>
+        <configuration key="height">1080</configuration>
+        <configuration key="posterimage-flavor">presenter/player+preview</configuration>
+        <configuration key="target-flavor">image/cover</configuration>
+     </configurations>
+    </operation>
+
+    <!-- tag cover image for archival -->
+
+    <operation
+      id="tag"
+      description="Tagging cover image for archival">
+      <configurations>
+        <configuration key="source-flavors">image/cover</configuration>
+        <configuration key="target-tags">+archive</configuration>
+      </configurations>
+    </operation>
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Segment video streams and extract metadata                        -->
     <!--                                                                   -->

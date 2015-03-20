@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" immediate="true" name="org.opencastproject.coverimage.impl.endpoint.CoverImageEndpoint">
+	<implementation class="org.opencastproject.coverimage.impl.endpoint.CoverImageEndpoint" />
+	<property name="service.description" value="Cover Image Service REST Endpoint" />
+
+	<property name="opencast.service.type" value="org.opencastproject.coverimage" />
+	<property name="opencast.service.path" value="/cover-image" />
+
+	<property name="opencast.service.jobproducer" value="true" />
+
+	<service>
+		<provide interface="org.opencastproject.coverimage.impl.endpoint.CoverImageEndpoint" />
+	</service>
+
+  <reference name="CoverImageService" interface="org.opencastproject.coverimage.CoverImageService" cardinality="1..1" policy="static" bind="setCoverImageService" />
+  <reference name="ServiceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" cardinality="1..1" policy="static" bind="setServiceRegistry" />
+</scr:component>
