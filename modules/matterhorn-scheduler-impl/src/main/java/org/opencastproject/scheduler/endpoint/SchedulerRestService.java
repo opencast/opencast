@@ -32,6 +32,7 @@ import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
@@ -242,10 +243,11 @@ public class SchedulerRestService {
           @RestParameter(name = "wfproperties", isRequired = false, type = Type.TEXT, description = "Workflow configuration properties"),
           @RestParameter(name = "event", isRequired = false, type = Type.TEXT, description = "Catalog containing information about the event that doesn't exist in DC (IE: Recurrence rule)") }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event or events were successfully created"),
+          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to create the event. Maybe you need to authenticate."),
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid information for this request") })
   public Response addEvent(@FormParam("dublincore") String dublinCoreXml,
           @FormParam("agentparameters") String agentParameters, @FormParam("wfproperties") String workflowProperties,
-          @FormParam("event") String event) {
+          @FormParam("event") String event) throws UnauthorizedException {
 
     if (StringUtils.isBlank(dublinCoreXml)) {
       logger.warn("Cannot add event without dublin core catalog.");
@@ -301,6 +303,8 @@ public class SchedulerRestService {
                 .header("Location", PathSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".xml" }))
                 .build();
       }
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       logger.warn("Unable to create new event: {}", e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -362,14 +366,17 @@ public class SchedulerRestService {
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "deleterecordings", description = "Removes scheduled event with specified ID.", returnDescription = "OK if event were successfully removed or NOT FOUND if event with specified ID does not exist", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "Event ID", type = Type.STRING) }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully removed"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
-  public Response deleteEvent(@PathParam("id") long eventId) {
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to remove the event. Maybe you need to authenticate.") })
+  public Response deleteEvent(@PathParam("id") long eventId) throws UnauthorizedException {
     try {
       service.removeEvent(eventId);
       return Response.status(Response.Status.OK).build();
     } catch (NotFoundException e) {
       logger.warn("Event with id '{}' does not exist.", eventId);
       return Response.status(Status.NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       logger.warn("Unable to delete event with id '{}': {}", eventId, e.getMessage());
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -398,7 +405,8 @@ public class SchedulerRestService {
           @RestResponse(responseCode = HttpServletResponse.SC_FORBIDDEN, description = "Event with specified ID cannot be updated"),
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Data is missing or invalid") })
   public Response updateEvent(@PathParam("id") String eventID, @FormParam("dublincore") String dublinCoreXml,
-          @FormParam("agentparameters") String agentParameters, @FormParam("wfproperties") String workflowProperties) {
+          @FormParam("agentparameters") String agentParameters, @FormParam("wfproperties") String workflowProperties)
+          throws UnauthorizedException {
 
     // Update CA properties from dublin core (event.title, etc)
     Long id;
@@ -455,11 +463,13 @@ public class SchedulerRestService {
       return Response.ok().build();
     } catch (SchedulerException e) {
       logger.warn("{}", e.getMessage());
-      //TODO: send the reason message in response body
+      // TODO: send the reason message in response body
       return Response.status(Status.FORBIDDEN).build();
     } catch (NotFoundException e) {
       logger.warn("Event with id '{}' does not exist.", id);
       return Response.status(Status.NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       logger.warn("Unable to update event with id '{}': {}", id, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -1189,8 +1199,8 @@ public class SchedulerRestService {
   @POST
   @Path("/removeOldScheduledRecordings")
   @RestQuery(name = "removeOldScheduledRecordings", description = "This will find and remove any scheduled events before the buffer time to keep performance in the scheduler optimum.", returnDescription = "No return value", reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Removed old scheduled recordings."), @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.")}, restParameters = {
-          @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "604800", isRequired = true, description = "The amount of seconds before now that a capture has to have stopped capturing. It must be 0 or greater.")})
+          @RestResponse(responseCode = SC_OK, description = "Removed old scheduled recordings."),
+          @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.") }, restParameters = { @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "604800", isRequired = true, description = "The amount of seconds before now that a capture has to have stopped capturing. It must be 0 or greater.") })
   public Response removeOldScheduledRecordings(@FormParam("buffer") long buffer) {
     if (buffer < 0) {
       return Response.status(SC_BAD_REQUEST).build();
@@ -1256,12 +1266,11 @@ public class SchedulerRestService {
   private DublinCoreCatalog parseDublinCore(String dcXML) throws IOException {
     // Trim XML string because parsing will fail if there are any chars before XML processing instruction
     String trimmedDcXml = StringUtils.trim(dcXML);
-    /* Warn the user if trimming was necessary as this meant that the XML
-     * string was technically invalid.
+    /*
+     * Warn the user if trimming was necessary as this meant that the XML string was technically invalid.
      */
     if (!trimmedDcXml.equals(dcXML)) {
-      logger.warn("Detected invalid XML data. Trying to fix this by "
-              + "removing spaces from beginning/end.");
+      logger.warn("Detected invalid XML data. Trying to fix this by removing spaces from beginning/end.");
     }
     return dcService.load(new ByteArrayInputStream(trimmedDcXml.getBytes("UTF-8")));
   }
