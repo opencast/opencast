@@ -15,13 +15,7 @@ $(document).ready(function() {
                     var player = data.org.properties.player ? data.org.properties.player : defaultPlayerURL;
                     if (player.charAt(0) != "/")
                         player = "/" + player;
-                    var server = "";
-                    if (data.org.properties.org && data.org.properties.org.opencastproject && 
-                            data.org.properties.org.opencastproject.engage &&
-                            data.org.properties.org.opencastproject.engage.ui && 
-                            data.org.properties.org.opencastproject.engage.ui.url) {
-                        server = data.org.properties.org.opencastproject.engage.ui.url ? data.org.properties.org.opencastproject.engage.ui.url : "";
-                    }
+                    var server = data.org.properties["org.opencastproject.engage.ui.url"] ? data.org.properties["org.opencastproject.engage.ui.url"] : "";
                     redirect(server + player);
                 } 
             }
