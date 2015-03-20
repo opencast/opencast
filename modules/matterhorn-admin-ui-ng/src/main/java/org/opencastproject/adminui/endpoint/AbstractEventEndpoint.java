@@ -1966,14 +1966,8 @@ public abstract class AbstractEventEndpoint {
         query.withText("*" + filters.get(name) + "*");
       if (EventListQuery.FILTER_SERIES_NAME.equals(name))
         query.withSeriesId(filters.get(name));
-      if (EventListQuery.FILTER_SUBJECT_NAME.equals(name))
-        query.withSubject(filters.get(name));
-      if (EventListQuery.FILTER_ACL_NAME.equals(name))
-        query.withManagedAcl(filters.get(name));
-      if (EventListQuery.FILTER_PROGRESS_NAME.equals(name))
-        query.withWorkflowState(filters.get(name));
       if (EventListQuery.FILTER_STATUS_NAME.equals(name))
-        query.withSchedulingStatus(filters.get(name));
+        query.withEventStatus(filters.get(name));
       if (EventListQuery.FILTER_COMMENTS_NAME.equals(name)) {
         switch (Comments.valueOf(filters.get(name))) {
           case NONE:
@@ -2019,23 +2013,14 @@ public abstract class AbstractEventEndpoint {
           case EventIndexSchema.END_DATE:
             query.sortByEndDate(criterion.getOrder());
             break;
-          case EventIndexSchema.REVIEW_STATUS:
-            query.sortByReviewStatus(criterion.getOrder());
-            break;
-          case EventIndexSchema.WORKFLOW_STATE:
-            query.sortByWorkflowState(criterion.getOrder());
-            break;
-          case EventIndexSchema.SCHEDULING_STATUS:
-            query.sortBySchedulingStatus(criterion.getOrder());
-            break;
           case EventIndexSchema.SERIES_NAME:
             query.sortBySeriesName(criterion.getOrder());
             break;
           case EventIndexSchema.LOCATION:
             query.sortByLocation(criterion.getOrder());
             break;
-          case EventIndexSchema.MANAGED_ACL:
-            query.sortByManagedAcl(criterion.getOrder());
+          case EventIndexSchema.EVENT_STATUS:
+            query.sortByEventStatus(criterion.getOrder());
             break;
           default:
             throw new WebApplicationException(Status.BAD_REQUEST);
@@ -2161,6 +2146,7 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("scheduling_status", vN(schedulingStatus)));
     fields.add(f("workflow_state", vN(event.getWorkflowState())));
     fields.add(f("review_status", vN(event.getReviewStatus())));
+    fields.add(f("event_status", v(event.getEventStatus())));
     fields.add(f("source", v(getIndexService().getEventSource(event).toString())));
     fields.add(f("has_comments", v(event.hasComments())));
     fields.add(f("has_open_comments", v(event.hasOpenComments())));

@@ -77,6 +77,9 @@ public interface EventIndexSchema extends IndexSchema {
   /** The publications */
   String PUBLICATION = "publication";
 
+  /** The event status */
+  String EVENT_STATUS = "event_status";
+
   /*
    * Dublincore fields
    */
@@ -163,6 +166,9 @@ public interface EventIndexSchema extends IndexSchema {
 
   /** The scheduling status */
   String SCHEDULING_STATUS = "scheduling_status";
+
+  /** The recording status */
+  String RECORDING_STATUS = "recording_status";
 
   /*
    * Archive specific fields

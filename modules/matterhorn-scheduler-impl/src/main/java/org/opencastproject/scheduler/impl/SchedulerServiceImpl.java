@@ -21,6 +21,7 @@ import static org.opencastproject.scheduler.impl.Util.getEventIdentifier;
 import static org.opencastproject.scheduler.impl.Util.setEventIdentifierImmutable;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.index.IndexProducer;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -188,6 +189,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The workflow service */
   protected WorkflowService workflowService;
 
+  /** The capture agent state service */
+  protected CaptureAgentStateService agentService;
+
   /** Persistent storage for events */
   protected SchedulerServiceDatabase persistence;
 
@@ -224,6 +228,24 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    */
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
+  }
+
+  /**
+   * OSGi callback for setting Capture Agent State Service.
+   *
+   * @param agentService
+   */
+  public void setCaptureAgentStateService(CaptureAgentStateService agentService) {
+    this.agentService = agentService;
+  }
+
+  /**
+   * Method to unset the capture agent state service this REST endpoint uses
+   *
+   * @param agentService
+   */
+  public void unsetCaptureAgentStateService(CaptureAgentStateService agentService) {
+    this.agentService = null;
   }
 
   /**
@@ -992,6 +1014,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       throw new SchedulerException(e);
     }
 
+    if (agentService != null) {
+      try {
+        agentService.removeRecording(Long.toString(eventId));
+      } catch (Exception e) {
+        logger.info("Agent recording '{}' already removed", eventId);
+      }
+    }
+
     try {
       index.delete(eventId);
     } catch (Exception e) {
@@ -1028,6 +1058,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     } catch (SchedulerServiceDatabaseException e) {
       logger.error("Could not remove event '{}' from persistent storage: {}", eventId, e);
       throw new SchedulerException(e);
+    }
+
+    if (agentService != null) {
+      try {
+        agentService.removeRecording(Long.toString(eventId));
+      } catch (Exception e) {
+        logger.info("Agent recording '{}' already removed", eventId);
+      }
     }
 
     try {
