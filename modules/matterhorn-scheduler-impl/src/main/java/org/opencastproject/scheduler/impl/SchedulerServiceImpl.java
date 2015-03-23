@@ -654,7 +654,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.scheduler.api.SchedulerService#addEvent(org.opencastproject.metadata.dublincore.DublinCoreCatalog
    * , java.lang.String)
@@ -732,7 +732,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#addReccuringEvent(org.opencastproject.metadata.dublincore.
    * DublinCoreCatalog, java.lang.String, java.util.Date, java.util.Date, long)
    */
@@ -756,7 +756,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#updateCaptureAgentMetadata(java.lang.Long[],
    * java.util.Properties)
    */
@@ -796,7 +796,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#updateEvent(org.opencastproject.metadata.dublincore.
    * DublinCoreCatalog)
    */
@@ -994,7 +994,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#removeEvent(long)
    */
   @Override
@@ -1017,8 +1017,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     if (agentService != null) {
       try {
         agentService.removeRecording(Long.toString(eventId));
-      } catch (Exception e) {
+      } catch (NotFoundException e) {
         logger.info("Agent recording '{}' already removed", eventId);
+      } catch (Exception e) {
+        logger.warn("Unable to remove agent recording '{}': {}", eventId, ExceptionUtils.getMessage(e));
       }
     }
 
@@ -1063,8 +1065,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     if (agentService != null) {
       try {
         agentService.removeRecording(Long.toString(eventId));
-      } catch (Exception e) {
+      } catch (NotFoundException e) {
         logger.info("Agent recording '{}' already removed", eventId);
+      } catch (Exception e) {
+        logger.warn("Unable to remove agent recording '{}': {}", eventId, ExceptionUtils.getMessage(e));
       }
     }
 
@@ -1078,7 +1082,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#getEventDublinCore(long)
    */
   @Override
@@ -1093,7 +1097,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#getEventCaptureAgentConfiguration(long)
    */
   @Override
@@ -1108,7 +1112,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#search(org.opencastproject.scheduler.api.SchedulerQuery)
    */
   @Override
@@ -1123,7 +1127,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#findConflictingEvents(java.lang.String, java.util.Date,
    * java.util.Date)
    */
@@ -1142,7 +1146,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#findConflictingEvents(java.lang.String, java.lang.String,
    * java.util.Date, java.util.Date, long)
    */
@@ -1198,7 +1202,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#getCalendarForCaptureAgent(java.lang.String)
    */
   @Override
@@ -1312,7 +1316,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#removeScheduledRecordingsBeforeBuffer(long)
    */
   @Override
