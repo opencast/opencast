@@ -83,6 +83,9 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
        *          If true the image returned should not have any default color correction the file may specify applied.
        */
       public Filter handleStream(InputStream inIS, ParsedURL origURL, boolean needRawData) {
+        // Code from org.apache.batik.ext.awt.image.codec.jpeg.JPEGRegistryEntry#handleStream
+        // Reading image with ImageIO to prevent NoClassDefFoundError on OpenJDK
+
         final DeferRable dr = new DeferRable();
         final InputStream is = inIS;
         final String errCode;
