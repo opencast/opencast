@@ -7,9 +7,9 @@
 <div id="navigation_wrapper_top">
     <div id="navigation_logo">
         <% if(typeof logoLink !== "undefined") { %>
-        <a href="<%= logoLink %>" role="link" aria-label="<%= str_openMediaModule %>">
+        <a id="mediamodulelink" href="<%= logoLink %>" role="link" aria-label="<%= str_openMediaModule %>">
         <% } %>
-        <img src="<%= plugin_path %>images/logo.png" />
+        <img id="headerLogo" src="<%= plugin_path %>images/logo.png" />
         <% if(typeof logoLink !== "undefined") { %>
         </a>
         <% } %>

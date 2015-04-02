@@ -5,7 +5,7 @@ $(document).ready(function() {
     var playerEndpoint = "";
     var page = 1;
     var totalEntries = -1;
-    var bufferEntries = 6; // number of entries to load for one page.
+    var bufferEntries = 15; // number of entries to load for one page.
     var restData = "";
     var active = "episodes";
     var stack = new Array();

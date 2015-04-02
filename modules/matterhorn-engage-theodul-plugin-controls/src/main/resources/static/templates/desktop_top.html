@@ -46,9 +46,9 @@
     <!-- ##### Logo ##### -->
     <div id="navigation_logo">
         <% if(typeof logoLink !== "undefined") { %>
-        <a href="<%= logoLink %>" role="link" aria-label="<%= str_openMediaModule %>">
+        <a id="mediamodulelink" href="<%= logoLink %>" role="link" aria-label="<%= str_openMediaModule %>">
         <% } %>
-        <img src="<%= plugin_path %>images/logo.png" />
+        <img id="headerLogo" src="<%= plugin_path %>images/logo.png" />
         <% if(typeof logoLink !== "undefined") { %>
         </a>
         <% } %>
@@ -64,7 +64,7 @@
 	     && (typeof str_qualityHigh !== "undefined")) { %>
             <div class="btn-group">
                 <button id="dropdownMenuQuality" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_qualityButton %>">
-                <span class="glyphicon glyphicon-wrench"></span>
+                <span class="glyphicon glyphicon-cog"></span>
                 <span id="qualityIndicator"><%= str_quality %></span>
                 <span class="caret"></span>
                 </button>
@@ -79,7 +79,7 @@
 	    <% } %>
             <div class="btn-group">
                 <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_playbackRateButton %>">
-                <span class="glyphicon glyphicon-time"></span>
+                <span class="glyphicon glyphicon-dashboard"></span>
                 <span id="playbackRateIndicator">100%</span>
                 <span class="caret"></span>
                 </button>

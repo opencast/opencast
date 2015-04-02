@@ -83,6 +83,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var isDesktopMode = false;
     var isEmbedMode = false;
     var isMobileMode = false;
+    
+    var $headerLogo = "#headerLogo";
+    var $mediaModuleLink = "#mediamodulelink";
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
@@ -938,6 +941,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     $("#" + id_segmentNo + no).removeClass("segmentHover");
                 }
             });
+            if (Engage.model.get("meInfo")) {
+                if (Engage.model.get("meInfo").get("logo_small")) {
+                    $($headerLogo).attr("src", Engage.model.get("meInfo").get("logo_small"));
+                }
+                if (! Engage.model.get("meInfo").get("link_mediamodule")) {
+                    $($mediaModuleLink).contents().unwrap();
+                }
+                if (! Engage.model.get("meInfo").get("show_embed_links")) {
+                    $("#" + id_embed_button).css("visibility","hidden");
+                }
+                
+            }
             loadStoredInitialValues();
         }
     }
