@@ -187,14 +187,24 @@ angular.module('adminNg.controllers')
     };
 
     $scope.accessSave = function (field) {
-        var ace = [];
+        var ace = [],
+            hasRights = false;
 
         if (angular.isDefined(field) && angular.isUndefined(field.role)) {
             return;
         }
 
+        if (aclNotification) {
+            Notifications.remove(aclNotification, 'series-acl');
+        }
+
         angular.forEach($scope.policies, function (policy) {
             if (angular.isDefined(policy.role)) {
+                if (policy.read && policy.write) {
+                    hasRights = true;
+                }
+
+
                 if (policy.read) {
                     ace.push({
                         'action' : 'read',
@@ -211,8 +221,12 @@ angular.module('adminNg.controllers')
                     });   
                 }
             }
-
         });
+
+        if (!hasRights) {
+            aclNotification = Notifications.add('error', 'SERIES_ACL_MISSING_READWRITE_ROLE', 'series-acl');
+            return;
+        }
 
         SeriesAccessResource.save({id: $scope.resourceId}, {
             acl: {
