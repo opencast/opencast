@@ -13,16 +13,13 @@
  *  permissions and limitations under the License.
  *
  */
-package org.opencastproject.adminui.impl.index;
+package org.opencastproject.external.impl.index;
 
-import org.opencastproject.index.service.api.EventIndex;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
 import org.opencastproject.index.service.impl.index.group.Group;
 import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.index.service.impl.index.theme.Theme;
-import org.opencastproject.index.service.impl.index.theme.ThemeIndexSchema;
 import org.opencastproject.util.data.Option;
 
 import org.osgi.service.component.ComponentContext;
@@ -36,20 +33,20 @@ import java.util.List;
 /**
  * A search index implementation based on ElasticSearch.
  */
-public class AdminUISearchIndex extends AbstractSearchIndex implements EventIndex {
+public class ExternalIndex extends AbstractSearchIndex {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(AdminUISearchIndex.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExternalIndex.class);
 
   /** The name of this index */
-  private static final String INDEX_NAME = "adminui";
+  private static final String INDEX_NAME = "externalapi";
 
   /** The required index version */
   private static final int INDEX_VERSION = 101;
 
   /** The document types */
   private static final String[] DOCUMENT_TYPES = new String[] { Event.DOCUMENT_TYPE, Group.DOCUMENT_TYPE,
-          Series.DOCUMENT_TYPE, Theme.DOCUMENT_TYPE, "version" };
+          Series.DOCUMENT_TYPE, "version" };
 
   /**
    * OSGi callback to activate this component instance.
@@ -98,7 +95,6 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
    *
    * @return a list of event locations
    */
-  @Override
   public List<String> getEventLocations() {
     return getTermsForField(EventIndexSchema.LOCATION, Option.some(new String[] { Event.DOCUMENT_TYPE }));
   }
@@ -108,7 +104,6 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
    *
    * @return a list of event subjects
    */
-  @Override
   public List<String> getEventSubjects() {
     return getTermsForField(EventIndexSchema.SUBJECT, Option.some(new String[] { Event.DOCUMENT_TYPE }));
   }
@@ -118,7 +113,6 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
    *
    * @return a list of contributors
    */
-  @Override
   public List<String> getEventContributors() {
     return getTermsForField(EventIndexSchema.CONTRIBUTOR, Option.some(new String[] { Event.DOCUMENT_TYPE }));
   }
@@ -128,19 +122,8 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
    *
    * @return a list of presenters
    */
-  @Override
   public List<String> getEventPresenters() {
     return getTermsForField(EventIndexSchema.PRESENTER, Option.some(new String[] { Event.DOCUMENT_TYPE }));
-  }
-
-  /**
-   * Returns all the known theme names
-   *
-   * @return a list of names
-   */
-  @Override
-  public List<String> getThemeNames() {
-    return getTermsForField(ThemeIndexSchema.NAME, Option.some(new String[] { Theme.DOCUMENT_TYPE }));
   }
 
 }

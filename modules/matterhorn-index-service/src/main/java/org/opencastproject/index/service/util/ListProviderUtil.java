@@ -18,8 +18,11 @@ package org.opencastproject.index.service.util;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.util.SmartIterator;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONAware;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +110,22 @@ public final class ListProviderUtil {
     int offset = query.getOffset().getOrElse(0);
     SmartIterator<JSONAware> si = new SmartIterator<JSONAware>(limit, offset);
     return si.applyLimitAndOffset(unfilteredList);
+  }
+
+  /**
+   * Go through the given list of string and split the element with comma
+   * 
+   * @param inputList
+   *          the list with the element to split
+   * @return the list with the split strings
+   */
+  public static List<String> splitStringList(List<String> inputList) {
+    List<String> outputList = new ArrayList<>();
+    for (String item : inputList) {
+      if (StringUtils.isNotBlank(item))
+        outputList.addAll(Arrays.asList(item.split(",")));
+    }
+    return outputList;
   }
 
 }

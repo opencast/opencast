@@ -18,10 +18,10 @@ package org.opencastproject.index.service.resources.list.query;
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter.SourceType;
 import org.opencastproject.index.service.resources.list.provider.AclListProvider;
+import org.opencastproject.index.service.resources.list.provider.ContributorsListProvider;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider;
 import org.opencastproject.index.service.resources.list.provider.LanguagesListProvider;
 import org.opencastproject.index.service.resources.list.provider.SeriesListProvider;
-import org.opencastproject.index.service.resources.list.provider.UsersListProvider;
 import org.opencastproject.index.service.util.FiltersUtils;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
@@ -326,7 +326,7 @@ public class EventListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createPresentersFilter(Option<String> presenter) {
     return FiltersUtils.generateFilter(presenter, FILTER_PRESENTERS_NAME, FILTER_PRESENTERS_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.NAME));
+            Option.some(ContributorsListProvider.DEFAULT));
   }
 
   /**
@@ -338,7 +338,7 @@ public class EventListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createContributorsFilter(Option<String> contributor) {
     return FiltersUtils.generateFilter(contributor, FILTER_CONTRIBUTORS_NAME, FILTER_CONTRIBUTORS_LABEL,
-            SourceType.SELECT, Option.some(UsersListProvider.NAME));
+            SourceType.SELECT, Option.some(ContributorsListProvider.DEFAULT));
   }
 
   /**

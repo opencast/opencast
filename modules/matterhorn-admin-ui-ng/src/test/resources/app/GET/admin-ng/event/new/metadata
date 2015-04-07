@@ -13,7 +13,7 @@
           "id": "presenters",
           "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTER",
           "value": [],
-          "type": "text",
+          "type": "mixed_text",
           "collection": "users",
           "readOnly": false
         }, {
@@ -27,7 +27,7 @@
           "id": "contributors",
           "label": "EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
           "value": [],
-          "type": "text",
+          "type": "mixed_text",
           "collection": "users",
           "readOnly": false
         }, {
