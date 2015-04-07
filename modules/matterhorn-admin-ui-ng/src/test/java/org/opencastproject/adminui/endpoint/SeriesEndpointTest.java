@@ -290,6 +290,9 @@ public class SeriesEndpointTest {
 
     given().pathParam("seriesId", validSeriesId).formParam("acl", validAcl).formParam("override", "true").expect()
             .statusCode(HttpStatus.SC_OK).when().post(rt.host("/{seriesId}/access"));
+
+    given().pathParam("seriesId", "2").formParam("acl", validAcl).formParam("override", "true").expect()
+            .statusCode(HttpStatus.SC_CONFLICT).when().post(rt.host("/{seriesId}/access"));
   }
 
   @Before
