@@ -39,5 +39,6 @@
     "ins": "Insert",
     "del": "Delete",
     "modMac": "cmd",
-    "modOther": "ctrl"
+    "modOther": "ctrl",
+    "shortcuts": "Shortcuts"
 }

@@ -185,10 +185,12 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
                 var tempVars = {
                     segments: segments,
                     str_segment: translate("segment", "Segment"),
-                    str_noSlidesAvailable: translate("noSlidesAvailable", "No slides available.")
+                    str_noSlidesAvailable: translate("noSlidesAvailable", "No slides available."),
+                    str_slide_text: translate("slide_text", "Slide text")
                 };
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
+                $("#engage_tab_" + plugin.name.replace(/\s/g,"_")).text(tempVars.str_slide_text);
                 if (segments && (segments.length > 0)) {
                     Engage.log("Tab:Slidetext: " + segments.length + " segments are available.");
                     $.each(segments, function(i, v) {

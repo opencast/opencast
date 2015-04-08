@@ -1,5 +1,6 @@
 {
     "value_locale": "en",
     "segment": "Segment",
-    "noSlidesAvailable": "No slides available."
+    "noSlidesAvailable": "No slides available.",
+    "slide_text": "Slide text"
 }

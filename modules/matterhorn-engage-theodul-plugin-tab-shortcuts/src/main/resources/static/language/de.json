@@ -39,5 +39,6 @@
   "ins":"Einfügen",
   "del":"Entfernen",
   "modMac":"cmd",
-  "modOther":"Strg"
+  "modOther":"Strg",
+  "shortcuts":"Tastenkürzel"
 }

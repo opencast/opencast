@@ -157,10 +157,12 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                     str_noShortcutsAvailable: translate("noShortcutsAvailable", "No shortcuts available"),
                     str_shortcutName: translate(name, "Shortcut name"),
                     str_shortcut: translate(name, "Shortcut"),
-                    shortcuts: shortcuts
+                    shortcuts: shortcuts,
+                    str_shortcuts: translate("shortcuts", "Shortcuts")
                 };
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
+                $("#engage_tab_" + plugin.name.replace(/\s/g,"_")).text(tempVars.str_shortcuts);
             }
         }
     });
