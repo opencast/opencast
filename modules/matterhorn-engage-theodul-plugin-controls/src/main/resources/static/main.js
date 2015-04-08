@@ -135,7 +135,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var embedHeightThree = 360;
     var embedHeightFour = 480;
     var embedHeightFive = 720;
-    var logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
+    var logoLink = false;
+    var logo = plugin_path + "images/logo.png";
+    var showEmbed = true;
 
     /* don't change these variables */
     var Utils;
@@ -383,6 +385,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             if (!mediapackageError) {
                 duration = parseInt(this.model.get("duration"));
                 segments = Engage.model.get("mediaPackage").get("segments");
+                
+                if (Engage.model.get("meInfo")) {
+                    if (Engage.model.get("meInfo").get("logo_small")) {
+                        logo = Engage.model.get("meInfo").get("logo_small");
+                    }
+                    if (Engage.model.get("meInfo").get("link_mediamodule")) {
+                        logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
+                    }
+                    if (! Engage.model.get("meInfo").get("show_embed_links")) {
+                        showEmbed = false;
+                    }               
+                }
 
                 var tempVars = {
                     plugin_path: this.pluginPath,
@@ -416,7 +430,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_qualityMedium: translate("qualityMedium", "Medium"),
                     str_qualityHigh: translate("qualityHigh", "High"),
                     hasqualities: resolutions !== undefined,
-                    controlsTop: Engage.controls_top
+                    controlsTop: Engage.controls_top,
+                    logo: logo,
+                    show_embed: showEmbed
                 };
 
                 // compile template and load it
@@ -456,6 +472,17 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         },
         render: function() {
             if (!mediapackageError) {
+                if (Engage.model.get("meInfo")) {
+                    if (Engage.model.get("meInfo").get("logo_small")) {
+                        logo = Engage.model.get("meInfo").get("logo_small");
+                    }
+                    if (Engage.model.get("meInfo").get("link_mediamodule")) {
+                        logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
+                    }
+                    if (! Engage.model.get("meInfo").get("show_embed_links")) {
+                        showEmbed = false;
+                    }               
+                }                
                 var tempVars = {
                     plugin_path: this.pluginPath,
                     logoLink: logoLink,
@@ -464,7 +491,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_fullscreen: translate("fullscreen", "Fullscreen"),
                     loggedIn: false,
                     str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
-                    str_loginLogout: translate("loginLogout", "Login/Logout")
+                    str_loginLogout: translate("loginLogout", "Login/Logout"),
+                    logo: logo,
+                    show_embed: showEmbed
                 };
 
                 // compile template and load into the html
@@ -941,18 +970,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     $("#" + id_segmentNo + no).removeClass("segmentHover");
                 }
             });
-            if (Engage.model.get("meInfo")) {
-                if (Engage.model.get("meInfo").get("logo_small")) {
-                    $($headerLogo).attr("src", Engage.model.get("meInfo").get("logo_small"));
-                }
-                if (! Engage.model.get("meInfo").get("link_mediamodule")) {
-                    $($mediaModuleLink).contents().unwrap();
-                }
-                if (! Engage.model.get("meInfo").get("show_embed_links")) {
-                    $("#" + id_embed_button).css("visibility","hidden");
-                }
-                
-            }
             loadStoredInitialValues();
         }
     }

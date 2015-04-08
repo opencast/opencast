@@ -45,11 +45,11 @@
     </div>
     <!-- ##### Logo ##### -->
     <div id="navigation_logo">
-        <% if(typeof logoLink !== "undefined") { %>
+        <% if(typeof logoLink !== "undefined" && logoLink) { %>
         <a id="mediamodulelink" href="<%= logoLink %>" role="link" aria-label="<%= str_openMediaModule %>">
         <% } %>
-        <img id="headerLogo" src="<%= plugin_path %>images/logo.png" />
-        <% if(typeof logoLink !== "undefined") { %>
+        <img id="headerLogo" src="<%= logo %>" />
+        <% if(typeof logoLink !== "undefined" && logoLink) { %>
         </a>
         <% } %>
     </div>
@@ -97,6 +97,7 @@
             <span class="glyphicon glyphicon-fullscreen"></span>
             </button>
         </div>
+        <% if (show_embed) { %>
         <div class="btn-group">
           <div class="btn-group">
             <button id="embed_button" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" aria-label="<%= str_embedButton %>">
@@ -112,6 +113,7 @@
             </ul>
           </div>
         </div>
+        <% } %>
       <% if((typeof loggedIn !== "undefined")
       && (typeof str_checkingStatus !== "undefined")
       && (typeof str_loginLogout !== "undefined")) { %>

@@ -58,16 +58,17 @@
     <% if((typeof controlsTop !== "undefined") && controlsTop) { %>
     <!-- ##### Logo ##### -->
     <div id="navigation_logo">
-        <% if(typeof logoLink !== "undefined") { %>
+        <% if(typeof logoLink !== "undefined" || logoLink != false) { %>
         <a href="<%= logoLink %>" role="link" aria-label="<%= str_openMediaModule %>">
         <% } %>
-        <img src="<%= plugin_path %>images/logo.png" />
-        <% if(typeof logoLink !== "undefined") { %>
+        <img src="<%= logo %>" />
+        <% if(typeof logoLink !== "undefined" || logoLink != false) { %>
         </a>
         <% } %>
     </div>
     <!-- ##### Navigation ##### -->
     <div id="menu">
+        <% if (show_embed) { %>
         <div class="btn-group">
           <div class="btn-group">
             <button id="embed_button" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" aria-label="<%= str_embedButton %>">
@@ -83,6 +84,7 @@
             </ul>
           </div>
         </div>
+        <% } %>
       <% if((typeof loggedIn !== "undefined")
       && (typeof str_checkingStatus !== "undefined")
       && (typeof str_loginLogout !== "undefined")) { %>
