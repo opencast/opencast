@@ -155,8 +155,8 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                 var tempVars = {
                     str_displayShortcuts: translate("displayShortcuts", "Display shortcuts"),
                     str_noShortcutsAvailable: translate("noShortcutsAvailable", "No shortcuts available"),
-                    str_shortcutName: translate(name, "Shortcut name"),
-                    str_shortcut: translate(name, "Shortcut"),
+                    str_shortcutName: translate("name", "Shortcut name"),
+                    str_shortcut: translate("shortcut", "Shortcut"),
                     shortcuts: shortcuts,
                     str_shortcuts: translate("shortcuts", "Shortcuts")
                 };

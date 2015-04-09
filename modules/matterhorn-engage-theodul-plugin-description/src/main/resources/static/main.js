@@ -162,6 +162,9 @@ define(["require", "jquery", "underscore", "backbone", "engage/core", "moment"],
                 }
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
+                if (tempVars.title) {
+                    document.title = tempVars.title;
+                }
             }
         }
     });
