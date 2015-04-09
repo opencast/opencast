@@ -261,8 +261,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     function bindShortcutsToEvents() {
         // disable scrolling when pressing the space bar
         $(document).keydown(function(e) {
-            // space = 32, backspace = 8, page up = 73, page down = 81, enter = 10, carriage return = 13
-            if ((e.keyCode == 32) || (e.keyCode == 8) || (e.keyCode == 73) || (e.keyCode == 81) || (e.keyCode == 10)) {
+            // space = 32, backspace = 8, page up = 73, page down = 33, enter = 13
+            if (((e.keyCode == 32) || (e.keyCode == 8) || (e.keyCode == 33) || (e.keyCode == 34) || (e.keyCode == 13)) && ((e.target != $("input#username")[0]) && (e.target != $("input#password")[0]))) {
                 return false;
             }
         });
@@ -349,7 +349,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         });
         return all_plugins_loaded;
     }
-    
+
     function loadTemplate(plugin, plugin_name, plugin_path) {
         if (plugin.template !== "none") {
             // load template asynchronously
@@ -513,6 +513,107 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             }
             return evaluated_plugin_path;
         },
+        loadInfoMeModel: function(func) {
+            require(["engage/models/meInfo"], function(me) {
+                MeInfoModel = new me();
+                // wait that me infos are loaded
+                var intv = window.setInterval(function() {
+                    if (MeInfoModel.ready()) {
+                        window.clearInterval(intv);
+                        if (func && (typeof func === "function")) {
+                            func();
+                        }
+                    }
+                }, 15);
+            });
+        },
+        loadCoreUI: function() {
+            // switch view template and css rules for current player mode
+            // link tag for css file
+            var cssLinkTag = $("<link>");
+            var cssAttr = {
+                type: "text/css",
+                rel: "stylesheet"
+            };
+            engageCore.controls_top = MeInfoModel.getPositionControls() == "top"; // bottom else
+            engageCore.log("Core: Position of the controls is " + (engageCore.controls_top ? "top" : "bottom"));
+
+            // template obj
+            var core_template = "none";
+            // path to the require module with the view logic
+            var view_logic_path = "";
+            switch (engageCore.model.get("mode")) {
+                case "embed":
+                    cssAttr.href = "css/core_embed_style.css";
+                    core_template = "templates/core_embed.html";
+                    view_logic_path = "engage/views/embed";
+                    engageCore.model.embed = true;
+                    break;
+                case "mobile":
+                    cssAttr.href = "css/core_mobile_style.css";
+                    core_template = "templates/core_mobile.html";
+                    view_logic_path = "engage/views/mobile";
+                    engageCore.model.mobile = true;
+                    break;
+                case "desktop":
+                default:
+                    cssAttr.href = engageCore.controls_top ? "css/core_desktop_style_top.css" : "css/core_desktop_style_bottom.css";
+                    core_template = engageCore.controls_top ? "templates/core_desktop_top.html" : "templates/core_desktop_bottom.html";
+                    view_logic_path = "engage/views/desktop";
+                    engageCore.model.desktop = true;
+                    break;
+            }
+            cssLinkTag.attr(cssAttr);
+            // add css to DOM
+            $("head").append(cssLinkTag);
+            // load js view logic via require, see files in views/
+            require([view_logic_path], function(pluginView) {
+                // link view logic to the core
+                engageCore.pluginView = pluginView;
+                engageCore.loadCoreTemplate(core_template);
+            });
+        },
+        loadCoreTemplate: function(core_template) {
+            // get core template
+            $.get(core_template, function(template) {
+                // set template, render it and add it to DOM
+                engageCore.template = template;
+                $(engageCore.el).html(_.template(template)).trigger("create"); // variables do not work in here!
+                // run init function of the view
+                engageCore.pluginView.initView();
+                if (engageCore.model.get("pluginsInfo") && engageCore.model.browserSupported) {
+                    engageCore.loadPlugins();
+                    bindShortcutsToEvents(); // bind configured shortcuts to events
+                } else {
+                    engageCore.trigger(events.plugin_load_done.getName());
+                }
+            });
+        },
+        loadPlugins: function() {
+            engageCore.model.get("pluginsInfo").fetch({
+                success: function(pluginInfos) {
+                    if ((pluginInfos.get("pluginlist").plugins != undefined) && pluginInfos.get("pluginlist")) {
+                        numberOfPlugins = pluginInfos.get("pluginlist").plugins.length;
+                        if ($.isArray(pluginInfos.get("pluginlist").plugins)) {
+                            $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
+                                var plugin_name = value["name"];
+                                plugins_loaded[plugin_name] = false;
+                            });
+                            $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
+                                var plugin_name = value["name"];
+                                engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + value["static-path"] + "/") + "'...");
+                                loadPlugin("../../../plugin/" + value["static-path"] + "/", plugin_name);
+                            });
+                        } else {
+                            var plugin_name = pluginInfos.get("pluginlist").plugins["name"];
+                            plugins_loaded[plugin_name] = false;
+                            engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/") + "'...");
+                            loadPlugin("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/", plugin_name);
+                        }
+                    }
+                }
+            });
+        },
         initialize: function() {
             $("." + class_loading).show();
             $("#" + id_loading1).show();
@@ -533,96 +634,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             this.model.mobile = false;
             // core init event
             this.dispatcher.on(events.coreInit.getName(), function() {
-                require(["engage/models/meInfo"], function(me) {
-                    MeInfoModel = new me();
-                    // wait that me infos are loaded
-                    var intv = window.setInterval(function() {
-                        if (MeInfoModel.ready()) {
-                            window.clearInterval(intv);
-                            // switch view template and css rules for current player mode
-                            // link tag for css file
-                            var cssLinkTag = $("<link>");
-                            var cssAttr = {
-                                type: "text/css",
-                                rel: "stylesheet"
-                            };
-                            engageCore.controls_top = MeInfoModel.getPositionControls() == "top"; // bottom else
-                            engageCore.log("Core: Position of the controls is " + (engageCore.controls_top ? "top" : "bottom"));
-
-                            // template obj
-                            var core_template = "none";
-                            // path to the require module with the view logic
-                            var view_logic_path = "";
-                            switch (engageCore.model.get("mode")) {
-                                case "embed":
-                                    cssAttr.href = "css/core_embed_style.css";
-                                    core_template = "templates/core_embed.html";
-                                    view_logic_path = "engage/views/embed";
-                                    engageCore.model.embed = true;
-                                    break;
-                                case "mobile":
-                                    cssAttr.href = "css/core_mobile_style.css";
-                                    core_template = "templates/core_mobile.html";
-                                    view_logic_path = "engage/views/mobile";
-                                    engageCore.model.mobile = true;
-                                    break;
-                                case "desktop":
-                                default:
-                                    cssAttr.href = engageCore.controls_top ? "css/core_desktop_style_top.css" : "css/core_desktop_style_bottom.css";
-                                    core_template = engageCore.controls_top ? "templates/core_desktop_top.html" : "templates/core_desktop_bottom.html";
-                                    view_logic_path = "engage/views/desktop";
-                                    engageCore.model.desktop = true;
-                                    break;
-                            }
-                            cssLinkTag.attr(cssAttr);
-                            // add css to DOM
-                            $("head").append(cssLinkTag);
-                            // load js view logic via require, see files in views/
-                            require([view_logic_path], function(pluginView) {
-                                // link view logic to the core
-                                engageCore.pluginView = pluginView;
-                                // get core template
-                                $.get(core_template, function(template) {
-                                    // set template, render it and add it to DOM
-                                    engageCore.template = template;
-                                    $(engageCore.el).html(_.template(template)).trigger("create"); // variables do not work in here!
-                                    // run init function of the view
-                                    engageCore.pluginView.initView();
-                                    if (engageCore.model.get("pluginsInfo") && engageCore.model.browserSupported) {
-                                        // BEGIN LOAD PLUGINS
-                                        engageCore.model.get("pluginsInfo").fetch({
-                                            success: function(pluginInfos) {
-                                                if ((pluginInfos.get("pluginlist").plugins != undefined) && pluginInfos.get("pluginlist")) {
-                                                    numberOfPlugins = pluginInfos.get("pluginlist").plugins.length;
-                                                    if ($.isArray(pluginInfos.get("pluginlist").plugins)) {
-                                                        $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
-                                                            var plugin_name = value["name"];
-                                                            plugins_loaded[plugin_name] = false;
-                                                        });
-                                                        $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
-                                                            var plugin_name = value["name"];
-                                                            engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + value["static-path"] + "/") + "'...");
-                                                            loadPlugin("../../../plugin/" + value["static-path"] + "/", plugin_name);
-                                                        });
-                                                    } else {
-                                                        var plugin_name = pluginInfos.get("pluginlist").plugins["name"];
-                                                        plugins_loaded[plugin_name] = false;
-                                                        engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/") + "'...");
-                                                        loadPlugin("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/", plugin_name);
-                                                    }
-                                                }
-                                            }
-                                        });
-                                        // END LOAD PLUGINS
-                                        bindShortcutsToEvents(); // bind configured shortcuts to events
-                                    } else {
-                                        engageCore.trigger(events.plugin_load_done.getName());
-                                    }
-                                });
-                            });
-                        }
-                    }, 15);
-                });
+                engageCore.loadInfoMeModel(engageCore.loadCoreUI);
             });
             // load plugins done, hide loading and show content
             this.dispatcher.on(events.mediaPackageModelError.getName(), function(str) {
