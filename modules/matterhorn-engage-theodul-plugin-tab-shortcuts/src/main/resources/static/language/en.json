@@ -38,6 +38,6 @@
     "down": "Down",
     "ins": "Insert",
     "del": "Delete",
-    "modMac": "cmd",
-    "modOther": "ctrl"
+    "modMac": "Cmd",
+    "modOther": "Ctrl"
 }

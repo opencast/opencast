@@ -54,7 +54,7 @@ describe('Conflict check API Resource', function () {
 
             expectedOutput = {
                 'start'    : startDate,
-                'end'      : endDate.substr(0, 11) + endFirstLecture.substr(11, 9),
+                'end'      : endDate,
                 'duration' : '3600000',
                 'rrule'    : 'FREQ=WEEKLY;BYDAY=MO,WE,TH;BYHOUR=' + date.getUTCHours() + ';BYMINUTE=0',
                 'device'   : '•mock• agent4'

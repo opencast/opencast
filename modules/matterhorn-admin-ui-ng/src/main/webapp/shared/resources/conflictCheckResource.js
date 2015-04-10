@@ -1,26 +1,28 @@
 angular.module('adminNg.resources')
 .factory('ConflictCheckResource', ['$resource', 'JsHelper', function ($resource, JsHelper) {
     var transformRequest = function (data) {
-        var endOfFirstLecture, endDate, result = {
-            start: JsHelper.toZuluTimeString(data.start),
-            device: data.device.id
-        };
-        result.duration = (
-            parseInt(data.duration.hour, 10) * 60 * 60 * 1000 +
-            parseInt(data.duration.minute, 10) * 60 * 1000
-        ).toString();
+        var result = {
+                start: JsHelper.toZuluTimeString(data.start),
+                device: data.device.id,
+                duration: String(moment.duration(parseInt(data.duration.hour, 10), 'h')
+                            .add(parseInt(data.duration.minute, 10), 'm')
+                            .asMilliseconds())
+            };
+
         if (data.weekdays) {
-            endOfFirstLecture = JsHelper.toZuluTimeString(data.start, data.duration);
-            endDate = JsHelper.toZuluTimeString(data.end);
-            result.end = endDate.substr(0, 11) + endOfFirstLecture.substr(11, 9);
+            result.end = JsHelper.toZuluTimeString({
+                date: data.end,
+                hour: data.start.hour,
+                minute: data.start.minute
+            }, data.duration);
             result.rrule = JsHelper.assembleRrule(data);
-        }
-        else {
+        } else {
             result.end = JsHelper.toZuluTimeString(data.start, data.duration);
         }
 
         return $.param({metadata: angular.toJson(result)});
     };
+
     return $resource('/admin-ng/event/new/conflicts', {}, {
         check: { method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
