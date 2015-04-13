@@ -2251,6 +2251,17 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
+    <developer>
+      <id>basil.brunner</id>
+      <name>Basil Brunner</name>
+      <email>basil@entwinemedia.com</email>
+      <organization>Entwine</organization>
+      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
 
   <contributors><!-- TODO? -->
