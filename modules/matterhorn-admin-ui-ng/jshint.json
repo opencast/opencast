@@ -56,10 +56,11 @@
         "by"              : false,
         "browser"         : false,
         "location"        : false,
-        "Element": false,
-        "vis": false,
-        "PlayerAdapter": false,
-        "videojs": false
+        "Element"         : false,
+        "vis"             : false,
+        "PlayerAdapter"   : false,
+        "videojs"         : false,
+        "moment"          : true
     },
     "ignores": ["src/main/webapp/lib/**/*"]
 }

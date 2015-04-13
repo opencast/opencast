@@ -29,15 +29,18 @@ import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchResultItemImpl;
-import org.opencastproject.util.Cache;
-import org.opencastproject.util.Caches;
 import org.opencastproject.util.data.Function;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This feed generator implements a feed for series. The series argument is taken from the first url parameter after the
@@ -58,12 +61,25 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
   /** Number of milliseconds to cache the recordings (1h) */
   private static final long SERIES_CACHE_TIME = 60L * 60L * 1000L;
 
-  /** The series metadata, cached for up to the indicated amount of time  */
-  private final Cache<String, SearchResult> seriesCache = Caches.lru(500, SERIES_CACHE_TIME);
+  /** A token to store in the miss cache */
+  private Object nullToken = new Object();
+
+  private final CacheLoader<String, Object> seriesLoader = new CacheLoader<String, Object>() {
+    @Override
+    public Object load(String id) {
+      SearchResult result = loadSeries.apply(id);
+      return result == null ? nullToken : result;
+    }
+  };
+
+  /** The series metadata, cached for up to the indicated amount of time */
+  private final LoadingCache<String, Object> seriesCache = CacheBuilder.newBuilder()
+          .expireAfterWrite(SERIES_CACHE_TIME, TimeUnit.MILLISECONDS).maximumSize(500).build(seriesLoader);
 
   /**
    * @see org.opencastproject.feed.api.FeedGenerator#accept(java.lang.String[])
    */
+  @Override
   public boolean accept(String[] query) {
     boolean generalChecksPassed = super.accept(query);
     if (!generalChecksPassed)
@@ -90,10 +106,13 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
       // To check if we can accept the query it is enough to query for just one result
       // Check the series service to see if the series exists
       // but has not yet had anything published from it
-      SearchResult result = seriesCache.get(seriesId, loadSeries);
-      if (result != null)
-        seriesData.set(result);
-      return result != null && result.size() > 0;
+      Object result = seriesCache.getUnchecked(seriesId);
+      if (result == nullToken)
+        return false;
+
+      SearchResult searchResult = (SearchResult) result;
+      seriesData.set(searchResult);
+      return searchResult.size() > 0;
     } catch (Exception e) {
       return false;
     }
@@ -104,6 +123,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
    *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#getIdentifier()
    */
+  @Override
   public String getIdentifier() {
     return series.get() != null ? series.get() : super.getIdentifier();
   }
@@ -113,6 +133,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
    *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#getName()
    */
+  @Override
   public String getName() {
     SearchResult rs = seriesData.get();
     return (rs != null) ? rs.getItems()[0].getDcTitle() : super.getName();
@@ -123,6 +144,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
    *
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#getDescription()
    */
+  @Override
   public String getDescription() {
     String dcAbstract = null;
     SearchResult rs = seriesData.get();
@@ -138,6 +160,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
    * @see org.opencastproject.feed.impl.AbstractFeedGenerator#loadFeedData(org.opencastproject.feed.api.Feed.Type,
    *      java.lang.String[], int, int)
    */
+  @Override
   protected SearchResult loadFeedData(Type type, String[] query, int limit, int offset) {
     SearchQuery q = createBaseQuery(type, limit, offset);
     q.includeEpisodes(true);
@@ -168,6 +191,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
    */
   private final Function<String, SearchResult> loadSeries = new Function<String, SearchResult>() {
 
+    @Override
     public SearchResult apply(String id) {
 
       // Try to look up the series from the search service
