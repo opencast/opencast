@@ -211,6 +211,11 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.WORKFLOW_SCHEDULED_DATETIME, query.getWorkflowScheduledDate(), true);
     }
 
+    // Event status
+    if (query.getEventStatus() != null) {
+      and(EventIndexSchema.EVENT_STATUS, query.getEventStatus(), true);
+    }
+
     // Review status
     if (query.getReviewStatus() != null) {
       and(EventIndexSchema.REVIEW_STATUS, query.getReviewStatus(), true);

@@ -68,6 +68,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private String workflowDefinition = null;
   private Long duration = null;
   private String startDate = null;
+  private String eventStatus = null;
   private String reviewStatus = null;
   private String schedulingStatus = null;
   private Boolean optedOut = null;
@@ -910,6 +911,28 @@ public class EventSearchQuery extends AbstractSearchQuery {
   }
 
   /**
+   * Selects recordings with the given event status.
+   *
+   * @param eventStatus
+   *          the event status
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withEventStatus(String eventStatus) {
+    clearExpectations();
+    this.eventStatus = eventStatus;
+    return this;
+  }
+
+  /**
+   * Returns the event status of the recording.
+   *
+   * @return the event status
+   */
+  public String getEventStatus() {
+    return eventStatus;
+  }
+
+  /**
    * Selects recordings with the given review date.
    *
    * @param reviewDate
@@ -1318,6 +1341,27 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public Order getSchedulingStatusSortOrder() {
     return getSortOrder(EventIndexSchema.SCHEDULING_STATUS);
+  }
+
+  /**
+   * Defines the sort order for the event status.
+   *
+   * @param order
+   *          the sort order
+   * @return the updated query
+   */
+  public EventSearchQuery sortByEventStatus(Order order) {
+    withSortOrder(EventIndexSchema.EVENT_STATUS, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the event status.
+   *
+   * @return the sort order
+   */
+  public Order getEventStatusSortOrder() {
+    return getSortOrder(EventIndexSchema.EVENT_STATUS);
   }
 
 }

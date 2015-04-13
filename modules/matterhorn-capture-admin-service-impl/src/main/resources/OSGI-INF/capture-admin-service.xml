@@ -14,6 +14,10 @@
     cardinality="1..1" policy="static" target="(type=persistence)" bind="setPersistenceProperties" />
   <reference name="workflow" interface="org.opencastproject.workflow.api.WorkflowService"
     cardinality="1..1" policy="static" bind="setWorkflowService" />
+  <reference name="scheduler-service" interface="org.opencastproject.scheduler.api.SchedulerService"
+    cardinality="1..1" policy="static" bind="setSchedulerService" />
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
     cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
+    cardinality="1..1" policy="static" bind="setMessageSender" />
 </scr:component>

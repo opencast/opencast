@@ -437,6 +437,7 @@
                             OSGI-INF/message-receiver-archive.xml,
                             OSGI-INF/message-receiver-comment.xml,
                             OSGI-INF/message-receiver-group.xml,
+                            OSGI-INF/message-receiver-recording.xml,
                             OSGI-INF/message-receiver-scheduler.xml,
                             OSGI-INF/message-receiver-series.xml,
                             OSGI-INF/message-receiver-theme.xml,
