@@ -178,7 +178,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="item in workflows.entries track by $index">
+                                <tr ng-repeat="item in workflows.entries|orderBy:'submitted':true track by $index">
                                     <td>{{ item.id }}</td>
                                     <td>{{ item.workflow }}</td>
                                     <td>{{ item.status }}</td>
