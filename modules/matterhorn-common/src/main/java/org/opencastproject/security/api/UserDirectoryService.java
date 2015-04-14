@@ -56,4 +56,12 @@ public interface UserDirectoryService {
    */
   Iterator<User> findUsers(String query, int offset, int limit);
 
+  /**
+   * Discards any cached value for given user name.
+   *
+   * @param userName
+   *          the user name
+   */
+  void invalidate(String userName);
+
 }

@@ -332,6 +332,16 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     return offsetLimitCollection(offset, limit, roles).iterator();
   }
 
+  @Override
+  public void invalidate(String userName) {
+    Organization org = securityService.getOrganization();
+    if (org == null)
+      throw new IllegalStateException("No organization is set");
+
+    cache.remove(tuple(org.getId(), userName));
+    logger.trace("Invalidated user {} from user directories", userName);
+  }
+
   private <T> HashSet<T> offsetLimitCollection(int offset, int limit, HashSet<T> entries) {
     HashSet<T> result = new HashSet<T>();
     int i = 0;
