@@ -102,8 +102,6 @@
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-workflowoperation</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
-        <module>modules/matterhorn-speech-recognition-workflowoperation</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-static</module>
@@ -497,7 +495,6 @@
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-impl</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-textanalyzer-api</module>
@@ -552,7 +549,6 @@
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-impl</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-textanalyzer-api</module>
@@ -599,7 +595,6 @@
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-remote</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-textanalyzer-api</module>
@@ -798,7 +793,7 @@
     </profile>
 
     <profile>
-      <id>alternatives</id>
+      <id>extra</id>
       <activation>
         <activeByDefault>false</activeByDefault>
         <property>
@@ -806,8 +801,10 @@
         </property>
       </activation>
       <modules>
-        <module>modules/matterhorn-dictionary-none</module>
         <module>modules/matterhorn-dictionary-hunspell</module>
+        <module>modules/matterhorn-dictionary-none</module>
+        <module>modules/matterhorn-speech-recognition-service-api</module>
+        <module>modules/matterhorn-speech-recognition-workflowoperation</module>
       </modules>
     </profile>
 
