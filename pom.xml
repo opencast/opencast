@@ -45,7 +45,6 @@
         <module>modules/matterhorn-authorization-manager</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-caption-api</module>
-        <module>modules/matterhorn-caption-remote</module>
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-admin-service-impl</module>
         <module>modules/matterhorn-capture-workflowoperation</module>
