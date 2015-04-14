@@ -1858,7 +1858,7 @@ public abstract class AbstractEventEndpoint {
       timezone = agent.getConfiguration().getProperty("capture.device.timezone");
       if (StringUtils.isBlank(timezone)) {
         timezone = TimeZone.getDefault().getID();
-        logger.warn("No 'capture.device.timezone' set on agent {}. The default server timezone {} will be used.",
+        logger.debug("No 'capture.device.timezone' set on agent {}. The default server timezone {} will be used.",
                 device, timezone);
       }
     }
