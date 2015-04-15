@@ -45,11 +45,11 @@
     </div>
     <!-- ##### Logo ##### -->
     <div id="navigation_logo">
-        <% if(typeof logoLink !== "undefined" && logoLink) { %>
+        <% if(typeof logoLink !== "undefined") { %>
         <a id="mediamodulelink" href="<%= logoLink %>" role="link" aria-label="<%= str_openMediaModule %>">
         <% } %>
         <img id="headerLogo" src="<%= logo %>" />
-        <% if(typeof logoLink !== "undefined" && logoLink) { %>
+        <% if(typeof logoLink !== "undefined") { %>
         </a>
         <% } %>
     </div>
