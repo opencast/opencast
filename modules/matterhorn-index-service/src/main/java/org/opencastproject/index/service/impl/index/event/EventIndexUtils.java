@@ -158,6 +158,10 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.BLACKLISTED, event.getBlacklisted(), true);
     if (event.getSchedulingStatus() != null)
       metadata.addField(EventIndexSchema.SCHEDULING_STATUS, event.getSchedulingStatus(), true);
+    if (event.getRecordingStatus() != null)
+      metadata.addField(EventIndexSchema.RECORDING_STATUS, event.getRecordingStatus(), true);
+
+    metadata.addField(EventIndexSchema.EVENT_STATUS, event.getEventStatus(), true);
 
     metadata.addField(EventIndexSchema.HAS_COMMENTS, event.hasComments(), true);
     metadata.addField(EventIndexSchema.HAS_OPEN_COMMENTS, event.hasOpenComments(), true);

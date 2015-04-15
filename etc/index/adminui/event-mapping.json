@@ -69,6 +69,8 @@
 
             "workflow_scheduled_datetime": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
+            "event_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
             "review_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
             "review_date": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
@@ -82,6 +84,8 @@
             "has_open_comments": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
 
             "scheduling_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "recording_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
             "archive_version": { "type" : "long", "store" : "no" },
 

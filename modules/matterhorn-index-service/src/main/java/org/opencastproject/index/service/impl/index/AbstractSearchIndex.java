@@ -385,6 +385,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     event.setReviewDate(null);
     event.setReviewStatus(null);
     event.setSchedulingStatus(null);
+    event.setRecordingStatus(null);
 
     if (toDelete(event)) {
       delete(Event.DOCUMENT_TYPE, uid.concat(organization));

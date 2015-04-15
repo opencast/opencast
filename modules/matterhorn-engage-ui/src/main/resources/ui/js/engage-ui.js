@@ -296,6 +296,9 @@ $(document).ready(function() {
                             if (data.username) {
                                 log("Username found: " + data.username);
                                 setUsername(data.username);
+                            } else if (data.user && data.user.username) {
+                                log("Username found: " + data.user.username);
+                                setUsername(data.user.username);
                             } else {
                                 log("Username not found");
                             }

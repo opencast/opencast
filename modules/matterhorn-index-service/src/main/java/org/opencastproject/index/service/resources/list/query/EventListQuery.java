@@ -17,7 +17,6 @@ package org.opencastproject.index.service.resources.list.query;
 
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter.SourceType;
-import org.opencastproject.index.service.resources.list.provider.AclListProvider;
 import org.opencastproject.index.service.resources.list.provider.ContributorsListProvider;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider;
 import org.opencastproject.index.service.resources.list.provider.LanguagesListProvider;
@@ -36,12 +35,9 @@ import java.util.Date;
  * <li>series</li>
  * <li>presenters</li>
  * <li>contributors</li>
- * <li>subject</li>
  * <li>location</li>
  * <li>language</li>
  * <li>startDate</li>
- * <li>managedAcl</li>
- * <li>progress</li>
  * <li>status</li>
  * </ul>
  */
@@ -56,9 +52,6 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static final String FILTER_CONTRIBUTORS_NAME = "contributors";
   private static final String FILTER_CONTRIBUTORS_LABEL = "FILTERS.EVENTS.CONTRIBUTORS.LABEL";
 
-  public static final String FILTER_SUBJECT_NAME = "subject";
-  private static final String FILTER_SUBJECT_LABEL = "FILTERS.EVENTS.SUBJECT.LABEL";
-
   public static final String FILTER_LOCATION_NAME = "location";
   private static final String FILTER_LOCATION_LABEL = "FILTERS.EVENTS.LOCATION.LABEL";
 
@@ -67,12 +60,6 @@ public class EventListQuery extends ResourceListQueryImpl {
 
   public static final String FILTER_STARTDATE_NAME = "startDate";
   private static final String FILTER_STARTDATE_LABEL = "FILTERS.EVENTS.START_DATE.LABEL";
-
-  public static final String FILTER_ACL_NAME = "managedAcl";
-  private static final String FILTER_ACL_LABEL = "FILTERS.EVENTS.ACCESS_POLICY.LABEL";
-
-  public static final String FILTER_PROGRESS_NAME = "progress";
-  private static final String FILTER_PROGRESS_LABEL = "FILTERS.EVENTS.PROGRESS.LABEL";
 
   public static final String FILTER_STATUS_NAME = "status";
   private static final String FILTER_STATUS_LABEL = "FILTERS.EVENTS.STATUS.LABEL";
@@ -88,10 +75,7 @@ public class EventListQuery extends ResourceListQueryImpl {
     this.availableFilters.add(createPresentersFilter(Option.<String> none()));
     this.availableFilters.add(createContributorsFilter(Option.<String> none()));
     this.availableFilters.add(createLocationFilter(Option.<String> none()));
-    this.availableFilters.add(createSubjectFilter(Option.<String> none()));
     this.availableFilters.add(createStartDateFilter(Option.<Tuple<Date, Date>> none()));
-    this.availableFilters.add(createManagedAclFilter(Option.<String> none()));
-    this.availableFilters.add(createProgressFilter(Option.<String> none()));
     this.availableFilters.add(createStatusFilter(Option.<String> none()));
     this.availableFilters.add(createCommentsFilter(Option.<String> none()));
   }
@@ -156,30 +140,11 @@ public class EventListQuery extends ResourceListQueryImpl {
   /**
    * Add a {@link ResourceListFilter} filter to the query with the given subject
    *
-   * @param subject
-   *          the subject to filter for
-   */
-  public void withSubject(String subject) {
-    this.addFilter(createSubjectFilter(Option.option(subject)));
-  }
-
-  /**
-   * Returns an {@link Option} containing the subject used to filter if set
-   *
-   * @return an {@link Option} containing the subject or none.
-   */
-  public Option<String> getSubject() {
-    return this.getFilterValue(FILTER_SUBJECT_NAME);
-  }
-
-  /**
-   * Add a {@link ResourceListFilter} filter to the query with the given subject
-   *
    * @param location
    *          the subject to filter for
    */
   public void withLocation(String location) {
-    this.addFilter(createSubjectFilter(Option.option(location)));
+    this.addFilter(createLocationFilter(Option.option(location)));
   }
 
   /**
@@ -198,7 +163,7 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          the subject to filter for
    */
   public void withLanguage(String language) {
-    this.addFilter(createSubjectFilter(Option.option(language)));
+    this.addFilter(createLanguageFilter(Option.option(language)));
   }
 
   /**
@@ -227,44 +192,6 @@ public class EventListQuery extends ResourceListQueryImpl {
    */
   public Option<Tuple<Date, Date>> getStartDate() {
     return this.getFilterValue(FILTER_STARTDATE_NAME);
-  }
-
-  /**
-   * Add a {@link ResourceListFilter} filter to the query with the given managed ACL
-   *
-   * @param acl
-   *          the managed ACL to filter for
-   */
-  public void withManagedAcl(String acl) {
-    this.addFilter(createManagedAclFilter(Option.option(acl)));
-  }
-
-  /**
-   * Returns an {@link Option} containing the managed ACL used to filter if set
-   *
-   * @return an {@link Option} containing the managed ACL or none.
-   */
-  public Option<String> getManagedAcl() {
-    return this.getFilterValue(FILTER_ACL_NAME);
-  }
-
-  /**
-   * Add a {@link ResourceListFilter} filter to the query with the given progress
-   *
-   * @param progress
-   *          the progress to filter for
-   */
-  public void withProgress(String progress) {
-    this.addFilter(createProgressFilter(Option.option(progress)));
-  }
-
-  /**
-   * Returns an {@link Option} containing the progress used to filter if set
-   *
-   * @return an {@link Option} containing the progress or none.
-   */
-  public Option<String> getProgress() {
-    return this.getFilterValue(FILTER_PROGRESS_NAME);
   }
 
   /**
@@ -314,7 +241,7 @@ public class EventListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createSeriesFilter(Option<String> seriesId) {
     return FiltersUtils.generateFilter(seriesId, FILTER_SERIES_NAME, FILTER_SERIES_LABEL, SourceType.SELECT,
-            Option.some(SeriesListProvider.NAME));
+            Option.some(SeriesListProvider.PROVIDER_PREFIX));
   }
 
   /**
@@ -339,18 +266,6 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static ResourceListFilter<String> createContributorsFilter(Option<String> contributor) {
     return FiltersUtils.generateFilter(contributor, FILTER_CONTRIBUTORS_NAME, FILTER_CONTRIBUTORS_LABEL,
             SourceType.SELECT, Option.some(ContributorsListProvider.DEFAULT));
-  }
-
-  /**
-   * Create a new {@link ResourceListFilter} based on a subject
-   *
-   * @param subject
-   *          the subject to filter on wrapped in an {@link Option} or {@link Option#none()}
-   * @return a new {@link ResourceListFilter} for a subject based query
-   */
-  public static ResourceListFilter<String> createSubjectFilter(Option<String> subject) {
-    return FiltersUtils.generateFilter(subject, FILTER_SUBJECT_NAME, FILTER_SUBJECT_LABEL, SourceType.SELECT,
-            Option.some(EventsListProvider.SUBJECT));
   }
 
   /**
@@ -390,30 +305,6 @@ public class EventListQuery extends ResourceListQueryImpl {
   }
 
   /**
-   * Create a new {@link ResourceListFilter} based on managed ACL
-   *
-   * @param acl
-   *          the acl to filter on wrapped in an {@link Option} or {@link Option#none()}
-   * @return a new {@link ResourceListFilter} for managed ACL based query
-   */
-  public static ResourceListFilter<String> createManagedAclFilter(Option<String> acl) {
-    return FiltersUtils.generateFilter(acl, FILTER_ACL_NAME, FILTER_ACL_LABEL, SourceType.SELECT,
-            Option.some(AclListProvider.NAME));
-  }
-
-  /**
-   * Create a new {@link ResourceListFilter} based on progress
-   *
-   * @param progress
-   *          the progress to filter on wrapped in an {@link Option} or {@link Option#none()}
-   * @return a new {@link ResourceListFilter} for progress based query
-   */
-  public static ResourceListFilter<String> createProgressFilter(Option<String> progress) {
-    return FiltersUtils.generateFilter(progress, FILTER_PROGRESS_NAME, FILTER_PROGRESS_LABEL, SourceType.SELECT,
-            Option.some(EventsListProvider.PROGRESS));
-  }
-
-  /**
    * Create a new {@link ResourceListFilter} based on stats
    *
    * @param status
@@ -437,5 +328,4 @@ public class EventListQuery extends ResourceListQueryImpl {
             Option.some(EventsListProvider.COMMENTS));
   }
 
-  // TODO Create all the missing filters for the events
 }

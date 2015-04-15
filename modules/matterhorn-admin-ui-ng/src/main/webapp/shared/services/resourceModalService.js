@@ -5,10 +5,27 @@
  * Provides a service for displaying details of table records.
  */
 angular.module('adminNg.services.modal')
-.factory('ResourceModal', ['$location', '$compile', '$injector', 'Table', 'Modal',
-    function ($location, $compile, $injector, Table, Modal) {
+.factory('ResourceModal', ['$location', '$compile', '$injector', 'Table', 'Modal', '$timeout',
+    function ($location, $compile, $injector, Table, Modal, $timeout) {
     var ResourceModal = function () {
-        var me = this;
+        var me = this,
+            DEFAULT_REFRESH_DELAY = 5000;
+
+        /**
+         * Scheduler for the refresh of the fetch
+         */
+        this.refreshScheduler = {
+            on: true,
+            newSchedule: function () {
+                me.refreshScheduler.cancel();
+                me.refreshScheduler.nextTimeout = $timeout(me.loadSubNavData, DEFAULT_REFRESH_DELAY);
+            },
+            cancel: function () {
+                if (me.refreshScheduler.nextTimeout) {
+                    $timeout.cancel(me.refreshScheduler.nextTimeout);
+                }
+            }
+        };
 
         /**
          * @ngdoc function
@@ -91,6 +108,11 @@ angular.module('adminNg.services.modal')
 
             params.breadcrumbs = JSON.stringify(me.$scope.breadcrumbs);
             $location.search(params);
+
+            if (me.refreshScheduler.on) {
+                me.refreshScheduler.cancel();
+                me.refreshScheduler.newSchedule();
+            }
         };
 
         /**
@@ -121,7 +143,13 @@ angular.module('adminNg.services.modal')
                 return prevValue;
             }, {});
 
-            me.$scope.subNavData = apiService.get(params);
+            apiService.get(params, function (data) {
+                me.$scope.subNavData = data;
+            });
+
+            if (me.refreshScheduler.on) {
+                me.refreshScheduler.newSchedule();
+            }
         };
 
         /**
