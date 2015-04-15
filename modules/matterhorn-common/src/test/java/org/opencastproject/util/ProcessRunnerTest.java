@@ -28,9 +28,8 @@ public class ProcessRunnerTest {
   @Test
   @Ignore
   public void testRunner() throws IOException {
-    int exit = ProcessRunner.run(ProcessRunner.mk("ls -Xal", true),
-                                 Fns.<String, Boolean>tee(Booleans.not.o(Strings.matches("^ls.*")), ProcessRunner.TO_CONSOLE.toFx()),
-                                 ProcessRunner.IGNORE);
-    System.out.println(exit);
+    ProcessRunner.run(ProcessRunner.mk("ls -Xal", true),
+            Fns.<String, Boolean> tee(Booleans.not.o(Strings.matches("^ls.*")), ProcessRunner.TO_CONSOLE.toFx()),
+            ProcessRunner.IGNORE);
   }
 }
