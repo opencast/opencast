@@ -19,6 +19,8 @@ define(['jquery', 'backbone'], function($, Backbone) {
     "use strict";
 
     var prop_shortcut = "player.shortcut.";
+    var prop_allowedtags = "player.allowedtags";
+    var prop_allowedformats = "player.allowedformats";
     var prop_mastervideotype = "player.mastervideotype";
     var prop_positioncontrols = "player.positioncontrols";
     var ready = false;
@@ -33,6 +35,8 @@ define(['jquery', 'backbone'], function($, Backbone) {
             this.fetch({
                 success: function(me) {
                     var shortcuts = new Array();
+                    var allowedTags;
+                    var allowedFormats;
                     var mastervideotype = "";
                     if (me && me.attributes && me.attributes.org && me.attributes.org.properties) {
                         // extract shortcuts
@@ -45,6 +49,14 @@ define(['jquery', 'backbone'], function($, Backbone) {
                                     key: value
                                 });
                             }
+                            // allowed tags on videos that should be played
+                            else if ((key == prop_allowedtags) && value) {
+                                allowedTags = value;
+                            }
+                            // formats that should be played
+                            else if ((key == prop_allowedformats) && value) {
+                                allowedFormats = value;
+                            }
                             // master video type
                             else if ((key == prop_mastervideotype) && value) {
                                 mastervideotype = value;
@@ -55,6 +67,8 @@ define(['jquery', 'backbone'], function($, Backbone) {
                             }
                         });
                     }
+                    me.set("allowedtags", allowedTags);
+                    me.set("allowedformats", allowedFormats);
                     me.set("shortcuts", shortcuts);
                     me.set("mastervideotype", mastervideotype);
                     ready = true;
