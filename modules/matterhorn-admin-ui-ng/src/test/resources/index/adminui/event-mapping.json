@@ -83,9 +83,13 @@
 
             "scheduling_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
+            "recording_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
             "archive_version": { "type" : "long", "store" : "no" },
 
             "publication": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            
+            "publication_flavor": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
             
             "text": { "type" : "string", "index" : "analyzed", "store" : "no" },
             "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no" }

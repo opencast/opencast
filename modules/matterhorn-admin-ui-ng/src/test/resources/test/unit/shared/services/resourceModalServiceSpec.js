@@ -324,7 +324,7 @@ describe('ResourceModal service', function () {
 
             it('loads the last resource specified in the breadcrumbs', function () {
                 ResourceModal.loadSubNavData();
-                expect(EventMediaDetailsResource.get).toHaveBeenCalledWith({ id0: 712, id1: 81, id2: 216 });
+                expect(EventMediaDetailsResource.get).toHaveBeenCalledWith({ id0: 712, id1: 81, id2: 216 }, jasmine.any(Function));
             });
         });
 
@@ -350,7 +350,7 @@ describe('ResourceModal service', function () {
 
             it('loads the last resource specified in the breadcrumbs', function () {
                 ResourceModal.loadSubNavData();
-                expect(EventMediaDetailsResource.get).toHaveBeenCalledWith({ id0: 712, id1: 81 });
+                expect(EventMediaDetailsResource.get).toHaveBeenCalledWith({ id0: 712, id1: 81 }, jasmine.any(Function));
             });
         });
     });

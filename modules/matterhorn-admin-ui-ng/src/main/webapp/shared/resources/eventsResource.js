@@ -27,6 +27,9 @@ angular.module('adminNg.resources')
                     row.series_name = r.series.title;
                 }
                 row.review_status = r.review_status;
+                $translate(r.event_status).then(function (translation) {
+                	row.event_status = translation;
+                });
                 row.source = r.source;
                 row.scheduling_status = r.scheduling_status;
                 $translate(r.scheduling_status).then(function (translation) {

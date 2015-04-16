@@ -78,20 +78,6 @@ describe('JsHelper service', function () {
         });
     });
 
-    describe('#timeToSeconds', function () {
-        var offset = (new Date()).getTimezoneOffset(),
-            zero = offset * 60 * 1000;
-
-        it('returns 0 in case of new Date(0)', function(){
-            expect(JsHelper.timeToSeconds(new Date(zero))).toEqual(0);
-        });
-
-        it('returns 3600 in case of new Date(3600000)', function(){
-            expect(JsHelper.timeToSeconds(new Date(zero +  3600 * 1000))).toEqual(3600);
-        });
-
-    });
-
     describe('#toZuluTime', function () {
         var toZuluTimeString = function (date) {
                 return JsHelper.toZuluTimeString({
@@ -127,10 +113,11 @@ describe('JsHelper service', function () {
 
         it('copes with timeless arguments', function () {
             var result,
-                 input = {
-                    date: '2014-07-17',
-                    hour:  undefined,
-                    minute: undefined
+                date = new Date ('2014-07-17T00:00:00Z'),
+                input = {
+                    date: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
+                    hour:  date.getHours(),
+                    minute: date.getMinutes()
                 };
             result = JsHelper.toZuluTimeString(input);
             expect(result).toEqual('2014-07-17T00:00:00Z');

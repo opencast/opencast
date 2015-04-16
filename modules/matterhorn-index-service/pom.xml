@@ -1,191 +1,191 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>matterhorn-index-service</artifactId>
-    <packaging>bundle</packaging>
-    <name>matterhorn-index-service</name>
-    <parent>
-        <groupId>org.opencastproject</groupId>
-        <artifactId>base</artifactId>
-        <version>2.1-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
-    </parent>
-    <properties>
-        <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
-        <checkstyle.skip>false</checkstyle.skip>
-    </properties>
-    <dependencies>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>matterhorn-index-service</artifactId>
+  <packaging>bundle</packaging>
+  <name>matterhorn-index-service</name>
+  <parent>
+    <groupId>org.opencastproject</groupId>
+    <artifactId>base</artifactId>
+    <version>2.1-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <properties>
+    <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
+    <checkstyle.skip>false</checkstyle.skip>
+  </properties>
+  <dependencies>
 
-        <!-- osgi support -->
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-        </dependency>
+    <!-- osgi support -->
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
 
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
 
 
-        <!-- matterhorn -->
-        <dependency>
-            <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-authorization-manager</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-capture-admin-service-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-common</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-comments</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-participation-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-search</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-ingest-service-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
+    <!-- matterhorn -->
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-authorization-manager</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
 
-        <dependency>
-            <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-userdirectory</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-        </dependency>
-        
-        <!-- Logging -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-capture-admin-service-api</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
 
-        <!-- Testing -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
 
-        <dependency>
-            <groupId>uk.co.datumedge</groupId>
-            <artifactId>hamcrest-json</artifactId>
-            <version>0.2</version>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-comments</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
 
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-participation-api</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
 
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-search</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Import-Package>
-                            org.opencastproject.message.broker.api.index;version=${project.version},
-                            *;resolution:=optional
-                        </Import-Package>
-                        <Export-Package>
-                            org.opencastproject.index.service.api,
-                            org.opencastproject.index.service.catalog.adapter,
-                            org.opencastproject.index.service.catalog.adapter.events,
-                            org.opencastproject.index.service.catalog.adapter.series,
-                            org.opencastproject.index.service.exception,
-                            org.opencastproject.index.service.impl,
-                            org.opencastproject.index.service.impl.index,
-                            org.opencastproject.index.service.impl.index.event,
-                            org.opencastproject.index.service.impl.index.group,
-                            org.opencastproject.index.service.impl.index.series,
-                            org.opencastproject.index.service.impl.index.theme,
-                            org.opencastproject.index.service.message,
-                            org.opencastproject.index.service.resources.list.api,
-                            org.opencastproject.index.service.resources.list.impl,
-                            org.opencastproject.index.service.resources.list.provider,
-                            org.opencastproject.index.service.resources.list.query,
-                            org.opencastproject.index.service.util
-                        </Export-Package>
-                        <Service-Component>
-                            OSGI-INF/catalog-ui-adapter-factory.xml,
-                            OSGI-INF/common-event-catalog-ui-adapter.xml,
-                            OSGI-INF/common-series-catalog-ui-adapter.xml,
-                            OSGI-INF/index_service.xml,
-                            OSGI-INF/list_providers_scanner.xml,
-                            OSGI-INF/list_providers_service.xml,
-                            OSGI-INF/list-providers/acl.xml,
-                            OSGI-INF/list-providers/agents.xml,
-                            OSGI-INF/list-providers/blacklists.xml,
-                            OSGI-INF/list-providers/comments.xml,
-                            OSGI-INF/list-providers/email.xml,
-                            OSGI-INF/list-providers/events.xml,
-                            OSGI-INF/list-providers/groups.xml,
-                            OSGI-INF/list-providers/jobs.xml,
-                            OSGI-INF/list-providers/languages.xml,
-                            OSGI-INF/list-providers/participation.xml,
-                            OSGI-INF/list-providers/roles.xml,
-                            OSGI-INF/list-providers/series.xml,
-                            OSGI-INF/list-providers/services.xml,
-                            OSGI-INF/list-providers/themes.xml,
-                            OSGI-INF/list-providers/users.xml,
-                            OSGI-INF/list-providers/workflows.xml
-                        </Service-Component>
-                        <JPA-PersistenceUnits>
-                            org.opencastproject.index.service
-                        </JPA-PersistenceUnits>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-ingest-service-api</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-userdirectory</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+    </dependency>
+
+    <!-- Logging -->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>uk.co.datumedge</groupId>
+      <artifactId>hamcrest-json</artifactId>
+      <version>0.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Import-Package>
+              org.opencastproject.message.broker.api.index;version=${project.version},
+              *;resolution:=optional
+            </Import-Package>
+            <Export-Package>
+              org.opencastproject.index.service.api,
+              org.opencastproject.index.service.catalog.adapter,
+              org.opencastproject.index.service.catalog.adapter.events,
+              org.opencastproject.index.service.catalog.adapter.series,
+              org.opencastproject.index.service.exception,
+              org.opencastproject.index.service.impl,
+              org.opencastproject.index.service.impl.index,
+              org.opencastproject.index.service.impl.index.event,
+              org.opencastproject.index.service.impl.index.group,
+              org.opencastproject.index.service.impl.index.series,
+              org.opencastproject.index.service.impl.index.theme,
+              org.opencastproject.index.service.message,
+              org.opencastproject.index.service.resources.list.api,
+              org.opencastproject.index.service.resources.list.impl,
+              org.opencastproject.index.service.resources.list.provider,
+              org.opencastproject.index.service.resources.list.query,
+              org.opencastproject.index.service.util
+            </Export-Package>
+            <Service-Component>
+              OSGI-INF/catalog-ui-adapter-factory.xml,
+              OSGI-INF/common-event-catalog-ui-adapter.xml,
+              OSGI-INF/common-series-catalog-ui-adapter.xml,
+              OSGI-INF/index_service.xml,
+              OSGI-INF/list_providers_scanner.xml,
+              OSGI-INF/list_providers_service.xml,
+              OSGI-INF/list-providers/acl.xml,
+              OSGI-INF/list-providers/agents.xml,
+              OSGI-INF/list-providers/blacklists.xml,
+              OSGI-INF/list-providers/comments.xml,
+              OSGI-INF/list-providers/email.xml,
+              OSGI-INF/list-providers/events.xml,
+              OSGI-INF/list-providers/groups.xml,
+              OSGI-INF/list-providers/jobs.xml,
+              OSGI-INF/list-providers/languages.xml,
+              OSGI-INF/list-providers/participation.xml,
+              OSGI-INF/list-providers/roles.xml,
+              OSGI-INF/list-providers/series.xml,
+              OSGI-INF/list-providers/services.xml,
+              OSGI-INF/list-providers/themes.xml,
+              OSGI-INF/list-providers/users.xml,
+              OSGI-INF/list-providers/workflows.xml
+            </Service-Component>
+            <JPA-PersistenceUnits>
+              org.opencastproject.index.service
+            </JPA-PersistenceUnits>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
