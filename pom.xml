@@ -45,7 +45,6 @@
         <module>modules/matterhorn-authorization-manager</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-caption-api</module>
-        <module>modules/matterhorn-caption-remote</module>
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-admin-service-impl</module>
         <module>modules/matterhorn-capture-workflowoperation</module>
@@ -61,7 +60,6 @@
         <module>modules/matterhorn-distribution-workflowoperation</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-fileupload</module>
-        <module>modules/matterhorn-gstreamer-service-api</module>
         <module>modules/matterhorn-holdstate-workflowoperation</module>
         <module>modules/matterhorn-incident-workflowoperation</module>
         <module>modules/matterhorn-index-service</module>
@@ -810,10 +808,6 @@
       <modules>
         <module>modules/matterhorn-dictionary-none</module>
         <module>modules/matterhorn-dictionary-hunspell</module>
-        <module>modules/matterhorn-videosegmenter-ffmpeg</module>
-        <module>modules/matterhorn-gstreamer-service-api</module>
-        <module>modules/matterhorn-gstreamer-service-impl</module>
-        <module>modules/matterhorn-gstreamer-service-remote</module>
       </modules>
     </profile>
 
