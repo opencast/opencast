@@ -2,6 +2,7 @@ YouTube Publication Configuration
 =================================
 This page documents the configuration for Matterhorn module
 **matterhorn-publication-service-youtube-v3**.
+
 Create new Google Project
 ------------------
 - Login to Google account
