@@ -465,15 +465,17 @@ function loadTracks() {
         },
         success: function(data) {
             ocUtils.log("Done: Loading workflow instance data");
-
+            var previewFlavor = getPreviewFlavorsFromWorkflow(data);
+            var sourceFlavor = getSourceFlavorsFromWorkflow(data);
+            
             // extract tracks
             workflowInstance = data.workflow;
             data = data.workflow.mediapackage.media.track;
             var singleFile = true;
             for (i = 0; i < data.length; i++) {
-                if (data[i].type.indexOf("work") != -1) {
+                if (data[i].type.indexOf(sourceFlavor) != -1) {
                     tracks.tracks.push(data[i]);
-                } else if (data[i].type.indexOf("preview") != -1) {
+                } else if (data[i].type.indexOf(previewFlavor) != -1) {
                     previewTracks.push(data[i]);
                 }
             }
@@ -777,6 +779,46 @@ function getPostdataId() {
     ocUtils.log("Done: Getting post data ID");
 
     return (postData.id != "");
+}
+
+function getPreviewFlavorsFromWorkflow(workflowReply) {
+    if (workflowReply.workflow.operations == undefined || workflowReply.workflow.operations.operation == undefined) {
+        return "preview";
+    }
+    var operations = workflowReply.workflow.operations.operation;
+    for (var i = 0; i < operations.length; i++) {
+        if (operations[i].id == "editor"){
+            if (operations[i].configurations != undefined && operations[i].configurations.configuration != undefined) {
+                for (var j = 0; j < operations[i].configurations.configuration.length; j++) {
+                    if (operations[i].configurations.configuration[j].key == "preview-flavors") {
+                        return operations[i].configurations.configuration[j].$.split("/")[1];
+                    } 
+                }
+            }
+            return "preview";
+        }
+    }
+    return "preview";
+}
+
+function getSourceFlavorsFromWorkflow(workflowReply) {
+    if (workflowReply.workflow.operations == undefined || workflowReply.workflow.operations.operation == undefined) {
+        return "work";
+    }
+    var operations = workflowReply.workflow.operations.operation;
+    for (var i = 0; i < operations.length; i++) {
+        if (operations[i].id == "editor"){
+            if (operations[i].configurations != undefined && operations[i].configurations.configuration != undefined) {
+                for (var j = 0; j < operations[i].configurations.configuration.length; j++) {
+                    if (operations[i].configurations.configuration[j].key == "source-flavors") {
+                        return operations[i].configurations.configuration[j].$.split("/")[1];
+                    } 
+                }
+            }
+            return "work";
+        }
+    }
+    return "work";
 }
 
 $(document).ready(function() {
