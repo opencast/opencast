@@ -16,24 +16,26 @@
 package org.opencastproject.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.IoSupport.loadFileFromClassPathAsString;
 import static org.opencastproject.util.JsonVal.asBoolean;
 import static org.opencastproject.util.JsonVal.asInteger;
 import static org.opencastproject.util.JsonVal.asString;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class JsonObjTest {
-  private static final String JSON = "{\"service\": {\n" + "\t\t\t\"type\": \"org.opencastproject.analytics\",\n"
-          + "\t\t\t\"host\": \"http:\\/\\/localhost:8080\",\n" + "\t\t\t\"path\": \"\\/analytics-rest\",\n"
-          + "\t\t\t\"active\": true,\n" + "\t\t\t\"online\": true,\n" + "\t\t\t\"maintenance\": false,\n"
-          + "\t\t\t\"jobproducer\": false,\n" + "\t\t\t\"onlinefrom\": \"2013-11-04T17:26:1201:00\",\n"
-          + "\t\t\t\"service_state\": \"NORMAL\",\n" + "\t\t\t\"state_changed\": \"2013-10-16T15:54:3702:00\",\n"
-          + "\t\t\t\"error_state_trigger\": 0,\n" + "\t\t\t\"warning_state_trigger\": 0\n"
-          + "\t\t\t\"array\": [1, 2, true, \"val\"]\n" + "\t\t}}";
+
+  private String jsonString;
+
+  @Before
+  public void setUp() {
+    jsonString = loadFileFromClassPathAsString("/org/opencastproject/util/obj-test.json").get();
+  }
 
   @Test
   public void testParse() {
-    final JsonObj json = JsonObj.jsonObj(JSON);
+    final JsonObj json = JsonObj.jsonObj(jsonString);
     assertEquals("org.opencastproject.analytics", json.getObj("service").get(String.class, "type"));
     assertEquals(true, json.obj("service").get(Boolean.class, "active"));
     assertEquals(true, json.obj("service").val("active").as(asBoolean));
@@ -43,7 +45,8 @@ public class JsonObjTest {
 
   @Test(expected = Exception.class)
   public void testTypeMismatch() {
-    final JsonObj json = JsonObj.jsonObj(JSON);
+    final JsonObj json = JsonObj.jsonObj(jsonString);
     json.getObj("service").get(String.class, "active");
   }
+
 }
