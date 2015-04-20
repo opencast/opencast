@@ -472,10 +472,11 @@ function loadTracks() {
             workflowInstance = data.workflow;
             data = data.workflow.mediapackage.media.track;
             var singleFile = true;
-            for (i = 0; i < data.length; i++) {
+            for (var i = 0; i < data.length; i++) {
                 if (data[i].type.indexOf(sourceFlavor) != -1) {
                     tracks.tracks.push(data[i]);
-                } else if (data[i].type.indexOf(previewFlavor) != -1) {
+                }
+                if (data[i].type.indexOf(previewFlavor) != -1) {
                     previewTracks.push(data[i]);
                 }
             }
@@ -541,18 +542,22 @@ function loadTracks() {
 function createPlayer() {
     ocUtils.log("Creating player");
     ocUtils.log("#Preview tracks: " + previewTracks.length);
-    ocUtils.log("Preview track #1: URL: '" + previewTracks[0].url + "', type='" + previewTracks[0].mimetype + "'");
+    if (previewTracks.length > 0) {
+        ocUtils.log("Preview track #1: URL: '" + previewTracks[0].url + "', type='" + previewTracks[0].mimetype + "'");
 
-    $('#videoPlayer').prepend('<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>');
+        $('#videoPlayer').prepend('<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>');
 
-    var fps = (previewTracks[0] && previewTracks[0].video && previewTracks[0].video.framerate) ? previewTracks[0].video.framerate : 0;
-    var duration = previewTracks[0].duration / 1000;
-    ocUtils.log("FPS: '" + fps + "',  duration: '" + duration + "'");
+        var fps = (previewTracks[0] && previewTracks[0].video && previewTracks[0].video.framerate) ? previewTracks[0].video.framerate : 0;
+        var duration = previewTracks[0].duration / 1000;
+        ocUtils.log("FPS: '" + fps + "',  duration: '" + duration + "'");
 
-    player = $('#videoPlayer').mhPlayer({
-        fps: fps,
-        duration: duration
-    });
+        player = $('#videoPlayer').mhPlayer({
+            fps: fps,
+            duration: duration
+        });
+    } else {
+        player = $('#videoPlayer').text("No preview tracks found.");
+    }
 
     if (previewTracks.length >= 2) {
         ocUtils.log("Preview track #1: URL: '" + previewTracks[1].url + "', type='" + previewTracks[1].mimetype + "'");
