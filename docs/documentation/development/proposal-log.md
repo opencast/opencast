@@ -15,6 +15,28 @@ response signals agreement. Apart from that committers may vote with:
 Passed Proposals
 ----------------
 
+### Requirement Specification
+Proposed by Lars Kiesow <lkiesow@uos.de>, Passed on Thu, 16 Apr 2015 15:55:31 UTC
+
+
+    On list or IRC we often see that people do not really know the current
+    requirements for a specific version of Opencast Matterhorn. Of course
+    there are the pom.xml files specifying internal dependencies, but there
+    is nothing for 3rd-party-tools, ...
+
+    It would be nice to add a file specifying these requirements in a
+    format that is easy to parse and can hence be used for automatic
+    scripts to generate dependency lists, ...
+
+    That is why I hereby #propose to add a requirements.xml file that
+    specifies the requirements for Opencast Matterhorn:
+     - Required tools including versions
+     - Which modules require which tools
+     - Which modules conflict with each other (negative requirement)
+
+    This is mainly what is not specified by the pom.xml files yet.
+
+
 
 ### FFmpeg Update
 Proposed by Lars Kiesow <lkiesow@uos.de>, Passed on Sat, 14 Mar 2015 22:12:18 UTC
