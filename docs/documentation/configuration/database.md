@@ -44,7 +44,7 @@ distribution. On RedHat based systems (CentOS, Scientific Linux, …) this shoul
 After the installation you can start the server and set it up to start automatically after each reboot with the
 following commands:
 
-    ä If you are using Systemd
+    # If you are using Systemd
     systemctl start mariadb.service
     systemctl enable mariadb.service
     # If you are using SysV-Init

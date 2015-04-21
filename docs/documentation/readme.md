@@ -32,7 +32,7 @@ for each release. It contains:
     - Encoding Configuration
     - [more...](configuration)
  - Module Documentation
-
+ - [Upgrade Instructions](upgrade) 
 
 Development Documentation
 -------------------------
