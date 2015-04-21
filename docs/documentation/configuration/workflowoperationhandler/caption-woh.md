@@ -5,10 +5,9 @@ TheCaptionWorkflowOperation waits for user to upload caption files which will be
 
 ## Parameter Table
 
-<table>
-<tr><th>configuration keys</th><th>example</th><th>description</th></tr>
-<tr><td>target-tags</td><td>engage</td><td>Specifies which media should be processed.</td></tr>
-<table>
+|configuration keys|example|description|
+|------------------|-------|-----------|
+|target-tags|engage|Specifies which media should be processed.|
  	
 ## Operation Example
 
