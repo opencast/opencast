@@ -5,7 +5,7 @@
 ## Overview
 The "concat" operation handler has been created to concatenate multiple video tracks into one video track. The concatenation process uses the ffmpeg scale filter which is always re-encoding the videos, this means the resulting video has most likely a loss of quality.
 
-<img src="Concat.png" width="700px" >
+![Concat](Concat.png)
 
 The internal ffmpeg command is using the following filters:  scale, pad and setdar for scaling all videos to a similar size including letterboxing, aevalsrc for creating silent audio streams and of course the concat for the actual concatenation step. More info can be found here: https://trac.ffmpeg.org/wiki/FilteringGuide
 ### Sample complex concat filter command

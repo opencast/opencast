@@ -44,9 +44,10 @@ The following table contains the workflow operations that are available in an ou
 |post-mediapackage	|Send mediapackage to remote service			|[Documentation](postmediapackage-woh.md)|
 |http-notify		|Notifies an HTTP endpoint about the process of the workflow |[Documentation](httpnotify-woh.md)|
 |incident		|Testing incidents on a dummy job			|[Documentation](incident-woh.md)|
+|ingest-download	|Download files from external URL for ingest		|[Documentation](ingestdownload-woh.md)|
 |analyze-audio		|Analyze first audio stream				|[Documentation](analyzeaudio-woh.md)|
 |normalize-audio		|Normalize first audio stream				|[Documentation](normalizeaudio-woh.md)|
 |editor			|Waiting for user to review, then create a new file based on edit-list |[Documentation](editor-woh.md)|
 |silence			|Silence detection on audio of the mediapackage		|[Documentation](silence-woh.md)|
-|waveform		|Create a waveform image of the audio of the Mediapackage |[Documentation](wafeform-woh.md)|
+|waveform		|Create a waveform image of the audio of the Mediapackage |[Documentation](waveform-woh.md)|
 
