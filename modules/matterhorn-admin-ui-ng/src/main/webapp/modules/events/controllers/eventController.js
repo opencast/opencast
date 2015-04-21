@@ -67,7 +67,7 @@ angular.module('adminNg.controllers')
                             episodeCatalogIndex = index;
                             var keepGoing = true;
                             angular.forEach(catalog.fields, function (entry) {
-                                if (entry.id == 'title') {
+                                if (entry.id === 'title') {
                                     $scope.title = entry.value;
                                 }
                                 if (keepGoing && entry.locked) {
