@@ -4,11 +4,12 @@
 The ArchiveWorkflowHandler will archive the current state of the mediapackage.
 
 ## Parameter Table
-<table>
-<tr><th>configuration keys</th><th>example</th><th>description</th></tr>
-<tr><td>source-tags</td><td>text</td><td> Specifies which media should be archived.</td></tr>
-<tr><td>source-flavors</td><td>presenter/source	</td><td>Flavors that should be archived, separated by ","</td></tr>
-</table>
+
+|configuration keys|example|description|
+|------------------|-------|-----------|
+|source-tags|text| Specifies which media should be archived.|
+|source-flavors|presenter/source	|Flavors that should be archived, separated by ","|
+
 
 ## Operation Example
 

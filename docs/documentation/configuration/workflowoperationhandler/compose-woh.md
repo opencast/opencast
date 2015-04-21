@@ -4,14 +4,15 @@
 The ComposeWorkflowHandler is used to encode media files to different formats using FFmpeg.
 
 ## Parameter Table
-<table>
-<tr><th>configuration keys</th><th>example</th><th>description</th></tr>	 
-<tr><td>source-flavor</td><td>presenter/work</td><td>Which media should be encoded</td></tr>
-<tr><td>target-flavor </td><td>presenter/delivery</td><td>Specifies the flavor of the new media</td></tr>
-<tr><td>source-tags</td><td>	sometag	</td><td>Tags of media to encode	 </td></tr>
-<tr><td>target-tags</td><td>	sometag	</td><td>Specifies the tags of the new media </td></tr>	 
-<tr><td>encoding-profile	webm-hd	</td><td>Specifies the encoding profile to use </td></tr>
-</table>	 
+
+|configuration keys|example|description|
+|------------------|-------|-----------|
+|source-flavor|presenter/work|Which media should be encoded|
+|target-flavor |presenter/delivery|Specifies the flavor of the new media|
+|source-tags|	sometag	|Tags of media to encode	 |
+|target-tags|	sometag	|Specifies the tags of the new media |
+|encoding-profile	webm-hd	|Specifies the encoding profile to use |
+	 
  
 ## Operation Example
 

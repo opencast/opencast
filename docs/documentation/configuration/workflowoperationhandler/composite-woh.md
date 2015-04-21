@@ -12,23 +12,24 @@ The internal ffmpeg command is using the following filters: scale for scaling th
 ## Parameter Table
 Tags and flavors can be used in combination.
 
-<table>
-<tr><th>configuration keys</th><th>value type (EBNF)</th><th>example</th><th>description</th><th>default value</th></tr> 
-<tr><td>source-tags-upper</td><td>String , { "," , String }	</td><td>comp,rss</td><td>The "tag" of the upper track to use as a source input.</td><td>EMPTY</td></tr>
-<tr><td>source-flavor-upper</td><td>MediaPackageElementFlavor	</td><td>presenter/trimmed</td><td>The "flavor" of the upper track to use as a source input.</td><td>EMPTY</td></tr>
-<tr><td>source-tags-lower</td><td>String , { "," , String }	</td><td>comp,rss</td><td>The "tag" of the lower track to use as a source input.</td><td>EMPTY</td></tr>
-<tr><td>source-flavor-lower</td><td>MediaPackageElementFlavor	</td><td>presenter/trimmed</td><td>The "flavor" of the lower track to use as a source input.</td><td>EMPTY</td></tr>
-<tr><td>source-tags-watermark</td><td>String , { "," , String }	</td><td>branding</td><td>The "tag" of the attachment image to use as a source input.</td><td>EMPTY</td></tr>
-<tr><td>source-flavor-watermark</td><td>MediaPackageElementFlavor	</td><td>image/work</td><td>The "flavor" of the attachment image to use as a source input.</td><td>EMPTY</td></tr>
-<tr><td>source-url-watermark</td><td>URL	</td><td>file:///Users/me/logo.jpg</td><td>The "URL" of the fallback image to use as a source input.</td><td>EMPTY</td></tr>
-<tr><td>target-tags</td><td>String , { "," , String }	</td><td>composite,rss,atom,archive</td><td>The tags to apply to the compound video track.</td><td>EMPTY</td></tr>
-<tr><td>\* **target-flavor**</td><td>MediaPackageElementFlavor</td><td>	composite/delivery	</td><td>The flavor to apply to the compound video track.</td><td>EMPTY</td></tr>
-<tr><td>\* **encoding-profile**</td><td>String</td><td>	composite	</td><td>The encoding profile to use.</td><td>EMPTY</td></tr>
-<tr><td>\* **output-resolution**</td><td>width , "x" , height	</td><td>1900x1080</td><td>The resulting resolution of the compound video e.g. 1900x1080.</td><td>EMPTY</td></tr>
-<tr><td>output-background</td><td>String	</td><td>red</td><td>The resulting background color of the compound video http://www.ffmpeg.org/ffmpeg-utils.html#Color.</td><td>black</td></tr>
-<tr><td>\* **layout**</td><td>name | Json , ";" , Json , [ ";" , Json ]	</td><td>topleft	</td><td>The layout name to use or a semi-colon separated JSON layout definition (lower video, upper video, optional watermark). If a layout name is given than the corresponding layout-{name} key must be defined.</td><td>EMPTY</td></tr>
-<tr><td>layout-{name}</td><td>Json , ";" , Json , [ ";" , Json ]	 	</td><td>Define semi-colon separated JSON layouts (lower video, upper video, optional watermark) to provide by name.</td><td>EMPTY</td></tr>
-</table>
+
+|configuration keys|value type (EBNF)|example|description|default value|
+|------------------|-----------------|-------|-----------|-------------|
+|source-tags-upper|String , { "," , String }	|comp,rss|The "tag" of the upper track to use as a source input.|EMPTY|
+|source-flavor-upper|MediaPackageElementFlavor	|presenter/trimmed|The "flavor" of the upper track to use as a source input.|EMPTY|
+|source-tags-lower|String , { "," , String }	|comp,rss|The "tag" of the lower track to use as a source input.|EMPTY|
+|source-flavor-lower|MediaPackageElementFlavor	|presenter/trimmed|The "flavor" of the lower track to use as a source input.|EMPTY|
+|source-tags-watermark|String , { "," , String }	|branding|The "tag" of the attachment image to use as a source input.|EMPTY|
+|source-flavor-watermark|MediaPackageElementFlavor	|image/work|The "flavor" of the attachment image to use as a source input.|EMPTY|
+|source-url-watermark|URL	|file:///Users/me/logo.jpg|The "URL" of the fallback image to use as a source input.|EMPTY|
+|target-tags|String , { "," , String }	|composite,rss,atom,archive|The tags to apply to the compound video track.|EMPTY|
+|\* **target-flavor**|MediaPackageElementFlavor|	composite/delivery	|The flavor to apply to the compound video track.|EMPTY|
+|\* **encoding-profile**|String|	composite	|The encoding profile to use.|EMPTY|
+|\* **output-resolution**|width , "x" , height	|1900x1080|The resulting resolution of the compound video e.g. 1900x1080.|EMPTY|
+|output-background|String	|red|The resulting background color of the compound video http://www.ffmpeg.org/ffmpeg-utils.html#Color.|black|
+|\* **layout**|name | Json , ";" , Json , [ ";" , Json ]	|topleft	|The layout name to use or a semi-colon separated JSON layout definition (lower video, upper video, optional watermark). If a layout name is given than the corresponding layout-{name} key must be defined.|EMPTY|
+|layout-{name}|Json , ";" , Json , [ ";" , Json ]	 	|Define semi-colon separated JSON layouts (lower video, upper video, optional watermark) to provide by name.|EMPTY|
+
 
 \* **mandatory**
 
