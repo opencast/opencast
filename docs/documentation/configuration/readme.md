@@ -14,7 +14,7 @@ General Configuration
  - [Logging and Privacy Configuration](logging.and.privacy.md)
  - [Multi Tenancy Configuration](multi.tenancy.md)
  - Security Configuration
- - Workflow Configuration
+ - [Workflow Configuration](workflow.md)
 
 
 Module Configuration
@@ -23,6 +23,7 @@ Module Configuration
  - [YouTube Publication Configuration](modules/youtubepublication.md)
  - [Text Extraction Configuration](modules/textextraction.md)
  - [Video Segmentation Configuration](modules/videosegmentation.md)
+ - [Atom and RSS Feed Configuration](modules/atomrss.md)
 
 
 Additional Documentation
