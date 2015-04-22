@@ -55,6 +55,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               *;resolution:=optional
       			</Import-Package>

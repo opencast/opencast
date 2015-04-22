@@ -119,6 +119,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>org.opencastproject.composer.remote;version=${project.version}</Export-Package>
             <Service-Component>OSGI-INF/composer-service-remote.xml</Service-Component>
           </instructions>

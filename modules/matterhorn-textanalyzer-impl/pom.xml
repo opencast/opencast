@@ -96,6 +96,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.textanalyzer.impl;version=${project.version}
               org.opencastproject.textanalyzer.impl.endpoint;version=${project.version}

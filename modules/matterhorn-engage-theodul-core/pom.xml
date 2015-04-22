@@ -150,7 +150,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Build-Number>${buildNumber}</Build-Number>
                         <Export-Package>org.opencastproject.engage.theodul.manager.impl</Export-Package>
                         <Private-Package>ui.*</Private-Package>
                         <Bundle-Activator>org.opencastproject.engage.theodul.manager.impl.Activator</Bundle-Activator>

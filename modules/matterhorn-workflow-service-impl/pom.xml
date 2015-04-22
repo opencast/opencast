@@ -168,6 +168,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               org.opencastproject.workflow.api;version=${project.version},
               org.opencastproject.rest;version=${project.version},

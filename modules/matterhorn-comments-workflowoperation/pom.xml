@@ -38,9 +38,8 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Build-Number>${build.number}</Build-Number>
-            <Mh-Db-Version>${mh.db.version}</Mh-Db-Version>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.workflow.handler.comments;version=${project.version}
             </Export-Package>

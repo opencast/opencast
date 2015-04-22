@@ -201,6 +201,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Embed-Dependency>
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true,

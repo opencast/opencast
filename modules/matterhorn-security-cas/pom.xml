@@ -60,6 +60,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               org.jasig.cas.client.authentication;resolution:=optional,
               org.jasig.cas.client.proxy;resolution:=optional,

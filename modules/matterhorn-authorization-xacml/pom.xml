@@ -126,6 +126,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Embed-Dependency>
               jboss-xacml;inline=true
             </Embed-Dependency>

@@ -80,6 +80,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Bundle-Activator>org.opencastproject.runtimeinfo.Activator</Bundle-Activator>
             <Import-Package>
               org.opencastproject.rest,
