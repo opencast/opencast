@@ -1,7 +1,7 @@
 # Upgrading Matterhorn to 2.0
 
 ## Database Migration
-You will find the database migration script in /docs/upgrade/1.6_to_1.7/<vendor>.sql
+You will find the database migration script in /docs/upgrade/1.6_to_2.0/<vendor>.sql
 
 ## Rebuilding Search Indices
 To update the search indices:

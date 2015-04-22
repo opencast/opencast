@@ -13,7 +13,8 @@ General Configuration
  - [Encoding Profile Configuration](encoding.md)
  - [Logging and Privacy Configuration](logging.and.privacy.md)
  - [Multi Tenancy Configuration](multi.tenancy.md)
- - Security Configuration
+ - [Security Configuration](security.md)
+   - [CAS Security Configuration](security.cas.md)
  - [Workflow Configuration](workflow.md)
 
 
@@ -24,9 +25,10 @@ Module Configuration
  - [Text Extraction Configuration](modules/textextraction.md)
  - [Video Segmentation Configuration](modules/videosegmentation.md)
  - [Atom and RSS Feed Configuration](modules/atomrss.md)
+ - [Search Index Configuration](modules/searchindex.md)
 
 
 Additional Documentation
 ------------------------
 
- - List of Configuration Files and Keys
+ - [List of Configuration Files and Keys](configuration.files.and.keys.md)

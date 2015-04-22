@@ -4,7 +4,7 @@ This document will help you get started with creating your own Matterhorn workfl
  - For a list of available workflow operations, see:
   [Workflow Operation Handler](workflowoperationhandler/readme.md)
  - For a more detailed discussion on how to create your own workflow operations, see:
-  [Create a Custom Workflow Operation Handler]()
+  [Create a Custom Workflow Operation Handler](https://opencast.jira.com/wiki/display/MHDOC/Create+a+Custom+Workflow+Operation+Handler)
  
 ## Overview
 A Matterhorn workflow is an ordered list of operations. There is no limit to the number of operations or their repetition in a given workflow.
