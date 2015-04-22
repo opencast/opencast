@@ -49,8 +49,6 @@ Alternatively, edit Apache's httpd.conf to reroute Matterhorn to port 80:
 |org.opencastproject.server.url|URL of Matterhorn http services|http://localhost:8080 e.g. org.opencastproject.server.url=http://matterhorn1.telavivuniv.org|
 |org.opencastproject.serviceregistry.url|URL of the service registry, if not running in the local JVM|This value is needed only if the host does not have access to the relational database (see JDBC settings below).  This is common for capture agents, but not for servers.|
 |org.opencastproject.server.maxload|The maximum number of concurrent jobs this server should attempt to run|Defaults to the number of processing cores available to the JVM, as reported by Runtime.availableProcessors()|
-|org.opencastproject.admin.ui.url|The URL to the administrative tools.  This sets the URL for the "Adminstrative Tools" link on the Matterhorn welcome page.|The local server URL, or ${org.opencastproject.server.url}|
-|org.opencastproject.engage.ui.url|The URL to the engage tools.  This sets the URL for the "Engage Tools" link on the Matterhorn welcome page.|The local server URL, or ${org.opencastproject.server.url}|
 |org.opencastproject.storage.dir|Base path of Matterhorn data file structure. Note: This must be changed on a production server so that media will not disappear on reboot.|${java.io.tmpdir}/opencast|
 |org.opencastproject.security.config|Path to Matterhorn security configuration file|conf/security.xml|
 |org.opencastproject.security.digest.user|Digest authentication privileged user name|matterhorn_system_account|
@@ -115,7 +113,21 @@ Alternatively, edit Apache's httpd.conf to reroute Matterhorn to port 80:
 |----|-----------|-------|
 |org.opencastproject.inbox.threads|The number of mediapackages to ingest concurrently from the watch folder|1|
 
+
+### <felix_home>/etc/load/org.opencastproject.organization-mh_default_org.cfg
+
+**org.opencastproject.organization-mh_default_org.cfg** defines the default tennant in a multi tennant setup. If you don't have a multi-tennant setup this is the file for you to edit.
+
+#### Servers and URLs
+
+|Name|Description|Default|
+|----|-----------|-------|
+|prop.org.opencastproject.admin.ui.url|The URL to the administrative tools.  This sets the URL for the "Adminstrative Tools" link on the Matterhorn welcome page.|The local server URL, or ${org.opencastproject.server.url}|
+|prop.org.opencastproject.engage.ui.url|The URL to the engage tools.  This sets the URL for the "Engage Tools" link on the Matterhorn welcome page.|The local server URL, or ${org.opencastproject.server.url}|
+
+
 ## Security
-**<felix_home>/etc/security/mh_default_org.xml**
+
+### <felix_home>/etc/security/mh_default_org.xml
 
 *mh_default_org.xml* defines the Matterhorn access policy using the [Spring Security](http://static.springsource.org/spring-security/site/) framework XML schema.
