@@ -653,13 +653,41 @@
                     <header translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">Operation Details</header>
                     <div class="obj-container">
                         <table class="main-tbl">
-                            <tr>
-                                <td>Retry Strategy</td>
-                                <td>{{ subNavData.retry_strategy }}</td>
+                             <tr>
+                                <td>Title</td>
+                                <td>{{ subNavData.name}}</td>
                             </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>{{ subNavData.description }}</td>
+                            </tr>
+                            <tr>
+                                <td>State</td>
+                                <td>{{ subNavData.state }}</td>
+                            </tr>                            
                             <tr>
                                 <td>Execution Host</td>
                                 <td>{{ subNavData.execution_host }}</td>
+                            </tr>
+                            <tr>
+                                <td>Job</td>
+                                <td>{{ subNavData.job }}</td>
+                            </tr>
+                            <tr>
+                                <td>Time in Queue</td>
+                                <td>{{ subNavData.time_in_queue }}ms</td>
+                            </tr>                            
+                            <tr>
+                                <td>Started</td>
+                                <td>{{ subNavData.started | localizeDate : 'dateTime' : 'medium'}}</td>
+                            </tr>                            
+                            <tr>
+                                <td>Finished</td>
+                                <td>{{ subNavData.completed | localizeDate : 'dateTime' : 'medium'}}</td>
+                            </tr>
+                                                        <tr>
+                                <td>Retry Strategy</td>
+                                <td>{{ subNavData.retry_strategy }}</td>
                             </tr>
                             <tr>
                                 <td>Failed Attempts</td>
@@ -676,22 +704,6 @@
                             <tr>
                                 <td>Fail on Error</td>
                                 <td>{{ subNavData.fail_on_error }}</td>
-                            </tr>
-                            <tr>
-                                <td>Description</td>
-                                <td>{{ subNavData.description }}</td>
-                            </tr>
-                            <tr>
-                                <td>State</td>
-                                <td>{{ subNavData.state }}</td>
-                            </tr>
-                            <tr>
-                                <td>Job</td>
-                                <td>{{ subNavData.job }}</td>
-                            </tr>
-                            <tr>
-                                <td>ID</td>
-                                <td>{{ subNavData.id }}</td>
                             </tr>
                         </table>
                     </div>
