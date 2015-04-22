@@ -124,9 +124,17 @@
                 <div class="obj-container">
                     <table class="main-tbl">
                         <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.TIMEZONE' | translate }}</td>
+                            <td>{{ wizard.step.tz }}</td>
+                        </tr>
+                        <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE' | translate }} <i class="required">*</i></td>
                             <td>
-                                <input  type="text" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.date" ng-change="wizard.step.checkConflicts()">
+                                <input datepicker
+                                    type="text"
+                                    placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"
+                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.date"
+                                    ng-change="wizard.step.checkConflicts()" />
                             </td>
                         </tr>
                         <tr>
@@ -198,6 +206,10 @@
                 <header translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.CAPTION"><!--Date / Time--></header>
                 <div class="obj-container">
                     <table class="main-tbl">
+                        <tr>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.TIMEZONE' | translate }}</td>
+                            <td>{{ wizard.step.tz }}</td>
+                        </tr>
                         <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE' | translate }} <i class="required">*</i></td>
                             <td>
