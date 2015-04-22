@@ -28,8 +28,8 @@ for each release. It contains:
  - [Configuration Guides](configuration)
     - [Basic Configuration](configuration/basic.md)
     - [Database Configuration](configuration/database.md)
-    - Workflow Configuration
-    - Encoding Configuration
+    - [Workflow Configuration](configuration/workflow.md)
+    - [Encoding Configuration](configuration/encoding.md)
     - [more...](configuration)
  - Module Documentation
  - [Upgrade Instructions](upgrade) 
