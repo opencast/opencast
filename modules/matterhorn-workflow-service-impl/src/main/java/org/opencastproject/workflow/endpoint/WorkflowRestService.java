@@ -16,6 +16,7 @@
 package org.opencastproject.workflow.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -39,9 +40,11 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.systems.MatterhornConstans;
 import org.opencastproject.util.LocalHashMap;
+import org.opencastproject.util.MultiResourceLock;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.Function;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -71,6 +74,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
@@ -133,6 +137,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   protected ServiceRegistry serviceRegistry = null;
   /** The workspace */
   private Workspace workspace;
+
+  /** Resource lock */
+  private final MultiResourceLock lock = new MultiResourceLock();
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
@@ -646,21 +653,12 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "resume", description = "Resumes a suspended workflow instance.", returnDescription = "An XML representation of the resumed workflow instance", restParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the resumed workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists.") })
+          @RestResponse(responseCode = SC_CONFLICT, description = "Can not resume workflow not in paused state"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate.") })
   public Response resume(@FormParam("id") long workflowInstanceId, @FormParam("properties") LocalHashMap properties)
           throws NotFoundException, UnauthorizedException {
-    Map<String, String> map;
-    if (properties == null) {
-      map = new HashMap<String, String>();
-    } else {
-      map = properties.getMap();
-    }
-    try {
-      WorkflowInstance workflow = service.resume(workflowInstanceId, map);
-      return Response.ok(workflow).build();
-    } catch (WorkflowException e) {
-      throw new WebApplicationException(e);
-    }
+    return resume(workflowInstanceId, null, properties);
   }
 
   @POST
@@ -671,45 +669,65 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "mediapackage", isRequired = false, description = "The new Mediapackage", type = TEXT),
           @RestParameter(name = "properties", isRequired = false, description = "Properties", type = TEXT) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the updated and resumed workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists.") })
-  public Response resume(@FormParam("id") long workflowInstanceId, @FormParam("mediapackage") String mediaPackage,
-          @FormParam("properties") LocalHashMap properties) throws NotFoundException, UnauthorizedException {
-    Map<String, String> map;
+          @RestResponse(responseCode = SC_CONFLICT, description = "Can not resume workflow not in paused state"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate.") })
+  public Response resume(@FormParam("id") long workflowInstanceId,
+          @FormParam("mediapackage") final String mediaPackage, @FormParam("properties") LocalHashMap properties)
+          throws NotFoundException, UnauthorizedException {
+    final Map<String, String> map;
     if (properties == null) {
       map = new HashMap<String, String>();
     } else {
       map = properties.getMap();
     }
-    try {
-      WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
-      if (mediaPackage != null) {
-        MediaPackage newMp = MediaPackageParser.getFromXml(mediaPackage);
-        MediaPackage oldMp = workflow.getMediaPackage();
-
-        // Delete removed elements from workspace
-        for (MediaPackageElement elem : oldMp.getElements()) {
-          if (MediaPackageSupport.contains(elem.getIdentifier(), newMp))
-            continue;
-          try {
-            workspace.delete(elem.getURI());
-            logger.info("Deleted removed mediapackge element {}", elem);
-          } catch (NotFoundException e) {
-            logger.info("Removed mediapackage element {} is already deleted", elem);
+    return lock.synchronize(workflowInstanceId, new Function.X<Long, Response>() {
+      @Override
+      public Response xapply(Long workflowInstanceId) throws Exception {
+        try {
+          WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
+          if (!WorkflowState.PAUSED.equals(workflow.getState())) {
+            logger.warn("Can not resume workflow '{}', not in state paused but {}", workflow, workflow.getState());
+            return Response.status(Status.CONFLICT).build();
           }
-        }
 
-        workflow.setMediaPackage(newMp);
-        service.update(workflow);
+          if (mediaPackage != null) {
+            MediaPackage newMp = MediaPackageParser.getFromXml(mediaPackage);
+            MediaPackage oldMp = workflow.getMediaPackage();
+
+            // Delete removed elements from workspace
+            for (MediaPackageElement elem : oldMp.getElements()) {
+              if (MediaPackageSupport.contains(elem.getIdentifier(), newMp))
+                continue;
+              try {
+                workspace.delete(elem.getURI());
+                logger.info("Deleted removed mediapackge element {}", elem);
+              } catch (NotFoundException e) {
+                logger.info("Removed mediapackage element {} is already deleted", elem);
+              }
+            }
+
+            workflow.setMediaPackage(newMp);
+            service.update(workflow);
+          }
+          workflow = service.resume(workflowInstanceId, map);
+          return Response.ok(workflow).build();
+        } catch (NotFoundException e) {
+          return Response.status(Status.NOT_FOUND).build();
+        } catch (UnauthorizedException e) {
+          return Response.status(Status.UNAUTHORIZED).build();
+        } catch (IllegalStateException e) {
+          logger.warn(ExceptionUtils.getMessage(e));
+          return Response.status(Status.CONFLICT).build();
+        } catch (WorkflowException e) {
+          logger.error(ExceptionUtils.getMessage(e), e);
+          return Response.serverError().build();
+        } catch (Exception e) {
+          logger.error(ExceptionUtils.getMessage(e), e);
+          return Response.serverError().build();
+        }
       }
-      service.resume(workflowInstanceId, map);
-      return Response.ok(workflow).build();
-    } catch (WorkflowException e) {
-      logger.error(e.getMessage(), e);
-      throw new WebApplicationException(e);
-    } catch (Exception e) {
-      logger.error(e.getMessage(), e);
-      throw new WebApplicationException(e);
-    }
+    });
   }
 
   @POST
