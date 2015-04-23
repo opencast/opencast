@@ -31,7 +31,8 @@ for each release. It contains:
     - [Workflow Configuration](configuration/workflow.md)
     - [Encoding Configuration](configuration/encoding.md)
     - [more...](configuration)
- - Module Documentation
+ - [Module Documentation](modules/readme.md)
+  includes Youtube configuration, text extraction, feed configuration, engage player manual
  - [Upgrade Instructions](upgrade) 
 
 Development Documentation

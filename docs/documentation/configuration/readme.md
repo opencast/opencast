@@ -17,17 +17,6 @@ General Configuration
    - [CAS Security Configuration](security.cas.md)
  - [Workflow Configuration](workflow.md)
 
-
-Module Configuration
---------------------
-
- - [YouTube Publication Configuration](modules/youtubepublication.md)
- - [Text Extraction Configuration](modules/textextraction.md)
- - [Video Segmentation Configuration](modules/videosegmentation.md)
- - [Atom and RSS Feed Configuration](modules/atomrss.md)
- - [Search Index Configuration](modules/searchindex.md)
-
-
 Additional Documentation
 ------------------------
 
