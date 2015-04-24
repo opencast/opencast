@@ -1084,6 +1084,11 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
+      <plugin>
+         <groupId>com.github.eirslett</groupId>
+         <artifactId>frontend-maven-plugin</artifactId>
+         <version>0.0.23</version>
+      </plugin>
     </plugins>
     <!-- This defines the global plugin configurations.  Plugins with configuration shared across multiple child poms
          should be configured here, and then referenced in the child. -->
@@ -1115,7 +1120,6 @@
                   <pluginExecutionFilter>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <versionRange>[0.0.9,)</versionRange>
                     <goals>
                       <goal>install-node-and-npm</goal>
                       <goal>npm</goal>
