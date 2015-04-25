@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -126,6 +127,8 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
           logger.error("Problem while getting {} message events {}", clazzName, ExceptionUtils.getStackTrace(e));
         } catch (ExecutionException e) {
           logger.error("Problem while getting {} message events {}", clazzName, ExceptionUtils.getStackTrace(e));
+        } catch (CancellationException e) {
+          logger.trace("Listening for messages {} has been cancelled.", clazzName);
         } catch (Throwable t) {
           logger.error("Problem while getting {} message events {}", clazzName, ExceptionUtils.getStackTrace(t));
         } finally {

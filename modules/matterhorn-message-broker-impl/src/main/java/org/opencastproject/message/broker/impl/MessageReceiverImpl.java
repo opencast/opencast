@@ -28,6 +28,7 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InterruptedIOException;
 import java.io.Serializable;
 import java.util.Dictionary;
 import java.util.concurrent.Callable;
@@ -104,7 +105,13 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
       Message message = consumer.receive();
       return Option.option(message);
     } catch (JMSException e) {
-      logger.error("Unable to receive messages {}", ExceptionUtils.getStackTrace(e));
+      if (e instanceof javax.jms.IllegalStateException || e.getCause() instanceof InterruptedException
+              || e.getCause() instanceof InterruptedIOException) {
+        // Swallowing the shutdown exception
+        logger.trace("Shutting down message receiver {}", ExceptionUtils.getStackTrace(e));
+      } else {
+        logger.error("Unable to receive messages {}", ExceptionUtils.getStackTrace(e));
+      }
       return Option.<Message> none();
     } finally {
       try {
