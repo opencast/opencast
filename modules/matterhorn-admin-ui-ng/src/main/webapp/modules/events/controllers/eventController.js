@@ -67,6 +67,9 @@ angular.module('adminNg.controllers')
                             episodeCatalogIndex = index;
                             var keepGoing = true;
                             angular.forEach(catalog.fields, function (entry) {
+                                if (entry.id === 'title') {
+                                    $scope.title = entry.value;
+                                }
                                 if (keepGoing && entry.locked) {
                                     metadata.locked = entry.locked;
                                     keepGoing = false;
@@ -136,7 +139,8 @@ angular.module('adminNg.controllers')
         };
 
         $scope.replyToId = null; // the id of the comment to which the user wants to reply
-
+        $scope.title = $scope.resourceId; // if nothing else use the resourceId
+        
         fetchChildResources($scope.resourceId);
 
         $scope.$on('change', function (event, id) {

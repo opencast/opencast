@@ -69,9 +69,9 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
     logger.info("Smtp service is in {} mode", isProductionMode() ? "production" : "test");
 
     // Mail transport protocol
-    String mailTransport = StringUtils.trimToNull((String) properties.get(OPT_MAIL_TRANSPORT));
-    if (StringUtils.isNotBlank(mailTransport))
-      setMailTransport(mailTransport);
+    String optMailTransport = StringUtils.trimToNull((String) properties.get(OPT_MAIL_TRANSPORT));
+    if (StringUtils.isNotBlank(optMailTransport))
+      setMailTransport(optMailTransport);
 
     // The mail host is mandatory
     String propName = OPT_MAIL_PREFIX + mailTransport + OPT_MAIL_HOST_SUFFIX;

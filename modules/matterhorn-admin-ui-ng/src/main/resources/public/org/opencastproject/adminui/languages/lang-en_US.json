@@ -72,6 +72,7 @@
      "EMAIL_NOT_SENT": "The message could not be sent",
      "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the room, dates or times.",
      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "The existing events in this series will need to be reprocessed",
+     "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
      "THEME_NAME_ALREADY_TAKEN": "This name is already in use",
      "THEME_NAME_EMPTY": "The name cannot be empty",
      "BUMPER_UPLOAD_ERROR": "Error while uploading media",
@@ -379,8 +380,27 @@
            "LINK":        "Link"
          },
          "ACCESS": {
-           "CAPTION":           "Access policy",
-           "SELECTPLACEHOLDER": "Select access policy"
+           "CAPTION": "Access policy",
+           "DESCRIPTION": "",
+            "TEMPLATES": {
+             "TITLE": "Templates"
+            },
+           "ACCESS_POLICY": {
+             "TITLE": "Access policy",
+             "DESCRIPTION": "",
+             "LABEL": "Select a template",
+             "EMPTY": "No template found",
+             "ROLE" : "Role",
+             "WRITE": "Write",
+             "READ" : "Read",
+             "ACTION": "Actions",
+             "NEW": "New policy",
+             "DETAILS": "Details"
+           },
+           "ROLES": {
+              "LABEL": "Select a role",
+              "EMPTY": "No role found"
+           }
          },
          "COMMENTS": {
            "CAPTION":     "Comments",

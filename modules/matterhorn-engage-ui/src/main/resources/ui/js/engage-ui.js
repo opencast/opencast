@@ -27,7 +27,7 @@ $(document).ready(function() {
     var msg_loginSuccessful = "Successfully logged in. Please reload the page if the page does not reload automatically.";
     var msg_loginFailed = "Failed to log in.";
     var infoMeURL = "/info/me.json";
-    var defaultPlayerURL = "/engage/ui/watch.html?id=";
+    var defaultPlayerURL = "/engage/ui/watch.html";
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
@@ -648,12 +648,12 @@ $(document).ready(function() {
                 $($main_container).append(tile);
 
                 $("#" + data["id"]).on("click", function() {
-                    $(location).attr("href", playerEndpoint + data["id"]);
+                    $(location).attr("href", playerEndpoint + "?id=" + data["id"]);
                 });
 
                 $("#" + data["id"]).on("keypress", function(ev) {
                     if (ev.which == 13 || ev.which == 32) {
-                        $(location).attr("href", playerEndpoint + data["id"]);
+                        $(location).attr("href", playerEndpoint + "?id=" + data["id"]);
                     }
                 });                
 
