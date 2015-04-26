@@ -710,7 +710,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             $("#" + id_browserWarning).show();
                             $("#" + id_btn_tryAnyway).click(function(e) {
                                 e.preventDefault();
-                                window.open(window.location.href + "&browser=all", "_self");
+                                window.location.href = window.location.href + "&browser=all";
                             });
                         }
                     }, loadingDelay2);
