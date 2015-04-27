@@ -311,14 +311,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
     }
 
-    function initSynchronize(showMsg) {
+    function initSynchronize() {
         $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
-        if (Bowser.chrome) {
-            $(document).trigger(event_sjs_stopBufferChecker);
-            if (showMsg) {
-                Engage.trigger(plugin.events.customError.getName(), translate("chromeBuffer", "The buffer checker has been disabled due to Chrome limitations. It is possible that you will encounter problems with the video playback."));
-            }
-        }
+        $(document).trigger(event_sjs_stopBufferChecker);
     }
 
     function compareResolutions(a, b) {
@@ -376,7 +371,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
                 if (pressedPlayOnce && (currentTime > 0)) {
                     window.setTimeout(function() {
-                        initSynchronize(false);
+                        initSynchronize();
                         Engage.trigger(plugin.events.seek.getName(), currentTime);
                     }, timer_qualitychange);
                 }
@@ -452,7 +447,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     }
                     ++i;
                 }
-                initSynchronize(true);
+                initSynchronize();
             } else {
                 videosReady = true;
                 if (!isAudioOnly) {
