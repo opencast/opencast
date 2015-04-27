@@ -15,15 +15,19 @@
  */
 package org.opencastproject.episode.filesystem;
 
+import static org.easymock.EasyMock.replay;
+
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.createNiceMock;
 import static org.opencastproject.episode.impl.elementstore.Source.source;
 
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.StoragePath;
 import org.opencastproject.episode.impl.elementstore.DeletionSelector;
-import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.workspace.api.Workspace;
 
 import junit.framework.Assert;
 
@@ -31,7 +35,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -78,9 +81,10 @@ public class FileSystemElementStoreTest {
     EasyMock.expect(response.getEntity()).andReturn(entity).anyTimes();
     EasyMock.replay(response);
 
-    TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
-    EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
-    EasyMock.replay(httpClient);
+    Workspace workspace = createNiceMock(Workspace.class);
+    expect(workspace.get(getClass().getClassLoader().getResource(FILE_NAME).toURI())).andStubReturn(
+            new File(getClass().getClassLoader().getResource(FILE_NAME).toURI()));
+    replay(workspace);
 
     tmpRoot = FileSupport.getTempDirectory(TEST_ROOT_DIR_NAME);
 
@@ -92,7 +96,7 @@ public class FileSystemElementStoreTest {
     EasyMock.expect(cc.getBundleContext()).andReturn(bundleContext).anyTimes();
     EasyMock.replay(cc);
 
-    repo.setHttpClient(httpClient);
+    repo.setWorkspace(workspace);
     repo.activate(cc);
 
     sampleElemDir = new File(

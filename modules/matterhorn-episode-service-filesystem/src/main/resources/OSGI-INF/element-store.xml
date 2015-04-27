@@ -7,6 +7,9 @@
     <provide interface="org.opencastproject.episode.impl.elementstore.ElementStore" />
   </service>
   
-  <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
-    cardinality="1..1" policy="static" bind="setHttpClient" />
+  <reference name="workspace"
+             interface="org.opencastproject.workspace.api.Workspace"
+             cardinality="1..1"
+             policy="static"
+             bind="setWorkspace" />
 </scr:component>

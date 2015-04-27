@@ -15,22 +15,23 @@
  */
 package org.opencastproject.episode.filesystem;
 
+import static org.apache.commons.lang.exception.ExceptionUtils.getMessage;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.opencastproject.episode.api.Version;
 import org.opencastproject.episode.impl.StoragePath;
 import org.opencastproject.episode.impl.elementstore.DeletionSelector;
 import org.opencastproject.episode.impl.elementstore.ElementStore;
 import org.opencastproject.episode.impl.elementstore.ElementStoreException;
 import org.opencastproject.episode.impl.elementstore.Source;
-import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.workspace.api.Workspace;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,17 +72,11 @@ public class FileSystemElementStore implements ElementStore {
   /** The root directory for storing files */
   private String rootDirectory = null;
 
-  /** The http client */
-  private TrustedHttpClient httpClient;
+  private Workspace workspace;
 
-  /**
-   * Sets the trusted http client
-   *
-   * @param httpClient
-   *          the http client
-   */
-  public void setHttpClient(TrustedHttpClient httpClient) {
-    this.httpClient = httpClient;
+  /** OSGi Di */
+  void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 
   /**
@@ -110,25 +104,31 @@ public class FileSystemElementStore implements ElementStore {
    */
   @Override
   public void put(StoragePath storagePath, Source source) throws ElementStoreException {
-    InputStream in = null;
-    FileOutputStream output = null;
-    HttpResponse response = null;
+    // Retrieving the file from the workspace has the advantage that in most cases the file already exists in the local
+    // working file repository. In the very few cases where the file is not in the working file repository,
+    // this strategy leads to a minor overhead because the file not only gets downloaded and stored in the file system
+    // but also a hard link needs to be created (or if that's not possible, a copy of the file.
+
+    final File origin = getFileFromWorkspace(source);
     final File destination = createFile(storagePath, source);
     try {
       mkParent(destination);
-      final HttpGet getRequest = new HttpGet(source.getUri());
-      response = httpClient.execute(getRequest);
-      in = response.getEntity().getContent();
-      output = FileUtils.openOutputStream(destination);
-      IOUtils.copy(in, output);
-    } catch (Exception e) {
-      FileUtils.deleteQuietly(destination);
-      logger.error("Error storing source {} to archive {}", source, destination.getAbsolutePath());
+      link(origin, destination);
+    } catch (IOException e) {
+      logger.error("Error while linking/copying file {} to {}: {}", new Object[] { origin, destination, getMessage(e) });
       throw new ElementStoreException(e);
-    } finally {
-      IOUtils.closeQuietly(output);
-      IOUtils.closeQuietly(in);
-      httpClient.close(response);
+    }
+  }
+
+  private File getFileFromWorkspace(Source source) {
+    try {
+      return workspace.get(source.getUri());
+    } catch (NotFoundException e) {
+      logger.error("Source file '{}' does not exist", source.getUri());
+      throw new ElementStoreException(e);
+    } catch (IOException e) {
+      logger.error("Error while getting file '{}' from workspace: {}", source.getUri(), getMessage(e));
+      throw new ElementStoreException(e);
     }
   }
 
