@@ -144,8 +144,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
           return true;
         }
       });
-      // Windows binary will return -1 when queried for options
-      if (exitCode != -1 && exitCode != 0 && exitCode != 255) {
+      if (exitCode != 0) {
         throw new TextExtractorException("Text analyzer " + binary + " exited with code " + exitCode);
       }
       // Read the tesseract output file
