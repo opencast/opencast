@@ -151,7 +151,9 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
       // Read the tesseract output file
       outputFile = new File(outputFileBase.getAbsolutePath() + ".txt");
       is = new FileInputStream(outputFile);
-      return TesseractTextFrame.parse(is);
+      TextFrame textFrame = TesseractTextFrame.parse(is);
+      is.close();
+      return textFrame;
     } catch (IOException e) {
       throw new TextExtractorException("Error running text extractor " + binary, e);
     } finally {
