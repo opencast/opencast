@@ -474,6 +474,9 @@ public class ToolsEndpoint {
     List<Publication> pubs = Stream.$(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
       @Override
       public Boolean ap(Publication pub) {
+        if (track.getFlavor() == null || pub.getFlavor() == null)
+          return false;
+
         return track.getFlavor().getType().equals(pub.getFlavor().getType())
                 && pub.getFlavor().getSubtype().equals(DEFAULT_WAVEFORM_PUBLICATION_FLAVOR_SUBTYPE);
       }

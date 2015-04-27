@@ -35,7 +35,9 @@ public class BaseSmtpService {
   private static final Logger logger = LoggerFactory.getLogger(BaseSmtpService.class);
 
   /** The mode */
-  protected enum Mode { production, test };
+  protected enum Mode {
+    production, test
+  };
 
   /** Parameter prefix common to all "mail" properties */
   protected static final String OPT_MAIL_PREFIX = "mail.";
@@ -74,7 +76,7 @@ public class BaseSmtpService {
   private static final int DEFAULT_MAIL_PORT = 25;
 
   /** The current mail transport protocol */
-  private String mailTransport = DEFAULT_MAIL_TRANSPORT;
+  protected String mailTransport = DEFAULT_MAIL_TRANSPORT;
 
   /** Flag indicating whether the service is actually sending messages */
   private boolean productionMode = true;

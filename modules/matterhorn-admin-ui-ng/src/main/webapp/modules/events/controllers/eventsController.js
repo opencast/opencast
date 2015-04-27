@@ -44,8 +44,8 @@ angular.module('adminNg.controllers')
                 name:  'location',
                 label: 'EVENTS.EVENTS.TABLE.LOCATION'
             }, {
-                name: 'workflow_state',
-                label: 'EVENTS.EVENTS.TABLE.WORKFLOW_STATE'
+                name: 'event_status',
+                label: 'EVENTS.EVENTS.TABLE.SCHEDULING_STATUS'
             }, {
                 template: 'modules/events/partials/eventActionsCell.html',
                 label:    'EVENTS.EVENTS.TABLE.ACTION',
@@ -60,8 +60,8 @@ angular.module('adminNg.controllers')
 
         $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
 
-        $scope.table.delete = function (row) {
-            row.$delete();
+        $scope.table.delete = function (id) {
+            EventsResource.delete({id: id});
         };
     }
 ]);

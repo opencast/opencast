@@ -39,7 +39,7 @@ import java.util.Map;
 public class SeriesListProvider implements ResourceListProvider {
   public static final String FILTER_TEXT = "text";
 
-  private static final String PROVIDER_PREFIX = "SERIES";
+  public static final String PROVIDER_PREFIX = "SERIES";
 
   public static final String NAME = PROVIDER_PREFIX + ".NAME";
   public static final String CONTRIBUTORS = PROVIDER_PREFIX + ".CONTRIBUTORS";

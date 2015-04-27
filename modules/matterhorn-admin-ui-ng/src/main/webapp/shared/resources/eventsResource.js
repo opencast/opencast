@@ -16,8 +16,8 @@ angular.module('adminNg.resources')
      */
 
     // We are live and are getting the real thing.
-    return $resource('/admin-ng/event/events.json', {}, {
-        query: {method: 'GET', isArray: false, transformResponse: function (data) {
+    return $resource('/admin-ng/event/:id', { id: '@id' }, {
+        query: {method: 'GET', params: { id: 'events.json' }, isArray: false, transformResponse: function (data) {
             return ResourceHelper.parseResponse(data, function (r) {
                 var row = {};
                 row.id = r.id;
@@ -27,6 +27,9 @@ angular.module('adminNg.resources')
                     row.series_name = r.series.title;
                 }
                 row.review_status = r.review_status;
+                $translate(r.event_status).then(function (translation) {
+                	row.event_status = translation;
+                });
                 row.source = r.source;
                 row.scheduling_status = r.scheduling_status;
                 $translate(r.scheduling_status).then(function (translation) {

@@ -20,7 +20,7 @@ angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource', 'SeriesThemeResource', 'ResourcesListResource', 'Notifications',
         function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, Notifications) {
 
-    var saveFns = {},
+    var saveFns = {}, aclNotification,
         mainCatalog = 'dublincore/series', fetchChildResources,
         createPolicy = function (role) {
             return {
@@ -50,6 +50,7 @@ angular.module('adminNg.controllers')
             }
         };
 
+    $scope.aclLocked = false,
     $scope.policies = [];
     $scope.baseAcl = {};
 
@@ -108,7 +109,17 @@ angular.module('adminNg.controllers')
             if (angular.isDefined(data.series_access)) {
                 var json = angular.fromJson(data.series_access.acl);
                 changePolicies(json.acl.ace, true);
+
+                $scope.aclLocked = data.series_access.locked;
+                    
+                if ($scope.aclLocked) {
+                    aclNotification = Notifications.add('warning', 'SERIES_ACL_LOCKED', 'series-acl-' + id, -1);
+                } else if (aclNotification) {
+                    Notifications.remove(aclNotification, 'series-acl');
+                }
+
             }
+
         });
 
         $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
