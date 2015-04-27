@@ -37,7 +37,7 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
   /**
    * Returns the element identifier.
    *
-   * @return the element identifier
+   * @return the element identifier, may be null
    */
   String getIdentifier();
 
