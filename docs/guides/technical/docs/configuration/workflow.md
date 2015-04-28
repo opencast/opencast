@@ -2,10 +2,10 @@
 
 This document will help you get started with creating your own Matterhorn workflows.
  - For a list of available workflow operations, see:
-  [Workflow Operation Handler](workflowoperationhandler/readme.md)
+  [Workflow Operation Handler](../workflowoperationhandlers/index.md)
  - For a more detailed discussion on how to create your own workflow operations, see:
   [Create a Custom Workflow Operation Handler](https://opencast.jira.com/wiki/display/MHDOC/Create+a+Custom+Workflow+Operation+Handler)
- 
+
 ## Overview
 A Matterhorn workflow is an ordered list of operations. There is no limit to the number of operations or their repetition in a given workflow.
 
@@ -26,19 +26,19 @@ Matterhorn workflows are defined in xml documents. The name of the document shou
 The structure of a Matterhorn workflow document:
 
     <definition xmlns="http://workflow.opencastproject.org">
-     
+
       <!-- Description -->
       <id></id>
       <title></title>
       <tags></tags>
       <description></description>
-     
+
       <!-- Operations -->
       <operations>
         <operation></operation>
         ...
       </operations>
-     
+
     </definition>
 
 ##Create a Workflow
@@ -54,7 +54,7 @@ In most cases you also want to create new encoding profiles for new workflows. Y
 Start by naming the workflow and giving it a meaningful description:
 
     <definition xmlns="http://workflow.opencastproject.org">
-     
+
       <!-- Description -->
       <id>example</id>
       <title>Encode QuickTime, Distribute and Publish</title>
@@ -69,10 +69,10 @@ Start by naming the workflow and giving it a meaningful description:
         Distribute to local repository.
         Publish to search index.
       </description>
-     
+
       <!-- Operations -->
       <operations></operations>
-     
+
     </definition>
 
 ### Inspect the Media
@@ -80,13 +80,13 @@ Start by naming the workflow and giving it a meaningful description:
 The first operation will be to inspect the media for technical metadata, such as format and length:
 
     <definition xmlns="http://workflow.opencastproject.org">
-     
+
       <!-- Description -->
       ...
-     
+
       <!-- Operations -->
       <operations>
-     
+
         <!-- inspect media -->
         <operation
           id="inspect"
@@ -94,9 +94,9 @@ The first operation will be to inspect the media for technical metadata, such as
           exception-handler-workflow="error"
           description="Inspect media package">
         </operation>
-     
+
       </operations>
-     
+
     </definition>
 
 The fail-on-error attribute is a boolean determining whether the workflow will throw an error to the exception-handler-workflow or simply proceed with the remaining operations.
@@ -106,16 +106,16 @@ The fail-on-error attribute is a boolean determining whether the workflow will t
 The next operations will encode the media to the QuickTime/MPEG-4 .mp4 format:
 
     <definition xmlns="http://workflow.opencastproject.org">
-     
+
       <!-- Description -->
       ...
-     
+
       <!-- Operations -->
       <operations>
-     
+
         <!-- inspect media -->
         ...
-     
+
         <!-- encode: quicktime/mp4 -->
         <operation
           id="compose"
@@ -129,7 +129,7 @@ The next operations will encode the media to the QuickTime/MPEG-4 .mp4 format:
             <configuration key="encoding-profile">mov-low.http</configuration>
           </configurations>
         </operation>
-     
+
         <operation
           id="compose"
           fail-on-error="true"
@@ -142,35 +142,35 @@ The next operations will encode the media to the QuickTime/MPEG-4 .mp4 format:
             <configuration key="encoding-profile">mov-low.http</configuration>
           </configurations>
         </operation>
-     
+
       </operations>
-     
+
     </definition>
 
 
 **The target-tags attribute tags the resulting media for later use as input for other operations, using the source-tags attribute. See #Distribute the Media\.**
 
 
-**The encoding-profile attribute refers to an encoding profile defined in <felix_home>/etc/workflows. See Encoding Profiles.** 
+**The encoding-profile attribute refers to an encoding profile defined in <felix_home>/etc/workflows. See Encoding Profiles.**
 
 ### Encode to Thumbnail
 
 The next operations will create thumbnails from the media:
 
     <definition xmlns="http://workflow.opencastproject.org">
-     
+
       <!-- Description -->
       ...
-     
+
       <!-- Operations -->
       <operations>
-     
+
         <!-- inspect media -->
         ...
-     
+
         <!-- encode: quicktime/mp4 -->
         ...
-     
+
         <!-- encode: images -->
           <!-- camera -->
         <operation
@@ -187,7 +187,7 @@ The next operations will create thumbnails from the media:
             <configuration key="time">1</configuration>
           </configurations>
         </operation>
-     
+
           <!-- screen -->
         <operation
           id="image"
@@ -203,9 +203,9 @@ The next operations will create thumbnails from the media:
             <configuration key="time">1</configuration>
           </configurations>
         </operation>
-     
+
       </operations>
-     
+
     </definition>
 
 **The time attribute determines the approximate frame of the source media is used. The time unit is in seconds.**
@@ -215,22 +215,22 @@ The next operations will create thumbnails from the media:
 The next operation copies the encoded media to the Matterhorn distribution channel:
 
     <definition xmlns="http://workflow.opencastproject.org">
-     
+
       <!-- Description -->
       ...
-     
+
       <!-- Operations -->
       <operations>
-     
+
         <!-- inspect media -->
         ...
-     
+
         <!-- encode: quicktime/mp4 -->
         ...
-     
+
         <!-- encode: images -->
         ...
-     
+
         <!-- distribute: local -->
         <operation
           id="publish-engage"
@@ -241,12 +241,12 @@ The next operation copies the encoded media to the Matterhorn distribution chann
             <configuration key="download-source-tags">publish, rss, atom</configuration>
             <configuration key="streaming-source-tags"></configuration>
             <configuration key="check-availability">true</configuration>
-     
+
           </configurations>
         </operation>
-     
+
       </operations>
-     
+
     </definition>
 
 **The publish-engage operation uses all media tagged as rss or atom as input.**
@@ -277,7 +277,7 @@ The easiest way to test a workflow is to just put it into the workflow folder wh
 
 
 **You can use the official all in one test VM for this: http://testallinone.usask.ca:8080/workflow/docs (user:admin / passwd:opencast)**
- 
+
 1. Scroll down to "POST /start" and click on the "Testing form" link.
 ![workflow start](workflow1.png)
 

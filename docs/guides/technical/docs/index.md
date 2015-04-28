@@ -24,16 +24,16 @@ Release Documentation
 The Matterhorn Release Documentation is the official Matterhorn documentation
 for each release. It contains:
 
- - [Installation Guides](installation)
- - [Configuration Guides](configuration)
+ - [Installation Guides](installation/index.md)
+ - [Configuration Guides](configuration/index.md)
     - [Basic Configuration](configuration/basic.md)
     - [Database Configuration](configuration/database.md)
     - [Workflow Configuration](configuration/workflow.md)
     - [Encoding Configuration](configuration/encoding.md)
     - [more...](configuration)
- - [Module Documentation](modules/readme.md)
+ - [Module Documentation](modules/index.md)
   includes Youtube configuration, text extraction, feed configuration, engage player manual
- - [Upgrade Instructions](upgrade) 
+ - [Upgrade Instructions](upgrade/index.md)
 
 Development Documentation
 -------------------------

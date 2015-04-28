@@ -36,7 +36,7 @@ The following table contains the workflow operations that are available in an ou
 |extract-text		|Extracting text from presentation segments		|[Documentation](extracttext-woh.md)|
 |publish-engage		|Distribute and publish media to the engage player	|[Documentation](publishengage-woh.md)|
 |archive			|Archive the current state of the mediapackage		|[Documentation](archive-woh.md)|
-|cleanup			|Cleanup the working file repository			|[Documentation](cleanup-woh.md)|
+|cleanup			|Cleanup the working file repository			|[Documentation]()|
 |zip			|Create a zipped archive of the current state of the mediapackage |[Documentation](zip-woh.md)|
 |image-to-video		|Create a video track from a source image		|[Documentation](imagetovideo-woh.md)|
 |composite		|Compose two videos on one canvas.			|[Documentation](composite-woh.md)|
@@ -50,4 +50,3 @@ The following table contains the workflow operations that are available in an ou
 |editor			|Waiting for user to review, then create a new file based on edit-list |[Documentation](editor-woh.md)|
 |silence			|Silence detection on audio of the mediapackage		|[Documentation](silence-woh.md)|
 |waveform		|Create a waveform image of the audio of the Mediapackage |[Documentation](waveform-woh.md)|
-
