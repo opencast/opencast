@@ -28,8 +28,16 @@ angular.module('adminNg.directives')
         getCurrentStateController = function () {
             return currentState.stateController;
         };
-        getPreviousState = function () {
-            return $scope.states[getCurrentStateIndex() - 1];
+        getPreviousState = function (offset) {
+            if (!offset) {
+                offset = 1;
+            }
+            var prevState = $scope.states[getCurrentStateIndex() - offset];
+            if (prevState.stateController.visible) {
+                return prevState;
+            } else {
+                return getPreviousState(offset + 1);
+            }
         };
         getNextState = function (offset) {
             if (!offset) {
