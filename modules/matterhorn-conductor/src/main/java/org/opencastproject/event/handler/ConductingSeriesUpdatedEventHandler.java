@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -105,6 +106,8 @@ public class ConductingSeriesUpdatedEventHandler {
           logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
         } catch (ExecutionException e) {
           logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
+        } catch (CancellationException e) {
+          logger.trace("Listening for series update messages has been cancelled.");
         } catch (Throwable t) {
           logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(t));
         } finally {

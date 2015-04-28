@@ -67,6 +67,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -103,6 +104,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *
    * @throws InterruptedException
    *           Thrown if the process is interupted.
+   * @throws CancellationException
+   *           Thrown if listeing to messages has been canceled.
    * @throws ExecutionException
    *           Thrown if there is a problem executing the process.
    * @throws IOException
@@ -110,8 +113,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws InternalServerErrorException
    *           Thrown if there was a problem adding some of the data back into the index.
    */
-  public synchronized void recreateIndex() throws InterruptedException, ExecutionException, IOException,
-          InternalServerErrorException {
+  public synchronized void recreateIndex() throws InterruptedException, CancellationException, ExecutionException,
+          IOException, InternalServerErrorException {
     // Clear index first
     clear();
     recreateService(IndexRecreateObject.Service.Groups);
@@ -133,11 +136,13 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *           Thrown if there is a problem re-sending the data from the service.
    * @throws InterruptedException
    *           Thrown if the process of re-sending the data is interupted.
+   * @throws CancellationException
+   *           Thrown if listening to messages has been canceled.
    * @throws ExecutionException
    *           Thrown if the process of re-sending the data has an error.
    */
   private void recreateService(IndexRecreateObject.Service service) throws InternalServerErrorException,
-          InterruptedException, ExecutionException {
+          InterruptedException, CancellationException, ExecutionException {
     logger.info("Starting to recreate index for service {}", service);
     messageSender.sendObjectMessage(IndexProducer.RECEIVER_QUEUE + "." + service, MessageSender.DestinationType.Queue,
             IndexRecreateObject.start(getIndexName(), service));
