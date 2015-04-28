@@ -221,13 +221,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         var path = Engage.getPluginPath("EngagePluginVideoVideoJS").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
-        if (language == "de") {
-            Engage.log("Video: Chosing german translations");
-            jsonstr += "language/de.json";
-        } else { // No other languages supported, yet
-            Engage.log("Video: Chosing english translations");
-            jsonstr += "language/en.json";
-        }
+        Engage.log("Controls: selecting language " + language);
+        jsonstr += "language/" + language + ".json";
         $.ajax({
             url: jsonstr,
             dataType: "json",
