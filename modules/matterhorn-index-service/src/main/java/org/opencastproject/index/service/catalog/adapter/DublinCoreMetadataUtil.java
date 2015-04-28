@@ -25,6 +25,7 @@ import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
 
 import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.DateTime;
@@ -74,7 +75,7 @@ public final class DublinCoreMetadataUtil {
           setDuration(dc, field, ename);
         } else if (field.getType() == TYPE.DATE) {
           setDate(dc, field, ename);
-        } else if (field.getType() == TYPE.ITERABLE_TEXT) {
+        } else if (field.getType() == TYPE.MIXED_TEXT || field.getType() == TYPE.ITERABLE_TEXT) {
           setIterableString(dc, field, ename);
         } else {
           dc.set(ename, field.getValue().get().toString());
@@ -369,7 +370,8 @@ public final class DublinCoreMetadataUtil {
         if (dublinCoreProperty == null) {
           dublinCoreProperty = new MetadataField();
         }
-        dublinCoreProperty.setValue(getDublinCorePropertyKey(property).get(), configProperties.get(property).toString());
+        dublinCoreProperty
+                .setValue(getDublinCorePropertyKey(property).get(), configProperties.get(property).toString());
         dublinCorePropertyMapByConfigurationName.put(getDublinCorePropertyName(property).get(), dublinCoreProperty);
       }
     }

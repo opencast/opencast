@@ -167,6 +167,7 @@
               OSGI-INF/list-providers/agents.xml,
               OSGI-INF/list-providers/blacklists.xml,
               OSGI-INF/list-providers/comments.xml,
+              OSGI-INF/list-providers/contributors.xml,
               OSGI-INF/list-providers/email.xml,
               OSGI-INF/list-providers/events.xml,
               OSGI-INF/list-providers/groups.xml,

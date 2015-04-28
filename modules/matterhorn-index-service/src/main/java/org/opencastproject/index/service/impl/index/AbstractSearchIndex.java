@@ -54,6 +54,7 @@ import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
 
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -61,11 +62,16 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -535,6 +541,35 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying theme index", t);
     }
+  }
+
+  /**
+   * Returns all the known terms for a field (aka facets).
+   *
+   * @param field
+   *          the field name
+   * @param types
+   *          an optional array of document types
+   * @return the list of terms
+   */
+  public List<String> getTermsForField(String field, Option<String[]> types) {
+    final String facetName = "terms";
+    TermsBuilder aggBuilder = AggregationBuilders.terms(facetName).field(field);
+    SearchRequestBuilder search = getSearchClient().prepareSearch(getIndexName()).addAggregation(aggBuilder);
+
+    if (types.isSome())
+      search = search.setTypes(types.get());
+
+    SearchResponse response = search.execute().actionGet();
+
+    List<String> terms = new ArrayList<String>();
+    Terms aggs = response.getAggregations().get(facetName);
+
+    for (Bucket bucket : aggs.getBuckets()) {
+      terms.add(bucket.getKey());
+    }
+
+    return terms;
   }
 
   /**
