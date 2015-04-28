@@ -3,7 +3,7 @@
 *Matterhorn has Solr included by default. This guide is only needed, if you want to run Solr on a separate server.*
 
 **The software versions in these instructions are not the only versions that will work, they are just the version tested when this document was written.  Newer versions of both Tomcat and Solr are highly recommended.**
- 
+
 ## Introduction
 Matterhorn services use filesystem, relational database, and/or search indexes to store and retrieve information. In order to cluster services across multiple servers, we must provide shared storage solutions for each of these technologies. We do this with NFS or ZFS for filesystems, JDBC for relational databases, and solr for search indexes. If you plan on clustering either the workflow service or the search service, you must configure Matterhorn to use remote solr servers as described below, otherwise no further action is required.
 
@@ -50,13 +50,13 @@ Edit the dataDir setting in solr/conf/solrconfig.xml to specify the directory yo
 
 You should see that the solr server is running on http://localhost:8080/solr
 
-![SOLR welcome page](searchindex1.png)
+![SOLR welcome page](modules/searchindex1.png)
 
 You can use the admin screen to monitor the server or make ad-hoc queries:
 
-![SOLR admin](searchindex2.png)
+![SOLR admin](modules/searchindex2.png)
 
-![SOLR XML](searchindex3.png)
+![SOLR XML](modules/searchindex3.png)
 
 ## Secure the solr server
 Just like with a relational database server, it is critical that you limit access to the solr server. Matterhorn's communication with solr servers is unauthenticated, so you must secure a firewall on the solr servers that accepts HTTP requests only from Matterhorn servers. If these servers were publicly accessible, anyone could make changes to Matterhorn data from outside Matterhorn itself.

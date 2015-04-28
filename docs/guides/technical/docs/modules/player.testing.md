@@ -125,7 +125,7 @@ The test relevant files are located in the **src/test/resources/ui/js/spec** tre
     |-----------engage  #Mockup of the engage_core.js and engage_model.js
     |-----------lib     #Libraries that are used and provided by the core (A copy of the lib directory in the engage core module)
     |-----------spec    #Tests the *_spec.js and the helper file spec_helper.js
- 
+
 ### Spec Helper
 The file **spec_helper.js** takes over the configuration of RequireJS which is usually done by the engage_init.js. The paths differ slighty from the player uses at runtime.
 
@@ -170,13 +170,13 @@ Now you can start the build process and the jasmine specs will be executed. Each
         -------------------------------------------------------
         [INFO]
         F..
-     
+
         1 failure:
-     
+
           1.) EngageCore it should have a model <<< FAILURE!
-     
+
             * Expected { cid : 'c3', ... _pending : false } not to be defined.
-     
+
         Results: 3 specs, 1 failures
         // some output before
 
@@ -186,7 +186,7 @@ The jasmine-maven-plugin can also be executed manually and show the result in a 
 
     mvn jasmine:bdd
         [INFO] Scanning for projects...
-        [INFO]                                                                        
+        [INFO]
         [INFO] ------------------------------------------------------------------------
         [INFO] Building matterhorn-engage-theodul-core 1.5-SNAPSHOT
         [INFO] ------------------------------------------------------------------------
@@ -195,20 +195,20 @@ The jasmine-maven-plugin can also be executed manually and show the result in a 
         2014-01-28 14:33:30.722:INFO:oejs.Server:jetty-8.1.10.v20130312
         2014-01-28 14:33:30.746:INFO:oejs.AbstractConnector:Started SelectChannelConnector@0.0.0.0:8234
         [INFO]
-     
+
         Server started--it's time to spec some JavaScript! You can run your specs as you develop by visiting this URL in a web browser:
-     
+
         http://localhost:8234
-     
+
         The server will monitor these two directories for scripts that you add, remove, and change:
-     
+
         source directory: src/main/resources/ui
-     
+
         spec directory: src/test/resources/ui/js/spec
-      
+
         Just leave this process running as you test-drive your code, refreshing your browser window to re-run your specs.
         You can kill the server with Ctrl-C when you're done.
 
 In a browser you should see an output like it is shown on the next screenshot.
 
-![Jasmin screen](player.testing1.png)
+![Jasmin screen](modules/player.testing1.png)

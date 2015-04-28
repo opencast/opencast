@@ -279,13 +279,13 @@ The easiest way to test a workflow is to just put it into the workflow folder wh
 **You can use the official all in one test VM for this: http://testallinone.usask.ca:8080/workflow/docs (user:admin / passwd:opencast)**
 
 1. Scroll down to "POST /start" and click on the "Testing form" link.
-![workflow start](workflow1.png)
+![workflow start](configuration/workflow1.png)
 
 2. Copy and paste the complete workflow definition into the "definition" field and click "submit."
-![testing form](workflow2.png
+![testing form](configuration/workflow2.png)
 
 3. Open the Admin Tools and navigate the recordings dashboard to view the status of the workflow instance.
-![dashboard](workflow3.png)
+![dashboard](configuration/workflow3.png)
 
 4. Open the Matterhorn Media Module to see the published media.
-![media module](workflow4.png)
+![media module](configuration/workflow4.png)

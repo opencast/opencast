@@ -5,7 +5,7 @@ This document will help you configure the Matterhorn security policy.
 ## Introduction
 Matterhorn service endpoints and user interfaces are secured by default using a set of servlet filters. The following diagram illustrates the flow of an HTTP request and response through these filters.
 
-![Diagram](security1.png)
+![Diagram](configuration/security1.png)
 
 The Spring Security filters used here are very powerful, but are also somewhat complicated. Please familiarize yourself with the basic concepts and vocabulary described in the Spring Security documentation, then edit the xml files in <felix_home>/etc/security, as described below.
 
@@ -16,10 +16,10 @@ Some examples:
 
     <!-- Allow anonymous access to the welcome.html URLs -->
     <sec:intercept-url pattern='/welcome.html' access='ROLE_ANONYMOUS,ROLE_USER'/>
-     
+
     <!-- Allow anonymous GET to the search service, but not POST or PUT -->
     <sec:intercept-url pattern='/search/**' method="GET" access='ROLE_ANONYMOUS,ROLE_USER' />
-     
+
     <!-- Allow users with the admin role to do anything -->
     <sec:intercept-url pattern='/**' access='ROLE_ADMIN'/>
 
@@ -38,7 +38,7 @@ The set of user and role providers can be configured. If you do not want to keep
 Additional users can be created by adding a username, organization and password hash to the mh_user table in the Matterhorn database. The default hash method is MD5 and the password must be salted with the username in curly braces.
 
 **At the moment, there is no graphical user interface for this task. It has to be done in the database.**
- 
+
 Example: Adding Garfield with the password 'monday' (in MySQL)
 
     INSERT INTO `matterhorn`.`mh_user` (`username`, `organization`, `password`) VALUES ('garfield', 'mh_default_org', MD5('monday{garfield}'));
@@ -49,7 +49,7 @@ In the next step roles for the newly created user can be added to the mh_role ta
     INSERT INTO `matterhorn`.`mh_user_role` (`user_id`, `role_id`) VALUES ('220', '221');
 
 ** Note that you must set the value of the organization field to the organization ID specified in one of the etc/load/org.opencast.organization-<organization_name>.cfg files. In a default installation this is 'mh_default_org'.**
- 
+
 ## Further Authentication Configuration
 
 [Configure Central Authentication Service (CAS)](security.cas.md)

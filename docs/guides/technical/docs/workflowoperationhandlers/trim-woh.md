@@ -19,10 +19,10 @@ The "duration-threshold" parameter  accepts a threshold value in milliseconds. I
 
 The parameter is currently in the default workflow, but commented. The threshold is 0 by default, i.e. no difference between the trim outpoint and the track length is allowed.
 
- 
+
 ## Capture UI
 
-![Trim UI](MatterhornTrimOperation.png)
+![Trim UI](workflowoperationhandlers/MatterhornTrimOperation.png)
 
 ## Operation Example
 

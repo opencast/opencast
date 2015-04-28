@@ -11,13 +11,13 @@ The editor operation provides the UI for editing trim hold state and processes t
 |preview-flavors	|"*/preview"	|the subtype of the media files that should be used for the preview player. This is an HTML5 player so the coded can be H.264 or WebM based on the browser. The main flavor should be the same as in source-flavors.	|EMPTY|
 |smil-flavors |"*/smil"| the smil file(s) that should be used as a proposal within the editor UI. If * is used presenter/smil will be favored, if this is not available the first in the list will be used.|EMPTY|
 |skipped-flavors|"*/work"	|the subtype of all media files that should be used in the following processing, if the editor operation was skipped|EMPTY|
- 
+
 ## Video Editor UI
 
-![Videoeditor UI](editor.png)
+![Videoeditor UI](workflowoperationhandlers/editor.png)
 
 ## Operation Example
- 
+
     <operation
       id="editor"
       if="${trimHold}"

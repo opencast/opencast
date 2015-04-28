@@ -4,7 +4,7 @@
 The architecture of the theodul player has a plugin based structure based around a core. The core and the plugins have been realized as OSGi modules. Each plugin can be separately build.
 The following figure shows the OSGi architecture of the player.
 
-![Architecture](player.architecture1.png)
+![Architecture](modules/player.architecture1.png)
 
 All Theodul OSGi modules are stored under:
 
@@ -148,8 +148,7 @@ If another plugin wants to use the defined "videoDataModel" model, it has to lis
        initCount -= 1;
        if (initCount === 0) {
           initPlugin();
-       }     
+       }
     });
 
 Have a look at the full implementation of the VideoJS Plugin and the Controls Plugin to get an idea how the Backbone MVC design works. For completeness' sake, the "Controller" does not have an extra Object in the Backbone MVC design. The "Controller" is usually used as the render function in the view. This function can be very complex and should link to other functions, which are short and easy to be tested by the Jasmine Test Framework.
-
