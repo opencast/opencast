@@ -723,6 +723,7 @@ public class WorkflowServiceImplTest {
     WorkflowSet workflowSet = EasyMock.createMock(WorkflowSet.class);
     EasyMock.expect(workflowSet.getTotalCount()).andReturn(new Long(workflows.length));
     EasyMock.expect(workflowSet.getItems()).andReturn(workflows).anyTimes();
+    EasyMock.expect(workflowSet.size()).andReturn(new Long(workflows.length)).once();
     EasyMock.replay(workflowSet);
 
     WorkflowServiceIndex mockIndex = EasyMock.createMock(WorkflowServiceIndex.class);
@@ -746,7 +747,8 @@ public class WorkflowServiceImplTest {
     mediapackage.setDate(startDate);
     mediapackage.setDuration(7200L);
 
-    WorkflowOperationInstanceImpl workflowOperation = new WorkflowOperationInstanceImpl(operation, OperationState.PAUSED);
+    WorkflowOperationInstanceImpl workflowOperation = new WorkflowOperationInstanceImpl(operation,
+            OperationState.PAUSED);
     workflowOperation.setId(id);
 
     List<WorkflowOperationInstance> workflowOperationInstanceList = new LinkedList<WorkflowOperationInstance>();
@@ -760,25 +762,24 @@ public class WorkflowServiceImplTest {
     return workflowInstanceImpl;
   }
 
-  private void setupJob(long id, String operation, ServiceRegistry mockServiceRegistry) throws ServiceRegistryException, NotFoundException {
+  private void setupJob(long id, String operation, ServiceRegistry mockServiceRegistry)
+          throws ServiceRegistryException, NotFoundException {
     ServiceRegistrationJpaImpl serviceRegistrationJpaImpl = EasyMock.createMock(ServiceRegistrationJpaImpl.class);
     EasyMock.expect(serviceRegistrationJpaImpl.getHost()).andReturn("http://localhost:8080");
     EasyMock.expect(serviceRegistrationJpaImpl.getServiceType()).andReturn(operation);
     EasyMock.replay(serviceRegistrationJpaImpl);
     List<String> arguments = new LinkedList<String>();
     arguments.add(Long.toString(id));
-    JobJpaImpl job = new JobJpaImpl(securityService.getUser(), securityService.getOrganization(), serviceRegistrationJpaImpl, "RESUME", arguments, null, false);
+    JobJpaImpl job = new JobJpaImpl(securityService.getUser(), securityService.getOrganization(),
+            serviceRegistrationJpaImpl, "RESUME", arguments, null, false);
     job.setId(id);
     EasyMock.expect(mockServiceRegistry.getJob(id)).andReturn(job).anyTimes();
     EasyMock.expect(mockServiceRegistry.updateJob(job)).andReturn(job);
   }
 
-  private void setupExceptionJob(long id, Exception e, ServiceRegistry mockServiceRegistry) throws ServiceRegistryException, NotFoundException {
-    EasyMock.expect(mockServiceRegistry.getJob(id)).andThrow(e);
-  }
-
-  private void setupNullJob(long id, ServiceRegistry mockServiceRegistry) throws ServiceRegistryException, NotFoundException {
-    EasyMock.expect(mockServiceRegistry.getJob(id)).andReturn(null).anyTimes();
+  private void setupExceptionJob(long id, Exception e, ServiceRegistry mockServiceRegistry)
+          throws ServiceRegistryException, NotFoundException {
+    EasyMock.expect(mockServiceRegistry.getJob(id)).andThrow(e).anyTimes();
   }
 
   private OrganizationDirectoryService setupMockOrganizationDirectoryService() {
@@ -791,7 +792,8 @@ public class WorkflowServiceImplTest {
   }
 
   @Test(expected = WorkflowDatabaseException.class)
-  public void testFailJobsInputWorkflowDatabaseExceptionExpectsWorkflowDatabaseExceptionThrown() throws WorkflowDatabaseException {
+  public void testFailJobsInputWorkflowDatabaseExceptionExpectsWorkflowDatabaseExceptionThrown()
+          throws WorkflowDatabaseException {
     WorkflowInstance[] workflows = {};
 
     WorkflowSet workflowSet = EasyMock.createMock(WorkflowSet.class);
@@ -799,8 +801,9 @@ public class WorkflowServiceImplTest {
     EasyMock.replay(workflowSet);
 
     WorkflowServiceIndex mockIndex = EasyMock.createMock(WorkflowServiceIndex.class);
-    EasyMock.expect(mockIndex.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            EasyMock.anyBoolean())).andThrow(new WorkflowDatabaseException());
+    EasyMock.expect(
+            mockIndex.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    EasyMock.anyBoolean())).andThrow(new WorkflowDatabaseException());
     EasyMock.replay(mockIndex);
 
     service.setDao(mockIndex);
@@ -835,17 +838,17 @@ public class WorkflowServiceImplTest {
     EasyMock.replay(mockServiceRegistry);
 
     // Setup workflows to be cleaned up
-    WorkflowInstanceImpl shouldBeCleanedBecauseCutoffWayBeforeNow = setupWorkflowInstanceImpl(1L, WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE,
-            WorkflowState.INSTANTIATED, wayBeforeNow);
-    WorkflowInstanceImpl shouldBeCleanedBecauseCutoffBeforeNow = setupWorkflowInstanceImpl(2L,WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE,
-            WorkflowState.INSTANTIATED, beforeNow);
+    WorkflowInstanceImpl shouldBeCleanedBecauseCutoffWayBeforeNow = setupWorkflowInstanceImpl(1L,
+            WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED, wayBeforeNow);
+    WorkflowInstanceImpl shouldBeCleanedBecauseCutoffBeforeNow = setupWorkflowInstanceImpl(2L,
+            WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED, beforeNow);
     // Setup workflows that haven't started yet.
-    WorkflowInstanceImpl shouldNotBeCleanedAfterNow = setupWorkflowInstanceImpl(3L, WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED,
-            afterNow);
-    WorkflowInstanceImpl shouldNotBeCleanedWayAfterNow = setupWorkflowInstanceImpl(4L, WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED,
-            wayAfterNow);
-    WorkflowInstanceImpl wrongOperation = setupWorkflowInstanceImpl(5L, WorkflowServiceImpl.CAPTURE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED,
-            wayBeforeNow);
+    WorkflowInstanceImpl shouldNotBeCleanedAfterNow = setupWorkflowInstanceImpl(3L,
+            WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED, afterNow);
+    WorkflowInstanceImpl shouldNotBeCleanedWayAfterNow = setupWorkflowInstanceImpl(4L,
+            WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED, wayAfterNow);
+    WorkflowInstanceImpl wrongOperation = setupWorkflowInstanceImpl(5L, WorkflowServiceImpl.CAPTURE_OPERATION_TEMPLATE,
+            WorkflowState.INSTANTIATED, wayBeforeNow);
 
     WorkflowInstance[] workflows = { shouldBeCleanedBecauseCutoffWayBeforeNow, shouldBeCleanedBecauseCutoffBeforeNow,
             shouldNotBeCleanedAfterNow, shouldNotBeCleanedWayAfterNow, wrongOperation };
@@ -854,18 +857,21 @@ public class WorkflowServiceImplTest {
     WorkflowSet workflowSet = EasyMock.createMock(WorkflowSet.class);
     EasyMock.expect(workflowSet.getTotalCount()).andReturn(new Long(workflows.length));
     EasyMock.expect(workflowSet.getItems()).andReturn(workflows).anyTimes();
+    EasyMock.expect(workflowSet.size()).andReturn(new Long(workflows.length)).once();
     EasyMock.replay(workflowSet);
 
     WorkflowServiceIndex mockIndex = EasyMock.createMock(WorkflowServiceIndex.class);
-    EasyMock.expect(mockIndex.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            EasyMock.anyBoolean())).andReturn(workflowSet).times(2);
+    EasyMock.expect(
+            mockIndex.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    EasyMock.anyBoolean())).andReturn(workflowSet).times(2);
     mockIndex.update(shouldBeCleanedBecauseCutoffWayBeforeNow);
     EasyMock.expectLastCall();
     mockIndex.update(shouldBeCleanedBecauseCutoffBeforeNow);
     EasyMock.expectLastCall();
     EasyMock.expect(mockIndex.getStatistics()).andReturn(new WorkflowStatistics()).anyTimes();
-    EasyMock.expect(mockIndex.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class), EasyMock.anyObject(String.class),
-            EasyMock.anyBoolean())).andReturn(emptyWorkflowSet).anyTimes();
+    EasyMock.expect(
+            mockIndex.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class), EasyMock.anyObject(String.class),
+                    EasyMock.anyBoolean())).andReturn(emptyWorkflowSet).anyTimes();
     EasyMock.replay(mockIndex);
 
     OrganizationDirectoryService orgDirService = setupMockOrganizationDirectoryService();
@@ -905,36 +911,43 @@ public class WorkflowServiceImplTest {
     Incidents incidents = new Incidents(mockServiceRegistry, mockIncidentService);
     EasyMock.expect(mockServiceRegistry.incident()).andReturn(incidents).anyTimes();
     setupJob(1L, WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, mockServiceRegistry);
-    setupNullJob(2L, mockServiceRegistry);
     setupExceptionJob(3L, new IllegalStateException(), mockServiceRegistry);
     setupExceptionJob(4L, new NotFoundException(), mockServiceRegistry);
     setupExceptionJob(5L, new ServiceRegistryException("Mock service registry exception."), mockServiceRegistry);
     EasyMock.replay(mockServiceRegistry);
 
+    WorkflowInstanceImpl shouldBeCleaned = setupWorkflowInstanceImpl(1L,
+            WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED, wayBeforeNow);
+    WorkflowInstanceImpl illegalState = setupWorkflowInstanceImpl(3L, WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE,
+            WorkflowState.INSTANTIATED, wayBeforeNow);
+    WorkflowInstanceImpl notFound = setupWorkflowInstanceImpl(4L, WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE,
+            WorkflowState.INSTANTIATED, wayBeforeNow);
+    WorkflowInstanceImpl serviceRegistry = setupWorkflowInstanceImpl(5L,
+            WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED, wayBeforeNow);
 
-    WorkflowInstanceImpl shouldBeCleaned = setupWorkflowInstanceImpl(1L, WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED, wayBeforeNow);
-    WorkflowInstanceImpl nullJob = setupWorkflowInstanceImpl(2L,WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED, wayBeforeNow);
-    WorkflowInstanceImpl illegalState = setupWorkflowInstanceImpl(3L, WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED, wayBeforeNow);
-    WorkflowInstanceImpl notFound = setupWorkflowInstanceImpl(4L, WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED, wayBeforeNow);
-    WorkflowInstanceImpl serviceRegistry = setupWorkflowInstanceImpl(5L, WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.INSTANTIATED, wayBeforeNow);
-
-    WorkflowInstance[] workflows = { shouldBeCleaned, nullJob, illegalState, notFound, serviceRegistry };
+    WorkflowInstance[] workflows = { shouldBeCleaned, illegalState, notFound, serviceRegistry };
     WorkflowSetImpl emptyWorkflowSet = new WorkflowSetImpl();
 
     WorkflowSet workflowSet = EasyMock.createMock(WorkflowSet.class);
     EasyMock.expect(workflowSet.getTotalCount()).andReturn(new Long(workflows.length));
     EasyMock.expect(workflowSet.getItems()).andReturn(workflows).anyTimes();
+    EasyMock.expect(workflowSet.size()).andReturn(new Long(workflows.length)).once();
     EasyMock.replay(workflowSet);
 
     WorkflowServiceIndex mockIndex = EasyMock.createMock(WorkflowServiceIndex.class);
-    EasyMock.expect(mockIndex.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            EasyMock.anyBoolean())).andReturn(workflowSet).times(2);
+    EasyMock.expect(
+            mockIndex.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    EasyMock.anyBoolean())).andReturn(workflowSet).times(2);
     mockIndex.update(shouldBeCleaned);
     EasyMock.expectLastCall();
     EasyMock.expect(mockIndex.getStatistics()).andReturn(new WorkflowStatistics()).anyTimes();
-    EasyMock.expect(mockIndex.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class), EasyMock.anyObject(String.class),
-            EasyMock.anyBoolean())).andReturn(emptyWorkflowSet).anyTimes();
+    EasyMock.expect(
+            mockIndex.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class), EasyMock.anyObject(String.class),
+                    EasyMock.anyBoolean())).andReturn(emptyWorkflowSet).anyTimes();
     EasyMock.replay(mockIndex);
+
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(messageSender);
 
     OrganizationDirectoryService orgDirService = setupMockOrganizationDirectoryService();
 
@@ -942,13 +955,16 @@ public class WorkflowServiceImplTest {
     workflowServiceImpl.setServiceRegistry(mockServiceRegistry);
     workflowServiceImpl.setSecurityService(securityService);
     workflowServiceImpl.setOrganizationDirectoryService(orgDirService);
+    workflowServiceImpl.setMessageSender(messageSender);
     workflowServiceImpl.activate(null);
     workflowServiceImpl.failJobs(WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, true);
 
     assertEquals(WorkflowState.FAILED, shouldBeCleaned.getState());
   }
 
-  protected WorkflowInstance setupFailedCapturePausedIngestOperationWorkflowInstance(WorkflowServiceImpl workflowServiceImpl, long buffer) throws ServiceRegistryException, NotFoundException, WorkflowDatabaseException {
+  protected WorkflowInstance setupFailedCapturePausedIngestOperationWorkflowInstance(
+          WorkflowServiceImpl workflowServiceImpl, long buffer) throws ServiceRegistryException, NotFoundException,
+          WorkflowDatabaseException {
     long offset = buffer * WorkflowServiceImpl.MILLISECONDS_IN_SECONDS;
     // Setup dates for test
     Date now = new Date();
@@ -960,24 +976,27 @@ public class WorkflowServiceImplTest {
     setupJob(3L, WorkflowServiceImpl.CAPTURE_OPERATION_TEMPLATE, mockServiceRegistry);
     setupJob(4L, WorkflowServiceImpl.INGEST_OPERATION_TEMPLATE, mockServiceRegistry);
 
-
     MediaPackage wayBeforeNowMediapackage = EasyMock.createMock(MediaPackage.class);
     EasyMock.expect(wayBeforeNowMediapackage.getDate()).andReturn(wayBeforeNow).anyTimes();
     EasyMock.expect(wayBeforeNowMediapackage.getSeries()).andReturn("Series-ID");
     EasyMock.expect(wayBeforeNowMediapackage.getElements()).andReturn(new MediaPackageElement[0]);
     List<WorkflowOperationInstance> operationInstances = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstance schedule = new WorkflowOperationInstanceImpl(WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, OperationState.SUCCEEDED);
+    WorkflowOperationInstance schedule = new WorkflowOperationInstanceImpl(
+            WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE, OperationState.SUCCEEDED);
     schedule.setId(2L);
     operationInstances.add(schedule);
-    WorkflowOperationInstance failedCapture = new WorkflowOperationInstanceImpl(WorkflowServiceImpl.CAPTURE_OPERATION_TEMPLATE, OperationState.FAILED);
+    WorkflowOperationInstance failedCapture = new WorkflowOperationInstanceImpl(
+            WorkflowServiceImpl.CAPTURE_OPERATION_TEMPLATE, OperationState.FAILED);
     operationInstances.add(failedCapture);
     failedCapture.setId(3L);
-    WorkflowOperationInstance pausedIngest = new WorkflowOperationInstanceImpl(WorkflowServiceImpl.INGEST_OPERATION_TEMPLATE, OperationState.PAUSED);
+    WorkflowOperationInstance pausedIngest = new WorkflowOperationInstanceImpl(
+            WorkflowServiceImpl.INGEST_OPERATION_TEMPLATE, OperationState.PAUSED);
     operationInstances.add(pausedIngest);
     pausedIngest.setId(4L);
 
     WorkflowInstance nullCurrentOperation = EasyMock.createMock(WorkflowInstanceImpl.class);
-    EasyMock.expect(nullCurrentOperation.getTemplate()).andReturn(WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE).anyTimes();
+    EasyMock.expect(nullCurrentOperation.getTemplate()).andReturn(WorkflowServiceImpl.SCHEDULE_OPERATION_TEMPLATE)
+            .anyTimes();
     EasyMock.expect(nullCurrentOperation.getMediaPackage()).andReturn(wayBeforeNowMediapackage).anyTimes();
     EasyMock.expect(nullCurrentOperation.getId()).andReturn(1L).anyTimes();
     EasyMock.expect(nullCurrentOperation.getCurrentOperation()).andReturn(null).anyTimes();
@@ -993,15 +1012,18 @@ public class WorkflowServiceImplTest {
     WorkflowSet workflowSet = EasyMock.createMock(WorkflowSet.class);
     EasyMock.expect(workflowSet.getItems()).andReturn(workflows).anyTimes();
     EasyMock.expect(workflowSet.getTotalCount()).andReturn(new Long(workflows.length)).anyTimes();
+    EasyMock.expect(workflowSet.size()).andReturn(new Long(workflows.length)).once();
 
     WorkflowServiceIndex mockIndex = EasyMock.createMock(WorkflowServiceIndex.class);
-    EasyMock.expect(mockIndex.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            EasyMock.anyBoolean())).andReturn(workflowSet).times(2);
+    EasyMock.expect(
+            mockIndex.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    EasyMock.anyBoolean())).andReturn(workflowSet).times(2);
     mockIndex.update(nullCurrentOperation);
     EasyMock.expectLastCall();
     EasyMock.expect(mockIndex.getStatistics()).andReturn(new WorkflowStatistics()).anyTimes();
-    EasyMock.expect(mockIndex.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class), EasyMock.anyObject(String.class),
-            EasyMock.anyBoolean())).andReturn(emptyWorkflowSet).anyTimes();
+    EasyMock.expect(
+            mockIndex.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class), EasyMock.anyObject(String.class),
+                    EasyMock.anyBoolean())).andReturn(emptyWorkflowSet).anyTimes();
 
     EasyMock.replay(mockServiceRegistry, wayBeforeNowMediapackage, nullCurrentOperation, workflowSet, mockIndex);
     workflowServiceImpl.setDao(mockIndex);
@@ -1028,12 +1050,14 @@ public class WorkflowServiceImplTest {
     long buffer = 7200L;
     service.deactivate();
     WorkflowServiceImpl workflowServiceImpl = new WorkflowServiceImpl();
-    WorkflowInstance workflowInstance = setupFailedCapturePausedIngestOperationWorkflowInstance(workflowServiceImpl, buffer);
+    WorkflowInstance workflowInstance = setupFailedCapturePausedIngestOperationWorkflowInstance(workflowServiceImpl,
+            buffer);
     OrganizationDirectoryService orgDirService = setupMockOrganizationDirectoryService();
     workflowServiceImpl.setSecurityService(securityService);
     workflowServiceImpl.setOrganizationDirectoryService(orgDirService);
     workflowServiceImpl.activate(null);
-    assertEquals(workflowInstance.getOperations().get(2), workflowServiceImpl.findIfFailedState(workflowInstance, WorkflowServiceImpl.INGEST_OPERATION_TEMPLATE));
+    assertEquals(workflowInstance.getOperations().get(2),
+            workflowServiceImpl.findIfFailedState(workflowInstance, WorkflowServiceImpl.INGEST_OPERATION_TEMPLATE));
   }
 
   @Test
@@ -1041,13 +1065,15 @@ public class WorkflowServiceImplTest {
     long buffer = 7200L;
     service.deactivate();
     WorkflowServiceImpl workflowServiceImpl = new WorkflowServiceImpl();
-    WorkflowInstance workflowInstance = setupFailedCapturePausedIngestOperationWorkflowInstance(workflowServiceImpl, buffer);
+    WorkflowInstance workflowInstance = setupFailedCapturePausedIngestOperationWorkflowInstance(workflowServiceImpl,
+            buffer);
     OrganizationDirectoryService orgDirService = setupMockOrganizationDirectoryService();
     workflowServiceImpl.setSecurityService(securityService);
     workflowServiceImpl.setOrganizationDirectoryService(orgDirService);
     workflowServiceImpl.activate(null);
     workflowServiceImpl.failJobs(WorkflowServiceImpl.CAPTURE_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, true);
-    assertEquals(null, workflowServiceImpl.findIfFailedState(workflowInstance, WorkflowServiceImpl.CAPTURE_OPERATION_TEMPLATE));
+    assertEquals(null,
+            workflowServiceImpl.findIfFailedState(workflowInstance, WorkflowServiceImpl.CAPTURE_OPERATION_TEMPLATE));
   }
 
   /**
