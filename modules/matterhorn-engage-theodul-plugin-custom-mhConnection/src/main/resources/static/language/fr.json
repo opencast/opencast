@@ -1,6 +1,0 @@
-{
-  "value_locale":"fr",
-  "error_mediaPackageInformationNotLoaded":"Cette erreur peut provenir de:<ul><li>La vidéo n'est plus disponible<\/li><li>La vidéo est protégée et nécessite que l'utilisateur soit connecté<\/li><\/ul>",
-  "error_noMediaInformationAvailable":"Aucune information disponible sur cette vidéo.",
-  "error_endpointNotAvailable":"The search service is currently not available."
-}
