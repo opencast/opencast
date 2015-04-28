@@ -163,13 +163,6 @@ Combined Admin/Worker Matterhorn distribution. This will install both the module
 Tools and the Worker. This package is targeted at medium sized installations, where you want to seperate the "backend"
 server that the admin accesses from the "frontend" server that the viewers use.
 
-### Capture-Agent Matterhorn distribution
-
-`opencast-matterhorn14-distribution-capture-agent`
-
-This is a package installing the Matterhorn reference Capture Agent with remote
-service registry.
-
 ### Default Matterhorn distribution
 
 `opencast-matterhorn14-distribution-default`
