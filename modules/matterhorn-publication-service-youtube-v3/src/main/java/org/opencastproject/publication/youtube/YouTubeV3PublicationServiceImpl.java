@@ -157,7 +157,7 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
         makeVideosPrivate = StringUtils.containsIgnoreCase(YouTubeUtils.get(properties, YouTubeKey.makeVideosPrivate), "true");
         defaultMaxFieldLength(YouTubeUtils.get(properties, YouTubeKey.maxFieldLength, false));
       } else {
-        logger.error("Client information file does not exist: " + path);
+        logger.warn("Client information file does not exist: " + path);
       }
     } catch (final Exception e) {
       throw new ConfigurationException("Failed to load YouTube v3 properties", dataStore, e);
