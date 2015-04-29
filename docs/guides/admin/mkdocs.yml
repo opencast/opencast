@@ -1,7 +1,7 @@
 
 
-site_name: Opencast - Technical Documentation
-repo_url: https://bitbucket.org/opencast-community/matterhorn/src/d96a3d8680fa609d31eb5071b35d46c9a96e9bdf/docs/guides/technical/
+site_name: Opencast - Administration Guide
+repo_url: https://bitbucket.org/opencast-community/matterhorn/src/d96a3d8680fa609d31eb5071b35d46c9a96e9bdf/docs/guides/admin/
 
 # Default theme used is readthedocs
 theme: readthedocs
@@ -20,7 +20,7 @@ site_dir: 'site'
 # Items will appear in this order
 
 pages:
-- ['index.md', 'Introduction']
+- ['index.md', 'Home']
 
 # configuration
 - ['configuration/index.md', 'Configuration']

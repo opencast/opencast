@@ -1,5 +1,5 @@
-Opencast Matterhorn Release Documentation
-=========================================
+Opencast Administration Guide
+=============================
 
 Welcome to the Matterhorn Universe! Matterhorn is an open-source enterprise
 level lecture recording system. The core of the system delivers functionality
