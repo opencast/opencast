@@ -40,24 +40,16 @@ Please make sure to install the following dependencies:
 Required:
 
     java-devel >= 1:1.7.0
-    ffmpeg >= 1.1
-    maven >= 3
+    ffmpeg >= 2.5
+    maven >= 3.1
+
+Required (not necessarily on the same machine):
+
+    ActiveMQ >= 5.10 (older versions untested)
 
 Required for text extraction (recommended):
 
     tesseract >= 3
-
-Required for the video editor (recommended):
-
-    gnonlin0.10
-    gstreamer
-    gstreamer-ffmpeg
-    gstreamer-plugins-base
-    gstreamer-plugins-good
-    gstreamer-plugins-ugly
-    gstreamer-plugins-bad-free
-
-*Note: Makre sure to install Gstreamer 0.10*
 
 Required for hunspell based text filtering (optional):
 
