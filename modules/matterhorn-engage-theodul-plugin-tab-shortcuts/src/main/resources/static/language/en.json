@@ -39,5 +39,9 @@
     "ins": "Insert",
     "del": "Delete",
     "modMac": "Cmd",
-    "modOther": "Ctrl"
+    "modOther": "Ctrl",
+    "focusPrev": "Focus previous video",
+    "focusNext": "Focus next video",
+    "togglePiP": "Enable/disable picture in picture",
+    "movePiP": "Move picture in picture"
 }

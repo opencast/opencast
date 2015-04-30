@@ -35,5 +35,9 @@
     "quality": "Quality",
     "qualityLow": "Low",
     "qualityMedium": "Medium",
-    "qualityHigh": "High"
+    "qualityHigh": "High",
+    "pictureInPicture": "Picture in Picture",
+    "left": "left",
+    "right": "right",
+    "off": "off"
 }

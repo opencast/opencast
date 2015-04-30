@@ -37,7 +37,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         playbackRateDecrease: new EngageEvent("Video:playbackRateDecrease", "", "trigger"),
         autoplay: new EngageEvent("Video:autoplay", "", "trigger"),
         initialSeek: new EngageEvent("Video:initialSeek", "", "trigger"),
-        mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler")
+        mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler"),
+        focusVideo: new EngageEvent("Video:focusVideo", "increases the size of one video", "handler"),
+        movePiP: new EngageEvent("Video:movePiP", "moves the smaller picture over the larger to the different corners", "handler"),
+        togglePiP: new EngageEvent("Video:togglePiP", "switches between PiP and next to each other layout", "handler")
     };
 
     /* change these variables */
@@ -82,6 +85,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var translationData = null;
     var loggedIn = false;
     var username = "Anonymous";
+    var pip = true;
     var askedForLogin = false;
     var springSecurityLoginURL = "/j_spring_security_check";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
@@ -99,6 +103,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var shortcut_jumpToBegin = "jumpToBegin";
     var shortcut_prevChapter = "prevChapter";
     var shortcut_nextChapter = "nextChapter";
+    var shortcut_prevFocus = "focusPrev";
+    var shortcut_nextFocus = "focusNext";
+    var shortcut_movePiP = "movePiP";
+    var shortcut_togglePiP = "togglePiP";
 
     var basilOptions = {
         namespace: "mhStorage"
@@ -334,6 +342,27 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         engageCore.trigger(events.volumeUp.getName());
                     });
                     break;
+                case shortcut_nextFocus:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.focusVideo.getName(), "next");
+                    });
+                    break;
+                case shortcut_prevFocus:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.focusVideo.getName(), "prev");
+                    });
+                    break;
+                case shortcut_movePiP:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.movePiP.getName());
+                    });
+                    break;
+                case shortcut_togglePiP:
+                    Mousetrap.bind(val.key, function() {
+                        pip = ! pip;
+                        engageCore.trigger(events.togglePiP.getName(), pip);
+                    });
+                    break;                
                 default:
                     break;
             }

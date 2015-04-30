@@ -184,6 +184,38 @@
             return undefined;
         }
     }
+    
+    /**
+     * Mute the video
+     *
+     * @param id video id
+     * @param volume 0.0 - 1.0
+     * @return true if id is not undefined
+     */
+    function unmute(id, volume) {
+        if (id && volume) {
+            log("SJS: [unmute] un-muting video element id '" + id + "'");
+            if (!useVideoJs()) {
+                getVideo(id).muted = false;
+                getVideo(id).volume(volume);
+            } else {
+                getVideo(id).volume(volume);
+            }
+        } else {
+            log("SJS: [unmute] Undefined video element id '" + id + "'");
+            return undefined;
+        }
+    } 
+    
+    function getVolume(id) {
+        if (id) {
+            log("SJS: [volume] getting volume from video element id '" + id + "': " + getVideo(id).volume());
+            return getVideo(id).volume();
+        } else {
+            log("SJS: [volume] Undefined video element id '" + id + "'");
+            return undefined;
+        }
+    }
 
     /**
      * Pause video
@@ -671,7 +703,6 @@
      * Initial play
      */
     function initialPlay() {
-        var myPlayer = this;
         for (var i = 0; i < videoIds.length; ++i) {
             pause(videoIds[i]);
         }
@@ -682,7 +713,6 @@
      * Initial pause
      */
     function initialPause() {
-        var myPlayer = this;
         for (var i = 0; i < videoIds.length; ++i) {
             pause(videoIds[i]);
         }
@@ -697,6 +727,66 @@
             window.clearInterval(tryToPlayWhenBufferingTimer);
             tryToPlayWhenBufferingTimer = null;
         }
+    }
+    
+    /**
+     * Remove a video-display from the list of videos that are currently synchronized.
+     * This maybe needed if only one video should be displ
+     * @param {type} videoId
+     */
+    function unsyncVideo(videoId) {
+        if (videoId === masterVideoId) {
+            if (! selectNewMasterVideo()) {
+                return; // if only the master video is left no video can be removed
+            };
+        }
+        for (var i = 0; i < videoIds.length; ++i) {
+            if (videoIds[i] === videoId) {
+                videoIds.splice(i, 1);
+                pause(videoId);
+                $(document).trigger("sjs:idUnregistered", [videoId]);
+                break;
+            }
+        }
+        
+    }
+    
+    /**
+     * Select a new master video from the videos left 
+     * @returns {Boolean} true if a new master video could be selected
+     */
+    function selectNewMasterVideo() {
+        if (videoIds.length <= 1) {
+            return false;
+        }
+        var volume = getVolume(masterVideoId);
+        for (var i = 0; i < videoIds.length; ++i) {
+            if (videoIds[i] !== masterVideoId) {
+                getVideoObj(masterVideoId).off();
+                setMasterVideoId(i);
+                break;
+            }
+        }
+        registerEvents();
+        unmute(masterVideoId, volume);
+        
+        return true;
+    }
+    
+    /**
+     * Add a new video to the group of synced videos
+     * @param {type} videoId
+     * @returns {undefined}
+     */
+    function addVideoForSync(videoId) {
+        for (var i = 0; i < videoIds.length; ++i) {
+            if (videoIds[i] === videoId) {
+                return; // Video is already synced
+            }
+        }
+        videoIds.push(videoId);
+        $(document).trigger("sjs:idRegistered", [videoId]);
+        synchronize();
     }
 
     /**

@@ -77,7 +77,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "handler"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler"),
-        videoFormatsFound: new Engage.Event("Video:videoFormatsFound", "", "handler")
+        videoFormatsFound: new Engage.Event("Video:videoFormatsFound", "", "handler"),
+        movePiP: new Engage.Event("Video:movePiP", "moves the smaller picture over the larger to the different corners", "handler"),
+        togglePiP: new Engage.Event("Video:togglePiP", "switches between PiP and next to each other layout", "handler")
     };
 
     var isDesktopMode = false;
@@ -153,6 +155,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_playbackRate100 = "playback100";
     var id_playbackRate125 = "playback125";
     var id_playbackRate150 = "playback150";
+    var id_pipIndicator = "pipIndicator";
+    var id_pipLeft = "pipLeft";
+    var id_pipRight = "pipRight";
+    var id_pipOff = "pipOff";
     var id_qualityLow = "qualityLow";
     var id_qualityMedium = "qualityMedium";
     var id_qualityHigh = "qualityHigh";
@@ -222,6 +228,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var controlsViewTopIfBottom = undefined;
     var controlsView = undefined;
     var resolutions = undefined;
+    var pipPos = "left";
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -412,6 +419,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_qualityLow: translate("qualityLow", "Low"),
                     str_qualityMedium: translate("qualityMedium", "Medium"),
                     str_qualityHigh: translate("qualityHigh", "High"),
+                    str_layoutButton: translate("layout", "Layout"),
+                    str_pictureInPicture: translate("pictureInPicture", "Picture in Picture"),
+                    str_left: translate("left", "left"),
+                    str_right: translate("right", "right"),
+                    str_off: translate("off", "off"),
                     hasqualities: resolutions !== undefined,
                     controlsTop: Engage.controls_top
                 };
@@ -519,6 +531,28 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 Engage.trigger(plugin.events.qualitySet.getName(), "high");
             });
         }
+    }
+    
+    function addLayoutEvents() {
+        $("#" + id_pipLeft).click(function(e) {
+            e.preventDefault();
+            $("#" + id_pipIndicator).html(translate("left", "left"));
+            Engage.trigger(plugin.events.movePiP.getName(), "left");
+            Engage.trigger(plugin.events.togglePiP.getName(), true);
+            pipPos = "left";
+        });
+        $("#" + id_pipRight).click(function(e) {
+            e.preventDefault();
+            $("#" + id_pipIndicator).html(translate("right", "right"));
+            Engage.trigger(plugin.events.movePiP.getName(), "right");
+            Engage.trigger(plugin.events.togglePiP.getName(), true);
+            pipPos = "right";
+        });
+        $("#" + id_pipOff).click(function(e) {
+            e.preventDefault();
+            $("#" + id_pipIndicator).html(translate("off", "off"));
+            Engage.trigger(plugin.events.togglePiP.getName(), false);
+        });
     }
 
     function triggerEmbedMessage(ratioWidth, ratioHeight) {
@@ -815,6 +849,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
                 }
             });
+            addLayoutEvents();
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
                 if (as) {
                     aspectRatioWidth = as[0] || 0;
@@ -938,6 +973,27 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     $("#" + id_segmentNo + no).removeClass("segmentHover");
                 }
             });
+            Engage.on(plugin.events.togglePiP.getName(), function(pip) {
+                if (! pip) {
+                    $("#" + id_pipIndicator).html(translate("off", "off"));
+                } else {
+                    if (pipPos === "left") {
+                        $("#" + id_pipIndicator).html(translate("left", "left"));
+                    } else {
+                        $("#" + id_pipIndicator).html(translate("right", "right"));
+                    }
+                }
+            });            
+
+            Engage.on(plugin.events.movePiP.getName(), function(pos) {
+                if (pos === "left") {
+                    $("#" + id_pipIndicator).html(translate("left", "left"));
+                } else {
+                    $("#" + id_pipIndicator).html(translate("right", "right"));
+                }
+                pipPos = pos;
+            });
+            
             loadStoredInitialValues();
         }
     }
