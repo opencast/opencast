@@ -32,7 +32,12 @@ for each release. It contains:
     - [Encoding Configuration](configuration/encoding.md)
     - [more...](configuration)
  - [Module Documentation](modules/index.md)
-  includes Youtube configuration, text extraction, feed configuration, engage player manual
+    - [Atom and RSS Feed](atomrss.md)
+    - [Media Module](mediamodule.configuration.md)
+    - [Text Extraction](textextraction.md)
+    - [Video Segmentation](videosegmentation.md)
+    - [YouTube Publication](youtubepublication.md)
+    - [more...](modules/index.md)
  - [Upgrade Instructions](upgrade/index.md)
 
 Development Documentation
