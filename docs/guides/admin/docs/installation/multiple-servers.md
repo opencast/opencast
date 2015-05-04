@@ -181,8 +181,7 @@ between certain parts of the storage. This may lead to failures.
 Step 3: Set-Up the Database
 ---------------------------
 
-First make sure to follow the [regular database set-up
-](https://opencast.jira.com/wiki/display/MHTRUNK/MySQL+Database+Configuration).
+First make sure to follow the [regular database set-up](../configuration/database.md).
 
 Do not forget to set the user also for the remote servers and grant them the necessary rights. Additionally, you need to
 configure your firewall:
@@ -191,12 +190,38 @@ configure your firewall:
 
 
 
-Step 4: Configure Matterhorn
+Step 4: Set-Up ActiveMQ
+-----------------------
+
+Since version 2, Opencast Matterhorn requires an Apache ActiveMQ message broker as message relay for the administrative
+user interface. ActiveMQ can either be set up to run on its own machine or on one of the existing Matterhorn nodes
+(usually the admin node).
+
+ActiveMQ 5.10 or above should work. ActiveMQ 5.6 will not work. Versions in between are untested.
+
+
+### Installation
+
+ - If you use the Matterhorn RPM repository, simply install the `activemq-dist` package.
+ - If you are running RHEL, CentOS or Fedora you can use the [ActiveMQ-dist Copr RPM repository
+   ](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
+ - You can download binary distributions from the [Apache ActiveMQ website](http://activemq.apache.org/download.html)
+
+
+### Configuration
+
+What you basically need to do is to point all your Matterhorn nodes to your message broker. For more information about
+the configuration, have a look at the [Message Broker Set-Up Guide](../configuration/message-broker.md).
+
+Do not forget that ActiveMQ uses TCP port 61616 (default configuration) for communication which you might have to allow in your firewall.
+
+
+Step 5: Configure Matterhorn
 ----------------------------
 
-You did already set-up and configured your database in the last step, but there is some more configuration you have to
-do. First of all you should follow the Basic Configuration guide which will tell you how to set the login credentials
-etc. After that continue with the following steps:
+You did already set-up and configured your database and message broker in the last steps, but there is some more
+configuration you have to do. First of all you should follow the Basic Configuration guide which will tell you how to
+set the login credentials etc. After that continue with the following steps:
 
 ### config.properties
 
