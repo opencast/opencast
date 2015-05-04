@@ -38,6 +38,17 @@ Proposed by Lars Kiesow <lkiesow@uos.de>, Passed on Thu, 16 Apr 2015 15:55:31 UT
 
 
 
+### Jira Clean-Up (Tags VS Labels)
+Proposed by Lars Kiesow <lkiesow@uos.de>, Passed on Thu, 19. Mar 2015 15:43:20 UTC
+
+    …then hereby I officially #propose removing the labels from Jira.
+
+For more details, have a look at the mail thread at:
+
+    https://groups.google.com/a/opencast.org/forum/#!topic/matterhorn/vIdWQkZmbdQ
+
+
+
 ### FFmpeg Update
 Proposed by Lars Kiesow <lkiesow@uos.de>, Passed on Sat, 14 Mar 2015 22:12:18 UTC
 
