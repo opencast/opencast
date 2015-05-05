@@ -32,21 +32,13 @@ for each release. It contains:
     - [Encoding Configuration](configuration/encoding.md)
     - [more...](configuration)
  - [Module Documentation](modules/index.md)
-    - [Atom and RSS Feed](atomrss.md)
-    - [Media Module](mediamodule.configuration.md)
-    - [Text Extraction](textextraction.md)
-    - [Video Segmentation](videosegmentation.md)
-    - [YouTube Publication](youtubepublication.md)
+    - [Atom and RSS Feed](modules/atomrss.md)
+    - [Media Module](modules/mediamodule.configuration.md)
+    - [Text Extraction](modules/textextraction.md)
+    - [Video Segmentation](modules/videosegmentation.md)
+    - [YouTube Publication](modules/youtubepublication.md)
     - [more...](modules/index.md)
  - [Upgrade Instructions](upgrade/index.md)
-
-Development Documentation
--------------------------
-
- - Change Log
- - [Proposal Log](development/proposal-log.md)
- - Development Process
- - [Packaging Guidelines](development/packaging.md)
 
 
 Further Documentation

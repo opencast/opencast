@@ -21,3 +21,5 @@ site_dir: 'site'
 
 pages:
 - ['index.md', 'Home']
+- ['proposal-log.md', 'Proposal Log']
+- ['packaging.md', 'Packaging']

@@ -20,35 +20,31 @@ site_dir: 'site'
 # Items will appear in this order
 
 pages:
-- ['index.md', 'Home']
-
-# configuration
-- ['configuration/index.md', 'Configuration']
-- ['configuration/basic.md', 'Configuration', 'Basic']
-- ['configuration/configuration.files.and.keys.md', 'Configuration', 'Configuration files and keys']
-- ['configuration/database.md', 'Configuration', 'Database']
-- ['configuration/encoding.md', 'Configuration', 'Encoding']
-- ['configuration/logging.and.privacy.md', 'Configuration', 'Logging and privacy']
-- ['configuration/multi.tenancy.md', 'Configuration', 'Multi tenancy']
-- ['configuration/security.md', 'Configuration', 'Security']
-- ['configuration/security.cas.md', 'Configuration', 'Security - CAS']
-- ['configuration/workflow.md', 'Configuration', 'Workflow']
-
-# development
-- ['development/index.md', 'Development']
-- ['development/packaging.md', 'Development', 'Packaging']
-- ['development/proposal-log.md', 'Development', 'Proposal log']
+- ['index.md', 'Administration Guide']
 
 # installation
-- ['installation/index.md', 'Installation']
+- ['installation/index.md', 'Installation', 'Installation Home']
 - ['installation/multiple-servers.md', 'Installation', 'Multiple Servers']
 - ['installation/rpm-fedora.md', 'Installation', 'RPM Fedora']
 - ['installation/rpm-rhel-sl-centos.md', 'Installation', 'RPM RHEL/CentOS']
 - ['installation/source-debian-ubuntu.md', 'Installation', 'Source Debian/Ubuntu']
 - ['installation/source-rhel-sl-centos.md', 'Installation', 'Source RHEL/CentOS']
 
+# configuration
+- ['configuration/index.md', 'Configuration', 'Configuration Home']
+- ['configuration/basic.md', 'Configuration', 'Basic']
+- ['configuration/database.md', 'Configuration', 'Database']
+- ['configuration/message-broker.md', 'Configuration', 'Message Broker']
+- ['configuration/encoding.md', 'Configuration', 'Encoding']
+- ['configuration/logging.and.privacy.md', 'Configuration', 'Logging and Privacy']
+- ['configuration/multi.tenancy.md', 'Configuration', 'Multi Tenancy']
+- ['configuration/security.md', 'Configuration', 'Security']
+- ['configuration/security.cas.md', 'Configuration', 'Security - CAS']
+- ['configuration/workflow.md', 'Configuration', 'Workflow']
+- ['configuration/configuration.files.and.keys.md', 'Configuration', 'Configuration Files and Keys']
+
 # modules
-- ['modules/index.md', 'Modules']
+- ['modules/index.md', 'Modules', 'Module Configuration Home']
 - ['modules/atomrss.md', 'Modules', 'Atom/RSS']
 - ['modules/mediamodule.configuration.md', 'Modules', 'Media Module Configuration']
 - ['modules/player.architecture.md', 'Modules', 'Player - Architecture']
@@ -70,10 +66,10 @@ pages:
 - ['modules/youtubepublication.md', 'Modules', 'YouTube publication']
 
 # upgrade
-- ['upgrade/index.md', 'Upgrade']
+- ['upgrade/index.md', 'Upgrade', 'Upgrading Home']
 
 # workflow operation handlers
-- ['workflowoperationhandlers/index.md', 'Workflow Operation Handlers']
+- ['workflowoperationhandlers/index.md', 'Workflow Operation Handlers', 'Workflow Operation Handler Overview']
 - ['workflowoperationhandlers/analyzeaudio-woh.md', 'Workflow Operation Handlers', 'Analyze audio WOH']
 - ['workflowoperationhandlers/applyacl-woh.md', 'Workflow Operation Handlers', 'Apply ACL WOH']
 - ['workflowoperationhandlers/archive-woh.md', 'Workflow Operation Handlers', 'Archive WOH']
