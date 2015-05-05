@@ -25,7 +25,7 @@
 	<div id="fullscreen_video_wrapper" class="videojs_wrapper clearfix">
 		<% if(typeof ids !== "undefined") { var i = 1; %>
 			<% _.each(ids, function(id) { %>
-				<div class="videoDisplay videoDefaultLayout">
+				<div class="videoDisplay videoDefaultLayout" data-videodisplay="<%= id %>">
 					<div id="videoDisplay<%= i %>_wrapper" class="videoFrame">
 						<video id="<%= id %>" class="video-js vjs-playback-rate vjs-default-skin container" data-setup="{}"></video>
 					</div>

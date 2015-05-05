@@ -86,6 +86,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var loggedIn = false;
     var username = "Anonymous";
     var pip = true;
+    var pipPos = "left";
     var askedForLogin = false;
     var springSecurityLoginURL = "/j_spring_security_check";
     var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
@@ -344,17 +345,22 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     break;
                 case shortcut_nextFocus:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.focusVideo.getName(), "next");
+                        engageCore.trigger(events.focusVideo.getName(), "focus.next");
                     });
                     break;
                 case shortcut_prevFocus:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.focusVideo.getName(), "prev");
+                        engageCore.trigger(events.focusVideo.getName(), "focus.prev");
                     });
                     break;
                 case shortcut_movePiP:
                     Mousetrap.bind(val.key, function() {
-                        engageCore.trigger(events.movePiP.getName());
+                        if (pipPos === "left") {
+                            pipPos = "right";
+                        } else {
+                            pipPos = "left";
+                        }
+                        engageCore.trigger(events.movePiP.getName(), pipPos);
                     });
                     break;
                 case shortcut_togglePiP:
@@ -745,6 +751,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     }, loadingDelay2);
                 }, loadingDelay1);
             });
+            
+            this.dispatcher.on(events.movePiP.getName(), function(pos) {
+                pipPos = pos;
+            }); 
+            this.dispatcher.on(events.togglePiP.getName(), function(status) {
+                pip = status;
+            }); 
         }
     });
 

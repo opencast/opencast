@@ -98,7 +98,8 @@
                     <li role="presentation"><a id="playback150" role="menuitem" tabindex="-1" href="#"><b>150%</b> (<span id="playbackRemTime150"></span>)</a></li>
                 </ul>
             </div>
-            <% if((typeof str_layoutButton !== "undefined")
+            <% if(hasmultiplevideos && (typeof pip_position !== "undefined")
+             && (typeof str_layoutButton !== "undefined")
              && (typeof str_pictureInPicture !== "undefined")
              && (typeof str_left !== "undefined")
              && (typeof str_right !== "undefined")
@@ -106,7 +107,7 @@
             <div class="btn-group">
                 <button id="dropdownMenuLayout" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_layoutButton %>">
                 <span class="glyphicon glyphicon-film"></span>
-                <span id="pipIndicator"><%= str_left %></span>
+                <span id="pipIndicator"><%= pip_position %></span>
                 <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu multi-level" role="menu">

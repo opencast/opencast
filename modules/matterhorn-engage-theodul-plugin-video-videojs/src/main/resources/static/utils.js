@@ -34,6 +34,20 @@ define(["jquery"], function($) {
         return "presenter" // fallback value, should never be returned, but does no harm 
     }
 
+    Utils.prototype.getFlavorForVideoDisplay = function(videoDisplay) {
+        if (videoDisplay === undefined) {
+            return;
+        }
+        var data = $(videoDisplay).data("videodisplay");
+        if (data === undefined) {
+            return;
+        }
+        var values = data.split("_");
+        if (values.length === 3) {
+            return (values[2]);
+        }        
+    }
+
     /**
      * Returns the formatted seconds
      *
