@@ -142,7 +142,7 @@ index.number_of_replicas: 0
 
 # Path to directory containing configuration (this file and logging.yml):
 #
-path.conf: ${felix.home}/etc/index/adminui
+path.conf: ${bundles.configuration.location}/index/adminui
 
 # Path to directory where to store index data allocated for this node.
 #

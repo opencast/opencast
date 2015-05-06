@@ -31,11 +31,10 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

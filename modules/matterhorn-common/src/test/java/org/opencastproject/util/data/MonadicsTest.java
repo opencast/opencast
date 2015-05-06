@@ -130,6 +130,8 @@ public class MonadicsTest {
   public void testFlatten() {
     List<Integer> mapped = mlist(list(list(1, 2), list(3, 4))).flatMap(Functions.<List<Integer>>identity()).value();
     assertEquals(4, mapped.size());
+    List<Integer> mapped2 = mlist(some(1), Option.<Integer>option(null), some(3), Option.<Integer>none()).flatMap(Functions.<Option<Integer>>identity()).value();
+    assertEquals(2, mapped2.size());
   }
 
   @Test

@@ -23,7 +23,8 @@ define(["jquery"], function($) {
     }
 
     Utils.prototype.detectLanguage = function() {
-        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+        var language = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+        return language.replace(/\-.*/,'');
     }
 
     return Utils;

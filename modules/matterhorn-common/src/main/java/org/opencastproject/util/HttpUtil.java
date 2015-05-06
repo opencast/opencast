@@ -109,7 +109,8 @@ public final class HttpUtil {
   }
 
   public static final Function<Tuple<String, String>, NameValuePair> param_ = new Function<Tuple<String, String>, NameValuePair>() {
-    @Override public NameValuePair apply(Tuple<String, String> p) {
+    @Override
+    public NameValuePair apply(Tuple<String, String> p) {
       return param(p);
     }
   };
@@ -122,8 +123,8 @@ public final class HttpUtil {
   };
 
   /**
-   * Return the content of the response as a string if its status code equals one of the given statuses.
-   * Throw an exception on an unexpected status.
+   * Return the content of the response as a string if its status code equals one of the given statuses. Throw an
+   * exception on an unexpected status.
    * <p/>
    * Function composition of {@link #getContentFn} and {@link #expect(int...)}.
    */
@@ -142,7 +143,8 @@ public final class HttpUtil {
 
   /** Return the content of the response as a string. */
   public static final Function<HttpResponse, String> getContentFn = new Function.X<HttpResponse, String>() {
-    @Override public String xapply(HttpResponse httpResponse) throws Exception {
+    @Override
+    public String xapply(HttpResponse httpResponse) throws Exception {
       final Header h = httpResponse.getEntity().getContentEncoding();
       if (h != null) {
         return IOUtils.toString(httpResponse.getEntity().getContent(), h.getValue());
@@ -159,7 +161,8 @@ public final class HttpUtil {
       public HttpResponse xapply(HttpResponse response) {
         final int sc = response.getStatusLine().getStatusCode();
         for (int s : status) {
-          if (sc == s) return response;
+          if (sc == s)
+            return response;
         }
         String responseBody;
         try {
@@ -167,7 +170,8 @@ public final class HttpUtil {
         } catch (IOException e) {
           responseBody = "";
         }
-        throw new RuntimeException("Returned status " + sc + " does not match any of the expected codes. " + responseBody);
+        throw new RuntimeException("Returned status " + sc + " does not match any of the expected codes. "
+                + responseBody);
       }
     };
   }

@@ -9,7 +9,7 @@ describe('Access Step in New Series Wizard', function () {
 
     describe('Access state', function () {
         it('accepts', function () {
-            expect(NewSeriesAccess.isValid()).toBeTruthy();
+            expect(NewSeriesAccess.isValid()).toBeFalsy();
         });
     });
 });

@@ -18,11 +18,11 @@
 // Controller for all event screens.
 angular.module('adminNg.controllers')
 .controller('EventCtrl', [
-    '$scope', 'EventMetadataResource', 'EventAttachmentsResource',
+    '$scope', 'Notifications', 'EventMetadataResource', 'EventAttachmentsResource',
     'EventMediaResource', 'CommentResource', 'EventWorkflowsResource',
     'ResourcesListResource', 'EventAccessResource', 'EventGeneralResource',
     'OptoutsResource',
-    function ($scope, EventMetadataResource,
+    function ($scope, Notifications, EventMetadataResource,
         EventAttachmentsResource, EventMediaResource, CommentResource,
         EventWorkflowsResource, ResourcesListResource, EventAccessResource, EventGeneralResource,
         OptoutsResource) {
@@ -96,7 +96,8 @@ angular.module('adminNg.controllers')
                     }
                 });
                 $scope.comments    = CommentResource.query({ resource: 'event', resourceId: id, type: 'comments' });
-            };
+            },
+            eventNotification;
 
         $scope.policies = [];
         $scope.baseAcl = {};
@@ -246,14 +247,23 @@ angular.module('adminNg.controllers')
         };
 
         $scope.accessSave = function (field) {
-            var ace = [];
+            var ace = [],
+                hasRights = false;
 
             if (angular.isDefined(field) && angular.isUndefined(field.role)) {
                 return;
             }
 
+            if (eventNotification) {
+                Notifications.remove(eventNotification, 'event-acl');
+            }
+
             angular.forEach($scope.policies, function (policy) {
                 if (angular.isDefined(policy.role)) {
+                    if (policy.read && policy.write) {
+                        hasRights = true;
+                    }
+
                     if (policy.read) {
                         ace.push({
                             'action' : 'read',
@@ -270,8 +280,12 @@ angular.module('adminNg.controllers')
                         });
                     }
                 }
-
             });
+
+            if (!hasRights) {
+                eventNotification = Notifications.add('error', 'EVENT_ACL_MISSING_READWRITE_ROLE', 'event-acl');
+                return;
+            }
 
             EventAccessResource.save({id: $scope.resourceId}, {
                 acl: {

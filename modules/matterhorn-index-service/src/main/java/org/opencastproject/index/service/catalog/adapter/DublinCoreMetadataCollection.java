@@ -22,6 +22,7 @@ import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 
 import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -120,6 +121,19 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
         }
         addField(iterableTextField);
         break;
+      case MIXED_TEXT:
+        // Add an iterable text style field
+        MetadataField<Iterable<String>> mixedIterableTextField = MetadataField.createMixedIterableStringMetadataField(
+                metadataField.getInputID(), Opt.some(metadataField.getOutputID()), metadataField.getLabel(),
+                metadataField.isReadOnly(), metadataField.isRequired(),
+                getCollection(metadataField, listProvidersService), metadataField.getCollectionID(),
+                metadataField.getOrder(), metadataField.getNamespace());
+        if (StringUtils.isNotBlank(value)) {
+          List<String> valueList = Arrays.asList(StringUtils.split(value, ","));
+          mixedIterableTextField.setValue(valueList);
+        }
+        addField(mixedIterableTextField);
+        break;
       case LONG:
         MetadataField<Long> longField = MetadataField.createLongMetadataField(metadataField.getInputID(),
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
@@ -140,7 +154,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
         }
         addField(textField);
         break;
-     case TEXT_LONG:
+      case TEXT_LONG:
         MetadataField<String> textLongField = MetadataField.createTextLongMetadataField(metadataField.getInputID(),
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
                 metadataField.isRequired(), getCollection(metadataField, listProvidersService),
