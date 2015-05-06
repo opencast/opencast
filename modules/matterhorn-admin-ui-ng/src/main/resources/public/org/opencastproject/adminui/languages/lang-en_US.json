@@ -254,6 +254,7 @@
                "CAPTION": "Schedule",
                "START_DATE": "Start date",
                "START_TIME": "Start time",
+               "TIMEZONE": "Time zone",
                "END_DATE": "End date",
                "DURATION": "Duration"
            },
