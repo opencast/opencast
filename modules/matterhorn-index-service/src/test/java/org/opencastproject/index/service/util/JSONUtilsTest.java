@@ -18,14 +18,12 @@ package org.opencastproject.index.service.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.SimpleSerializer;
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
-import org.opencastproject.index.service.resources.list.provider.UsersListProvider;
+import org.opencastproject.index.service.resources.list.provider.ContributorsListProvider;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.resources.list.query.StringListFilter;
@@ -33,6 +31,9 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.data.Option;
+
+import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.SimpleSerializer;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jettison.json.JSONException;
@@ -129,7 +130,7 @@ public class JSONUtilsTest {
 
       @Override
       public String[] getListNames() {
-        return new String[] { UsersListProvider.NAME };
+        return new String[] { ContributorsListProvider.DEFAULT };
       }
 
       @Override

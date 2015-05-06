@@ -3,8 +3,8 @@
 
     <admin-ng-nav></admin-ng-nav>
     <nav>
-        <a href="#/events/events" ng-class="{active: table.resource == 'events'}" translate-cloak="EVENTS.EVENTS.NAVIGATION.EVENTS" with-role="ROLE_UI_EVENTS_VIEW">Events</a>
-        <a href="#/events/series" ng-class="{active: table.resource == 'series'}" translate-cloak="EVENTS.EVENTS.NAVIGATION.SERIES" with-role="ROLE_UI_SERIES_VIEW">Series</a>
+        <a href="#/events/events" ng-class="{active: table.resource == 'events'}" translate="EVENTS.EVENTS.NAVIGATION.EVENTS" with-role="ROLE_UI_EVENTS_VIEW">Events</a>
+        <a href="#/events/series" ng-class="{active: table.resource == 'series'}" translate="EVENTS.EVENTS.NAVIGATION.SERIES" with-role="ROLE_UI_SERIES_VIEW">Series</a>
     </nav>
 </section>
 
@@ -14,7 +14,7 @@
     <div class="controls-container">
         <div class="filters-container">
             <div old-admin-ng-dropdown="" class="drop-down-container">
-                <span translate-cloak="BULK_ACTIONS.CAPTION">Actions</span>
+                <span translate="BULK_ACTIONS.CAPTION">Actions</span>
                 <ul class="dropdown-ul">
                     <!-- <li with-role="ROLE_UI_{{ table.resource | uppercase }}_MESSAGES_CREATE"><a href="#" data-open-modal="send-message-modal">{{ 'BULK_ACTIONS.SEND_MESSAGE' | translate}}</a></li> -->
                     <!-- <li with-role="ROLE_UI_{{ table.resource | uppercase }}_STATUS_EDIT"><a href="#" data-open-modal="edit-{{table.resource}}-status-modal">{{ 'BULK_ACTIONS.EDIT_STATUS.CAPTION' | translate}}</a></li> -->

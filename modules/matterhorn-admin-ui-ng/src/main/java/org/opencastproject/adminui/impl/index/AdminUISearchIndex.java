@@ -25,19 +25,12 @@ import org.opencastproject.index.service.impl.index.theme.Theme;
 import org.opencastproject.index.service.impl.index.theme.ThemeIndexSchema;
 import org.opencastproject.util.data.Option;
 
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -98,35 +91,6 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
   @Override
   public String[] getDocumenTypes() {
     return DOCUMENT_TYPES;
-  }
-
-  /**
-   * Returns all the known terms for a field (aka facets).
-   *
-   * @param field
-   *          the field name
-   * @param types
-   *          an optional array of document types
-   * @return the list of terms
-   */
-  private List<String> getTermsForField(String field, Option<String[]> types) {
-    final String facetName = "terms";
-    TermsBuilder aggBuilder = AggregationBuilders.terms(facetName).field(field);
-    SearchRequestBuilder search = getSearchClient().prepareSearch(INDEX_NAME).addAggregation(aggBuilder);
-
-    if (types.isSome())
-      search = search.setTypes(types.get());
-
-    SearchResponse response = search.execute().actionGet();
-
-    List<String> terms = new ArrayList<String>();
-    Terms aggs = response.getAggregations().get(facetName);
-
-    for (Bucket bucket : aggs.getBuckets()) {
-      terms.add(bucket.getKey());
-    }
-
-    return terms;
   }
 
   /**

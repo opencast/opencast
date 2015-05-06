@@ -16,6 +16,8 @@
 
 package org.opencastproject.index.service.impl.index.event;
 
+import static org.opencastproject.index.service.util.ListProviderUtil.splitStringList;
+
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
@@ -156,6 +158,10 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.BLACKLISTED, event.getBlacklisted(), true);
     if (event.getSchedulingStatus() != null)
       metadata.addField(EventIndexSchema.SCHEDULING_STATUS, event.getSchedulingStatus(), true);
+    if (event.getRecordingStatus() != null)
+      metadata.addField(EventIndexSchema.RECORDING_STATUS, event.getRecordingStatus(), true);
+
+    metadata.addField(EventIndexSchema.EVENT_STATUS, event.getEventStatus(), true);
 
     metadata.addField(EventIndexSchema.HAS_COMMENTS, event.hasComments(), true);
     metadata.addField(EventIndexSchema.HAS_OPEN_COMMENTS, event.hasOpenComments(), true);
@@ -361,8 +367,8 @@ public final class EventIndexUtils {
     }
 
     // TODO: Add support for language
-    event.setContributors(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY));
-    event.setPresenters(dc.get(DublinCore.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY));
+    event.setContributors(splitStringList(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY)));
+    event.setPresenters(splitStringList(dc.get(DublinCore.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY)));
     return event;
   }
 

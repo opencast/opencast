@@ -118,19 +118,15 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     }
 
     function detectLanguage() {
-        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+        var language = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+        return language.replace(/\-.*/,'');
     }
 
     function initTranslate(language) {
         var jsonstr = "";
 
-        if (language == "de") {
-            // console.log("Core: Chosing german translations");
-            jsonstr += path_language_de;
-        } else { // No other languages supported, yet
-            // console.log("Core: Chosing english translations");
-            jsonstr += path_language_en;
-        }
+        console.log("Controls: selecting language " + language);
+        jsonstr += "language/" + language + ".json";
         $.ajax({
             url: jsonstr,
             dataType: "json",
@@ -710,7 +706,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             $("#" + id_browserWarning).show();
                             $("#" + id_btn_tryAnyway).click(function(e) {
                                 e.preventDefault();
-                                window.open(window.location.href + "&browser=all", "_self");
+                                window.location.href = window.location.href + "&browser=all";
                             });
                         }
                     }, loadingDelay2);

@@ -17,6 +17,8 @@ package org.opencastproject.util;
 
 /**
  * This exception is thrown by the {@link ProcessExecutor} and indicates that the process failed.
+ *
+ * @deprecated see {@link ProcessExecutor}
  */
 public class ProcessExcecutorException extends Exception {
 

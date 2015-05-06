@@ -39,6 +39,9 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
                     if (attr.username) {
                         Engage.log("MhConnection: Username found: " + attr.username);
                         model.username = attr.username;
+                    } else if (attr.user.username) {
+                        Engage.log("MhConnection: Username found: " + attr.user.username);
+                        model.username = attr.user.username;
                     } else {
                         Engage.log("MhConnection: No username found.");
                     }

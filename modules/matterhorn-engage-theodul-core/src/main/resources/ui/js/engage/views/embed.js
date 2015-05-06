@@ -28,21 +28,6 @@ define(['jquery', 'backbone', "engage/core", "engage/models/engage"], function($
      * Init logic function
      */
     var initEmbedView = function() {
-        // load bootstrap css
-        var link = $("<link>");
-        link.attr({
-            type: 'text/css',
-            rel: 'stylesheet',
-            href: 'css/bootstrap/css/bootstrap.css'
-        });
-        $("head").append(link);
-        link = $("<link>");
-        link.attr({
-            type: 'text/css',
-            rel: 'stylesheet',
-            href: 'css/bootstrap/css/bootstrap-responsive.css'
-        });
-        $("head").append(link);
     }
 
     /*

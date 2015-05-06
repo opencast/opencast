@@ -482,8 +482,6 @@ public class IndexServiceImpl implements IndexService {
       }
     }
 
-    acl = extendAclWithCurrentUser.curry(getSecurityService().getUser().getUsername()).apply(acl);
-
     switch (type) {
       case UPLOAD:
       case UPLOAD_LATER:
@@ -838,8 +836,6 @@ public class IndexServiceImpl implements IndexService {
         throw new IllegalArgumentException("Unable to parse access control list!");
       }
     }
-
-    acl = extendAclWithCurrentUser.apply(securityService.getUser().getUsername(), acl);
 
     String seriesId;
     try {

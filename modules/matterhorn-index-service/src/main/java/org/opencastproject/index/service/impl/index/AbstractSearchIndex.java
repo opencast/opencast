@@ -54,6 +54,7 @@ import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
 
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -61,12 +62,18 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -103,6 +110,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *
    * @throws InterruptedException
    *           Thrown if the process is interupted.
+   * @throws CancellationException
+   *           Thrown if listeing to messages has been canceled.
    * @throws ExecutionException
    *           Thrown if there is a problem executing the process.
    * @throws IOException
@@ -110,8 +119,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws InternalServerErrorException
    *           Thrown if there was a problem adding some of the data back into the index.
    */
-  public synchronized void recreateIndex() throws InterruptedException, ExecutionException, IOException,
-          InternalServerErrorException {
+  public synchronized void recreateIndex() throws InterruptedException, CancellationException, ExecutionException,
+          IOException, InternalServerErrorException {
     // Clear index first
     clear();
     recreateService(IndexRecreateObject.Service.Groups);
@@ -133,11 +142,13 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *           Thrown if there is a problem re-sending the data from the service.
    * @throws InterruptedException
    *           Thrown if the process of re-sending the data is interupted.
+   * @throws CancellationException
+   *           Thrown if listening to messages has been canceled.
    * @throws ExecutionException
    *           Thrown if the process of re-sending the data has an error.
    */
   private void recreateService(IndexRecreateObject.Service service) throws InternalServerErrorException,
-          InterruptedException, ExecutionException {
+          InterruptedException, CancellationException, ExecutionException {
     logger.info("Starting to recreate index for service {}", service);
     messageSender.sendObjectMessage(IndexProducer.RECEIVER_QUEUE + "." + service, MessageSender.DestinationType.Queue,
             IndexRecreateObject.start(getIndexName(), service));
@@ -379,6 +390,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     event.setReviewDate(null);
     event.setReviewStatus(null);
     event.setSchedulingStatus(null);
+    event.setRecordingStatus(null);
 
     if (toDelete(event)) {
       delete(Event.DOCUMENT_TYPE, uid.concat(organization));
@@ -529,6 +541,35 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying theme index", t);
     }
+  }
+
+  /**
+   * Returns all the known terms for a field (aka facets).
+   *
+   * @param field
+   *          the field name
+   * @param types
+   *          an optional array of document types
+   * @return the list of terms
+   */
+  public List<String> getTermsForField(String field, Option<String[]> types) {
+    final String facetName = "terms";
+    TermsBuilder aggBuilder = AggregationBuilders.terms(facetName).field(field);
+    SearchRequestBuilder search = getSearchClient().prepareSearch(getIndexName()).addAggregation(aggBuilder);
+
+    if (types.isSome())
+      search = search.setTypes(types.get());
+
+    SearchResponse response = search.execute().actionGet();
+
+    List<String> terms = new ArrayList<String>();
+    Terms aggs = response.getAggregations().get(facetName);
+
+    for (Bucket bucket : aggs.getBuckets()) {
+      terms.add(bucket.getKey());
+    }
+
+    return terms;
   }
 
   /**

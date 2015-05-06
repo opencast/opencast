@@ -209,20 +209,6 @@
           <artifactId>functional</artifactId>
         </dependency>
 
-        <!-- Compile -->
-        <dependency>
-            <groupId>com.github.eirslett</groupId>
-            <artifactId>frontend-maven-plugin</artifactId>
-            <version>0.0.20</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion> 
-                <groupId>com.googlecode.slf4j-maven-plugin-log</groupId>
-                <artifactId>slf4j-maven-plugin-log</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- Logging -->
         <dependency>
             <groupId>log4j</groupId>
@@ -333,7 +319,6 @@
                     <plugin>
                         <groupId>com.github.eirslett</groupId>
                         <artifactId>frontend-maven-plugin</artifactId>
-                        <version>0.0.20</version>
                         <executions>
                             <execution>
                                 <id>install node and npm</id>
@@ -341,7 +326,7 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v0.10.36</nodeVersion>
+                                    <nodeVersion>v0.12.2</nodeVersion>
                                     <npmVersion>2.3.0</npmVersion>
                                 </configuration>
                             </execution>
@@ -437,6 +422,7 @@
                             OSGI-INF/message-receiver-archive.xml,
                             OSGI-INF/message-receiver-comment.xml,
                             OSGI-INF/message-receiver-group.xml,
+                            OSGI-INF/message-receiver-recording.xml,
                             OSGI-INF/message-receiver-scheduler.xml,
                             OSGI-INF/message-receiver-series.xml,
                             OSGI-INF/message-receiver-theme.xml,

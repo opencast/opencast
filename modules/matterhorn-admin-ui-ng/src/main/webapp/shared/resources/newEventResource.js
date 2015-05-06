@@ -71,6 +71,17 @@ angular.module('adminNg.resources')
                     })(data.source);
                 }
 
+                // Remove useless information for the request
+                angular.forEach(data.metadata, function (catalog) {
+                    angular.forEach(catalog.fields, function (field) {
+                            delete field.collection;                        
+                            delete field.label;
+                            delete field.presentableValue;
+                            delete field.readOnly;
+                            delete field.required;
+                    });
+                });
+
                 // Add metadata form field
                 fd.append('metadata', JSON.stringify({
                     metadata: data.metadata,

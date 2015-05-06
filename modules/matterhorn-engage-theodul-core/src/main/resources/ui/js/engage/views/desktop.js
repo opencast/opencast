@@ -83,21 +83,6 @@ define(["jquery", "engage/core", "engage/models/engage", "engage/tab_logic"], fu
      * init logic function
      */
     var initDesktopView = function() {
-        // load bootstrap css
-        var link = $("<link>");
-        link.attr({
-            type: "text/css",
-            rel: "stylesheet",
-            href: "css/bootstrap/css/bootstrap.css"
-        });
-        $("head").append(link);
-        link = $("<link>");
-        link.attr({
-            type: "text/css",
-            rel: "stylesheet",
-            href: "css/bootstrap/css/bootstrap-responsive.css"
-        });
-        $("head").append(link);
         // build timeline plugins
         $("#" + id_engage_timeline_expand_btn).click(function() {
             $("#" + id_engage_timeline_plugin).slideToggle("fast");

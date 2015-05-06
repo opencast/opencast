@@ -103,13 +103,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
         var path = Engage.getPluginPath("EngagePluginTabSlidetext").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
-        if (language == "de") {
-            Engage.log("Tab:Slidetext: Chosing german translations");
-            jsonstr += "language/de.json";
-        } else { // No other languages supported, yet
-            Engage.log("Tab:Slidetext: Chosing english translations");
-            jsonstr += "language/en.json";
-        }
+        Engage.log("Controls: selecting language " + language);
+        jsonstr += "language/" + language + ".json";
         $.ajax({
             url: jsonstr,
             dataType: "json",

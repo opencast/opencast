@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -102,6 +103,8 @@ public abstract class AbstractIndexProducer implements IndexProducer {
           logger.error("Problem while getting {} message events {}", getClassName(), ExceptionUtils.getStackTrace(e));
         } catch (ExecutionException e) {
           logger.error("Problem while getting {} message events {}", getClassName(), ExceptionUtils.getStackTrace(e));
+        } catch (CancellationException e) {
+          logger.trace("Listening for messages {} has been cancelled.", getClassName());
         } catch (Throwable t) {
           logger.error("Problem while getting {} message events {}", getClassName(), ExceptionUtils.getStackTrace(t));
         }
