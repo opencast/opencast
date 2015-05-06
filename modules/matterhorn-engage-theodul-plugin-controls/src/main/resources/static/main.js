@@ -83,6 +83,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var isDesktopMode = false;
     var isEmbedMode = false;
     var isMobileMode = false;
+    
+    var $headerLogo = "#headerLogo";
+    var $mediaModuleLink = "#mediamodulelink";
 
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
@@ -132,7 +135,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var embedHeightThree = 360;
     var embedHeightFour = 480;
     var embedHeightFive = 720;
-    var logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
+    var logoLink = false;
+    var logo = plugin_path + "images/logo.png";
+    var showEmbed = true;
 
     /* don't change these variables */
     var Utils;
@@ -218,7 +223,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var askedForLogin = false;
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
-    var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
+    var springLoggedInStrCheck = "<title>Opencast – Login Page</title>";
     var controlsViewTopIfBottom = undefined;
     var controlsView = undefined;
     var resolutions = undefined;
@@ -376,6 +381,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             if (!mediapackageError) {
                 duration = parseInt(this.model.get("duration"));
                 segments = Engage.model.get("mediaPackage").get("segments");
+                
+                if (Engage.model.get("meInfo")) {
+                    if (Engage.model.get("meInfo").get("logo_small")) {
+                        logo = Engage.model.get("meInfo").get("logo_small");
+                    }
+                    if (Engage.model.get("meInfo").get("link_mediamodule")) {
+                        logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
+                    }
+                    if (! Engage.model.get("meInfo").get("show_embed_links")) {
+                        showEmbed = false;
+                    }               
+                }
 
                 var tempVars = {
                     plugin_path: this.pluginPath,
@@ -409,7 +426,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_qualityMedium: translate("qualityMedium", "Medium"),
                     str_qualityHigh: translate("qualityHigh", "High"),
                     hasqualities: resolutions !== undefined,
-                    controlsTop: Engage.controls_top
+                    controlsTop: Engage.controls_top,
+                    logo: logo,
+                    show_embed: showEmbed
                 };
 
                 // compile template and load it
@@ -449,6 +468,17 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         },
         render: function() {
             if (!mediapackageError) {
+                if (Engage.model.get("meInfo")) {
+                    if (Engage.model.get("meInfo").get("logo_small")) {
+                        logo = Engage.model.get("meInfo").get("logo_small");
+                    }
+                    if (Engage.model.get("meInfo").get("link_mediamodule")) {
+                        logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
+                    }
+                    if (! Engage.model.get("meInfo").get("show_embed_links")) {
+                        showEmbed = false;
+                    }               
+                }                
                 var tempVars = {
                     plugin_path: this.pluginPath,
                     logoLink: logoLink,
@@ -457,7 +487,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_fullscreen: translate("fullscreen", "Fullscreen"),
                     loggedIn: false,
                     str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
-                    str_loginLogout: translate("loginLogout", "Login/Logout")
+                    str_loginLogout: translate("loginLogout", "Login/Logout"),
+                    logo: logo,
+                    show_embed: showEmbed
                 };
 
                 // compile template and load into the html
@@ -524,7 +556,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         } else {
             str = Utils.replaceAll(str, "mode=desktop", "mode=embed");
         }
-        var code = "<iframe src=\"" + str + "\" style=\"border:0px #FFFFFF none;\" name=\"Opencast Matterhorn video player\" scrolling=\"no\" frameborder=\"0\" marginheight=\"0px\" marginwidth=\"0px\" width=\"" + ratioWidth + "\" height=\"" + ratioHeight + "\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\"></iframe>";
+        var code = "<iframe src=\"" + str + "\" style=\"border:0px #FFFFFF none;\" name=\"Opencast media player\" scrolling=\"no\" frameborder=\"0\" marginheight=\"0px\" marginwidth=\"0px\" width=\"" + ratioWidth + "\" height=\"" + ratioHeight + "\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\"></iframe>";
         code = Utils.escapeHtml(code);
         Engage.trigger(plugin.events.customOKMessage.getName(), "Copy the following code and paste it to the body of your html page: <div class=\"well well-sm well-alert\">" + code + "</div>");
     }

@@ -8,8 +8,8 @@
 }
 
 .navbar-brand img {
-    height: 40px;
-    margin-top: 5px;
+    height: 30px;
+    margin-top: 12px;
     margin-right: 20px;
 }
 
@@ -193,6 +193,12 @@ strong {
 @media (min-width: 1200px) {
     .tile img {
 	max-height: 84px;
+    }
+}
+
+@media (min-width: 1000px) {
+    .container {
+	min-width: 990px;
     }
 }
 

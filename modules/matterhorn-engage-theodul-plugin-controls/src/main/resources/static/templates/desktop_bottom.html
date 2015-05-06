@@ -61,13 +61,14 @@
         <% if(typeof logoLink !== "undefined") { %>
         <a href="<%= logoLink %>" role="link" aria-label="<%= str_openMediaModule %>">
         <% } %>
-        <img src="<%= plugin_path %>images/logo.png" />
+        <img src="<%= logo %>" />
         <% if(typeof logoLink !== "undefined") { %>
         </a>
         <% } %>
     </div>
     <!-- ##### Navigation ##### -->
     <div id="menu">
+        <% if (show_embed) { %>
         <div class="btn-group">
           <div class="btn-group">
             <button id="embed_button" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" aria-label="<%= str_embedButton %>">
@@ -83,6 +84,7 @@
             </ul>
           </div>
         </div>
+        <% } %>
       <% if((typeof loggedIn !== "undefined")
       && (typeof str_checkingStatus !== "undefined")
       && (typeof str_loginLogout !== "undefined")) { %>
@@ -117,7 +119,7 @@
 	     && (typeof str_qualityHigh !== "undefined")) { %>
             <div class="btn-group">
                 <button id="dropdownMenuQuality" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_qualityButton %>">
-                <span class="glyphicon glyphicon-wrench"></span>
+                <span class="glyphicon glyphicon-cog"></span>
                 <span id="qualityIndicator"><%= str_quality %></span>
                 <span class="caret"></span>
                 </button>
@@ -132,7 +134,7 @@
 	    <% } %>
             <div class="btn-group">
                 <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_playbackRateButton %>">
-                <span class="glyphicon glyphicon-time"></span>
+                <span class="glyphicon glyphicon-dashboard"></span>
                 <span id="playbackRateIndicator">100%</span>
                 <span class="caret"></span>
                 </button>

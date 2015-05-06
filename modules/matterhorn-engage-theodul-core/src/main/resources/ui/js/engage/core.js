@@ -84,7 +84,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var username = "Anonymous";
     var askedForLogin = false;
     var springSecurityLoginURL = "/j_spring_security_check";
-    var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
+    var springLoggedInStrCheck = "<title>Opencast – Login Page</title>";
     // shortcuts
     var shortcut_playPause = "playPause";
     var shortcut_seekLeft = "seekLeft";

@@ -193,6 +193,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
                 }
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
+                $("#engage_tab_" + plugin.name.replace(/\s/g,"_")).text(tempVars.str_description);
                 /*
         	    $(".description-item").mouseover(function() {
         	        $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
@@ -230,6 +231,8 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
             Utils = new utils();
             initTranslate(Utils.detectLanguage(), function() {
                 Engage.log("Tab:Description: Successfully translated.");
+                locale = translate("value_locale", locale);
+                dateFormat = translate("value_dateFormatFull", dateFormat);
                 initCount -= 1;
                 if (initCount <= 0) {
                     initPlugin();
