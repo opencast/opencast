@@ -1586,6 +1586,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     }
 
     function compareVideoSources(a, b) {
+        if (a === undefined || b === undefined || a [1][0] === undefined ||
+                b[1][0] === undefined) {
+            return 0;
+        }
         var s1 = a[1][0].typemh;
         var s2 = b[1][0].typemh;
         if (s1 == mastervideotype) {
