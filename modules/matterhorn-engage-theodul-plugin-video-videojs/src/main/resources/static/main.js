@@ -269,6 +269,51 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
         return true;
     }
+    
+    function filterTracksByTag(tracks, filterTags) {
+        if (filterTags == undefined) {
+            return tracks;
+        }
+        var filterTagsArray = filterTags.split(",");
+        var newTracksArray = new Array();
+        
+        for (var i = 0; i < tracks.length; i++) {
+            var found = false;
+            for (var j = 0; j < tracks[i].tags.tag.length; j++) {
+                for (var k = 0; k < filterTagsArray.length; k++) {
+                    if (tracks[i].tags.tag[j] == filterTagsArray[k].trim()) {
+                        found = true;
+                        newTracksArray.push(tracks[i]);
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+        }
+        
+        return newTracksArray;
+    }
+    
+    function filterTracksByFormat(tracks, filterFormats) {
+        if (filterFormats == undefined) {
+            return tracks;
+        }
+        var filterFormatsArray = filterFormats.split(",");
+        var newTracksArray = new Array();
+        
+        for (var i = 0; i < tracks.length; i++) {
+            for (var j = 0; j < filterFormatsArray.length; j++) {
+                var formatMimeType = Utils.preferredFormat(filterFormatsArray[j].trim());
+                if (formatMimeType == undefined) return tracks; // if illegal mimetypes are configured ignore config
+                if (tracks[i].mimetype == formatMimeType) {
+                    newTracksArray.push(tracks[i]);
+                    break;
+                }
+            }
+        }
+        
+        return newTracksArray;
+    }
 
     function registerSynchronizeEvents() {
         // throw some important synchronize.js-events for other plugins
@@ -1435,11 +1480,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 videoSources[Utils.extractFlavorMainType(flavorsArray[i])] = [];
             }
 
-            var hasVideo = false
+            var hasVideo = false;
             var hasAudio = false;
 
             // look for video sources
             var duration = 0;
+            var allowedTags = Engage.model.get("meInfo").get("allowedtags");
+            var allowedFormats = Engage.model.get("meInfo").get("allowedformats");
+            mediaInfo.tracks = filterTracksByFormat(filterTracksByTag(mediaInfo.tracks, allowedTags), allowedFormats);
             if (mediaInfo.tracks) {
                 $(mediaInfo.tracks).each(function(i, track) {
                     if (track.mimetype && track.type && acceptFormat(track)) {
@@ -1460,7 +1508,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                                 src: track.url,
                                 type: track.mimetype,
                                 typemh: track.type,
-                                resolution: resolution
+                                resolution: resolution,
+                                tags: track.tags
                             });
                         } else if (track.mimetype.match(/audio/g)) {
                             hasAudio = true;
@@ -1470,7 +1519,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                             videoSources.audio.push({
                                 src: track.url,
                                 type: track.mimetype,
-                                typemh: track.type
+                                typemh: track.type,
+                                tags: track.tags
                             });
                         }
                     }
@@ -1531,6 +1581,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     }
 
     function compareVideoSources(a, b) {
+        if (a === undefined || b === undefined || a [1][0] === undefined ||
+                b[1][0] === undefined) {
+            return 0;
+        }
         var s1 = a[1][0].typemh;
         var s2 = b[1][0].typemh;
         if (s1 == mastervideotype) {
