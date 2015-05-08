@@ -238,6 +238,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var pipStatus = true;
     var numberVideos = 1;
     var currentFocusFlavor = "focus.none";
+    var videosInitialReadyness = true;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -447,6 +448,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         calculateEmbedAspectRatios();
                         addEmbedRatioEvents();
                     }
+                    if (tempVars.hasqualities) {
+                        addQualityChangeEvents();
+                    }
+                    if (tempVars.hasmultiplevideos) {
+                        addLayoutEvents();
+                    }
                     ready();
                     playPause();
                     timeUpdate();
@@ -541,6 +548,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 $("#" + id_qualityIndicator).html(translate("qualityHigh", "High"));
                 Engage.trigger(plugin.events.qualitySet.getName(), "high");
             });
+            var q = Engage.model.get("quality");
+            $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));            
         }
     }
     
@@ -794,7 +803,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             }   
             Engage.trigger(plugin.events.movePiP.getName(), pipPos);
             Engage.trigger(plugin.events.togglePiP.getName(), pipStatus);
-            Engage.trigger(plugin.events.focusVideo.getName(), currentFocusFlavor);
+            if (videosInitialReadyness) {
+                Engage.trigger(plugin.events.focusVideo.getName(), currentFocusFlavor);
+                videosInitialReadyness = false;
+            }
         }
     }
 
@@ -871,8 +883,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         controlsView.render();
                     }
                     addQualityChangeEvents();
-                    var q = Engage.model.get("quality");
-                    $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
                 }
             });
             Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function(number) {
