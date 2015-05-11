@@ -34,19 +34,15 @@ angular.module('adminNg').config(['$provide', '$httpProvider', function ($provid
       },
  
       responseError: function (rejection) {
-
         if (rejection.status === 0) {
             if (angular.isDefined(unresponsiveNotifications)) {
               Notifications.remove(unresponsiveNotifications);
             }
-            
             unresponsiveNotifications = Notifications.add('error', 'SERVER_UNRESPONSIVE', 'global', -1);
+        } else if (rejection.status === 419) {
+          // Try to access index.html again --> will redirect to the login page
+          location.reload(true);
         }
-
-        // TODO Manage session timeout (MH-10829)
-        // if (rejection.status === 401) {
-        //     $location.path('/login.html');
-        // }
 
         return $q.reject(rejection);
       }

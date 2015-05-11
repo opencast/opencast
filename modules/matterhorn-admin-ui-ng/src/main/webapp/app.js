@@ -77,6 +77,8 @@ angular.module('adminNg', [
     $logProvider.debugEnabled(false);
 }])
 .config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
     // Try to anticipate a session logout and reload if it applies. When reloading,
     // Spring Security will redirect to the login page.
     $httpProvider.interceptors.push(['$q', function ($q) {
