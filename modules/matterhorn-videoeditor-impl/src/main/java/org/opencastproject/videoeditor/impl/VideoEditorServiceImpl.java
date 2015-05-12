@@ -55,6 +55,7 @@ import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
+import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 import org.opencastproject.videoeditor.api.VideoEditorService;
@@ -83,6 +84,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
   private static enum Operation {
     PROCESS_SMIL
   }
+
   /**
    * Reference to the media inspection service
    */
@@ -119,10 +121,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
    * Bundle properties
    */
   private Properties properties;
-  /**
-   * Temp storage directory
-   */
-  private String storageDir;
 
   public VideoEditorServiceImpl() {
     super(JOB_TYPE);
@@ -131,11 +129,15 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
   /**
    * Splice segments given by smil document for the given track to the new one.
    *
-   * @param job processing job
-   * @param smil smil document with media segments description
-   * @param track source track
+   * @param job
+   *          processing job
+   * @param smil
+   *          smil document with media segments description
+   * @param track
+   *          source track
    * @return processed track
-   * @throws ProcessFailedException if an error occured
+   * @throws ProcessFailedException
+   *           if an error occured
    */
   protected synchronized Track processSmil(Job job, Smil smil, String trackParamGroupId) throws ProcessFailedException {
 
@@ -179,8 +181,8 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     }
 
     // create working directory
-    File outputPath = new File(storageDir + "/" + job.getId(),
-            sourceTrackFlavor + "_" + sourceFile.getName() + outputFileExtension);
+    File tempDirectory = FileSupport.getTempDirectory(Long.toString(job.getId()));
+    File outputPath = new File(tempDirectory, sourceTrackFlavor + "_" + sourceFile.getName() + outputFileExtension);
 
     if (!outputPath.getParentFile().exists()) {
       outputPath.getParentFile().mkdirs();
@@ -228,7 +230,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       sourceBins = null;
 
       if (error != null) {
-        FileUtils.deleteQuietly(outputPath.getParentFile());
+        FileUtils.deleteQuietly(tempDirectory);
         throw new ProcessFailedException("Editing pipeline exited abnormaly! Error: " + error);
       }
 
@@ -242,7 +244,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         throw new ProcessFailedException("Copy track into workspace failed! " + ex.getMessage());
       } finally {
         IOUtils.closeQuietly(in);
-        FileUtils.deleteQuietly(outputPath.getParentFile());
+        FileUtils.deleteQuietly(tempDirectory);
       }
       logger.info("Copied the edited file to workspace at {}.", newTrackURI);
 
@@ -272,7 +274,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         // pipeline running ?! => cleanup
         runningPipeline.stop();
       }
-      FileUtils.deleteQuietly(outputPath.getParentFile());
+      FileUtils.deleteQuietly(tempDirectory);
     }
   }
 
@@ -347,8 +349,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     logger.debug("activating...");
     Gst.setUseDefaultContext(true);
     Gst.init();
-
-    storageDir = context.getBundleContext().getProperty("org.opencastproject.storage.dir");
   }
 
   protected void deactivate(ComponentContext context) {
