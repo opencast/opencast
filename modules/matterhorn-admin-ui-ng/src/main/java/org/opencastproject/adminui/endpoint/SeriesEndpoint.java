@@ -99,7 +99,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.Jsons.Val;
@@ -256,7 +256,7 @@ public class SeriesEndpoint {
 
   protected void activate(ComponentContext cc) {
     if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
       logger.debug("Configured server url is {}", ccServerUrl);
       if (ccServerUrl != null)
         this.serverUrl = ccServerUrl;

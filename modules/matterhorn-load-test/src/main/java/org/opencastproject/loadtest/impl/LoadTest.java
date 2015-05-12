@@ -16,7 +16,7 @@
 package org.opencastproject.loadtest.impl;
 
 import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -213,7 +213,7 @@ public class LoadTest implements Runnable {
       coreAddress = newCoreAddress;
     } else if (componentContext != null && componentContext.getBundleContext() != null) {
       // Use the core address as a default.
-      coreAddress = componentContext.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      coreAddress = componentContext.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
       if (coreAddress == null) {
         throw new InvalidConfigurationException(
                 "The core address must be set in the configuration file so that loadtesting will occur. It isn't set in {FELIX_HOME}/conf/config.properties or {FELIX_HOME}/conf/services/org.opencastproject.loadtest.impl.LoadTestFactory.properties");

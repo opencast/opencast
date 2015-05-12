@@ -20,7 +20,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.usertracking.api.UserSession;
 import org.opencastproject.usertracking.api.UserTrackingException;
 import org.opencastproject.usertracking.api.UserTrackingService;
@@ -112,7 +112,7 @@ public class UserTrackingRestService {
     if (cc == null) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
       logger.info("configured server url is {}", ccServerUrl);
       if (ccServerUrl == null) {
         serverUrl = UrlSupport.DEFAULT_BASE_URL;

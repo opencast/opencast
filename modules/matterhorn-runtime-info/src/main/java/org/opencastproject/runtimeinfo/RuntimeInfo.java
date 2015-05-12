@@ -22,7 +22,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.userdirectory.UserIdRoleProvider;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -104,7 +104,7 @@ public class RuntimeInfo {
   public void activate(ComponentContext cc) throws MalformedURLException {
     logger.debug("start()");
     this.bundleContext = cc.getBundleContext();
-    serverUrl = new URL(bundleContext.getProperty(MatterhornConstans.SERVER_URL_PROPERTY));
+    serverUrl = new URL(bundleContext.getProperty(MatterhornConstants.SERVER_URL_PROPERTY));
   }
 
   public void deactivate() {

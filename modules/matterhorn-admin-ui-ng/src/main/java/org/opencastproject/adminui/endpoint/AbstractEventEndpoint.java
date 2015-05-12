@@ -125,7 +125,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.Jsons.Val;
 import org.opencastproject.util.NotFoundException;
@@ -297,7 +297,7 @@ public abstract class AbstractEventEndpoint {
    */
   public void activate(ComponentContext cc) {
     if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
       if (StringUtils.isNotBlank(ccServerUrl))
         this.serverUrl = ccServerUrl;
     }

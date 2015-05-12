@@ -18,7 +18,7 @@ package org.opencastproject.systems;
 /**
  * Matterhorn system constant definitions.
  */
-public interface MatterhornConstans {
+public interface MatterhornConstants {
 
   /**
    * The property key for the current machine's hostname defined in the config.properties
