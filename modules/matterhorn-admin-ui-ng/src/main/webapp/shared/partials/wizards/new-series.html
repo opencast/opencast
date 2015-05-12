@@ -170,7 +170,7 @@
                 <header class="no-expand" translate="EVENTS.SERIES.NEW.METADATA.CAPTION"></header>
                 <div class="obj-container">
                     <table class="main-tbl">
-                        <tr ng-repeat="userEntry in wizard.states[0].stateController.getUserEntries()">
+                        <tr ng-repeat="userEntry in wizard.states[0].stateController.getUserEntries()" ng-if="userEntry.presentableValue">
                             <td>{{ userEntry.label | translate }}</td>
                             <td>{{ userEntry.presentableValue }}</td>
                         <tr>
@@ -178,11 +178,11 @@
                 </div>
             </div>
 
-            <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('metadata-extended').visible">
+            <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('metadata-extended').visible && wizard.getStateControllerByName('metadata-extended').getFiledCatalogs().length > 0">
                 <header class="no-expand" translate="EVENTS.EVENTS.NEW.METADATA_EXTENDED.CAPTION"><!--Metadata Extended--></header>
                 <div class="obj-container">
-                    <table class="main-tbl" ng-repeat="(name, block) in wizard.getStateControllerByName('metadata-extended').getUserEntries()">
-                        <tr ng-repeat="field in block.fields">
+                    <table class="main-tbl" ng-repeat="(name, block) in wizard.getStateControllerByName('metadata-extended').getFiledCatalogs()">
+                        <tr ng-repeat="field in block.fields" ng-if="field.presentableValue">
                             <td>{{ field.label | translate }}</td>
                             <td>{{ field.presentableValue }}</td>
                         <tr>
@@ -210,14 +210,13 @@
                 </div>
             </div>
 
-            <div class="obj tbl-list">
+            <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('theme').ud.theme && wizard.getStateControllerByName('theme').ud.theme !== ''">
                 <header class="no-expand" translate="EVENTS.SERIES.NEW.THEME.CAPTION"></header>
                 <div class="obj-container">
                     <table class="main-tbl">
                         <tr>
                             <td translate="EVENTS.SERIES.NEW.THEME.CAPTION"></td>
                             <td ng-if="wizard.getStateControllerByName('theme').ud.theme">{{wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme]}}</td>
-                            <td ng-if="!wizard.getStateControllerByName('theme').ud.theme">-</td>
                         </tr>
                     </table>
                 </div>

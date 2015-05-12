@@ -92,6 +92,10 @@ angular.module('adminNg.services')
                 return hours + ':' + minutes + ':' + seconds;
             },
 
+            humanizeTime: function (hour, minute) {
+                return moment().hour(hour).minute(minute).format('LT');
+            },
+
             /**
              * Transform the UTC time string ('HH:mm') to a date object
              * @param  {String} utcTimeString the UTC time string

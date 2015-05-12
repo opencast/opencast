@@ -179,6 +179,13 @@ angular.module('adminNg.directives')
         link: function (scope) {
             scope.isCurrentTab = function (tab) {
                 return scope.wizard.getCurrentStateName() === tab;
+            };     
+            /**
+             * Check if the given value is empty or undefined
+             */
+            scope.isEmpty =  function (value) {
+                return angular.isUndefined(value) || (angular.isString(value) && value.length === 0) ||
+                        (angular.isObject(value) && JSON.stringify(value).length === 2);
             };
             scope.wizard = createWizard(scope);
             scope.deleted = true;
