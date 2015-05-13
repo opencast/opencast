@@ -465,8 +465,8 @@ function loadTracks() {
         },
         success: function(data) {
             ocUtils.log("Done: Loading workflow instance data");
-            var previewFlavor = getPreviewFlavorsFromWorkflow(data);
-            var sourceFlavor = getSourceFlavorsFromWorkflow(data);
+            var previewFlavor = getFlavorsFromWorkflow(data, "preview-flavors", "preview");
+            var sourceFlavor = getFlavorsFromWorkflow(data, "source-flavors", "work");
             
             // extract tracks
             workflowInstance = data.workflow;
@@ -786,44 +786,24 @@ function getPostdataId() {
     return (postData.id != "");
 }
 
-function getPreviewFlavorsFromWorkflow(workflowReply) {
+function getFlavorsFromWorkflow(workflowReply, flavorKey, defaultFlavor) {
     if (workflowReply.workflow.operations == undefined || workflowReply.workflow.operations.operation == undefined) {
-        return "preview";
+        return defaultFlavor;
     }
     var operations = workflowReply.workflow.operations.operation;
     for (var i = 0; i < operations.length; i++) {
         if (operations[i].id == "editor"){
             if (operations[i].configurations != undefined && operations[i].configurations.configuration != undefined) {
                 for (var j = 0; j < operations[i].configurations.configuration.length; j++) {
-                    if (operations[i].configurations.configuration[j].key == "preview-flavors") {
+                    if (operations[i].configurations.configuration[j].key == flavorKey) {
                         return operations[i].configurations.configuration[j].$.split("/")[1];
                     } 
                 }
             }
-            return "preview";
+            return defaultFlavor;
         }
     }
-    return "preview";
-}
-
-function getSourceFlavorsFromWorkflow(workflowReply) {
-    if (workflowReply.workflow.operations == undefined || workflowReply.workflow.operations.operation == undefined) {
-        return "work";
-    }
-    var operations = workflowReply.workflow.operations.operation;
-    for (var i = 0; i < operations.length; i++) {
-        if (operations[i].id == "editor"){
-            if (operations[i].configurations != undefined && operations[i].configurations.configuration != undefined) {
-                for (var j = 0; j < operations[i].configurations.configuration.length; j++) {
-                    if (operations[i].configurations.configuration[j].key == "source-flavors") {
-                        return operations[i].configurations.configuration[j].$.split("/")[1];
-                    } 
-                }
-            }
-            return "work";
-        }
-    }
-    return "work";
+    return defaultFlavor;
 }
 
 $(document).ready(function() {
