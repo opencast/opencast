@@ -245,9 +245,7 @@
   <!-- # Custom ajax timeout Filter Definition   # -->
   <!-- ########################################### --> 
 
-  <bean id="asyncTimeoutRedirectFilter" class="org.opencastproject.kernel.security.AsyncTimeoutRedirectFilter">
-    <property name="timeoutErrorCode" value="419"/>
-  </bean> 
+  <bean id="asyncTimeoutRedirectFilter" class="org.opencastproject.kernel.security.AsyncTimeoutRedirectFilter" />
 
   <!-- ######################################## -->
   <!-- # Custom Anonymous Filter Definition   # -->

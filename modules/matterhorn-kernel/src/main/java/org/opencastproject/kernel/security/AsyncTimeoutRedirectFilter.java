@@ -46,7 +46,7 @@ public class AsyncTimeoutRedirectFilter extends GenericFilterBean {
   private AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
   /** The error code to return for the asynchronous request in case of session timeout */
-  private int timeoutErrorCode = 419;
+  private static final int TIMEOUT_ERROR_CODE = 419;
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
@@ -64,9 +64,7 @@ public class AsyncTimeoutRedirectFilter extends GenericFilterBean {
       if (exception == null) {
         exception = (AccessDeniedException) throwableAnalyzer.getFirstThrowableOfType(AccessDeniedException.class,
                 causeChain);
-      }
-
-      if (exception != null) {
+      } else {
         if (exception instanceof AuthenticationException) {
           throw exception;
         } else if (exception instanceof AccessDeniedException) {
@@ -78,9 +76,9 @@ public class AsyncTimeoutRedirectFilter extends GenericFilterBean {
 
             // If asynchronous request, we returned the error code set, otherwise we redirect to the login page
             if ("XMLHttpRequest".equals(ajaxHeader)) {
-              logger.debug("Asynchronous call detected, send {} error code", this.timeoutErrorCode);
+              logger.debug("Asynchronous call detected, send {} error code", TIMEOUT_ERROR_CODE);
               HttpServletResponse resp = (HttpServletResponse) response;
-              resp.sendError(this.timeoutErrorCode);
+              resp.sendError(TIMEOUT_ERROR_CODE);
             } else {
               logger.debug("Redirect to login page");
               throw exception;
@@ -109,14 +107,5 @@ public class AsyncTimeoutRedirectFilter extends GenericFilterBean {
       });
     }
 
-  }
-
-  /**
-   * Set the status code to return for the asynchronous request in case of timeout
-   * 
-   * @param timeoutErrorCode
-   */
-  public void setTimeoutErrorCode(int timeoutErrorCode) {
-    this.timeoutErrorCode = timeoutErrorCode;
   }
 }
