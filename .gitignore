@@ -36,6 +36,9 @@ www/
 /.m2/
 /settings.xml
 
+# Ignore mkdocs sites
+docs/guides/*/site
+
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked
 Makefile

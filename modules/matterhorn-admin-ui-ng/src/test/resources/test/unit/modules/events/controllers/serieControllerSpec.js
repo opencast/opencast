@@ -133,15 +133,22 @@ describe('Serie controller', function () {
                 write: true
             };
 
-            $scope.access = {
-                series_access: {
-                    current_acl: 123
-                }
+            $scope.policies = [];
+            $scope.policies[0] = {
+                role  : 'admin',
+                read  : true,
+                write : true
             };
+            
             spyOn(SeriesAccessResource, 'save');
             $scope.accessSave.call(this);
 
-            expect(SeriesAccessResource.save).toHaveBeenCalledWith({ id: '4581' }, { acl : { ace : [  ] }, override: true});
+            expect(SeriesAccessResource.save).toHaveBeenCalledWith({ id: '4581' }, 
+                { 
+                    acl : { ace : [ { action : 'read', allow : true, role : 'admin' }, { action : 'write', allow : true, role : 'admin' } ] }, 
+                    override: true
+                }
+            );
         });
     });
 

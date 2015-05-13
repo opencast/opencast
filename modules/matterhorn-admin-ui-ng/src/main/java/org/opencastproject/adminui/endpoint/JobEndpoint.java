@@ -448,9 +448,10 @@ public class JobEndpoint {
                 f("failed_attempts", v(wflOp.getFailedAttempts())), f("max_attempts", v(wflOp.getMaxAttempts())),
                 f("exception_handler_workflow", vN(wflOp.getExceptionHandlingWorkflow())),
                 f("fail_on_error", v(wflOp.isFailWorkflowOnException())), f("description", vN(wflOp.getDescription())),
-                f("state", vN(wflOp.getState())), f("job", v(jobId)), f("name", vN(wflOp.getTemplate())),
-                f("id", v(operationId))
-
+                f("state", vN(wflOp.getState())), f("job", v(operationId)), f("name", vN(wflOp.getTemplate())),
+                f("time_in_queue", vN(wflOp.getTimeInQueue())),
+                f("started", vN(DateTimeSupport.toUTC(wflOp.getDateStarted().getTime()))),
+                f("completed", vN(DateTimeSupport.toUTC(wflOp.getDateCompleted().getTime())))
         );
       }
     }

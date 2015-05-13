@@ -15,6 +15,7 @@
  */
 package org.opencastproject.util.data;
 
+import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 
 import com.google.common.collect.ImmutableMultimap;
@@ -97,6 +98,7 @@ public final class Collections {
    *          the function to apply to each element of <code>as</code>
    * @deprecated use {@link Monadics}
    */
+  @Deprecated
   public static <A, B, M extends Collection<B>> M map(Collection<A> as, M bs, Function<A, B> f) {
     for (A x : as) {
       bs.add(f.apply(x));
@@ -111,6 +113,7 @@ public final class Collections {
    *
    * @deprecated use {@link Monadics}
    */
+  @Deprecated
   public static <A, B> B foldl(Collection<A> as, B start, Function2<B, A, B> f) {
     B fold = start;
     for (A a : as) {
@@ -132,6 +135,7 @@ public final class Collections {
    *           if the target collection cannot be created
    * @deprecated use {@link Monadics}
    */
+  @Deprecated
   public static <A, B> Collection<B> map(Collection<A> as, Function<A, B> f) {
     Collection<B> b = buildFrom(as);
     for (A x : as) {
@@ -153,6 +157,7 @@ public final class Collections {
    *           if the result collection cannot be created
    * @deprecated use {@link Monadics}
    */
+  @Deprecated
   public static <A, B> Collection<B> flatMap(Collection<A> as, Function<A, Collection<B>> f) {
     Collection<B> bs = buildFrom(as);
     for (A a : as) {
@@ -167,6 +172,7 @@ public final class Collections {
    *
    * @deprecated use {@link Monadics}
    */
+  @Deprecated
   public static <A, B, M extends Collection<B>> M flatMap(Collection<A> as, M bs, Function<A, Collection<B>> f) {
     for (A a : as) {
       bs.addAll(f.apply(a));
@@ -179,6 +185,7 @@ public final class Collections {
    *
    * @deprecated use {@link Monadics}
    */
+  @Deprecated
   public static <A> Option<A> find(Collection<A> as, Predicate<A> p) {
     for (A x : as) {
       if (p.apply(x))
@@ -192,6 +199,7 @@ public final class Collections {
    *
    * @deprecated use {@link Monadics}
    */
+  @Deprecated
   public static <A> boolean exists(Collection<A> as, Predicate<A> p) {
     for (A a : as) {
       if (p.apply(a))
@@ -207,6 +215,7 @@ public final class Collections {
    *
    * @deprecated use {@link Monadics}
    */
+  @Deprecated
   public static <A, M extends Collection<A>> M filter(M as, Predicate<A> p) {
     @SuppressWarnings("unchecked")
     final M filtered = (M) buildFrom(as);
@@ -310,6 +319,14 @@ public final class Collections {
     return java.util.Collections.unmodifiableSet(x);
   }
 
+  public static <A, M extends Iterable<? extends A>> List<A> diff(M as, M bs) {
+    final List<A> diff = toList(as.iterator());
+    for (A b : bs) {
+      diff.remove(b);
+    }
+    return diff;
+  }
+
   /** Drain all elements of <code>as</code> into a list. */
   public static <A> List<A> toList(Iterator<? extends A> as) {
     final List<A> t = new ArrayList<A>();
@@ -349,8 +366,10 @@ public final class Collections {
 
   /**
    * Return the list as is or nil, if <code>as</code> is null.
+   * 
    * @deprecated use {@link #nullToNil(java.util.List)}
    */
+  @Deprecated
   public static <A> List<A> mkList(List<A> as) {
     return as != null ? as : Collections.<A> nil();
   }
@@ -553,6 +572,39 @@ public final class Collections {
     return a.toArray((A[]) Array.newInstance(elemType, a.size()));
   }
 
+  /** Convert a collection of {@link Double}s into an array of primitive type. */
+  public static double[] toDoubleArray(Collection<Double> as) {
+    final double[] target = new double[as.size()];
+    int i = 0;
+    for (Double a : as) {
+      target[i] = a;
+      i++;
+    }
+    return target;
+  }
+
+  /** Convert a collection of {@link Float}s into an array of primitive type. */
+  public static float[] toFloatArray(Collection<Float> as) {
+    final float[] target = new float[as.size()];
+    int i = 0;
+    for (Float a : as) {
+      target[i] = a;
+      i++;
+    }
+    return target;
+  }
+
+  /** Convert a collection of {@link Integer}s into an array of primitive type. */
+  public static int[] toIntArray(Collection<Integer> as) {
+    final int[] target = new int[as.size()];
+    int i = 0;
+    for (Integer a : as) {
+      target[i] = a;
+      i++;
+    }
+    return target;
+  }
+
   /** Create an iterator form an array. */
   public static <A> Iterator<A> iterator(final A... as) {
     return new Iterator<A>() {
@@ -634,7 +686,8 @@ public final class Collections {
    */
   public static <A> Iterable<A> forc(final Iterator<A> as) {
     return new Iterable<A>() {
-      @Override public Iterator<A> iterator() {
+      @Override
+      public Iterator<A> iterator() {
         return as;
       }
     };
@@ -727,4 +780,15 @@ public final class Collections {
     }
     return target;
   }
+
+  /** Return a function to get data from a map. <code>map -> key -> value</code> */
+  public static <A, B> Function<A, Option<B>> getMap(final Map<A, B> map) {
+    return new Function<A, Option<B>>() {
+      @Override
+      public Option<B> apply(A a) {
+        return option(map.get(a));
+      }
+    };
+  }
+
 }

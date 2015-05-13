@@ -14,14 +14,21 @@
     color: #000000;
     background-color: #F1F1F1;
     border-color: #969696;
+    cursor: pointer;
 }
 
 .mediaColor-hover {
     color: #31708f;
     background-color: #d9edf7;
     border-color: #bce8f1;
+    cursor: pointer;
 }
 
 .media-time {
     color: rgba(98, 98, 98, 1);
+}
+
+.media-heading {
+    font-size: 1.2em;
+    font-style: italic;
 }

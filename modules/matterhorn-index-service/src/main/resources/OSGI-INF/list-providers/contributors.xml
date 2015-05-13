@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.index.service.resources.list.provider.ContributorsListProvider" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.index.service.resources.list.provider.ContributorsListProvider" />
+  <property name="service.description" value="Contributors list provider" />
+  <property name="opencast.service.type" value="org.opencastproject.index.service.resources.list.provider.ContributorsListProvider" />
+  
+  <service>
+     <provide interface="org.opencastproject.index.service.resources.list.api.ResourceListProvider"/>
+  </service>
+  
+  <reference name="userDirectoryService" 
+  			interface="org.opencastproject.security.api.UserDirectoryService"
+      		cardinality="1..1" 
+      		policy="static" 
+      		bind="setUserDirectoryService"/>
+  
+ <reference name="AdminUISearchIndex" 
+ 			interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
+    		cardinality="1..1" 
+    		policy="static" 
+    		bind="setIndex" />
+  
+</scr:component>

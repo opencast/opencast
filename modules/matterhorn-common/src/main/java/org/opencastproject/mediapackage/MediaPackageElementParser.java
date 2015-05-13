@@ -15,8 +15,9 @@
  */
 package org.opencastproject.mediapackage;
 
-import org.apache.commons.io.IOUtils;
 import org.opencastproject.util.data.Function;
+
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 
 import java.io.StringWriter;
@@ -43,10 +44,10 @@ public final class MediaPackageElementParser {
    * Serializes the media package element to a string.
    *
    * @param element
-   *          the element
+   *         the element
    * @return the serialized media package element
    * @throws MediaPackageException
-   *           if serialization failed
+   *         if serialization failed
    */
   public static String getAsXml(MediaPackageElement element) throws MediaPackageException {
     if (element == null)
@@ -76,10 +77,10 @@ public final class MediaPackageElementParser {
    * Parses the serialized media package element and returns its object representation.
    *
    * @param xml
-   *          the serialized element
+   *         the serialized element
    * @return the media package element instance
    * @throws MediaPackageException
-   *           if de-serializing the element fails
+   *         if de-serializing the element fails
    */
   public static MediaPackageElement getFromXml(String xml) throws MediaPackageException {
     try {
@@ -104,10 +105,10 @@ public final class MediaPackageElementParser {
    * Serializes media package element list to a string.
    *
    * @param elements
-   *          element list to be serialized
+   *         element list to be serialized
    * @return serialized media package element list
    * @throws MediaPackageException
-   *           if serialization fails
+   *         if serialization fails
    */
   public static String getArrayAsXml(List<? extends MediaPackageElement> elements) throws MediaPackageException {
     // TODO write real serialization function
@@ -128,14 +129,20 @@ public final class MediaPackageElementParser {
     }
   }
 
+  public static final Function<String, List<MediaPackageElement>> getArrayFromXmlFn = new Function.X<String, List<MediaPackageElement>>() {
+    @Override public List<MediaPackageElement> xapply(String xml) throws Exception {
+      return (List<MediaPackageElement>) getArrayFromXml(xml);
+    }
+  };
+
   /**
    * Parses the serialized media package element list.
    *
    * @param xml
-   *          String to be parsed
+   *         String to be parsed
    * @return parsed media package element list
    * @throws MediaPackageException
-   *           if de-serialization fails
+   *         if de-serialization fails
    */
   public static List<? extends MediaPackageElement> getArrayFromXml(String xml) throws MediaPackageException {
     // TODO write real deserialization function

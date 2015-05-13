@@ -865,6 +865,7 @@
         $(document).on("sjs:stopBufferChecker", function(e) {
             log("SJS: Received 'sjs:stopBufferChecker' event");
             window.clearInterval(bufferChecker);
+            checkBuffer = false;
             bufferCheckerSet = false;
             isBuffering = false;
         });

@@ -16,6 +16,8 @@
 
 package org.opencastproject.index.service.impl.index.series;
 
+import static org.opencastproject.index.service.util.ListProviderUtil.splitStringList;
+
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
@@ -226,9 +228,9 @@ public final class SeriesIndexUtils {
     Date createdDate = EncodingSchemeUtils.decodeDate(dc.getFirst(DublinCoreCatalog.PROPERTY_CREATED));
     series.setCreatedDateTime(createdDate);
 
-    series.setPublishers(dc.get(DublinCore.PROPERTY_PUBLISHER, DublinCore.LANGUAGE_ANY));
-    series.setContributors(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY));
-    series.setOrganizers(dc.get(DublinCoreCatalog.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY));
+    series.setPublishers(splitStringList(dc.get(DublinCore.PROPERTY_PUBLISHER, DublinCore.LANGUAGE_ANY)));
+    series.setContributors(splitStringList(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY)));
+    series.setOrganizers(splitStringList(dc.get(DublinCoreCatalog.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY)));
     return series;
   }
 

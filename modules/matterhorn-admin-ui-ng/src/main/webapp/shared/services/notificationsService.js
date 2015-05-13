@@ -48,7 +48,9 @@ angular.module('adminNg.services')
                     case 'error':
                     case 'success':
                     case 'warning':
-                        duration = defaultDuration;
+                        if (angular.isUndefined(duration)) {
+                            duration = defaultDuration;
+                        }
                         break;
                 }
             }

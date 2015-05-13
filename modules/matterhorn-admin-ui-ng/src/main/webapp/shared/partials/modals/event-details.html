@@ -2,7 +2,7 @@
 
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="EVENTS.EVENTS.DETAILS.HEADER" translate-values="{ resourceId: '{{ resourceId}}' }">Event Details {{resourceId}}</h2>
+        <h2 translate="EVENTS.EVENTS.DETAILS.HEADER" translate-values="{ resourceId: '{{ title }}' }">Event Details {{ title }}</h2>
     </header>
 
     <nav class="modal-nav" id="modal-nav">
@@ -196,34 +196,38 @@
     <div class="modal-content" data-modal-tab-content="access">
         <p class="tab-desc"></p>
         <div class="modal-body">
+
             <div data-admin-ng-notification="" type="warning" show="access.episode_access.locked" message="{{ metadata.locked }}"></div>
+            <div data-admin-ng-notifications="" type="error" context="event-acl"></div>
+
             <div class="full-col">
                 <ul>
                     <li>
                         <div class="obj list-obj">
-                            <header translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS">Access Policy</header>
+                            <header translate="EVENTS.EVENTS.DETAILS.TABS.ACCESS">Access Policy</header>
                             <div class="obj-container">
                                 <div class="obj tbl-list">
-                                    <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
+                                    <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')">
                                     <thead>
                                         <tr>
-                                            <th translate="EVENTS.SERIES.DETAILS.ACCESS.TEMPLATES.TITLE">Templates</th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ACCESS.TEMPLATES.TITLE">Templates</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td>
                                                 <div class="obj-container padded">
-                                                    <p translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
+                                                    <p translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
                                                     <select chosen
+                                                        ng-disabled="(tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"
                                                         data-width="'200px'"
                                                         data-disable-search-threshold="8"
                                                         data-search_contains="true"
                                                         ng-change="changeBaseAcl()"
                                                         ng-model="baseAclId"
                                                         ng-options="id as name for (id, name) in acls"
-                                                        data-placeholder="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
-                                                        no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
+                                                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                                        no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
                                                     />
                                                 </div>
                                             </td>
@@ -236,39 +240,39 @@
                             change the format of the response. -->
                             <div class="obj-container">
                                 <div class="obj tbl-list">
-                                    <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">Details</header>
+                                    <header translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">Details</header>
                                     <div class="obj-container">
                                     <table class="main-tbl">
                                         <thead>
                                             <tr>
-                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ROLE">Role</th>
-                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">Read</th>
-                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">Write</th>
-                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ACTION" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" class="fit">Action</th>
+                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ROLE">Role</th>
+                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">Read</th>
+                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">Write</th>
+                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ACTION" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" class="fit">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="policy in policies track by $index">
                                                 <td>
                                                     <select chosen
-                                                        ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"
+                                                        ng-disabled="(tab == 'access') && !$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT')"
                                                         data-width="'200px'"
                                                         data-disable-search-threshold="8"
                                                         data-search_contains="true"
                                                         ng-model="policy.role"
                                                         ng-change="accessSave(policy)"
                                                         ng-options="id as name for (id, name) in roles"
-                                                        data-placeholder="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}"
-                                                        no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
+                                                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}"
+                                                        no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
                                                     />
                                                 </td>
-                                                <td class="fit"><input type="checkbox" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
-                                                <td class="fit"><input type="checkbox" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
-                                                <td ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" class="fit"><a ng-click="deletePolicy(policy)" class="remove"></a>
+                                                <td class="fit"><input type="checkbox" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
+                                                <td class="fit"><input type="checkbox" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
+                                                <td ng-if="$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT')" class="fit"><a ng-click="deletePolicy(policy)" class="remove"></a>
                                                 </td>
                                             </tr>
-                                            <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" >
-                                                <td colspan="4"><a ng-click="addPolicy()">+ {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                                            <tr ng-if="$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT')" >
+                                                <td colspan="4"><a ng-click="addPolicy()">+ {{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
                                             <tr>
                                             </tr>
                                         </tbody>
@@ -653,13 +657,41 @@
                     <header translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">Operation Details</header>
                     <div class="obj-container">
                         <table class="main-tbl">
-                            <tr>
-                                <td>Retry Strategy</td>
-                                <td>{{ subNavData.retry_strategy }}</td>
+                             <tr>
+                                <td>Title</td>
+                                <td>{{ subNavData.name}}</td>
                             </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>{{ subNavData.description }}</td>
+                            </tr>
+                            <tr>
+                                <td>State</td>
+                                <td>{{ subNavData.state }}</td>
+                            </tr>                            
                             <tr>
                                 <td>Execution Host</td>
                                 <td>{{ subNavData.execution_host }}</td>
+                            </tr>
+                            <tr>
+                                <td>Job</td>
+                                <td>{{ subNavData.job }}</td>
+                            </tr>
+                            <tr>
+                                <td>Time in Queue</td>
+                                <td>{{ subNavData.time_in_queue }}ms</td>
+                            </tr>                            
+                            <tr>
+                                <td>Started</td>
+                                <td>{{ subNavData.started | localizeDate : 'dateTime' : 'medium'}}</td>
+                            </tr>                            
+                            <tr>
+                                <td>Finished</td>
+                                <td>{{ subNavData.completed | localizeDate : 'dateTime' : 'medium'}}</td>
+                            </tr>
+                                                        <tr>
+                                <td>Retry Strategy</td>
+                                <td>{{ subNavData.retry_strategy }}</td>
                             </tr>
                             <tr>
                                 <td>Failed Attempts</td>
@@ -676,22 +708,6 @@
                             <tr>
                                 <td>Fail on Error</td>
                                 <td>{{ subNavData.fail_on_error }}</td>
-                            </tr>
-                            <tr>
-                                <td>Description</td>
-                                <td>{{ subNavData.description }}</td>
-                            </tr>
-                            <tr>
-                                <td>State</td>
-                                <td>{{ subNavData.state }}</td>
-                            </tr>
-                            <tr>
-                                <td>Job</td>
-                                <td>{{ subNavData.job }}</td>
-                            </tr>
-                            <tr>
-                                <td>ID</td>
-                                <td>{{ subNavData.id }}</td>
                             </tr>
                         </table>
                     </div>

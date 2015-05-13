@@ -1,0 +1,22 @@
+{
+   "service":{
+      "type":"org.opencastproject.analytics",
+      "host":"http://localhost:8080",
+      "path":"/analytics-rest",
+      "active":true,
+      "online":true,
+      "maintenance":false,
+      "jobproducer":false,
+      "onlinefrom":"2013-11-04T17:26:1201:00",
+      "service_state":"NORMAL",
+      "state_changed":"2013-10-16T15:54:3702:00",
+      "error_state_trigger":0,
+      "warning_state_trigger":0,
+      "array":[
+         1,
+         2,
+         true,
+         "val"
+      ]
+   }
+}

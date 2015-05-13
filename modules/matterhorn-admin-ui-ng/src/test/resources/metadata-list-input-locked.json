@@ -63,10 +63,10 @@
          {
             "id":"creator",
             "readOnly":true,
-            "value":"",
+            "value":[],
             "label":"EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS",
             "required":false,
-            "type":"text"
+            "type":"mixed_text"
          },
          {
             "id":"contributor",
@@ -74,7 +74,7 @@
             "value":[],
             "label":"EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
             "required":false,
-            "type":"text"
+            "type":"mixed_text"
          },
          {
             "id":"startDate",

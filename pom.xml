@@ -102,8 +102,6 @@
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-workflowoperation</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
-        <module>modules/matterhorn-speech-recognition-workflowoperation</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-static</module>
@@ -497,7 +495,6 @@
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-impl</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-textanalyzer-api</module>
@@ -552,7 +549,6 @@
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-impl</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-textanalyzer-api</module>
@@ -599,7 +595,6 @@
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-remote</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-textanalyzer-api</module>
@@ -798,7 +793,7 @@
     </profile>
 
     <profile>
-      <id>alternatives</id>
+      <id>extra</id>
       <activation>
         <activeByDefault>false</activeByDefault>
         <property>
@@ -806,8 +801,10 @@
         </property>
       </activation>
       <modules>
-        <module>modules/matterhorn-dictionary-none</module>
         <module>modules/matterhorn-dictionary-hunspell</module>
+        <module>modules/matterhorn-dictionary-none</module>
+        <module>modules/matterhorn-speech-recognition-service-api</module>
+        <module>modules/matterhorn-speech-recognition-workflowoperation</module>
       </modules>
     </profile>
 
@@ -1084,6 +1081,11 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
+      <plugin>
+         <groupId>com.github.eirslett</groupId>
+         <artifactId>frontend-maven-plugin</artifactId>
+         <version>0.0.23</version>
+      </plugin>
     </plugins>
     <!-- This defines the global plugin configurations.  Plugins with configuration shared across multiple child poms
          should be configured here, and then referenced in the child. -->
@@ -1115,7 +1117,6 @@
                   <pluginExecutionFilter>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <versionRange>[0.0.9,)</versionRange>
                     <goals>
                       <goal>install-node-and-npm</goal>
                       <goal>npm</goal>
@@ -1299,6 +1300,33 @@
               <goals>
                 <goal>pmd</goal>
                 <goal>cpd</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>com.github.klieber</groupId>
+          <artifactId>phantomjs-maven-plugin</artifactId>
+          <version>0.5</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>install</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <version>1.9.8</version>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.github.searls</groupId>
+          <artifactId>jasmine-maven-plugin</artifactId>
+          <version>2.0-beta-01</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>test</goal>
               </goals>
             </execution>
           </executions>
@@ -1831,9 +1859,9 @@
     <developer>
       <id>ruben.perez</id>
       <name>Ruben Perez Vazquez</name>
-      <email>rubenperez@teltek.es</email>
-      <organization>Teltek</organization>
-      <organizationUrl>http://www.teltek.es</organizationUrl>
+      <email>ruben.perez@uni-koeln.de</email>
+      <organization>University of Cologne</organization>
+      <organizationUrl>http://www.uni-koeln.de</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>

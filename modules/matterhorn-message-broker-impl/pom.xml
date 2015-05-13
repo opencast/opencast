@@ -64,11 +64,6 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.github.eirslett</groupId>
-      <artifactId>frontend-maven-plugin</artifactId>
-      <version>0.0.9</version>
-    </dependency>
 
     <!-- Logging -->
     <dependency>

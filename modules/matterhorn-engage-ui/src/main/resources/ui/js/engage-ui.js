@@ -5,7 +5,7 @@ $(document).ready(function() {
     var playerEndpoint = "";
     var page = 1;
     var totalEntries = -1;
-    var bufferEntries = 6; // number of entries to load for one page.
+    var bufferEntries = 15; // number of entries to load for one page.
     var restData = "";
     var active = "episodes";
     var stack = new Array();
@@ -13,7 +13,7 @@ $(document).ready(function() {
     var tabIndexNumber = 100;
     var seriesRgbMax = new Array(220, 220, 220); //color range. 
     var seriesRgbOffset = new Array(20, 20, 20); //darkest possible color 
-    var title_enterUsernamePassword = "Login with your Matterhorn account";
+    var title_enterUsernamePassword = "Login with your Opencast account";
     var placeholder_username = "Username";
     var placeholder_password = "Password";
     var placeholder_rememberMe = "Remember me";
@@ -27,10 +27,10 @@ $(document).ready(function() {
     var msg_loginSuccessful = "Successfully logged in. Please reload the page if the page does not reload automatically.";
     var msg_loginFailed = "Failed to log in.";
     var infoMeURL = "/info/me.json";
-    var defaultPlayerURL = "/engage/ui/watch.html?id=";
+    var defaultPlayerURL = "/engage/ui/watch.html";
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
-    var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
+    var springLoggedInStrCheck = "<title>Opencast – Login Page</title>";
     var $navbarEpisodes = "#navbarEpisodes";
     var $navbarSeries = "#navbarSeries";
     var $headerLogo = "#headerLogo";
@@ -648,12 +648,12 @@ $(document).ready(function() {
                 $($main_container).append(tile);
 
                 $("#" + data["id"]).on("click", function() {
-                    $(location).attr("href", playerEndpoint + data["id"]);
+                    $(location).attr("href", playerEndpoint + "?id=" + data["id"]);
                 });
 
                 $("#" + data["id"]).on("keypress", function(ev) {
                     if (ev.which == 13 || ev.which == 32) {
-                        $(location).attr("href", playerEndpoint + data["id"]);
+                        $(location).attr("href", playerEndpoint + "?id=" + data["id"]);
                     }
                 });                
 

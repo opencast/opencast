@@ -145,15 +145,20 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
       final ClientCredentials clientCredentials = new ClientCredentials();
       clientCredentials.setCredentialDatastore(dataStore);
       final String path = YouTubeUtils.get(properties, YouTubeKey.clientSecretsV3);
-      clientCredentials.setClientSecrets(new File(path));
-      clientCredentials.setDataStoreDirectory(YouTubeUtils.get(properties, YouTubeKey.dataStore));
-      //
-      youTubeService.initialize(clientCredentials);
-      //
-      tags = StringUtils.split(YouTubeUtils.get(properties, YouTubeKey.keywords), ',');
-      defaultPlaylist = YouTubeUtils.get(properties, YouTubeKey.defaultPlaylist);
-      makeVideosPrivate = StringUtils.containsIgnoreCase(YouTubeUtils.get(properties, YouTubeKey.makeVideosPrivate), "true");
-      defaultMaxFieldLength(YouTubeUtils.get(properties, YouTubeKey.maxFieldLength, false));
+      File secretsFile = new File(path);
+      if (secretsFile.exists() && !secretsFile.isDirectory()) {
+        clientCredentials.setClientSecrets(secretsFile);
+        clientCredentials.setDataStoreDirectory(YouTubeUtils.get(properties, YouTubeKey.dataStore));
+        //
+        youTubeService.initialize(clientCredentials);
+        //
+        tags = StringUtils.split(YouTubeUtils.get(properties, YouTubeKey.keywords), ',');
+        defaultPlaylist = YouTubeUtils.get(properties, YouTubeKey.defaultPlaylist);
+        makeVideosPrivate = StringUtils.containsIgnoreCase(YouTubeUtils.get(properties, YouTubeKey.makeVideosPrivate), "true");
+        defaultMaxFieldLength(YouTubeUtils.get(properties, YouTubeKey.maxFieldLength, false));
+      } else {
+        logger.warn("Client information file does not exist: " + path);
+      }
     } catch (final Exception e) {
       throw new ConfigurationException("Failed to load YouTube v3 properties", dataStore, e);
     }
