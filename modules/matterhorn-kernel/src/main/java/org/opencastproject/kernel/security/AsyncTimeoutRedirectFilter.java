@@ -64,7 +64,9 @@ public class AsyncTimeoutRedirectFilter extends GenericFilterBean {
       if (exception == null) {
         exception = (AccessDeniedException) throwableAnalyzer.getFirstThrowableOfType(AccessDeniedException.class,
                 causeChain);
-      } else {
+      }
+
+      if (exception != null) {
         if (exception instanceof AuthenticationException) {
           throw exception;
         } else if (exception instanceof AccessDeniedException) {
