@@ -216,6 +216,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var videoDataView = undefined;
     var fullscreen = false;
     var mappedResolutions = undefined;
+    var foundQualities = undefined;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginVideoVideoJS").replace(/(\.\.\/)/g, "");
@@ -291,7 +292,86 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
         }
         
+        //avoid filtering to an empty list, better play something than nothing
+        if (newTracksArray.length < 1 ) {
+            return tracks;
+        }
         return newTracksArray;
+    }
+    
+    /**
+     * Lookup all tags that are in use
+     * @param {type} videoSources, List of still used tracks
+     * @param {type} keyword, substing that should be included in the tag
+     * @returns {Array}
+     */
+    function getTags(videoSources, keyword) {
+        if (videoSources === undefined) {
+            return;
+        }
+        var tagList = new Set();
+        
+        for (var v in videoSources) {
+            for (var i = 0; i < videoSources[v].length; i++) {
+                for (var j = 0; j < videoSources[v][i].tags.tag.length; j++) {
+                    if (keyword !== undefined) {
+                        if (videoSources[v][i].tags.tag[j].indexOf(keyword) > 0) {
+                            tagList.add(videoSources[v][i].tags.tag[j]);
+                        }
+                    } else {
+                        tagList.add(videoSources[v][i].tags.tag[j]);
+                    }
+                } 
+            }
+        }
+        
+        return tagList;
+    }    
+    
+    /**
+     * Find the different video qualities
+     * @param {type} videoSources videoSources that are still in use
+     * @returns {undefined}
+     * 
+     */
+    function getQualities(videoSources) {
+        // using a cache for qualities, as they probably do not change
+        if (foundQualities) {
+            return foundQualities;
+        }
+        var qualitesList = new Array();
+        var tagsList = getTags(videoSources, "-quality");
+        tagsList.forEach(function(i, value) {
+            qualitesList.push(value.substring(0, value.indexOf("-quality")));
+        });
+        var tracks;
+        for (var source in videoSources) {
+            if (videoSources[source] !== undefined) {
+                tracks = videoSources[source];
+                break;
+            }            
+        }
+        var sortedResolutionsList = new Array();
+        for (var i = 0; i< qualitesList.length; i++){
+            var currentTrack = filterTracksByTag(tracks, qualitesList[i] + "-quality")[0];
+            sortedResolutionsList.push([qualitesList[i], currentTrack.resolution.substring(0, currentTrack.resolution.indexOf("x"))]);
+        }
+        sortedResolutionsList.sort(compareQuality);
+        foundQualities = new Array();
+        for (var i = 0; i < sortedResolutionsList.length; i++){
+            foundQualities.push(sortedResolutionsList[i][0]);
+        }
+        return foundQualities;
+    }
+    
+    function compareQuality (a, b) {
+        if (a && b) {
+            if (parseInt(a[1]) == parseInt(b[1])) {
+                return 0;
+            }
+            return parseInt(a[1]) > parseInt(b[1]) ? 1 : -1;
+        }
+        return 0;
     }
     
     function filterTracksByFormat(tracks, filterFormats) {
@@ -361,31 +441,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
     }
 
-    function compareResolutions(a, b) {
-        var aspl = a.split("x");
-        var bspl = b.split("x");
-        aspl[0] = parseInt(aspl[0]);
-        bspl[0] = parseInt(bspl[0]);
-        aspl[1] = parseInt(aspl[1]);
-        bspl[1] = parseInt(bspl[1]);
-        if (aspl[0] == bspl[0]) {
-            if (aspl[1] == bspl[1]) {
-                return 0;
-            }
-            return aspl[1] > bspl[1] ? 1 : -1;
-        }
-        return aspl[0] > bspl[0] ? 1 : -1;
-    }
-
-    function getSortedMappedResolutionArray(resolutions) {
-        resolutions.sort(compareResolutions);
-        var maparr = [];
-        maparr["low"] = resolutions[0];
-        maparr["medium"] = resolutions[resolutions.length - 2];
-        maparr["high"] = resolutions[resolutions.length - 1];
-        return maparr;
-    }
-
     function registerQualityChangeEvent() {
         Engage.on(plugin.events.qualitySet.getName(), function(q) {
             changeQuality(q);
@@ -394,33 +449,31 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     function changeQuality(q) {
         if (q) {
+            var isPaused = videojs(globalVideoSource[0][0]).paused();
             Engage.trigger(plugin.events.pause.getName(), false);
-            q = q.toLowerCase();
-            if ((q == "low") || (q == "medium") || (q == "high")) {
-                Engage.model.set("quality", q);
-                Engage.log("Setting quality to: " + q);
-
-                var tuples = getSortedVideosourcesArray(globalVideoSource);
-                for (var i = 0; i < tuples.length; ++i) {
-                    var key = tuples[i][0];
-                    var value = tuples[i][1];
-
-                    for (var val in value[1]) {
-                        if (value[1][val].resolution) {
-                            if (mappedResolutions[q] == value[1][val].resolution) {
-                                videojs(value[0]).src(value[1][val].src);
-                                break;
-                            }
-                        }
+            var quality = q + "-quality";
+            Engage.model.set("quality", q);
+            Engage.log("Setting quality to: " + q);
+            var tuples = getSortedVideosourcesArray(globalVideoSource);
+            for (var i = 0; i < tuples.length; ++i) {
+                var key = tuples[i][0];
+                var value = tuples[i][1];
+                if (value[1][0]) {
+                    var track = filterTracksByTag(value[1], quality);
+                    if (track && track.length > 0) {
+                        videojs(value[0]).src(track[0].src);
                     }
                 }
-                if (pressedPlayOnce && (currentTime > 0)) {
-                    window.setTimeout(function() {
-                        initSynchronize(false);
-                        Engage.trigger(plugin.events.seek.getName(), currentTime);
-                    }, timer_qualitychange);
-                }
             }
+            if (pressedPlayOnce && (currentTime > 0)) {
+                window.setTimeout(function() {
+                    initSynchronize(false);
+                    Engage.trigger(plugin.events.seek.getName(), currentTime);
+                    if (! isPaused) {
+                        Engage.trigger(plugin.events.play.getName());
+                    }
+                }, timer_qualitychange);
+            } 
         }
     }
 
@@ -436,20 +489,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
         }
 
-        var key_tmp = tuples[0][0];
-        var value_tmp = tuples[0][1];
-        var nr_res = 0;
-        var res_array = [];
-        for (var val in value_tmp) {
-            if (value_tmp[val].resolution) {
-                res_array[res_array.length] = value_tmp[val].resolution;
-            }
-            ++nr_res;
-        }
-        if (nr_res > 2) {
+        var qualities = getQualities(videoSources);
+        
+        if (qualities.length > 1) {
             registerQualityChangeEvent();
-            mappedResolutions = getSortedMappedResolutionArray(res_array);
-            Engage.trigger(plugin.events.videoFormatsFound.getName(), mappedResolutions);
+            Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
             changeQuality(Engage.model.get("quality"));
         }
 

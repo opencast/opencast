@@ -393,6 +393,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         showEmbed = false;
                     }               
                 }
+                var translatedQualites = new Array();
+                if (resolutions) {
+                    for (var i = 0; i < resolutions.length; i++) {
+                        translatedQualites[resolutions[i]] = translate(resolutions[i], resolutions[i]);
+                    }
+                }
 
                 var tempVars = {
                     plugin_path: this.pluginPath,
@@ -422,9 +428,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_fullscreen: translate("fullscreen", "Fullscreen"),
                     str_qualityButton: translate("quality", "Quality"),
                     str_quality: translate("quality", "Quality"),
-                    str_qualityLow: translate("qualityLow", "Low"),
-                    str_qualityMedium: translate("qualityMedium", "Medium"),
-                    str_qualityHigh: translate("qualityHigh", "High"),
+                    qualities: resolutions,
+                    translatedqualities: translatedQualites,
                     hasqualities: resolutions !== undefined,
                     controlsTop: Engage.controls_top,
                     logo: logo,
@@ -438,6 +443,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     if (aspectRatioTriggered) {
                         calculateEmbedAspectRatios();
                         addEmbedRatioEvents();
+                    }
+                    if (tempVars.hasqualities) {
+                        addQualityChangeEvents();
                     }
                     ready();
                     playPause();
@@ -531,22 +539,21 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function addQualityChangeEvents() {
         if (!mediapackageError) {
-            $("#" + id_qualityLow).click(function(e) {
-                e.preventDefault();
-                $("#" + id_qualityIndicator).html(translate("qualityLow", "Low"));
-                Engage.trigger(plugin.events.qualitySet.getName(), "low");
-            });
-            $("#" + id_qualityMedium).click(function(e) {
-                e.preventDefault();
-                $("#" + id_qualityIndicator).html(translate("qualityMedium", "Medium"));
-                Engage.trigger(plugin.events.qualitySet.getName(), "medium");
-            });
-            $("#" + id_qualityHigh).click(function(e) {
-                e.preventDefault();
-                $("#" + id_qualityIndicator).html(translate("qualityHigh", "High"));
-                Engage.trigger(plugin.events.qualitySet.getName(), "high");
-            });
+            for (var i = 0; i < resolutions.length; i++) {
+                var quality = resolutions[i];
+                addQualityListener(quality);
+            }
+            var q = Engage.model.get("quality");
+            $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
         }
+    }
+    
+    function addQualityListener(quality) {
+        $("#quality" + quality).click(function(element) {
+                    element.preventDefault();
+                    $("#" + id_qualityIndicator).html(translate(quality, quality));
+                    Engage.trigger(plugin.events.qualitySet.getName(), quality);
+        });
     }
 
     function triggerEmbedMessage(ratioWidth, ratioHeight) {
@@ -838,9 +845,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     if (controlsView) {
                         controlsView.render();
                     }
-                    addQualityChangeEvents();
-                    var q = Engage.model.get("quality");
-                    $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
                 }
             });
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
