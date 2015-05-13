@@ -1859,9 +1859,9 @@
     <developer>
       <id>ruben.perez</id>
       <name>Ruben Perez Vazquez</name>
-      <email>rubenperez@teltek.es</email>
-      <organization>Teltek</organization>
-      <organizationUrl>http://www.teltek.es</organizationUrl>
+      <email>ruben.perez@uni-koeln.de</email>
+      <organization>University of Cologne</organization>
+      <organizationUrl>http://www.uni-koeln.de</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
