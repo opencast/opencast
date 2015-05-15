@@ -296,8 +296,8 @@ public class RestPublisher implements RestConstants {
   }
 
   /**
-   * A custom ServiceTracker that published JAX-RS annotated services with the {@link RestPublisher#SERVICE_PROPERTY}
-   * property set to some non-null value.
+   * A custom ServiceTracker that published JAX-RS annotated services with the
+   * {@link RestPublisher#SERVICE_PATH_PROPERTY} property set to some non-null value.
    */
   public class JaxRsServiceTracker extends ServiceTracker {
 

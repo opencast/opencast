@@ -102,7 +102,7 @@ public class CurrentJobFilter implements Filter {
         serviceRegistry.setCurrentJob(currentJob);
       }
     } catch (Exception e) {
-      logger.error("Was not able to set the current job id {} to the service registry", currentJobId);
+      logger.error("Unable to set the current job {}: {}", currentJobId, e);
       httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
               "Was not able to set the current job id {} to the service registry" + currentJobId);
     }
