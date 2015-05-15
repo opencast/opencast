@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ng-partial-publish</id>
+  <title>Publish the recording</title>
+  <tags/>
+  <description/>
+
+  <configuration_panel/>
+
+  <operations>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Cut the video according the SMIL file                             -->
+    <!--                                                                   -->
+    <!-- Perform cutting according to the edit decision list.              -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <operation id="editor"
+      exception-handler-workflow="ng-partial-error"
+      description="Cut the recording according to the edit decision list">
+      <configurations>
+        <configuration key="source-flavors">*/work</configuration>
+        <configuration key="smil-flavors">smil/*</configuration>
+        <configuration key="target-smil-flavor">smil/cutting</configuration>
+        <configuration key="target-flavor-subtype">trimmed</configuration>
+        <configuration key="interactive">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Extract preview images                                            -->
+    <!--                                                                   -->
+    <!-- From the edited recording, take preview images for the placer,    -->
+    <!-- search results etc.                                               -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  
+    <!-- Encode to engage search result thumbnails -->
+
+    <operation
+      id="image"
+      exception-handler-workflow="ng-partial-error"
+      description="Creating search result thumbnails">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="source-tags"></configuration>
+        <configuration key="target-flavor">*/search+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">search-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Encode to engage player preview images -->
+
+    <operation
+      id="image"
+      exception-handler-workflow="ng-partial-error"
+      description="Creating player preview image">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="source-tags"></configuration>
+        <configuration key="target-flavor">*/player+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-preview.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Apply the branding artifacts                                      -->
+    <!--                                                                   -->
+    <!-- Add trailer and bumper to the recording prior to publication.     -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Apply the theme to the mediapackage -->
+
+    <operation 
+      id="theme"
+      exception-handler-workflow="ng-partial-error"
+      description="Apply the theme">
+      <configurations>
+        <configuration key="bumper-flavor">branding/bumper</configuration>
+        <configuration key="bumper-tags">archive</configuration>
+        <configuration key="trailer-flavor">branding/trailer</configuration>
+        <configuration key="trailer-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Inspect the media from the theme -->
+
+    <operation
+      id="inspect"
+      exception-handler-workflow="ng-partial-error"
+      description="Inspecting audio and video streams">
+      <configurations>
+        <configuration key="overwrite">false</configuration>
+        <configuration key="accept-no-media">false</configuration>s
+      </configurations>
+    </operation>
+
+    <!-- Add bumper and trailer part to the presenter track -->
+    
+      <operation
+        id="concat"
+        exception-handler-workflow="ng-partial-error"
+        description="Concatenate presenter track with intro and outro videos">
+        <configurations>
+          <configuration key="source-flavor-part-0">branding/bumper</configuration>
+          <configuration key="source-flavor-part-1">presenter/work</configuration>
+          <configuration key="source-flavor-part-1-mandatory">true</configuration>
+          <configuration key="source-flavor-part-2">branding/trailer</configuration>
+          <configuration key="target-flavor">presenter/themed</configuration>
+          <configuration key="encoding-profile">defaults-concat-vga-hd</configuration>
+          <configuration key="output-resolution">part-1</configuration>
+        </configurations>
+      </operation>
+    
+    <!-- Add bumper and trailer part to the presentation track -->
+    
+      <operation
+        id="concat"
+        exception-handler-workflow="ng-partial-error"
+        description="Concatenate presentation track with intro and outro videos">
+        <configurations>
+          <configuration key="source-flavor-part-0">branding/bumper</configuration>
+          <configuration key="source-flavor-part-1">presentation/work</configuration>
+          <configuration key="source-flavor-part-1-mandatory">true</configuration>
+          <configuration key="source-flavor-part-2">branding/trailer</configuration>
+          <configuration key="target-flavor">presentation/themed</configuration>
+          <configuration key="encoding-profile">defaults-concat-camera-hd</configuration>
+          <configuration key="output-resolution">part-1</configuration>
+        </configurations>
+      </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Encode for publication to Engage                                  -->
+    <!--                                                                   -->
+    <!-- Encode audio and video formats to the distribution formats that   -->
+    <!-- are required by the Engage publication channel.                   -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Encode presenter (camera) to Engage player format -->
+
+    <operation
+      id="compose"
+      exception-handler-workflow="ng-partial-error"
+      description="Encoding presenter (camera) video to MP4 download">
+      <configurations>
+        <configuration key="source-flavor">presenter/themed</configuration>
+        <configuration key="target-flavor">presenter/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
+        <configuration key="encoding-profile">defaults-camera-hd</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Encode presentation (vga) to Engage player format -->
+
+    <operation
+      id="compose"
+      exception-handler-workflow="ng-partial-error"
+      description="Encoding presentation (screen) to MP4 download">
+      <configurations>
+        <configuration key="source-flavor">presentation/themed</configuration>
+        <configuration key="target-flavor">presentation/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
+        <configuration key="encoding-profile">defaults-vga-hd</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Encode presentater (camera) to Engage player audio only format -->
+
+    <operation
+      id="compose"
+      fail-on-error="false"
+      exception-handler-workflow="ng-partial-error"
+      description="Encoding presenter (screen) to MP3 audio download">
+      <configurations>
+        <configuration key="source-flavor">presenter/themed</configuration>
+        <configuration key="target-flavor">presenter/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
+        <configuration key="encoding-profile">defaults-mp3</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Segment video streams and extract metadata                        -->
+    <!--                                                                   -->
+    <!-- Apply the video segmentation algorithm to the presentation tracks -->
+    <!-- and extract segment preview images and metadata.                  -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Run the videosegmentation -->
+    
+    <operation
+      id="segment-video"
+      fail-on-error="false"
+      description="Detecting slide transitions in presentation track">
+      <configurations>
+        <configuration key="source-flavor">presentation/themed</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Generate segment preview images -->
+    
+    <operation
+      id="segmentpreviews"
+      fail-on-error="false"
+      description="Creating preview images for presentation segments">
+      <configurations>
+        <configuration key="source-flavor">presentation/themed</configuration>
+        <configuration key="target-flavor">presentation/segment+preview</configuration>
+        <configuration key="reference-flavor">presentation/delivery</configuration>
+        <configuration key="reference-tags">engage-download</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-slides.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Extract text form slide preview images -->
+
+    <operation
+      id="extract-text"
+      fail-on-error="false"
+      description="Extracting text from presentation segments">
+      <configurations>
+        <configuration key="source-flavor">presentation/themed</configuration>
+        <configuration key="target-tags">engage-download,archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Publish to publication channels                                   -->
+    <!--                                                                   -->
+    <!-- Send the encoded material along with the metadata to the          -->
+    <!-- publication channels.                                             -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Publish to engage player -->
+
+    <operation
+      id="publish-engage"
+      if="${publishToEngage}"
+      max-attempts="2"
+      exception-handler-workflow="ng-partial-error"
+      description="Publishing to Opencast Media Module">
+      <configurations>
+        <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
+        <configuration key="streaming-source-tags">engage-streaming</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish to YouTube -->
+
+    <operation
+      id="publish-youtube"
+      if="${publishToYouTube}"
+      max-attempts="2"
+      exception-handler-workflow="ng-partial-error"
+      description="Publishing to YouTube">
+      <configurations>
+        <configuration key="source-tags">engage-download</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

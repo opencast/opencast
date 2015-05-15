@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ng-partial-work</id>
+  <title>Prepare work versions</title>
+  <tags/>
+  <description/>
+
+  <configuration_panel></configuration_panel>
+
+  <operations>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Prepare the work media                                            -->
+    <!--                                                                   -->
+    <!-- Ensure the work media is in a format that allows Opencast to do   -->
+    <!-- its work. This includes potentially rewriting the container and   -->
+    <!-- making sure that the audio track is part of each video track.     -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Prepare presenter track -->
+
+    <operation
+      id="prepare-av"
+      exception-handler-workflow="ng-partial-error"
+      description="Preparing presenter (camera) audio and video work versions">
+      <configurations>
+        <configuration key="source-flavor">presenter/source</configuration>
+        <configuration key="target-flavor">presenter/work</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="promiscuous-audio-muxing">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Prepare presentation track -->
+
+    <operation
+      id="prepare-av"
+      exception-handler-workflow="ng-partial-error"
+      description="Preparing presentation (screen) audio and video work version">
+      <configurations>
+        <configuration key="source-flavor">presentation/source</configuration>
+        <configuration key="target-flavor">presentation/work</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="promiscuous-audio-muxing">true</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

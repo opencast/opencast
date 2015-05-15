@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>ng-retract-delete</id>
+  <title>Retract or delete</title>
+  <tags>
+    <tag>archive-ng</tag>
+  </tags>
+  <description>Retract or delete a recording</description>
+  <configuration_panel>
+      <![CDATA[
+        <style type="text/css">
+        <!-- 
+            #workflow-configuration legend { padding-top:20px; padding-bottom:5px; }
+            #workflow-configuration li { padding-top:5px; padding-bottom:5px; line-height:14px }
+        -->
+        </style>
+        <div id="workflow-configuration">
+          <fieldset>
+            <legend>Retract the recording from:</legend>
+            <ul>
+              <li>
+                <span>
+                  <input id="retractFromEngage" type="checkbox" checked="checked" class="configField" value="true" />
+                  <span>&nbsp;Opencast Media Module</span>
+                </span>
+              </li>
+              <li>
+                <span>
+                  <input id="retractFromYouTube" type="checkbox" class="configField" value="true" />
+                  <span>&nbsp;YouTube</span>
+                </span>
+              </li>
+            </ul>
+          </fieldset>
+          <fieldset>
+            <legend>Deletion</legend>
+            <ul>
+              <li>
+                <span>
+                  <input id="deleteAsset" name="deleteAsset" type="checkbox" checked="checked" class="configField" value="true" />
+                  <span>&nbsp;Permanently delete recording</span>
+                </span>
+              </li>
+            </ul>
+          </fieldset>
+        </div>
+      ]]>
+  </configuration_panel>
+  <operations>
+  
+    <!-- Make sure the workflow contains at least a default configuration -->
+
+    <operation
+      id="defaults"
+      description="Applying default configuration values">
+      <configurations>
+        <configuration key="retractFromEngage">true</configuration>
+        <configuration key="retractFromYouTube">false</configuration>
+        <configuration key="deleteAsset">false</configuration>
+      </configurations>
+    </operation>
+  
+    <!-- Retract from engage player -->
+
+    <operation
+      id="retract-engage"
+      fail-on-error="true"
+      exception-handler-workflow="ng-partial-error"
+      if="${retractFromEngage}"
+      description="Retract recording from Engage">
+    </operation>
+
+    <!-- Retract from YouTube -->
+
+    <operation
+      id="retract-youtube"
+      if="${retractFromYouTube}"
+      fail-on-error="true"
+      exception-handler-workflow="ng-partial-error"
+      description="Retract recording from YouTube">
+    </operation>
+
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+      id="delete-archive"
+      if="${deleteAsset}"
+      fail-on-error="true"
+      exception-handler-workflow="ng-partial-error"
+      description="Permanently remove recording">
+    </operation>
+
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+      id="archive"
+      if="not ${deleteAsset}"
+      fail-on-error="true"
+      exception-handler-workflow="ng-partial-error"
+      description="Archiving state of retracted recording">
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Cleanup                                                           -->
+    <!--                                                                   -->
+    <!-- Remove work artifacts.                                            -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Clean the system from work artifacts -->
+
+    <operation
+      id="include"
+      description="Remove temporary processing artifacts">
+      <configurations>
+        <configuration key="workflow-id">ng-partial-cleanup</configuration>
+      </configurations>
+    </operation>
+  
+  </operations>
+  
+</definition>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>minimal</id>
-  <title>Minimal Testing Workflow</title>
+  <id>test-minimal</id>
+  <title>Test: Minimal Testing Workflow</title>
   <tags>
     <tag>upload</tag>
     <tag>schedule</tag>
