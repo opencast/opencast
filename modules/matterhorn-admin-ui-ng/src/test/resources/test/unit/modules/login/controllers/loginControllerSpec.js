@@ -55,6 +55,21 @@ describe('Login Controller', function () {
             $controller('LoginCtrl', {$scope: $scope});
             expect($scope.isError).toBeFalsy();
         });
+
+        it('should fetch version information', function () {
+            $httpBackend.expectGET('/sysinfo/bundles/version?prefix=matterhorn')
+                .respond('');
+            $controller('LoginCtrl', {$scope: $scope});
+            $httpBackend.flush();
+        });
+
+        it('sets the version string', function () {
+            $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn')
+                .respond('{"consistent":true,"version":"1.5.0.MOCKED-SNAPSHOT","buildNumber":"3fba397"}');
+            $controller('LoginCtrl', {$scope: $scope});
+            $httpBackend.flush();
+            expect($scope.version.version).toEqual('1.5.0.MOCKED-SNAPSHOT');
+        });
     });
 
     describe('#toLanguageClass', function () {
