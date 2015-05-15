@@ -14,32 +14,116 @@
         $.each(data, function(section) {
             if("rest" == section) {
                $.each(data.rest, function(i) {
-                  var col = $('#docs1');
-                  var pathToDocs = data.rest[i].docs.replace(/^.*\/\/[^\/]+/, '');
-                  col.append("<li>" + data.rest[i].description + " <a href='" + pathToDocs + "'>Docs</a></li>");
-                  if(data.rest[i].description.toLowerCase() == "Capture REST Endpoint".toLowerCase()) {
-                    $('#col3m').append('<br /><a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
-                    capt = true;
-                  } else if(data.rest[i].description.toLowerCase() == "Confidence Monitoring REST Endpoint".toLowerCase()) {
-                    $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" '
-                        + 'href="/confidence-monitoring">Go to Confidence Monitoring</a>');
-                    confMon = true;
+	                  var col = $('#docs1');
+	                  var pathToDocs = data.rest[i].docs.replace(/^.*\/\/[^\/]+/, '');
+	                  col.append("<li>" + data.rest[i].description + " <a href='" + pathToDocs + "'>Docs</a></li>");
+					          if(data.rest[i].description.toLowerCase() == "Capture REST Endpoint".toLowerCase()) {
+					            $('#col3m').append('<br /><a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
+					            capt = true;
+					          } else if(data.rest[i].description.toLowerCase() == "Confidence Monitoring REST Endpoint".toLowerCase()) {
+					            $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" href="/confidence-monitoring">Go to Confidence Monitoring</a>');
+					            confMon = true;
+					          }
+	               })
+		            } else if("engage" == section) {
+		               $('#engagelink').attr('href', data.engage + '/engage/ui');
+		            } else if("admin" == section) {
+		               $('#adminlink').attr('href', data.admin + '/admin-ng/index.html');
+		            }
+		          });
+				      if(capt) {
+				        $('#col3m').show();
+				      }
+				      if(confMon) {
+				        $('#col4m').show();
+				      }
+				    });
+
+            var $sysInfoContainer = $("div#system-info"),
+                checkAndDisplay = function (field, $container) {
+                    var value = field;
+                    if (typeof field !== "undefined" && field !== null) {
+                      if (field instanceof Array) {
+                        value = field.toString();
+                      } else if (field instanceof Date) {
+                        value = field.toLocaleDateString() + ", " + field.toLocaleTimeString();
+                      }
+                      $container.html(value);
+                      $container.parent().show();
+                    } else {
+                      $container.parent().hide();
+                    }
+                },
+                dbConsistent = false,
+                bundlesConsistent = false;
+
+            $.getJSON("/sysinfo/db/schemaversion", function (data) {
+                var $message = $sysInfoContainer.find("div#db span.message"),
+                    $messageDiv = $sysInfoContainer.find("div#db"),
+                    $dbVersion = $sysInfoContainer.find("#db-version span"),
+                    $dbApplication = $sysInfoContainer.find("#db-application span"),
+                    $dbRequiredVersions = $sysInfoContainer.find("#db-required-version span");
+
+                dbConsistent = data.consistent;
+                checkAndDisplay(data.schemaVersion, $dbVersion);
+                if (data.schemaAppliedAt) {
+                  checkAndDisplay(new Date(data.schemaAppliedAt), $dbApplication);
+                }
+                checkAndDisplay(data.requiredSchemaVersions, $dbRequiredVersions);
+
+                if (data.consistent) {
+                  $message.html("Matterhorn is running with consistent DB schema version.")
+                  $messageDiv.addClass("ok");
+                } else {
+                  $message.html("Different schema versions are required by the bundles. Update the DB to avoid loss or corruption of data.");
+                  $dbVersion.addClass("error");
+                  $dbRequiredVersions.addClass("error");
+                }
+            });
+
+            $.getJSON("/sysinfo/bundles/version", function (data) {
+                var $message = $sysInfoContainer.find("div#build span.message"),
+                    $messageDiv = $sysInfoContainer.find("div#build"),
+                    $version = $sysInfoContainer.find("div#version span"),
+                    $buildNumber = $sysInfoContainer.find("div#build-number span"),
+                    versions = [],
+                    buildNumbers = [];
+
+
+                if (data.consistent) {
+                  $message.html("Matterhorn is running with consistent bundles version.");
+                  $messageDiv.addClass("ok");
+                  
+                  checkAndDisplay(data.version, $version);
+                  checkAndDisplay(data.buildNumber, $buildNumber);
+                } else {
+                  $message.html("Matterhorn is running with inconsistent bundles version. Update the deprecated bundles to avoid loss or corruption of data.");
+                  $buildNumber.addClass("error");
+                  
+                  if (typeof data.versions !== "undefined") {
+                      $.each(data.versions, function (index, element) {
+                          if ($.inArray(element.version, versions)) {
+                              versions.push(element.version);
+                          }
+
+                          if ($.inArray(element.buildNumber, buildNumbers)) {
+                              buildNumbers.push(element.buildNumber);
+                          }
+                      });
                   }
-               })
-            } else if("engage" == section) {
-               $('#engagelink').attr('href', data.engage + '/engage/ui');
-            } else if("admin" == section) {
-               $('#adminlink').attr('href', data.admin + '/admin/');
-            }
+
+                  if (versions.length > 0) {
+                      $version.before("Version"  + (versions.length > 1 ? "s: " : ": "));
+                      checkAndDisplay(versions, $version);
+                  }
+
+                  if (buildNumbers.length > 0) {
+                      $buildNumber.before("Build number"  + (buildNumbers.length > 1 ? "s: " : ": "));
+                      checkAndDisplay(buildNumbers, $buildNumber);
+                  }
+                }
+            });
           });
-          if(capt) {
-            $('#col3m').show();
-          }
-          if(confMon) {
-            $('#col4m').show();
-          }
-        });
-      });
     </script>
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
@@ -49,6 +133,11 @@
         <div id="matterhornlogo"><img src="img/mh_logos/MatterhornLogo_large.png" alt="Matterhorn logo" width="260" height="182" class="matterhornlogo" /></div>
         <div id="opencastlogo"><a href="http://www.opencastproject.org"><img src="img/mh_logos/OpencastLogo.png" alt="Opencast" width="143" height="38" hspace="20" vspace="5" border="0" /></a></div>
         <h1>1.7 Development Snapshot</h1>
+        <div id="system-info">
+          <div id="version">Version: <span></span></div>
+          <div id="build-number">Build number: <span></span></div>
+          <div id="builds-page"><a href="/bundles.html"> More &gt; </a></div>
+        </div>
         <div id="promotext">
           <p>Matterhorn is a free, open-source system that provides a lecture capture solution and an enterprise media
             infrastructure for educational audio and video content.</p>

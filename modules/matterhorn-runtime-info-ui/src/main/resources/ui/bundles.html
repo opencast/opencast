@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+    <link rel="shortcut icon" href="img/favicon.ico" /> 
+    <title>Opencast Matterhorn - Bundles information</title>
+
+    <script type="text/javascript" src="js/jquery/jquery.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $.getJSON("/sysinfo//bundles/list", function (data) {
+                var $buildContainer = $("div#bundles table"),
+                    bundleInfos = data.bundleInfos,
+                    createTd = function (value) {
+                        var td = document.createElement("td");
+                        td.textContent = value;
+                        return td;
+                    }
+
+                if (typeof bundleInfos === "object") {
+                    var tr;
+
+                    $.each(bundleInfos, function (index, element) {
+                        tr = document.createElement("tr");
+                        tr.appendChild(createTd(element["bundleId"]));
+                        tr.appendChild(createTd(element["bundleSymbolicName"]));
+                        tr.appendChild(createTd(element["version"]));
+                        tr.appendChild(createTd(element["buildNumber"]));
+                        tr.appendChild(createTd(element["dbSchemaVersion"]));
+                        tr.appendChild(createTd(element["host"]));
+                        $buildContainer.append(tr);
+                    });
+                }
+
+            });
+
+            var $sysInfoContainer = $("div#general-info"),
+                checkAndDisplay = function (field, $container) {
+                    var value = field;
+                    if (typeof field !== "undefined" && field !== null) {
+                      if (field instanceof Array) {
+                        value = field.toString();
+                      } else if (field instanceof Date) {
+                        value = field.toLocaleDateString() + ", " + field.toLocaleTimeString();
+                      }
+                      $container.html(value);
+                      $container.parent().show();
+                    } else {
+                      $container.parent().hide();
+                    }
+                },
+                dbConsistent = false,
+                bundlesConsistent = false;
+
+            $.getJSON("/sysinfo/db/schemaversion", function (data) {
+                var $message = $sysInfoContainer.find("div#db div.message"),
+                    $messageDiv = $sysInfoContainer.find("div#db"),
+                    $dbVersion = $sysInfoContainer.find("#db-version span"),
+                    $dbApplication = $sysInfoContainer.find("#db-application span"),
+                    $dbRequiredVersions = $sysInfoContainer.find("#db-required-version span");
+
+                dbConsistent = data.consistent;
+                checkAndDisplay(data.schemaVersion, $dbVersion);
+                if (data.schemaAppliedAt) {
+                  checkAndDisplay(new Date(data.schemaAppliedAt), $dbApplication);
+                }
+                checkAndDisplay(data.requiredSchemaVersions, $dbRequiredVersions);
+
+                if (data.consistent) {
+                  $message.html("Matterhorn is running with consistent DB schema version.")
+                  $messageDiv.addClass("ok");
+                } else {
+                  $message.html("Different schema versions are required by the bundles. Update the DB to avoid loss or corruption of data.");
+                  $dbVersion.addClass("error");
+                  $dbRequiredVersions.addClass("error");
+                }
+            });
+
+            $.getJSON("/sysinfo/bundles/version", function (data) {
+                var $message = $sysInfoContainer.find("div#build div.message"),
+                    $messageDiv = $sysInfoContainer.find("div#build"),
+                    $version = $sysInfoContainer.find("div#version span"),
+                    $buildNumber = $sysInfoContainer.find("div#build-number span"),
+                    versions = [],
+                    buildNumbers = [];
+
+
+                if (data.consistent) {
+                  $message.html("Matterhorn is running with consistent bundles version.");
+                  $messageDiv.addClass("ok");
+                  
+                  checkAndDisplay(data.version, $version);
+                  checkAndDisplay(data.buildNumber, $buildNumber);
+                } else {
+                  $message.html("Matterhorn is running with inconsistent bundles version. Update the deprecated bundles to avoid loss or corruption of data.");
+                  $buildNumber.addClass("error");
+                  
+                  if (typeof data.versions !== "undefined") {
+                      $.each(data.versions, function (index, element) {
+                          if ($.inArray(element.version, versions)) {
+                              versions.push(element.version);
+                          }
+
+                          if ($.inArray(element.buildNumber, buildNumbers)) {
+                              buildNumbers.push(element.buildNumber);
+                          }
+                      });
+                  }
+
+                  if (versions.length > 0) {
+                      $version.before("Version"  + (versions.length > 1 ? "s: " : ": "));
+                      checkAndDisplay(versions, $version);
+                  }
+
+                  if (buildNumbers.length > 0) {
+                      $buildNumber.before("Build number"  + (buildNumbers.length > 1 ? "s: " : ": "));
+                      checkAndDisplay(buildNumbers, $buildNumber);
+                  }
+                }
+            });
+          });
+    </script>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        table {
+            width: 100%;
+        }
+
+        td {
+            padding: 4px;
+            background-color: linen;
+        }
+
+        #bundles {
+            margin-top: 10px;
+        }
+
+        h3 {
+            padding-left: 10px;
+        }
+
+        #general-info {
+        }
+
+        #general-info span{
+            font-weight: bold;
+        }
+
+        #general-info.error {
+            color: red;
+        }
+
+        #general-info.error .message{
+            font-weight: bold;
+        }
+        #general-info.error #db div, #general-info.error #build div{
+            padding-left: 20px;
+        }
+
+        #general-info div#builds-page {
+            text-align: right;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="header">
+        <h1>Bundles information</h2>
+      </div>
+      <div id="general-info">
+        <div id="build">
+          <h3>Codebase: </h3>
+          <div class="message"></div>
+          <div id="version">Version: <span></span></div>
+          <div id="build-number">Build number: <span></span></div>
+        </div>
+        <div id="db">
+          <h3>Database: </h3>
+          <div class="message"></div>
+          <div id="db-version">Schema version: <span></span></div>
+          <div id="db-application">Schema applied at: <span></span></div>
+          <div id="db-required-version">Required DB schema versions: <span></span></div>
+        </div>
+      </div>
+
+      <div id="bundles">
+            <h3>Current states of the running bundles from the Matterhorn instance.</h3>
+            <table class="list">
+                <tr>
+                    <th>ID</th>
+                    <th>Symbolic name</th>
+                    <th>Version</th>
+                    <th>Build number</th>
+                    <th>DB Schema Version</th>
+                    <th>Host</th>
+                </tr>
+            </table>
+      </div>
+    </div>
+</body>
+</html>

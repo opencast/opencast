@@ -240,3 +240,40 @@ a:hover {
 	padding: 0 0 16px 16px;
 	margin-bottom:0
 }
+
+#system-info {
+	height: 10px;
+	font-size: 1.25em;
+	line-height: 1.25em;
+	margin-left: 330px;
+}
+
+#system-info div {
+	margin-right: 10px;
+	float: left;
+}
+
+#system-info span{
+	font-weight: bold;
+}
+
+#system-info.error {
+	color: red;
+}
+
+#system-info.error .message{
+	font-size: 0.85em;
+	font-weight: normal;;
+}
+
+#system-info.error .message{
+	font-weight: bold;
+}
+#system-info.error #db div, #system-info.error #build div{
+	padding-left: 20px;
+}
+
+#system-info div#builds-page {
+	text-align: right;
+}
+
