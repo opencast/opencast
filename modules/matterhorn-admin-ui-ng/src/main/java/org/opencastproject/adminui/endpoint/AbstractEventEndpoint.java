@@ -189,6 +189,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -1858,7 +1859,7 @@ public abstract class AbstractEventEndpoint {
       timezone = agent.getConfiguration().getProperty("capture.device.timezone");
       if (StringUtils.isBlank(timezone)) {
         timezone = TimeZone.getDefault().getID();
-        logger.debug("No 'capture.device.timezone' set on agent {}. The default server timezone {} will be used.",
+        logger.warn("No 'capture.device.timezone' set on agent {}. The default server timezone {} will be used.",
                 device, timezone);
       }
     }
