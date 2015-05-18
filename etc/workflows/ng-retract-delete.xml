@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
-  <id>ng-retract-delete</id>
-  <title>Retract or delete</title>
+  <id>ng-retract</id>
+  <title>Retract</title>
   <tags>
     <tag>archive-ng</tag>
   </tags>
-  <description>Retract or delete a recording</description>
+  <description>Retract a recording</description>
   <configuration_panel>
       <![CDATA[
         <style type="text/css">
@@ -32,17 +32,6 @@
               </li>
             </ul>
           </fieldset>
-          <fieldset>
-            <legend>Deletion</legend>
-            <ul>
-              <li>
-                <span>
-                  <input id="deleteAsset" name="deleteAsset" type="checkbox" checked="checked" class="configField" value="true" />
-                  <span>&nbsp;Permanently delete recording</span>
-                </span>
-              </li>
-            </ul>
-          </fieldset>
         </div>
       ]]>
   </configuration_panel>
@@ -56,7 +45,6 @@
       <configurations>
         <configuration key="retractFromEngage">true</configuration>
         <configuration key="retractFromYouTube">false</configuration>
-        <configuration key="deleteAsset">false</configuration>
       </configurations>
     </operation>
   
@@ -83,18 +71,7 @@
     <!-- Archive the current state of the mediapackage -->
 
     <operation
-      id="delete-archive"
-      if="${deleteAsset}"
-      fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
-      description="Permanently remove recording">
-    </operation>
-
-    <!-- Archive the current state of the mediapackage -->
-
-    <operation
       id="archive"
-      if="not ${deleteAsset}"
       fail-on-error="true"
       exception-handler-workflow="ng-partial-error"
       description="Archiving state of retracted recording">
