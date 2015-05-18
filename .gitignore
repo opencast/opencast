@@ -31,6 +31,8 @@ www/
 
 # Ignore all temporary editor files
 *.swp
+*.iml
+.idea
 
 # Ignore Maven files and local repository
 /.m2/
