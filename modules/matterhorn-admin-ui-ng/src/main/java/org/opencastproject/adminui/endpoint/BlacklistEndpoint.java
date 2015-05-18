@@ -29,7 +29,7 @@ import org.opencastproject.pm.api.persistence.ParticipationManagementDatabaseExc
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.Jsons.Obj;
@@ -107,7 +107,7 @@ public class BlacklistEndpoint {
 
   protected void activate(ComponentContext cc) {
     if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
       logger.debug("Configured server url is {}", ccServerUrl);
       if (ccServerUrl != null)
         this.serverUrl = ccServerUrl;
