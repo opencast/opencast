@@ -39,6 +39,17 @@
   </configuration_panel>
 
   <operations>
+	
+    <!-- Apply the default workflow configuration -->
+
+    <operation
+      id="defaults"
+      description="Applying default configuration values">
+      <configurations>
+        <configuration key="publishToEngage">true</configuration>
+        <configuration key="publishToYouTube">false</configuration>
+      </configurations>
+    </operation>
 
     <!-- Update recording metadata -->
 
