@@ -189,6 +189,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -1787,8 +1788,7 @@ public abstract class AbstractEventEndpoint {
   @RestQuery(name = "checkNewConflicts", description = "Checks if the current scheduler parameters are in a conflict with another event", returnDescription = "Returns NO CONTENT if no event are in conflict within specified period or list of conflicting recordings in JSON", restParameters = { @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
           @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "There is a conflict"),
-          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters"),
-          @RestResponse(responseCode = HttpServletResponse.SC_PRECONDITION_FAILED, description = "Capture agent configuration is missing capture.device.timezone") })
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters") })
   public Response getNewConflicts(@FormParam("metadata") String metadata) throws NotFoundException {
     if (StringUtils.isBlank(metadata)) {
       logger.warn("Metadata is not specified");
@@ -1858,8 +1858,9 @@ public abstract class AbstractEventEndpoint {
       Agent agent = getCaptureAgentStateService().getAgent(device);
       timezone = agent.getConfiguration().getProperty("capture.device.timezone");
       if (StringUtils.isBlank(timezone)) {
-        logger.warn("No capture.device.timezone set on agent {}, unable to check for conflicts!", device);
-        RestUtil.R.preconditionFailed("No capture.device.timezone set on agent");
+        timezone = TimeZone.getDefault().getID();
+        logger.warn("No 'capture.device.timezone' set on agent {}. The default server timezone {} will be used.",
+                device, timezone);
       }
     }
 
