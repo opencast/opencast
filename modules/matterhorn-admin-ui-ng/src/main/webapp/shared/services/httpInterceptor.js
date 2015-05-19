@@ -19,7 +19,14 @@ angular.module('adminNg').config(['$provide', '$httpProvider', function ($provid
   
   // Intercept http calls.
   $provide.factory('HttpInterceptor', ['$q', 'Notifications', function ($q, Notifications) {
-    var unresponsiveNotifications;
+    var unresponsiveNotifications,
+        addNotification = function (message) {
+          if (angular.isDefined(unresponsiveNotifications)) {
+              Notifications.remove(unresponsiveNotifications);
+          }
+
+          unresponsiveNotifications = Notifications.add('error', message, 'global', -1); 
+        };
 
 
     return {
@@ -34,14 +41,17 @@ angular.module('adminNg').config(['$provide', '$httpProvider', function ($provid
       },
  
       responseError: function (rejection) {
-        if (rejection.status === 0) {
-            if (angular.isDefined(unresponsiveNotifications)) {
-              Notifications.remove(unresponsiveNotifications);
-            }
-            unresponsiveNotifications = Notifications.add('error', 'SERVER_UNRESPONSIVE', 'global', -1);
-        } else if (rejection.status === 419) {
-          // Try to access index.html again --> will redirect to the login page
-          location.reload(true);
+        switch (rejection.status) {
+          case 0:
+            addNotification('SERVICE_UNAVAILABLE');
+            break;
+          case 503:
+            addNotification('SERVER_UNRESPONSIVE');
+            break;
+          case 419:
+            // Try to access index.html again --> will redirect to the login page
+            location.reload(true);
+            break;
         }
 
         return $q.reject(rejection);

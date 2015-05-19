@@ -92,7 +92,8 @@
      "VIDEO_CUT_NOT_SAVED": "The editing information could not be saved",
      "VIDEO_CUT_SAVED": "The editing information has been saved",
      "VIDEO_CUT_PROCESSING": "The video is being processed...",
-     "SERVER_UNRESPONSIVE": "The server is currently unresponsive."
+     "SERVER_UNRESPONSIVE": "The server is currently unresponsive.",
+     "SERVICE_UNAVAILABLE": "The service called is currently unavailable."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
