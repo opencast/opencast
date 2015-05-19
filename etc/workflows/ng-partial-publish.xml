@@ -150,7 +150,7 @@
         <configuration key="source-flavor">presenter/themed</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">flash.http</configuration>
+        <configuration key="encoding-profile">mp4-medium.http</configuration>
       </configurations>
     </operation>
 
@@ -164,7 +164,7 @@
         <configuration key="source-flavor">presentation/themed</configuration>
         <configuration key="target-flavor">presentation/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">flash-vga.http</configuration>
+        <configuration key="encoding-profile">mp4-vga-medium.http</configuration>
       </configurations>
     </operation>
 
@@ -179,7 +179,7 @@
         <configuration key="source-flavor">presenter/themed</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">flash-audio.http</configuration>
+        <configuration key="encoding-profile">mp3.http</configuration>
       </configurations>
     </operation>
 
