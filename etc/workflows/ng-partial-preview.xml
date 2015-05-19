@@ -26,7 +26,7 @@
         <configuration key="source-flavors">*/work</configuration>
         <configuration key="target-flavor">*/preview</configuration>
         <configuration key="target-tags">+preview</configuration>
-        <configuration key="encoding-profile">preview</configuration>
+        <configuration key="encoding-profile">mp4-preview.http</configuration>
       </configurations>
     </operation>
 

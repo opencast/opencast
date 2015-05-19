@@ -111,7 +111,7 @@
           <configuration key="source-flavor-part-1-mandatory">true</configuration>
           <configuration key="source-flavor-part-2">branding/trailer</configuration>
           <configuration key="target-flavor">presenter/themed</configuration>
-          <configuration key="encoding-profile">defaults-concat-vga-hd</configuration>
+          <configuration key="encoding-profile">concat.work</configuration>
           <configuration key="output-resolution">part-1</configuration>
         </configurations>
       </operation>
@@ -128,7 +128,7 @@
           <configuration key="source-flavor-part-1-mandatory">true</configuration>
           <configuration key="source-flavor-part-2">branding/trailer</configuration>
           <configuration key="target-flavor">presentation/themed</configuration>
-          <configuration key="encoding-profile">defaults-concat-camera-hd</configuration>
+          <configuration key="encoding-profile">concat.work</configuration>
           <configuration key="output-resolution">part-1</configuration>
         </configurations>
       </operation>
@@ -150,7 +150,7 @@
         <configuration key="source-flavor">presenter/themed</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">defaults-camera-hd</configuration>
+        <configuration key="encoding-profile">flash.http</configuration>
       </configurations>
     </operation>
 
@@ -164,7 +164,7 @@
         <configuration key="source-flavor">presentation/themed</configuration>
         <configuration key="target-flavor">presentation/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">defaults-vga-hd</configuration>
+        <configuration key="encoding-profile">flash-vga.http</configuration>
       </configurations>
     </operation>
 
@@ -179,7 +179,7 @@
         <configuration key="source-flavor">presenter/themed</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">defaults-mp3</configuration>
+        <configuration key="encoding-profile">flash-audio.http</configuration>
       </configurations>
     </operation>
 
