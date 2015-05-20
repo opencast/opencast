@@ -102,13 +102,8 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
         var path = Engage.getPluginPath("EngagePluginTabDescription").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
-        if (language == "de") {
-            Engage.log("Tab:Description: Chosing german translations");
-            jsonstr += "language/de.json";
-        } else { // No other languages supported, yet
-            Engage.log("Tab:Description: Chosing english translations");
-            jsonstr += "language/en.json";
-        }
+        Engage.log("Controls: selecting language " + language);
+        jsonstr += "language/" + language + ".json";
         $.ajax({
             url: jsonstr,
             dataType: "json",
@@ -198,6 +193,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
                 }
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
+                $("#engage_tab_" + plugin.name.replace(/\s/g,"_")).text(tempVars.str_description);
                 /*
         	    $(".description-item").mouseover(function() {
         	        $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
@@ -235,6 +231,8 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
             Utils = new utils();
             initTranslate(Utils.detectLanguage(), function() {
                 Engage.log("Tab:Description: Successfully translated.");
+                locale = translate("value_locale", locale);
+                dateFormat = translate("value_dateFormatFull", dateFormat);
                 initCount -= 1;
                 if (initCount <= 0) {
                     initPlugin();

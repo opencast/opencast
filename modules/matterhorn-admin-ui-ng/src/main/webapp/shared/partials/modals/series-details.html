@@ -96,8 +96,11 @@
     <div class="modal-content" data-modal-tab-content="permissions" data-level="1">
         <p class="tab-desc"></p>
         <div class="modal-body">
+
+            <div data-admin-ng-notifications="" type="error" context="series-acl"></div>
             <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
             <div data-admin-ng-notifications="" type="warning" context="series-acl-{{resourceId}}"></div>
+
             <div class="full-col">
                 <ul>
                     <li>

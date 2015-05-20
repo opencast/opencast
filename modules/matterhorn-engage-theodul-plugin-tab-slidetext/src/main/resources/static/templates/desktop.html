@@ -7,9 +7,9 @@
     <div class="media mediaColor" id="tab_slidetext_segment_<%= i %>">
         <img class="media-object pull-left" src="<%= segment.image_url %>" alt="<%= str_segment %> <%= i %>" />
         <div class="media-body">
-            <h4 class="media-heading">
-                <p><%= str_segment %></p> <%= i %>
-            </h4>
+            <div class="media-heading">
+                <%= str_segment %> <%= i + 1 %>
+            </div>
             <div class="media-time">
                 <%= segment.time %>
             </div>

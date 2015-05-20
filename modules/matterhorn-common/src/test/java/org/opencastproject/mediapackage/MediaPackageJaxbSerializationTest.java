@@ -15,14 +15,16 @@
  */
 package org.opencastproject.mediapackage;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
-
-import junit.framework.Assert;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -47,11 +49,11 @@ public class MediaPackageJaxbSerializationTest {
       is = getClass().getResourceAsStream("/manifest-simple.xml");
       mediaPackage = mediaPackageBuilder.loadFromXml(is);
 
-      Assert.assertEquals(0, mediaPackage.getTracks().length);
-      Assert.assertEquals(1, mediaPackage.getCatalogs().length);
-      Assert.assertEquals(0, mediaPackage.getAttachments().length);
+      assertEquals(0, mediaPackage.getTracks().length);
+      assertEquals(1, mediaPackage.getCatalogs().length);
+      assertEquals(0, mediaPackage.getAttachments().length);
 
-      Assert.assertEquals("dublincore/episode", mediaPackage.getCatalogs()[0].getFlavor().toString());
+      assertEquals("dublincore/episode", mediaPackage.getCatalogs()[0].getFlavor().toString());
     } finally {
       IOUtils.closeQuietly(is);
     }
@@ -84,22 +86,22 @@ public class MediaPackageJaxbSerializationTest {
 
     // Serialize the media package
     String xml = MediaPackageParser.getAsXml(mp);
-    Assert.assertNotNull(xml);
+    assertNotNull(xml);
 
     // Serialize the media package as JSON
     String json = MediaPackageParser.getAsJSON(mp);
-    Assert.assertNotNull(json);
+    assertNotNull(json);
 
     // Deserialize the media package
     MediaPackage deserialized = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
             .loadFromXml(IOUtils.toInputStream(xml, "UTF-8"));
 
     // Ensure that the deserialized mediapackage is correct
-    Assert.assertEquals(2, deserialized.getCatalogs().length);
-    Assert.assertEquals(1, deserialized.getAttachments().length);
-    Assert.assertEquals(1, deserialized.getTracks().length);
-    Assert.assertEquals(2, deserialized.getTracks()[0].getStreams().length);
-    Assert.assertEquals(1, deserialized.getCatalogs(new MediaPackageReferenceImpl(cat1)).length);
+    assertEquals(2, deserialized.getCatalogs().length);
+    assertEquals(1, deserialized.getAttachments().length);
+    assertEquals(1, deserialized.getTracks().length);
+    assertEquals(2, deserialized.getTracks()[0].getStreams().length);
+    assertEquals(1, deserialized.getCatalogs(new MediaPackageReferenceImpl(cat1)).length);
   }
 
   /**
@@ -111,14 +113,14 @@ public class MediaPackageJaxbSerializationTest {
     String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><mediapackage start=\"0\" id=\"123\" duration=\"0\" xmlns=\"http://mediapackage.opencastproject.org\"><metadata><catalog type=\"dublincore/episode\"><mimetype>text/xml</mimetype><tags/><checksum type=\"md5\">7891011abcd</checksum><url>http://opencastproject.org/index.html</url></catalog></metadata><attachments><attachment id=\"attachment-1\"><tags/><checksum type=\"md5\">123456abcd</checksum><url>http://opencastproject.org/index.html</url></attachment></attachments></mediapackage>";
     MediaPackage deserialized = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
             .loadFromXml(IOUtils.toInputStream(xml, "UTF-8"));
-    Assert.assertEquals(2, deserialized.getElements().length);
+    assertEquals(2, deserialized.getElements().length);
 
     String elementXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>video/mpeg</mimetype>"
             + "<url>http://localhost:8080/workflow/samples/screen.mpg</url></track>";
     MediaPackageElement element = MediaPackageElementParser.getFromXml(elementXml);
-    Assert.assertEquals("track-1", element.getIdentifier());
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, element.getFlavor());
-    Assert.assertEquals("http://localhost:8080/workflow/samples/screen.mpg", element.getURI().toString());
+    assertEquals("track-1", element.getIdentifier());
+    assertEquals(MediaPackageElements.PRESENTATION_SOURCE, element.getFlavor());
+    assertEquals("http://localhost:8080/workflow/samples/screen.mpg", element.getURI().toString());
   }
 
   @Test
@@ -127,14 +129,14 @@ public class MediaPackageJaxbSerializationTest {
     try {
       in = this.getClass().getResourceAsStream("/manifest.xml");
       MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(in);
-      Assert.assertEquals(2, mp.getTracks().length);
-      Assert.assertTrue(mp.getTracks()[0].hasVideo());
-      Assert.assertTrue(!mp.getTracks()[0].hasAudio());
-      Assert.assertTrue(mp.getTracks()[1].hasAudio());
-      Assert.assertTrue(!mp.getTracks()[1].hasVideo());
-      Assert.assertEquals(3, mp.getCatalogs().length);
-      Assert.assertEquals(2, mp.getAttachments().length);
-      Assert.assertEquals(1, mp.getPublications().length);
+      assertEquals(2, mp.getTracks().length);
+      assertTrue(mp.getTracks()[0].hasVideo());
+      assertTrue(!mp.getTracks()[0].hasAudio());
+      assertTrue(mp.getTracks()[1].hasAudio());
+      assertTrue(!mp.getTracks()[1].hasVideo());
+      assertEquals(3, mp.getCatalogs().length);
+      assertEquals(2, mp.getAttachments().length);
+      assertEquals(1, mp.getPublications().length);
     } finally {
       IOUtils.closeQuietly(in);
     }
@@ -148,9 +150,9 @@ public class MediaPackageJaxbSerializationTest {
     original.setTitle(title);
     original.setSeriesTitle("s1");
     String xml = MediaPackageParser.getAsXml(original);
-    Assert.assertTrue(xml.indexOf(title) > 0);
+    assertTrue(xml.indexOf(title) > 0);
     MediaPackage unmarshalled = builder.loadFromXml(xml);
-    Assert.assertEquals(title, unmarshalled.getTitle());
-    Assert.assertEquals("s1", unmarshalled.getSeriesTitle());
+    assertEquals(title, unmarshalled.getTitle());
+    assertEquals("s1", unmarshalled.getSeriesTitle());
   }
 }

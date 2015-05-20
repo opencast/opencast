@@ -49,7 +49,16 @@ angular.module('adminNg.services')
 
             if (params.collection) {
                 if (angular.isArray(value)) {
-                    params.presentableValue = value;
+                    var presentableValue = '';
+
+                    angular.forEach(value, function (item, index) {
+                        presentableValue += item;
+                        if ((index + 1) < value.length) {
+                            presentableValue += ', ';
+                        }
+                    });
+
+                    params.presentableValue = presentableValue;
                 } else {
                     params.presentableValue = params.collection[value];
                 }

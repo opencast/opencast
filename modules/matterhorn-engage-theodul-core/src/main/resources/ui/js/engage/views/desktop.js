@@ -115,7 +115,7 @@ define(["jquery", "engage/core", "engage/models/engage", "engage/tab_logic"], fu
             case id_engage_tab:
                 var tab_ref = plugin.name.replace(/ /g, "_");
                 // insert tab navigation line
-                var tabNavTag = "<li><a href=\"#" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + "\">" + (((translationData != null) && (translationData[plugin_name] != undefined)) ? translationData[plugin_name] : plugin.name) + "</a></li>";
+                var tabNavTag = "<li><a href=\"#" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + "\"><div id=\"engage_tab_" + plugin.name.replace(/\s/g,"_") + "\">" + (((translationData != null) && (translationData[plugin_name] != undefined)) ? translationData[plugin_name] : plugin.name) + "</div></a></li>";
                 $("#" + id_engage_tab_nav).prepend(tabNavTag);
                 // insert tab content
                 var tabTag = "<div class=\"" + class_tab_pane + "\" id=\"" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + "\">" + plugin.templateProcessed + "</div>";

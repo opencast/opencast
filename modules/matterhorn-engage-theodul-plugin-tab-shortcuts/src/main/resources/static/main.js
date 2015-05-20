@@ -103,13 +103,8 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
         var path = Engage.getPluginPath("EngagePluginTabShortcuts").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
-        if (language == "de") {
-            Engage.log("Tab:Shortcuts: Chosing german translations");
-            jsonstr += "language/de.json";
-        } else { // No other languages supported, yet
-            Engage.log("Tab:Shortcuts: Chosing english translations");
-            jsonstr += "language/en.json";
-        }
+        Engage.log("Controls: selecting language " + language);
+        jsonstr += "language/" + language + ".json";
         $.ajax({
             url: jsonstr,
             dataType: "json",
@@ -155,12 +150,14 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                 var tempVars = {
                     str_displayShortcuts: translate("displayShortcuts", "Display shortcuts"),
                     str_noShortcutsAvailable: translate("noShortcutsAvailable", "No shortcuts available"),
-                    str_shortcutName: translate(name, "Shortcut name"),
-                    str_shortcut: translate(name, "Shortcut"),
-                    shortcuts: shortcuts
+                    str_shortcutName: translate("name", "Shortcut name"),
+                    str_shortcut: translate("shortcut", "Shortcut"),
+                    shortcuts: shortcuts,
+                    str_shortcuts: translate("shortcuts", "Shortcuts")
                 };
                 // compile template and load into the html
                 this.$el.html(_.template(this.template, tempVars));
+                $("#engage_tab_" + plugin.name.replace(/\s/g,"_")).text(tempVars.str_shortcuts);
             }
         }
     });

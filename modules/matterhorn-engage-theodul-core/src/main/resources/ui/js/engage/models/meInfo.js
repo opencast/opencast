@@ -19,8 +19,14 @@ define(['jquery', 'backbone'], function($, Backbone) {
     "use strict";
 
     var prop_shortcut = "player.shortcut.";
+    var prop_allowedtags = "player.allowedtags";
+    var prop_allowedformats = "player.allowedformats";
     var prop_mastervideotype = "player.mastervideotype";
     var prop_positioncontrols = "player.positioncontrols";
+    var prop_logo_small = "logo_small";
+    var prop_logo_large = "logo_large";
+    var prop_link_mediamodule = "link_mediamodule";
+    var prop_show_embed_link = "show_embed_links";
     var ready = false;
     var positioncontrols = "";
 
@@ -33,7 +39,13 @@ define(['jquery', 'backbone'], function($, Backbone) {
             this.fetch({
                 success: function(me) {
                     var shortcuts = new Array();
+                    var allowedTags;
+                    var allowedFormats;
                     var mastervideotype = "";
+                    var logo_large = "";
+                    var logo_small = "";
+                    var link_mediamodule = false
+                    var show_embed_link = false;
                     if (me && me.attributes && me.attributes.org && me.attributes.org.properties) {
                         // extract shortcuts
                         $.each(me.attributes.org.properties, function(key, value) {
@@ -45,6 +57,14 @@ define(['jquery', 'backbone'], function($, Backbone) {
                                     key: value
                                 });
                             }
+                            // allowed tags on videos that should be played
+                            else if ((key == prop_allowedtags) && value) {
+                                allowedTags = value;
+                            }
+                            // formats that should be played
+                            else if ((key == prop_allowedformats) && value) {
+                                allowedFormats = value;
+                            }
                             // master video type
                             else if ((key == prop_mastervideotype) && value) {
                                 mastervideotype = value;
@@ -52,11 +72,33 @@ define(['jquery', 'backbone'], function($, Backbone) {
                             // controls position
                             else if ((key == prop_positioncontrols) && value) {
                                 positioncontrols = value;
+                            } 
+                            // large logo
+                            else if ((key == prop_logo_large) && value) {
+                                logo_large = value;
                             }
+                            // small logo
+                            else if ((key == prop_logo_small) && value) {
+                                logo_small = value;
+                            }             
+                            // link to Media Modul
+                            else if ((key == prop_link_mediamodule) && value) {
+                                if (value.trim() == "true") link_mediamodule = true;
+                            }
+                            // show embed links
+                            else if ((key == prop_show_embed_link) && value) {
+                                if (value.trim() == "true") show_embed_link = true;
+                            }                              
                         });
                     }
+                    me.set("allowedtags", allowedTags);
+                    me.set("allowedformats", allowedFormats);
                     me.set("shortcuts", shortcuts);
                     me.set("mastervideotype", mastervideotype);
+                    me.set("logo_large", logo_large);
+                    me.set("logo_small", logo_small);
+                    me.set("link_mediamodule", link_mediamodule);
+                    me.set("show_embed_links", show_embed_link);
                     ready = true;
                 }
             });

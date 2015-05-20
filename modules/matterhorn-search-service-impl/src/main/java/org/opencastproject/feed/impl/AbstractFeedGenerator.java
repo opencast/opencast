@@ -35,7 +35,7 @@ import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchResultItem.SearchResultItemType;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.lang.StringUtils;
@@ -228,7 +228,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    */
   @Override
   public void initialize(Properties properties) {
-    serverUrl = (String) properties.get(MatterhornConstans.SERVER_URL_PROPERTY);
+    serverUrl = (String) properties.get(MatterhornConstants.SERVER_URL_PROPERTY);
 
     uri = generateFeedUri((String) properties.get(PROP_URI));
 

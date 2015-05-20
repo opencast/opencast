@@ -1,7 +1,7 @@
 {
   "value_locale":"de",
   "ok":"OK",
-  "loginInformation":"Einloggen mit einem Matterhorn-Benutzerkonto",
+  "loginInformation":"Einloggen mit einem Opencast-Benutzerkonto",
   "login":"Einloggen",
   "logout":"Ausloggen",
   "loginLogout":"Einloggen\/Ausloggen",

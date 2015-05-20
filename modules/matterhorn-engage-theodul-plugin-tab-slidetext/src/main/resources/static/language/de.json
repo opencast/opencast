@@ -1,5 +1,6 @@
 {
   "value_locale":"de",
   "segment":"Segment",
-  "noSlidesAvailable":"Keine Folien verfügbar."
+  "noSlidesAvailable":"Keine Folien verfügbar.",
+  "slide_text":"Folientext" 
 }

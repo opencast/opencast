@@ -29,6 +29,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -93,6 +94,8 @@ public class IndexEndpoint {
               logger.info("Finished repopulating the index");
             } catch (InterruptedException e) {
               logger.error("Repopulating the index was interrupted {}", ExceptionUtils.getStackTrace(e));
+            } catch (CancellationException e) {
+              logger.trace("Listening for index messages has been cancelled.");
             } catch (ExecutionException e) {
               logger.error("Repopulating the index failed to execute because {}", ExceptionUtils.getStackTrace(e));
             } catch (Throwable t) {

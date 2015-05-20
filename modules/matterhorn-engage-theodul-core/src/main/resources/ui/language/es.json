@@ -1,0 +1,18 @@
+{
+  "error":"Error",
+  "error_unknown":"Se ha producido un error. Por favor, vuelva a cargar la página.",
+  "reloadPage":"Recargar página",
+  "loginInformation":"Inicie sesión con su cuenta de usuario de Matterhorn",
+  "login":"Iniciar sesión",
+  "enterUsernamePassword":"Por favor, introduzca su nombre de usuario y contraseña:",
+  "username":"Nombre de usuario",
+  "password":"Contraseña",
+  "rememberMe":"Recordarme",
+  "cancel":"Cancelar",
+  "loginSuccessful":"Sesión iniciada correctamente. Por favor, vuelva a cargar la página si ésta no lo hace automáticamente.",
+  "logoutSuccessful":"Sesión terminada correctamente. Por favor, vuelva a cargar la página si ésta no lo hace automáticamente.",
+  "loginFailed":"Error al iniciar sesión.",
+  "description":"Descripción",
+  "slideText":"Texto de la diapositiva",
+  "shortcuts":"Atajos"
+}

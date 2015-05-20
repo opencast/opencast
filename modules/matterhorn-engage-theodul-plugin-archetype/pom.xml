@@ -8,7 +8,7 @@
   <packaging>maven-archetype</packaging>
 
   <name>matterhorn-engage-theodul-plugin-archetype</name>
-  <description>An archetype that generates a plugin for the Opencast Matterhorn Theodul Player</description>
+  <description>An archetype that generates a plugin for the Opencast Theodul Player</description>
 
   <parent>
     <groupId>org.opencastproject</groupId>

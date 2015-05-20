@@ -1,0 +1,101 @@
+
+
+site_name: Opencast - Administration Guide
+repo_url: https://bitbucket.org/opencast-community/matterhorn/src/d96a3d8680fa609d31eb5071b35d46c9a96e9bdf/docs/guides/admin/
+
+# Default theme used is readthedocs
+theme: readthedocs
+
+# Some of the themes elements can be overridded by elements in this folder
+# Note: this is currently not working in on ReadTheDocs
+theme_dir: 'theme_override'
+
+# The directory that contain the source .md files
+docs_dir: 'docs'
+
+# The directory to which the site is built using mkdocs
+site_dir: 'site'
+
+# This needs to be listed in order to populate the left navigation and the TOC
+# Items will appear in this order
+
+pages:
+- ['index.md', 'Administration Guide']
+
+# installation
+- ['installation/index.md', 'Installation', 'Installation Home']
+- ['installation/multiple-servers.md', 'Installation', 'Multiple Servers']
+- ['installation/rpm-fedora.md', 'Installation', 'RPM Fedora']
+- ['installation/rpm-rhel-sl-centos.md', 'Installation', 'RPM RHEL/CentOS']
+- ['installation/source-debian-ubuntu.md', 'Installation', 'Source Debian/Ubuntu']
+- ['installation/source-rhel-sl-centos.md', 'Installation', 'Source RHEL/CentOS']
+
+# configuration
+- ['configuration/index.md', 'Configuration', 'Configuration Home']
+- ['configuration/basic.md', 'Configuration', 'Basic']
+- ['configuration/database.md', 'Configuration', 'Database']
+- ['configuration/message-broker.md', 'Configuration', 'Message Broker']
+- ['configuration/encoding.md', 'Configuration', 'Encoding']
+- ['configuration/logging.and.privacy.md', 'Configuration', 'Logging and Privacy']
+- ['configuration/multi.tenancy.md', 'Configuration', 'Multi Tenancy']
+- ['configuration/security.md', 'Configuration', 'Security']
+- ['configuration/security.cas.md', 'Configuration', 'Security - CAS']
+- ['configuration/workflow.md', 'Configuration', 'Workflow']
+- ['configuration/configuration.files.and.keys.md', 'Configuration', 'Configuration Files and Keys']
+
+# modules
+- ['modules/index.md', 'Modules', 'Module Configuration Home']
+- ['modules/atomrss.md', 'Modules', 'Atom/RSS']
+- ['modules/mediamodule.configuration.md', 'Modules', 'Media Module Configuration']
+- ['modules/player.architecture.md', 'Modules', 'Player - Architecture']
+- ['modules/player.configuration.md', 'Modules', 'Player - Configuration']
+- ['modules/player.core.reference.md', 'Modules', 'Player - Core Reference']
+- ['modules/player.events.md', 'Modules', 'Player - Events']
+- ['modules/player.storage.md', 'Modules', 'Player - Storage']
+- ['modules/player.plugins.md', 'Modules', 'Player - Plugins']
+- ['modules/player.plugin.development.md', 'Modules', 'Player - Plugin Development']
+- ['modules/player.testing.md', 'Modules', 'Player - Testing']
+- ['modules/player.configuration.md', 'Modules', 'Player - Configuration']
+- ['modules/player.url.parameter.md', 'Modules', 'Player - URL Parameters']
+- ['modules/searchindex.md', 'Modules', 'Search Index']
+- ['modules/textextraction.md', 'Modules', 'Text Extraction']
+- ['modules/videoeditor.manual.md', 'Modules', 'Video Editor']
+- ['modules/videoeditor.setup.md', 'Modules', 'Video Editor - Setup']
+- ['modules/videoeditor.architecture.md', 'Modules', 'Video Editor - Architecture']
+- ['modules/videosegmentation.md', 'Modules', 'Video Segmentation']
+- ['modules/youtubepublication.md', 'Modules', 'YouTube publication']
+
+# upgrade
+- ['upgrade/index.md', 'Upgrade', 'Upgrading Home']
+
+# workflow operation handlers
+- ['workflowoperationhandlers/index.md', 'Workflow Operation Handlers', 'Workflow Operation Handler Overview']
+- ['workflowoperationhandlers/analyzeaudio-woh.md', 'Workflow Operation Handlers', 'Analyze audio WOH']
+- ['workflowoperationhandlers/applyacl-woh.md', 'Workflow Operation Handlers', 'Apply ACL WOH']
+- ['workflowoperationhandlers/archive-woh.md', 'Workflow Operation Handlers', 'Archive WOH']
+- ['workflowoperationhandlers/caption-woh.md', 'Workflow Operation Handlers', 'Caption WOH']
+- ['workflowoperationhandlers/compose-woh.md', 'Workflow Operation Handlers', 'Compose WOH']
+- ['workflowoperationhandlers/composite-woh.md', 'Workflow Operation Handlers', 'Composite WOH']
+- ['workflowoperationhandlers/concat-woh.md', 'Workflow Operation Handlers', 'Concat WOH']
+- ['workflowoperationhandlers/defaults-woh.md', 'Workflow Operation Handlers', 'Defaults WOH']
+- ['workflowoperationhandlers/editor-woh.md', 'Workflow Operation Handlers', 'Editor WOH']
+- ['workflowoperationhandlers/email-woh.md', 'Workflow Operation Handlers', 'Email WOH']
+- ['workflowoperationhandlers/extracttext-woh.md', 'Workflow Operation Handlers', 'Extract Text WOH']
+- ['workflowoperationhandlers/httpnotify-woh.md', 'Workflow Operation Handlers', 'HTTP Notify WOH']
+- ['workflowoperationhandlers/image-woh.md', 'Workflow Operation Handlers', 'Image WOH']
+- ['workflowoperationhandlers/imagetovideo-woh.md', 'Workflow Operation Handlers', 'Image to Video WOH']
+- ['workflowoperationhandlers/incident-woh.md', 'Workflow Operation Handlers', 'Incident WOH']
+- ['workflowoperationhandlers/ingestdownload-woh.md', 'Workflow Operation Handlers', 'Ingest-Download WOH']
+- ['workflowoperationhandlers/inspect-woh.md', 'Workflow Operation Handlers', 'Inspect WOH']
+- ['workflowoperationhandlers/normalizeaudio-woh.md', 'Workflow Operation Handlers', 'Normalize Audio WOH']
+- ['workflowoperationhandlers/postmediapackage-woh.md', 'Workflow Operation Handlers', 'Post Media Package WOH']
+- ['workflowoperationhandlers/prepareav-woh.md', 'Workflow Operation Handlers', 'Prepare A/V WOH']
+- ['workflowoperationhandlers/publishengage-woh.md', 'Workflow Operation Handlers', 'Publish Engage WOH']
+- ['workflowoperationhandlers/republish-woh.md', 'Workflow Operation Handlers', 'Republish WOH']
+- ['workflowoperationhandlers/segmentpreviews-woh.md', 'Workflow Operation Handlers', 'Segment Previews WOH']
+- ['workflowoperationhandlers/segmentvideo-woh.md', 'Workflow Operation Handlers', 'Segment Video WOH']
+- ['workflowoperationhandlers/silence-woh.md', 'Workflow Operation Handlers', 'Silence WOH']
+- ['workflowoperationhandlers/tag-woh.md', 'Workflow Operation Handlers', 'Tag WOH']
+- ['workflowoperationhandlers/trim-woh.md', 'Workflow Operation Handlers', 'Trim WOH']
+- ['workflowoperationhandlers/waveform-woh.md', 'Workflow Operation Handlers', 'Waveform WOH']
+- ['workflowoperationhandlers/zip-woh.md', 'Workflow Operation Handlers', 'Zip WOH']
