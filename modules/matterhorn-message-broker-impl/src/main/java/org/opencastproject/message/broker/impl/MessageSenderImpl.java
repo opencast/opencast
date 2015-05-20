@@ -16,6 +16,7 @@
 package org.opencastproject.message.broker.impl;
 
 import static org.opencastproject.util.OsgiUtil.getContextProperty;
+import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageSender;
@@ -59,13 +60,17 @@ public class MessageSenderImpl extends MessageBaseFacility implements MessageSen
   public void activate(ComponentContext cc) throws Exception {
     logger.info("MessageSender service is starting...");
     final String url = getContextProperty(cc, ACTIVEMQ_BROKER_URL_KEY);
+    Option<String> username = getOptContextProperty(cc, ACTIVEMQ_BROKER_USERNAME_KEY);
+    Option<String> password = getOptContextProperty(cc, ACTIVEMQ_BROKER_PASSWORD_KEY);
+
     logger.info("MessageSender is configured to connect with URL {}", url);
     try {
         disconnectMessageBroker();
-        connectMessageBroker(url);
+        connectMessageBroker(url, username, password);
     } catch (JMSException e) {
         throw new ConfigurationException(ACTIVEMQ_BROKER_URL_KEY, null, e);
     }
+
     logger.info("MessageSender service successfully started");
   }
 

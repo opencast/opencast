@@ -15,6 +15,8 @@
  */
 package org.opencastproject.message.broker.impl;
 
+import org.opencastproject.util.data.Option;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.transport.TransportListener;
 import org.slf4j.Logger;
@@ -36,6 +38,12 @@ public class MessageBaseFacility {
   /** The key to find the URL to connect to the ActiveMQ Message Broker */
   protected static final String ACTIVEMQ_BROKER_URL_KEY = "activemq.broker.url";
 
+  /** The key to find the username to connect to the ActiveMQ Message Broker */
+  protected static final String ACTIVEMQ_BROKER_USERNAME_KEY = "activemq.broker.username";
+
+  /** The key to find the password to connect to the ActiveMQ Message Broker */
+  protected static final String ACTIVEMQ_BROKER_PASSWORD_KEY = "activemq.broker.password";
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(MessageBaseFacility.class);
 
@@ -52,8 +60,13 @@ public class MessageBaseFacility {
   private MessageProducer producer = null;
 
   /** Opens new sessions and connections to the message broker */
-  protected void connectMessageBroker(final String url) throws JMSException {
+  protected void connectMessageBroker(final String url, Option<String> brokerUsername, Option<String> brokerPassword)
+          throws JMSException {
     connectionFactory = new ActiveMQConnectionFactory(url);
+    if (brokerUsername.isSome() && brokerPassword.isSome()) {
+      connectionFactory.setUserName(brokerUsername.get());
+      connectionFactory.setPassword(brokerPassword.get());
+    }
     connectionFactory.setTransportListener(new TransportListener() {
       @Override
       public void transportResumed() {
