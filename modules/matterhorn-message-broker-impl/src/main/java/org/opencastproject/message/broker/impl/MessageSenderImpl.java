@@ -70,7 +70,6 @@ public class MessageSenderImpl extends MessageBaseFacility implements MessageSen
     } catch (JMSException e) {
         throw new ConfigurationException(ACTIVEMQ_BROKER_URL_KEY, null, e);
     }
-
     logger.info("MessageSender service successfully started");
   }
 
