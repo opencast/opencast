@@ -33,13 +33,8 @@ will give you a basic configuration with all queues set-up and accepting connect
 61616.`Simply replace the default ActiveMQ configuration, usually located at `/etc/activemq/activemq.xml`, with this
 file.
 
-In the Opencast Matterhorn configuration, there are currently two places for Active MQ configuration (*Work in progress
-to put this to one central place*). These are:
-
- - `services/org.opencastproject.message.broker.impl.MessageReceiverImpl.properties`
- - `services/org.opencastproject.message.broker.impl.MessageSenderImpl.properties`
-
-In both places, the connection to the message broker can be configured like this:
+Then configure the ActiveMQ connectvion in the `config.properties`. The default configuration points to a local
+installation of ActiveMQ, but that can be changed with:
 
     activemq.broker.url = failover://tcp://example.opencast.org:61616
 
