@@ -3,7 +3,7 @@
 
 .extra-small-modal {
     width: 400px;
-    margin-left: -200px;   
+    margin-left: -200px;
 }
 
 .small-modal {
@@ -12,12 +12,12 @@
 }
 
 .medium-modal {
-    width: @modal-width; 
+    width: @modal-width;
     margin-left: -(@modal-width / 2);
 }
 
 .large-modal {
-    width: 1000px; 
+    width: 1000px;
     margin-left: -500px;
 }
 
@@ -26,15 +26,15 @@
 // ----------------------------------------
 
 .modal {
-    
+
     // Hide modal
     visibility: hidden;
     opacity: 0;
     display: none;
     .transition(all .2s);
-    z-index: (@max-z + 2);    
+    z-index: (@max-z + 2);
     .size(@modal-width, auto);
-    
+
     // Center box
     position: absolute;
     top: 100px; left: 50%;
@@ -42,13 +42,13 @@
     background: @body-background;
     border-radius: @main-border-radius;
     .box-shadow(0px 0px 20px 2px rgba(0,0,0,.3));
-    
+
     &.active {
         opacity: 1;
         top: 30px;
         visibility: visible;
     }
-    
+
     // Directional Arrows Outside of Modal
     .arrow {
         @spacing: -75px;
@@ -58,19 +58,19 @@
         color: rgba(255,255,255, .7);
         text-shadow: 0px 0px 10px rgba(0,0,0,.4);
         .transition(all .2s);
-        
+
         &.fa-chevron-left  {
             left: @spacing;
         }
-        
+
         &.fa-chevron-right {
             right: @spacing;
         }
-        
+
         &:hover {
             color: #fff;
         }
-        
+
     }
 
 }
@@ -85,7 +85,7 @@
     visibility: hidden;
     opacity: 0;
     .transition(all .15s);
-    
+
     &.active {
         opacity: 1;
         visibility: visible;
@@ -132,11 +132,11 @@
             .accordion-header(@height);
             .user-select(none);
             position: static;
-            
+
             &.expand {
                 .accordion-header(@height, true);
             }
-            
+
             // This is used when there is data displayed in header
             span.header-value {
                 float: right;
@@ -153,11 +153,11 @@
         vertical-align: top;
 
         &:not {
-        
+
             &(:first-child) {
                 margin-left: 1%;
             }
-            
+
             &(:last-child) {
                 margin-right: 1%;
             }
@@ -188,17 +188,17 @@
             width: @modal-full-col-width;
 
             .obj-container .table-series .wrapper {
-            
+
                 padding: 1% 2%;
-                
+
                 &:first-child {
                     padding-top: 2%;
                 }
-                
+
                 &:last-child {
                     padding-bottom: 2%;
                 }
-                
+
                 header {
                     .border(@main-border-color);
                 }
@@ -212,7 +212,7 @@
             }
         }
 
-    } // full-col    
+    } // full-col
 } // modal
 
 
@@ -228,7 +228,7 @@
         border-radius: @main-border-radius;
         .border(@main-border-color);
         color: @black-50;
-        
+
         &:not(:last-child) {
             margin-bottom: 20px;
         }
@@ -236,7 +236,7 @@
         table {
             border: none;
             padding-left: 0;
-            
+
             &.main-tbl.top-tbl {
                 border-bottom: 1px solid @main-border-color;
                 border-radius: 0;
@@ -255,11 +255,11 @@
                     float: none;
                     margin: 0;
                 }
-                
+
                 a.external-link {
                     .fa-icon(@fa-external-link-square, before, inline-block, 4px, 0, inherit, 14px);
                     float: right;
-    
+
                     &:hover {
                         .fa-icon-color(before, @l-blue);
                     }
@@ -285,7 +285,7 @@
                 color: @black-40;
                 line-height: 18px;
                 margin-bottom: 15px;
-                
+
                 &:last-child {
                     margin-bottom: 8px;
                 }
@@ -305,12 +305,12 @@
                 padding: 10px 20px 5px;
                 border-bottom: 1px solid @main-border-color;
             }
-            
+
             h4 {
                 color: @black-60;
                 font-size: 14px;
                 margin-bottom: 8px;
-                
+
                 &:not(:first-child) {
                     margin-top: 15px;
                 }
@@ -346,7 +346,7 @@
             }
 
         } // obj-container
-    
+
     } // obj
 
 } // modal
