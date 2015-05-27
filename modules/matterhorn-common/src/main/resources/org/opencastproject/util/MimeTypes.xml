@@ -395,6 +395,11 @@
     <Extensions>flv</Extensions>
   </MimeType>
   <MimeType>
+    <Type>video/x-matroska</Type>
+    <Description>Matroska video</Description>
+    <Extensions>mkv</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>video/ogg</Type>
     <Description>Ogg video</Description>
     <Extensions>ogg,oga,ogv,ogx</Extensions>
