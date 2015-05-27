@@ -78,6 +78,7 @@ DEBUG_SUSPEND="n"
 FELIX_CONFIG_DIR=/etc/matterhorn
 FELIX_WORK_DIR=/srv/matterhorn
 FELIX_CACHE_DIR="/tmp/matterhorn/felix-cache"
+MATTERHORN_TEMP_DIR="/tmp/matterhorn/tmp"
 ADD_OPTS=""
 if [ -f $MATTERHORN/lib/matterhorn/matterhorn-capture-agent-impl*.jar ]
 then
@@ -136,7 +137,8 @@ JETTY="-Dorg.mortbay.jetty.Request.maxFormContentSize=1000000"
 DISABLE_PHONEHOME="-Dnet.sf.ehcache.skipUpdateCheck=true"
 DISABLE_PHONEHOME="${DISABLE_PHONEHOME} -Dorg.terracotta.quartz.skipUpdateCheck=true"
 
-JAVA="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
+JAVA="-Djava.io.tmpdir=$MATTERHORN_TEMP_DIR"
+JAVA="${JAVA} -Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
 [ "$1" == '--daemon' ] && GOSH="-Dgosh.args='--noshutdown -c noop=true'"
 
 if $DEBUG
