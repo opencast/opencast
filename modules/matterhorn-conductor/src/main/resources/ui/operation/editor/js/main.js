@@ -465,15 +465,18 @@ function loadTracks() {
         },
         success: function(data) {
             ocUtils.log("Done: Loading workflow instance data");
-
+            var previewFlavor = getFlavorsFromWorkflow(data, "preview-flavors", "preview");
+            var sourceFlavor = getFlavorsFromWorkflow(data, "source-flavors", "work");
+            
             // extract tracks
             workflowInstance = data.workflow;
             data = data.workflow.mediapackage.media.track;
             var singleFile = true;
-            for (i = 0; i < data.length; i++) {
-                if (data[i].type.indexOf("work") != -1) {
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].type.indexOf(sourceFlavor) != -1) {
                     tracks.tracks.push(data[i]);
-                } else if (data[i].type.indexOf("preview") != -1) {
+                }
+                if (data[i].type.indexOf(previewFlavor) != -1) {
                     previewTracks.push(data[i]);
                 }
             }
@@ -539,18 +542,22 @@ function loadTracks() {
 function createPlayer() {
     ocUtils.log("Creating player");
     ocUtils.log("#Preview tracks: " + previewTracks.length);
-    ocUtils.log("Preview track #1: URL: '" + previewTracks[0].url + "', type='" + previewTracks[0].mimetype + "'");
+    if (previewTracks.length > 0) {
+        ocUtils.log("Preview track #1: URL: '" + previewTracks[0].url + "', type='" + previewTracks[0].mimetype + "'");
 
-    $('#videoPlayer').prepend('<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>');
+        $('#videoPlayer').prepend('<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>');
 
-    var fps = (previewTracks[0] && previewTracks[0].video && previewTracks[0].video.framerate) ? previewTracks[0].video.framerate : 0;
-    var duration = previewTracks[0].duration / 1000;
-    ocUtils.log("FPS: '" + fps + "',  duration: '" + duration + "'");
+        var fps = (previewTracks[0] && previewTracks[0].video && previewTracks[0].video.framerate) ? previewTracks[0].video.framerate : 0;
+        var duration = previewTracks[0].duration / 1000;
+        ocUtils.log("FPS: '" + fps + "',  duration: '" + duration + "'");
 
-    player = $('#videoPlayer').mhPlayer({
-        fps: fps,
-        duration: duration
-    });
+        player = $('#videoPlayer').mhPlayer({
+            fps: fps,
+            duration: duration
+        });
+    } else {
+        player = $('#videoPlayer').text("No preview tracks found.");
+    }
 
     if (previewTracks.length >= 2) {
         ocUtils.log("Preview track #1: URL: '" + previewTracks[1].url + "', type='" + previewTracks[1].mimetype + "'");
@@ -777,6 +784,26 @@ function getPostdataId() {
     ocUtils.log("Done: Getting post data ID");
 
     return (postData.id != "");
+}
+
+function getFlavorsFromWorkflow(workflowReply, flavorKey, defaultFlavor) {
+    if (workflowReply.workflow.operations == undefined || workflowReply.workflow.operations.operation == undefined) {
+        return defaultFlavor;
+    }
+    var operations = workflowReply.workflow.operations.operation;
+    for (var i = 0; i < operations.length; i++) {
+        if (operations[i].id == "editor"){
+            if (operations[i].configurations != undefined && operations[i].configurations.configuration != undefined) {
+                for (var j = 0; j < operations[i].configurations.configuration.length; j++) {
+                    if (operations[i].configurations.configuration[j].key == flavorKey) {
+                        return operations[i].configurations.configuration[j].$.split("/")[1];
+                    } 
+                }
+            }
+            return defaultFlavor;
+        }
+    }
+    return defaultFlavor;
 }
 
 $(document).ready(function() {
