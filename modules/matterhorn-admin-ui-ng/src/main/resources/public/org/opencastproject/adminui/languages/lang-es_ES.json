@@ -101,8 +101,8 @@
         "CAPTION":"Eliminar"
       }
     },
-    "DELETE_WARNING_LINE1":"Una vez eliminados todos los metadatos, los archivos de audio y vídeo serán eliminados e irrecuperables.",
-    "DELETE_WARNING_LINE2":"",
+    "DELETE_EVENTS_WARNING_LINE1":"Una vez eliminados todos los metadatos, los archivos de audio y vídeo serán eliminados e irrecuperables.",
+    "DELETE_EVENTS_WARNING_LINE2":"",
     "SCHEDULE_TASK":{
       "CAPTION":"Comenzar Tarea",
       "GENERAL":{

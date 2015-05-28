@@ -101,8 +101,8 @@
         "CAPTION":"Löschen"
       }
     },
-    "DELETE_WARNING_LINE1":"Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",
-    "DELETE_WARNING_LINE2":"",
+    "DELETE_EVENTS_WARNING_LINE1":"Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",
+    "DELETE_EVENTS_WARNING_LINE2":"",
     "SCHEDULE_TASK":{
       "CAPTION":"Task starten",
       "GENERAL":{
