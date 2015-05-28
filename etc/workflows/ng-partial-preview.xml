@@ -25,7 +25,7 @@
       <configurations>
         <configuration key="source-flavors">*/work</configuration>
         <configuration key="target-flavor">*/preview</configuration>
-        <configuration key="target-tags">+preview</configuration>
+        <configuration key="target-tags">preview</configuration>
         <configuration key="encoding-profile">mp4-preview.http</configuration>
       </configurations>
     </operation>
@@ -61,6 +61,18 @@
       </configurations>
     </operation>
 
+    <!-- Tag the waveform for internal publishing -->
+    <!-- Fixme: remove once "waveform" operation supports target-tags -->
+
+    <operation
+      id="tag"
+      description="Preparing waveform for publishing">
+      <configurations>
+        <configuration key="source-flavors">*/waveform</configuration>
+        <configuration key="target-tags">+preview</configuration>
+      </configurations>
+    </operation>
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Silence detection                                                 -->
     <!--                                                                   -->
@@ -89,6 +101,7 @@
       <configurations>
         <configuration key="source-flavors">*/smil</configuration>
         <configuration key="target-flavor">smil/preview</configuration>
+        <configuration key="target-tags">+preview</configuration>
       </configurations>
     </operation>
 
@@ -97,17 +110,6 @@
     <!--                                                                   -->
     <!-- Distributing preview artifacts to preview publication channel.    -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-    <!-- Tag the waveform for internal publishing -->
-
-    <operation
-      id="tag"
-      description="Preparing preview artifacts for publishing">
-      <configurations>
-        <configuration key="source-flavors">*/preview,*/waveform,smil/*</configuration>
-        <configuration key="target-tags">+preview</configuration>
-      </configurations>
-    </operation>
 
     <!-- Publish previews -->
 
