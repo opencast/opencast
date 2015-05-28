@@ -28,6 +28,17 @@
       </configurations>
     </operation>
 
+    <!-- Tag the dublin core catalogs created during trim operation for archival and publication -->
+
+    <operation
+      id="tag"
+      description="Tagging metadata catalogs for archival and publication">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*</configuration>
+        <configuration key="target-tags">+archive,+engage-download</configuration>
+      </configurations>
+    </operation>
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Extract preview images                                            -->
     <!--                                                                   -->
