@@ -40,7 +40,11 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler"),
         focusVideo: new EngageEvent("Video:focusVideo", "increases the size of one video", "handler"),
         movePiP: new EngageEvent("Video:movePiP", "moves the smaller picture over the larger to the different corners", "handler"),
-        togglePiP: new EngageEvent("Video:togglePiP", "switches between PiP and next to each other layout", "handler")
+        togglePiP: new EngageEvent("Video:togglePiP", "switches between PiP and next to each other layout", "handler"),
+        moveUp: new EngageEvent("Video:moveUp", "moves video up", "trigger"),
+        moveDown: new EngageEvent("Video:moveDown", "moves video down", "trigger"),
+        moveLeft: new EngageEvent("Video:moveLeft", "moves video left", "trigger"),
+        moveRight: new EngageEvent("Video:moveRight", "moves video right", "trigger")
     };
 
     /* change these variables */
@@ -108,6 +112,10 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var shortcut_nextFocus = "focusNext";
     var shortcut_movePiP = "movePiP";
     var shortcut_togglePiP = "togglePiP";
+    var shortcut_moveLeft = "moveLeft";
+    var shortcut_moveRight = "moveRight";
+    var shortcut_moveUp = "moveUp";
+    var shortcut_moveDown = "moveDown";
 
     var basilOptions = {
         namespace: "mhStorage"
@@ -364,7 +372,32 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         pip = ! pip;
                         engageCore.trigger(events.togglePiP.getName(), pip);
                     });
-                    break;                
+                    break;
+                case shortcut_moveLeft:
+                    console.log("Shortcut moveLeft trigger");
+                    Mousetrap.bind(val.key, function() {
+                        console.log(val.key);
+                        engageCore.trigger(events.moveLeft.getName(), true);
+                    });
+                    break;
+                case shortcut_moveRight:
+                    Mousetrap.bind(val.key, function() {
+                        console.log(val.key);
+                        engageCore.trigger(events.moveRight.getName(), true);
+                    });
+                    break;
+                case shortcut_moveUp:
+                    Mousetrap.bind(val.key, function() {
+                        console.log(val.key);
+                        engageCore.trigger(events.moveUp.getName(), true);
+                    });
+                    break;
+                case shortcut_moveDown:
+                    Mousetrap.bind(val.key, function() {
+                        console.log(val.key);
+                        engageCore.trigger(events.moveDown.getName(), true);
+                    });
+                    break;  
                 default:
                     break;
             }

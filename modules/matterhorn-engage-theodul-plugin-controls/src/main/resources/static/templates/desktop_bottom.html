@@ -130,6 +130,24 @@
                 </ul>
             </div>
 	    <% } %>
+      <% if(true) { %>
+            <div class="btn-group">
+                <button id="dropDownZoomToggle" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="Zoom">
+                <span class="glyphicon glyphicon-zoom-in"></span>
+                <span id="zoomLevelIndicator">Zoom</span>
+                <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li class="disabled" role="presentation"><a id="qualityDescription" role="menuitem" tabindex="-1" href="#"><b>Zoom</b></a></li>
+                    <li class="divider"></li>
+                    <li class="" role="presentation"><a id="resetZoom" role="menuitem" tabindex="-1" href="#"><b>Reset</b></a></li>
+                    <li class="divider"></li>
+                    <li role="presentation"><a id="zoomLevel1" role="menuitem" tabindex="-1" href="#"><b>1.0</b></a></li>
+                    <li role="presentation"><a id="zoomLevel15" role="menuitem" tabindex="-1" href="#"><b>1.5</b></a></li>
+                    <li role="presentation"><a id="zoomLevel2" role="menuitem" tabindex="-1" href="#"><b>2.0</b></a></li>
+                </ul>
+            </div>
+      <% } %>
             <div class="btn-group">
                 <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_playbackRateButton %>">
                 <span class="glyphicon glyphicon-time"></span>
@@ -166,7 +184,7 @@
                     <li role="presentation"><a id="pipOff" role="menuitem" tabindex="-1" href="#"><%= str_off %></a></li>
                 </ul>
             </div>
-            <% } %>            
+            <% } %>   
             <button id="fullscreen_button" type="button" class="btn btn-default disabled" role="button" aria-label="<%= str_fullscreen %>">
             <span class="glyphicon glyphicon-fullscreen"></span>
             </button>

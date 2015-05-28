@@ -81,7 +81,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         movePiP: new Engage.Event("Video:movePiP", "moves the smaller picture over the larger to the different corners", "handler"),
         togglePiP: new Engage.Event("Video:togglePiP", "switches between PiP and next to each other layout", "handler"),
         closeVideo: new Engage.Event("Video:closeVideo", "closes one videostream", "handler"),
-        openVideo: new Engage.Event("Video:openVideo", "opens a new videostream", "handler")
+        openVideo: new Engage.Event("Video:openVideo", "opens a new videostream", "handler"),
+        moveUp: new Engage.Event("Video:moveUp", "moves video up", "handler"),
+        moveDown: new Engage.Event("Video:moveDown", "moves video down", "handler"),
+        moveLeft: new Engage.Event("Video:moveLeft", "moves video left", "handler"),
+        moveRight: new Engage.Event("Video:moveRight", "moves video right", "handler"),
+        setZoomLevel: new Engage.Event("Video:setZoomLevel", "sets the zoom level", "trigger"),
+        zoomReset: new Engage.Event("Video:resetZoom", "resets position and zoom level", "handler")
     };
 
     var isDesktopMode = false;
@@ -366,6 +372,45 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
     }
 
+    function registerZoomLevelEvents() {
+        Engage.on(plugin.events.setZoomLevel.getName(), function(level){
+            console.log("Set Zoom Level: " + level);
+            Basil.set("zoomLevel", level);
+            $('video')[0].style.transform = "scale("+level+")";
+        });
+
+        Engage.on(plugin.events.moveLeft.getName(), function() {
+            var offset = $('video').css("left");
+            offset = offset.replace("px", "");
+            offset = Number(offset);
+            $('video').css("left", (offset + 10) + "px");
+        });
+        Engage.on(plugin.events.moveRight.getName(), function() {
+            var offset = $('video').css("left");
+            offset = offset.replace("px", "");
+            offset = Number(offset);
+            $('video').css("left", (offset - 10) + "px");
+        });
+        Engage.on(plugin.events.moveUp.getName(), function() {
+            var offset = $('video').css("top");
+            offset = offset.replace("px", "");
+            offset = Number(offset);
+            $('video').css("top", (offset + 10) + "px");
+        });
+        Engage.on(plugin.events.moveDown.getName(), function() {
+            var offset = $('video').css("top");
+            offset = offset.replace("px", "");
+            offset = Number(offset);
+            $('video').css("top", (offset - 10) + "px");
+        });
+
+        Engage.on(plugin.events.zoomReset.getName(), function() {
+           $('video').css("top", "0px");
+           $('video').css("left", "0px");
+           $('video')[0].style.transform = "scale(1)";
+        });
+    }
+
     function changeQuality(q) {
         if (q) {
             Engage.trigger(plugin.events.pause.getName(), false);
@@ -438,6 +483,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             });
             for (var i = 0; i < videoDisplays.length; ++i) {
                 $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+                
+                $("#" + videoDisplays[i]).css("position", "relative");
+                $("#" + videoDisplays[i]).css("overflow", "hidden");
             }
         } else {
             Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
@@ -453,6 +501,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
             // set first videoDisplay as master
             registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
+            registerZoomLevelEvents();
+
 
             if (nr >= 2) {
                 registerSynchronizeEvents();
@@ -905,6 +955,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             videodisplay.pause();
         });
         Engage.on(plugin.events.playPause.getName(), function() {
+            console.log("PlayPause toggle");
             if (videodisplay.paused()) {
                 Engage.trigger(plugin.events.play.getName());
             } else {

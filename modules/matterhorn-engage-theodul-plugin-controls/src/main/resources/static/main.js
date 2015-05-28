@@ -82,7 +82,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         focusVideo: new Engage.Event("Video:focusVideo", "increases the size of one video", "handler"),
         resetLayout: new Engage.Event("Video:resetLayout", "resets the layout of the videodisplays", "handler"),
         movePiP: new Engage.Event("Video:movePiP", "moves the smaller picture over the larger to the different corners", "handler"),
-        togglePiP: new Engage.Event("Video:togglePiP", "switches between PiP and next to each other layout", "handler")
+        togglePiP: new Engage.Event("Video:togglePiP", "switches between PiP and next to each other layout", "handler"),
+        setZoomLevel: new Engage.Event("Video:setZoomLevel", "sets the zoom level", "trigger"),
+        zoomReset: new Engage.Event("Video:resetZoom", "resets position and zoom level", "trigger")
     };
 
     var isDesktopMode = false;
@@ -150,6 +152,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var storage_focus_video = "focusvideo";
     var bootstrapPath = "lib/bootstrap/js/bootstrap";
     var jQueryUIPath = "lib/jqueryui/jquery-ui";
+    var storage_zoomLevel = "zoomLevel";
+    var id_zoomLevelIndicator = "zoomLevelIndicator";
+    var id_zoomReset = "resetZoom";
+    var id_zoomLevel1 = "zoomLevel1";
+    var id_zoomLevel15 = "zoomLevel15";
+    var id_zoomLevel2 = "zoomLevel2";
     var id_engage_controls = "engage_controls";
     var id_engage_controls_topIfBottom = "engage_controls_second";
     var id_slider = "slider";
@@ -437,7 +445,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     hasqualities: resolutions !== undefined,
                     hasmultiplevideos: numberVideos > 1,
                     controlsTop: Engage.controls_top,
-                    pip_position: translate(pipPosition, pipPosition)
+                    pip_position: translate(pipPosition, pipPosition),
+                    str_zoomlevel: "1.0"
                 };
 
                 // compile template and load it
@@ -573,6 +582,45 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         });
     }
 
+    function addZoomEvents() {
+        var zoom = Basil.get(storage_zoomLevel);
+
+        if (!zoom) {
+            $("#" + id_zoomLevelIndicator).html(zoom);
+            Engage.trigger(plugin.events.setZoomLevel.getName(), zoom);
+        } else {
+            Basil.set(storage_zoomLevel, "1.0");
+            $("#" + id_zoomLevelIndicator).html("1.0");
+            Engage.trigger(plugin.events.setZoomLevel.getName(), "1");
+        }
+
+        /* Events for Button */
+        $("#" + id_zoomLevel1).click(function(event) {
+            event.preventDefault();
+            Engage.trigger(plugin.events.setZoomLevel.getName(), "1");
+            $("#" + id_zoomLevelIndicator).html("1.0");
+        });
+
+        $("#" + id_zoomLevel15).click(function(event) {
+            event.preventDefault();
+            Engage.trigger(plugin.events.setZoomLevel.getName(), "1.5");
+            $("#" + id_zoomLevelIndicator).html("1.5");
+        });
+
+        $("#" + id_zoomLevel2).click(function(event) {
+            event.preventDefault();
+            Engage.trigger(plugin.events.setZoomLevel.getName(), "2");
+            $("#" + id_zoomLevelIndicator).html("2.0");
+        });
+
+        $("#" + id_zoomReset).click(function(event) {
+            event.preventDefault();
+            Engage.trigger(plugin.events.zoomReset.getName(), true);
+        });
+
+        /* Events for Keys */
+
+    }
     function triggerEmbedMessage(ratioWidth, ratioHeight) {
         var str = window.location.href;
         if (str.indexOf("mode=desktop") == -1) {
@@ -887,6 +935,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
             Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function(number) {
                 numberVideos = number;
+                if (number == 1) {
+                    addZoomEvents();
+                };
                 if (number > 1) {
                     if (controlsViewTopIfBottom) {
                         controlsViewTopIfBottom.render();

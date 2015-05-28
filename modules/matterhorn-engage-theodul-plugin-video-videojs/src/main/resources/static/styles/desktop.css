@@ -49,8 +49,9 @@
     margin-left: 70%;
    }
 
-
-
+.video-js {
+    background-color: #FFF !important;
+}
 .clearfix:before,
 .clearfix:after {
     content: " ";
