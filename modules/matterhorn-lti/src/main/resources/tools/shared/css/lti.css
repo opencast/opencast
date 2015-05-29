@@ -1,0 +1,67 @@
+#addHeader{
+    width: 750px;
+}
+
+.ui-widget-header{ border: #FFF;
+    background: #FFF;
+}
+.ui-widget-content{ border: #FFF; }
+.form-box .form-box-content { padding: 0px;}
+.form-box .form-box-head { padding: 0px;}
+.oc-ui-form-list .scheduler-label, .scheduler-label {
+    text-align: left;
+    width: 14%;
+}
+
+a.secondaryButton, a.secondaryButton:link, a.secondaryButton:visited {
+    color: black;
+    background: #FFF;
+    border: 0px;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+background: #CCC;
+color: #000;
+}
+
+a.secondaryButton:hover, a.secondaryButton:focus {
+  color: #000;
+}
+
+h2 { color: grey; font-weight: normal; font-size: 1.5em; }
+
+#more_info{
+    background: #CCC;
+    width: 650px;
+    padding-bottom: 8px;
+}
+
+.lti_links{
+    float: right;
+}
+.lti_links li{ display: inline;}
+.lti_links li a{
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+}
+
+#i18n_additional{
+    margin-top: 10px;
+}
+
+#i18n_additional img{
+    float: left;
+}
+
+#ui-datepicker-div{
+    border: grey solid 1px ;
+}
+
+#ie_warning{
+padding: 5px;
+background-color: #ffefc6;
+color: #735005;
+font-weight: bold;
+margin-top: 5px;
+}

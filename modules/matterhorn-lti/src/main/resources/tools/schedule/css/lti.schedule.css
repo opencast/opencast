@@ -1,0 +1,14 @@
+* {padding: 0; margin: 0;}
+
+body{ padding-top: 0px; }
+
+.layout-page-content{
+    width: 800px;
+    margin-top: 10px;
+}
+
+.scheduler-selection-container{ text-align: left;}
+.scheduler-selection-container h2{ margin-bottom: 10px;}
+
+fieldset{ border: 0;}
+

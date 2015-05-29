@@ -1,0 +1,9 @@
+#gallery-wrap{overflow: hidden; width: 558px; position: relative; float:left;}
+#gallery{position: relative; left: 0; top: 0; overflow: hidden;}
+#gallery{padding-left: 0px;}
+#gallery li{float: left; margin: 0 20px 15px 0; list-style: none; text-align: left; width: 162px;}
+
+#gallery-prev{float: left; height: 100px;position: relative; top: 60px; padding: 4px;}
+#gallery-next{float: left;height: 100px;position: relative; top: 60px; padding: 4px}
+.clear{ clear: both;}
+

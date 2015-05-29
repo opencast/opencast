@@ -1,0 +1,33 @@
+#addHeader{
+    padding: 0px;
+}
+.ui-widget-header {
+    color: #000;
+    text-decoration: underline;
+}
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid #000; background: #CCC;}
+.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { color: #000; text-decoration: none; }
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+    border-bottom: 1px solid #CCC;
+    border-top: 1px solid #CCC;
+    border-right: #FFF;
+    border-left: #FFF;
+    background: #FFF;
+    color: #eb8f00;
+}
+
+#recordingsTable thead>tr>th {
+width: 115px;
+}
+
+#recordingsTable tr td{ font-weight: normal;}
+
+#searchBox{ background: #CCC;}
+
+.layout-centered { clear: both; }
+
+#tableContainer thead tr{ text-align: left;}
+
+.lti_links {
+margin-top: 5px;
+}
