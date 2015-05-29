@@ -43,6 +43,7 @@ MAVEN_ARG="-DM2_REPO=$M2_REPO"
 
 FELIX_CONFIG_DIR="$FELIX_HOME/etc"
 FELIX_WORK_DIR="$FELIX_HOME/work"
+MATTERHORN_TEMP_DIR="$FELIX_WORK_DIR/tmp"
 
 FELIX="-Dfelix.home=$FELIX_HOME"
 FELIX_WORK="-Dfelix.work=$FELIX_WORK_DIR"
@@ -66,7 +67,8 @@ UTIL_LOGGING_OPTS="-Djava.util.logging.config.file=$FELIX_CONFIG_DIR/services/ja
 LOG_OPTS="$PAX_LOGGING_OPTS $MATTERHORN_LOGGING_OPTS $ECLIPSELINK_LOGGING_OPTS $UTIL_LOGGING_OPTS"
 
 GRAPHICS_OPTS="-Djava.awt.headless=true -Dawt.toolkit=sun.awt.HeadlessToolkit"
-JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
+JAVA_OPTS="-Djava.io.tmpdir=$MATTERHORN_TEMP_DIR"
+JAVA_OPTS="${JAVA_OPTS} -Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
 
 #Added in response to MH-9831
 LIBRARY_OPTS="-Dnet.sf.ehcache.skipUpdateCheck=true -Dorg.terracotta.quartz.skipUpdateCheck=true"
