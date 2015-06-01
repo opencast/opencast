@@ -1298,7 +1298,7 @@ public abstract class AbstractEventEndpoint {
     try {
       return okJson(getJobService().getTasksAsJSON(query));
     } catch (NotFoundException e) {
-      return notFound("Not able to found workflows for event %s", id);
+      return notFound("Cannot find workflows for event %s", id);
     }
   }
 
@@ -1329,7 +1329,7 @@ public abstract class AbstractEventEndpoint {
     try {
       return okJson(getJobService().getTasksAsJSON(workflowInstanceId));
     } catch (NotFoundException e) {
-      return notFound("Not able to found workflow  %s", workflowId);
+      return notFound("Cannot find workflow  %s", workflowId);
     }
   }
 
@@ -1359,22 +1359,22 @@ public abstract class AbstractEventEndpoint {
     try {
       return okJson(getJobService().getOperationsAsJSON(workflowInstanceId));
     } catch (NotFoundException e) {
-      return notFound("Not able to found workflow  %s", workflowId);
+      return notFound("Cannot find workflow %s", workflowId);
     }
   }
 
   @GET
-  @Path("{eventId}/workflows/{workflowId}/operations/{operationId}")
+  @Path("{eventId}/workflows/{workflowId}/operations/{operationPosition}")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "geteventoperation", description = "Returns all the data related to the workflow/operation tab in the event details modal as JSON", returnDescription = "All the data related to the event workflow/opertation tab as JSON", pathParameters = {
           @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
           @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "operationId", description = "The operation id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestParameter(name = "operationPosition", description = "The operation position", isRequired = true, type = RestParameter.Type.INTEGER) }, reponses = {
           @RestResponse(description = "Returns all the data related to the event workflow/operation tab as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Unable to parse workflowId or operationId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+          @RestResponse(description = "Unable to parse workflowId or operationPosition", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "No operation with these identifiers was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventOperation(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId,
-          @PathParam("operationId") String operationId) throws WorkflowDatabaseException, JobEndpointException,
+          @PathParam("operationPosition") Integer operationPosition) throws WorkflowDatabaseException, JobEndpointException,
           SearchIndexException {
     Opt<Event> optEvent = getEvent(eventId);
     if (optEvent.isNone())
@@ -1387,19 +1387,11 @@ public abstract class AbstractEventEndpoint {
       logger.warn("Unable to parse workflow id {}", workflowId);
       return RestUtil.R.badRequest();
     }
-    long operationInstanceId;
-    try {
-      operationId = StringUtils.remove(operationId, ".json");
-      operationInstanceId = Long.parseLong(operationId);
-    } catch (Exception e) {
-      logger.warn("Unable to parse operation id {}", operationId);
-      return RestUtil.R.badRequest();
-    }
 
     try {
-      return okJson(getJobService().getOperationAsJSON(workflowInstanceId, operationInstanceId));
+      return okJson(getJobService().getOperationAsJSON(workflowInstanceId, operationPosition));
     } catch (NotFoundException e) {
-      return notFound("Not able to found workflow  %s", workflowId);
+      return notFound("Cannot find workflow %s", workflowId);
     }
   }
 
@@ -1429,7 +1421,7 @@ public abstract class AbstractEventEndpoint {
       try {
         return okJson(getJobService().getIncidentsAsJSON(workflowIdLong, req.getLocale(), true));
       } catch (NotFoundException e) {
-        return notFound("Not able to find the incident for the workflow %s", workflowId);
+        return notFound("Cannot find the incident for the workflow %s", workflowId);
       }
     }
     return notFound("Cannot find an event with id '%s'.", eventId);
@@ -1463,7 +1455,7 @@ public abstract class AbstractEventEndpoint {
       try {
         return okJson(getJobService().getIncidentAsJSON(errorIdLong, req.getLocale()));
       } catch (NotFoundException e) {
-        return notFound("Not able to find the incident %s", errorId);
+        return notFound("Cannot find the incident %s", errorId);
       }
     }
     return notFound("Cannot find an event with id '%s'.", eventId);
