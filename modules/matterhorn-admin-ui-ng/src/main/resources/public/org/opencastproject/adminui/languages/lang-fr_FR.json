@@ -103,7 +103,7 @@
     },
     "DELETE_EVENTS_WARNING_LINE1":"Une fois supprimés toutes les métadonnées, les fichiers audio et vidéo seront supprimés et rendus irrécupérable.",
     "DELETE_EVENTS_WARNING_LINE2":"",
-    "DELETE_SERIES_WARNING_LINE1": "Une fois supprimés toutes les métadonnées seront rendus irrécupérable.",
+    "DELETE_SERIES_WARNING_LINE1": "Une fois supprimées toutes les métadonnées seront rendues irrécupérables.",
     "DELETE_SERIES_WARNING_LINE2": "",
     "SCHEDULE_TASK":{
       "CAPTION":"Démarrer tâche",

@@ -103,7 +103,7 @@
     },
     "DELETE_EVENTS_WARNING_LINE1":"Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",
     "DELETE_EVENTS_WARNING_LINE2":"",
-    "DELETE_SERIES_WARNING_LINE1": "",
+    "DELETE_SERIES_WARNING_LINE1": "Die Metadaten der Serien werden unwiderruflich gelöscht.",
     "DELETE_SERIES_WARNING_LINE2": "",
     "SCHEDULE_TASK":{
       "CAPTION":"Task starten",
