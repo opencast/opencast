@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>ng-republish-metadata</id>
+  <title>Republish metadata</title>
+  <tags>
+    <tag>archive-ng</tag>
+  </tags>
+  <description/>
+  <configuration_panel>
+    <![CDATA[
+      <style type="text/css">
+      <!--
+          #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
+          #workflow-configuration li { padding-top:5px; padding-bottom:5px; line-height:14px }
+      -->
+      </style>
+      <div id="workflow-configuration">
+        <fieldset>
+          <legend>Update metadata at:</legend>
+          <ul>
+            <li>
+              <span>
+                <input id="publishToEngage" name="publishToEngage" type="checkbox" checked="checked" class="configField" value="true" />
+                <span>&nbsp;Opencast Media Module</span>
+              </span>
+            </li>
+            <!-- Fixme: uncomment as soon as the publish-youtube workflow operation handler supports merging
+            <li>
+              <span>
+                <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" />
+                <span>&nbsp;YouTube</span>
+              </span>
+            </li>
+            -->
+          </ul>
+        </fieldset>
+      </div>
+    ]]>
+  </configuration_panel>
+
+  <operations>
+	
+    <!-- Apply the default workflow configuration -->
+
+    <operation
+      id="defaults"
+      description="Applying default configuration values">
+      <configurations>
+        <configuration key="publishToEngage">true</configuration>
+        <configuration key="publishToYouTube">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Update recording metadata -->
+
+    <operation
+      id="publish-engage"
+      max-attempts="2"
+      fail-on-error="false"
+      description="Download and Publish to Engage">
+      <configurations>
+        <configuration key="download-source-flavors">dublincore/*</configuration>
+        <configuration key="merge-only">true</configuration>
+        <configuration key="check-availability">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Publish to publication channels                                   -->
+    <!--                                                                   -->
+    <!-- Update the recording metadata in the publication channels.        -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Publish to engage player -->
+
+    <operation
+      id="publish-engage"
+      if="${publishToEngage}"
+      exception-handler-workflow="ng-partial-error"
+      description="Update recording in Opencast Media Module">
+      <configurations>
+        <configuration key="download-source-flavors">dublincore/*</configuration>
+        <configuration key="merge-only">true</configuration>
+        <configuration key="check-availability">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish to YouTube -->
+
+    <!-- Fixme: activate as soon as the publish-youtube supports merging
+    <operation
+      id="publish-youtube"
+      if="${publishToYouTube}"
+      max-attempts="2"
+      exception-handler-workflow="ng-partial-error"
+      description="Update recording in YouTube">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*</configuration>
+      </configurations>
+    </operation>
+    -->
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Cleanup                                                           -->
+    <!--                                                                   -->
+    <!-- Remove work artifacts.                                            -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Clean the system from work artifacts -->
+
+    <operation
+      id="include"
+      description="Remove temporary processing artifacts">
+      <configurations>
+        <configuration key="workflow-id">ng-partial-cleanup</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

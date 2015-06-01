@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ng-partial-cleanup</id>
+  <description>Cleanup after processing</description>
+  <operations>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Cleanup                                                           -->
+    <!--                                                                   -->
+    <!-- Remove work artifacts.                                            -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Clean the system from work artifacts -->
+
+    <!-- Fixme: remove the "preserve-flavors" option as soon as the        -->
+    <!-- workflow service can access the security policy through other     -->
+    <!-- means than downloading it from the working file repository (where -->
+    <!-- it is no longer located after cleanup.                            -->
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Remove temporary processing artifacts">
+      <configurations>
+        <configuration key="preserve-flavors">security/*</configuration>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>
