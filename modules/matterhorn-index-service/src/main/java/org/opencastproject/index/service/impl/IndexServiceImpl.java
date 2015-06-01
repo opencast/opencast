@@ -54,6 +54,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -338,6 +339,15 @@ public class IndexServiceImpl implements IndexService {
         }
       } else {
         throw new IllegalArgumentException("No multipart content");
+      }
+
+      // MH-10834 If there is only an audio track, change the flavor from presenter-audio/source to presenter/source.
+      if (mp.getTracks().length == 1
+              && mp.getTracks()[0].getFlavor().equals(new MediaPackageElementFlavor("presenter-audio", "source"))) {
+        Track audioTrack = mp.getTracks()[0];
+        mp.remove(audioTrack);
+        audioTrack.setFlavor(MediaPackageElements.PRESENTER_SOURCE);
+        mp.add(audioTrack);
       }
 
       return createEvent(metadataJson, mp);
