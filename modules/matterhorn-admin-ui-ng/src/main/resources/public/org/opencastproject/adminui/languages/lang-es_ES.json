@@ -23,6 +23,11 @@
     }
   },
   "NOTIFICATIONS":{
+    "ACL_ADDED":"Se ha creado la política de acceso",
+    "ACL_NOT_SAVED":"No se ha podido guardar la política de acceso",
+    "ACL_UPDATED":"La política de acceso ha sido actualizada",
+    "ACL_DELETED":"La política de acceso ha sido eliminada",
+    "ACL_NOT_DELETED":"No se ha podido eliminar la política de acceso",
     "USER_ADDED":"Se ha creado el usuario",
     "USER_UPDATED":"El usuario ha sido actualizado",
     "USER_NOT_SAVED":"No se ha podido guardar el usuario",
@@ -67,7 +72,10 @@
     "EMAIL_NOT_SENT":"No se ha podido enviar el mensaje",
     "CONFLICT_DETECTED":"Conflicto de programación: el nuevo evento coincide con otro existente. Por favor, cambie la sala, las fechas o las horas.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Los eventos que contiene esta serie deberán ser reprocesados",
-    "THEME_NAME_ALREADY_TAKEN":"El nombre ya está en uso",
+    "SERIES_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
+    "EVENT_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
+    "SERIES_ACL_LOCKED":"No es posible editar las Políticas de Acceso cuando existen operaciones activas en algún evento de la serie",
+    "THEME_NAME_ALREADY_TAKEN":"Este nombre ya está en uso",
     "THEME_NAME_EMPTY":"El nombre no puede estar vacío",
     "BUMPER_UPLOAD_ERROR":"Error en la subida de archivos",
     "TRAILER_UPLOAD_ERROR":"Error en la subida de archivos",
@@ -83,7 +91,9 @@
     "TASK_NOT_CREATED":"No se ha podido crear la tarea",
     "VIDEO_CUT_NOT_SAVED":"No se han podido guardar los datos de edición",
     "VIDEO_CUT_SAVED":"Se han guardado los datos de edición",
-    "VIDEO_CUT_PROCESSING":"Se está procesando el vídeo..."
+    "VIDEO_CUT_PROCESSING":"Se está procesando el vídeo...",
+    "SERVER_UNRESPONSIVE":"The server is currently unresponsive.",
+    "SERVICE_UNAVAILABLE":"The service called is currently unavailable."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Acciones",
@@ -103,8 +113,8 @@
     },
     "DELETE_EVENTS_WARNING_LINE1":"Una vez eliminados todos los metadatos, los archivos de audio y vídeo serán eliminados e irrecuperables.",
     "DELETE_EVENTS_WARNING_LINE2":"",
-    "DELETE_SERIES_WARNING_LINE1": "Una vez eliminados, todos los metadatos de la serie serán irrecuperables.",
-    "DELETE_SERIES_WARNING_LINE2": "",
+    "DELETE_SERIES_WARNING_LINE1":"Una vez eliminados, todos los metadatos de la serie serán irrecuperables.",
+    "DELETE_SERIES_WARNING_LINE2":"",
     "SCHEDULE_TASK":{
       "CAPTION":"Comenzar Tarea",
       "GENERAL":{
@@ -181,14 +191,14 @@
       "GPL":"GPL"
     },
     "SEND_MESSAGE":{
-      "CAPTION":"Enviar Mensaje",
+      "CAPTION":"Enviar mensaje",
       "TABS":{
         "RECIPIENTS":"Destinatarios",
         "MESSAGE":"Mensaje",
         "SUMMARY":"Resumen"
       },
       "RECIPIENTS":{
-        "AUDIT_TRAIL_CAPTION":"Añadir al Informe de Auditoría",
+        "AUDIT_TRAIL_CAPTION":"Añadir al informe de auditoría",
         "AUDIT_TRAIL_DESCRIPTION":"Marque la casilla para añadir el mensaje al informe de auditoría",
         "AUDIT_TRAIL_LABEL":""
       },
@@ -255,21 +265,21 @@
           },
           "SCHEDULE_MULTIPLE":{
             "CAPTION":"Programar múltiples eventos",
-            "REPEATS":"Repeticiones",
-            "REPEAT_ON":"Repetir el",
+            "REPEATS":"Repetir",
+            "REPEAT_ON":"Repetir",
             "WEEKDAYS":"Entre semana"
           }
         },
         "PROCESSING":{
           "CAPTION":"Procesado",
           "SELECT_WORKFLOW":"Seleccione flujo de trabajo",
-          "SELECT_WORKFLOW_EMPTY":"No se han encontrado flujos de trabajo",
-          "WORKFLOW":"Flujo de Trabajo"
+          "SELECT_WORKFLOW_EMPTY":"No hay flujos de trabajo disponibles",
+          "WORKFLOW":"Flujo de trabajo"
         },
         "ACCESS":{
           "CAPTION":"Política de acceso",
           "POLICY":"Política de acceso",
-          "ACL":"ACL"
+          "ACL":"Política de acceso"
         },
         "SUMMARY":{
           "CAPTION":"Resumen"
@@ -295,7 +305,7 @@
       "TABLE":{
         "CAPTION":"Eventos",
         "TITLE":"Título",
-        "CREATORS":"Protagonista(s)",
+        "CREATORS":"Ponente(s)",
         "SERIES":"Serie",
         "DATE":"Fecha",
         "START":"Inicio",
@@ -319,6 +329,21 @@
         "BLACKLISTED":"En la lista negra",
         "OPTED_OUT":"Excluído"
       },
+      "STATUS":{
+        "SCHEDULED":"Programado",
+        "OPTEDOUT":"Excluido",
+        "BLACKLISTED":"En la lista negra",
+        "RECORDING":"Grabando",
+        "UPLOADING":"Subiendo",
+        "INGESTING":"Importando",
+        "PENDING":"Pendiente",
+        "PROCESSING":"Procesando",
+        "PAUSED":"En pausa",
+        "PROCESSED":"Procesado",
+        "RECORDING_FAILURE":"Fallo en la grabación",
+        "PROCESSING_FAILURE":"Fallo en el procesamiento",
+        "PROCESSING_CANCELED":"Procesamiento cancelado"
+      },
       "DETAILS":{
         "HEADER":"Detalles del evento {{resourceId}}",
         "TABS":{
@@ -338,7 +363,9 @@
           "OPTED_OUT":"Excluído",
           "CUSTOM":"Custom",
           "ENGAGE":"Engage",
-          "YOUTUBE":"Youtube"
+          "YOUTUBE":"Youtube",
+          "OAIPMH":"OAI-PMH",
+          "SELECT_WORKFLOW":"Seleccione el flujo de trabajo"
         },
         "MEDIA":{
           "TRIM_MEDIA":"Cortar vídeos",
@@ -359,7 +386,26 @@
         },
         "ACCESS":{
           "CAPTION":"Política de acceso",
-          "SELECTPLACEHOLDER":"Seleccione política de acceso"
+          "DESCRIPTION":"",
+          "TEMPLATES":{
+            "TITLE":"Plantillas"
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Política de acceso",
+            "DESCRIPTION":"",
+            "LABEL":"Seleccione una plantilla",
+            "EMPTY":"No hay plantillas disponibles",
+            "ROLE":"Rol",
+            "WRITE":"Escritura",
+            "READ":"Lectura",
+            "ACTION":"Acciones",
+            "NEW":"Nueva política",
+            "DETAILS":"Detalles"
+          },
+          "ROLES":{
+            "LABEL":"Seleccione un rol",
+            "EMPTY":"No hay roles disponibles"
+          }
         },
         "COMMENTS":{
           "CAPTION":"Comentarios",
@@ -387,9 +433,9 @@
           "CREATED":"Fecha de creación",
           "CREATED_BY":"Creado por",
           "LICENSE":"Licencia",
-          "CONTRIBUTORS":"Participante(s)",
+          "CONTRIBUTORS":"Colaborador(es)",
           "RIGHTS":"Permisos",
-          "PRESENTERS":"Protagonista(s)",
+          "PRESENTERS":"Ponente(s)",
           "LANGUAGE":"Idioma",
           "COPYRIGHT":"Copyright",
           "VISIBILITY":"Visibilidad",
@@ -442,8 +488,8 @@
           "RESOLUTION":"Resolución"
         },
         "ERRORS_AND_WARNINGS":{
-          "HEADER":"Errores y Avisos",
-          "TITLE":"Errores y Avisos",
+          "HEADER":"Errores y avisos",
+          "TITLE":"Errores y avisos",
           "DATE":"Fecha",
           "HOST":"Servidor",
           "TYPE":"Tipo",
@@ -487,7 +533,7 @@
           },
           "ACCESS_POLICY":{
             "TITLE":"Política de acceso",
-            "DESCRIPTION":"",
+            "DESCRIPTION":"At least one role with Read and Write permissions is required.",
             "LABEL":"Seleccione una plantilla",
             "EMPTY":"No hay plantillas disponibles",
             "ROLE":"Rol",
@@ -517,7 +563,7 @@
         "CAPTION":"Series",
         "TITLE":"Series",
         "CREATORS":"Organizador(es)",
-        "CONTRIBUTORS":"Participante(s)",
+        "CONTRIBUTORS":"Colaborador(es)",
         "CREATED":"Fecha de creación",
         "MANAGED_ACL":"Política de acceso",
         "EVENTS":"Eventos",
@@ -558,11 +604,11 @@
           "TITLE":"Título",
           "UID":"UID",
           "SERIES":"Serie",
-          "PUBLISHERS":"Editore(s)",
+          "PUBLISHERS":"Editor(es)",
           "ORGANIZERS":"Organizador(es)",
-          "CONTRIBUTORS":"Participante(s)",
+          "CONTRIBUTORS":"Colaborador(es)",
           "RECORDING_DATE":"Fecha de grabación",
-          "CREATED_BY":"Creado Por",
+          "CREATED_BY":"Creado por",
           "RIGHTS":"Permisos",
           "SUBJECT":"Tema",
           "LANGUAGE":"Idioma",
@@ -571,9 +617,9 @@
         },
         "EVENTS":{
           "TITLE":"Título",
-          "PRESENTER":"Protagonista(s)",
+          "PRESENTER":"Ponente(s)",
           "CREATED":"Fecha de creación",
-          "MODIFIED":"Modificado",
+          "MODIFIED":"Fecha de modificación",
           "STATUS":"Estado",
           "LOCATION":"Ubicación",
           "LINK":"Enlace"
@@ -658,13 +704,13 @@
       "USERS":"Usuarios",
       "GROUPS":"Grupos",
       "PERMISSIONS":"Políticas de acceso",
-      "BLACKLISTS":"Lista Negra"
+      "BLACKLISTS":"Lista negra"
     },
     "USERS":{
       "TABLE":{
         "CAPTION":"Usuarios",
         "NAME":"Nombre",
-        "USERNAME":"Nombre de Usuario",
+        "USERNAME":"Nombre de usuario",
         "ROLES":"Roles",
         "TYPE":"Tipo",
         "BLACKLIST_FROM":"En la lista negra desde",
@@ -679,9 +725,9 @@
           "ROLES":"Roles"
         },
         "FORM":{
-          "USERNAME":"Nombre de Usuario",
+          "USERNAME":"Nombre de usuario",
           "NAME":"Nombre",
-          "EMAIL":"Correo Electrónico",
+          "EMAIL":"Correo electrónico",
           "PASSWORD":"Contraseña",
           "REPEAT_PASSWORD":"Repetir contraseña"
         },
@@ -743,6 +789,78 @@
         "CREATOR":"Creador",
         "IN_USE":"En uso",
         "ACTION":"Acciones"
+      },
+      "NEW":{
+        "CAPTION":"Nueva política de acceso",
+        "TABS":{
+          "SUMMARY":"Resumen",
+          "METADATA":"Metadatos",
+          "ACCESS":"Acceso"
+        },
+        "METADATA":{
+          "TITLE":"Metadatos",
+          "NAME":{
+            "CAPTION":"Nombre",
+            "PLACEHOLDER":"Nombre..."
+          }
+        },
+        "ACCESS":{
+          "CAPTION":"Política de acceso",
+          "TEMPLATES":{
+            "TITLE":"Plantillas"
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Política de acceso",
+            "LABEL":"Seleccione una plantilla",
+            "EMPTY":"No hay plantillas disponibles",
+            "ROLE":"Rol",
+            "WRITE":"Escritura",
+            "READ":"Lectura",
+            "ACTION":"Acciones",
+            "NEW":"Nueva política",
+            "DETAILS":"Detalles"
+          },
+          "ROLES":{
+            "LABEL":"Seleccione un rol",
+            "EMPTY":"No hay roles disponibles"
+          }
+        }
+      },
+      "DETAILS":{
+        "HEADER":"Detalles de la Política de Acceso ",
+        "TABS":{
+          "SUMMARY":"Resumen",
+          "METADATA":"Metadatos",
+          "ACCESS":"Acceso"
+        },
+        "METADATA":{
+          "TITLE":"Metadatos",
+          "NAME":{
+            "CAPTION":"Nombre",
+            "PLACEHOLDER":"Nombre..."
+          }
+        },
+        "ACCESS":{
+          "CAPTION":"Política de acceso",
+          "TEMPLATES":{
+            "TITLE":"Plantillas"
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Política de acceso",
+            "LABEL":"Seleccione una plantilla",
+            "EMPTY":"No hay plantillas disponibles",
+            "ROLE":"Rol",
+            "WRITE":"Escritura",
+            "READ":"Lectura",
+            "ACTION":"Acciones",
+            "NEW":"Nueva política",
+            "DETAILS":"Detalles"
+          },
+          "ROLES":{
+            "LABEL":"Seleccione un rol",
+            "EMPTY":"No hay roles disponibles"
+          }
+        }
       }
     },
     "BLACKLISTS":{
@@ -813,7 +931,7 @@
         },
         "BUMPER":{
           "CAPTION":"Cortinilla (principio)",
-          "DESCRIPTION":"Vídeo predefinido que se anexa al principio de las grabación.",
+          "DESCRIPTION":"Vídeo predefinido que se anexa al principio de la grabación.",
           "ACTIVE":"Activada"
         },
         "TRAILER":{
@@ -898,7 +1016,7 @@
         "BUMPER":{
           "CAPTION":"Cortinilla (principio)",
           "FILE_UPLOADED":"Archivo subido: ",
-          "DESCRIPTION":"Vídeo predefinido que se anexa al principio de las grabación.",
+          "DESCRIPTION":"Vídeo predefinido que se anexa al principio de la grabación.",
           "ACTIVE":"Activada",
           "ENABLE":"Activar cortinilla",
           "SELECT":"Seleccionar",
@@ -917,7 +1035,7 @@
         "TITLE":{
           "CAPTION":"Título",
           "FILE_UPLOADED":"Archivo subido: ",
-          "DESCRIPTION":"Diapositiva predefinida que se adjunta al principio o al final de las grabación y contiene metadatos descriptivos.",
+          "DESCRIPTION":"Diapositiva predefinida que se adjunta al principio o al final de la grabación y contiene metadatos descriptivos.",
           "ACTIVE":"Activada",
           "ENABLE":"Activar la diapositiva de título",
           "BACKGROUND":"Fondo",
@@ -963,7 +1081,7 @@
         "CAPTION":"Trabajos",
         "TITLE":"Título",
         "SERIES":"Series",
-        "WORKFLOW":"Flujo de Trabajo",
+        "WORKFLOW":"Flujo de trabajo",
         "STATUS":"Estado",
         "SUBMITTED":"Enviado",
         "ACTION":"Acciones"
@@ -1035,10 +1153,10 @@
   "LOGIN":{
     "WELCOME":"Bienvenidos a Opencast",
     "REMEMBER":"Recordarme en este equipo",
-    "USERNAME":"Correo...",
+    "USERNAME":"Nombre de usuario...",
     "PASSWORD":"Contraseña...",
     "LOGIN":"Identificarse",
-    "ERROR":"Correo electrónico y\/o contraseña incorrectos"
+    "ERROR":"Nombre de usuario y\/o contraseña incorrecto(s)"
   },
   "TABLE_FILTERS":{
     "CLEAR":"Borrar todos los filtros",
@@ -1049,7 +1167,7 @@
       "FILTERS_HEADER":"Grupos de filtros guardados",
       "EMPTY":"Aún no se ha guardado ningún filtro",
       "SAVE_FILTERS":"Guardar",
-      "FILTER_HEADER":"Gardar grupo de filtros",
+      "FILTER_HEADER":"Guardar grupo de filtros",
       "NAME":"Nombre",
       "NAME_PLACEHOLDER":"Nombre...",
       "DESCRIPTION":"Descripción",
@@ -1079,7 +1197,7 @@
         "LABEL":"Serie"
       },
       "PRESENTERS":{
-        "LABEL":"Protagonistas"
+        "LABEL":"Ponentes"
       },
       "CONTRIBUTORS":{
         "LABEL":"Colaboradores"
@@ -1172,7 +1290,7 @@
     },
     "USERS":{
       "USERNAME":{
-        "LABEL":"Nombre de Usuario"
+        "LABEL":"Nombre de usuario"
       },
       "NAME":{
         "LABEL":"Nombre"

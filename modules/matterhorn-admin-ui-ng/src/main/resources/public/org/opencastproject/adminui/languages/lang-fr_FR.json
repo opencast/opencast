@@ -67,6 +67,9 @@
     "EMAIL_NOT_SENT":"Le message n'a pas pu être envoyé",
     "CONFLICT_DETECTED":"Conflit de programmation: les données sélectionnées entrent en conflit avec un événement existant. Veuillez changer l'emplacement ou les dates.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Les événements existants dans cette série devront être retraités",
+    "SERIES_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
+    "EVENT_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
+    "SERIES_ACL_LOCKED":"Modification des droits d'accès n'est pas autorisée lorsque des opérations sont en cours d'exécution sur un événement appartenant à cette série",
     "THEME_NAME_ALREADY_TAKEN":"Ce nom est déjà utilisé",
     "THEME_NAME_EMPTY":"Le nom ne peux pas rester vide",
     "BUMPER_UPLOAD_ERROR":"Erreur lors de l'envoi du ficher",
@@ -83,7 +86,9 @@
     "TASK_NOT_CREATED":"La tâche n'a pas pu être créée",
     "VIDEO_CUT_NOT_SAVED":"Les informations n'ont pas pu être enregistrées",
     "VIDEO_CUT_SAVED":"Les informations ont été enregistrées",
-    "VIDEO_CUT_PROCESSING":"La vidéo est en cours de traitement..."
+    "VIDEO_CUT_PROCESSING":"La vidéo est en cours de traitement...",
+    "SERVER_UNRESPONSIVE":"The server is currently unresponsive.",
+    "SERVICE_UNAVAILABLE":"The service called is currently unavailable."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Actions",
@@ -101,10 +106,10 @@
         "CAPTION":"Supprimer"
       }
     },
-    "DELETE_EVENTS_WARNING_LINE1":"Une fois supprimés toutes les métadonnées, les fichiers audio et vidéo seront supprimés et rendus irrécupérable.",
+    "DELETE_EVENTS_WARNING_LINE1":"Une fois supprimés, toutes les métadonnées, les fichiers audio et vidéo seront supprimés et rendus irrécupérable.",
     "DELETE_EVENTS_WARNING_LINE2":"",
-    "DELETE_SERIES_WARNING_LINE1": "Une fois supprimées toutes les métadonnées seront rendues irrécupérables.",
-    "DELETE_SERIES_WARNING_LINE2": "",
+    "DELETE_SERIES_WARNING_LINE1":"Une fois supprimées, toutes les métadonnées seront rendues irrécupérables.",
+    "DELETE_SERIES_WARNING_LINE2":"",
     "SCHEDULE_TASK":{
       "CAPTION":"Démarrer tâche",
       "GENERAL":{
@@ -487,7 +492,7 @@
           },
           "ACCESS_POLICY":{
             "TITLE":"Droits d'accès",
-            "DESCRIPTION":"",
+            "DESCRIPTION":"At least one role with Read and Write permissions is required.",
             "LABEL":"Séléctionner un modèle",
             "EMPTY":"Aucun modèle trouvé",
             "ROLE":"Rôle",

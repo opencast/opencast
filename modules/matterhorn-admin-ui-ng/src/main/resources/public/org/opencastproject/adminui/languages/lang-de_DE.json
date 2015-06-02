@@ -23,6 +23,11 @@
     }
   },
   "NOTIFICATIONS":{
+    "ACL_ADDED":"Die Zugriffs-Richtlinie wurde erstellt",
+    "ACL_NOT_SAVED":"Die Zugriffs-Richtlinie konnte nicht gespeichert werden",
+    "ACL_UPDATED":"Die Zugriffs-Richtlinie wurde aktualisiert",
+    "ACL_DELETED":"Die Zugriffs-Richtlinie wurde gelöscht",
+    "ACL_NOT_DELETED":"Die Zugriffs-Richtlinie konnte nicht gelöscht werden",
     "USER_ADDED":"Der Nutzer wurde angelegt",
     "USER_UPDATED":"Die Nutzerdaten wurden aktualisiert",
     "USER_NOT_SAVED":"Der Nutzer konnte nicht angelegt werden",
@@ -67,6 +72,9 @@
     "EMAIL_NOT_SENT":"Die Nachricht konnte nicht gesendet werden",
     "CONFLICT_DETECTED":"Planungs-Konflikt: Die neue Aufzeichnung überlappt eine bestehende. Bitte ändern Sie den Aufnahmeort oder die Daten.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Die vorhandenen Aufzeichnungen in dieser Serie müssen neu verarbeitet werden",
+    "SERIES_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
+    "EVENT_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
+    "SERIES_ACL_LOCKED":"Das Editieren von Zugriffs-Richtlinien ist nicht erlaubt so lange Aufnahmen, die Teil der Serie sind, verarbeitet werden",
     "THEME_NAME_ALREADY_TAKEN":"Dieser Name wird bereits verwendet",
     "THEME_NAME_EMPTY":"Der Name darf nicht leer sein",
     "BUMPER_UPLOAD_ERROR":"Fehler beim Hochladen von Medien",
@@ -83,7 +91,9 @@
     "TASK_NOT_CREATED":"Der Task konnte nicht erstellt werden",
     "VIDEO_CUT_NOT_SAVED":"Die Bearbeitungs-Informationen konnten nicht gespeichert werden",
     "VIDEO_CUT_SAVED":"Die Bearbeitungs-Informationen wurde gespeichert",
-    "VIDEO_CUT_PROCESSING":"Das Video wird verarbeitet..."
+    "VIDEO_CUT_PROCESSING":"Das Video wird verarbeitet...",
+    "SERVER_UNRESPONSIVE":"The server is currently unresponsive.",
+    "SERVICE_UNAVAILABLE":"The service called is currently unavailable."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Aktionen",
@@ -103,8 +113,8 @@
     },
     "DELETE_EVENTS_WARNING_LINE1":"Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",
     "DELETE_EVENTS_WARNING_LINE2":"",
-    "DELETE_SERIES_WARNING_LINE1": "Die Metadaten der Serien werden unwiderruflich gelöscht.",
-    "DELETE_SERIES_WARNING_LINE2": "",
+    "DELETE_SERIES_WARNING_LINE1":"Die Metadaten der Serien werden unwiderruflich gelöscht.",
+    "DELETE_SERIES_WARNING_LINE2":"",
     "SCHEDULE_TASK":{
       "CAPTION":"Task starten",
       "GENERAL":{
@@ -319,6 +329,21 @@
         "BLACKLISTED":"Gesperrt",
         "OPTED_OUT":"Wird nicht aufgezeichnet"
       },
+      "STATUS":{
+        "SCHEDULED":"Geplant",
+        "OPTEDOUT":"Wird nicht aufgezeichnet",
+        "BLACKLISTED":"Gesperrt",
+        "RECORDING":"Zeichnet auf",
+        "UPLOADING":"Lädt hoch",
+        "INGESTING":"Importiert",
+        "PENDING":"Ausstehend",
+        "PROCESSING":"In Verarbeitung",
+        "PAUSED":"Pausiert",
+        "PROCESSED":"Verarbeitet",
+        "RECORDING_FAILURE":"Aufnahme-Fehler",
+        "PROCESSING_FAILURE":"Verarbeitungs-Fehler",
+        "PROCESSING_CANCELED":"Verarbeitung abgebrochen"
+      },
       "DETAILS":{
         "HEADER":"Aufzeichnungs-Details {{resourceId}}",
         "TABS":{
@@ -338,7 +363,9 @@
           "OPTED_OUT":"Wird nicht aufgezeichnet",
           "CUSTOM":"Benutzerdefiniert",
           "ENGAGE":"Engage",
-          "YOUTUBE":"YouTube"
+          "YOUTUBE":"YouTube",
+          "OAIPMH":"OAI-PMH",
+          "SELECT_WORKFLOW":"Workflow wählen"
         },
         "MEDIA":{
           "TRIM_MEDIA":"Medien zuschneiden",
@@ -359,7 +386,26 @@
         },
         "ACCESS":{
           "CAPTION":"Zugriffsrechte",
-          "SELECTPLACEHOLDER":"Zugriffsrichtlinie wählen"
+          "DESCRIPTION":"",
+          "TEMPLATES":{
+            "TITLE":"Vorlagen"
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Zugriffsrechte",
+            "DESCRIPTION":"",
+            "LABEL":"Vorlage auswählen",
+            "EMPTY":"Keine Vorlage gefunden",
+            "ROLE":"Rolle",
+            "WRITE":"Schreiben",
+            "READ":"Lesen",
+            "ACTION":"Aktionen",
+            "NEW":"Neue Richtlinie",
+            "DETAILS":"Details"
+          },
+          "ROLES":{
+            "LABEL":"Rolle auswählen",
+            "EMPTY":"Keine Rolle gefunden"
+          }
         },
         "COMMENTS":{
           "CAPTION":"Kommentare",
@@ -487,7 +533,7 @@
           },
           "ACCESS_POLICY":{
             "TITLE":"Zugriffs-Richtlinie",
-            "DESCRIPTION":"",
+            "DESCRIPTION":"At least one role with Read and Write permissions is required.",
             "LABEL":"Vorlage auswählen",
             "EMPTY":"Keine Vorlage gefunden",
             "ROLE":"Rolle",
@@ -743,6 +789,78 @@
         "CREATOR":"Author",
         "IN_USE":"In Benutzung",
         "ACTION":"Aktionen"
+      },
+      "NEW":{
+        "CAPTION":"Neue Zugriffs-Richtlinie",
+        "TABS":{
+          "SUMMARY":"Zusammenfassung",
+          "METADATA":"Metadaten",
+          "ACCESS":"Zugriffsberechtigung"
+        },
+        "METADATA":{
+          "TITLE":"Metadaten",
+          "NAME":{
+            "CAPTION":"Name",
+            "PLACEHOLDER":"Name..."
+          }
+        },
+        "ACCESS":{
+          "CAPTION":"Zugriffsrechte",
+          "TEMPLATES":{
+            "TITLE":"Vorlagen"
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Zugriffsrechte",
+            "LABEL":"Vorlage auswählen",
+            "EMPTY":"Keine Vorlage gefunden",
+            "ROLE":"Rolle",
+            "WRITE":"Schreiben",
+            "READ":"Lesen",
+            "ACTION":"Aktionen",
+            "NEW":"Neue Richtlinie",
+            "DETAILS":"Details"
+          },
+          "ROLES":{
+            "LABEL":"Rolle auswählen",
+            "EMPTY":"Keine Rolle gefunden"
+          }
+        }
+      },
+      "DETAILS":{
+        "HEADER":"Zugriffsrichtlinien-Details",
+        "TABS":{
+          "SUMMARY":"Zusammenfassung",
+          "METADATA":"Metadaten",
+          "ACCESS":"Zugriffsberechtigung"
+        },
+        "METADATA":{
+          "TITLE":"Metadaten",
+          "NAME":{
+            "CAPTION":"Name",
+            "PLACEHOLDER":"Name..."
+          }
+        },
+        "ACCESS":{
+          "CAPTION":"Zugriffsrechte",
+          "TEMPLATES":{
+            "TITLE":"Vorlagen"
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Zugriffsrechte",
+            "LABEL":"Vorlage auswählen",
+            "EMPTY":"Keine Vorlage gefunden",
+            "ROLE":"Rolle",
+            "WRITE":"Schreiben",
+            "READ":"Lesen",
+            "ACTION":"Aktionen",
+            "NEW":"Neue Richtlinie",
+            "DETAILS":"Details"
+          },
+          "ROLES":{
+            "LABEL":"Rolle auswählen",
+            "EMPTY":"Keine Rolle gefunden"
+          }
+        }
       }
     },
     "BLACKLISTS":{
