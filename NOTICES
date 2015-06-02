@@ -1,0 +1,624 @@
+Copyright <2015>, The Apereo Foundation
+This project includes software developed by The Apereo Foundation.
+http://www.apereo.org/
+
+Licensed under the Educational Community License, Version 2.0
+(the "License"); you may not use this software except in compliance
+with the License. You may obtain a copy of the License at:
+
+  http://opensource.org/licenses/ecl2.txt
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Portions of the Matterhorn source code are Copyright (c) University of
+California Berkeley and were originally developed and distributed by University
+of California Berkeley, including contributions it licensed from others under
+one or more contributor license agreements. This source code is licensed by the
+Apereo Foundation under the Educational Community License, Version 2.0, unless
+it is already directly licensed to the Apereo Foundation under one or more
+contributor license agreements by the copyright holder.
+
+Additional third-party dependencies defined in Maven pom.xml files are pulled
+from remote repositories at build-time and then deployed within the Matterhorn
+bundle. All third party libraries and tools included in the source code are
+distributed under licenses that are compatible with ECL 2.0.
+
+
+List of Included Third-Party Dependencies
+-----------------------------------------
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/css/vendor/chosen.less
+  Chosen, a Select Box Enhancer for jQuery and Prototype
+  by Patrick Filler for Harvest, http://getharvest.com
+  Copyright (c) 2011 Harvest http://getharvest.com
+  MIT License, https://github.com/harvesthq/chosen/blob/master/LICENSE.md
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/*
+  AngularJS v1.3.6
+  (c) 2010-2014 Google, Inc. http://angularjs.org
+  License: MIT
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-file-upload/*
+  Copyright (c) 2013 danialfarid
+  The MIT License (MIT)
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-sortable.js
+  UI.Sortable
+  https://github.com/angular-ui/ui-sortable
+  Copyright (c) 2012 the AngularUI Team, http://angular-ui.github.com
+  MIT License
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/backbone-1.1.0.js
+  Backbone.js 1.1.0
+  (c) 2010-2011 Jeremy Ashkenas, DocumentCloud Inc.
+  (c) 2011-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+  Backbone may be freely distributed under the MIT license.
+  http://backbonejs.org
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.js
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.jquery.*
+  Chosen, a Select Box Enhancer for jQuery and Prototype
+  by Patrick Filler for Harvest, http://getharvest.com
+  Version 1.1.0
+  Copyright (c) 2011 Harvest http://getharvest.com
+  MIT License
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/datepicker/*
+  jQuery UI - v1.10.3 - 2013-12-13
+  http://jqueryui.com
+  Copyright 2013 jQuery Foundation and other contributors; Licensed MIT
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/font-awesome/*
+  Font Awesome 4.2.0 by @davegandy - http://fontawesome.io - @fontawesome
+  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/google-fonts/*
+  Open Sans
+  Steve Matteson
+  https://www.google.com/fonts/specimen/Open+Sans
+  Apache License, version 2.0
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/jquery-1.10.2.js
+  jQuery JavaScript Library v1.10.2
+  http://jquery.com/
+  Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors
+  Released under the MIT license
+  http://jquery.org/license
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/jquery-ui.js
+  jQuery UI - v1.10.4 - 2014-01-17
+  http://jqueryui.com
+  Copyright 2014 jQuery Foundation and other contributors; Licensed MIT */
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/moment.min.js
+  version : 2.9.0
+  authors : Tim Wood, Iskren Chernev, Moment.js contributors
+  license : MIT
+  momentjs.com
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/underscore-1.5.2.js
+  Underscore.js 1.5.2
+  http://underscorejs.org
+  (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+  Underscore may be freely distributed under the MIT license.
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/video-js/*
+  Video.js v4.11.2
+  Copyright 2014 Brightcove, Inc.
+  Licensed under the Apache License, Version 2.0
+
+modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/angular/angular-scenario.js
+  Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors
+  Released under the MIT license
+  http://jquery.org/license
+
+modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/jasmine-jquery.js
+  Jasmine-jQuery: a set of jQuery helpers for Jasmine tests.
+  Version 2.0.5
+  https://github.com/velesin/jasmine-jquery
+  Copyright (c) 2010-2014 Wojciech Zawistowski, Travis Jeffery
+  MIT License
+
+modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/jquery-deparam.js
+  Deparam is the inverse of jquery's $.param method
+  Extracted $.deparam from Ben Alman's jquery-bbq with license info included
+  https://github.com/AceMetrix/jquery-deparam
+  MIT License
+
+modules/matterhorn-admin-ui/src/main/resources/ui/js/excanvas.js
+  Copyright 2006 Google Inc.
+  Licensed under the Apache License, Version 2.
+
+modules/matterhorn-admin-ui/src/main/resources/ui/js/jquery.address-1.4.min.js
+  jQuery Address Plugin v1.4
+  http://www.asual.com/jquery/address/
+  Copyright (c) 2009-2010 Rostislav Hristov
+  Dual licensed under the MIT or GPL Version 2 licenses.
+
+modules/matterhorn-admin-ui/src/main/resources/ui/js/jquery.cookie.js
+  jQuery Cookie Plugin v1.4.1
+  https://github.com/carhartl/jquery-cookie
+  Copyright 2013 Klaus Hartl
+  Released under the MIT license
+
+modules/matterhorn-admin-ui/src/main/resources/ui/js/jquery.jqote2.js
+  jQote2 - client-side Javascript templating engine
+  Copyright (C) 2010, aefxx
+  http://aefxx.com/
+  Dual licensed under the WTFPL v2 or MIT (X11) licenses
+
+modules/matterhorn-admin-ui/src/test/qunit/qunit/qunit.js
+  QUnit - A JavaScript Unit Testing Framework
+  http://docs.jquery.com/QUnit
+  Copyright (c) 2009 John Resig, Jörn Zaefferer
+  Dual licensed under the MIT and GPL licenses.
+
+modules/matterhorn-common/src/test/resources/InfusionAll.js
+  jQuery JavaScript Library v1.3.2
+  http://jquery.com/
+  Copyright (c) 2009 John Resig
+  Dual licensed under the MIT and GPL licenses.
+
+modules/matterhorn-engage-player/src/main/flex/bridge/FABridge.as
+  Copyright � 2006 Adobe Systems Incorporated
+  MIT License
+
+modules/matterhorn-engage-player/src/main/flex/com/osmf/MediaContainerUIComponent.as
+  Copyright 2010 Adobe Systems Incorporated.  All Rights Reserved.
+  Mozilla Public License Version 1.1
+
+modules/matterhorn-engage-theodul-core/src/main/resources/ui/css/bootstrap/*
+modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/bootstrap.js
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/jquery-ui.js
+  jQuery UI - v1.10.2 - 2013-03-14
+  http://jqueryui.com
+  Copyright 2013 jQuery Foundation and other contributors
+  Licensed MIT
+
+modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/mousetrap.js
+  Simple keyboard shortcut library for Javascript
+  Copyright 2013 Craig Campbell
+  Licensed under the Apache License, Version 2.0
+  Version 1.4.6
+  http://craig.is/killing/mice
+
+modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/punch.js
+  jQuery UI Touch Punch 0.2.3
+  Copyright 2011–2014, Dave Furfero
+  Dual licensed under the MIT or GPL Version 2 licenses.
+
+modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/require.js
+  RequireJS 2.1.17
+  Copyright (c) 2010-2015, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-theodul-plugin-archetype/src/main/resources/archetype-resources/src/test/resources/js/lib/require.js
+  RequireJS 2.1.5
+  Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-theodul-plugin-controls/src/main/resources/static/lib/bootstrap/*
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-plugin-controls/src/main/resources/static/lib/jqueryui/*
+  jQuery UI - v1.10.2 - 2013-03-14
+  http://jqueryui.com
+  Copyright 2013 jQuery Foundation and other contributors
+  Licensed MIT
+
+modules/matterhorn-engage-theodul-plugin-controls/src/test/resources/js/lib/bootstrap.js
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-plugin-controls/src/test/resources/js/lib/mousetrap.js
+  Simple keyboard shortcut library for Javascript
+  Copyright 2013 Craig Campbell
+  Licensed under the Apache License, Version 2.0
+  Version 1.4.6
+  http://craig.is/killing/mice
+
+modules/matterhorn-engage-theodul-plugin-controls/src/test/resources/js/lib/require.js
+  RequireJS 2.1.5
+  Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-theodul-plugin-custom-mhConnection/src/test/resources/js/lib/bootstrap.js
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-plugin-custom-mhConnection/src/test/resources/js/lib/mousetrap.js
+  Simple keyboard shortcut library for Javascript
+  Copyright 2013 Craig Campbell
+  Licensed under the Apache License, Version 2.0
+  Version 1.4.6
+  http://craig.is/killing/mice
+
+modules/matterhorn-engage-theodul-plugin-custom-mhConnection/src/test/resources/js/lib/require.js
+  RequireJS 2.1.5
+  Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-theodul-plugin-custom-notifications/src/main/resources/static/lib/alertify/alertify.js
+  AlertifyJS - v0.13.12
+  Copyright Fabien Doiron <fabien.doiron@gmail.com>
+  MIT license
+
+modules/matterhorn-engage-theodul-plugin-custom-notifications/src/test/resources/js/lib/bootstrap.js
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-plugin-custom-notifications/src/test/resources/js/lib/mousetrap.js
+  Simple keyboard shortcut library for Javascript
+  Copyright 2013 Craig Campbell
+  Licensed under the Apache License, Version 2.0
+  Version 1.4.6
+  http://craig.is/killing/mice
+
+modules/matterhorn-engage-theodul-plugin-custom-notifications/src/test/resources/js/lib/require.js
+  RequireJS 2.1.5
+  Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-theodul-plugin-custom-usertracking/src/test/resources/js/lib/bootstrap.js
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-plugin-custom-usertracking/src/test/resources/js/lib/mousetrap.js
+  Simple keyboard shortcut library for Javascript
+  Copyright 2013 Craig Campbell
+  Licensed under the Apache License, Version 2.0
+  Version 1.4.6
+  http://craig.is/killing/mice
+
+modules/matterhorn-engage-theodul-plugin-custom-usertracking/src/test/resources/js/lib/require.js
+  RequireJS 2.1.5
+  Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-theodul-plugin-description/src/test/resources/js/lib/bootstrap.js
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-plugin-description/src/test/resources/js/lib/mousetrap.js
+  Simple keyboard shortcut library for Javascript
+  Copyright 2013 Craig Campbell
+  Licensed under the Apache License, Version 2.0
+  Version 1.4.6
+  http://craig.is/killing/mice
+
+modules/matterhorn-engage-theodul-plugin-description/src/test/resources/js/lib/require.js
+  RequireJS 2.1.5
+  Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-theodul-plugin-tab-description/src/test/resources/js/lib/bootstrap.js
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-plugin-tab-description/src/test/resources/js/lib/mousetrap.js
+  Simple keyboard shortcut library for Javascript
+  Copyright 2013 Craig Campbell
+  Licensed under the Apache License, Version 2.0
+  Version 1.4.6
+  http://craig.is/killing/mice
+
+modules/matterhorn-engage-theodul-plugin-tab-description/src/test/resources/js/lib/require.js
+  RequireJS 2.1.5
+  Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-theodul-plugin-tab-shortcuts/src/test/resources/js/lib/bootstrap.js
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-plugin-tab-shortcuts/src/test/resources/js/lib/mousetrap.js
+  Simple keyboard shortcut library for Javascript
+  Copyright 2013 Craig Campbell
+  Licensed under the Apache License, Version 2.0
+  Version 1.4.6
+  http://craig.is/killing/mice
+
+modules/matterhorn-engage-theodul-plugin-tab-shortcuts/src/test/resources/js/lib/require.js
+  RequireJS 2.1.5
+  Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-theodul-plugin-tab-slidetext/src/test/resources/js/lib/bootstrap.js
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-plugin-tab-slidetext/src/test/resources/js/lib/mousetrap.js
+  Simple keyboard shortcut library for Javascript
+  Copyright 2013 Craig Campbell
+  Licensed under the Apache License, Version 2.0
+  Version 1.4.6
+  http://craig.is/killing/mice
+
+modules/matterhorn-engage-theodul-plugin-tab-slidetext/src/test/resources/js/lib/require.js
+  RequireJS 2.1.5
+  Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/main/resources/static/lib/Chart.js
+  Chart.js
+  http://chartjs.org/
+  Version: 1.0.1-beta.4
+  Copyright 2014 Nick Downie
+  Released under the MIT license
+
+modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/bootstrap.js
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/Chart.min.js
+  Chart.js
+  http://chartjs.org/
+  Copyright 2013 Nick Downie
+  Released under the MIT license
+  https://github.com/nnnick/Chart.js
+
+modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/mousetrap.js
+  Simple keyboard shortcut library for Javascript
+  Copyright 2013 Craig Campbell
+  Licensed under the Apache License, Version 2.0
+  Version 1.4.6
+  http://craig.is/killing/mice
+
+modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/require.js
+  RequireJS 2.1.5
+  Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-theodul-plugin-video-videojs/src/main/resources/static/lib/videojs/video.js
+  Video.js v4.7.1
+  Copyright 2014 Brightcove, Inc.
+  https://github.com/videojs/video.js
+  Licensed under the Apache License, Version 2.0
+
+modules/matterhorn-engage-theodul-plugin-video-videojs/src/main/resources/static/lib/videojs/videojs.hls.min.js
+  videojs-contrib-hls - v0.8.3 - 2014-07-25
+  Copyright (c) 2014 Brightcove
+  https://github.com/videojs/videojs-contrib-hls
+  Apache License, Version 2.0
+
+modules/matterhorn-engage-theodul-plugin-video-videojs/src/test/resources/js/lib/bootstrap.js
+  Bootstrap v3.2.0 (http://getbootstrap.com)
+  Copyright 2011-2014 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+
+modules/matterhorn-engage-theodul-plugin-video-videojs/src/test/resources/js/lib/mousetrap.js
+  Simple keyboard shortcut library for Javascript
+  Copyright 2013 Craig Campbell
+  Licensed under the Apache License, Version 2.0
+  Version 1.4.6
+  http://craig.is/killing/mice
+
+modules/matterhorn-engage-theodul-plugin-video-videojs/src/test/resources/js/lib/require.js
+  RequireJS 2.1.5
+  Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+  Available via the MIT or new BSD license.
+  http://github.com/jrburke/requirejs
+
+modules/matterhorn-engage-ui/src/main/resources/ui/css/bootstrap.*
+  Bootstrap v3.3.2 (http://getbootstrap.com)
+  Copyright 2011-2015 Twitter, Inc.
+  Licensed under MIT
+
+modules/matterhorn-engage-ui/src/main/resources/ui/js/alertify/alertify.js
+  AlertifyJS - v0.13.12
+  Copyright Fabien Doiron <fabien.doiron@gmail.com>
+  MIT license
+
+modules/matterhorn-engage-ui/src/main/resources/ui/js/bootstrap-accessibility.min.js
+  bootstrap-accessibility-plugin - v1.0.4 - 2014-11-03
+  https://github.com/paypal/bootstrap-accessibility-plugin
+  Copyright (c) 2014 PayPal Accessibility Team
+  Licensed BSD
+
+modules/matterhorn-engage-ui/src/main/resources/ui/js/bootstrap.min.js
+  Bootstrap v3.3.2 (http://getbootstrap.com)
+  Copyright 2011-2015 Twitter, Inc.
+  Licensed under MIT
+
+modules/matterhorn-engage-ui/src/main/resources/ui/js/jquery.liveSearch.js
+  Live Search 2.0
+  http://andreaslagerkvist.com/jquery/live-search/
+  2008 Andreas Lagerkvist (andreaslagerkvist.com)
+  http://creativecommons.org/licenses/by/3.0/
+
+modules/matterhorn-engage-ui/src/main/resources/ui/js/seedrandom.js
+  seedrandom.js version 2.3.4
+  Author: David Bau
+  Copyright (c)2014 David Bau.
+  MIT License
+
+modules/matterhorn-ingest-service-impl/src/test/qunit/qunit/qunit.js
+  QUnit - A JavaScript Unit Testing Framework
+  http://docs.jquery.com/QUnit
+  Copyright (c) 2009 John Resig, Jörn Zaefferer
+  Dual licensed under the MIT and GPL licenses
+
+modules/matterhorn-kernel/src/test/resources/InfusionAll.js
+  jQuery JavaScript Library v1.3.2
+  http://jquery.com/
+  Copyright (c) 2009 John Resig
+  Dual licensed under the MIT and GPL licenses.
+
+modules/matterhorn-manager-impl/src/main/resources/ui-files/css/jquery-ui-1.8.6.custom.css
+  jQuery UI CSS Framework 1.8.6
+  Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+  Dual licensed under the MIT or GPL Version 2 licenses.
+
+modules/matterhorn-manager-impl/src/main/resources/ui-files/css/market-ui.css
+  jQuery UI CSS Framework 1.8.9
+  Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+  Dual licensed under the MIT or GPL Version 2 licenses.
+  http://jquery.org/license
+
+modules/matterhorn-manager-impl/src/main/resources/ui-files/js/config-editor/jqueryFileTree.js
+  jQuery File Tree Plugin
+  Version 1.01
+  Dual licensed under the MIT or GPL licenses.
+  copyright 2008 A Beautiful Site, LLC.
+
+modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/codemirror/*
+  Copyright (C) 2013 by Marijn Haverbeke <marijnh@gmail.com> and others
+  MIT License
+
+modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/jquery-1.4.4.min.js
+  jQuery JavaScript Library v1.4.4
+  http://jquery.com/
+  Copyright 2010, John Resig
+  Dual licensed under the MIT or GPL Version 2 licenses.
+
+modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/jquery.address-1.4.min.js
+  jQuery Address Plugin v1.4
+  http://www.asual.com/jquery/address/
+  Copyright (c) 2009-2010 Rostislav Hristov
+  Dual licensed under the MIT or GPL Version 2 licenses.
+
+modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/jquery.cookie.js
+  jQuery Cookie plugin
+  Copyright (c) 2010 Klaus Hartl (stilbuero.de)
+  Dual licensed under the MIT and GPL licenses:
+
+modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/jquery.jqote2.js
+  jQote2 - client-side Javascript templating engine
+  Copyright (C) 2010, aefxx
+  http://aefxx.com/
+  Dual licensed under the WTFPL v2 or MIT (X11) licenses
+
+modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/jquery-ui-1.8.6.custom.min.js
+  jQuery UI 1.8.6
+  Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
+  Dual licensed under the MIT or GPL Version 2 licenses.
+
+modules/matterhorn-mediapackage-ui/src/main/resources/ui/scripts/jquery.tmpl.min.js
+  jQuery Templates Plugin 1.0.0pre
+  http://github.com/jquery/jquery-tmpl
+  Copyright Software Freedom Conservancy, Inc.
+  Dual licensed under the MIT or GPL Version 2 licenses.
+
+modules/matterhorn-mediapackage-ui/src/main/resources/ui/scripts/jquery.validate.min.js
+  jQuery Validation Plugin 1.9.0
+  http://bassistance.de/jquery-plugins/jquery-plugin-validation/
+  http://docs.jquery.com/Plugins/Validation
+  Copyright (c) 2006 - 2011 Jörn Zaefferer
+  Dual licensed under the MIT and GPL licenses:
+
+modules/matterhorn-mediapackage-ui/src/main/resources/ui/scripts/jquery.xmlns.js
+  jquery.xmlns.js:  xml-namespace selector support for jQuery
+  Copyright (c) 2009, Ryan Kelly.
+  Dual licensed under the MIT and GPL licenses.
+
+modules/matterhorn-mediapackage-ui/src/main/resources/ui/tests/qunit.*
+  QUnit v1.3.0pre - A JavaScript Unit Testing Framework
+  http://docs.jquery.com/QUnit
+  Copyright (c) 2011 John Resig, Jörn Zaefferer
+  Dual licensed under the MIT or GPL licenses
+
+modules/matterhorn-videoeditor-workflowoperation/src/main/resources/ui/operation/editor/js/ObjTree.js
+  XML.ObjTree -- XML source code from/to JavaScript object like E4X
+  Author: Yusuke Kawasaki http://www.kawa.net/
+  Copyright (c) 2005-2006 Yusuke Kawasaki. All rights reserved.
+  Artistic license.
+
+shared-resources/css/jquery-ui/*
+  jQuery UI CSS Framework
+  Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+  Dual licensed under the MIT or GPL Version 2 licenses.
+  http://jquery.org/license
+
+shared-resources/css/player-multi-hybrid/opencast-reset.css
+  YUI fonts, reset and base
+  Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+  Code licensed under the BSD License:
+  http://developer.yahoo.net/yui/license.txt
+  version: 2.5.2
+
+shared-resources/js/bridge/lib/FABridge.js
+  Copyright 2006 Adobe Systems Incorporated
+  MIT License
+
+shared-resources/js/ext/trimpath.js
+  TrimPath Template. Release 1.0.38.
+  Copyright (C) 2004, 2005 Metaha.
+  TrimPath Template is licensed under the GNU General Public License
+  and the Apache License, Version 2.0
+
+shared-resources/js/jquery/jquery-ui.js
+  jQuery UI 1.8.18
+  Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+  Dual licensed under the MIT or GPL Version 2 licenses.
+  http://docs.jquery.com/UI
+
+shared-resources/js/jquery/plugins/jARIA.js
+  Copyright 2007 Chris Hoffman
+  This software is dual licensed under the MIT (MIT-LICENSE.txt)
+  and GPL (GPL-LICENSE.txt) licenses.
+
+shared-resources/js/jquery/plugins/jquery.cookie.js
+  jQuery Cookie plugin
+  Copyright (c) 2010 Klaus Hartl (stilbuero.de)
+  Dual licensed under the MIT and GPL licenses:
+
+shared-resources/js/jquery/plugins/jquery.crypt.js
+ * jQuery Cryptography Plug-in
+ * version: 1.0.0 (24 Sep 2008)
+ * copyright 2008 Scott Thompson http://www.itsyndicate.ca - scott@itsyndicate.ca
+ * http://www.opensource.org/licenses/mit-license.php
+
+shared-resources/js/jquery/plugins/jquery-ui-timepicker-addon.js
+  jQuery timepicker addon
+  Version 1.0.2
+  Copyright 2012 Trent Richardson
+  You may use this project under MIT or GPL licenses.
+
+shared-resources/js/jquery/plugins/jquery.wysiwyg.js
+  WYSIWYG - jQuery plugin 0.6
+  Copyright (c) 2008-2009 Juan M Martinez
+  http://plugins.jquery.com/project/jWYSIWYG
+  Dual licensed under the MIT and GPL licenses:
+
+shared-resources/js/jquery/plugins/jquery.xslt.js
+  jquery.xslt.js
+  Copyright (c) 2005-2008 Johann Burkard (<mailto:jb@eaio.com>)
+  <http://eaio.com>
+  MIT License
+
+shared-resources/js/jquery/plugins/jquery.xslt.new.js
+  XSLT jQuery Plugin - Copyright (C) 2007, Jorrit Jongma (Chainfire) 
+	Version: 0.70
+	@update 7.2.2013 by Martin Abel (mabel@uos.de): Change callback function order
+	Homepage: http://www.jongma.org/webtools/jquery/
+	License: MIT / Public Domain
