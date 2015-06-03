@@ -15,7 +15,9 @@
  */
 package org.opencastproject.serviceregistry.api;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -35,20 +37,21 @@ public class SystemLoad {
 
   /** No-arg constructor needed by JAXB */
   public SystemLoad() {
+    nodeLoads = new LinkedHashMap<String, NodeLoad>();
   }
 
   /** The list of nodes and their current load */
-  @XmlElementWrapper(name = "nodes")
-  @XmlElement(name = "node")
-  protected List<NodeLoad> nodeLoads;
+  protected Map<String, NodeLoad> nodeLoads;
 
   /**
    * Get the list of nodes and their current loadfactor.
    *
    * @return the nodeLoads
    */
-  public List<NodeLoad> getNodeLoads() {
-    return nodeLoads;
+  @XmlElementWrapper(name = "nodes")
+  @XmlElement(name = "node")
+  public Collection<NodeLoad> getNodeLoads() {
+    return nodeLoads.values();
   }
 
   /**
@@ -57,18 +60,60 @@ public class SystemLoad {
    * @param nodeLoads
    *          the nodeLoads to set
    */
-  public void setNodeLoads(List<NodeLoad> nodeLoads) {
-    this.nodeLoads = nodeLoads;
+  public void setNodeLoads(Collection<NodeLoad> newLoads) {
+    for (NodeLoad node : newLoads) {
+      nodeLoads.put(node.getHost(), node);
+    }
+  }
+
+  /**
+   * Adds a node to the map of load values, overwriting an existing entry if the node is already present in the map
+   * @param load
+   *          the nodeLoad to add
+   */
+  public void addNodeLoad(NodeLoad load) {
+    nodeLoads.put(load.getHost(), load);
+  }
+
+  /**
+   * Gets a specific host from the map, if present.  If the node is not present, or the host value is null, this method returns null.
+   * @param host
+   *        The hostname of the host you are interested in.
+   * @return
+   *        The specific host from the map, if present.  If the node is not present, or the host value is null, this method returns null.
+   */
+  public NodeLoad get(String host) {
+    if (host != null && this.containsHost(host))
+      return nodeLoads.get(host);
+    return null;
+  }
+
+  /**
+   * Returns true if the load map contains the host in question.
+   * @param host
+   *          The hostname of the host you are interested in.
+   * @return
+   *          True if the host is present, false if the host is not, or the host variable is null.
+   */
+  public boolean containsHost(String host) {
+    if (host != null)
+      return nodeLoads.containsKey(host);
+    return false;
   }
 
   /** A record of a node in the cluster and its load factor */
   @XmlType(name = "nodetype", namespace = "http://serviceregistry.opencastproject.org")
   @XmlRootElement(name = "nodetype", namespace = "http://serviceregistry.opencastproject.org")
   @XmlAccessorType(XmlAccessType.NONE)
-  public static class NodeLoad {
+  public static class NodeLoad implements Comparable<NodeLoad> {
 
     /** No-arg constructor needed by JAXB */
     public NodeLoad() {
+    }
+
+    public NodeLoad(String host, float load) {
+      this.host = host;
+      this.loadFactor = load;
     }
 
     /** This node's base URL */
@@ -107,6 +152,24 @@ public class SystemLoad {
      */
     public void setLoadFactor(float loadFactor) {
       this.loadFactor = loadFactor;
+    }
+
+    @Override
+    public int compareTo(NodeLoad other) {
+      if (other.getLoadFactor() > this.loadFactor) {
+        return 1;
+      } else if (this.loadFactor > other.getLoadFactor()) {
+        return -1;
+      } else {
+        return 0;
+      }
+    }
+
+    public boolean exceeds(NodeLoad other) {
+      if (this.compareTo(other) > 1) {
+        return true;
+      }
+      return false;
     }
   }
 }

@@ -68,6 +68,7 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
           @RestParameter(description = "The mediapackage to apply the command to. Either this or " + ExecuteService.INPUT_ELEM_FORM_PARAM + " are required",
           isRequired = false, name = ExecuteService.INPUT_MP_FORM_PARAM, type = RestParameter.Type.TEXT),
           @RestParameter(description = "The arguments to the command", isRequired = true, name = ExecuteService.PARAMS_FORM_PARAM, type = RestParameter.Type.STRING),
+          @RestParameter(description = "The estimated load placed on the system by this command", isRequired = false, name = ExecuteService.LOAD_FORM_PARAM, type = RestParameter.Type.FLOAT),
           @RestParameter(description = "The mediapackage element to apply the command to. Either this or " + ExecuteService.INPUT_MP_FORM_PARAM + " are required",
           isRequired = false, name = ExecuteService.INPUT_ELEM_FORM_PARAM, type = RestParameter.Type.TEXT),
           @RestParameter(description = "The mediapackage element produced by the command", isRequired = false, name = ExecuteService.OUTPUT_NAME_FORM_PARAMETER,
@@ -82,6 +83,7 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
           returnDescription = "")
   public Response execute(@FormParam(ExecuteService.EXEC_FORM_PARAM) String exec,
           @FormParam(ExecuteService.PARAMS_FORM_PARAM) String params,
+          @FormParam(ExecuteService.LOAD_FORM_PARAM) Float loadParam,
           @FormParam(ExecuteService.INPUT_ELEM_FORM_PARAM) String inputElementStr,
           @FormParam(ExecuteService.INPUT_MP_FORM_PARAM) String inputMpStr,
           @FormParam(ExecuteService.OUTPUT_NAME_FORM_PARAMETER) String outputFileName,
@@ -103,6 +105,11 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
         }
       }
 
+      float load = 1.0f;
+      if (loadParam != null) {
+        load = loadParam;
+      }
+     
       Job retJob = null;
       if ((inputElementStr != null) && (inputMpStr != null)) {
         logger.error("Only one input MediaPackage OR input MediaPackageElement can be set at the same time");

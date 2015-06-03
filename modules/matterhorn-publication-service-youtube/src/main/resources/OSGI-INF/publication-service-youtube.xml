@@ -4,6 +4,7 @@
     activate="activate">
     <implementation class="org.opencastproject.publication.youtube.YouTubePublicationServiceImpl" />
     <property name="service.description" value="Publication Service (Youtube)" />
+    <property name="service.pid" value="org.opencastproject.publication.youtube.YouTubePublicationServiceImpl" />
     <service>
       <provide interface="org.osgi.service.cm.ManagedService" />
       <provide interface="org.opencastproject.publication.api.YouTubePublicationService" />

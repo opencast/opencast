@@ -395,7 +395,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         Job inspectionJob = null;
         try {
           inspectionJob = inspectionService.inspect(returnURL);
-          JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
+          JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
           if (!barrier.waitForJobs().isSuccess()) {
             throw new EncoderException("Media inspection of " + returnURL + " failed");
           }
@@ -1645,7 +1645,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       throw new EncoderException("Media inspection of " + workspaceURI + " failed", e);
     }
 
-    JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
+    JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
     if (!barrier.waitForJobs().isSuccess()) {
       throw new EncoderException("Media inspection of " + workspaceURI + " failed");
     }

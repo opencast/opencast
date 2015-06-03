@@ -105,6 +105,9 @@ public class JaxbJob implements Job {
   /** Whether this job is queueable */
   protected boolean dispatchable;
 
+  /** The load value for this job.  This should be roughly the number of cores that this job occupies while running. */
+  protected Float jobLoad = 1.0f;
+
   /** Default constructor needed by jaxb */
   public JaxbJob() {
     this.context = new JaxbJobContext();
@@ -152,6 +155,7 @@ public class JaxbJob implements Job {
     this.uri = job.getUri();
     this.creator = job.getCreator();
     this.organization = job.getOrganization();
+    this.jobLoad = job.getJobLoad();
   }
 
   /**
@@ -606,6 +610,26 @@ public class JaxbJob implements Job {
 
     return jobType.hashCode() + arguments.hashCode();
 
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.Job#getCreator()
+   */
+  @Override
+  @XmlElement(name = "jobLoad")
+  public Float getJobLoad() {
+    return jobLoad;
+  }
+
+  /**
+   * Sets the job's load value
+   *
+   * @param newLoad the load value for the job
+   */
+  public void setJobLoad(Float newLoad) {
+    this.jobLoad = newLoad;
   }
 
   /**

@@ -17,6 +17,7 @@ package org.opencastproject.serviceregistry.api;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.List;
@@ -35,12 +36,12 @@ public interface ServiceRegistry {
    *          The allocated memory of this host
    * @param cores
    *          The available cores of this host
-   * @param maxConcurrentJobs
-   *          the maximum number of concurrent jobs this server can execute
+   * @param maxLoad
+   *          the maximum load this host can support
    * @throws ServiceRegistryException
    *           if communication with the service registry fails
    */
-  void registerHost(String host, String address, long memory, int cores, int maxConcurrentJobs)
+  void registerHost(String host, String address, long memory, int cores, float maxLoad)
           throws ServiceRegistryException;
 
   /**
@@ -78,13 +79,36 @@ public interface ServiceRegistry {
   void disableHost(String host) throws ServiceRegistryException, NotFoundException;
 
   /**
-   * Returns the total number of jobs that can be handled by the currently registered hosts.
+   * Returns the maximum load that can be handled by the currently registered hosts.
+   * Note that this load is *not* 1-to-1 equivalent with number of jobs.  A job may take up more than one load.
    *
-   * @return the total number of jobs that can be processed concurrently
+   * @return the total load that can be processed concurrently
    * @throws ServiceRegistryException
    *           if communication with the service registry fails
    */
-  int getMaxConcurrentJobs() throws ServiceRegistryException;
+  SystemLoad getMaxLoads() throws ServiceRegistryException;
+
+  /**
+   * Returns the maximum load that can be handled by a given node.
+   * Note that this load is *not* 1-to-1 equivalent with number of jobs.  A job may take up more than one load.
+   *
+   * @param host
+   *          The base URL for this server
+   *
+   * @return the total load that can be processed concurrently on that node
+   * @throws ServiceRegistryException
+   *           if communication with the service registry fails
+   */
+  NodeLoad getMaxLoadOnNode(String host) throws ServiceRegistryException, NotFoundException;
+
+  /**
+   * Gets a map of hosts to the number of jobs currently loading that host
+   *
+   * @param activeOnly
+   *          if true, the map will include only hosts that are online and have non-maintenance mode services
+   * @return the map of hosts to job counts
+   */
+  SystemLoad getCurrentHostLoads(boolean activeOnly) throws ServiceRegistryException;
 
   /**
    * Registers a host to handle a specific type of job
@@ -166,6 +190,27 @@ public interface ServiceRegistry {
 
   /**
    * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
+   * {@link #createJob(String, String, List, String, boolean)} with an empty argument list.
+   * <p>
+   * Note that this job will be linked to the current job as its parent. Use
+   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
+   * need the link.
+   * </p>
+   *
+   * @param type
+   *          the type of service responsible for this job
+   * @param operation
+   *          the operation for this service to run
+   * @param jobLoad
+   *          the load caused by this job, roughly equivalent to the number of cores used this job
+   * @return the job
+   * @throws ServiceRegistryException
+   *           if there is a problem creating the job
+   */
+  Job createJob(String type, String operation, float jobLoad) throws ServiceRegistryException;
+
+  /**
+   * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
    * {@link #createJob(String, String, List, String, boolean)}.
    * <p>
    * Note that this job will be linked to the current job as its parent. Use
@@ -184,6 +229,29 @@ public interface ServiceRegistry {
    *           if there is a problem creating the job
    */
   Job createJob(String type, String operation, List<String> arguments) throws ServiceRegistryException;
+
+  /**
+   * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
+   * {@link #createJob(String, String, List, String, boolean)}.
+   * <p>
+   * Note that this job will be linked to the current job as its parent. Use
+   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
+   * need the link.
+   * </p>
+   *
+   * @param type
+   *          the type of service responsible for this job
+   * @param operation
+   *          the operation for this service to run
+   * @param arguments
+   *          the arguments to the operation
+   * @param jobLoad
+   *          the load caused by this job, roughly equivalent to the number of cores used this job
+   * @return the job
+   * @throws ServiceRegistryException
+   *           if there is a problem creating the job
+   */
+  Job createJob(String type, String operation, List<String> arguments, float jobLoad) throws ServiceRegistryException;
 
   /**
    * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
@@ -207,6 +275,32 @@ public interface ServiceRegistry {
    *           if there is a problem creating the job
    */
   Job createJob(String type, String operation, List<String> arguments, String payload) throws ServiceRegistryException;
+
+  /**
+   * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
+   * {@link #createJob(String, String, List, String, boolean)}. The job will carry the given payload from the beginning.
+   * <p>
+   * Note that this job will be linked to the current job as its parent. Use
+   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
+   * need the link.
+   * </p>
+   *
+   * @param type
+   *          the type of service responsible for this job
+   * @param operation
+   *          the operation for this service to run
+   * @param arguments
+   *          the arguments to the operation
+   * @param payload
+   *          an optional initial payload
+   * @param jobLoad
+   *          the load caused by this job, roughly equivalent to the number of cores used this job
+   * @return the job
+   * @throws ServiceRegistryException
+   *           if there is a problem creating the job
+   */
+  Job createJob(String type, String operation, List<String> arguments, String payload, float jobLoad)
+          throws ServiceRegistryException;
 
   /**
    * Create and store a new job. If <code>enqueueImmediately</code> is true, the job will be in the
@@ -240,6 +334,36 @@ public interface ServiceRegistry {
    * Create and store a new job. If <code>enqueueImmediately</code> is true, the job will be in the
    * {@link Status#QUEUED} state and will be dispatched as soon as possible. Otherwise, it will be
    * {@link Status#INSTANTIATED}.
+   * <p>
+   * Note that this job will be linked to the current job as its parent. Use
+   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
+   * need the link.
+   * </p>
+   *
+   * @param type
+   *          the type of service responsible for this job
+   * @param operation
+   *          the operation for this service to run
+   * @param arguments
+   *          the arguments to the operation
+   * @param payload
+   *          an optional initial payload
+   * @param queueable
+   *          whether the job can be enqueued for dispatch. If false, the job's initial state will be
+   *          {@link Status#INSTANTIATED} and will not be dispatched.
+   * @param jobLoad
+   *          the load caused by this job, roughly equivalent to the number of cores used this job
+   * @return the job
+   * @throws ServiceRegistryException
+   *           if there is a problem creating the job
+   */
+  Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, float jobLoad)
+          throws ServiceRegistryException;
+
+  /**
+   * Create and store a new job. If <code>enqueueImmediately</code> is true, the job will be in the
+   * {@link Status#QUEUED} state and will be dispatched as soon as possible. Otherwise, it will be
+   * {@link Status#INSTANTIATED}.
    *
    * @param type
    *          the type of service responsible for this job
@@ -259,6 +383,34 @@ public interface ServiceRegistry {
    *           if there is a problem creating the job
    */
   Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, Job parentJob)
+          throws ServiceRegistryException;
+
+  /**
+   * Create and store a new job. If <code>enqueueImmediately</code> is true, the job will be in the
+   * {@link Status#QUEUED} state and will be dispatched as soon as possible. Otherwise, it will be
+   * {@link Status#INSTANTIATED}.
+   *
+   * @param type
+   *          the type of service responsible for this job
+   * @param operation
+   *          the operation for this service to run
+   * @param arguments
+   *          the arguments to the operation
+   * @param payload
+   *          an optional initial payload
+   * @param queueable
+   *          whether the job can be enqueued for dispatch. If false, the job's initial state will be
+   *          {@link Status#INSTANTIATED} and will not be dispatched.
+   * @param parentJob
+   *          the parent job
+   * @param jobLoad
+   *          the load caused by this job, roughly equivalent to the number of cores used this job
+   * @return the job
+   * @throws ServiceRegistryException
+   *           if there is a problem creating the job
+   */
+  Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, Job parentJob,
+                float jobLoad)
           throws ServiceRegistryException;
 
   /**
@@ -403,6 +555,13 @@ public interface ServiceRegistry {
   List<ServiceRegistration> getServiceRegistrations() throws ServiceRegistryException;
 
   /**
+   * Returns the service regstry's hostname.  This can be used to fetch the list of services on the local host.
+   *
+   * @return The hostname that the service registry is running on.
+   */
+  String getRegistryHostname();
+
+  /**
    * Finds all host registrations, including offline hosts and those in maintenance mode.
    *
    * @return A list of host registrations
@@ -487,15 +646,6 @@ public interface ServiceRegistry {
    *           if there is a problem accessing the service registry
    */
   long count(String serviceType, String host, String operation, Status status) throws ServiceRegistryException;
-
-  /**
-   * Get the load factors for each registered node.
-   *
-   * @return the load values
-   * @throws ServiceRegistryException
-   *           if there is a problem accessing the service registry
-   */
-  SystemLoad getLoad() throws ServiceRegistryException;
 
   /**
    * Sets the given service to NORMAL state

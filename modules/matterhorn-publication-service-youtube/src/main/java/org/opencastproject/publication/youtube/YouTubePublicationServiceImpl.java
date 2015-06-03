@@ -199,6 +199,33 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
     if (StringUtils.isNotBlank(isChunked))
       isDefaultChunked = Boolean.getBoolean(isChunked);
+
+    String publishJobLoad = StringUtils.trimToNull((String) properties.get(YOUTUBE_PUBLISH_LOAD_KEY));
+    if (publishJobLoad != null) {
+      try {
+        youtubePublishJobLoad = Float.parseFloat(publishJobLoad);
+        logger.info("Set YouTube publish job load to {}", youtubePublishJobLoad);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set YouTube publish job loads to {}. {} must be a float", publishJobLoad,
+                YOUTUBE_PUBLISH_LOAD_KEY);
+        youtubePublishJobLoad = DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD;
+        logger.info("Set YouTube publish job load to default of {}", youtubePublishJobLoad);
+      }
+    }
+
+    String retractJobLoad = StringUtils.trimToNull((String) properties.get(YOUTUBE_RETRACT_LOAD_KEY));
+    if (retractJobLoad != null) {
+      try {
+        youtubeRetractJobLoad = Float.parseFloat(retractJobLoad);
+        logger.info("Set YouTube retract job load to {}", youtubePublishJobLoad);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set YouTube retract job loads to {}. {} must be a float", retractJobLoad,
+                YOUTUBE_RETRACT_LOAD_KEY);
+        youtubeRetractJobLoad = DEFAULT_YOUTUBE_RETRACT_JOB_LOAD;
+        logger.info("Set YouTube retract job load to default of {}", youtubeRetractJobLoad);
+      }
+    }
+
   }
 
   @Override
@@ -212,7 +239,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Publish.toString(),
-              Arrays.asList(MediaPackageParser.getAsXml(mediapackage), track.getIdentifier()));
+              Arrays.asList(MediaPackageParser.getAsXml(mediapackage), track.getIdentifier()), youtubePublishJobLoad);
     } catch (ServiceRegistryException e) {
       throw new PublicationException("Unable to create a job", e);
     }
@@ -408,7 +435,7 @@ public class YouTubePublicationServiceImpl extends AbstractJobProducer implement
     try {
       List<String> arguments = new ArrayList<String>();
       arguments.add(MediaPackageParser.getAsXml(mediaPackage));
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(), arguments);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(), arguments, youtubeRetractJobLoad);
     } catch (ServiceRegistryException e) {
       throw new PublicationException("Unable to create a job", e);
     }

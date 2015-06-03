@@ -174,7 +174,7 @@ public class VideoSegmenterTest {
   @Test
   public void testAnalyze() throws Exception {
     Job receipt = vsegmenter.segment(track);
-    JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 1000, receipt);
+    JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 1000, receipt);
     jobBarrier.waitForJobs();
 
     Catalog catalog = (Catalog) MediaPackageElementParser.getFromXml(receipt.getPayload());

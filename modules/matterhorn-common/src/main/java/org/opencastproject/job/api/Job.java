@@ -26,7 +26,7 @@ import java.util.List;
 public interface Job {
   /** The status of the job that this receipt represents */
   public static enum Status {
-    QUEUED, PAUSED, RUNNING, FINISHED, FAILED, DELETED, INSTANTIATED, DISPATCHING, RESTART, CANCELED;
+    QUEUED, PAUSED, RUNNING, FINISHED, FAILED, DELETED, INSTANTIATED, DISPATCHING, RESTART, CANCELED, WAITING;
 
     /** Return if the job is terminated. */
     public boolean isTerminated() {
@@ -275,4 +275,11 @@ public interface Job {
 
   /** Gets the job signature by calculating the hash code from the concatenation of the jobType + the job arguments */
   int getSignature();
+
+  /**
+   * Gets the job's load.  For example, a job which uses four cores would have a load of 4.0
+   *
+   * @return the job's load
+   */
+  Float getJobLoad();
 }

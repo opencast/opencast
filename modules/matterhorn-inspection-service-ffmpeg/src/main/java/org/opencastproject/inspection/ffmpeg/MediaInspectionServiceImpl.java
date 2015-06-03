@@ -43,6 +43,25 @@ import java.util.List;
 
 /** Inspects media via ffprobe. */
 public class MediaInspectionServiceImpl extends AbstractJobProducer implements MediaInspectionService, ManagedService {
+
+  /** The load introduced on the system by creating an inspect job */
+  public static final float DEFAULT_INSPECT_JOB_LOAD = 1.0f;
+
+  /** The load introduced on the system by creating an enrich job */
+  public static final float DEFAULT_ENRICH_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_INSPECT_JOB_LOAD} */
+  public static final String INSPECT_JOB_LOAD_KEY = "job.load.inspect";
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_ENRICH_JOB_LOAD} */
+  public static final String ENRICH_JOB_LOAD_KEY = "job.load.enrich";
+
+  /** The load introduced on the system by creating an inspect job */
+  private float inspectJobLoad = DEFAULT_INSPECT_JOB_LOAD;
+
+  /** The load introduced on the system by creating an enrich job */
+  private float enrichJobLoad = DEFAULT_ENRICH_JOB_LOAD;
+
   private static final Logger logger = LoggerFactory.getLogger(MediaInspectionServiceImpl.class);
 
   /** List of available operations on jobs */
@@ -103,6 +122,32 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       logger.info("Setting the path to ffprobe to " + path);
       inspector = new MediaInspector(workspace, tikaParser, path);
     }
+
+    String inspectStringJobLoad = StringUtils.trimToNull((String) properties.get(INSPECT_JOB_LOAD_KEY));
+    if (inspectStringJobLoad != null) {
+      try {
+        inspectJobLoad = Float.parseFloat(inspectStringJobLoad);
+        logger.info("Set inspect job load to {}", inspectJobLoad);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set inspect job loads to {}. {} must be a float", inspectStringJobLoad,
+                INSPECT_JOB_LOAD_KEY);
+        inspectJobLoad = DEFAULT_INSPECT_JOB_LOAD;
+        logger.info("Set inspect job load to default of {}", inspectJobLoad);
+      }
+    }
+
+    String enrichStringJobLoad = StringUtils.trimToNull((String) properties.get(ENRICH_JOB_LOAD_KEY));
+    if (enrichStringJobLoad != null) {
+      try {
+        enrichJobLoad = Float.parseFloat(enrichStringJobLoad);
+        logger.info("Set enrich job load to {}", enrichJobLoad);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set enrich job loads to {}. {} must be a float", enrichStringJobLoad,
+                INSPECT_JOB_LOAD_KEY);
+        enrichJobLoad = DEFAULT_ENRICH_JOB_LOAD;
+        logger.info("Set enrich job load to default of {}", enrichJobLoad);
+      }
+    }
   }
 
   /**
@@ -149,7 +194,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   @Override
   public Job inspect(URI uri) throws MediaInspectionException {
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString()));
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString()), inspectJobLoad);
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
@@ -166,7 +211,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
          MediaPackageException {
            try {
              return serviceRegistry.createJob(JOB_TYPE, Operation.Enrich.toString(),
-                 Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)));
+                 Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)), enrichJobLoad);
            } catch (ServiceRegistryException e) {
              throw new MediaInspectionException(e);
            }

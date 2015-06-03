@@ -62,6 +62,10 @@ public final class ServiceRegistryRemoteImpl extends ServiceRegistryRemoteBase {
     return serverUrl;
   }
 
+  public String getRegistryHostname() {
+    return serverUrl;
+  }
+
   /**
    * Callback for the OSGi environment that is called upon service activation.
    *

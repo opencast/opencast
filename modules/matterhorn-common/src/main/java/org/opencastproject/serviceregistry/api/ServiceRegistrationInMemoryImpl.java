@@ -77,11 +77,14 @@ public class ServiceRegistrationInMemoryImpl implements ServiceRegistration {
    *
    * @param service
    *          the local service instance
+   * @param host
+   *          the host that the service is running on
    */
-  public ServiceRegistrationInMemoryImpl(JobProducer service) {
+  public ServiceRegistrationInMemoryImpl(JobProducer service, String host) {
     this.service = service;
     this.serviceType = service.getJobType();
     this.isJobProducer = true;
+    this.host = host;
   }
 
   /**

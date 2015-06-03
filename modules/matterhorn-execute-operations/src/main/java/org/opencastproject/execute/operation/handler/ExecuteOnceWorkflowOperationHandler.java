@@ -60,6 +60,9 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
   /** Property containing the list of command parameters */
   public static final String PARAMS_PROPERTY = "params";
 
+  /** Property containingn an approximation of the load imposed by running this operation */
+  public static final String LOAD_PROPERTY = "load";
+
   /** Property containing the "flavor" that a mediapackage elements must have in order to be used as input arguments */
   public static final String SOURCE_FLAVOR_PROPERTY = "source-flavor";
 
@@ -94,6 +97,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(EXEC_PROPERTY, "The full path the executable to run");
     CONFIG_OPTIONS.put(PARAMS_PROPERTY, "Space separated list of command line parameters to pass to the executable')");
+    CONFIG_OPTIONS.put(LOAD_PROPERTY, "A floating point estimate of the load imposed on the node by this job");
     CONFIG_OPTIONS.put(OUTPUT_FILENAME_PROPERTY, "The name of the elements created by this operation");
     CONFIG_OPTIONS.put(EXPECTED_TYPE_PROPERTY,
             "The type of the element returned by this operation. Accepted values are: manifest, timeline, track, catalog, attachment, other");
@@ -117,6 +121,13 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
     // Get operation parameters
     String exec = StringUtils.trimToNull(operation.getConfiguration(EXEC_PROPERTY));
     String params = StringUtils.trimToNull(operation.getConfiguration(PARAMS_PROPERTY));
+    float load = 1.0f;
+    try {
+      load = Float.parseFloat(StringUtils.trimToEmpty(operation.getConfiguration(LOAD_PROPERTY)));
+    } catch (NumberFormatException e) {
+      String description = StringUtils.trimToEmpty(operation.getDescription());
+      logger.warn("Bad load value on execute operation with description {}, assuming load of 1.0", description);
+    }
     String targetFlavorStr = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR_PROPERTY));
     String targetTags = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS_PROPERTY));
     String outputFilename = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_FILENAME_PROPERTY));
@@ -144,7 +155,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
     MediaPackageElement resultElement = null;
 
     try {
-      Job job = executeService.execute(exec, params, mediaPackage, outputFilename, expectedType);
+      Job job = executeService.execute(exec, params, mediaPackage, outputFilename, expectedType, load);
 
       // Wait for all jobs to be finished
       if (!waitForStatus(job).isSuccess())
@@ -158,7 +169,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
           // Have the track inspected and return the result
           Job inspectionJob = null;
           inspectionJob = inspectionService.inspect(resultElement.getURI());
-          JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
+          JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
           if (!barrier.waitForJobs().isSuccess()) {
             throw new ExecuteException("Media inspection of " + resultElement.getURI() + " failed");
           }

@@ -312,7 +312,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       incident().recordJobCreationIncident(job, e);
       throw new MediaInspectionException("Media inspection of " + workspaceURI + " failed", e);
     }
-    JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
+    JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
     if (!barrier.waitForJobs().isSuccess()) {
       throw new ProcessFailedException("Media inspection of " + workspaceURI + " failed");
     }

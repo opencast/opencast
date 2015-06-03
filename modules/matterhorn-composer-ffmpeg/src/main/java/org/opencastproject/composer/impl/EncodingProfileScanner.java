@@ -61,6 +61,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
   private static final String PROP_OUTPUT = ".output";
   private static final String PROP_SUFFIX = ".suffix";
   private static final String PROP_MIMETYPE = ".mimetype";
+  private static final String PROP_JOBLOAD = ".jobload";
 
   /** OSGi bundle context */
   private BundleContext bundleCtx = null;
@@ -184,6 +185,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
               + "). (Check web.xml profiles.)");
 
     EncodingProfileImpl df = new EncodingProfileImpl(identifier, name, artifact);
+
     // Output Type
     String type = getDefaultProperty(profile, PROP_OUTPUT, properties, defaultProperties);
     if (StringUtils.isBlank(type))
@@ -229,6 +231,10 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     if (StringUtils.isBlank(applicableObj))
       throw new ConfigurationException("Input type (" + PROP_APPLICABLE + ") of profile '" + profile + "' is missing");
     df.setApplicableType(MediaType.parseString(StringUtils.trimToEmpty(applicableObj)));
+
+    String jobLoad = getDefaultProperty(profile, PROP_JOBLOAD, properties, defaultProperties);
+    if (!StringUtils.isBlank(jobLoad))
+      df.setJobLoad(Float.valueOf(jobLoad));
 
     // Look for extensions
     String extensionKey = PROP_PREFIX + profile + ".";

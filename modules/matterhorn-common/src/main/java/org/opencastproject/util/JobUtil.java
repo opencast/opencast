@@ -79,22 +79,22 @@ public final class JobUtil {
   }
 
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, long timeout, Job... jobs) {
-    JobBarrier barrier = new JobBarrier(reg, jobs);
+    JobBarrier barrier = new JobBarrier(null, reg, jobs);
     return barrier.waitForJobs(timeout);
   }
 
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, Job... jobs) {
-    JobBarrier barrier = new JobBarrier(reg, jobs);
+    JobBarrier barrier = new JobBarrier(null, reg, jobs);
     return barrier.waitForJobs();
   }
 
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, long timeout, Collection<Job> jobs) {
-    JobBarrier barrier = new JobBarrier(reg, toArray(Job.class, jobs));
+    JobBarrier barrier = new JobBarrier(null, reg, toArray(Job.class, jobs));
     return barrier.waitForJobs(timeout);
   }
 
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, Collection<Job> jobs) {
-    JobBarrier barrier = new JobBarrier(reg, toArray(Job.class, jobs));
+    JobBarrier barrier = new JobBarrier(null, reg, toArray(Job.class, jobs));
     return barrier.waitForJobs();
   }
 

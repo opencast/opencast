@@ -209,7 +209,7 @@ public final class AclServiceImpl implements AclService {
                   // Distribute the updated XACML file
                   Job distributionJob = distributionService.distribute(CHANNEL_ID, searchSvcMp,
                           episodeXACML.getIdentifier());
-                  JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
+                  JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
                   Result jobResult = barrier.waitForJobs();
                   if (jobResult.getStatus().get(distributionJob).equals(Job.Status.FINISHED)) {
                     searchSvcMp.remove(episodeXACML);
@@ -219,7 +219,7 @@ public final class AclServiceImpl implements AclService {
                     logger.error("Unable to distribute XACML {}", episodeXACML.getIdentifier());
                   }
                   Job addSearchJob = searchService.add(searchSvcMp);
-                  barrier = new JobBarrier(serviceRegistry, addSearchJob);
+                  barrier = new JobBarrier(null, serviceRegistry, addSearchJob);
                   barrier.waitForJobs();
                 } catch (Exception e) {
                   logger.warn(e.getMessage());
@@ -248,7 +248,7 @@ public final class AclServiceImpl implements AclService {
                 // Retract the updated XACML file
                 retractXacmlElements(searchSvcMp, AclScope.Episode);
                 Job addSearchJob = searchService.add(authorizationService.removeAcl(searchSvcMp, AclScope.Episode));
-                JobBarrier barrier = new JobBarrier(serviceRegistry, addSearchJob);
+                JobBarrier barrier = new JobBarrier(null, serviceRegistry, addSearchJob);
                 barrier.waitForJobs();
               } catch (Exception e) {
                 logger.warn("Cannot add media package to search service");
@@ -294,7 +294,7 @@ public final class AclServiceImpl implements AclService {
     List<Attachment> aclAttachments = authorizationService.getAclAttachments(searchSvcMp, Option.some(scope));
     for (Attachment xacml : aclAttachments) {
       Job retractJob = distributionService.retract(CHANNEL_ID, searchSvcMp, xacml.getIdentifier());
-      JobBarrier barrier = new JobBarrier(serviceRegistry, retractJob);
+      JobBarrier barrier = new JobBarrier(null, serviceRegistry, retractJob);
       Result jobResult = barrier.waitForJobs();
       if (!jobResult.getStatus().get(retractJob).equals(Job.Status.FINISHED))
         logger.error("Unable to retract XACML {}", xacml.getIdentifier());
@@ -326,7 +326,7 @@ public final class AclServiceImpl implements AclService {
           // Retract the updated XACML file
           retractXacmlElements(mp, AclScope.Episode);
           Job addSearchJob = searchService.add(authorizationService.removeAcl(mp, AclScope.Episode));
-          JobBarrier barrier = new JobBarrier(serviceRegistry, addSearchJob);
+          JobBarrier barrier = new JobBarrier(null, serviceRegistry, addSearchJob);
           barrier.waitForJobs();
         }
       }

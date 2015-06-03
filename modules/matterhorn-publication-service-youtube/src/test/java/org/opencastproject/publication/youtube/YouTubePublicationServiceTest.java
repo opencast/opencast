@@ -111,7 +111,7 @@ public class YouTubePublicationServiceTest {
   @Test
   public void testPublishAuthFailed() throws Exception {
     Job job = service.publish(mp, mp.getTrack("track-1"));
-    JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 500, job);
+    JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 500, job);
     jobBarrier.waitForJobs();
     Assert.assertEquals(Status.FAILED, job.getStatus());
   }
@@ -119,7 +119,7 @@ public class YouTubePublicationServiceTest {
   @Test
   public void testRetractFailed() throws Exception {
     Job job = service.retract(mp);
-    JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 500, job);
+    JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 500, job);
     jobBarrier.waitForJobs();
     Assert.assertNull(job.getPayload());
     Assert.assertEquals(Status.FINISHED, job.getStatus());

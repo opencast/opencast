@@ -41,6 +41,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,7 @@ import java.util.regex.Pattern;
 /**
  * Implements a service that runs CLI commands with MediaPackage elements as arguments
  */
-public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteService {
+public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteService, ManagedService  {
 
   public enum Operation {
     Execute_Element, Execute_Mediapackage
@@ -105,6 +106,14 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   @SuppressWarnings("rawtypes")
   private Dictionary properties = null;
 
+  /** The approximate load placed on the system by running an execute operation */
+  public static final float DEFAULT_EXECUTE_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_EXECUTE_JOB_LOAD} */
+  public static final String EXECUTE_JOB_LOAD_KEY = "job.load.execute";
+
+  private float executeJobLoad = 1.0f;
+
   /**
    * Creates a new instance of the execute service.
    */
@@ -139,13 +148,43 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    */
   @Override
   public Job execute(String exec, String params, MediaPackageElement inElement) throws ExecuteException {
-    return execute(exec, params, inElement, null, null);
+    return execute(exec, params, inElement, null, null, executeJobLoad);
   }
 
   /**
    * {@inheritDoc}
-   * 
-   * @see org.opencastproject.textanalyzer.api.ExecuteService#execute(String, String)
+   *
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
+   *                                                             org.opencastproject.mediapackage.MediaPackageElement,
+   *                                                             float)
+   */
+  @Override
+  public Job execute(String exec, String params, MediaPackageElement inElement, float load) throws ExecuteException {
+    return execute(exec, params, inElement, null, null, load);
+  }
+
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
+   *                                                             org.opencastproject.mediapackage.MediaPackageElement,
+   *                                                             java.lang.String,
+   *                                                             org.opencastproject.mediapackage.MediaPackageElement.Type)
+   */
+  @Override
+  public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type expectedType)
+          throws ExecuteException, IllegalArgumentException {
+    return execute(exec, params, inElement, null, null, executeJobLoad);
+  }
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
+   *                                                             org.opencastproject.mediapackage.MediaPackageElement,
+   *                                                             java.lang.String,
+   *                                                             org.opencastproject.mediapackage.MediaPackageElement.Type,
+   *                                                             float)
    * @throws IllegalArgumentException
    *           if the input arguments are incorrect
    * @throws ExecuteException
@@ -178,7 +217,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
       paramList.add(outFileName);
       paramList.add((expectedType == null) ? null : expectedType.toString());
 
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Execute_Element.toString(), paramList);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Execute_Element.toString(), paramList, load);
 
     } catch (ServiceRegistryException e) {
       throw new ExecuteException(String.format("Unable to create a job of type '%s'", JOB_TYPE), e);
@@ -198,7 +237,21 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   @Override
   public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type expectedType)
           throws ExecuteException {
+    return execute(exec, params, mp, outFileName, expectedType, 1.0f);
+  }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
+   *                                                             org.opencastproject.mediapackage.MediaPackage,
+   *                                                             java.lang.String,
+   *                                                             org.opencastproject.mediapackage.MediaPackageElement.Type,
+   *                                                             float)
+   */
+  @Override
+  public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type expectedType, float load)
+          throws ExecuteException {
     if (StringUtils.isBlank(exec))
       throw new IllegalArgumentException("The command to execute cannot be null");
 
@@ -220,7 +273,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
       paramList.add(outFileName);
       paramList.add((expectedType == null) ? null : expectedType.toString());
 
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Execute_Mediapackage.toString(), paramList);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Execute_Mediapackage.toString(), paramList, load);
     } catch (ServiceRegistryException e) {
       throw new ExecuteException(String.format("Unable to create a job of type '%s'", JOB_TYPE), e);
     }

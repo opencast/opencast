@@ -65,15 +65,15 @@ public interface HostRegistration {
   void setCores(int cores);
 
   /**
-   * @return the maxJobs
+   * @return the maxLoad
    */
-  int getMaxJobs();
+  float getMaxLoad();
 
   /**
-   * @param maxJobs
-   *          the maxJobs to set
+   * @param maxLoad
+   *          the maxLoad to set
    */
-  void setMaxJobs(int maxJobs);
+  void setMaxLoad(float maxLoad);
 
   /**
    * @return whether this host is active

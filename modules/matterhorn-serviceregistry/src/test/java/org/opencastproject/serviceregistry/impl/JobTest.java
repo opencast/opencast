@@ -118,8 +118,8 @@ public class JobTest {
     serviceRegistry.setSecurityService(securityService);
 
     // register the hosts
-    serviceRegistry.registerHost(LOCALHOST, "127.0.0.1", 1024, 1, 1);
-    serviceRegistry.registerHost(REMOTEHOST, "127.0.0.1", 1024, 1, 1);
+    serviceRegistry.registerHost(LOCALHOST, "127.0.0.1", 1024, 1, 1.0f);
+    serviceRegistry.registerHost(REMOTEHOST, "127.0.0.1", 1024, 1, 1.0f);
 
     // register some service instances
     regType1Localhost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_1, LOCALHOST, PATH);
@@ -143,12 +143,13 @@ public class JobTest {
   @Test
   public void testGetJob() throws Exception {
     // Start a job, but don't allow it to be dispatched
-    JobJpaImpl job = (JobJpaImpl) serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false);
+    JobJpaImpl job = (JobJpaImpl) serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, 4.0f);
 
     Assert.assertNotNull(job.getUri());
 
     Job jobFromDb = serviceRegistry.getJob(job.getId());
     Assert.assertEquals(Status.INSTANTIATED, jobFromDb.getStatus());
+    Assert.assertEquals(new Float(4.0f), job.getJobLoad());
 
     // Simulate starting the job
     job.setStatus(Status.RUNNING);
@@ -562,8 +563,11 @@ public class JobTest {
   }
 
   @Test
-  public void testNumberOfCores() throws Exception {
-    Assert.assertEquals(2, serviceRegistry.getMaxConcurrentJobs());
+  public void testMaxLoad() throws Exception {
+    Assert.assertEquals(1.0f, serviceRegistry.getMaxLoads().get(serviceRegistry.getRegistryHostname()).getLoadFactor(), 0.01f);
+    Assert.assertEquals(1.0f, serviceRegistry.getMaxLoads().get(LOCALHOST).getLoadFactor(), 0.01f);
+    Assert.assertEquals(1.0f, serviceRegistry.getMaxLoads().get(REMOTEHOST).getLoadFactor(), 0.01f);
+    Assert.assertEquals(1.0f, serviceRegistry.getMaxLoadOnNode(serviceRegistry.getRegistryHostname()).getLoadFactor(), 0.01f);
   }
 
   @Test

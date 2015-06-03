@@ -59,6 +59,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceException;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,13 +74,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * A Solr-based {@link SearchService} implementation.
  */
-public final class SearchServiceImpl extends AbstractJobProducer implements SearchService {
+public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, ManagedService {
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
@@ -91,6 +94,24 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /** The job type */
   public static final String JOB_TYPE = "org.opencastproject.search";
+
+  /** The load introduced on the system by creating an add job */
+  public static final float DEFAULT_ADD_JOB_LOAD = 1.0f;
+
+  /** The load introduced on the system by creating a delete job */
+  public static final float DEFAULT_DELETE_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_ADD_JOB_LOAD} */
+  public static final String ADD_JOB_LOAD_KEY = "job.load.add";
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_DELETE_JOB_LOAD} */
+  public static final String DELETE_JOB_LOAD_KEY = "job.load.delete";
+
+  /** The load introduced on the system by creating an add job */
+  private float addJobLoad = DEFAULT_ADD_JOB_LOAD;
+
+  /** The load introduced on the system by creating a delete job */
+  private float deleteJobLoad = DEFAULT_DELETE_JOB_LOAD;
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -312,7 +333,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           UnauthorizedException, ServiceRegistryException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Add.toString(),
-              Arrays.asList(MediaPackageParser.getAsXml(mediaPackage)));
+              Arrays.asList(MediaPackageParser.getAsXml(mediaPackage)), addJobLoad);
     } catch (ServiceRegistryException e) {
       throw new SearchException(e);
     }
@@ -373,7 +394,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    */
   public Job delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException {
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Delete.toString(), Arrays.asList(mediaPackageId));
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Delete.toString(), Arrays.asList(mediaPackageId), deleteJobLoad);
     } catch (ServiceRegistryException e) {
       throw new SearchException(e);
     }
@@ -657,4 +678,32 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     return userDirectoryService;
   }
 
+  @Override
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+    String addJobLoadString = StringUtils.trimToNull((String) properties.get(ADD_JOB_LOAD_KEY));
+    if (addJobLoadString != null) {
+      try {
+        addJobLoad = Float.parseFloat(addJobLoadString);
+        logger.info("Set add job load to {}", addJobLoad);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set add job loads to {}. {} must be a float", addJobLoadString,
+                ADD_JOB_LOAD_KEY);
+        addJobLoad = DEFAULT_ADD_JOB_LOAD;
+        logger.info("Set add job load to default of {}", addJobLoad);
+      }
+    }
+
+    String deleteJobLoadString = StringUtils.trimToNull((String) properties.get(DELETE_JOB_LOAD_KEY));
+    if (deleteJobLoadString != null) {
+      try {
+        deleteJobLoad = Float.parseFloat(deleteJobLoadString);
+        logger.info("Set delete job load to {}", deleteJobLoad);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set delete job loads to {}. {} must be a float", deleteJobLoadString,
+                DELETE_JOB_LOAD_KEY);
+        deleteJobLoad = DEFAULT_DELETE_JOB_LOAD;
+        logger.info("Set delete job load to default of {}", deleteJobLoad);
+      }
+    }
+  }
 }

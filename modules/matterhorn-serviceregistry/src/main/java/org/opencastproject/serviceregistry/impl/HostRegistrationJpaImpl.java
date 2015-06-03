@@ -40,7 +40,8 @@ import javax.xml.bind.annotation.XmlType;
 @Entity(name = "HostRegistration")
 @Table(name = "mh_host_registration", uniqueConstraints = @UniqueConstraint(columnNames = "host"))
 @NamedQueries({
-        @NamedQuery(name = "HostRegistration.cores", query = "SELECT sum(hr.maxJobs) FROM HostRegistration hr where hr.active = true"),
+        @NamedQuery(name = "HostRegistration.getMaxLoad", query = "SELECT sum(hr.maxLoad) FROM HostRegistration hr where hr.active = true"),
+        @NamedQuery(name = "HostRegistration.getMaxLoadByHostName", query = "SELECT hr.maxLoad FROM HostRegistration hr where hr.baseUrl = :host and hr.active = true"),
         @NamedQuery(name = "HostRegistration.byHostName", query = "SELECT hr from HostRegistration hr where hr.baseUrl = :host"),
         @NamedQuery(name = "HostRegistration.getAll", query = "SELECT hr FROM HostRegistration hr where hr.active = true") })
 public class HostRegistrationJpaImpl extends JaxbHostRegistration {
@@ -55,9 +56,9 @@ public class HostRegistrationJpaImpl extends JaxbHostRegistration {
     super();
   }
 
-  public HostRegistrationJpaImpl(String baseUrl, String address, long memory, int cores, int maxJobs, boolean online,
+  public HostRegistrationJpaImpl(String baseUrl, String address, long memory, int cores, float maxLoad, boolean online,
           boolean maintenance) {
-    super(baseUrl, address, memory, cores, maxJobs, online, maintenance);
+    super(baseUrl, address, memory, cores, maxLoad, online, maintenance);
   }
 
   @Id
@@ -96,10 +97,10 @@ public class HostRegistrationJpaImpl extends JaxbHostRegistration {
   }
 
   @Override
-  @Column(name = "max_jobs", nullable = false)
-  @XmlElement(name = "max_jobs")
-  public int getMaxJobs() {
-    return super.getMaxJobs();
+  @Column(name = "max_load", nullable = false)
+  @XmlElement(name = "max_load")
+  public float getMaxLoad() {
+    return super.getMaxLoad();
   }
 
   @Override

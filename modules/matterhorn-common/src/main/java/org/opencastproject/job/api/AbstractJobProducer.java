@@ -25,6 +25,8 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.SystemLoad;
+import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
@@ -117,6 +119,24 @@ public abstract class AbstractJobProducer implements JobProducer {
    */
   @Override
   public boolean isReadyToAccept(Job job) throws ServiceRegistryException, UndispatchableJobException {
+    NodeLoad maxload;
+    try {
+      maxload = getServiceRegistry().getMaxLoadOnNode(getServiceRegistry().getRegistryHostname());
+    } catch (NotFoundException e) {
+      throw new ServiceRegistryException(e);
+    }
+
+    SystemLoad systemLoad = getServiceRegistry().getCurrentHostLoads(true);
+    //Note: We are not adding the job load in the next line because it is already accounted for in the load values we
+    //get back from the service registry.
+    float currentLoad = systemLoad.get(getServiceRegistry().getRegistryHostname()).getLoadFactor();
+    if (currentLoad > maxload.getLoadFactor()) {
+      logger.debug("Declining job {} of type {} because load of {} would exceed this node's limit of {}.",
+                    new Object[] {job.getId(), job.getJobType(), currentLoad, maxload});
+      return false;
+    }
+    logger.debug("Accepting job {} of type {} because load of {} is within this node's limit of {}.",
+                  new Object[] {job.getId(), job.getJobType(), currentLoad, maxload});
     return true;
   }
 
