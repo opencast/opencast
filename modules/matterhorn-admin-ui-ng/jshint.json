@@ -60,7 +60,8 @@
         "vis"             : false,
         "PlayerAdapter"   : false,
         "videojs"         : false,
-        "moment"          : true
+        "moment"          : true,
+        "$location"       : true
     },
     "ignores": ["src/main/webapp/lib/**/*"]
 }
