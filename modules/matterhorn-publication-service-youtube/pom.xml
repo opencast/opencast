@@ -148,16 +148,17 @@
               org.jdom.*,
               flexjson,
             </Private-Package>
-            <Import-Bundle>
-              javax.activation-mail
-            </Import-Bundle>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.deliver.youtube.*;version=${project.version},
               org.opencastproject.publication.youtube.*;version=${project.version}
             </Export-Package>
+            <Import-Package>
+              !com.sun.mirror.*,
+              !oracle.xml.parser.*,
+              !org.jaxen.*,
+              !sun.security.util.*,
+              *
+            </Import-Package>
             <Embed-Dependency>
               flexjson;inline=true,
               gdata-client;inline=true,

@@ -96,9 +96,6 @@
               org.opencastproject.staticfiles.api;version=${project.version},
               org.opencastproject.staticfiles.endpoint;version=${project.version}
             </Export-Package>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Service-Component>
               OSGI-INF/static-file-rest-service.xml
             </Service-Component>

@@ -120,14 +120,6 @@
             <Private-Package>
             	ui.*
             </Private-Package>
-            <Import-Package>
-                org.osgi.service.http,
-                org.apache.felix.scr;
-                org.apache.felix.shell;
-                org.osgi.service.*;resolution:=optional,
-                javax.servlet.*;version=2.4,
-                *
-            </Import-Package>
             <DynamicImport-Package>
             </DynamicImport-Package>
           </instructions>

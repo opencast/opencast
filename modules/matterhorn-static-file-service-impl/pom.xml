@@ -104,9 +104,6 @@
               org.opencastproject.staticfiles.impl;version=${project.version},
               org.opencastproject.staticfiles.jmx;version=${project.version}
             </Private-Package>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Service-Component>
               OSGI-INF/static-file-service.xml
             </Service-Component>

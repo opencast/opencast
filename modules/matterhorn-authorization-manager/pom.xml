@@ -169,15 +169,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-              org.slf4j,
-              javax.xml.namespace;version=0,
-              org.opencastproject.message.broker.api.index;version=${project.version},
-              org.opencastproject.security.api;version=${project.version},
-              org.opencastproject.workspace.api;version=${project.version},
-              org.opencastproject.authorization.xacml;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.authorization.xacml.manager.api;version=${project.version},
               org.opencastproject.authorization.xacml.manager.impl;version=${project.version},

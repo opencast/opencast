@@ -104,9 +104,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package> org.opencastproject.workingfilerepository.impl;version=${project.version} </Export-Package>
             <Service-Component>
               OSGI-INF/working-file-repo.xml

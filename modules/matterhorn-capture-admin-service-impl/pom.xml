@@ -143,10 +143,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Import-Package>
-              javax.persistence,
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package> org.opencastproject.capture.admin.*;version=${project.version} </Export-Package>
             <Service-Component>
               OSGI-INF/capture-admin-service.xml,

@@ -85,11 +85,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-              javax.xml.namespace;version=0,
-              org.w3c.dom;version=0,
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.event.handler;version=${project.version}
             </Export-Package>

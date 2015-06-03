@@ -54,9 +54,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Private-Package>
               org.opencastproject.presets.impl;version=${project.version}
             </Private-Package>

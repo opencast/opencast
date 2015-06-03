@@ -238,10 +238,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Import-Package>
-              org.opencastproject.rest;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Private-Package>tools.*</Private-Package>
             <Service-Component>
               OSGI-INF/opencast-lti.xml

@@ -108,22 +108,27 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
-              javax.jms,
-              org.opencastproject.message.broker.api;version=${project.version},
-              org.opencastproject.message.broker.api.acl;version=${project.version},
-              org.opencastproject.message.broker.api.agent;version=${project.version},
-              org.opencastproject.message.broker.api.archive;version=${project.version},
-              org.opencastproject.message.broker.api.comments;version=${project.version},
-              org.opencastproject.message.broker.api.group;version=${project.version},
-              org.opencastproject.message.broker.api.index;version=${project.version},
-              org.opencastproject.message.broker.api.scheduler;version=${project.version},
-              org.opencastproject.message.broker.api.series;version=${project.version},
-              org.opencastproject.message.broker.api.theme;version=${project.version},
-              org.opencastproject.message.broker.api.workflow;version=${project.version},
-              org.opencastproject.rest;version=${project.version},
-              org.osgi.framework,
-              org.slf4j,
-              *;resolution:=optional
+              !com.thoughtworks.xstream.*,
+              !javax.ejb.*,
+              !junit.framework,
+              !org.apache.activeio.*,
+              !org.apache.axis.*,
+              !org.apache.camel.*,
+              !org.apache.commons.net.ftp.*,
+              !org.apache.derby.jdbc.*,
+              !org.apache.log4j.helpers.*,
+              !org.apache.maven.*,
+              !org.apache.tools.ant.*,
+              !org.apache.velocity.*,
+              !org.apache.xbean.spring.context.*,
+              !org.codehaus.jam.*,
+              !org.josql,
+              !org.mortbay.jetty.*,
+              !org.springframework.jms.connection,
+              !org.springframework.oxm,
+              !org.springframework.xml.transform,
+              !sun.management,
+              *
             </Import-Package>
             <Embed-Dependency>
               activemq-all;inline=true

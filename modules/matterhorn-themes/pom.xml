@@ -121,10 +121,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-              org.opencastproject.message.broker.api.index;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.themes;version=${project.version},
               org.opencastproject.themes.persistence;version=${project.version}

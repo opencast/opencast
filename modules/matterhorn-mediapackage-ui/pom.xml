@@ -117,7 +117,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>org.opencastproject.rest;version=${project.version}</Import-Package>
             <Private-Package>ui.*</Private-Package>
             <Http-Alias>/mediapackage-editor</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>

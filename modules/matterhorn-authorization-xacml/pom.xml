@@ -142,13 +142,6 @@
               org.jboss.security.xacml.sunxacml.finder,
               org.jboss.security.xacml.sunxacml.finder.impl
             </Private-Package>
-            <Import-Package>
-              org.slf4j,
-              javax.xml.namespace;version=0,
-              org.opencastproject.security.api;version=${project.version},
-              org.opencastproject.workspace.api;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.authorization.xacml;version=${project.version},
             </Export-Package>

@@ -73,10 +73,6 @@
                     <instructions>
                         <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
                         <Export-Package> org.opencastproject.engage.theodul.plugin.tab.slidetext;version=${project.version} </Export-Package>
-                        <Import-Package>
-                            org.opencastproject.engage.theodul.api;version=${project.version},
-                            *;resolution:=optional
-                        </Import-Package>
                         <Service-Component>
                             OSGI-INF/engage-plugin.xml
                         </Service-Component>

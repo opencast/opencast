@@ -119,13 +119,6 @@
             <Export-Package>
               org.opencastproject.userdirectory;version=${project.version},
             </Export-Package>
-            <Import-Package>
-              org.opencastproject.message.broker.api.index;version=${project.version},
-              org.opencastproject.kernel.security.persistence;version=${project.version},
-              org.json.simple,
-			  org.json.simple.parser,
-              *;resolution:=optional
-            </Import-Package>
             <Service-Component>
               OSGI-INF/userdirectory-service.xml,
               OSGI-INF/group-role-provider.xml,

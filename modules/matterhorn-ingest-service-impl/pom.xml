@@ -236,16 +236,6 @@
               org.opencastproject.ingest.endpoint;version=${project.version},
               org.opencastproject.ingest.scanner;version=${project.version}
             </Export-Package>
-            <Private-Package>
-              META-INF.services;-split-package:=merge-first,
-              de.schlichtherle.*;-split-package:=merge-first
-            </Private-Package>
-            <Import-Package>
-              org.opencastproject.rest;version=${project.version},
-              org.opencastproject.util.doc.rest,
-              javax.persistence,
-              *;resolution:=optional
-            </Import-Package>
             <Service-Component>
               OSGI-INF/ingest-service.xml,
               OSGI-INF/ingest-service-rest.xml,
