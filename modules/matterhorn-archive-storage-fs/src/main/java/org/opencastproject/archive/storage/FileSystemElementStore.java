@@ -18,7 +18,7 @@ package org.opencastproject.archive.storage;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.opencastproject.archive.api.Version;
@@ -77,7 +77,7 @@ public class FileSystemElementStore implements ElementStore {
 
   /**
    * Sets the trusted http client
-   * 
+   *
    * @param httpClient
    *          the http client
    */
@@ -87,7 +87,7 @@ public class FileSystemElementStore implements ElementStore {
 
   /**
    * Service activator, called via declarative services configuration.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -181,7 +181,7 @@ public class FileSystemElementStore implements ElementStore {
 
   /**
    * Returns the directory file from a deletion selector
-   * 
+   *
    * @param sel
    *          the deletion selector
    * @return the directory file
@@ -244,7 +244,7 @@ public class FileSystemElementStore implements ElementStore {
 
   /**
    * Returns a file {@link Option} from a storage path if one is found or an empty {@link Option}
-   * 
+   *
    * @param storagePath
    *          the storage path
    * @return the file {@link Option}

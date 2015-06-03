@@ -28,7 +28,7 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -61,6 +61,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.opencastproject.mediapackage.MediaPackageElement.Type,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public boolean accept(MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     return type.equals(MediaPackageElement.Type.Catalog);
   }
@@ -68,6 +69,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
   /**
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.w3c.dom.Node)
    */
+  @Override
   public boolean accept(Node elementNode) {
     String name = elementNode.getNodeName();
     if (name.contains(":")) {
@@ -81,6 +83,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
    *      org.opencastproject.mediapackage.MediaPackageElement.Type,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public boolean accept(URI uri, MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     return MediaPackageElement.Type.Catalog.equals(type);
   }
@@ -88,6 +91,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
   /**
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#elementFromURI(URI)
    */
+  @Override
   public MediaPackageElement elementFromURI(URI uri) throws UnsupportedElementException {
     logger.trace("Creating video track from " + uri);
     Catalog track = CatalogImpl.fromURI(uri);

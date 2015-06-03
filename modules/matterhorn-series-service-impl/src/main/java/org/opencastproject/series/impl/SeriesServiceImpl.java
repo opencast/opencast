@@ -54,9 +54,9 @@ import org.opencastproject.util.data.Tuple;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -298,7 +298,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.api.SeriesService#deleteSeries(java.lang.String)
    */
   @Override

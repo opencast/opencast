@@ -215,12 +215,12 @@ public class IndexServiceImplTest {
     String testResourceLocation = "/events/create-event.json";
     JSONObject metadataJson = (JSONObject) parser.parse(IOUtils.toString(IndexServiceImplTest.class
             .getResourceAsStream(testResourceLocation)));
-    Capture<Catalog> result = new Capture<Catalog>();
-    Capture<String> mediapackageIdResult = new Capture<String>();
-    Capture<String> catalogIdResult = new Capture<String>();
-    Capture<String> filenameResult = new Capture<String>();
-    Capture<InputStream> catalogResult = new Capture<InputStream>();
-    Capture<String> mediapackageTitleResult = new Capture<String>();
+    Capture<Catalog> result = Capture.newInstance();
+    Capture<String> mediapackageIdResult = Capture.newInstance();
+    Capture<String> catalogIdResult = Capture.newInstance();
+    Capture<String> filenameResult = Capture.newInstance();
+    Capture<InputStream> catalogResult = Capture.newInstance();
+    Capture<String> mediapackageTitleResult = Capture.newInstance();
 
     // Setup Security Service, Organization and User
     Organization organization = EasyMock.createMock(Organization.class);

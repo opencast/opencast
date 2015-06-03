@@ -203,8 +203,8 @@
     </dependency>
 
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
 
     <!-- testing -->
@@ -249,8 +249,8 @@
               javax.xml.transform.dom,
               javax.xml.transform.stream,
               org.apache.commons.io,
-              org.apache.commons.lang,
-              org.apache.commons.lang.exception,
+              org.apache.commons.lang3,
+              org.apache.commons.lang3.exception,
               org.apache.commons.logging,
               org.apache.regexp,
               org.opencastproject.matterhorn.search,

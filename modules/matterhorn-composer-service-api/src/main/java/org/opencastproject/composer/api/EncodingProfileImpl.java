@@ -18,7 +18,7 @@ package org.opencastproject.composer.api;
 
 import org.opencastproject.util.EqualsUtil;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

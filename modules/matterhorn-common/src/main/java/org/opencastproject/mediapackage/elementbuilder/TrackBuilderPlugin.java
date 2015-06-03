@@ -29,7 +29,7 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -58,6 +58,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.opencastproject.mediapackage.MediaPackageElement.Type,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public boolean accept(MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     return type.equals(MediaPackageElement.Type.Track);
   }
@@ -65,6 +66,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
   /**
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.w3c.dom.Node)
    */
+  @Override
   public boolean accept(Node elementNode) {
     String name = elementNode.getNodeName();
     if (name.contains(":")) {
@@ -78,6 +80,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
    *      org.opencastproject.mediapackage.MediaPackageElement.Type,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public boolean accept(URI uri, MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     return MediaPackageElement.Type.Track.equals(type);
   }
@@ -85,6 +88,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
   /**
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#elementFromURI(URI)
    */
+  @Override
   public MediaPackageElement elementFromURI(URI uri) throws UnsupportedElementException {
     logger.trace("Creating track from " + uri);
     Track track = TrackImpl.fromURI(uri);
@@ -95,6 +99,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#newElement(org.opencastproject.mediapackage.MediaPackageElement.Type
    *      ,org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public MediaPackageElement newElement(MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     Track track = new TrackImpl();
     track.setFlavor(flavor);
@@ -105,6 +110,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#elementFromManifest(org.w3c.dom.Node,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
+  @Override
   public MediaPackageElement elementFromManifest(Node elementNode, MediaPackageSerializer serializer)
           throws UnsupportedElementException {
 

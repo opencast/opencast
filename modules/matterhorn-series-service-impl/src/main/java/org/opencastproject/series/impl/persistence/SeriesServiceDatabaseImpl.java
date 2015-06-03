@@ -34,8 +34,8 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,7 +172,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#deleteSeries(java.lang.String)
    */
   @Override
@@ -212,7 +212,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#deleteSeriesProperty(java.lang.String)
    */
   @Override
@@ -257,7 +257,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#getAllSeries()
    */
   @SuppressWarnings("unchecked")
@@ -289,7 +289,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#getAccessControlList(java.lang.String)
    */
   @Override
@@ -318,7 +318,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#storeSeries(org.opencastproject.metadata.dublincore.
    * DublinCoreCatalog)
    */
@@ -527,7 +527,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#storeSeriesAccessControl(java.lang.String,
    * org.opencastproject.security.api.AccessControlList)
    */

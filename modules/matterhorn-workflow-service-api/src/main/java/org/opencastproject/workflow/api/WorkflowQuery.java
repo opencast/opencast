@@ -17,7 +17,7 @@ package org.opencastproject.workflow.api;
 
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -34,9 +34,9 @@ import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -348,7 +348,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   private SerializableTheme toSerializableTheme(Theme theme) {
     String creator = StringUtils.isNotBlank(theme.getCreator().getName()) ? theme.getCreator().getName() : theme
             .getCreator().getUsername();
-    return new SerializableTheme(theme.getId().getOrElse(org.apache.commons.lang.math.NumberUtils.LONG_MINUS_ONE),
+    return new SerializableTheme(theme.getId().getOrElse(org.apache.commons.lang3.math.NumberUtils.LONG_MINUS_ONE),
             theme.getCreationDate(), theme.isDefault(), creator, theme.getName(), theme.getDescription(),
             theme.isBumperActive(), theme.getBumperFile(), theme.isTrailerActive(), theme.getTrailerFile(),
             theme.isTitleSlideActive(), theme.getTitleSlideMetadata(), theme.getTitleSlideBackground(),

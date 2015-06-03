@@ -15,7 +15,7 @@
  */
 package org.opencastproject.serviceregistry.api;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -275,6 +275,7 @@ public class RemoteBase {
      * @throws IOException
      * @see java.io.InputStream#close()
      */
+    @Override
     public void close() throws IOException {
       delegateStream.close();
       closeConnection(httpResponse);
@@ -284,6 +285,7 @@ public class RemoteBase {
      * @param readlimit
      * @see java.io.InputStream#mark(int)
      */
+    @Override
     public void mark(int readlimit) {
       delegateStream.mark(readlimit);
     }
@@ -292,6 +294,7 @@ public class RemoteBase {
      * @return whether this stream supports marking
      * @see java.io.InputStream#markSupported()
      */
+    @Override
     public boolean markSupported() {
       return delegateStream.markSupported();
     }
@@ -315,6 +318,7 @@ public class RemoteBase {
      *              <code>b.length - off</code>
      * @see java.io.InputStream#read(byte[], int, int)
      */
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
       return delegateStream.read(b, off, len);
     }
@@ -331,6 +335,7 @@ public class RemoteBase {
      *              if <code>b</code> is <code>null</code>.
      * @see java.io.InputStream#read(byte[])
      */
+    @Override
     public int read(byte[] b) throws IOException {
       return delegateStream.read(b);
     }
@@ -339,6 +344,7 @@ public class RemoteBase {
      * @throws IOException
      * @see java.io.InputStream#reset()
      */
+    @Override
     public void reset() throws IOException {
       delegateStream.reset();
     }
@@ -351,6 +357,7 @@ public class RemoteBase {
      *              if the stream does not support seek, or if some other I/O error occurs.
      * @see java.io.InputStream#skip(long)
      */
+    @Override
     public long skip(long n) throws IOException {
       return delegateStream.skip(n);
     }
@@ -359,6 +366,7 @@ public class RemoteBase {
      * @return
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
       return getClass().getName() + " : " + delegateStream.toString();
     }

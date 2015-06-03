@@ -65,8 +65,8 @@ import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.json.JString;
 import com.entwinemedia.fn.data.json.JValue;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
