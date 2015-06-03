@@ -15,25 +15,26 @@
  */
 package org.opencastproject.archive.storage;
 
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.opencastproject.archive.base.storage.Source.source;
 
 import org.opencastproject.archive.api.Version;
 import org.opencastproject.archive.base.StoragePath;
 import org.opencastproject.archive.base.storage.DeletionSelector;
-import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Option;
-
-import junit.framework.Assert;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
@@ -72,16 +73,16 @@ public class FileSystemElementStoreTest {
 
     HttpEntity entity = EasyMock.createNiceMock(HttpEntity.class);
     EasyMock.expect(entity.getContent()).andReturn(getClass().getClassLoader().getResourceAsStream(FILE_NAME))
-            .anyTimes();
+    .anyTimes();
     EasyMock.replay(entity);
 
     HttpResponse response = EasyMock.createNiceMock(HttpResponse.class);
     EasyMock.expect(response.getEntity()).andReturn(entity).anyTimes();
     EasyMock.replay(response);
 
-    TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
-    EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
-    EasyMock.replay(httpClient);
+    Workspace workspace = createNiceMock(Workspace.class);
+    expect(workspace.get(getClass().getClassLoader().getResource(FILE_NAME).toURI())).andStubReturn(new File(getClass().getClassLoader().getResource(FILE_NAME).toURI()));
+    replay(workspace);
 
     tmpRoot = FileSupport.getTempDirectory(TEST_ROOT_DIR_NAME);
 
@@ -94,7 +95,7 @@ public class FileSystemElementStoreTest {
     EasyMock.expect(cc.getBundleContext()).andReturn(bundleContext).anyTimes();
     EasyMock.replay(cc);
 
-    repo.setHttpClient(httpClient);
+    repo.setWorkspace(workspace);
     repo.activate(cc);
 
     sampleElemDir = new File(

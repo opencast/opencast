@@ -58,10 +58,12 @@ import org.opencastproject.workflow.api.WorkflowSet;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.StreamOp;
+import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JObjectWrite;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
@@ -140,7 +142,7 @@ public class JobEndpoint {
     int totalSize = jobs.toList().size();
 
     List<JValue> json = getJobsAsJSON(jobs.drop(offset)
-            .apply(limit > 0 ? StreamOp.<Job>id().take(limit) : StreamOp.<Job>id()).toList());
+            .apply(limit > 0 ? StreamOp.<Job> id().take(limit) : StreamOp.<Job> id()).toList());
 
     return RestUtils.okJsonList(json, offset, limit, jobs.getSizeHint());
   }
@@ -314,7 +316,7 @@ public class JobEndpoint {
                 instanceId, e), e.getCause());
       }
 
-      jsonList.add(j(f("id", v(instanceId)), f("title", v(instance.getMediaPackage().getTitle())),
+      jsonList.add(j(f("id", v(instanceId)), f("title", v(Opt.nul(instance.getMediaPackage().getTitle()).or(""))),
               f("series", vN(series)), f("workflow", vN(instance.getTitle())),
               f("status", v(instance.getState().toString())),
               f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : ""))));
