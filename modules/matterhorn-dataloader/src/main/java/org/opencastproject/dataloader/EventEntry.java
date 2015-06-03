@@ -17,7 +17,7 @@ package org.opencastproject.dataloader;
 
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;

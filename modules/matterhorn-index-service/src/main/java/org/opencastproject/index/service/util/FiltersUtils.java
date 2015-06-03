@@ -20,7 +20,7 @@ import org.opencastproject.index.service.resources.list.api.ResourceListFilter.S
 import org.opencastproject.index.service.resources.list.query.AbstractListFilter;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class providing helpers for all operations related to the filters.

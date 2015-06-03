@@ -110,7 +110,7 @@ public class DictionaryServiceImpl implements DictionaryService, ManagedService 
     while (matcher.find()) {
       words.add(matcher.group());
     }
-    String result = org.apache.commons.lang.StringUtils.join(words, " ");
+    String result = org.apache.commons.lang3.StringUtils.join(words, " ");
     logger.info("Resulting text: “{}”", result);
     if ("".equals(result)) {
       return null;

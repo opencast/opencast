@@ -15,7 +15,7 @@
  */
 package org.opencastproject.serviceregistry.impl;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.job.api.Job.FailureReason.DATA;
 import static org.opencastproject.job.api.Job.Status.FAILED;
 import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
@@ -55,8 +55,8 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.jmx.JmxUtil;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;

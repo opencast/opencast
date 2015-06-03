@@ -29,7 +29,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;

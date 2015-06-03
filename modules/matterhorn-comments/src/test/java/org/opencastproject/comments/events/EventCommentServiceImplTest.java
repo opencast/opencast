@@ -31,7 +31,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mchange.v2.c3p0.DataSources;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.easymock.EasyMock;
 import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;

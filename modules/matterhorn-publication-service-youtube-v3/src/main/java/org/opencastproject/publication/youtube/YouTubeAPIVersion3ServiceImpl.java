@@ -35,7 +35,7 @@ import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoListResponse;
 import com.google.api.services.youtube.model.VideoSnippet;
 import com.google.api.services.youtube.model.VideoStatus;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.opencastproject.publication.youtube.auth.ClientCredentials;
 import org.opencastproject.publication.youtube.auth.OAuth2CredentialFactory;
 import org.opencastproject.publication.youtube.auth.OAuth2CredentialFactoryImpl;

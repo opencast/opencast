@@ -32,7 +32,7 @@ import org.opencastproject.schema.OcDublinCoreUtil.OcDublinCoreConversion;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;

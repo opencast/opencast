@@ -88,7 +88,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.lang3.math.RandomUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -683,7 +683,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         throw new SchedulerException(e);
       }
     } else {
-      eventId = RandomUtils.nextLong();
+      eventId = RandomUtils.nextLong(0, Long.MAX_VALUE);
     }
 
     addEventInternal(setEventIdentifierImmutable(eventId, eventCatalog));

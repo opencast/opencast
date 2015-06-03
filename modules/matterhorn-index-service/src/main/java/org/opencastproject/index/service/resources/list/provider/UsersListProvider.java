@@ -22,7 +22,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

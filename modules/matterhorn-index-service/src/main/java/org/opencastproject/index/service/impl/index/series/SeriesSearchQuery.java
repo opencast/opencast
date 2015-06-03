@@ -22,7 +22,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.security.api.User;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -15,7 +15,7 @@
  */
 package org.opencastproject.index.service.catalog.adapter;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static java.lang.String.format;
 
 import org.opencastproject.util.ConfigurationException;

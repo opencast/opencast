@@ -28,7 +28,7 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

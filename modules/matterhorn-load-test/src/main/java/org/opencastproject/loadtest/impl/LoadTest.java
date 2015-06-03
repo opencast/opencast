@@ -19,7 +19,7 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.systems.MatterhornConstants;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.quartz.impl.jdbcjobstore.InvalidConfigurationException;
 import org.slf4j.Logger;

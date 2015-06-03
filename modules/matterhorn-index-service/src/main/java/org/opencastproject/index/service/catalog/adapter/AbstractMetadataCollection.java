@@ -24,7 +24,7 @@ import org.opencastproject.index.service.resources.list.query.ResourceListQueryI
 
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JValue;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

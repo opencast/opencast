@@ -17,8 +17,8 @@ package org.opencastproject.kernel.scanner;
 
 import org.opencastproject.util.Log;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.quartz.CronExpression;
 import org.slf4j.LoggerFactory;

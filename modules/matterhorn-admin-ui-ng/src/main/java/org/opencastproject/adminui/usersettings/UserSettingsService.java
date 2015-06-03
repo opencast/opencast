@@ -22,7 +22,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.Log;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.LoggerFactory;
 

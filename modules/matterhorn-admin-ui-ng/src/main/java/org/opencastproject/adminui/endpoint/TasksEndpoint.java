@@ -47,8 +47,8 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

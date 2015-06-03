@@ -17,7 +17,7 @@ package org.opencastproject.publication.youtube;
 
 import org.opencastproject.util.XProperties;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Dictionary;
 

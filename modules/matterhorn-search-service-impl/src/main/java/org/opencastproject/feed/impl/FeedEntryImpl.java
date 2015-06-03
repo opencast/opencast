@@ -25,7 +25,7 @@ import org.opencastproject.feed.api.FeedExtension;
 import org.opencastproject.feed.api.Link;
 import org.opencastproject.feed.api.Person;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;

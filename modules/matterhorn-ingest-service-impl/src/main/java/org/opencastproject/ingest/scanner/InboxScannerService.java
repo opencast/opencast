@@ -37,7 +37,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;

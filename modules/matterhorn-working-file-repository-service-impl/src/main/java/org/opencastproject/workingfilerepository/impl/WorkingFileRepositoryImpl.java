@@ -18,7 +18,7 @@ package org.opencastproject.workingfilerepository.impl;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.systems.MatterhornConstants;

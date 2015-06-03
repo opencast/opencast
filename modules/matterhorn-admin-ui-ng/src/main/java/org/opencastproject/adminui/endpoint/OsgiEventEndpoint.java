@@ -39,7 +39,7 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Stream;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 

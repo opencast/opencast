@@ -30,7 +30,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.videosegmenter.api.VideoSegmenterException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

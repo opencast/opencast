@@ -31,7 +31,7 @@ import org.opencastproject.util.PasswordEncoder;
 
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.StreamOp;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

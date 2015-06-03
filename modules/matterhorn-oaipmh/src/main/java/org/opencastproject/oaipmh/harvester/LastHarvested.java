@@ -16,7 +16,7 @@
 
 package org.opencastproject.oaipmh.harvester;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.opencastproject.oaipmh.util.PersistenceEnv;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;

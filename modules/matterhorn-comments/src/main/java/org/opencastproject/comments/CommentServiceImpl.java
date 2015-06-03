@@ -20,7 +20,7 @@ import org.opencastproject.comments.persistence.CommentDatabaseException;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

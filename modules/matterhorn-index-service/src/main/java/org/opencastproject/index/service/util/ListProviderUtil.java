@@ -18,7 +18,7 @@ package org.opencastproject.index.service.util;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.util.SmartIterator;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONAware;
 
 import java.util.ArrayList;

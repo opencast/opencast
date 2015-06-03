@@ -25,7 +25,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import junit.framework.Assert;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
 import org.junit.Before;

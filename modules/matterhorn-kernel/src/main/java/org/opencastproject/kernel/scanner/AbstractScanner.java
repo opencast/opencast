@@ -27,7 +27,7 @@ import org.opencastproject.util.NeedleEye;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.quartz.CronTrigger;
 import org.quartz.Job;

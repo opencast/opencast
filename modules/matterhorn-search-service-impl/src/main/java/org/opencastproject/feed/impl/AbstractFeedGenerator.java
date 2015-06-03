@@ -38,7 +38,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.UrlSupport;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

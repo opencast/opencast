@@ -16,7 +16,7 @@
 package org.opencastproject.staticfiles.impl;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.security.api.Organization;
@@ -35,8 +35,8 @@ import com.google.common.util.concurrent.Service.Listener;
 import com.google.common.util.concurrent.Service.State;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;

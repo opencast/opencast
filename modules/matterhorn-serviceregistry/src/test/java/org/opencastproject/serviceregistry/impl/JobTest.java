@@ -46,7 +46,7 @@ import org.opencastproject.util.persistence.PersistenceEnv;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
 import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;

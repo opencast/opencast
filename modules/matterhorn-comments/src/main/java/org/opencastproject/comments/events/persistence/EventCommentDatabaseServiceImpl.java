@@ -39,8 +39,8 @@ import org.opencastproject.util.data.Monadics;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 
-import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;

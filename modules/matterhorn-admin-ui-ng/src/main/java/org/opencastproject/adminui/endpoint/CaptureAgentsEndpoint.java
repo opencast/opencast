@@ -20,7 +20,7 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
-import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.opencastproject.index.service.util.JSONUtils.blacklistToJSON;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
@@ -51,7 +51,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JValue;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

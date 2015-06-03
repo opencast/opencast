@@ -17,7 +17,7 @@ package org.opencastproject.kernel.security;
 
 import org.opencastproject.security.api.SecurityConstants;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
 import javax.servlet.http.HttpServletRequest;

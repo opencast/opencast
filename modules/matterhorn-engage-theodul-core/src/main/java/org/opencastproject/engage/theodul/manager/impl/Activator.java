@@ -19,7 +19,7 @@ import java.io.File;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import javax.servlet.Servlet;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opencastproject.engage.theodul.api.EngagePluginManager;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.rest.StaticResource;

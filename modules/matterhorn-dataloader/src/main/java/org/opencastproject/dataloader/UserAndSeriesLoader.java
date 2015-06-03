@@ -43,7 +43,7 @@ import org.opencastproject.userdirectory.JpaUser;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

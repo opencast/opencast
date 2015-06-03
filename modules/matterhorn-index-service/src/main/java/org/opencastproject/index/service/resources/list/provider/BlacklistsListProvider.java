@@ -24,7 +24,7 @@ import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase;
 import org.opencastproject.pm.api.persistence.ParticipationManagementDatabaseException;
 import org.opencastproject.security.api.Organization;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

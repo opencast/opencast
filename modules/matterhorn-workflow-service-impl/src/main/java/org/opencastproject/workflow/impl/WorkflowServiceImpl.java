@@ -15,7 +15,7 @@
  */
 package org.opencastproject.workflow.impl;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Collections.mkString;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.FAILED;
@@ -101,10 +101,10 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.FnX;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceException;
 import org.osgi.framework.ServiceReference;

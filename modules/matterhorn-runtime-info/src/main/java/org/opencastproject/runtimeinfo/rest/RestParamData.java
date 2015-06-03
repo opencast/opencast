@@ -19,7 +19,7 @@ import org.opencastproject.util.JaxbXmlSchemaGenerator;
 import org.opencastproject.util.doc.DocData;
 import org.opencastproject.util.doc.rest.RestParameter;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -160,7 +160,7 @@ public final class RestParamData {
    * @return an HTML formatted version of the default value for display
    */
   public String getEscapedDefaultValue() {
-    return StringEscapeUtils.escapeHtml(defaultValue);
+    return StringEscapeUtils.escapeHtml4(defaultValue);
   }
 
   /**

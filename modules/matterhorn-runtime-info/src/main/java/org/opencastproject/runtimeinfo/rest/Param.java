@@ -17,7 +17,7 @@ package org.opencastproject.runtimeinfo.rest;
 
 import org.opencastproject.util.doc.DocData;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -145,10 +145,10 @@ public final class Param {
   public String getDefaultValueHtml() {
     if (defaultValue != null) {
       if (defaultValue.length() > 20) {
-        return "<strong title=\"" + StringEscapeUtils.escapeHtml(defaultValue) + "\">TEXT</strong>";
+        return "<strong title=\"" + StringEscapeUtils.escapeHtml4(defaultValue) + "\">TEXT</strong>";
       }
     }
-    return StringEscapeUtils.escapeHtml(defaultValue);
+    return StringEscapeUtils.escapeHtml4(defaultValue);
   }
 
   public String getType() {

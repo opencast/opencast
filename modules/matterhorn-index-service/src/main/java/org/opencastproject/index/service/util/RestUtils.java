@@ -29,7 +29,7 @@ import org.opencastproject.util.data.Tuple;
 import com.entwinemedia.fn.Fx;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

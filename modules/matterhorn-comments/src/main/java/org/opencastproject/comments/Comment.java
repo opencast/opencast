@@ -34,7 +34,7 @@ import org.opencastproject.util.Jsons.Obj;
 import org.opencastproject.util.Jsons.Val;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;

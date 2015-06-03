@@ -20,7 +20,7 @@ import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.UrlSupport;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 

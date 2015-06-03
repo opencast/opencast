@@ -25,7 +25,7 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Business object for a course.

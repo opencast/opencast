@@ -33,7 +33,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpResponse;

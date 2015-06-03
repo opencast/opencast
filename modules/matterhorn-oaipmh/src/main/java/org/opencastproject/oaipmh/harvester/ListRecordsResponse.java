@@ -24,7 +24,7 @@ import org.w3c.dom.NodeList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.util.data.Option.option;
 
 /**

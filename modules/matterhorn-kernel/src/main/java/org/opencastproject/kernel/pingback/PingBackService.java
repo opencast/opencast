@@ -19,7 +19,7 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.UrlSupport;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;

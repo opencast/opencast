@@ -40,7 +40,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -31,7 +31,7 @@ import org.opencastproject.util.data.Option;
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

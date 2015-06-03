@@ -33,7 +33,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;

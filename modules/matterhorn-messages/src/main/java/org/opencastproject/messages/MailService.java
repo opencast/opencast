@@ -39,8 +39,8 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

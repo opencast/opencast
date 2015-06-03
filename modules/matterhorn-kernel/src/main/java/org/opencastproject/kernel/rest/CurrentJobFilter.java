@@ -18,7 +18,7 @@ package org.opencastproject.kernel.rest;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

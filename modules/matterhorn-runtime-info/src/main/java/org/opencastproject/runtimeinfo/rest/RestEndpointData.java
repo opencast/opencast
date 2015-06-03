@@ -20,7 +20,7 @@ import org.opencastproject.util.doc.DocData;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -299,7 +299,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
             sb.append("}");
           }
         }
-        qs = StringEscapeUtils.escapeHtml(sb.toString());
+        qs = StringEscapeUtils.escapeHtml4(sb.toString());
       }
     }
     return qs;

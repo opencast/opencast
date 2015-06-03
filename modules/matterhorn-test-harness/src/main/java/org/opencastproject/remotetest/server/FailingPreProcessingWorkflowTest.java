@@ -28,7 +28,7 @@ import org.opencastproject.remotetest.util.Utils;
 import org.opencastproject.remotetest.util.WorkflowUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;

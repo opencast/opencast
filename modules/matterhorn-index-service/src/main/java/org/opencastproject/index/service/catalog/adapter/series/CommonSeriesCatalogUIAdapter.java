@@ -26,7 +26,7 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentException;

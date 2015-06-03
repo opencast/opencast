@@ -26,7 +26,7 @@ import org.opencastproject.message.broker.api.index.IndexRecreateObject.Status;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.OsgiUtil;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
