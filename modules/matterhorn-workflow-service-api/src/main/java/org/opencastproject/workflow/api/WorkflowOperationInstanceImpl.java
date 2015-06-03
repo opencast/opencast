@@ -473,7 +473,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getTimeInQueue()
    */
   @Override
-  public long getTimeInQueue() {
+  public Long getTimeInQueue() {
     return timeInQueue;
   }
 
