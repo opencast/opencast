@@ -754,7 +754,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             isAudioOnly = videoDataView.model.get("type") == "audio";
             Engage.trigger(plugin.events.isAudioOnly.getName(), isAudioOnly);
 
-            if (videoSources && videoDisplays && aspectRatio) {
+            if (videoSources && videoDisplays) {
                 if (isEmbedMode) {
                     renderEmbed(videoDataView, videoSources, videoDisplays, aspectRatio);
                 } else if (isMobileMode) {
@@ -768,7 +768,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             }
         }
-        checkVideoDisplaySize();
+        if (videoDataView.model.get("type") != "audio") {
+            checkVideoDisplaySize();
+        }
     }
 
     function prepareRenderingVideoDisplay(videoDataView) {
@@ -866,120 +868,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         window.clearInterval(interval_initialSeek);
     }
 
-    function registerEvents(videoDisplay) {
-        var videodisplay = videojs(videoDisplay);
-
-        $(window).resize(function() {
-            checkVideoDisplaySize();
-        });
-
-        Engage.on(plugin.events.play.getName(), function() {
-            if (videosReady) {
-                clearAutoplay();
-                videodisplay.play();
-                pressedPlayOnce = true;
-            }
-        });
-        Engage.on(plugin.events.autoplay.getName(), function() {
-            interval_autoplay = window.setInterval(function() {
-                if (pressedPlayOnce) {
-                    clearAutoplay();
-                } else if (videosReady) {
-                    videodisplay.play();
-                    clearAutoplay();
-                }
-            }, interval_autoplay_ms);
-        });
-        Engage.on(plugin.events.initialSeek.getName(), function(e) {
-            parsedSeconds = Utils.parseSeconds(e);
-            interval_initialSeek = window.setInterval(function() {
-                if (pressedPlayOnce) {
-                    clearInitialSeek();
-                } else if (videosReady) {
-                    videodisplay.play();
-                    window.setTimeout(function() {
-                        Engage.trigger(plugin.events.seek.getName(), parsedSeconds);
-                    }, timeout_initialSeek_ms);
-                    clearInitialSeek();
-                }
-            }, interval_initialSeek_ms);
-        });
-        Engage.on(plugin.events.pause.getName(), function() {
-            clearAutoplay();
-            videodisplay.pause();
-        });
-        Engage.on(plugin.events.playPause.getName(), function() {
-            if (videodisplay.paused()) {
-                Engage.trigger(plugin.events.play.getName());
-            } else {
-                Engage.trigger(plugin.events.pause.getName());
-            }
-        });
-        Engage.on(plugin.events.seekLeft.getName(), function() {
-            if (pressedPlayOnce) {
-                var currTime = videodisplay.currentTime();
-                if ((currTime - seekSeconds) >= 0) {
-                    Engage.trigger(plugin.events.seek.getName(), currTime - seekSeconds);
-                } else {
-                    Engage.trigger(plugin.events.seek.getName(), 0);
-                }
-            }
-        });
-        Engage.on(plugin.events.seekRight.getName(), function() {
-            if (pressedPlayOnce) {
-                var currTime = videodisplay.currentTime();
-                var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
-                if (duration && ((currTime + seekSeconds) < duration)) {
-                    Engage.trigger(plugin.events.seek.getName(), currTime + seekSeconds);
-                } else {
-                    Engage.trigger(plugin.events.seek.getName(), duration);
-                }
-            }
-        });
-        Engage.on(plugin.events.playbackRateIncrease.getName(), function() {
-            if (pressedPlayOnce) {
-                var rate = videodisplayMaster.playbackRate();
-                switch (rate * 100) {
-                    case 50:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
-                        break;
-                    case 75:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
-                        break;
-                    case 100:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
-                        break;
-                    case 125:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5)
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-        Engage.on(plugin.events.playbackRateDecrease.getName(), function() {
-            if (pressedPlayOnce) {
-                var rate = videodisplayMaster.playbackRate();
-                switch (rate * 100) {
-                    case 75:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5)
-                        break;
-                    case 100:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
-                        break;
-                    case 125:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
-                        break;
-                    case 150:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-    }
-
     function registerEvents(videoDisplay, numberOfVideodisplays) {
         if (isAudioOnly) {
             var audioPlayer_id = $("#" + videoDisplay);
@@ -990,6 +878,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 $("." + class_audioDisplayError).show();
             }, audioLoadTimeoutCheckDelay);
             audioPlayer_id.on("canplay", function() {
+                videosReady = true;
                 Engage.trigger(plugin.events.ready.getName());
                 window.clearTimeout(audioLoadTimeout);
             });
@@ -1119,7 +1008,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             Engage.on(plugin.events.volumeSet.getName(), function(volume) {
                 if ((volume >= 0) && (volume <= 1)) {
                     Engage.log("Video: Volume changed to " + volume);
-                    audioPlayer.volume(volume);
+                    audioPlayer.volume = volume;
                 }
             });
             Engage.on(plugin.events.volumeGet.getName(), function(callback) {
