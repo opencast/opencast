@@ -456,8 +456,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
 
             if (videoDataView.model.get("type") != "audio") {
-                $(window).resize(function() {
+                $(window).resize(function(event, el) {
                     checkVideoDisplaySize();
+                    var factor = 0.01;
+                    while(!isElementVisible($('#engage_resize_container')) && factor <= 1.0){
+                        $('#'+id_engageContent).css("max-width", event.currentTarget.innerWidth / (videoDisplaySizeFactor + factor));
+                        factor += 0.01;
+                    }
                 });
             }
         }
@@ -813,6 +818,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
     }
 
+    function isElementVisible(elementToBeChecked) {
+        var TopView = $(window).scrollTop();
+        var BotView = TopView + $(window).height();
+        var TopElement = $(elementToBeChecked).offset().top;
+        var BotElement = TopElement + $(elementToBeChecked).height();
+        return ((BotElement <= BotView) && (TopElement >= TopView));
+    }
+
     function clearAutoplay() {
         window.clearInterval(interval_autoplay);
     }
@@ -824,7 +837,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     function registerEvents(videoDisplay) {
         var videodisplay = videojs(videoDisplay);
 
-        $(window).resize(function() {
+        $(window).resize(function(event, el) {
             checkVideoDisplaySize();
         });
 
