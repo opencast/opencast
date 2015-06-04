@@ -135,6 +135,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var embedHeightThree = 360;
     var embedHeightFour = 480;
     var embedHeightFive = 720;
+    var min_segment_duration = 5000;
     var logoLink = false;
     var logo = plugin_path + "images/logo.png";
     var showEmbed = true;
@@ -381,6 +382,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             if (!mediapackageError) {
                 duration = parseInt(this.model.get("duration"));
                 segments = Engage.model.get("mediaPackage").get("segments");
+                
+                segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
                 
                 if (Engage.model.get("meInfo")) {
                     if (Engage.model.get("meInfo").get("logo_small")) {
