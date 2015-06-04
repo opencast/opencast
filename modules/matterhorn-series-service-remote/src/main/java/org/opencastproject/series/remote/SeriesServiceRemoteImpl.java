@@ -45,7 +45,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import com.entwinemedia.fn.data.Opt;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
