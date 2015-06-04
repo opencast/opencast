@@ -92,8 +92,8 @@
     "VIDEO_CUT_NOT_SAVED":"No se han podido guardar los datos de edición",
     "VIDEO_CUT_SAVED":"Se han guardado los datos de edición",
     "VIDEO_CUT_PROCESSING":"Se está procesando el vídeo...",
-    "SERVER_UNRESPONSIVE":"The server is currently unresponsive.",
-    "SERVICE_UNAVAILABLE":"The service called is currently unavailable."
+    "SERVER_UNRESPONSIVE":"Oops! The server seems to be unresponsive. Please try again later.",
+    "SERVICE_UNAVAILABLE":"Oops! The server seems to be unresponsive. Please try again later."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Acciones",

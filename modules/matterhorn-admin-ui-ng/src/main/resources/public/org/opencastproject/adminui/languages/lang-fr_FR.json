@@ -67,8 +67,8 @@
     "EMAIL_NOT_SENT":"Le message n'a pas pu être envoyé",
     "CONFLICT_DETECTED":"Conflit de programmation: les données sélectionnées entrent en conflit avec un événement existant. Veuillez changer l'emplacement ou les dates.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Les événements existants dans cette série devront être retraités",
-    "SERIES_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
-    "EVENT_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
+    "SERIES_ACL_MISSING_READWRITE_ROLE":"Sélectionner au moins un role avec permission de lecture et écriture.",
+    "EVENT_ACL_MISSING_READWRITE_ROLE":"Sélectionner au moins un role avec permission de lecture et écriture.",
     "SERIES_ACL_LOCKED":"Modification des droits d'accès n'est pas autorisée lorsque des opérations sont en cours d'exécution sur un événement appartenant à cette série",
     "THEME_NAME_ALREADY_TAKEN":"Ce nom est déjà utilisé",
     "THEME_NAME_EMPTY":"Le nom ne peux pas rester vide",
@@ -87,8 +87,8 @@
     "VIDEO_CUT_NOT_SAVED":"Les informations n'ont pas pu être enregistrées",
     "VIDEO_CUT_SAVED":"Les informations ont été enregistrées",
     "VIDEO_CUT_PROCESSING":"La vidéo est en cours de traitement...",
-    "SERVER_UNRESPONSIVE":"The server is currently unresponsive.",
-    "SERVICE_UNAVAILABLE":"The service called is currently unavailable."
+    "SERVER_UNRESPONSIVE":"Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
+    "SERVICE_UNAVAILABLE":"Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Actions",

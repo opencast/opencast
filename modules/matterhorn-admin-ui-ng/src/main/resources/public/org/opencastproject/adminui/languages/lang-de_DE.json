@@ -72,8 +72,8 @@
     "EMAIL_NOT_SENT":"Die Nachricht konnte nicht gesendet werden",
     "CONFLICT_DETECTED":"Planungs-Konflikt: Die neue Aufzeichnung überlappt eine bestehende. Bitte ändern Sie den Aufnahmeort oder die Daten.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Die vorhandenen Aufzeichnungen in dieser Serie müssen neu verarbeitet werden",
-    "SERIES_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
-    "EVENT_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
+    "SERIES_ACL_MISSING_READWRITE_ROLE":"Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
+    "EVENT_ACL_MISSING_READWRITE_ROLE":"Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
     "SERIES_ACL_LOCKED":"Das Editieren von Zugriffs-Richtlinien ist nicht erlaubt so lange Aufnahmen, die Teil der Serie sind, verarbeitet werden",
     "THEME_NAME_ALREADY_TAKEN":"Dieser Name wird bereits verwendet",
     "THEME_NAME_EMPTY":"Der Name darf nicht leer sein",
@@ -92,8 +92,8 @@
     "VIDEO_CUT_NOT_SAVED":"Die Bearbeitungs-Informationen konnten nicht gespeichert werden",
     "VIDEO_CUT_SAVED":"Die Bearbeitungs-Informationen wurde gespeichert",
     "VIDEO_CUT_PROCESSING":"Das Video wird verarbeitet...",
-    "SERVER_UNRESPONSIVE":"The server is currently unresponsive.",
-    "SERVICE_UNAVAILABLE":"The service called is currently unavailable."
+    "SERVER_UNRESPONSIVE":"Oops! The server seems to be unresponsive. Please try again later.",
+    "SERVICE_UNAVAILABLE":"Oops! The server seems to be unresponsive. Please try again later."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Aktionen",
