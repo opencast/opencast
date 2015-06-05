@@ -79,6 +79,7 @@
             <Import-Package>
                 !org.apache.lucene.*,
                 !org.jboss.resource.adapter.jdbc.*,
+                org.w3c.dom;version=0,
                 *
              </Import-Package>
             <Embed-Dependency>
