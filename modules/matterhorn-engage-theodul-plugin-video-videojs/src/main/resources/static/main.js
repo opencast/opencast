@@ -341,8 +341,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
         var qualitesList = new Array();
         var tagsList = getTags(videoSources, "-quality");
-        tagsList.forEach(function(i, value) {
-            qualitesList.push(value.substring(0, value.indexOf("-quality")));
+        tagsList.forEach(function(quality, value) {
+            qualitesList.push(quality.substring(0, quality.indexOf("-quality")));
         });
         var tracks;
         for (var source in videoSources) {
