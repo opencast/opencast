@@ -20,7 +20,7 @@
                     <!-- <li with-role="ROLE_UI_{{ table.resource | uppercase }}_STATUS_EDIT"><a href="#" data-open-modal="edit-{{table.resource}}-status-modal">{{ 'BULK_ACTIONS.EDIT_STATUS.CAPTION' | translate}}</a></li> -->
                     <li with-role="ROLE_UI_{{ table.resource | uppercase }}_DELETE"><a href="#" data-open-modal="delete-{{table.resource}}-modal">{{ 'BULK_ACTIONS.DELETE.' + table.resource.toUpperCase() + '.CAPTION' | translate}}</a></li>
                     <!-- TODO: Find out which role may do this -->
-                    <li ng-if="table.resource == 'events'" with-role="ROLE_UI_{{ table.resource | uppercase }}_DELETE"><a href="#" data-open-modal="schedule-task-modal">{{ 'BULK_ACTIONS.SCHEDULE_TASK.CAPTION' | translate}}</a></li>
+                    <li ng-if="table.resource == 'events'" with-role="ROLE_UI_TASKS_CREATE"><a href="#" data-open-modal="schedule-task-modal">{{ 'BULK_ACTIONS.SCHEDULE_TASK.CAPTION' | translate}}</a></li>
                 </ul>
             </div>
             <div data-admin-ng-table-filter="" data-filters="filters" data-namespace="table.resource"></div>

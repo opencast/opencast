@@ -19,8 +19,8 @@ tweaking. For some modules some more in depth documentation is available too.
  - [Search Index](searchindex.md)
  - [Text Extraction](textextraction.md)
  - Videoeditor
+    - [Setup](videoeditor.setup.md)
     - [Manual](videoeditor.manual.md)
     - [Architecture](videoeditor.architecture.md)
-    - [Setup](videoeditor.setup.md)
  - [Video Segmentation](videosegmentation.md)
  - [YouTube Publication](youtubepublication.md)

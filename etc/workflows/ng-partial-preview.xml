@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ng-partial-preview</id>
+  <title>Prepare preview artifacts</title>
+  <tags/>
+  <description/>
+
+  <configuration_panel></configuration_panel>
+
+  <operations>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Preview movies                                                    -->
+    <!--                                                                   -->
+    <!-- Based on the work artifacts, extract preview versions.            -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Transcode video previews -->
+
+    <operation
+      id="compose"
+      exception-handler-workflow="ng-partial-error"
+      description="Creating video previews">
+      <configurations>
+        <configuration key="source-flavors">*/work</configuration>
+        <configuration key="target-flavor">*/preview</configuration>
+        <configuration key="target-tags">preview</configuration>
+        <configuration key="encoding-profile">mp4-preview.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Audio waveform                                                    -->
+    <!--                                                                   -->
+    <!-- Extract the audio track and create the waveform.                  -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Extract the audio track -->
+
+    <operation 
+      id="compose"
+      fail-on-error="false"
+      description="Extracting audio">
+      <configurations>
+        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="target-flavor">*/audio</configuration>
+        <configuration key="encoding-profile">audio.wav</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Create the audio waveform -->
+
+    <operation 
+      id="waveform"
+      fail-on-error="false"
+      description="Generating waveform">
+      <configurations>
+        <configuration key="source-flavor">*/audio</configuration>
+        <configuration key="target-flavor">*/waveform</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag the waveform for internal publishing -->
+    <!-- Fixme: remove once "waveform" operation supports target-tags -->
+
+    <operation
+      id="tag"
+      description="Preparing waveform for publishing">
+      <configurations>
+        <configuration key="source-flavors">*/waveform</configuration>
+        <configuration key="target-tags">+preview</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Silence detection                                                 -->
+    <!--                                                                   -->
+    <!-- Run silence detection to provide hints to the video editor.       -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Run silence detection -->
+
+    <operation
+      id="silence"
+      fail-on-error="false"
+      description="Detecting silence">
+      <configurations>
+        <configuration key="source-flavors">*/audio</configuration>
+        <configuration key="smil-flavor-subtype">smil</configuration>
+        <configuration key="reference-tracks-flavor">*/preview</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag the results for internal publishing -->
+    <!-- Fixme: remove once "silence" operation supports target-tags -->
+
+    <operation
+      id="tag"
+      description="Preparing silence detection for preview">
+      <configurations>
+        <configuration key="source-flavors">*/smil</configuration>
+        <configuration key="target-flavor">smil/preview</configuration>
+        <configuration key="target-tags">+preview</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Publish previews                                                  -->
+    <!--                                                                   -->
+    <!-- Distributing preview artifacts to preview publication channel.    -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Publish previews -->
+
+    <operation
+      id="publish-internal"
+      exception-handler-workflow="ng-partial-error"
+      description="Publish to preview publication channel">
+      <configurations>
+        <configuration key="source-tags">preview</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

@@ -49,7 +49,7 @@ import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.jmx.HostsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.JobsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.ServicesStatistics;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.jmx.JmxUtil;
@@ -248,10 +248,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     cleanUndispatchableJobs();
 
     // Find this host's url
-    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY))) {
+    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY))) {
       hostName = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      hostName = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      hostName = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
     }
 
     // Register JMX beans with statistics

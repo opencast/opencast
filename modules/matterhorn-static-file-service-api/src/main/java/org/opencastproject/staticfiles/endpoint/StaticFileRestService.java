@@ -23,7 +23,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.staticfiles.api.StaticFileService;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
@@ -136,7 +136,7 @@ public class StaticFileRestService {
    */
   public void activate(ComponentContext cc) throws ConfigurationException {
     logger.info("Static File REST Service started.");
-    serverUrl = OsgiUtil.getContextProperty(cc, MatterhornConstans.SERVER_URL_PROPERTY);
+    serverUrl = OsgiUtil.getContextProperty(cc, MatterhornConstants.SERVER_URL_PROPERTY);
     useWebserver = BooleanUtils.toBoolean(OsgiUtil.getOptCfg(cc.getProperties(), STATICFILES_WEBSERVER_ENABLED_KEY)
             .getOrElse("false"));
     webserverURL = OsgiUtil.getOptCfg(cc.getProperties(), STATICFILES_WEBSERVER_URL_KEY);

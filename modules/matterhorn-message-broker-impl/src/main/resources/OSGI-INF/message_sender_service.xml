@@ -7,7 +7,6 @@
   <property name="service.description" value="Message Broker Sender" />
   <property name="service.pid" value="org.opencastproject.message.broker.impl.MessageSenderImpl" />
   <service>
-    <provide interface="org.osgi.service.cm.ManagedService" />
     <provide interface="org.opencastproject.message.broker.api.MessageSender" />
   </service>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"

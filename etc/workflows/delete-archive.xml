@@ -4,7 +4,6 @@
   <title>Delete from Archive</title>
   <tags>
     <tag>archive</tag>
-    <tag>archive-ng</tag>
   </tags>
   <description>Delete a media packge from the archive on optianlly retract it from the engage distribution channel.
     WARNING! When retracting from the different publication channels is disabled, they can't be retracted anymore by the

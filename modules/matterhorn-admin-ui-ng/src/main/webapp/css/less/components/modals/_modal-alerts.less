@@ -15,37 +15,37 @@
     .clearfix();
     display: block;
     padding: 15px 25px;
-    
+
     p {
         line-height: 18px;
-                
+
         &:not(:last-child) {
             margin-bottom: 10px;
         }
     }
-    
+
     strong {
         font-weight: 600;
     }
-    
+
     &.info {
         .alert-variant(@state-info-bg, @state-info-border, @state-info-text);
     }
-    
+
     &.warning {
         .alert-variant(@state-warning-bg, @state-warning-border, @state-warning-text);
         .warning-symbol(warning);
     }
-    
+
     &.success {
         .alert-variant(@state-success-bg, @state-success-border, @state-success-text);
     }
-    
+
     &.danger {
         .alert-variant(@state-danger-bg, @state-danger-border, @state-danger-text);
         .warning-symbol(danger);
     }
-    
+
     &.info,
     &.warning,
     &.success,

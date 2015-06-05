@@ -52,6 +52,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -60,10 +61,12 @@ public class CaptureAgentStateServiceImplTest {
   private Properties capabilities;
   private ComboPooledDataSource pooledDataSource = null;
   private long timestamp = -1L;
+  private long random = -1L;
 
   @Before
   public void setUp() throws Exception {
     timestamp = System.currentTimeMillis();
+    random = Math.abs(new Random().nextLong());
     setupService();
 
     capabilities = new Properties();
@@ -76,7 +79,7 @@ public class CaptureAgentStateServiceImplTest {
   private void setupService() throws Exception {
     pooledDataSource = new ComboPooledDataSource();
     pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + timestamp);
+    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + timestamp + "_" + random);
     pooledDataSource.setUser("sa");
     pooledDataSource.setPassword("sa");
 

@@ -20,7 +20,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
 import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 
 import junit.framework.Assert;
 
@@ -412,7 +412,7 @@ public class LoadTestTest {
     properties.put(LoadTest.WORKSPACE_KEY, "/example/path");
     properties.put(LoadTest.WORKFLOW_KEY, "full");
     expect(contextMock.getBundleContext()).andReturn(bundleContextMock).times(2);
-    expect(bundleContextMock.getProperty(MatterhornConstans.SERVER_URL_PROPERTY)).andReturn("http://test.url.com:8080");
+    expect(bundleContextMock.getProperty(MatterhornConstants.SERVER_URL_PROPERTY)).andReturn("http://test.url.com:8080");
     replay(contextMock);
     replay(bundleContextMock);
     loadTest = new LoadTest(properties, clientMock, contextMock);

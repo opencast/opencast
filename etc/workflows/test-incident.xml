@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>incident</id>
-  <title>Provoke a job incident</title>
+  <id>test-incident</id>
+  <title>Test: Provoke a job incident</title>
   <tags />
   <description>Provoke a job incident</description>
 
@@ -11,10 +11,11 @@
   </configuration_panel>
 
   <operations>
-    <operation id="incident"
-               fail-on-error="true"
-               exception-handler-workflow="error"
-               description="Provoke a job incident">
+    <operation
+      id="incident"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Provoke a job incident">
       <configurations>
         <configuration key="incident-code">2</configuration>
       </configurations>
