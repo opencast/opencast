@@ -86,7 +86,7 @@
               javax.servlet,
               javax.servlet.http,
               javax.ws.rs,
-              org.apache.commons.lang,
+              org.apache.commons.lang3,
               org.opencastproject.security.api,
               org.opencastproject.util,
               org.opencastproject.util.doc.rest,

@@ -252,7 +252,7 @@
               org.apache.cxf.wsdl11,
               org.apache.commons.codec.digest,
               org.apache.commons.io,
-              org.apache.commons.lang,
+              org.apache.commons.lang3,
               org.apache.http,
               org.apache.http.client,
               org.apache.http.client.entity,

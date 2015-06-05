@@ -382,7 +382,7 @@
                             javax.servlet,
                             javax.servlet.http,
                             javax.ws.rs,
-                            org.apache.commons.lang,
+                            org.apache.commons.lang3,
                             org.osgi.service.component,
                             org.json.simple,
                             org.json.simple.parser,
