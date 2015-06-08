@@ -176,6 +176,20 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     } catch (URISyntaxException ex) {
       throw new ProcessFailedException("Source URI " + sourceTrackUri + " is not valid.");
     }
+    // inspect input file to retrieve media information
+    Job inspectionJob = null;
+    Track sourceTrack = null;
+    try {
+      inspectionJob = inspect(job, new URI(sourceTrackUri));
+      sourceTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+    } catch (URISyntaxException e) {
+      throw new ProcessFailedException("Source URI " + sourceTrackUri + " is not valid.");
+    } catch (MediaInspectionException e) {
+      throw new ProcessFailedException("Media inspection of " + sourceTrackUri + " failed", e);
+    } catch (MediaPackageException e) {
+      throw new ProcessFailedException("Deserialization of source track " + sourceTrackUri + " failed", e);
+    }
+
     // get output file extension
     String outputFileExtension = properties.getProperty(VideoEditorProperties.DEFAULT_EXTENSION, ".mp4");
     outputFileExtension = properties.getProperty(VideoEditorProperties.OUTPUT_FILE_EXTENSION, outputFileExtension);
@@ -255,7 +269,8 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       // TODO: Each clips could have a region id, relative to the root-layout
       // Then each clip is zoomed/panned/padded to WxH befor concatenation
       FFmpegEdit ffmpeg = new FFmpegEdit(properties);
-      error = ffmpeg.processEdits(inputfile, outputPath.getAbsolutePath(), outputResolution, cleanclips);
+      error = ffmpeg.processEdits(inputfile, outputPath.getAbsolutePath(), outputResolution, cleanclips,
+              sourceTrack.hasAudio(), sourceTrack.hasVideo());
 
       if (error != null) {
         FileUtils.deleteQuietly(tempDirectory);
@@ -277,7 +292,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       //logger.debug("Copied the edited file from " + outputPath.toString() + " to workspace at " + String.format("%s-%s%s", sourceTrackFlavor.getType(), newTrackId, outputFileExtension) + " returns  " + newTrackURI.toString());
 
       // inspect new Track
-      Job inspectionJob = null;
       try {
           inspectionJob = inspect(job,newTrackURI);
       } catch (MediaInspectionException e) {

@@ -99,10 +99,14 @@ public class FFmpegEdit {
     this.audioCodec = properties.getProperty(VideoEditorProperties.AUDIO_CODEC, null);
   }
 
-
   public String processEdits(List<String> inputfiles, String dest, String outputSize, List<VideoClip> cleanclips)
           throws Exception {
-    List<String> cmd = makeEdits(inputfiles, dest, outputSize, cleanclips);
+    return processEdits(inputfiles, dest, outputSize, cleanclips, true, true);
+  }
+
+  public String processEdits(List<String> inputfiles, String dest, String outputSize, List<VideoClip> cleanclips,
+          boolean hasAudio, boolean hasVideo) throws Exception {
+    List<String> cmd = makeEdits(inputfiles, dest, outputSize, cleanclips, hasAudio, hasVideo);
     return run(cmd);
   }
 
@@ -149,10 +153,17 @@ public class FFmpegEdit {
    * Inputfile is an ordered list of video src
    * clips is a list of edit points indexing into the video src list
    * outputResolution when specified is the size to which all the clips will scale
-   * NOTE: This command will fail if the sizes are mismatched or if some of the clips lacked audio
+   * hasAudio and hasVideo specify media type of the input files
+   * NOTE: This command will fail if the sizes are mismatched or
+   * if some of the clips aren't same as specified mediatype
+   * (hasn't audio or video stream while hasAudio, hasVideo parameter set)
    */
   public List<String> makeEdits(List<String> inputfiles, String dest, String outputResolution,
-          List<VideoClip> clips) throws Exception {
+          List<VideoClip> clips, boolean hasAudio, boolean hasVideo) throws Exception {
+
+    if (!hasAudio && !hasVideo) {
+      throw new IllegalArgumentException("Inputfiles should have at least audio or video stream.");
+    }
 
     DecimalFormat f = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.US));
     int n = clips.size();
@@ -166,11 +177,15 @@ public class FFmpegEdit {
 
     if (n > 1) { // Create the input pads if we have multiple segments
       for (i = 0; i < n ; i++) {
-        vpads.add("[v" + i + "]");  // post filter
-        apads.add("[a" + i + "]");
+        if (hasVideo) {
+          vpads.add("[v" + i + "]");  // post filter
+        }
+        if (hasAudio) {
+          apads.add("[a" + i + "]");
+        }
       }
     }
-    if (outputResolution != null && outputResolution.length() > 3) // format is "<width>x<height>"
+    if (hasVideo && outputResolution != null && outputResolution.length() > 3) // format is "<width>x<height>"
       scale = ",scale=" + outputResolution;    // scale each clip to the same size
 
     for (i = 0; i < n; i++) { // Examine each clip
@@ -180,35 +195,44 @@ public class FFmpegEdit {
       double inpt = vclip.getStart();     // get in points
       double duration = vclip.getDuration();
 
-      String vfadeFilter = "";
-      /* Only include fade into the filter graph if necessary */
-      if (vfade > 0.00001) {
-        double vend = duration - vfade;
-        vfadeFilter = ",fade=t=in:st=0:d=" + vfade + ",fade=t=out:st=" + f.format(vend) + ":d=" + vfade;
-      }
-      /* Add filters for video */
-      String clip = "[" + fileindx + ":v]trim=" + f.format(inpt) + ":duration=" + f.format(duration)
-                + scale + ",setpts=PTS-STARTPTS" + vfadeFilter + "[v" + i + "]";
+      String clip = "";
+      if (hasVideo) {
+        String vfadeFilter = "";
+        /* Only include fade into the filter graph if necessary */
+        if (vfade > 0.00001) {
+          double vend = duration - vfade;
+          vfadeFilter = ",fade=t=in:st=0:d=" + vfade + ",fade=t=out:st=" + f.format(vend) + ":d=" + vfade;
+        }
+        /* Add filters for video */
+        clip = "[" + fileindx + ":v]trim=" + f.format(inpt) + ":duration=" + f.format(duration)
+                  + scale + ",setpts=PTS-STARTPTS" + vfadeFilter + "[v" + i + "]";
 
-      clauses.add(clip);
-
-      String afadeFilter = "";
-      /* Only include fade into the filter graph if necessary */
-      if (afade > 0.00001) {
-        double aend = duration - afade;
-        afadeFilter = ",afade=t=in:st=0:d=" + afade + ",afade=t=out:st=" + f.format(aend) + ":d=" + afade;
+        clauses.add(clip);
       }
-      /* Add filters for audio */
-      clip = "[" + fileindx + ":a]atrim=" + f.format(inpt) + ":duration=" + f.format(duration)
-                + ",asetpts=PTS-STARTPTS" + afadeFilter + "[a"
-                + i + "]";
-      clauses.add(clip);
+
+      if (hasAudio) {
+        String afadeFilter = "";
+        /* Only include fade into the filter graph if necessary */
+        if (afade > 0.00001) {
+          double aend = duration - afade;
+          afadeFilter = ",afade=t=in:st=0:d=" + afade + ",afade=t=out:st=" + f.format(aend) + ":d=" + afade;
+        }
+        /* Add filters for audio */
+        clip = "[" + fileindx + ":a]atrim=" + f.format(inpt) + ":duration=" + f.format(duration)
+                  + ",asetpts=PTS-STARTPTS" + afadeFilter + "[a"
+                  + i + "]";
+        clauses.add(clip);
+      }
     }
     if (n > 1) { // concat the outpads when there are more then 1 per stream
                   // use unsafe because different files may have different SAR/framerate
-      clauses.add(StringUtils.join(vpads, "") + "concat=n=" + n + ":unsafe=1[ov0]"); // concat video clips
-      clauses.add(StringUtils.join(apads, "") + "concat=n=" + n
+      if (hasVideo) {
+        clauses.add(StringUtils.join(vpads, "") + "concat=n=" + n + ":unsafe=1[ov0]"); // concat video clips
+      }
+      if (hasAudio) {
+        clauses.add(StringUtils.join(apads, "") + "concat=n=" + n
                 + ":v=0:a=1[oa0]"); // concat audio clips in stream 0, video in stream 1
+      }
       outmap = "o";                 // if more than one clip
     }
     command.add("-y");      // overwrite old pathname
@@ -220,15 +244,19 @@ public class FFmpegEdit {
     command.add(StringUtils.join(clauses, ";"));
     String[] options = ffmpegProperties.split(" ");
     command.addAll(Arrays.asList(options));
-    command.add("-map");
-    command.add("[" + outmap + "a0]");
-    command.add("-map");
-    command.add("[" + outmap + "v0]");
-    if (videoCodec != null) { // If using different codecs from source, add them here
+    if (hasAudio) {
+      command.add("-map");
+      command.add("[" + outmap + "a0]");
+    }
+    if (hasVideo) {
+      command.add("-map");
+      command.add("[" + outmap + "v0]");
+    }
+    if (hasVideo && videoCodec != null) { // If using different codecs from source, add them here
       command.add("-c:v");
       command.add(videoCodec);
     }
-    if (audioCodec != null) {
+    if (hasAudio && audioCodec != null) {
       command.add("-c:a");
       command.add(audioCodec);
     }
