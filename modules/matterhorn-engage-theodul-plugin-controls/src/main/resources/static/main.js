@@ -749,18 +749,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             embedHeightOne = 70;
 
             $("#" + id_embed0).html("Embed " + embedWidthOne + "x" + embedHeightOne);
-            if ($("#" + id_embed1) && $("#" + id_embed1).parent()) {
-                $("#" + id_embed1).parent().remove();
-            }
-            if ($("#" + id_embed2) && $("#" + id_embed2).parent()) {
-                $("#" + id_embed2).parent().remove();
-            }
-            if ($("#" + id_embed3) && $("#" + id_embed3).parent()) {
-                $("#" + id_embed3).parent().remove();
-            }
-            if ($("#" + id_embed4) && $("#" + id_embed4).parent()) {
-                $("#" + id_embed4).parent().remove();
-            }
+            Utils.removeParentIfElementExists(id_embed1);
+            Utils.removeParentIfElementExists(id_embed2);
+            Utils.removeParentIfElementExists(id_embed3);
+            Utils.removeParentIfElementExists(id_embed4);
         }
 
         $("#" + id_embed_button).removeClass("disabled");

@@ -131,7 +131,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var dashPath = "lib/videojs/dash.min";
     var dashPluginPath = "lib/videojs/videojs-tech-dashjs"
     var videojs_swf_path = "lib/videojs/video-js.swf";
-    var videoDisplaySizeFactor = 1.1;
+    var videoDisplaySizeFactor = 1.3;
     var videoDisplaySizeTimesCheck = 100; // the smaller the factor, the higher the times check!
     var checkVideoDisplaySizeTimeout = 1500;
     var audioLoadTimeoutCheckDelay = 5000;
@@ -351,14 +351,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
     }
 
-    function initSynchronize(showMsg) {
+    function initSynchronize() {
         $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
-        if (Bowser.chrome) {
-            $(document).trigger(event_sjs_stopBufferChecker);
-            if (showMsg) {
-                Engage.trigger(plugin.events.customError.getName(), translate("chromeBuffer", "The buffer checker has been disabled due to Chrome limitations. It is possible that you will encounter problems with the video playback."));
-            }
-        }
+        $(document).trigger(event_sjs_stopBufferChecker);
     }
 
     function compareResolutions(a, b) {
@@ -416,7 +411,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
                 if (pressedPlayOnce && (currentTime > 0)) {
                     window.setTimeout(function() {
-                        initSynchronize(false);
+                        initSynchronize();
                         Engage.trigger(plugin.events.seek.getName(), currentTime);
                     }, timer_qualitychange);
                 }
@@ -463,7 +458,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             });
             for (var i = 0; i < videoDisplays.length; ++i) {
-                $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+                $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 90) + "%").addClass("auto-height");
             }
         } else {
             Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
@@ -492,7 +487,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     }
                     ++i;
                 }
-                initSynchronize(true);
+                initSynchronize();
             } else {
                 videosReady = true;
                 if (!isAudioOnly) {
@@ -501,8 +496,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
 
             if (videoDataView.model.get("type") != "audio") {
-                $(window).resize(function() {
+                $(window).resize(function(event, el) {
                     checkVideoDisplaySize();
+                    var factor = 0.01;
+                    while(!isElementVisible($('#engage_resize_container')) && factor <= 1.0){
+                        $('#'+id_engageContent).css("max-width", event.currentTarget.innerWidth / (videoDisplaySizeFactor + factor));
+                        factor += 0.01;
+                    }
                 });
             }
         }
@@ -858,6 +858,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 break;
             }
         }
+    }
+
+    function isElementVisible(elementToBeChecked) {
+        var TopView = $(window).scrollTop();
+        var BotView = TopView + $(window).height();
+        var TopElement = $(elementToBeChecked).offset().top;
+        var BotElement = TopElement + $(elementToBeChecked).height();
+        return ((BotElement <= BotView) && (TopElement >= TopView));
     }
 
     function clearAutoplay() {
