@@ -163,6 +163,40 @@ define(["jquery"], function($) {
             opacity: 0.5
         });
     }
+    
+    Utils.prototype.repairSegmentLength = function(segments, duration, min_segment_duration) {
+        if (segments && duration) {
+            var total = 0;
+            for (var i = 0; i < segments.length; i++) {
+                if (segments[i].duration) {
+                    total += parseInt(segments[i].duration);
+                    if (parseInt(segments[i].duration) < min_segment_duration) {
+                        if (i > 1 && segments[i-1].duration) {
+                            segments[i-1].duration = parseInt(segments[i].duration) + parseInt(segments[i-1].duration);
+                            segments.splice(i,1);
+                        } else {
+                            if (segments.length > 1 && segments[i+1].duration) {
+                                segments[i+1].duration = parseInt(segments[i].duration) + parseInt(segments[i+1].duration);
+                                segments.splice(i,1);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (total > parseInt(duration)) {
+                var diff = total - parseInt(duration);
+                for (var i = segments.length - 1; i >= 0; i-- ) {
+                    if (parseInt(segments[i].duration) > diff) {
+                        segments[i].duration = parseInt(segments[i].duration) - diff;
+                        break;
+                    }
+                }
+            }
+            
+        }
+        return segments;
+    }
 
     return Utils;
 });
