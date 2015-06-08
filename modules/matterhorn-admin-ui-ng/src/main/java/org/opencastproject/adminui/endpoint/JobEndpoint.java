@@ -422,14 +422,14 @@ public class JobEndpoint {
    * Returns the operation with the given id from the given workflow instance
    *
    * @param jobId
-   *          the woworkflow instance id
-   * @param operationId
-   *          the operation id
+   *          the workflow instance id
+   * @param operationPosition
+   *          the operation position
    * @return the operation as JSON object
    * @throws JobEndpointException
    * @throws NotFoundException
    */
-  public JObjectWrite getOperationAsJSON(long jobId, long operationId) throws JobEndpointException, NotFoundException {
+  public JObjectWrite getOperationAsJSON(long jobId, int operationPosition) throws JobEndpointException, NotFoundException {
 
     WorkflowInstance instance;
     try {
@@ -444,17 +444,22 @@ public class JobEndpoint {
 
     List<WorkflowOperationInstance> operations = instance.getOperations();
 
-    for (WorkflowOperationInstance wflOp : operations) {
-      if (wflOp.getId() == operationId) {
-        return j(f("retry_strategy", vN(wflOp.getRetryStrategy())), f("execution_host", vN(wflOp.getExecutionHost())),
-                f("failed_attempts", v(wflOp.getFailedAttempts())), f("max_attempts", v(wflOp.getMaxAttempts())),
-                f("exception_handler_workflow", vN(wflOp.getExceptionHandlingWorkflow())),
-                f("fail_on_error", v(wflOp.isFailWorkflowOnException())), f("description", vN(wflOp.getDescription())),
-                f("state", vN(wflOp.getState())), f("job", v(operationId)), f("name", vN(wflOp.getTemplate())),
-                f("time_in_queue", vN(wflOp.getTimeInQueue())),
-                f("started", vN(DateTimeSupport.toUTC(wflOp.getDateStarted().getTime()))),
-                f("completed", vN(DateTimeSupport.toUTC(wflOp.getDateCompleted().getTime()))));
-      }
+    if (operations.size() > operationPosition) {
+      WorkflowOperationInstance wflOp = operations.get(operationPosition);
+      return j(f("retry_strategy", vN(wflOp.getRetryStrategy())),
+              f("execution_host", vN(wflOp.getExecutionHost())),
+              f("failed_attempts", v(wflOp.getFailedAttempts())),
+              f("max_attempts", v(wflOp.getMaxAttempts())),
+              f("exception_handler_workflow", vN(wflOp.getExceptionHandlingWorkflow())),
+              f("fail_on_error", v(wflOp.isFailWorkflowOnException())),
+              f("description", vN(wflOp.getDescription())),
+              f("state", vN(wflOp.getState())),
+              f("job", vN(wflOp.getId())),
+              f("name", vN(wflOp.getTemplate())),
+              f("time_in_queue", v(wflOp.getTimeInQueue() == null ? 0 : wflOp.getTimeInQueue())),
+              f("started", vN(wflOp.getDateStarted() == null ? null : DateTimeSupport.toUTC(wflOp.getDateStarted().getTime()))),
+              f("completed", vN(wflOp.getDateCompleted() == null ? null : DateTimeSupport.toUTC(wflOp.getDateCompleted().getTime())))
+      );
     }
 
     return null;

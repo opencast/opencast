@@ -100,7 +100,7 @@ public interface WorkflowOperationInstance extends Configurable {
   Date getDateStarted();
 
   /** The number of milliseconds this operation waited in a service queue */
-  long getTimeInQueue();
+  Long getTimeInQueue();
 
   /** The timestamp this operation completed */
   Date getDateCompleted();
