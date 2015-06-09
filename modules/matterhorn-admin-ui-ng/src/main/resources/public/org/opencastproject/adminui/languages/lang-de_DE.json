@@ -92,8 +92,8 @@
     "VIDEO_CUT_NOT_SAVED":"Die Bearbeitungs-Informationen konnten nicht gespeichert werden",
     "VIDEO_CUT_SAVED":"Die Bearbeitungs-Informationen wurde gespeichert",
     "VIDEO_CUT_PROCESSING":"Das Video wird verarbeitet...",
-    "SERVER_UNRESPONSIVE":"Oops! The server seems to be unresponsive. Please try again later.",
-    "SERVICE_UNAVAILABLE":"Oops! The server seems to be unresponsive. Please try again later."
+    "SERVER_UNRESPONSIVE":"Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
+    "SERVICE_UNAVAILABLE":"Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Aktionen",
@@ -1153,10 +1153,10 @@
   "LOGIN":{
     "WELCOME":"Willkommen bei Opencast",
     "REMEMBER":"Automatisch anmelden",
-    "USERNAME":"E-Mail...",
+    "USERNAME":"Benutzername...",
     "PASSWORD":"Passwort...",
     "LOGIN":"anmelden",
-    "ERROR":"Falsche E-Mail-Adresse und\/oder falsches Passwort"
+    "ERROR":"Falscher Benutzername und\/oder Passwort"
   },
   "TABLE_FILTERS":{
     "CLEAR":"Alle Filter löschen",

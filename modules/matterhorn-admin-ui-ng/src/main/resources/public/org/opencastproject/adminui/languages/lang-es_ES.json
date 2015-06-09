@@ -72,8 +72,8 @@
     "EMAIL_NOT_SENT":"No se ha podido enviar el mensaje",
     "CONFLICT_DETECTED":"Conflicto de programación: el nuevo evento coincide con otro existente. Por favor, cambie la sala, las fechas o las horas.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Los eventos que contiene esta serie deberán ser reprocesados",
-    "SERIES_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
-    "EVENT_ACL_MISSING_READWRITE_ROLE":"The Access Policy requires at least one role with Read and Write permissions.",
+    "SERIES_ACL_MISSING_READWRITE_ROLE":"La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
+    "EVENT_ACL_MISSING_READWRITE_ROLE":"La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
     "SERIES_ACL_LOCKED":"No es posible editar las Políticas de Acceso cuando existen operaciones activas en algún evento de la serie",
     "THEME_NAME_ALREADY_TAKEN":"Este nombre ya está en uso",
     "THEME_NAME_EMPTY":"El nombre no puede estar vacío",
@@ -92,8 +92,8 @@
     "VIDEO_CUT_NOT_SAVED":"No se han podido guardar los datos de edición",
     "VIDEO_CUT_SAVED":"Se han guardado los datos de edición",
     "VIDEO_CUT_PROCESSING":"Se está procesando el vídeo...",
-    "SERVER_UNRESPONSIVE":"Oops! The server seems to be unresponsive. Please try again later.",
-    "SERVICE_UNAVAILABLE":"Oops! The server seems to be unresponsive. Please try again later."
+    "SERVER_UNRESPONSIVE":"¡Uy! Parece que el servidor no responde. Por favor, inténtelo de nuevo más tarde.",
+    "SERVICE_UNAVAILABLE":"¡Uy! Parece que el servidor no responde. Por favor, inténtelo de nuevo más tarde."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Acciones",
@@ -111,7 +111,7 @@
         "CAPTION":"Eliminar"
       }
     },
-    "DELETE_EVENTS_WARNING_LINE1":"Una vez eliminados todos los metadatos, los archivos de audio y vídeo serán eliminados e irrecuperables.",
+    "DELETE_EVENTS_WARNING_LINE1":"Una vez eliminados todos los metadatos, los archivos de audio y vídeo se eliminarán y serán irrecuperables.",
     "DELETE_EVENTS_WARNING_LINE2":"",
     "DELETE_SERIES_WARNING_LINE1":"Una vez eliminados, todos los metadatos de la serie serán irrecuperables.",
     "DELETE_SERIES_WARNING_LINE2":"",
