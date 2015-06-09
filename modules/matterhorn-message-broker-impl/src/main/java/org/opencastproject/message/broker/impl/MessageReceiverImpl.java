@@ -68,7 +68,7 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
         disconnectMessageBroker();
         connectMessageBroker(url, username, password);
     } catch (JMSException e) {
-        throw new ConfigurationException(ACTIVEMQ_BROKER_URL_KEY, null, e);
+        throw new ConfigurationException(ACTIVEMQ_BROKER_URL_KEY, url, e);
     }
     logger.info("MessageReceiver service successfully started");
   }
