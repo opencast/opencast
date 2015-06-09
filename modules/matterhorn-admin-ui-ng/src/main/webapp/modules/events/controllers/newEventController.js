@@ -51,7 +51,13 @@ angular.module('adminNg.controllers')
     $scope.submit = function () {
         var messageId, userdata = { metadata: []}, ace = [];
 
+        window.onbeforeunload = function (e) {
+            var confirmationMessage = 'The file has not completed uploading.';
 
+            (e || window.event).returnValue = confirmationMessage;     //Gecko + IE
+            return confirmationMessage;                                //Webkit, Safari, Chrome etc.
+        };
+        
         angular.forEach($scope.states, function (state) {
 
             if (state.stateController.isMetadataState) {
@@ -100,9 +106,11 @@ angular.module('adminNg.controllers')
                     state.stateController.reset();
                 }
             });
+            window.onbeforeunload = null;
         }, function () {
             Notifications.add('error', 'EVENTS_NOT_CREATED');
             Notifications.remove(messageId);
+            window.onbeforeunload = null;
         });
 
         // close will also make the Table.fetch()
