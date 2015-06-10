@@ -19,21 +19,21 @@
       "SUBHEADING":"Wählen Sie die Standard-Daten, die Sie in der {{ tableName }}-Ansicht anzeigen möchten",
       "AVAILABLE_COLUMNS":"Verfügbare Spalten",
       "SELECTED_COLUMNS":"Ausgewählte Spalten",
-      "FOOTER_TEXT":"Die Reihenfolge und Auswahl werden automatisch gespeichert. Drücken Sie \"{{resetTranslation}}\", um die Standardansicht wiederzuherstellen."
+      "FOOTER_TEXT":"Die Reihenfolge und Auswahl werden automatisch gespeichert. Drücken Sie \"{{resetTranslation}}\", um die Standardansicht wiederherzustellen."
     }
   },
   "NOTIFICATIONS":{
-    "ACL_ADDED":"Die Zugriffs-Richtlinie wurde erstellt",
-    "ACL_NOT_SAVED":"Die Zugriffs-Richtlinie konnte nicht gespeichert werden",
-    "ACL_UPDATED":"Die Zugriffs-Richtlinie wurde aktualisiert",
-    "ACL_DELETED":"Die Zugriffs-Richtlinie wurde gelöscht",
-    "ACL_NOT_DELETED":"Die Zugriffs-Richtlinie konnte nicht gelöscht werden",
+    "ACL_ADDED":"Die Zugriffsrichtlinie wurde erstellt",
+    "ACL_NOT_SAVED":"Die Zugriffsrichtlinie konnte nicht gespeichert werden",
+    "ACL_UPDATED":"Die Zugriffsrichtlinie wurde aktualisiert",
+    "ACL_DELETED":"Die Zugriffsrichtlinie wurde gelöscht",
+    "ACL_NOT_DELETED":"Die Zugriffsrichtlinie konnte nicht gelöscht werden",
     "USER_ADDED":"Der Nutzer wurde angelegt",
     "USER_UPDATED":"Die Nutzerdaten wurden aktualisiert",
     "USER_NOT_SAVED":"Der Nutzer konnte nicht angelegt werden",
     "USER_DELETED":"Der Nutzer wurde gelöscht",
     "USER_NOT_DELETED":"Der Nutzer konnte nicht gelöscht werden",
-    "USER_NOT_MANAGEABLE":"Dieser Nutzer kann nicht verwaltet werden",
+    "USER_NOT_MANAGEABLE":"Dieser Nutzer kann nicht geändert werden",
     "GROUP_ADDED":"Die Gruppe wurde angelegt",
     "GROUP_UPDATED":"Die Gruppe wurde aktualisiert",
     "GROUP_NOT_SAVED":"Die Gruppe konnte nicht gespeichert werden",
@@ -257,6 +257,7 @@
             "CAPTION":"Zeitplan",
             "START_DATE":"Startdatum",
             "START_TIME":"Startzeit",
+            "TIMEZONE":"Time zone",
             "END_DATE":"Enddatum",
             "DURATION":"Dauer"
           },
