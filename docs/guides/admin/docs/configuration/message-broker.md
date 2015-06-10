@@ -7,7 +7,7 @@ user interface. ActiveMQ can either be set up to run on its own machine or on on
 
 ### Required Version
 
- - ActiveMQ 5.10 or above should work.
+ - ActiveMQ 5.10 or above should work. The queues in the example activemq.xml file should be transferred to the configuration file provided with the version of Active MQ you are using.
  - ActiveMQ 5.6 will not work.
  - Versions in between are untested.
 
@@ -40,12 +40,43 @@ installation of ActiveMQ, but that can be changed with:
 
 
 ### Security
+ActiveMQ can secure its message queues with user name and password access. This will go through the steps of setting up a configured username and password. On the ActiveMQ security site: http://activemq.apache.org/security.html there are more details about using alternative authentication and authorization providers.
+## users.properties
+First you need to create a new user that will have acess to the queues. This is configured in the user.properties configuration file in the configuration directory for ActiveMQ. It is a list of "username=password" so for example we could create a new admin user with the following file contents:
+    admin=password
+## groups.properties
+Next is to provide a group that will have our user in it and will secure access to the message queues. This is configured in the groups.properties configuration file in the configuration directory for ActiveMQ. It is a list of groups equal to a comma separated list of users so for example: "groups=user1,user2,user3". To setup our new user to be a part of the admin group: 
+    admins=admin
+## login.conf
+Next we need to make sure that ActiveMQ is using our user.properties and group.properties files to authenticate and authorize users. The login.conf file should be in the ActivemQ configuration directory and contain: 
+activemq {
+    org.apache.activemq.jaas.PropertiesLoginModule required
+    org.apache.activemq.jaas.properties.user="users.properties"
+    org.apache.activemq.jaas.properties.group="groups.properties";
+ };
 
-*To be determined!*
+## activemq.conf
+The final step to secure the ActiveMQ queues by limiting them with a group. 
 
-Ideas:
+Inside the activemq.xml configuration file in the ActiveMQ configuration directory there are some <broker></broker> tags we will add the following plugin configuration: 
+    <plugins>
+        <jaasAuthenticationPlugin configuration="activemq" />
+        <authorizationPlugin>
+            <map>
+                <authorizationMap>
+                    <authorizationEntries>
+                        <authorizationEntry queue=">" read="admins" write="admins" admin="admins" />
+                        <authorizationEntry topic=">" read="admins" write="admins" admin="admins" />
+                        <authorizationEntry topic="ActiveMQ.Advisory.>" read="admins" write="admins" admin="admins"/>
+                    </authorizationEntries>
+                </authorizationMap>
+            </map>
+        </authorizationPlugin>
+    </plugins>
 
- - Limit `transportConnectores` (see `activemq.xml`) to certain hosts. This may require ActiveMQ to use multiple hosts.
-   Have a look at the Matterhorn mailing list for the ongoing discussion.
+The <jaasAuthenticationPlugin configuration="activemq" /> part configures the plugin to use our login.conf file to do the authentication and authorization. The "configuration=activemq" property needs to match the name given for surrounding object in login.conf i.e. activemq{};
 
+The authorizationEntry gives read, write and admin access to only those members in the group admins for queues and topics.
+
+## Firewall
 Do not forget that ActiveMQ uses TCP port 61616 (default configuration) for communication which you might have to allow in your firewall.
