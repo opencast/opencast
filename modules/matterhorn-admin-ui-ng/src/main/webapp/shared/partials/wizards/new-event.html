@@ -431,7 +431,7 @@
                     <table class="main-tbl">
                         <tr ng-repeat="userEntry in wizard.states[0].stateController.getUserEntries()">
                             <td>{{ userEntry.label | translate }}</td>
-                            <td>{{ userEntry.presentableValue }}</td>
+                            <td>{{ userEntry.presentableValue | translate }}</td>
                         <tr>
                     </table>
                 </div>
@@ -442,7 +442,7 @@
                     <table class="main-tbl" ng-repeat="(name, block) in wizard.getStateControllerByName('metadata-extended').getUserEntries()">
                         <tr ng-repeat="field in block.fields">
                             <td>{{ field.label | translate }}</td>
-                            <td>{{ field.presentableValue }}</td>
+                            <td>{{ (field.presentableValue | translate) || field.presentableValue  }}</td>
                         <tr>
                     </table>
                 </div>
