@@ -24,7 +24,15 @@ angular.module('adminNg.controllers')
     // Shall be banished ASAP
 
     var metadata,
-        accessController;
+        accessController,
+        // Reset all the wizard states
+        resetStates = function () {
+            angular.forEach($scope.states, function(state)  {
+                if (angular.isDefined(state.stateController.reset)) {
+                    state.stateController.reset();
+                }
+            });
+        };
 
     angular.forEach($scope.states, function (state) {
         if (state.stateController.isAccessState) {
@@ -90,19 +98,15 @@ angular.module('adminNg.controllers')
                 userdata[state.name] = state.stateController.ud;
             }
         });
+
         NewEventResource.save({}, userdata, function () {
             Notifications.add('success', 'EVENTS_CREATED');
             Notifications.remove(messageId);
-
-            // Reset all states
-            angular.forEach($scope.states, function(state)  {
-                if (angular.isDefined(state.stateController.reset)) {
-                    state.stateController.reset();
-                }
-            });
+            resetStates();
         }, function () {
             Notifications.add('error', 'EVENTS_NOT_CREATED');
             Notifications.remove(messageId);
+            resetStates();
         });
 
         // close will also make the Table.fetch()
