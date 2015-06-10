@@ -48,7 +48,7 @@
     "EVENTS_UPDATED":"Das Ereignis wurde aktualisiert",
     "EVENTS_NOT_UPDATED":"Das Ereignis konnte nicht gespeichert werden",
     "EVENTS_DELETED":"Das Ereignis wurde gelöscht",
-    "EVENTS_NOT_DELETED":"Das\/die Ereignis(se) konnte(n) nicht gelöscht werden",
+    "EVENTS_NOT_DELETED":"Die Ereignisse konnten nicht gelöscht werden",
     "USER_BLACKLIST_CREATED":"Die Sperrliste wurde erstellt",
     "USER_BLACKLIST_NOT_CREATED":"Die Sperrliste konnte nicht erstellt werden",
     "USER_BLACKLIST_SAVED":"Die Sperrliste wurde gespeichert",
@@ -70,11 +70,11 @@
     "EMAIL_TEMPLATE_NAME_TAKEN":"Dieser Name wird bereits verwendet",
     "EMAIL_SENT":"Die Nachricht wurde gesendet",
     "EMAIL_NOT_SENT":"Die Nachricht konnte nicht gesendet werden",
-    "CONFLICT_DETECTED":"Planungs-Konflikt: Die neue Aufzeichnung überlappt eine bestehende. Bitte ändern Sie den Aufnahmeort oder die Daten.",
+    "CONFLICT_DETECTED":"Konflikt: Die neue Aufzeichnung überlappt zeitlich mit einer bestehenden. Bitte ändern Sie Ort oder Zeit.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Die vorhandenen Aufzeichnungen in dieser Serie müssen neu verarbeitet werden",
     "SERIES_ACL_MISSING_READWRITE_ROLE":"Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
     "EVENT_ACL_MISSING_READWRITE_ROLE":"Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
-    "SERIES_ACL_LOCKED":"Das Editieren von Zugriffs-Richtlinien ist nicht erlaubt so lange Aufnahmen, die Teil der Serie sind, verarbeitet werden",
+    "SERIES_ACL_LOCKED":"Das Editieren von Zugriffsrichtlinien ist nicht erlaubt solange Aufnahmen verarbeitet werden, die Teil der Serie sind",
     "THEME_NAME_ALREADY_TAKEN":"Dieser Name wird bereits verwendet",
     "THEME_NAME_EMPTY":"Der Name darf nicht leer sein",
     "BUMPER_UPLOAD_ERROR":"Fehler beim Hochladen von Medien",
@@ -82,16 +82,16 @@
     "TITLE_UPLOAD_ERROR":"Fehler beim Hochladen von Medien",
     "LICENSE_UPLOAD_ERROR":"Fehler beim Hochladen von Medien",
     "WATERMARK_UPLOAD_ERROR":"Fehler beim Hochladen von Medien",
-    "THEME_UPLOAD_STARTED":"Die Medien werden hochgeladen...",
+    "THEME_UPLOAD_STARTED":"Die Medien werden hochgeladen…",
     "THEME_CREATED":"Das Branding wurde erstellt",
     "THEME_NOT_CREATED":"Das Branding konnte nicht erstellt werden",
     "THEME_DELETED":"Das Branding wurde gelöscht",
     "THEME_NOT_DELETED":"Das Branding konnte nicht gelöscht werden",
     "TASK_CREATED":"Der Task wurde erstellt",
     "TASK_NOT_CREATED":"Der Task konnte nicht erstellt werden",
-    "VIDEO_CUT_NOT_SAVED":"Die Bearbeitungs-Informationen konnten nicht gespeichert werden",
-    "VIDEO_CUT_SAVED":"Die Bearbeitungs-Informationen wurde gespeichert",
-    "VIDEO_CUT_PROCESSING":"Das Video wird verarbeitet...",
+    "VIDEO_CUT_NOT_SAVED":"Die Bearbeitungsinformationen konnten nicht gespeichert werden",
+    "VIDEO_CUT_SAVED":"Die Bearbeitungsinformationen wurde gespeichert",
+    "VIDEO_CUT_PROCESSING":"Das Video wird verarbeitet…",
     "SERVER_UNRESPONSIVE":"Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
     "SERVICE_UNAVAILABLE":"Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut."
   },
@@ -123,7 +123,7 @@
       },
       "TASKS":{
         "CAPTION":"Tasks",
-        "SELECT":"Taks auswählen"
+        "SELECT":"Task auswählen"
       },
       "SUMMARY":{
         "CAPTION":"Zusammenfassung",
@@ -242,11 +242,11 @@
             "RECORDING_ELEMENTS":"Aufnahme-Elemente",
             "SEGMENTABLE":{
               "SHORT":"Folien",
-              "DETAIL":"Die Datei enthält eine Aufnahme von einer Präsentation (Keynote, Powerpoint, etc.)."
+              "DETAIL":"Die Datei enthält die Aufnahme einer Präsentation (Keynote, Powerpoint, etc.)."
             },
             "NON_SEGMENTABLE":{
-              "SHORT":"Präsentator",
-              "DETAIL":"Die Datei enthält eine Aufnahme von einer zum Publikum sprechenden Person."
+              "SHORT":"Vortragender",
+              "DETAIL":"Die Datei enthält die Aufnahme einer zum Publikum sprechenden Person."
             },
             "AUDIO_ONLY":{
               "SHORT":"Nur Audio",
@@ -257,12 +257,12 @@
             "CAPTION":"Zeitplan",
             "START_DATE":"Startdatum",
             "START_TIME":"Startzeit",
-            "TIMEZONE":"Time zone",
+            "TIMEZONE":"Zeitzone",
             "END_DATE":"Enddatum",
             "DURATION":"Dauer"
           },
           "SCHEDULE_SINGLE":{
-            "CAPTION":"Einzelne Aufzeichnung planen"
+            "CAPTION":"Einzelaufzeichnung planen"
           },
           "SCHEDULE_MULTIPLE":{
             "CAPTION":"Mehrere Aufzeichnungen planen",
@@ -278,9 +278,9 @@
           "WORKFLOW":"Workflow"
         },
         "ACCESS":{
-          "CAPTION":"Zugriffsrechte",
+          "CAPTION":"Zugriffsrichtlinie",
           "POLICY":"Zugriffs-Richtlinie",
-          "ACL":"ACL"
+          "ACL":"Zugriffsrichtlinie"
         },
         "SUMMARY":{
           "CAPTION":"Zusammenfassung"
@@ -306,10 +306,10 @@
       "TABLE":{
         "CAPTION":"Aufzeichnungen",
         "TITLE":"Titel",
-        "CREATORS":"Dozent(en)",
+        "CREATORS":"Vortragende(r)",
         "SERIES":"Serien",
         "DATE":"Datum",
-        "START":"Start",
+        "START":"Beginn",
         "STOP":"Ende",
         "STATUS":"Status",
         "LOCATION":"Raum",
@@ -317,12 +317,12 @@
         "ACTION":"Aktionen",
         "FIRST":"Erste",
         "LAST":"Letzte",
-        "NEXT":"weiter",
+        "NEXT":"Weiter",
         "MANAGED_ACL":"Zugriffsrechte",
         "SCHEDULING_STATUS":"Status",
         "WORKFLOW_STATE":"Fortschritt",
         "REVIEW_STATUS":"Prüfstatus",
-        "PREVIOUS":"zurück",
+        "PREVIOUS":"Zurück",
         "NOCONTENT":"Keine Daten verfügbar"
       },
       "SCHEDULING_STATUS":{
@@ -434,16 +434,16 @@
           "CREATED":"Erstellt am",
           "CREATED_BY":"Erstellt von",
           "LICENSE":"Lizenz",
-          "CONTRIBUTORS":"Author(en)",
+          "CONTRIBUTORS":"Mitwirkende",
           "RIGHTS":"Rechte",
-          "PRESENTERS":"Präsentator(en)",
+          "PRESENTERS":"Vortragende(r)",
           "LANGUAGE":"Sprache",
           "COPYRIGHT":"Urheberrecht",
           "VISIBILITY":"Sichtbarkeit",
           "PUBLIC":"Public target",
-          "OS":"Verarbeitungs-Betriebssystem",
+          "OS":"Verarbeitedes Betriebssystem",
           "LOCKED":{
-            "RUNNING":"Bearbeiten von Metadaten ist nicht zulässig, wenn Operationen auf einer Aufzeichnung ausgeführt werden"
+            "RUNNING":"Das Bearbeiten von Metadaten ist nicht zulässig, wenn sich die Aufzeichnung gerade in Verarbeitung befindet"
           }
         },
         "WORKFLOWS":{
@@ -472,7 +472,7 @@
           "TITLE":"Workflow-Details"
         },
         "MEDIA_DETAILS":{
-          "TITLE":"Medieninfo",
+          "TITLE":"Medien-Details",
           "ID":"ID",
           "TYPE":"Typ",
           "MIMETYPE":"MIME-Type",
@@ -481,8 +481,8 @@
           "FLAVOR":"Flavor",
           "TAGS":"Stichwörter",
           "DURATION":"Dauer",
-          "STREAM_AUDIO":"Audio-Spuren",
-          "STREAM_VIDEO":"Video-Spuren",
+          "STREAM_AUDIO":"Audiospuren",
+          "STREAM_VIDEO":"Videospuren",
           "CHANNELS":"Kanäle",
           "BITRATE":"Bitrate",
           "FRAMERATE":"Framerate",
@@ -500,10 +500,10 @@
             "SEVERITY":"Schweregrad",
             "TITLE":"Titel",
             "DESCRIPTION":"Beschreibung",
-            "JOB_ID":"Job ID",
+            "JOB_ID":"Job-ID",
             "DATE":"Datum",
-            "HOST":"Verarbeitung-Server",
-            "TYPE":"Service-Typ",
+            "HOST":"Verarbeitender Server",
+            "TYPE":"Dienst-Typ",
             "TECHNICAL_DETAILS":"Technische Details"
           }
         }
@@ -533,7 +533,7 @@
             "TITLE":"Vorlagen"
           },
           "ACCESS_POLICY":{
-            "TITLE":"Zugriffs-Richtlinie",
+            "TITLE":"Zugriffsrichtlinie",
             "DESCRIPTION":"At least one role with Read and Write permissions is required.",
             "LABEL":"Vorlage auswählen",
             "EMPTY":"Keine Vorlage gefunden",
@@ -564,7 +564,7 @@
         "CAPTION":"Serien",
         "TITLE":"Serie",
         "CREATORS":"Organisator(en)",
-        "CONTRIBUTORS":"Kontributoren(s)",
+        "CONTRIBUTORS":"Mitwirkende",
         "CREATED":"Erstellt",
         "MANAGED_ACL":"Zugriffsrechte",
         "EVENTS":"Ereignisse",
@@ -573,13 +573,13 @@
       "DETAILS":{
         "TABS":{
           "METADATA":"Metadaten",
-          "EXTENDED_METADATA":"Metadaten-II",
+          "EXTENDED_METADATA":"Metadaten II",
           "EVENTS":"Ereignisse",
           "PERMISSIONS":"Zugriffsrechte",
           "THEME":"Branding"
         },
         "ACCESS":{
-          "CAPTION":"Zugriffs-Richtlinie",
+          "CAPTION":"Zugriffsrichtlinie",
           "DESCRIPTION":"",
           "TEMPLATES":{
             "TITLE":"Vorlagen"
@@ -618,7 +618,7 @@
         },
         "EVENTS":{
           "TITLE":"Titel",
-          "PRESENTER":"Präsentatoren",
+          "PRESENTER":"Vortragende(r)",
           "CREATED":"Erstellt am",
           "MODIFIED":"Geändert am",
           "STATUS":"Status",
@@ -704,7 +704,7 @@
     "NAVIGATION":{
       "USERS":"Benutzer",
       "GROUPS":"Gruppen",
-      "PERMISSIONS":"Zugriffsrechte",
+      "PERMISSIONS":"Zugriffsrichtlinien",
       "BLACKLISTS":"Sperrliste"
     },
     "USERS":{
@@ -770,7 +770,7 @@
         },
         "USERS":{
           "LEFT":"Benutzer",
-          "RIGHT":"Ausgewählte Anwender",
+          "RIGHT":"Ausgewählte Benutzer",
           "REMOVE":"Benutzer entfernen",
           "ADD":"Benutzer hinzufügen"
         },
@@ -792,7 +792,7 @@
         "ACTION":"Aktionen"
       },
       "NEW":{
-        "CAPTION":"Neue Zugriffs-Richtlinie",
+        "CAPTION":"Neue Zugriffsrichtlinie",
         "TABS":{
           "SUMMARY":"Zusammenfassung",
           "METADATA":"Metadaten",
@@ -802,7 +802,7 @@
           "TITLE":"Metadaten",
           "NAME":{
             "CAPTION":"Name",
-            "PLACEHOLDER":"Name..."
+            "PLACEHOLDER":"Name…"
           }
         },
         "ACCESS":{
@@ -838,7 +838,7 @@
           "TITLE":"Metadaten",
           "NAME":{
             "CAPTION":"Name",
-            "PLACEHOLDER":"Name..."
+            "PLACEHOLDER":"Name…"
           }
         },
         "ACCESS":{
@@ -942,12 +942,12 @@
         },
         "TITLE":{
           "CAPTION":"Titel",
-          "DESCRIPTION":"Folie mit Metadaten die am Anfang oder am Ende einer Aufzeichnung angehängt wird.",
+          "DESCRIPTION":"Folie mit Metadaten die am Anfang oder Ende einer Aufzeichnung angefügt wird.",
           "ACTIVE":"Aktiv"
         },
         "WATERMARK":{
           "CAPTION":"Wasserzeichen",
-          "DESCRIPTION":"Halbtransparentes Bild, das auf jedem Frame der Aufnahme überlagert ist.",
+          "DESCRIPTION":"Halbtransparentes Bild, als Wasserzeichen für die gesamte Aufnahme.",
           "ACTIVE":"Aktiv"
         },
         "USAGE":{
@@ -971,7 +971,7 @@
       "TABLE":{
         "CAPTION":"E-Mail-Vorlagen",
         "NAME":"Name",
-        "CREATOR":"Ersteller",
+        "CREATOR":"Author",
         "CREATED":"Erstellt am",
         "ACTION":"Aktionen"
       },
@@ -997,7 +997,7 @@
         "CAPTION":"Brandings",
         "NAME":"Name",
         "DESCRIPTION":"Beschreibung",
-        "CREATOR":"Redner",
+        "CREATOR":"Author",
         "CREATED":"Erstellt am",
         "DEFAULT":"Standard",
         "USAGE":"Verwendung",
@@ -1036,7 +1036,7 @@
         "TITLE":{
           "CAPTION":"Titel",
           "FILE_UPLOADED":"Datei hochgeladen: ",
-          "DESCRIPTION":"Folie mit Metadaten die am Anfang oder am Ende einer Aufzeichnung angehängt wird.",
+          "DESCRIPTION":"Folie mit Metadaten die am Anfang oder Ende einer Aufzeichnung angefügt wird.",
           "ACTIVE":"Aktiv",
           "ENABLE":"Titelfolie aktivieren",
           "BACKGROUND":"Hintergrund",
@@ -1048,7 +1048,7 @@
         "WATERMARK":{
           "CAPTION":"Wasserzeichen",
           "FILE_UPLOADED":"Datei hochgeladen: ",
-          "DESCRIPTION":"Halbtransparentes Bild, das auf jedem Frame der Aufnahme überlagert ist.",
+          "DESCRIPTION":"Halbtransparentes Bild, als Wasserzeichen für die gesamte Aufnahme.",
           "ACTIVE":"Aktiv",
           "TOP_LEFT":"Oben links",
           "TOP_RIGHT":"Oben rechts",
@@ -1056,7 +1056,7 @@
           "BOTTOM_RIGHT":"Unten rechts",
           "UPLOAD":"Hochladen",
           "POSITION":"Wasserzeichen-Position & -Vorschau",
-          "FILEUPLOAD_DESCRIPTION":"Die Datei sollten einen Alpha-Kanal (transparenten Hintergrund) haben. Zulässige Datei-Typen sind: .PNG, .GIF, .SVG & .WEBP",
+          "FILEUPLOAD_DESCRIPTION":"Die Datei sollten einen Alpha-Kanal (transparenten Hintergrund) haben. Zulässige Dateiformate sind PNG, GIF, SVG und WEBP",
           "UPLOAD_LABEL":"Bild hochladen",
           "UPLOAD_BUTTON":"Hochladen"
         },
@@ -1075,7 +1075,7 @@
     "NAVIGATION":{
       "JOBS":"Aufgaben",
       "SERVERS":"Server",
-      "SERVICES":"Services"
+      "SERVICES":"Dienste"
     },
     "JOBS":{
       "TABLE":{
@@ -1084,7 +1084,7 @@
         "SERIES":"Serien",
         "WORKFLOW":"Workflow",
         "STATUS":"Status",
-        "SUBMITTED":"In Auftrag",
+        "SUBMITTED":"Übermittelt",
         "ACTION":"Aktionen"
       },
       "DETAILS":{
@@ -1104,7 +1104,7 @@
         "CORES":"Kerne",
         "COMPLETED":"Jobs abgeschlossen",
         "RUNNING":"Jobs in Bearbeitung",
-        "QUEUED":"Jobs in der Warteschlange",
+        "QUEUED":"Jobs in Warteschlange",
         "MEAN_RUN_TIME":"Mittlere Laufzeit",
         "MEAN_QUEUE_TIME":"Mittlere Wartezeit",
         "MAINTENANCE":"Wartungsarbeiten",
@@ -1115,15 +1115,15 @@
     },
     "SERVICES":{
       "TABLE":{
-        "CAPTION":"Services",
+        "CAPTION":"Dienste",
         "STATUS":"Status",
-        "NAME":"Servicename",
+        "NAME":"Dienstname",
         "COMPLETED":"Jobs abgeschlossen",
         "RUNNING":"Jobs in Bearbeitung",
-        "QUEUED":"Jobs in der Warteschlange",
+        "QUEUED":"Jobs in Warteschlange",
         "MEAN_RUN_TIME":"Mittlere Laufzeit",
         "MEAN_QUEUE_TIME":"Mittlere Wartezeit",
-        "SANITIZE":"Fehlerhafte Services löschen",
+        "SANITIZE":"Fehlerhafte Dienste löschen",
         "ACTION":"Aktionen"
       }
     }
@@ -1143,7 +1143,7 @@
       "ANNOTATIONS":"Anmerkungen"
     },
     "ACTIONS":{
-      "SPLIT":"Splitten",
+      "SPLIT":"Auftrennen",
       "CUT":"Schneiden",
       "REPLAY_SEGMENT":"Segment erneut abspielen",
       "UNDO":"Widerrufen",
@@ -1154,25 +1154,25 @@
   "LOGIN":{
     "WELCOME":"Willkommen bei Opencast",
     "REMEMBER":"Automatisch anmelden",
-    "USERNAME":"Benutzername...",
-    "PASSWORD":"Passwort...",
-    "LOGIN":"anmelden",
+    "USERNAME":"Benutzername…",
+    "PASSWORD":"Passwort…",
+    "LOGIN":"Anmelden",
     "ERROR":"Falscher Benutzername und\/oder Passwort"
   },
   "TABLE_FILTERS":{
     "CLEAR":"Alle Filter löschen",
     "REMOVE":"Filter entfernen",
     "ADD":"Filter hinzufügen",
-    "PLACEHOLDER":"Suchen...",
+    "PLACEHOLDER":"Suchen…",
     "PROFILES":{
-      "FILTERS_HEADER":"Gespeichertes Filter-Set",
+      "FILTERS_HEADER":"Gespeicherte Filter",
       "EMPTY":"Keine gespeicherten Filter gefunden",
       "SAVE_FILTERS":"Speichern",
-      "FILTER_HEADER":"Filter-Set speichern",
+      "FILTER_HEADER":"Filter speichern",
       "NAME":"Name",
-      "NAME_PLACEHOLDER":"Name...",
+      "NAME_PLACEHOLDER":"Name…",
       "DESCRIPTION":"Beschreibung",
-      "DESCRIPTION_PLACEHOLDER":"Beschreibung..."
+      "DESCRIPTION_PLACEHOLDER":"Beschreibung…"
     }
   },
   "FILTERS":{
@@ -1198,7 +1198,7 @@
         "LABEL":"Serien"
       },
       "PRESENTERS":{
-        "LABEL":"Präsentator"
+        "LABEL":"Vortragende"
       },
       "CONTRIBUTORS":{
         "LABEL":"Mitwirkende"
@@ -1301,9 +1301,9 @@
       }
     }
   },
-  "TABLE_SUMMARY":"{{numberOfRows}} Zeilen",
+  "TABLE_SUMMARY":"{{numberOfRows}} Zeile(n)",
   "TABLE_NO_RESULT":"Keine Treffer gefunden.",
-  "TABLE_LOADING":"Wird geladen...",
+  "TABLE_LOADING":"Wird geladen…",
   "PM":{
     "BLACKLIST":{
       "REASONS":{
