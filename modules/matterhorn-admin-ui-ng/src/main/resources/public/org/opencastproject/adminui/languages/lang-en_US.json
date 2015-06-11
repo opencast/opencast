@@ -185,9 +185,14 @@
    },
    "EVENTS": {
      "LICENSE": {
-        "BSD": "BSD",
-        "CCND": "CCND",
-        "GPL": "GPL"
+        "ALLRIGHTS": "All rights reserved",
+        "CCBY": "CC BY",
+        "CCBYSA": "CC BY-SA",
+        "CCBYND": "CC BY-ND",
+        "CCBYNC": "CC BY-NC",
+        "CCBYNCSA": "CC BY-NC-SA",
+        "CCBYNCND": "CC BY-NC-ND",
+        "CC0": "CC0"
       },
      "SEND_MESSAGE": {
        "CAPTION": "Send message",

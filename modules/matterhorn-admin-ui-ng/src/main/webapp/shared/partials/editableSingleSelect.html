@@ -1,5 +1,5 @@
 <div ng-form="innerForm">
-    <span ng-show="!editMode" ng-click="editMode = true">{{ collection[params.value] }}</span>
+    <span ng-show="!editMode" ng-click="editMode = true">{{ collection[params.value] | translate }}</span>
 
     <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-click="editMode = true"></i>
     <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
@@ -11,7 +11,7 @@
                 name="{{ params.name }}"
                 ng-selected="item === params.value"
                 value="{{ item }}">
-                {{ label }}
+                {{ label | translate }}
             </option>
         </select>
     </div>
