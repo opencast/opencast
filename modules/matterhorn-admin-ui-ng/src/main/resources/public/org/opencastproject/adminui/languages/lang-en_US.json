@@ -92,8 +92,8 @@
      "VIDEO_CUT_NOT_SAVED": "The editing information could not be saved",
      "VIDEO_CUT_SAVED": "The editing information has been saved",
      "VIDEO_CUT_PROCESSING": "The video is being processed...",
-     "SERVER_UNRESPONSIVE": "The server is currently unresponsive.",
-     "SERVICE_UNAVAILABLE": "The service called is currently unavailable."
+     "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
+     "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -112,8 +112,10 @@
           }
       },
 
-      "DELETE_WARNING_LINE1": "Once deleted all metadata, audio and video files will be deleted and unrecoverable.",
-      "DELETE_WARNING_LINE2": "",
+      "DELETE_EVENTS_WARNING_LINE1": "Once deleted, all event metadata, audio and video files will be deleted and be unrecoverable.",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
+      "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
           "CAPTION": "Start Task",
           "GENERAL": {
@@ -185,9 +187,14 @@
    },
    "EVENTS": {
      "LICENSE": {
-        "BSD": "BSD",
-        "CCND": "CCND",
-        "GPL": "GPL"
+        "ALLRIGHTS": "All rights reserved",
+        "CCBY": "CC BY",
+        "CCBYSA": "CC BY-SA",
+        "CCBYND": "CC BY-ND",
+        "CCBYNC": "CC BY-NC",
+        "CCBYNCSA": "CC BY-NC-SA",
+        "CCBYNCND": "CC BY-NC-ND",
+        "CC0": "CC0"
       },
      "SEND_MESSAGE": {
        "CAPTION": "Send message",
@@ -337,9 +344,9 @@
          "UPLOADING": "Uploading",
          "INGESTING": "Ingesting",
          "PENDING": "Pending",
-         "PROCESSING": "Processing",
+         "PROCESSING": "Running",
          "PAUSED": "Paused",
-         "PROCESSED": "Processed",
+         "PROCESSED": "Finished",
          "RECORDING_FAILURE": "Recording failure",
          "PROCESSING_FAILURE": "Processing failure",
          "PROCESSING_CANCELED": "Processing canceled"

@@ -42,8 +42,6 @@ import java.util.Map;
 
 public class ListProvidersServiceImpl implements ListProvidersService {
 
-  public static final String LICENSES = "LICENSES";
-
   private static final Logger logger = LoggerFactory.getLogger(ListProvidersServiceImpl.class);
   private static final String FILTER_SUFFIX = "Filter";
 
@@ -82,25 +80,6 @@ public class ListProvidersServiceImpl implements ListProvidersService {
         list.put("Location 1", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION1");
         list.put("Location 2", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION2");
         list.put("Location 3", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION3");
-        return list;
-      }
-    });
-
-    // TODO create a file for each resource and made it dynamic
-
-    providers.put(LICENSES, new ResourceListProvider() {
-
-      @Override
-      public String[] getListNames() {
-        return new String[] { LICENSES };
-      }
-
-      @Override
-      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-        Map<String, Object> list = new HashMap<String, Object>();
-        list.put("CCND", "EVENTS.LICENSE.CCND");
-        list.put("GPL3", "EVENTS.LICENSE.GPL");
-        list.put("BSD", "EVENTS.LICENSE.BSD");
         return list;
       }
     });

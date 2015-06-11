@@ -33,7 +33,7 @@
     "embedButton": "Embed button. Select embed size from dropdown.",
     "checkingLoginStatus": "Checking login status...",
     "quality": "Quality",
-    "qualityLow": "Low",
-    "qualityMedium": "Medium",
-    "qualityHigh": "High"
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
 }
