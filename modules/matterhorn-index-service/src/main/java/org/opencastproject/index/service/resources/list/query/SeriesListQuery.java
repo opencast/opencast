@@ -17,7 +17,6 @@ package org.opencastproject.index.service.resources.list.query;
 
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter.SourceType;
-import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
 import org.opencastproject.index.service.resources.list.provider.AclListProvider;
 import org.opencastproject.index.service.resources.list.provider.ContributorsListProvider;
 import org.opencastproject.index.service.resources.list.provider.LanguagesListProvider;
@@ -320,7 +319,7 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createLicenseFilter(Option<String> license) {
     return FiltersUtils.generateFilter(license, FILTER_LICENSE_NAME, FILTER_LICENSE_LABEL, SourceType.SELECT,
-            Option.some(ListProvidersServiceImpl.LICENSES));
+            Option.some("LICENSES"));
   }
 
   /**
