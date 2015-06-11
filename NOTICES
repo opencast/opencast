@@ -593,10 +593,10 @@ shared-resources/js/jquery/plugins/jquery.cookie.js
   Dual licensed under the MIT and GPL licenses:
 
 shared-resources/js/jquery/plugins/jquery.crypt.js
- * jQuery Cryptography Plug-in
- * version: 1.0.0 (24 Sep 2008)
- * copyright 2008 Scott Thompson http://www.itsyndicate.ca - scott@itsyndicate.ca
- * http://www.opensource.org/licenses/mit-license.php
+  jQuery Cryptography Plug-in
+  version: 1.0.0 (24 Sep 2008)
+  copyright 2008 Scott Thompson http://www.itsyndicate.ca - scott@itsyndicate.ca
+  http://www.opensource.org/licenses/mit-license.php
 
 shared-resources/js/jquery/plugins/jquery-ui-timepicker-addon.js
   jQuery timepicker addon
@@ -618,7 +618,7 @@ shared-resources/js/jquery/plugins/jquery.xslt.js
 
 shared-resources/js/jquery/plugins/jquery.xslt.new.js
   XSLT jQuery Plugin - Copyright (C) 2007, Jorrit Jongma (Chainfire) 
-	Version: 0.70
-	@update 7.2.2013 by Martin Abel (mabel@uos.de): Change callback function order
-	Homepage: http://www.jongma.org/webtools/jquery/
-	License: MIT / Public Domain
+  Version: 0.70
+  @update 7.2.2013 by Martin Abel (mabel@uos.de): Change callback function order
+  Homepage: http://www.jongma.org/webtools/jquery/
+  License: MIT / Public Domain
