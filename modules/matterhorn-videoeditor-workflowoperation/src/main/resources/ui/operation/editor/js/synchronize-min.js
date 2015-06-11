@@ -1,10 +1,26 @@
 /**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
  * Synchronize.js
  * Version 1.1.0
  * 
  * Attention: Version without a pause when buffering!
- *
- * Copyright 2013 Denis Meyer
  */
 (function($){var videoIds=[];var videoIdsReady={};var videoIdsInit={};var masterVidNumber=0;var masterVideoId;var nrOfPlayersReady=0;var lastSynch=0;var synchInterval=2000;var synchGap=1.0;var startClicked=false;var bufferCheckerSet=false;var bufferChecker;var checkBufferInterval=1000;var playWhenBuffered=false;var ignoreNextPause=false;var hitPauseWhileBuffering=false;var bufferInterval=1.5;function isInInterval(num,lower,upper){if(!isNaN(num)&&!isNaN(lower)&&!isNaN(upper)&&(lower<=upper)){return((num>=lower)&&(num<=upper));}else{return false;}}
 function getVideoObj(id){if(id){if(!useVideoJs()){return $("#"+id);}else{return videojs(id);}}else{return undefined;}}
