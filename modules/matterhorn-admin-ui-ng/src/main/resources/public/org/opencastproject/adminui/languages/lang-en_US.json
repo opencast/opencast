@@ -344,9 +344,9 @@
          "UPLOADING": "Uploading",
          "INGESTING": "Ingesting",
          "PENDING": "Pending",
-         "PROCESSING": "Processing",
+         "PROCESSING": "Running",
          "PAUSED": "Paused",
-         "PROCESSED": "Processed",
+         "PROCESSED": "Finished",
          "RECORDING_FAILURE": "Recording failure",
          "PROCESSING_FAILURE": "Processing failure",
          "PROCESSING_CANCELED": "Processing canceled"
