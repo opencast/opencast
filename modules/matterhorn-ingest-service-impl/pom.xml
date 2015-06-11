@@ -236,6 +236,12 @@
               org.opencastproject.ingest.endpoint;version=${project.version},
               org.opencastproject.ingest.scanner;version=${project.version}
             </Export-Package>
+            <Import-Package>
+              !org.apache.tools.bzip2,
+              !org.apache.tools.tar,
+              !org.bouncycastle.crypto.*,
+              *
+            </Import-Package>
             <Private-Package>
               META-INF.services;-split-package:=merge-first,
               de.schlichtherle.*;-split-package:=merge-first
