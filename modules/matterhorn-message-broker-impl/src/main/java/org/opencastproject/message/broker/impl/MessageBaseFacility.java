@@ -29,7 +29,6 @@ import javax.jms.DeliveryMode;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
-import javax.security.auth.login.FailedLoginException;
 
 /**
  * This is a base facility that handles connections and sessions to an ActiveMQ message broker.
@@ -60,9 +59,6 @@ public class MessageBaseFacility {
   /** The message producer */
   private MessageProducer producer = null;
 
-  /** Tracks whether the username and password were incorrect when trying to connect. */
-  private boolean invalidUsernameOrPassword = false;
-
   /** Opens new sessions and connections to the message broker */
   protected void connectMessageBroker(final String url, final Option<String> brokerUsername, Option<String> brokerPassword)
           throws JMSException {
@@ -79,13 +75,9 @@ public class MessageBaseFacility {
 
       @Override
       public void transportInterupted() {
-        if (invalidUsernameOrPassword) {
-          logger.error(
-                  "Unable to connect to the message broker '{}' because either the broker is unavailable, or the username '{}' and password is incorrect.",
-                  url, brokerUsername);
-        } else {
-          logger.error("Connection to ActiveMQ ({}) got interupted!", connection);
-        }
+        logger.error(
+                "Connection to ActiveMQ ({}) got interupted! The most likely causes are that we cannot connect to the broker at '{}' or that the message broker requires a username ({}) and password that doesn't match the ones configured in Matterhorn.",
+                new Object[] { connection, url, brokerUsername });
       }
 
       @Override
@@ -101,17 +93,7 @@ public class MessageBaseFacility {
 
     logger.info("Starting connection to ActiveMQ message broker, waiting until connection is established...");
     connection = connectionFactory.createConnection();
-    try {
-      connection.start();
-    } catch (JMSException e) {
-      if (e.getCause() != null && e.getCause() instanceof SecurityException && e.getCause().getCause() != null
-              && e.getCause().getCause() instanceof FailedLoginException) {
-        invalidUsernameOrPassword = true;
-        throw e;
-      } else {
-        throw e;
-      }
-    }
+    connection.start();
 
     session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
