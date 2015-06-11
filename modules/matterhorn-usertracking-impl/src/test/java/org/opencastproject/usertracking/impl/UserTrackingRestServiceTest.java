@@ -20,7 +20,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserSession;
 import org.opencastproject.usertracking.api.UserTrackingException;
@@ -59,7 +59,7 @@ public class UserTrackingRestServiceTest {
                             new DefaultOrganization()))).anyTimes();
 
     BundleContext bc = EasyMock.createMock(BundleContext.class);
-    EasyMock.expect(bc.getProperty(MatterhornConstans.SERVER_URL_PROPERTY)).andReturn("http://www.example.org:8080")
+    EasyMock.expect(bc.getProperty(MatterhornConstants.SERVER_URL_PROPERTY)).andReturn("http://www.example.org:8080")
             .anyTimes();
 
     @SuppressWarnings("rawtypes")

@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+        <link rel="shortcut icon" href="../img/favicon.ico" />
+        <title>Opencast Matterhorn – Login Page</title>
+        <link href="../style.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="../js/jquery/jquery.js"></script>
+        <script type="text/javascript">
+            function startup(){
+            	$.get("info/me.json",
+            		    function (json)
+            		    {
+            		        if (json.org.properties["login.display_defaults"] == 'true') {
+            		            $("#defaults").show();
+            		        }
+            		    },
+            		    "json");
+            }
+        </script>
+    </head>	
+    <body onload='startup()'>
+       <div id="wrapper">
+           <div id="headergraphic">
+               <a href="http://www.opencastproject.org"><img
+                 border="0" width="128" vspace="5" hspace="20" height="30" alt="Opencast"
+                 src="../img/mh_logos/opencast_logo.gif"></a>
+           </div>
+	       <div id="bottombanner">
+               <div id="col1-2">
+                   <div id="col1b">&nbsp</div>
+                   <div id="col2b">
+                       <h2>Welcome to Matterhorn</h2>
+                       <div id="error" style="display:none; background-color:#FFDDDC;">
+                            <div style="color:red; text-align:center;">Your login attempt was not successful, try again.</div>
+                        </div>
+                       <h3>Login with Username and Password</h3>
+                       <form name='f' action='/j_spring_security_check' method='POST'>
+                           <table>
+                               <tr><td>User:</td><td><input type='text' name='j_username' value='' autofocus="autofocus"></td></tr>
+                               <tr><td>Password:</td><td><input type='password' name='j_password'/></td></tr>
+                               <tr id="defaults" style="display: none;"><td>Default</td><td>admin / opencast</td></tr>	
+                               <tr><td><input type='checkbox' name='_spring_security_remember_me'/></td><td>Remember me on this computer.</td></tr>
+                               <tr><td><input name="submit" type="submit" value="Login"/></td><td><input name="reset" type="reset"/></td></tr>
+                           </table>
+                       </form>
+                   </div>
+               </div>
+           </div>
+       </body>
+</html>

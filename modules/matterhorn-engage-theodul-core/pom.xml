@@ -17,6 +17,7 @@
     <properties>
         <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
         <checkstyle.skip>false</checkstyle.skip>
+        <skipJasmineTests>true</skipJasmineTests>
     </properties>
   
     <dependencies>
@@ -161,29 +162,10 @@
             <plugin>
                 <groupId>com.github.klieber</groupId>
                 <artifactId>phantomjs-maven-plugin</artifactId>
-                <version>0.4</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>install</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <version>1.9.7</version>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.github.searls</groupId>
                 <artifactId>jasmine-maven-plugin</artifactId>
-                <version>1.3.1.5</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <configuration>
                     <preloadSources>
                         <source>${project.basedir}/src/main/resources/ui/js/lib/require.js</source>

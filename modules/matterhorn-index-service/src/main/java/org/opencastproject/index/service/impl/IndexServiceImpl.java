@@ -54,6 +54,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -340,6 +341,15 @@ public class IndexServiceImpl implements IndexService {
         throw new IllegalArgumentException("No multipart content");
       }
 
+      // MH-10834 If there is only an audio track, change the flavor from presenter-audio/source to presenter/source.
+      if (mp.getTracks().length == 1
+              && mp.getTracks()[0].getFlavor().equals(new MediaPackageElementFlavor("presenter-audio", "source"))) {
+        Track audioTrack = mp.getTracks()[0];
+        mp.remove(audioTrack);
+        audioTrack.setFlavor(MediaPackageElements.PRESENTER_SOURCE);
+        mp.add(audioTrack);
+      }
+
       return createEvent(metadataJson, mp);
     } catch (Exception e) {
       logger.error("Unable to create event: {}", ExceptionUtils.getStackTrace(e));
@@ -481,8 +491,6 @@ public class IndexServiceImpl implements IndexService {
         throw new IllegalArgumentException("Unable to parse access control list!");
       }
     }
-
-    acl = extendAclWithCurrentUser.curry(getSecurityService().getUser().getUsername()).apply(acl);
 
     switch (type) {
       case UPLOAD:
@@ -838,8 +846,6 @@ public class IndexServiceImpl implements IndexService {
         throw new IllegalArgumentException("Unable to parse access control list!");
       }
     }
-
-    acl = extendAclWithCurrentUser.apply(securityService.getUser().getUsername(), acl);
 
     String seriesId;
     try {

@@ -1,6 +1,6 @@
 {
   "value_locale":"de",
-  "value_dateFormatFull":"Do MMMM YYYY, h:mm:ss a",
+  "value_dateFormatFull":"Do MMMM YYYY, HH:mm",
   "videoTitle":"Videotitel",
   "creator":"Autor",
   "date":"Datum"

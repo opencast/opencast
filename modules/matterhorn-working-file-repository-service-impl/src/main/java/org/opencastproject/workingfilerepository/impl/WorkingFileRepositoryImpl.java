@@ -21,7 +21,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.Log;
@@ -98,7 +98,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       return; // If the root directory was set, respect that setting
 
     // server url
-    serverUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+    serverUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
     if (StringUtils.isBlank(serverUrl))
       throw new IllegalStateException("Server URL must be set");
 

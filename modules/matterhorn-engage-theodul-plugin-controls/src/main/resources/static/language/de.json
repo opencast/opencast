@@ -1,7 +1,7 @@
 {
   "value_locale":"de",
   "ok":"OK",
-  "loginInformation":"Einloggen mit einem Matterhorn-Benutzerkonto",
+  "loginInformation":"Einloggen mit einem Opencast-Benutzerkonto",
   "login":"Einloggen",
   "logout":"Ausloggen",
   "loginLogout":"Einloggen\/Ausloggen",
@@ -33,7 +33,7 @@
   "embedButton":"Schaltfläche zum Einbetten des Videos. Größe zum Einbetten aus der Liste auswählen.",
   "checkingLoginStatus":"Login-Status wird überprüft...",
   "quality": "Qualität",
-  "qualityLow": "Niedrig",
-  "qualityMedium": "Mittel",
-  "qualityHigh": "Hoch"
+  "low": "Niedrig",
+  "medium": "Mittel",
+  "high": "Hoch"
 }

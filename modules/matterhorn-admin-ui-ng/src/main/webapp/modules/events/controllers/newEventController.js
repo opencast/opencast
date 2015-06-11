@@ -24,7 +24,15 @@ angular.module('adminNg.controllers')
     // Shall be banished ASAP
 
     var metadata,
-        accessController;
+        accessController,
+        // Reset all the wizard states
+        resetStates = function () {
+            angular.forEach($scope.states, function(state)  {
+                if (angular.isDefined(state.stateController.reset)) {
+                    state.stateController.reset();
+                }
+            });
+        };
 
     angular.forEach($scope.states, function (state) {
         if (state.stateController.isAccessState) {
@@ -51,7 +59,13 @@ angular.module('adminNg.controllers')
     $scope.submit = function () {
         var messageId, userdata = { metadata: []}, ace = [];
 
+        window.onbeforeunload = function (e) {
+            var confirmationMessage = 'The file has not completed uploading.';
 
+            (e || window.event).returnValue = confirmationMessage;     //Gecko + IE
+            return confirmationMessage;                                //Webkit, Safari, Chrome etc.
+        };
+        
         angular.forEach($scope.states, function (state) {
 
             if (state.stateController.isMetadataState) {
@@ -90,19 +104,17 @@ angular.module('adminNg.controllers')
                 userdata[state.name] = state.stateController.ud;
             }
         });
+
         NewEventResource.save({}, userdata, function () {
             Notifications.add('success', 'EVENTS_CREATED');
             Notifications.remove(messageId);
-
-            // Reset all states
-            angular.forEach($scope.states, function(state)  {
-                if (angular.isDefined(state.stateController.reset)) {
-                    state.stateController.reset();
-                }
-            });
+            resetStates();
+            window.onbeforeunload = null;
         }, function () {
             Notifications.add('error', 'EVENTS_NOT_CREATED');
             Notifications.remove(messageId);
+            resetStates();
+            window.onbeforeunload = null;
         });
 
         // close will also make the Table.fetch()

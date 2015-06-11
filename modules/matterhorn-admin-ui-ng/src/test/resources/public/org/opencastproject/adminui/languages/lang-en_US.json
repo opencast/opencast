@@ -6,6 +6,181 @@
    "SUBMIT":       "Submit",
    "CANCEL":       "Cancel",
    "SAVE":         "Save",
+   "LOGOUT":       "Logout",
+   "RESET":        "Reset",
+   "PREFERENCES":  {
+      "CAPTION": "Preferences",
+      "PROFILE": "Profile",
+      "NAME": "Name",
+      "REPLYTO": "Reply-to email",
+      "SIGNATURE": "Email Signature",
+      "TABLE": {
+        "CAPTION": "Edit Table View",
+        "SUBHEADING": "Select the default data you would like displayed in the {{ tableName }} view",
+        "AVAILABLE_COLUMNS": "Available columns",
+        "SELECTED_COLUMNS": "Selected columns",
+        "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
+      }
+   },
+   "NOTIFICATIONS": {
+     "ACL_ADDED":           "The access policy has been created",
+     "ACL_NOT_SAVED":       "The access policy could not be saved",
+     "ACL_UPDATED":         "The access policy has been updated",
+     "ACL_DELETED":         "The access policy has been deleted",
+     "ACL_NOT_DELETED":     "The access policy could not be deleted",
+     "USER_ADDED":          "The user has been created",
+     "USER_UPDATED":        "The user has been updated",
+     "USER_NOT_SAVED":      "The user could not be saved",
+     "USER_DELETED":        "The user has been deleted",
+     "USER_NOT_DELETED":    "The user could not be deleted",
+     "USER_NOT_MANAGEABLE": "The user is not manageable",
+     "GROUP_ADDED":          "The group has been created",
+     "GROUP_UPDATED":        "The group has been updated",
+     "GROUP_NOT_SAVED":      "The group could not be saved",
+     "GROUP_DELETED":        "The group has been deleted",
+     "GROUP_NOT_DELETED":    "The group could not be deleted",
+     "ACCESS_DENIED":       "Access denied. You're not allowed to view this page",
+     "SERIES_ADDED":        "The series has been created",
+     "SERIES_NOT_SAVED":    "The series could not be saved",
+     "EVENTS_CREATED":      "The event has been created",
+     "EVENTS_UPLOAD_STARTED": "The event is being uploaded...",
+     "EVENTS_NOT_CREATED":  "The event could not be created",
+     "EVENTS_UPDATED":      "The event has been updated",
+     "EVENTS_NOT_UPDATED":  "The event could not be saved",
+     "EVENTS_DELETED":      "The event has been deleted",
+     "EVENTS_NOT_DELETED":  "The event(s) could not be deleted",
+     "USER_BLACKLIST_CREATED": "The blacklist has been created",
+     "USER_BLACKLIST_NOT_CREATED":  "The blacklist could not be created",
+     "USER_BLACKLIST_SAVED": "The blacklist has been saved",
+     "USER_BLACKLIST_NOT_SAVED":  "The blacklist could not be saved",
+     "USER_BLACKLIST_DELETED":  "The blacklist has been deleted",
+     "USER_BLACKLIST_NOT_DELETED":  "The blacklist could not be deleted",
+     "LOCATION_BLACKLIST_CREATED": "The blacklist has been created",
+     "LOCATION_BLACKLIST_NOT_CREATED":  "The blacklist could not be created",
+     "LOCATION_BLACKLIST_SAVED": "The blacklist has been saved",
+     "LOCATION_BLACKLIST_NOT_SAVED":  "The blacklist could not be saved",
+     "LOCATION_BLACKLIST_DELETED":  "The blacklist has been deleted",
+     "LOCATION_BLACKLIST_NOT_DELETED":  "The blacklist could not be deleted",
+     "EMAIL_TEMPLATE_CREATED": "The template has been created",
+     "EMAIL_TEMPLATE_NOT_CREATED":  "The template could not be created",
+     "EMAIL_TEMPLATE_SAVED": "The template has been saved",
+     "EMAIL_TEMPLATE_NOT_SAVED":  "The template could not be saved",
+     "EMAIL_TEMPLATE_DELETED":  "The template has been deleted",
+     "EMAIL_TEMPLATE_NOT_DELETED":  "The template could not be deleted",
+     "EMAIL_TEMPLATE_NAME_TAKEN": "This name is already in use",
+     "EMAIL_SENT": "The message has been sent",
+     "EMAIL_NOT_SENT": "The message could not be sent",
+     "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the room, dates or times.",
+     "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "The existing events in this series will need to be reprocessed",
+     "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
+     "THEME_NAME_ALREADY_TAKEN": "This name is already in use",
+     "THEME_NAME_EMPTY": "The name cannot be empty",
+     "BUMPER_UPLOAD_ERROR": "Error while uploading media",
+     "TRAILER_UPLOAD_ERROR": "Error while uploading media",
+     "TITLE_UPLOAD_ERROR": "Error while uploading media",
+     "LICENSE_UPLOAD_ERROR": "Error while uploading media",
+     "WATERMARK_UPLOAD_ERROR": "Error while uploading media",
+     "THEME_UPLOAD_STARTED": "The media is being uploaded...",
+     "THEME_CREATED": "The theme has been created",
+     "THEME_NOT_CREATED": "The theme could not be created",
+     "THEME_DELETED":        "The theme has been deleted",
+     "THEME_NOT_DELETED":    "The theme could not be deleted",
+     "TASK_CREATED": "The task has been created",
+     "TASK_NOT_CREATED": "The task could not be created",
+     "VIDEO_CUT_NOT_SAVED": "The editing information could not be saved",
+     "VIDEO_CUT_SAVED": "The editing information has been saved",
+     "VIDEO_CUT_PROCESSING": "The video is being processed..."
+   },
+   "BULK_ACTIONS": {
+      "CAPTION": "Actions",
+      "SEND_MESSAGE": "Send message",
+      "EDIT_STATUS": {
+          "CAPTION": "Edit Status",
+          "READY_FOR_RECORDING": "Ready for recording",
+          "OPTED_OUT": "Opted-out"
+      },
+      "DELETE": {
+          "SERIES": {
+            "CAPTION": "Delete"
+          },
+          "EVENTS": {
+            "CAPTION": "Delete"
+          }
+      },
+
+      "DELETE_EVENTS_WARNING_LINE1": "Once deleted all metadata, audio and video files will be deleted and unrecoverable.",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "Once deleted all series metadata will be unrecoverable.",
+      "DELETE_SERIES_WARNING_LINE2": "",
+      "SCHEDULE_TASK": {
+          "CAPTION": "Start Task",
+          "GENERAL": {
+             "SUMMARY": "({{ count }} events selected)",
+             "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
+          },
+          "TASKS": {
+             "CAPTION": "Tasks",
+             "SELECT": "Select Task"
+          },
+          "SUMMARY": {
+             "CAPTION": "Summary",
+             "EVENTS": "Events",
+             "EVENTS_SUMMARY": "You have selected {{numberOfEvents}} events",
+             "CONFIGURATION": "Configuration",
+             "WORKFLOW": "Task"
+          }
+      }
+   },
+   "DATES": {
+     "TODAY":     "Today",
+     "TOMORROW":  "Tomorrow",
+     "YESTERDAY": "Yesterday"
+   },
+   "DATETIMES": {
+     "TODAY":     "Today at {{ time }}",
+     "TOMORROW":  "Tomorrow at {{ time }}",
+     "YESTERDAY": "Yesterday at {{ time }}"
+   },
+   "WIZARD": {
+      "NEXT_STEP": "Next",
+      "BACK": "Previous",
+      "CREATE": "Create",
+      "UPDATE": "Update",
+      "DURATION": {
+          "HOURS": "Hours",
+          "MINUTES": "Minutes"
+      }
+   },
+   "CAPTURE_AGENT": {
+      "DEVICE": {
+         "MICROPHONE": "Microphone",
+         "CAMERA": "Camera",
+         "PRESENTATION": "Presentation"
+      }
+   },
+   "NAV": {
+     "DASHBOARD": {
+       "TITLE": "Dashboard"
+     },
+     "EVENTS": {
+       "TITLE": "Recordings"
+     },
+     "SYSTEMS": {
+       "TITLE": "Systems"
+     },
+     "CAPTUREAGENTS": {
+       "TITLE": "Capture"
+     },
+     "USERS": {
+       "TITLE": "Organization"
+     },
+     "INTEGRATIONS": {
+       "TITLE": "Integrations"
+     },
+     "CONFIGURATION": {
+       "TITLE": "Configuration"
+     }
+   },
    "EVENTS": {
      "EVENT": {
        "TABLE": {

@@ -9,6 +9,10 @@ angular.module('adminNg.services')
             upload: {}
         };
 
+        /* Get the current client timezone */
+        var tzOffset = (new Date()).getTimezoneOffset() / -60;
+        me.tz = 'UTC' + (tzOffset < 0 ? '' : '+') + tzOffset;
+
         CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
             me.captureAgents = data.rows;
         });

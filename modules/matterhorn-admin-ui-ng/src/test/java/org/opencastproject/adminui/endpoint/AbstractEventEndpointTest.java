@@ -312,17 +312,17 @@ public class AbstractEventEndpointTest {
   public void testGetEventOperation() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventOperation.json"));
 
-    given().pathParam("eventId", "asdasd").pathParam("workflowId", "asdasd").pathParam("operationId", "asdasd")
-    .expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
-    .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationId}"));
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", "asdasd").pathParam("operationPosition", "asdasd")
+            .expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
+            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationPosition}"));
 
-    given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("operationId", "asdasd").expect()
-    .statusCode(HttpStatus.SC_BAD_REQUEST).when()
-    .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationId}"));
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("operationPosition", "asdasd").expect()
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when()
+            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationPosition}"));
 
-    String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("operationId", 5)
+    String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("operationPosition", 3)
             .expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationId}")).asString();
+            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationPosition}")).asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }

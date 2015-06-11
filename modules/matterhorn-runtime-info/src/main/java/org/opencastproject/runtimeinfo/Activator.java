@@ -21,7 +21,7 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.runtimeinfo.rest.RestDocData;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -87,7 +87,7 @@ public class Activator extends HttpServlet implements BundleActivator {
   private void prepareMacros() {
     globalMacro = new HashMap<String, String>();
     globalMacro.put("PING_BACK_URL", bundleContext.getProperty("org.opencastproject.anonymous.feedback.url"));
-    globalMacro.put("HOST_URL", bundleContext.getProperty(MatterhornConstans.SERVER_URL_PROPERTY));
+    globalMacro.put("HOST_URL", bundleContext.getProperty(MatterhornConstants.SERVER_URL_PROPERTY));
     globalMacro.put("LOCAL_STORAGE_DIRECTORY", bundleContext.getProperty("org.opencastproject.storage.dir"));
   }
 

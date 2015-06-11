@@ -1,7 +1,7 @@
 <div ng-click="enterEditMode()" ng-form="innerForm">
     <ul ng-show="!editMode">
         <li ng-repeat="value in params.value">
-            <span ng-if="value">{{ getText(value) }}</span>
+            <span ng-if="value">{{ getText(value) | translate }}</span>
         </li>
     </ul>
 
@@ -15,13 +15,13 @@
         <datalist id="data-list">
             <option ng-repeat="(item, label) in collection"
                 value="{{ item }}">
-                {{ label }}
+                {{ label | translate }}
             </option>
         </datalist>
     </div>
     <span ng-show="editMode" class="ng-multi-value"
         ng-repeat="value in params.value">
-        {{ getText(value) }}
+        {{ getText(value) | translate }}
         <a ng-mousedown="removeValue(params.value, value)">
             <i class="fa fa-times"></i>
         </a>

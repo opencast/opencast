@@ -1,7 +1,7 @@
 {
     "value_locale": "en",
     "ok": "OK",
-    "loginInformation": "Log in with your Matterhorn user account",
+    "loginInformation": "Log in with your Opencast user account",
     "login": "Log in",
     "logout": "Log out",
     "loginLogout": "Log in/Log out",
@@ -33,7 +33,7 @@
     "embedButton": "Embed button. Select embed size from dropdown.",
     "checkingLoginStatus": "Checking login status...",
     "quality": "Quality",
-    "qualityLow": "Low",
-    "qualityMedium": "Medium",
-    "qualityHigh": "High"
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
 }

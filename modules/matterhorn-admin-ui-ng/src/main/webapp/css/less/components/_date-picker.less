@@ -1,17 +1,17 @@
 .date-picker {
 
     &.popover{
-        
+
         .btn-dd-content-mixin(520px);
         left: auto;
-        right: 0;        
+        right: 0;
         height: 320px;
         z-index: @max-z;
-        
+
         .dates {
             clear: both;
             position: relative;
-            
+
             > label {
                 .box-sizing();
                 font-size: 22px;
@@ -20,9 +20,9 @@
                 width: 215px;
                 text-align: center;
             }
-            
+
             .start { float: left; }
-            
+
             > span {
                 position: absolute;
                 top: 3px;
@@ -31,20 +31,20 @@
                 margin-left: -7px;
                 text-transform: uppercase;
             }
-            
+
             .end { float: right; }
-        
+
         } // dates
-        
+
         // Set arrow position
         &:after, &:before { left: 20px; }
-        
+
         &.active {
             opacity: 1;
             visibility: visible;
         }
     }
-    
+
     .dashboard-container & {
         visibility: visible;
         opacity: 1;
@@ -53,5 +53,5 @@
         height: intrinsic;
         border-bottom: none;
     }
-        
+
 } // date-picker

@@ -129,7 +129,7 @@
             </Private-Package>
             <Http-Alias>/</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>
-            <Http-Welcome>welcome.html</Http-Welcome>
+            <Http-Welcome>/index.html</Http-Welcome>
           </instructions>
         </configuration>
       </plugin>

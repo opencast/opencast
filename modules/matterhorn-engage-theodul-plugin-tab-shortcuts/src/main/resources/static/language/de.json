@@ -2,8 +2,8 @@
   "displayShortcuts":"Tastaturkombinationen anzeigen",
   "shortcutsNotAvailable":"Es sind aktuelle keine Tastaturkombinationen verfügbar.",
   "shortcutOverview":"Tastaturkombinationen-Übersicht",
-  "name":"Tastaturkombinationsname",
-  "shortcut":"Tastaturkombination",
+  "name":"Funktion",
+  "shortcut":"Tastenkürzel",
   "fullscreen":"Vollbild aktivieren",
   "playPause":"Wiedergabe\/Pause",
   "playbackrateDecrease":"Wiedergaberate erhöhen",
@@ -39,5 +39,6 @@
   "ins":"Einfügen",
   "del":"Entfernen",
   "modMac":"Cmd",
-  "modOther":"Strg"
+  "modOther":"Strg",
+  "shortcuts":"Tastenkürzel"
 }
