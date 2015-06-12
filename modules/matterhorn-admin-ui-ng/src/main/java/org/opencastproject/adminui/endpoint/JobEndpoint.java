@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
@@ -58,10 +64,12 @@ import org.opencastproject.workflow.api.WorkflowSet;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.StreamOp;
+import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JObjectWrite;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
@@ -140,7 +148,7 @@ public class JobEndpoint {
     int totalSize = jobs.toList().size();
 
     List<JValue> json = getJobsAsJSON(jobs.drop(offset)
-            .apply(limit > 0 ? StreamOp.<Job>id().take(limit) : StreamOp.<Job>id()).toList());
+            .apply(limit > 0 ? StreamOp.<Job> id().take(limit) : StreamOp.<Job> id()).toList());
 
     return RestUtils.okJsonList(json, offset, limit, jobs.getSizeHint());
   }
@@ -314,7 +322,7 @@ public class JobEndpoint {
                 instanceId, e), e.getCause());
       }
 
-      jsonList.add(j(f("id", v(instanceId)), f("title", v(instance.getMediaPackage().getTitle())),
+      jsonList.add(j(f("id", v(instanceId)), f("title", v(Opt.nul(instance.getMediaPackage().getTitle()).or(""))),
               f("series", vN(series)), f("workflow", vN(instance.getTitle())),
               f("status", v(instance.getState().toString())),
               f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : ""))));
@@ -420,14 +428,14 @@ public class JobEndpoint {
    * Returns the operation with the given id from the given workflow instance
    *
    * @param jobId
-   *          the woworkflow instance id
-   * @param operationId
-   *          the operation id
+   *          the workflow instance id
+   * @param operationPosition
+   *          the operation position
    * @return the operation as JSON object
    * @throws JobEndpointException
    * @throws NotFoundException
    */
-  public JObjectWrite getOperationAsJSON(long jobId, long operationId) throws JobEndpointException, NotFoundException {
+  public JObjectWrite getOperationAsJSON(long jobId, int operationPosition) throws JobEndpointException, NotFoundException {
 
     WorkflowInstance instance;
     try {
@@ -442,18 +450,22 @@ public class JobEndpoint {
 
     List<WorkflowOperationInstance> operations = instance.getOperations();
 
-    for (WorkflowOperationInstance wflOp : operations) {
-      if (wflOp.getId() == operationId) {
-        return j(f("retry_strategy", vN(wflOp.getRetryStrategy())), f("execution_host", vN(wflOp.getExecutionHost())),
-                f("failed_attempts", v(wflOp.getFailedAttempts())), f("max_attempts", v(wflOp.getMaxAttempts())),
-                f("exception_handler_workflow", vN(wflOp.getExceptionHandlingWorkflow())),
-                f("fail_on_error", v(wflOp.isFailWorkflowOnException())), f("description", vN(wflOp.getDescription())),
-                f("state", vN(wflOp.getState())), f("job", v(operationId)), f("name", vN(wflOp.getTemplate())),
-                f("time_in_queue", vN(wflOp.getTimeInQueue())),
-                f("started", vN(DateTimeSupport.toUTC(wflOp.getDateStarted().getTime()))),
-                f("completed", vN(DateTimeSupport.toUTC(wflOp.getDateCompleted().getTime())))
-        );
-      }
+    if (operations.size() > operationPosition) {
+      WorkflowOperationInstance wflOp = operations.get(operationPosition);
+      return j(f("retry_strategy", vN(wflOp.getRetryStrategy())),
+              f("execution_host", vN(wflOp.getExecutionHost())),
+              f("failed_attempts", v(wflOp.getFailedAttempts())),
+              f("max_attempts", v(wflOp.getMaxAttempts())),
+              f("exception_handler_workflow", vN(wflOp.getExceptionHandlingWorkflow())),
+              f("fail_on_error", v(wflOp.isFailWorkflowOnException())),
+              f("description", vN(wflOp.getDescription())),
+              f("state", vN(wflOp.getState())),
+              f("job", vN(wflOp.getId())),
+              f("name", vN(wflOp.getTemplate())),
+              f("time_in_queue", v(wflOp.getTimeInQueue() == null ? 0 : wflOp.getTimeInQueue())),
+              f("started", vN(wflOp.getDateStarted() == null ? null : DateTimeSupport.toUTC(wflOp.getDateStarted().getTime()))),
+              f("completed", vN(wflOp.getDateCompleted() == null ? null : DateTimeSupport.toUTC(wflOp.getDateCompleted().getTime())))
+      );
     }
 
     return null;

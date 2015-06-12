@@ -1,21 +1,41 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
 .important-message {
-    
+
     .border(@main-border-color);
     border-radius: @main-border-radius;
     background: #fff;
     box-shadow: 0 0 4px @light-black-alpha;
     margin: 20px auto;
-    
+
     &:first-child {
         margin-top: 0;
     }
-    
+
     .message-header,
     .message-body {
         color: @grey;
         font-weight: 600;
     }
-        
+
     .message-header {
         border-bottom: 1px solid lighten(@main-border-color, 5%);
         box-shadow: 0 1px 2px @light-black-alpha;
@@ -23,31 +43,31 @@
         line-height: 18px;
         padding: 10px 10px;
     }
-    
+
     .message-body {
         font-size: 12px;
         line-height: 16px;
         padding: 20px 15px;
-        
+
         p:not(:last-child) {
             margin-bottom: 10px;
         }
     }
-    
+
 
 
     // Color Variations
-    
+
     &.danger {
         .message-header,
         .message-body {
             color: @alt-red;
         }
-        
+
         .message-header {
             position: relative;
             padding-left: 40px;
-            
+
             &:before {
                 @image-name: warning-message-icon;
                 @w: 18px;
@@ -63,7 +83,7 @@
             }
         }
     }
-    
+
     &.info {
         .message-header,
         .message-body {

@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.data.json.Jsons.a;
@@ -125,7 +131,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.Jsons.Val;
 import org.opencastproject.util.NotFoundException;
@@ -189,6 +195,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -297,7 +304,7 @@ public abstract class AbstractEventEndpoint {
    */
   public void activate(ComponentContext cc) {
     if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
       if (StringUtils.isNotBlank(ccServerUrl))
         this.serverUrl = ccServerUrl;
     }
@@ -1297,7 +1304,7 @@ public abstract class AbstractEventEndpoint {
     try {
       return okJson(getJobService().getTasksAsJSON(query));
     } catch (NotFoundException e) {
-      return notFound("Not able to found workflows for event %s", id);
+      return notFound("Cannot find workflows for event %s", id);
     }
   }
 
@@ -1328,7 +1335,7 @@ public abstract class AbstractEventEndpoint {
     try {
       return okJson(getJobService().getTasksAsJSON(workflowInstanceId));
     } catch (NotFoundException e) {
-      return notFound("Not able to found workflow  %s", workflowId);
+      return notFound("Cannot find workflow  %s", workflowId);
     }
   }
 
@@ -1358,22 +1365,22 @@ public abstract class AbstractEventEndpoint {
     try {
       return okJson(getJobService().getOperationsAsJSON(workflowInstanceId));
     } catch (NotFoundException e) {
-      return notFound("Not able to found workflow  %s", workflowId);
+      return notFound("Cannot find workflow %s", workflowId);
     }
   }
 
   @GET
-  @Path("{eventId}/workflows/{workflowId}/operations/{operationId}")
+  @Path("{eventId}/workflows/{workflowId}/operations/{operationPosition}")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "geteventoperation", description = "Returns all the data related to the workflow/operation tab in the event details modal as JSON", returnDescription = "All the data related to the event workflow/opertation tab as JSON", pathParameters = {
           @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
           @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "operationId", description = "The operation id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestParameter(name = "operationPosition", description = "The operation position", isRequired = true, type = RestParameter.Type.INTEGER) }, reponses = {
           @RestResponse(description = "Returns all the data related to the event workflow/operation tab as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Unable to parse workflowId or operationId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+          @RestResponse(description = "Unable to parse workflowId or operationPosition", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "No operation with these identifiers was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventOperation(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId,
-          @PathParam("operationId") String operationId) throws WorkflowDatabaseException, JobEndpointException,
+          @PathParam("operationPosition") Integer operationPosition) throws WorkflowDatabaseException, JobEndpointException,
           SearchIndexException {
     Opt<Event> optEvent = getEvent(eventId);
     if (optEvent.isNone())
@@ -1386,19 +1393,11 @@ public abstract class AbstractEventEndpoint {
       logger.warn("Unable to parse workflow id {}", workflowId);
       return RestUtil.R.badRequest();
     }
-    long operationInstanceId;
-    try {
-      operationId = StringUtils.remove(operationId, ".json");
-      operationInstanceId = Long.parseLong(operationId);
-    } catch (Exception e) {
-      logger.warn("Unable to parse operation id {}", operationId);
-      return RestUtil.R.badRequest();
-    }
 
     try {
-      return okJson(getJobService().getOperationAsJSON(workflowInstanceId, operationInstanceId));
+      return okJson(getJobService().getOperationAsJSON(workflowInstanceId, operationPosition));
     } catch (NotFoundException e) {
-      return notFound("Not able to found workflow  %s", workflowId);
+      return notFound("Cannot find workflow %s", workflowId);
     }
   }
 
@@ -1428,7 +1427,7 @@ public abstract class AbstractEventEndpoint {
       try {
         return okJson(getJobService().getIncidentsAsJSON(workflowIdLong, req.getLocale(), true));
       } catch (NotFoundException e) {
-        return notFound("Not able to find the incident for the workflow %s", workflowId);
+        return notFound("Cannot find the incident for the workflow %s", workflowId);
       }
     }
     return notFound("Cannot find an event with id '%s'.", eventId);
@@ -1462,7 +1461,7 @@ public abstract class AbstractEventEndpoint {
       try {
         return okJson(getJobService().getIncidentAsJSON(errorIdLong, req.getLocale()));
       } catch (NotFoundException e) {
-        return notFound("Not able to find the incident %s", errorId);
+        return notFound("Cannot find the incident %s", errorId);
       }
     }
     return notFound("Cannot find an event with id '%s'.", eventId);
@@ -1787,8 +1786,7 @@ public abstract class AbstractEventEndpoint {
   @RestQuery(name = "checkNewConflicts", description = "Checks if the current scheduler parameters are in a conflict with another event", returnDescription = "Returns NO CONTENT if no event are in conflict within specified period or list of conflicting recordings in JSON", restParameters = { @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
           @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "There is a conflict"),
-          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters"),
-          @RestResponse(responseCode = HttpServletResponse.SC_PRECONDITION_FAILED, description = "Capture agent configuration is missing capture.device.timezone") })
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters") })
   public Response getNewConflicts(@FormParam("metadata") String metadata) throws NotFoundException {
     if (StringUtils.isBlank(metadata)) {
       logger.warn("Metadata is not specified");
@@ -1858,8 +1856,9 @@ public abstract class AbstractEventEndpoint {
       Agent agent = getCaptureAgentStateService().getAgent(device);
       timezone = agent.getConfiguration().getProperty("capture.device.timezone");
       if (StringUtils.isBlank(timezone)) {
-        logger.warn("No capture.device.timezone set on agent {}, unable to check for conflicts!", device);
-        RestUtil.R.preconditionFailed("No capture.device.timezone set on agent");
+        timezone = TimeZone.getDefault().getID();
+        logger.warn("No 'capture.device.timezone' set on agent {}. The default server timezone {} will be used.",
+                device, timezone);
       }
     }
 

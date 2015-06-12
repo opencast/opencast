@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ng-publish-after-cutting</id>
+  <title>Publish</title>
+  <tags>
+    <tag>editor</tag>
+  </tags>
+  <description/>
+  <configuration_panel/>
+
+  <operations>
+
+    <!-- Apply the default workflow configuration -->
+
+    <operation
+      id="defaults"
+      description="Applying default configuration values">
+      <configurations>
+        <configuration key="publishToEngage">true</configuration>
+        <configuration key="publishToYouTube">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Remove tag for cutting                                            -->
+    <!--                                                                   -->
+    <!-- Remove the comments that marked the recording for cutting.        -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Resolve the comment for cutting -->
+
+    <operation
+      id="comment"
+      description="Resolve the cutting flag">
+      <configurations>
+        <configuration key="description">Recording has not been cut yet.</configuration>
+        <configuration key="reason">EVENTS.COMMENTS.REASONS.CUTTING</configuration>
+        <configuration key="action">resolve</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Prepare asset                                                     -->
+    <!--                                                                   -->
+    <!-- Prepare the recording for asset management, including creation of -->
+    <!-- previews, audio waveforms and storing of the recording data in    -->
+    <!-- the asset area for further processing.                            -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Prepare work versions of the source material for further processing -->
+
+    <operation
+      id="include"
+      description="Prepare the recording for further processing">
+      <configurations>
+        <configuration key="workflow-id">ng-partial-work</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Publish                                                           -->
+    <!--                                                                   -->
+    <!-- Encode and publish the recording to the selected publication      -->
+    <!-- channels, unless review for cutting has been selected.            -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Encode and publish -->
+
+    <operation
+      id="include"
+      description="Publish the recording">
+      <configurations>
+        <configuration key="workflow-id">ng-partial-publish</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Archive                                                           -->
+    <!--                                                                   -->
+    <!-- Download from external ingest nodes, tag, inspect and and prepare -->
+    <!-- source recording and metadata catalogs.                           -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Archive the recording -->
+
+    <operation
+      id="archive"
+      description="Archive publishing information">
+      <configurations>
+        <configuration key="source-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Cleanup                                                           -->
+    <!--                                                                   -->
+    <!-- Remove work artifacts.                                            -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Clean the system from work artifacts -->
+
+    <operation
+      id="include"
+      description="Remove temporary processing artifacts">
+      <configurations>
+        <configuration key="workflow-id">ng-partial-cleanup</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

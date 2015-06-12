@@ -1075,7 +1075,7 @@
       <plugin>
         <groupId>com.atlassian.maven.plugins</groupId>
         <artifactId>maven-clover2-plugin</artifactId>
-        <version>3.1.5</version>
+        <version>4.0.4</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -1859,9 +1859,9 @@
     <developer>
       <id>ruben.perez</id>
       <name>Ruben Perez Vazquez</name>
-      <email>rubenperez@teltek.es</email>
-      <organization>Teltek</organization>
-      <organizationUrl>http://www.teltek.es</organizationUrl>
+      <email>ruben.perez@uni-koeln.de</email>
+      <organization>University of Cologne</organization>
+      <organizationUrl>http://www.uni-koeln.de</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>

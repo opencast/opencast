@@ -1,16 +1,22 @@
 /**
- * Copyright 2009-2013 The Regents of the University of California Licensed
- * under the Educational Community License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain a
- * copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- * http://www.osedu.org/licenses/ECL-2.0
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
+ *
  */
 var PLAYER_URL = '/admin/embed.html';
 var DEFAULT_SERIES_CATALOG_ID = 'seriesCatalog';
@@ -465,15 +471,18 @@ function loadTracks() {
         },
         success: function(data) {
             ocUtils.log("Done: Loading workflow instance data");
-
+            var previewFlavor = getFlavorsFromWorkflow(data, "preview-flavors", "preview");
+            var sourceFlavor = getFlavorsFromWorkflow(data, "source-flavors", "work");
+            
             // extract tracks
             workflowInstance = data.workflow;
             data = data.workflow.mediapackage.media.track;
             var singleFile = true;
-            for (i = 0; i < data.length; i++) {
-                if (data[i].type.indexOf("work") != -1) {
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].type.indexOf(sourceFlavor) != -1) {
                     tracks.tracks.push(data[i]);
-                } else if (data[i].type.indexOf("preview") != -1) {
+                }
+                if (data[i].type.indexOf(previewFlavor) != -1) {
                     previewTracks.push(data[i]);
                 }
             }
@@ -539,18 +548,22 @@ function loadTracks() {
 function createPlayer() {
     ocUtils.log("Creating player");
     ocUtils.log("#Preview tracks: " + previewTracks.length);
-    ocUtils.log("Preview track #1: URL: '" + previewTracks[0].url + "', type='" + previewTracks[0].mimetype + "'");
+    if (previewTracks.length > 0) {
+        ocUtils.log("Preview track #1: URL: '" + previewTracks[0].url + "', type='" + previewTracks[0].mimetype + "'");
 
-    $('#videoPlayer').prepend('<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>');
+        $('#videoPlayer').prepend('<source src="' + previewTracks[0].url + '" type="' + previewTracks[0].mimetype + '"/>');
 
-    var fps = (previewTracks[0] && previewTracks[0].video && previewTracks[0].video.framerate) ? previewTracks[0].video.framerate : 0;
-    var duration = previewTracks[0].duration / 1000;
-    ocUtils.log("FPS: '" + fps + "',  duration: '" + duration + "'");
+        var fps = (previewTracks[0] && previewTracks[0].video && previewTracks[0].video.framerate) ? previewTracks[0].video.framerate : 0;
+        var duration = previewTracks[0].duration / 1000;
+        ocUtils.log("FPS: '" + fps + "',  duration: '" + duration + "'");
 
-    player = $('#videoPlayer').mhPlayer({
-        fps: fps,
-        duration: duration
-    });
+        player = $('#videoPlayer').mhPlayer({
+            fps: fps,
+            duration: duration
+        });
+    } else {
+        player = $('#videoPlayer').text("No preview tracks found.");
+    }
 
     if (previewTracks.length >= 2) {
         ocUtils.log("Preview track #1: URL: '" + previewTracks[1].url + "', type='" + previewTracks[1].mimetype + "'");
@@ -777,6 +790,26 @@ function getPostdataId() {
     ocUtils.log("Done: Getting post data ID");
 
     return (postData.id != "");
+}
+
+function getFlavorsFromWorkflow(workflowReply, flavorKey, defaultFlavor) {
+    if (workflowReply.workflow.operations == undefined || workflowReply.workflow.operations.operation == undefined) {
+        return defaultFlavor;
+    }
+    var operations = workflowReply.workflow.operations.operation;
+    for (var i = 0; i < operations.length; i++) {
+        if (operations[i].id == "editor"){
+            if (operations[i].configurations != undefined && operations[i].configurations.configuration != undefined) {
+                for (var j = 0; j < operations[i].configurations.configuration.length; j++) {
+                    if (operations[i].configurations.configuration[j].key == flavorKey) {
+                        return operations[i].configurations.configuration[j].$.split("/")[1];
+                    } 
+                }
+            }
+            return defaultFlavor;
+        }
+    }
+    return defaultFlavor;
 }
 
 $(document).ready(function() {

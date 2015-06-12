@@ -1,16 +1,22 @@
 /**
- * Copyright 2009-2011 The Regents of the University of California Licensed
- * under the Educational Community License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain a
- * copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- * http://www.osedu.org/licenses/ECL-2.0
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
+ *
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
@@ -135,6 +141,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var embedHeightThree = 360;
     var embedHeightFour = 480;
     var embedHeightFive = 720;
+    var min_segment_duration = 5000;
     var logoLink = false;
     var logo = plugin_path + "images/logo.png";
     var showEmbed = true;
@@ -382,6 +389,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 duration = parseInt(this.model.get("duration"));
                 segments = Engage.model.get("mediaPackage").get("segments");
                 
+                segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
+                
                 if (Engage.model.get("meInfo")) {
                     if (Engage.model.get("meInfo").get("logo_small")) {
                         logo = Engage.model.get("meInfo").get("logo_small");
@@ -392,6 +401,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     if (! Engage.model.get("meInfo").get("show_embed_links")) {
                         showEmbed = false;
                     }               
+                }
+                var translatedQualites = new Array();
+                if (resolutions) {
+                    for (var i = 0; i < resolutions.length; i++) {
+                        translatedQualites[resolutions[i]] = translate(resolutions[i], resolutions[i]);
+                    }
                 }
 
                 var tempVars = {
@@ -422,9 +437,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_fullscreen: translate("fullscreen", "Fullscreen"),
                     str_qualityButton: translate("quality", "Quality"),
                     str_quality: translate("quality", "Quality"),
-                    str_qualityLow: translate("qualityLow", "Low"),
-                    str_qualityMedium: translate("qualityMedium", "Medium"),
-                    str_qualityHigh: translate("qualityHigh", "High"),
+                    qualities: resolutions,
+                    translatedqualities: translatedQualites,
                     hasqualities: resolutions !== undefined,
                     controlsTop: Engage.controls_top,
                     logo: logo,
@@ -438,6 +452,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     if (aspectRatioTriggered) {
                         calculateEmbedAspectRatios();
                         addEmbedRatioEvents();
+                    }
+                    if (tempVars.hasqualities) {
+                        addQualityChangeEvents();
                     }
                     ready();
                     playPause();
@@ -531,22 +548,21 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function addQualityChangeEvents() {
         if (!mediapackageError) {
-            $("#" + id_qualityLow).click(function(e) {
-                e.preventDefault();
-                $("#" + id_qualityIndicator).html(translate("qualityLow", "Low"));
-                Engage.trigger(plugin.events.qualitySet.getName(), "low");
-            });
-            $("#" + id_qualityMedium).click(function(e) {
-                e.preventDefault();
-                $("#" + id_qualityIndicator).html(translate("qualityMedium", "Medium"));
-                Engage.trigger(plugin.events.qualitySet.getName(), "medium");
-            });
-            $("#" + id_qualityHigh).click(function(e) {
-                e.preventDefault();
-                $("#" + id_qualityIndicator).html(translate("qualityHigh", "High"));
-                Engage.trigger(plugin.events.qualitySet.getName(), "high");
-            });
+            for (var i = 0; i < resolutions.length; i++) {
+                var quality = resolutions[i];
+                addQualityListener(quality);
+            }
+            var q = Engage.model.get("quality");
+            $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
         }
+    }
+    
+    function addQualityListener(quality) {
+        $("#quality" + quality).click(function(element) {
+                    element.preventDefault();
+                    $("#" + id_qualityIndicator).html(translate(quality, quality));
+                    Engage.trigger(plugin.events.qualitySet.getName(), quality);
+        });
     }
 
     function triggerEmbedMessage(ratioWidth, ratioHeight) {
@@ -838,9 +854,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     if (controlsView) {
                         controlsView.render();
                     }
-                    addQualityChangeEvents();
-                    var q = Engage.model.get("quality");
-                    $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
                 }
             });
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {

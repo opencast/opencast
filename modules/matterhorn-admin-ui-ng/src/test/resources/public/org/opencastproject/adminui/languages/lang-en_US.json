@@ -108,8 +108,11 @@
           }
       },
 
-      "DELETE_WARNING_LINE1": "Once deleted all metadata, audio and video files will be deleted and unrecoverable.",
-      "DELETE_WARNING_LINE2": "",
+      "DELETE_EVENTS_WARNING_LINE1": "Once deleted all metadata, audio and video files will be deleted and unrecoverable.",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "Once deleted all series metadata will be unrecoverable.",
+      "DELETE_SERIES_WARNING_LINE2": "",
+
       "SCHEDULE_TASK": {
           "CAPTION": "Start Task",
           "GENERAL": {
