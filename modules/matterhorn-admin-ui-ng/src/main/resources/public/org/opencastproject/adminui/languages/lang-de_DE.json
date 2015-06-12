@@ -534,7 +534,7 @@
           },
           "ACCESS_POLICY":{
             "TITLE":"Zugriffsrichtlinie",
-            "DESCRIPTION":"At least one role with Read and Write permissions is required.",
+            "DESCRIPTION":"Es ist mindestens eine Rolle mit Lese- und Schreibberechtigungen erforderlich.",
             "LABEL":"Vorlage auswählen",
             "EMPTY":"Keine Vorlage gefunden",
             "ROLE":"Rolle",
