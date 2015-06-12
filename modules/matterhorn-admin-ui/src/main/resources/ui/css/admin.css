@@ -67,7 +67,7 @@ li#titleNote {padding:0 0 4px 0;}
 
 
 /* page layout */
-#pageHeader { background: #A72123; padding: 2px; margin-bottom: 20px; text-align: right;}
+#pageHeader { background: #24425D; padding: 2px; margin-bottom: 20px; text-align: right;}
 #pageHeader a { color: #FFFFFF; margin-right: 10px; text-decoration: none;}
 #pageHeader #currentVersion { float: left; margin-left: 10px;}
 
@@ -75,7 +75,7 @@ li#titleNote {padding:0 0 4px 0;}
 
 #header { margin-bottom: -2em; } /* IE Problem */
 #header #oc-logo { float: right;}
-#header a h1 { margin-left: 160px; font-size: 18px; color: #F6921E; text-decoration: none!important;}
+#header a h1 { margin-left: 160px; font-size: 18px; color: #4BB07B; text-decoration: none!important;}
 
 #tabsWrapper { border: none; background: none;}
 #tabsWrapper #tabs { border-left: none; border-right: none; border-top: none; background: none; padding-left: 150px; }

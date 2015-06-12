@@ -34,7 +34,7 @@ body {
 #middlebanner,
 #middlebanner2,
 #middlebanner3 {
-	background-color:#861B1D;
+	background-color:#24425D;
 	width:100%;
 	display:inline-block;
 	padding:20px 0 20px;
@@ -115,7 +115,7 @@ body {
 h1 {
 	font-size: 2.2em;
         line-height: 1.1em;
-	color:#A72123;
+	color:#24425D;
 	margin-left:330px;
 	}
 
@@ -128,13 +128,13 @@ h2 {
 #middlebanner2 h3, 
 #middlebanner3 h2,
 #middlebanner3 h3 {
-	font-size:1.9em;
+	font-size:1.9em;mo  
 	margin-top:0;
 	}
 #bottombanner h2 {
 	font-size:1.6em;
 	margin-top:0;
-	color:#871B1D;
+	color:#24425D;
 	}
 
 #middlebanner p,
@@ -206,7 +206,7 @@ h2 {
 #middlebanner2 a.redbutton:hover, 
 #middlebanner3 a.redbutton:hover {
 	border:2px solid #F6921E;
-	background-color:#A72123;
+	background-color:#24425D;
 	color:#FFF;
 	text-decoration:none;
 	}
@@ -217,7 +217,7 @@ h2 {
 	}
 	
 a, a:link, a:visited {
-	color: #871B1D;
+	color: #24425D;
 	text-decoration:none;
 	font-weight:bold;
 	}
@@ -227,7 +227,7 @@ a:hover {
 #topbanner ul {
 	list-style-image:url(/admin/img/bullet_orange.png);
 	padding-left: 16px;
-	color:#A72123;
+	color:#24425D;
 }
 #middlebanner ul,
 #middlebanner2 ul,

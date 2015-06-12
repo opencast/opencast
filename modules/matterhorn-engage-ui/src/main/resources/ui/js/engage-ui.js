@@ -312,7 +312,7 @@ $(document).ready(function() {
                         setAnonymousUser();
                     }
                     if (data.org && data.org.properties) {
-                        var logo = data.org.properties.logo_large ? data.org.properties.logo_large : "";
+                        var logo = data.org.properties.logo_mediamodule ? data.org.properties.logo_mediamodule : "";
                         $($headerLogo).attr("src", logo);
 
                         var player = data.org.properties.player ? data.org.properties.player : defaultPlayerURL;
