@@ -110,14 +110,14 @@ public class DictionaryServiceImpl implements DictionaryService, ManagedService 
   @Override
   public Textual cleanUpText(String text) {
 
-    logger.info("Text input: “{}”", text);
+    logger.debug("Text input: “{}”", text);
     LinkedList<String> words = new LinkedList<String>();
     Matcher matcher = compilesPattern.matcher(text);
     while (matcher.find()) {
       words.add(matcher.group());
     }
     String result = org.apache.commons.lang.StringUtils.join(words, " ");
-    logger.info("Resulting text: “{}”", result);
+    logger.debug("Resulting text: “{}”", result);
     if ("".equals(result)) {
       return null;
     }
