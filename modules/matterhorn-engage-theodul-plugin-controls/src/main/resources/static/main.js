@@ -765,7 +765,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             embedHeightOne = 70;
 
             $("#" + id_embed0).html("Embed " + embedWidthOne + "x" + embedHeightOne);
-            $("#" + id_embed1 + ", " + "#" + id_embed2 + ", " + "#" + id_embed3 + ", " + "#" + id_embed4 + ", ").hide();
+            Utils.removeParentIfElementExists(id_embed1);
+            Utils.removeParentIfElementExists(id_embed2);
+            Utils.removeParentIfElementExists(id_embed3);
+            Utils.removeParentIfElementExists(id_embed4);
         }
 
         $("#" + id_embed_button).removeClass("disabled");

@@ -147,6 +147,12 @@ define(["jquery"], function($) {
         $("#" + id).attr("disabled", "disabled");
     }
 
+    Utils.prototype.removeParentIfElementExists = function(elemenId) {
+        if ($("#" + elemenId) && $("#" + elemenId).parent()) {
++                $("#" + elemenId).parent().remove();
+        }
+    }
+
     /**
      * greyIn
      *
