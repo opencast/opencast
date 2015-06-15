@@ -392,8 +392,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
                 
                 if (Engage.model.get("meInfo")) {
-                    if (Engage.model.get("meInfo").get("logo_small")) {
-                        logo = Engage.model.get("meInfo").get("logo_small");
+                    if (Engage.model.get("meInfo").get("logo_player")) {
+                        logo = Engage.model.get("meInfo").get("logo_player");
                     }
                     if (Engage.model.get("meInfo").get("link_mediamodule")) {
                         logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
@@ -486,8 +486,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         render: function() {
             if (!mediapackageError) {
                 if (Engage.model.get("meInfo")) {
-                    if (Engage.model.get("meInfo").get("logo_small")) {
-                        logo = Engage.model.get("meInfo").get("logo_small");
+                    if (Engage.model.get("meInfo").get("logo_player")) {
+                        logo = Engage.model.get("meInfo").get("logo_player");
                     }
                     if (Engage.model.get("meInfo").get("link_mediamodule")) {
                         logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
