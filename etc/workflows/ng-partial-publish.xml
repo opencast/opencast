@@ -21,7 +21,7 @@
       description="Cut the recording according to the edit decision list">
       <configurations>
         <configuration key="source-flavors">*/work</configuration>
-        <configuration key="smil-flavors">smil/*</configuration>
+        <configuration key="smil-flavors">smil/cutting</configuration>
         <configuration key="target-smil-flavor">smil/cutting</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
         <configuration key="interactive">false</configuration>

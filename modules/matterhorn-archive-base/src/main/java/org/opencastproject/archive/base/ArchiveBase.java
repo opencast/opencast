@@ -690,6 +690,10 @@ public abstract class ArchiveBase<RS extends ResultSet> extends AbstractIndexPro
     int errors = 0;
     while (episodes.hasNext()) {
       final Episode episode = episodes.next();
+      if (episode.isDeleted()) {
+        current[0] += 1;
+        continue;
+      }
       try {
         String episodeId = episode.getMediaPackage().getIdentifier().toString();
 

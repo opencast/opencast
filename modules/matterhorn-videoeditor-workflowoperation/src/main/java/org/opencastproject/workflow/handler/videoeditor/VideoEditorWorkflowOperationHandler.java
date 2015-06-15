@@ -293,7 +293,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
       return createResult(mp, Action.PAUSE);
     } else {
       logger.debug("Move on, SMIL catalog ({}) already exists for media package '{}'", targetSmilFlavor, mp);
-      return resume(workflowInstance, context, Collections.EMPTY_MAP);
+      return resume(workflowInstance, context, Collections.<String, String> emptyMap());
     }
   }
 
