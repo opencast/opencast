@@ -466,7 +466,8 @@
             "URL": "URL"
           },
          "WORKFLOW_DETAILS": {
-           "TITLE": "Workflow details"
+           "TITLE": "Workflow details",
+           "CONFIGURATION": "Workflow configuration"
          },
          "WORKFLOW_OPERATIONS": {
            "TITLE": "Workflow operations"
