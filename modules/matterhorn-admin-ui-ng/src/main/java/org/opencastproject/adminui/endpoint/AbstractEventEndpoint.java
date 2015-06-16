@@ -54,6 +54,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.adminui.exception.JobEndpointException;
+import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.ParticipationUtils;
 import org.opencastproject.archive.api.ArchiveException;
@@ -275,7 +276,7 @@ public abstract class AbstractEventEndpoint {
 
   public abstract EventCatalogUIAdapter getEpisodeCatalogUIAdapter();
 
-  public abstract String getPreviewSubtype();
+  public abstract AdminUIConfiguration getAdminUIConfiguration();
 
   /** Default server URL */
   protected String serverUrl = "http://localhost:8080";
@@ -1923,7 +1924,7 @@ public abstract class AbstractEventEndpoint {
       return Opt.<Event> none();
     }
     Event event = result.getItems()[0].getSource();
-    event.updatePreview(getPreviewSubtype());
+    event.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
     return Opt.some(event);
   }
 
@@ -2058,7 +2059,7 @@ public abstract class AbstractEventEndpoint {
 
     for (SearchResultItem<Event> item : results.getItems()) {
       Event source = item.getSource();
-      source.updatePreview(getPreviewSubtype());
+      source.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
       eventsList.add(eventToJSON(source));
     }
 

@@ -21,6 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.opencast.OpencastArchive;
@@ -45,21 +46,15 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Stream;
 
-import org.apache.commons.lang.StringUtils;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
-
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.List;
 
 import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
 @Path("/")
-public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedService {
+public class OsgiEventEndpoint extends AbstractEventEndpoint {
 
-  private static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
   private AclServiceFactory aclServiceFactory;
   private AdminUISearchIndex index;
   private AuthorizationService authorizationService;
@@ -79,9 +74,19 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   private SeriesService seriesService;
   private WorkflowService workflowService;
   private Workspace workspace;
-  private String previewSubtype;
+  private AdminUIConfiguration adminUIConfiguration;
 
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
+
+  @Override
+  public AdminUIConfiguration getAdminUIConfiguration() {
+    return adminUIConfiguration;
+  }
+
+  /** OSGi DI. */
+  public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
+    this.adminUIConfiguration = adminUIConfiguration;
+  }
 
   @Override
   public OpencastArchive getArchive() {
@@ -294,23 +299,5 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
       return organization.equals(catalogUIAdapter.getOrganization());
     }
   };
-
-  @Override
-  public String getPreviewSubtype() {
-    return previewSubtype;
-  }
-
-  @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
-    if (properties == null)
-      return;
-
-    // Preview subtype
-    previewSubtype = StringUtils.trimToNull((String)properties.get(OPT_PREVIEW_SUBTYPE));
-    if (previewSubtype != null)
-      logger.info("Preview subtype is '{}'", previewSubtype);
-    else
-      logger.warn("No preview ubtype configured");
-  }
 
 }

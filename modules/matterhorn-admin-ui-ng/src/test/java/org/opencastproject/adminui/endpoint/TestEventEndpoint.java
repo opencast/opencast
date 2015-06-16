@@ -32,6 +32,7 @@ import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.endpoint.AbstractEventEndpointTest.TestEnv;
+import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.api.UriRewriter;
@@ -158,6 +159,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -239,7 +241,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     env.setIndex(searchIndex);
 
     // Preview subtype
-    env.setPreviewSubtype(PREVIEW_SUBTYPE);
+    AdminUIConfiguration adminUIConfiguration = new AdminUIConfiguration();
+    Hashtable<String, String> dictionary = new Hashtable<String, String>();
+    dictionary.put(AdminUIConfiguration.OPT_PREVIEW_SUBTYPE, PREVIEW_SUBTYPE);
+    adminUIConfiguration.updated(dictionary);
+    env.setAdminUIConfiguration(adminUIConfiguration);
 
     // acl
     final String anonymousRole = securityService.getOrganization().getAnonymousRole();
@@ -538,10 +544,10 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     EventCommentService eventCommentService = EasyMock.createNiceMock(EventCommentService.class);
     EasyMock.expect(eventCommentService.getComments(EasyMock.anyString())).andReturn(Arrays.asList(comment, comment2))
-    .anyTimes();
+            .anyTimes();
     EasyMock.expect(eventCommentService.getComment(EasyMock.anyString(), EasyMock.anyLong())).andReturn(comment2);
     EasyMock.expect(eventCommentService.updateComment(EasyMock.anyString(), EasyMock.anyObject(Comment.class)))
-    .andReturn(comment2);
+            .andReturn(comment2);
     EasyMock.replay(eventCommentService);
     env.setEventCommentService(eventCommentService);
 
@@ -971,8 +977,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public String getPreviewSubtype() {
-    return env.getPreviewSubtype();
+  public AdminUIConfiguration getAdminUIConfiguration() {
+    return env.getAdminUIConfiguration();
   }
 
 }

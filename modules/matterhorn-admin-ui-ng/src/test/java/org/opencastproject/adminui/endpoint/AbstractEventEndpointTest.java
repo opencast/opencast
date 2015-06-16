@@ -26,6 +26,7 @@ import static org.junit.Assert.assertThat;
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 
+import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.opencast.OpencastArchive;
@@ -501,6 +502,7 @@ public class AbstractEventEndpointTest {
   }
 
   public static final class TestEnv {
+    private AdminUIConfiguration adminUIConfiguration;
     private Workspace workspace;
     private WorkflowService workflowService;
     private OpencastArchive archive;
@@ -521,7 +523,6 @@ public class AbstractEventEndpointTest {
     private AdminUISearchIndex index;
     private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
     private CommonEventCatalogUIAdapter episodeCatalogUIAdapter;
-    private String previewSubtype;
 
     public Workspace getWorkspace() {
       return workspace;
@@ -667,12 +668,12 @@ public class AbstractEventEndpointTest {
       return index;
     }
 
-    public void setPreviewSubtype(String subtype) {
-      this.previewSubtype = subtype;
+    public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
+      this.adminUIConfiguration = adminUIConfiguration;
     }
 
-    public String getPreviewSubtype() {
-      return previewSubtype;
+    public AdminUIConfiguration getAdminUIConfiguration() {
+      return adminUIConfiguration;
     }
 
     public EventCatalogUIAdapter getEpisodeCatalogUIAdapter() {
