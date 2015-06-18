@@ -414,4 +414,9 @@
     <Description>WebM video</Description>
     <Extensions>webm</Extensions>
   </MimeType>
+  <MimeType>
+    <Type>application/json</Type>
+    <Description>JavaScript Object Notation</Description>
+    <Extensions>json</Extensions>
+  </MimeType>
 </MimeTypes>

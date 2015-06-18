@@ -1,7 +1,7 @@
 <div ng-click="enterEditMode()" ng-form="innerForm">
     <ul ng-show="!editMode">
         <li ng-repeat="value in params.value">
-            <span>{{ value }}</span>
+            <span>{{ value | translate }}</span>
         </li>
     </ul>
 
@@ -17,7 +17,7 @@
     </div>
     <span ng-show="editMode" class="ng-multi-value"
         ng-repeat="value in params.value">
-        {{ value }}
+        {{ value | translate }}
         <a ng-mousedown="removeValue(params.value, value)">
             <i class="fa fa-times"></i>
         </a>

@@ -1,13 +1,10 @@
 angular.module('adminNg.services')
-.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', function (JsHelper, CaptureAgentsResource,
-            ConflictCheckResource, Notifications, Language) {
+.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate',
+    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate) {
     var Source = function () {
         var me = this,
             NOTIFICATION_CONTEXT = 'events-form';
 
-        this.ud = {
-            upload: {}
-        };
 
         /* Get the current client timezone */
         var tzOffset = (new Date()).getTimezoneOffset() / -60;
@@ -17,27 +14,42 @@ angular.module('adminNg.services')
             me.captureAgents = data.rows;
         });
 
-        this.ud.SCHEDULE_SINGLE = {
-            device: {
-                inputMethods: {}
+        this.ud = {
+            upload: {},
+            
+            SCHEDULE_SINGLE: {
+                device: {
+                    inputMethods: {}
+                }
+            },
+            
+            SCHEDULE_MULTIPLE: {
+                device: {
+                    inputMethods: {}
+                },
+                weekdays: {},
+                presentableWeekdays: ''
             }
         };
-        this.ud.SCHEDULE_MULTIPLE = {
-            device: {
-                inputMethods: {}
-            },
-            weekdays: {}
+
+        this.weekdays = {
+            'MO': 'EVENTS.EVENTS.NEW.WEEKDAYS.MO',
+            'TU': 'EVENTS.EVENTS.NEW.WEEKDAYS.TU',
+            'WE': 'EVENTS.EVENTS.NEW.WEEKDAYS.WE',
+            'TH': 'EVENTS.EVENTS.NEW.WEEKDAYS.TH',
+            'FR': 'EVENTS.EVENTS.NEW.WEEKDAYS.FR',
+            'SA': 'EVENTS.EVENTS.NEW.WEEKDAYS.SA',
+            'SU': 'EVENTS.EVENTS.NEW.WEEKDAYS.SU'
         };
 
-        this.weekdays = [
-            { key: 'MO', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.MO' },
-            { key: 'TU', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.TU' },
-            { key: 'WE', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.WE' },
-            { key: 'TH', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.TH' },
-            { key: 'FR', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.FR' },
-            { key: 'SA', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.SA' },
-            { key: 'SU', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.SU' }
-        ];
+        this.sortedWeekdays = [];
+
+        angular.forEach(me.weekdays, function (day, index) {
+            me.sortedWeekdays.push({
+                key: index,
+                translation: day
+            });
+        });
 
         this.conflicts = [];
 
@@ -150,7 +162,47 @@ angular.module('adminNg.services')
         this.checkConflicts = function () {
             if (me.readyToPollConflicts()) {
                 ConflictCheckResource.check(me.ud[me.ud.type], me.noConflictsDetected, me.conflictsDetected);
+                me.updateWeekdays();
             }
+        };
+
+        /**
+         * Update the presentation fo the weekdays for the summary
+         */
+        this.updateWeekdays = function () {
+            var keyWeekdays = [],
+                keysOrder = [],
+                sortDay = function (day1, day2) {
+                    return keysOrder[day1] - keysOrder[day2];
+                };
+
+            angular.forEach(me.sortedWeekdays, function (day, idx) {
+                keysOrder[day.translation] = idx;
+            });
+            
+            if (me.ud.type === 'SCHEDULE_MULTIPLE') {
+                angular.forEach(me.ud.SCHEDULE_MULTIPLE.weekdays, function (weekday, index) {
+                    if (weekday) {
+                        keyWeekdays.push(me.weekdays[index]);                    
+                    }
+                 });
+            }
+
+            keyWeekdays.sort(sortDay);
+
+            $translate(keyWeekdays).then(function (translations) {
+                var translatedWeekdays = [];
+
+                angular.forEach(translations, function(t) {
+                    translatedWeekdays.push(t);
+                });
+
+                me.ud.SCHEDULE_MULTIPLE.presentableWeekdays = translatedWeekdays.join(',');
+            });
+        };
+
+        this.changeType = function () {
+            me.reset();
         };
 
         this.noConflictsDetected = function () {
@@ -177,6 +229,38 @@ angular.module('adminNg.services')
             }
         };
 
+        this.getFormatedStartTime = function () {
+            var time,
+                hour,
+                minute;
+
+            if (me.ud.type !== 'UPLOAD') {
+                hour = me.ud[me.ud.type].start.hour;
+                minute = me.ud[me.ud.type].start.minute;
+                if (angular.isDefined(hour) && angular.isDefined(minute)) {
+                    time = JsHelper.humanizeTime(hour, minute);
+                }
+            }
+
+            return time;
+        };        
+
+        this.getFormatedDuration = function () {
+            var time,
+                hour,
+                minute;
+
+            if (me.ud.type !== 'UPLOAD') {
+                hour = me.ud[me.ud.type].duration.hour;
+                minute = me.ud[me.ud.type].duration.minute;
+                if (angular.isDefined(hour) && angular.isDefined(minute)) {
+                    time = JsHelper.secondsToTime(((hour * 60) + minute) * 60);
+                }
+            }
+
+            return time;
+        };
+
         this.isValid = function () {
 
             if (me.ud.type === 'later') {
@@ -197,8 +281,20 @@ angular.module('adminNg.services')
         };
 
         this.reset = function () {
-            me.ud = {
-                upload: {}
+            me.ud.upload = {},
+                
+            me.ud.SCHEDULE_SINGLE = {
+                device: {
+                    inputMethods: {}
+                }
+            };
+                
+            me.ud.SCHEDULE_MULTIPLE = {
+                device: {
+                    inputMethods: {}
+                },
+                weekdays: {},
+                presentableWeekdays: ''
             };
         };
 

@@ -7,21 +7,26 @@ This document will help you get started with creating your own Matterhorn workfl
   [Create a Custom Workflow Operation Handler](https://opencast.jira.com/wiki/display/MHDOC/Create+a+Custom+Workflow+Operation+Handler)
 
 ## Overview
-A Matterhorn workflow is an ordered list of operations. There is no limit to the number of operations or their repetition in a given workflow.
 
-Workflow operations can be configured using configuration elements. The use of string replacement in configuration values allows workflows to dynamically adapt to a given input or user decision.
+A Matterhorn workflow is an ordered list of operations. There is no limit to the number of operations or their
+repetition in a given workflow.
+
+Workflow operations can be configured using configuration elements. The use of string replacement in configuration
+values allows workflows to dynamically adapt to a given input or user decision.
 
 A workflow operation can run autonomously or pause itself to allow for external, usually user, interaction.
 
 ### Watch Folder
 
-The Matterhorn workflow service will automatically register any workflow documents placed in the Felix workflow configuration directory:
+The Matterhorn workflow service will automatically register any workflow documents placed in the Felix workflow
+configuration directory:
 
     <mh_config_dir>/workflows
 
 ### Document
 
-Matterhorn workflows are defined in xml documents. The name of the document should follow the pattern <workflow_name>-workflow.xml, e.g. compose-distribute-publish-workflow.xml.
+Matterhorn workflows are defined in xml documents. The name of the document should follow the pattern
+<workflow_name>-workflow.xml, e.g. compose-distribute-publish-workflow.xml.
 
 The structure of a Matterhorn workflow document:
 
@@ -47,7 +52,10 @@ This sections will walk you through creating a custom workflow, which will encod
 
 ###Add an Encoding Profile
 
-In most cases you also want to create new encoding profiles for new workflows. You can find more information about that topic on the page “Encoding Profiles”. For this quide we assume that we have an encoding profile “mov-low.http” which creates a distribution format definition for mpeg4 quicktime presenter/presentation download and a “feed-cover.http” encoding profile to create thumbnail images for the videos.
+In most cases you also want to create new encoding profiles for new workflows. You can find more information about that
+topic on the page “Encoding Profiles”. For this quide we assume that we have an encoding profile “mov-low.http” which
+creates a distribution format definition for mpeg4 quicktime presenter/presentation download and a “feed-cover.http”
+encoding profile to create thumbnail images for the videos.
 
 ###Describe the Workflow
 
@@ -99,7 +107,8 @@ The first operation will be to inspect the media for technical metadata, such as
 
     </definition>
 
-The fail-on-error attribute is a boolean determining whether the workflow will throw an error to the exception-handler-workflow or simply proceed with the remaining operations.
+The fail-on-error attribute is a boolean determining whether the workflow will throw an error to the
+exception-handler-workflow or simply proceed with the remaining operations.
 
 ### Encoding
 
@@ -148,10 +157,11 @@ The next operations will encode the media to the QuickTime/MPEG-4 .mp4 format:
     </definition>
 
 
-**The target-tags attribute tags the resulting media for later use as input for other operations, using the source-tags attribute. See #Distribute the Media\.**
+**The target-tags attribute tags the resulting media for later use as input for other operations, using the source-tags
+attribute. See #Distribute the Media\.**
 
 
-**The encoding-profile attribute refers to an encoding profile defined in <felix_home>/etc/workflows. See Encoding Profiles.**
+**The encoding-profile attribute refers to an encoding profile defined in `etc/workflows`. See Encoding Profiles.**
 
 ### Encode to Thumbnail
 
@@ -253,7 +263,11 @@ The next operation copies the encoded media to the Matterhorn distribution chann
 
 ## Accept User Input
 
-Workflow definitions may optionally include variables to be replaced by user input. For instance, the "review" operation can put a workflow "on hold" and wait for an administrative user to review the media before allowing processing to continue. To enable user control of individual workflow instances, the workflow definition must 1) use the ${variable} notation in the workflow definition and 2) contain a custom configuration panel. Here is an example of a configurable "review" operation:
+Workflow definitions may optionally include variables to be replaced by user input. For instance, the "review" operation
+can put a workflow "on hold" and wait for an administrative user to review the media before allowing processing to
+continue. To enable user control of individual workflow instances, the workflow definition must 1) use the ${variable}
+notation in the workflow definition and 2) contain a custom configuration panel. Here is an example of a configurable
+"review" operation:
 
      <operation id="review">
       <configurations>
@@ -261,7 +275,9 @@ Workflow definitions may optionally include variables to be replaced by user inp
       </configurations>
     </operation>
 
-Once the operation is configured to accept a variable, we need to describe how to gather the value from the administrative user. The <configuration_panel> element of a workflow definitions describes this user interface snippet. A simple configuration panel for the "review" operation might look like this:
+Once the operation is configured to accept a variable, we need to describe how to gather the value from the
+administrative user. The <configuration_panel> element of a workflow definitions describes this user interface snippet.
+A simple configuration panel for the "review" operation might look like this:
 
     <configuration_panel>
       <![CDATA[
@@ -269,23 +285,27 @@ Once the operation is configured to accept a variable, we need to describe how t
       ]]>
     </configuration_panel>
 
-The checkbox in this <configuration_panel> will now be displayed in the administrative tools, and the user's selection will be used to replace the ${review.hold} variable in the workflow.
+The checkbox in this <configuration_panel> will now be displayed in the administrative tools, and the user's selection
+will be used to replace the ${review.hold} variable in the workflow.
 
 ## Test the Workflow
 
-The easiest way to test a workflow is to just put it into the workflow folder where it will be picked up by Matterhorn automatically. This needs, however, administrative privileges. If you don't have those you can also use the workflow service REST endpoint.
+The easiest way to test a workflow is to just put it into the workflow folder where it will be picked up by Matterhorn
+automatically. This needs, however, administrative privileges. If you don't have those you can also use the workflow
+service REST endpoint.
 
 
-**You can use the official all in one test VM for this: http://testallinone.usask.ca:8080/workflow/docs (user:admin / passwd:opencast)**
+**You can use the [official all in one test server](http://testallinone.usask.ca:8080/workflow/docs) for this
+(user:admin / passwd:opencast)**
 
 1. Scroll down to "POST /start" and click on the "Testing form" link.
-![workflow start](configuration/workflow1.png)
+![workflow start](workflow1.png)
 
 2. Copy and paste the complete workflow definition into the "definition" field and click "submit."
-![testing form](configuration/workflow2.png)
+![testing form](workflow2.png)
 
 3. Open the Admin Tools and navigate the recordings dashboard to view the status of the workflow instance.
-![dashboard](configuration/workflow3.png)
+![dashboard](workflow3.png)
 
 4. Open the Matterhorn Media Module to see the published media.
-![media module](configuration/workflow4.png)
+![media module](workflow4.png)
