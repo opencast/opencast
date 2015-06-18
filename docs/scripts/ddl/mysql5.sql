@@ -393,8 +393,8 @@ CREATE TABLE mh_group (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_group_member (
-  JpaGroup_id bigint(20) NOT NULL,
-  MEMBERS varchar(255) DEFAULT NULL
+  group_id bigint(20) NOT NULL,
+  member varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_group_role (

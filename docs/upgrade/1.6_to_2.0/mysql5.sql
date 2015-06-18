@@ -108,6 +108,10 @@ ALTER TABLE mh_group_role
 DROP CONSTRAINT UNQ_mh_group_role_0,
 ADD CONSTRAINT UNQ_mh_group_role UNIQUE (group_id, role_id);
 
+ALTER TABLE mh_group_member
+CHANGE JpaGroup_id group_id bigint(20) NOT NULL,
+CHANGE MEMBERS member varchar(255) DEFAULT NULL;
+
 ALTER TABLE mh_user
 DROP CONSTRAINT UNQ_mh_user_0,
 ADD CONSTRAINT UNQ_mh_user UNIQUE (username, organization);
