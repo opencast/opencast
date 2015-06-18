@@ -23,6 +23,7 @@
         "console"         : true,
         "window"          : true,
         "Backbone"        : true,
+        "moment"          : true,
         "handlbars"       : true,
         "_"               : true,
         "define"          : true,
