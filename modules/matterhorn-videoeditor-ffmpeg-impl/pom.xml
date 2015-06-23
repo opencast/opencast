@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.6.x-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -118,6 +118,7 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
+      <version>3.3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
