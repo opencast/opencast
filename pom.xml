@@ -1,10 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XML-instance"
   xsi:Location="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <packaging>pom</packaging>
   <version>2.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
   <name>matterhorn</name>
   <description>The Opencast Project's Matterhorn software is a media capture, processing, and distribution system</description>
   <url>http://opencastproject.org</url>
@@ -13,13 +16,14 @@
   <prerequisites>
     <maven>3.0.4</maven>
   </prerequisites>
+
   <properties>
+    <checkstyle.skip>false</checkstyle.skip>
+    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
+    <jmeter.version>2.4</jmeter.version>
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <checkstyle.skip>false</checkstyle.skip>
-    <jmeter.version>2.4</jmeter.version>
-    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
   </properties>
 
   <profiles>
