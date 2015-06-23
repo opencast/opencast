@@ -11,23 +11,8 @@
     <bundle>mvn:org.apache.felix/org.apache.felix.webconsole.plugins.ds/1.0.0</bundle>
     <!--bundle>mvn:org.apache.felix/org.apache.felix.webconsole.plugins.packageadmin/1.0.0</bundle-->
 
-
     <bundle>mvn:org.osgi/org.osgi.compendium/4.2.0</bundle>
     <bundle>mvn:org.osgi/org.osgi.enterprise/4.2.0</bundle>
-
-    <!-- DOES NOT YET WORK -->
-    <!--
-    <feature version="2.0.0">jpa</feature>
-    -->
-
-    <!-- DOES NOT YET WORK -->
-    <!--
-    <feature version="3.1.4.RELEASE">spring</feature>
-    <feature version="3.1.4.RELEASE">spring-security</feature>
-    <feature version="3.1.4.RELEASE">spring-tx</feature>
-    <feature version="3.1.4.RELEASE">spring-web</feature>
-    -->
-
 
     <bundle>mvn:org.aopalliance/com.springsource.org.aopalliance/1.0.0</bundle>
 
@@ -197,7 +182,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-videoeditor-workflowoperation/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-videosegmenter-api/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-videosegmenter-workflowoperation/2.1-SNAPSHOT</bundle>
-    <!--bundle>mvn:org.opencastproject/matterhorn-webconsole/2.1-SNAPSHOT</bundle-->
     <bundle>mvn:org.opencastproject/matterhorn-serviceregistry/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-workflow-service-impl/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-acl/2.1-SNAPSHOT</bundle>

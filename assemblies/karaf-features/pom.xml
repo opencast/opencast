@@ -14,35 +14,7 @@
   <packaging>pom</packaging>
   <name>Opencast // Assemblies // Apache Karaf Features</name>
 
-  <dependencies>
-
-    <!--dependency>
-      <groupId>org.apache.karaf.features</groupId>
-      <artifactId>standard</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId>
-      <artifactId>org.apache.servicemix.bundles.aopalliance</artifactId>
-      <scope>provided</scope>
-    </dependency-->
-
-  </dependencies>
-
   <build>
-    <resources>
-      <resource>
-        <directory>${project.basedir}/../../etc</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>services/*.properties</include>
-          <include>config.properties</include>
-        </includes>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
@@ -92,11 +64,6 @@
                   <file>target/feature/feature.xml</file>
                   <classifier>features</classifier>
                   <type>xml</type>
-                </artifact>
-                <artifact>
-                  <file>target/classes/config.properties</file>
-                  <classifier>custom</classifier>
-                  <type>properties</type>
                 </artifact>
               </artifacts>
             </configuration>
