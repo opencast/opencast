@@ -17,6 +17,7 @@
 
   <modules>
     <module>karaf-features</module>
+    <module>karaf-dist-allinone</module>
   </modules>
 
   <build>
