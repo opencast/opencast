@@ -68,7 +68,6 @@
         <module>modules/matterhorn-ingest-workflowoperation</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-workflowoperation</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-mediapackage-manipulator</module>
@@ -137,7 +136,6 @@
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-ingest-service-api</module>
         <module>modules/matterhorn-ingest-service-impl</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-message-broker-api</module>
         <module>modules/matterhorn-message-broker-impl</module>
@@ -174,7 +172,6 @@
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-ingest-service-api</module>
         <module>modules/matterhorn-ingest-service-impl</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-message-broker-api</module>
         <module>modules/matterhorn-message-broker-impl</module>
@@ -218,7 +215,6 @@
         <module>modules/matterhorn-distribution-service-download</module>
         <module>modules/matterhorn-distribution-service-streaming</module>
         <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-message-broker-api</module>
         <module>modules/matterhorn-message-broker-impl</module>
@@ -258,7 +254,6 @@
         <module>modules/matterhorn-distribution-service-download</module>
         <module>modules/matterhorn-distribution-service-streaming</module>
         <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-message-broker-api</module>
         <module>modules/matterhorn-message-broker-impl</module>
@@ -297,7 +292,6 @@
         <module>modules/matterhorn-distribution-service-download-remote</module>
         <module>modules/matterhorn-distribution-service-streaming-remote</module>
         <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-message-broker-api</module>
         <module>modules/matterhorn-message-broker-impl</module>
@@ -343,7 +337,6 @@
         <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
         <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
         <module>modules/matterhorn-engage-ui</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-message-broker-api</module>
@@ -396,7 +389,6 @@
         <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
         <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
         <module>modules/matterhorn-engage-ui</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-message-broker-api</module>
@@ -438,7 +430,6 @@
         <module>modules/matterhorn-distribution-service-download-remote</module>
         <module>modules/matterhorn-distribution-service-streaming-remote</module>
         <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-message-broker-api</module>
@@ -479,7 +470,6 @@
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-message-broker-api</module>
         <module>modules/matterhorn-message-broker-impl</module>
@@ -532,7 +522,6 @@
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-message-broker-api</module>
         <module>modules/matterhorn-message-broker-impl</module>
@@ -581,7 +570,6 @@
         <module>modules/matterhorn-composer-service-remote</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-remote</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-message-broker-api</module>
         <module>modules/matterhorn-message-broker-impl</module>
@@ -618,7 +606,6 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-impl</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -636,7 +623,6 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-remote</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -655,7 +641,6 @@
       <modules>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-workflow-service-api</module>
         <module>modules/matterhorn-serviceregistry</module>
@@ -673,7 +658,6 @@
       <modules>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-serviceregistry-remote</module>
       </modules>
     </profile>
@@ -688,7 +672,6 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-impl</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -715,7 +698,6 @@
         <module>modules/matterhorn-dataloader</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-userdirectory</module>
@@ -733,7 +715,6 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-security-ldap</module>
         <module>modules/matterhorn-userdirectory-ldap</module>
       </modules>
@@ -919,7 +900,6 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-load-test</module>
         <module>modules/matterhorn-runtime-info</module>
