@@ -3,193 +3,118 @@
 
   <feature name="opencast-core" version="2.1-SNAPSHOT">
 
+    <!-- Base features -->
     <feature>http-whiteboard</feature>
     <feature>scr</feature>
     <feature>webconsole</feature>
 
     <!-- Webconsole plugins -->
     <bundle>mvn:org.apache.felix/org.apache.felix.webconsole.plugins.ds/1.0.0</bundle>
-    <!--bundle>mvn:org.apache.felix/org.apache.felix.webconsole.plugins.packageadmin/1.0.0</bundle-->
 
+    <!-- OSGi specifications -->
     <bundle>mvn:org.osgi/org.osgi.compendium/4.2.0</bundle>
     <bundle>mvn:org.osgi/org.osgi.enterprise/4.2.0</bundle>
 
-    <bundle>mvn:org.aopalliance/com.springsource.org.aopalliance/1.0.0</bundle>
-
-    <bundle>mvn:org.springframework/spring-aop/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-asm/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-beans/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-context/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-context-support/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-core/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-expression/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-tx/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-web/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-core/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-web/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-core/1.2.1</bundle>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-extender/1.2.1</bundle>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-io/1.2.1</bundle>
-
-    <bundle>mvn:org.springframework.security/spring-security-config/3.1.0.RELEASE</bundle>
-
-
-    <bundle>mvn:com.entwinemedia.common/functional/1.1.1</bundle>
-
-    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1.1/2.5.0</bundle>
-    <!--bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxp-api-1.4/2.3.0</bundle-->
+    <!-- General specifications -->
+    <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
+    <bundle>mvn:javax.servlet.jsp/javax.servlet.jsp-api/2.3.1</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
+    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1.1/2.5.0</bundle>
     <bundle>mvn:org.eclipse.persistence/javax.persistence/2.0.3</bundle>
 
-
-    <bundle>mvn:javax.servlet.jsp/javax.servlet.jsp-api/2.3.1</bundle>
-    <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
-
-
+    <!-- 3rd party libraries -->
+    <bundle>mvn:com.entwinemedia.common/functional/1.1.1</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.3.2</bundle>
+    <bundle>mvn:com.google.guava/guava/18.0</bundle>
     <bundle>mvn:commons-codec/commons-codec/1.6</bundle>
-    <bundle>mvn:org.apache.commons/commons-compress/1.5</bundle>
     <bundle>mvn:commons-collections/commons-collections/3.2.1</bundle>
     <bundle>mvn:commons-fileupload/commons-fileupload/1.2.1</bundle>
     <bundle>mvn:commons-io/commons-io/2.1</bundle>
     <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
+    <bundle>mvn:joda-time/joda-time/2.7</bundle>
+    <bundle>mvn:org.aopalliance/com.springsource.org.aopalliance/1.0.0</bundle>
+    <bundle>mvn:org.apache.commons/com.springsource.org.apache.commons.beanutils/1.7.0</bundle>
+    <bundle>mvn:org.apache.commons/commons-compress/1.5</bundle>
     <bundle>mvn:org.apache.commons/commons-compress/1.5</bundle>
     <bundle>mvn:org.apache.commons/commons-csv/1.0</bundle>
-    <bundle>mvn:org.apache.commons/com.springsource.org.apache.commons.beanutils/1.7.0</bundle>
-
-
-    <!-- EclipseLink -->
-    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.antlr/2.0.2</bundle>
-    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.asm/2.0.2</bundle>
-    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.core/2.0.2</bundle>
-    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.jpa/2.0.2</bundle>
-
-
     <bundle>mvn:org.apache.cxf/cxf-bundle-jaxrs/2.2.9</bundle>
-    <bundle>mvn:org.apache.neethi/neethi/3.0.1</bundle>
-
-
-
-    <bundle>mvn:com.google.guava/guava/18.0</bundle>
-    <bundle>mvn:joda-time/joda-time/2.7</bundle>
-    <bundle>mvn:org.jdom/com.springsource.org.jdom/1.0.0</bundle>
-
-    <bundle>mvn:org.apache.httpcomponents/httpcore-osgi/4.3.3</bundle>
     <bundle>mvn:org.apache.httpcomponents/httpclient-osgi/4.3.6</bundle>
-
+    <bundle>mvn:org.apache.httpcomponents/httpcore-osgi/4.3.3</bundle>
+    <bundle>mvn:org.apache.neethi/neethi/3.0.1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/5.2_3</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/3.1_7</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jakarta-regexp/1.4_1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/1.8.5_1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.wsdl4j/1.6.3_1</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlbeans/2.6.0_2</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlschema/1.4.3_1</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/1.2_1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/2.7.2_2</bundle>
-
-    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.core/2.0.2</bundle>
-
-
-    <bundle>mvn:org.codehaus.jettison/jettison/1.3.1</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.3.2</bundle>
-    <bundle>mvn:org.apache.tika/tika-core/1.1</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlbeans/2.6.0_2</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/1.2_1</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlschema/1.4.3_1</bundle>
     <bundle>mvn:org.apache.tika/tika-bundle/1.1</bundle>
+    <bundle>mvn:org.apache.tika/tika-core/1.1</bundle>
+    <bundle>mvn:org.codehaus.jettison/jettison/1.3.1</bundle>
+    <bundle>mvn:org.jdom/com.springsource.org.jdom/1.0.0</bundle>
+    <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/1.1</bundle>
 
-    <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/1.1</bundle> <!-- replaces matterhorn-json -->
+    <!-- Spring Framework / Security -->
+    <bundle>mvn:org.springframework.osgi/spring-osgi-core/1.2.1</bundle>
+    <bundle>mvn:org.springframework.osgi/spring-osgi-extender/1.2.1</bundle>
+    <bundle>mvn:org.springframework.osgi/spring-osgi-io/1.2.1</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-config/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-core/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-web/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework/spring-aop/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework/spring-asm/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework/spring-beans/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework/spring-context-support/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework/spring-context/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework/spring-core/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework/spring-expression/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework/spring-tx/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework/spring-web/3.1.0.RELEASE</bundle>
 
-    <bundle>mvn:org.opencastproject/matterhorn-common/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-kernel/2.1-SNAPSHOT</bundle>
+    <!-- EclipseLink -->
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.core/2.0.2</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.antlr/2.0.2</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.asm/2.0.2</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.core/2.0.2</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.jpa/2.0.2</bundle>
 
-    <bundle>mvn:org.opencastproject/matterhorn-workflow-service-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-archive-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-metadata-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-workspace-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-scheduler-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-message-broker-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-ingest-service-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-series-service-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-inspection-service-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-series-service-impl/2.1-SNAPSHOT</bundle>
-
-    <bundle>mvn:org.opencastproject/matterhorn-dublincore/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-solr/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mpeg7/2.1-SNAPSHOT</bundle>
-
-    <bundle>mvn:org.opencastproject/matterhorn-archive-base/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-schema/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-kernel/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-archive-schema/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-inspection-workflowoperation/2.1-SNAPSHOT</bundle>
-
-    <bundle>mvn:org.opencastproject/matterhorn-search-service-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-publication-service-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-distribution-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-conductor/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-authorization-xacml/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-authorization-manager/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-capture-admin-service-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-comments/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-messages/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-participation-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-search-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-search/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-userdirectory/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-index-service/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-presets/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-static-file-service-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-composer-service-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-themes/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-smil-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-smil-impl/2.1-SNAPSHOT</bundle>
+    <!-- Opencast -->
     <bundle>mvn:org.opencastproject/matterhorn-admin-ui-ng/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-admin-ui/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-archive-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-archive-storage-fs/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-caption-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-capture-admin-service-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-working-file-repository-service-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-workflow-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-capture-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-comments-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-composer-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-db/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-deprecated-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-fileupload/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-holdstate-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-incident-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-ingest-service-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-ingest-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-lti/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-manipulator/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-ui/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-message-broker-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-metadata/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-notification-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-runtime-info/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-runtime-info-ui-ng/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-scheduler-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-scheduler-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-search-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-silencedetection-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-sox-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-sox-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-static-file-service-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-static/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-themes-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-videoeditor-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-videoeditor-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-videosegmenter-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-videosegmenter-workflowoperation/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-serviceregistry/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-workflow-service-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-acl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-download/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-streaming/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-publication-service-youtube-v3/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-annotation-api/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-annotation-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-archive-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-archive-base/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-archive-schema/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-archive-storage-fs/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-archive-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-authorization-manager/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-authorization-xacml/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-caption-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-caption-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-capture-admin-service-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-capture-admin-service-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-capture-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-comments-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-comments/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-common/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-composer-ffmpeg/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-composer-service-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-composer-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-conductor/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-dataloader/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-db/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-deprecated-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-dictionary-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-dictionary-regexp/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-acl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-download/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-streaming/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-distribution-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-dublincore/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-engage-theodul-api/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-engage-theodul-core/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-engage-theodul-plugin-controls/2.1-SNAPSHOT</bundle>
@@ -203,24 +128,80 @@
     <bundle>mvn:org.opencastproject/matterhorn-engage-theodul-plugin-timeline-statistics/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-engage-theodul-plugin-video-videojs/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-engage-ui/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-fileupload/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-holdstate-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-incident-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-index-service/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-ingest-service-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-ingest-service-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-ingest-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-inspection-service-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-inspection-service-ffmpeg/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-inspection-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-kernel/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-kernel/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-lti/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-manipulator/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-ui/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-message-broker-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-message-broker-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-messages/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-metadata-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-metadata/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-mpeg7/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-notification-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-participation-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-presets/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-publication-service-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-publication-service-youtube-v3/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-runtime-info-ui-ng/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-runtime-info/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-scheduler-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-scheduler-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-scheduler-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-schema/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-search-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-search-service-api/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-search-service-feeds/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-search-service-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-search-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-search/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-series-service-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-series-service-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-serviceregistry/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-silencedetection-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-silencedetection-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-smil-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-smil-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-solr/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-sox-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-sox-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-sox-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-static-file-service-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-static-file-service-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-static/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-textextractor-tesseract/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-themes-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-themes/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-userdirectory/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-usertracking-api/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-usertracking-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-caption-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-composer-ffmpeg/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-dictionary-api/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-dictionary-regexp/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-inspection-service-ffmpeg/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-silencedetection-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-sox-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-textextractor-tesseract/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-videoeditor-api/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-videoeditor-ffmpeg-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-videoeditor-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-videosegmenter-api/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-videosegmenter-ffmpeg/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-videosegmenter-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-workflow-service-api/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-workflow-service-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-workflow-workflowoperation/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-working-file-repository-service-api/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-working-file-repository-service-impl/2.1-SNAPSHOT</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-workspace-api/2.1-SNAPSHOT</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-workspace-impl/2.1-SNAPSHOT</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-dataloader/2.1-SNAPSHOT</bundle>
 
   </feature>
 
