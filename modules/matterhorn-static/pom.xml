@@ -76,9 +76,6 @@
             <Export-Package>
               org.opencastproject.fsresources;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/static.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
