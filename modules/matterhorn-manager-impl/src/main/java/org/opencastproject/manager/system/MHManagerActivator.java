@@ -75,7 +75,7 @@ public class MHManagerActivator implements BundleActivator {
     StaticResource staticResource = new StaticResource(getClass().getClassLoader(), "/ui-files", "/config/ui-files", null);
 
     Dictionary<String, String> resourceProps = new Hashtable<String, String>();
-    resourceProps.put("contextId", RestConstants.HTTP_CONTEXT_ID);
+    resourceProps.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
     resourceProps.put("alias", "/ui-files");
 
     staticResourceRegistration = bundleContext.registerService(Servlet.class.getName(), staticResource, resourceProps);

@@ -117,7 +117,7 @@ public class Activator implements BundleActivator {
     private void registerStaticResources(File overrideDir, BundleContext bc) {
         // build properties
         Dictionary<String, String> props = new Hashtable<String, String>();
-        props.put("contextId", RestConstants.HTTP_CONTEXT_ID);
+        props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
         props.put("alias", URL_ALIAS);
 
         // instantiate Servelet that delivers the resources

@@ -69,8 +69,8 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
     // Register the security filter
     securityFilter = new SecurityFilter(securityService);
     Dictionary props = new Hashtable<String, Boolean>();
-    props.put("contextId", RestConstants.HTTP_CONTEXT_ID);
-    props.put("pattern", ".*");
+    props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
+    props.put("urlPatterns", "*");
     props.put("service.ranking", "2");
     filterRegistration = bundleContext.registerService(Filter.class.getName(), securityFilter, props);
   }

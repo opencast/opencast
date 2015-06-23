@@ -143,7 +143,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
             new BundleDelegatingClassLoader(plugin.getServiceReference().getBundle()),
             EngagePlugin.STATIC_RESOURCES_PATH, plugin.getStaticResourcesPath(), null);
     Dictionary<String, String> props = new Hashtable<String, String>();
-    props.put("contextId", RestConstants.HTTP_CONTEXT_ID);
+    props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
     props.put("alias", PLUGIN_URL_PREFIX + plugin.getStaticResourcesPath());
     return bundleContext.registerService(Servlet.class.getName(), staticResource, props);
   }

@@ -4,7 +4,7 @@
   <implementation class="org.opencastproject.fsresources.StaticResourceServlet" />
   <property name="service.description" value="Opencast Download Resources" />
   <property name="alias" value="/static" />
-  <property name="contextId" value="opencast.httpcontext" />
+  <property name="httpContext.id" value="opencast.httpcontext" />
   <service>
     <provide interface="javax.servlet.Servlet" />
   </service>

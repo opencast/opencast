@@ -175,7 +175,7 @@ public class RestPublisher implements RestConstants {
     boolean jobProducer = Boolean.parseBoolean((String) ref.getProperty(SERVICE_JOBPRODUCER_PROPERTY));
     try {
       Dictionary<String, Object> props = new Hashtable<String, Object>();
-      props.put("contextId", RestConstants.HTTP_CONTEXT_ID);
+      props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
       props.put("alias", servicePath);
       props.put(SERVICE_TYPE_PROPERTY, serviceType);
       props.put(SERVICE_PATH_PROPERTY, servicePath);
@@ -381,7 +381,7 @@ public class RestPublisher implements RestConstants {
       if (classpath != null && alias != null) {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put("alias", alias);
-        props.put("contextId", RestConstants.HTTP_CONTEXT_ID);
+        props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
 
         StaticResource servlet = new StaticResource(new StaticResourceClassLoader(bundle), classpath, alias,
                 welcomeFile);

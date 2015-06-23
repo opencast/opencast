@@ -50,14 +50,14 @@ public class Activator implements BundleActivator {
   public void start(BundleContext bundleContext) throws Exception {
     StaticResource staticResource = new StaticResource(getClass().getClassLoader(), "/res", "/system/console/res", null);
     Dictionary<String, String> resourceProps = new Hashtable<String, String>();
-    resourceProps.put("contextId", RestConstants.HTTP_CONTEXT_ID);
+    resourceProps.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
     resourceProps.put("alias", "/system/console/res");
     staticResourceRegistration = bundleContext.registerService(Servlet.class.getName(), staticResource, resourceProps);
 
     manager = new WebConsole(bundleContext);
     Dictionary<String, String> consoleProps = new Hashtable<String, String>();
     consoleProps.put("alias", "/system/console");
-    consoleProps.put("contextId", RestConstants.HTTP_CONTEXT_ID);
+    consoleProps.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
     webConsoleRegistration = bundleContext.registerService(Servlet.class.getName(), manager, consoleProps);
   }
 
