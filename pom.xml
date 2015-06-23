@@ -82,7 +82,6 @@
         <module>modules/matterhorn-participation-api</module>
         <module>modules/matterhorn-presets</module>
         <module>modules/matterhorn-publication-service-api</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-runtime-info-ui-ng</module>
         <module>modules/matterhorn-scheduler-api</module>
@@ -141,7 +140,6 @@
         <module>modules/matterhorn-message-broker-impl</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-scheduler-api</module>
         <module>modules/matterhorn-scheduler-impl</module>
@@ -177,7 +175,6 @@
         <module>modules/matterhorn-message-broker-impl</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-scheduler-api</module>
@@ -222,7 +219,6 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-publication-service-api</module>
         <module>modules/matterhorn-publication-service-youtube-v3</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -261,7 +257,6 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-publication-service-api</module>
         <module>modules/matterhorn-publication-service-youtube-v3</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
@@ -299,7 +294,6 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-publication-service-api</module>
         <module>modules/matterhorn-publication-service-youtube-remote</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
@@ -343,7 +337,6 @@
         <module>modules/matterhorn-message-broker-impl</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-feeds</module>
@@ -395,7 +388,6 @@
         <module>modules/matterhorn-message-broker-impl</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-search-service-api</module>
@@ -438,7 +430,6 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-publication-service-api</module>
         <module>modules/matterhorn-publication-service-youtube-remote</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-remote</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -475,7 +466,6 @@
         <module>modules/matterhorn-message-broker-impl</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-impl</module>
@@ -527,7 +517,6 @@
         <module>modules/matterhorn-message-broker-impl</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-series-service-api</module>
@@ -575,7 +564,6 @@
         <module>modules/matterhorn-message-broker-impl</module>
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-silencedetection-api</module>
         <module>modules/matterhorn-silencedetection-remote</module>
