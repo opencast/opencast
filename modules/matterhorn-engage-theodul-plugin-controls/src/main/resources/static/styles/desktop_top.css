@@ -181,3 +181,8 @@
     background-color: #dddddd;
 /* border-bottom: 1px solid #cccccc; */
 }
+
+#headerLogo {
+    height: 36px;
+    margin-top: -7px;
+}

@@ -1,5 +1,4 @@
-<!--
-<a class="remove"></a>
+<!-- 
 <a class="play" ng-class="{ on: row.publications.Engage }"></a>
 -->
 <a data-open-modal="event-details"
@@ -7,6 +6,13 @@
 	class="more"
 	with-role="ROLE_UI_EVENTS_DETAILS_VIEW">
 </a>
+
+<a class="remove"
+	data-confirmation-modal="confirm-modal"
+    data-callback="table.delete"
+    data-object="row.id"
+    with-role="ROLE_UI_EVENTS_DELETE"
+></a>
 
 <a ng-if="row.has_preview" href="#/events/events/{{row.id}}/tools/playback"
 	class="preview"
@@ -27,3 +33,4 @@
 	data-tab="comments"
 	class="fa fa-comment">
 </a>
+

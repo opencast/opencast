@@ -27,6 +27,8 @@
     cardinality="1..1" policy="static" bind="setSeriesService" />
   <reference name="workflow-service" interface="org.opencastproject.workflow.api.WorkflowService"
     cardinality="1..1" policy="static" bind="setWorkflowService" />
+  <reference name="agentService" interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
+    cardinality="0..1" policy="dynamic" bind="setCaptureAgentStateService" unbind="unsetCaptureAgentStateService" />
   <reference name="dublincore-service" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
     cardinality="1..1" policy="static" bind="setDublinCoreCatalogService" />
 </scr:component>

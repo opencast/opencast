@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.index.service.impl;
 
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
@@ -54,6 +60,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -340,6 +347,15 @@ public class IndexServiceImpl implements IndexService {
         throw new IllegalArgumentException("No multipart content");
       }
 
+      // MH-10834 If there is only an audio track, change the flavor from presenter-audio/source to presenter/source.
+      if (mp.getTracks().length == 1
+              && mp.getTracks()[0].getFlavor().equals(new MediaPackageElementFlavor("presenter-audio", "source"))) {
+        Track audioTrack = mp.getTracks()[0];
+        mp.remove(audioTrack);
+        audioTrack.setFlavor(MediaPackageElements.PRESENTER_SOURCE);
+        mp.add(audioTrack);
+      }
+
       return createEvent(metadataJson, mp);
     } catch (Exception e) {
       logger.error("Unable to create event: {}", ExceptionUtils.getStackTrace(e));
@@ -481,8 +497,6 @@ public class IndexServiceImpl implements IndexService {
         throw new IllegalArgumentException("Unable to parse access control list!");
       }
     }
-
-    acl = extendAclWithCurrentUser.curry(getSecurityService().getUser().getUsername()).apply(acl);
 
     switch (type) {
       case UPLOAD:
@@ -838,8 +852,6 @@ public class IndexServiceImpl implements IndexService {
         throw new IllegalArgumentException("Unable to parse access control list!");
       }
     }
-
-    acl = extendAclWithCurrentUser.apply(securityService.getUser().getUsername(), acl);
 
     String seriesId;
     try {

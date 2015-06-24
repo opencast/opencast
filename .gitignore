@@ -31,10 +31,15 @@ www/
 
 # Ignore all temporary editor files
 *.swp
+*.iml
+.idea
 
 # Ignore Maven files and local repository
 /.m2/
 /settings.xml
+
+# Ignore mkdocs sites
+docs/guides/*/site
 
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked

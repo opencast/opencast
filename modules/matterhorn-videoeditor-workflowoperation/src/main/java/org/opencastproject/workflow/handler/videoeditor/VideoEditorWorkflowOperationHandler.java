@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.videoeditor;
 
 import org.opencastproject.job.api.Job;
@@ -174,7 +180,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     String previewTrackFlavorsProperty = StringUtils.trimToNull(worflowOperationInstance
             .getConfiguration(PREVIEW_FLAVORS_PROPERTY));
     if (previewTrackFlavorsProperty == null) {
-      logger.info("Configuration property {} not set, use preview tracks from smil catalog");
+      logger.info("Configuration property '{}' not set, use preview tracks from smil catalog", PREVIEW_FLAVORS_PROPERTY);
     }
 
     if (StringUtils.trimToNull(worflowOperationInstance.getConfiguration(TARGET_FLAVOR_SUBTYPE_PROPERTY)) == null) {
@@ -193,13 +199,20 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
 
     if (smilCatalogs.isEmpty()) {
-      if (previewTrackFlavorsProperty == null) {
-        throw new WorkflowOperationException(String.format("No smil catalogs found in mediapackage %s with flavors %s",
-                mp.getIdentifier().compact(), smilFlavorsProperty));
+
+      // There is nothing to do, skip the operation
+      if (!interactive) {
+        logger.info("Skipping cutting opertion since no edit decision list is available");
+        return skip(workflowInstance, context);
       }
 
-      // no smil catalogs exists but preview flavors are set
-      // create new smil catalog
+      // Without SMIL catalogs and without preview tracks, there is nothing we can do
+      if (previewTrackFlavorsProperty == null) {
+        throw new WorkflowOperationException(String.format("No smil catalogs with flavor %s nor preview files with flavor %s found in mediapackage %s",
+                smilFlavorsProperty, previewTrackFlavorsProperty, mp.getIdentifier().compact()));
+      }
+
+      // Basd on the preview trcks, create new and empty SMIL catalog
       TrackSelector trackSelector = new TrackSelector();
       for (String flavor : asList(previewTrackFlavorsProperty)) {
         trackSelector.addFlavor(flavor);
@@ -280,7 +293,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
       return createResult(mp, Action.PAUSE);
     } else {
       logger.debug("Move on, SMIL catalog ({}) already exists for media package '{}'", targetSmilFlavor, mp);
-      return resume(workflowInstance, context, Collections.EMPTY_MAP);
+      return resume(workflowInstance, context, Collections.<String, String> emptyMap());
     }
   }
 

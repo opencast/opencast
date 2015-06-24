@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 
 package org.opencastproject.index.service.impl.index.event;
 
@@ -68,6 +74,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private String workflowDefinition = null;
   private Long duration = null;
   private String startDate = null;
+  private String eventStatus = null;
   private String reviewStatus = null;
   private String schedulingStatus = null;
   private Boolean optedOut = null;
@@ -910,6 +917,28 @@ public class EventSearchQuery extends AbstractSearchQuery {
   }
 
   /**
+   * Selects recordings with the given event status.
+   *
+   * @param eventStatus
+   *          the event status
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withEventStatus(String eventStatus) {
+    clearExpectations();
+    this.eventStatus = eventStatus;
+    return this;
+  }
+
+  /**
+   * Returns the event status of the recording.
+   *
+   * @return the event status
+   */
+  public String getEventStatus() {
+    return eventStatus;
+  }
+
+  /**
    * Selects recordings with the given review date.
    *
    * @param reviewDate
@@ -1318,6 +1347,27 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public Order getSchedulingStatusSortOrder() {
     return getSortOrder(EventIndexSchema.SCHEDULING_STATUS);
+  }
+
+  /**
+   * Defines the sort order for the event status.
+   *
+   * @param order
+   *          the sort order
+   * @return the updated query
+   */
+  public EventSearchQuery sortByEventStatus(Order order) {
+    withSortOrder(EventIndexSchema.EVENT_STATUS, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the event status.
+   *
+   * @return the sort order
+   */
+  public Order getEventStatusSortOrder() {
+    return getSortOrder(EventIndexSchema.EVENT_STATUS);
   }
 
 }

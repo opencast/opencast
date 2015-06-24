@@ -216,6 +216,8 @@
     <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="digestFilter" />
 
+    <sec:custom-filter ref="asyncTimeoutRedirectFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
+
     <!-- Matterhorn is shipping its own implementation of the anonymous filter -->
     <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
 
@@ -238,6 +240,12 @@
     <sec:logout success-handler-ref="logoutSuccessHandler" />
 
   </sec:http>
+
+  <!-- ########################################### -->
+  <!-- # Custom ajax timeout Filter Definition   # -->
+  <!-- ########################################### --> 
+
+  <bean id="asyncTimeoutRedirectFilter" class="org.opencastproject.kernel.security.AsyncTimeoutRedirectFilter" />
 
   <!-- ######################################## -->
   <!-- # Custom Anonymous Filter Definition   # -->

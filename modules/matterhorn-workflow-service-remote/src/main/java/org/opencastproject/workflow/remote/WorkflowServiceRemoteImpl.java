@@ -1,24 +1,33 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.remote;
+
+import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -28,6 +37,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
+import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowListener;
@@ -56,6 +66,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -475,7 +486,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    * @see org.opencastproject.workflow.api.WorkflowService#resume(long)
    */
   @Override
-  public WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowDatabaseException {
+  public WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, UnauthorizedException,
+          WorkflowException, IllegalStateException {
     return resume(workflowInstanceId, null);
   }
 
@@ -486,22 +498,22 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public WorkflowInstance resume(long workflowInstanceId, Map<String, String> properties) throws NotFoundException,
-          WorkflowDatabaseException {
+          UnauthorizedException, WorkflowException, IllegalStateException {
     HttpPost post = new HttpPost("/resume");
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("id", Long.toString(workflowInstanceId)));
     if (properties != null)
       params.add(new BasicNameValuePair("properties", mapToString(properties)));
-    try {
-      post.setEntity(new UrlEncodedFormEntity(params));
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
-    }
-    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND);
+    post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
+    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_CONFLICT);
     try {
       if (response != null) {
         if (response.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
           throw new NotFoundException("Workflow instance with id='" + workflowInstanceId + "' not found");
+        } else if (response.getStatusLine().getStatusCode() == SC_UNAUTHORIZED) {
+          throw new UnauthorizedException("You do not have permission to resume");
+        } else if (response.getStatusLine().getStatusCode() == SC_CONFLICT) {
+          throw new IllegalStateException("Can not resume a workflow where the current state is not in paused");
         } else {
           logger.info("Workflow '{}' resumed", workflowInstanceId);
           return WorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
@@ -509,12 +521,16 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
       }
     } catch (NotFoundException e) {
       throw e;
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (IllegalStateException e) {
+      throw e;
     } catch (Exception e) {
-      throw new WorkflowDatabaseException(e);
+      throw new WorkflowException(e);
     } finally {
       closeConnection(response);
     }
-    throw new WorkflowDatabaseException("Unable to resume workflow instance " + workflowInstanceId);
+    throw new WorkflowException("Unable to resume workflow instance " + workflowInstanceId);
   }
 
   /**
@@ -677,7 +693,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   @Override
   public void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
     if (buffer < 0) {
-      throw new IllegalArgumentException("Buffer '" + buffer + "' is not a valid value, it must be equal or greater than 0.");
+      throw new IllegalArgumentException("Buffer '" + buffer
+              + "' is not a valid value, it must be equal or greater than 0.");
     }
 
     HttpPost post = new HttpPost("/failMissedCaptures");
@@ -705,7 +722,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   @Override
   public void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
     if (buffer < 0) {
-      throw new IllegalArgumentException("Buffer '" + buffer + "' is not a valid value, it must be equal or greater than 0.");
+      throw new IllegalArgumentException("Buffer '" + buffer
+              + "' is not a valid value, it must be equal or greater than 0.");
     }
 
     HttpPost post = new HttpPost("/failMissedIngests");

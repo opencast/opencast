@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.index.service.catalog.adapter;
 
 import static com.entwinemedia.fn.data.json.Jsons.a;
@@ -99,11 +105,11 @@ public class MetadataField<A> {
    * fields should be formatted (if needed).
    */
   public enum TYPE {
-    BOOLEAN, DATE, DURATION, ITERABLE_TEXT, LONG, START_DATE, START_TIME, TEXT, TEXT_LONG
+    BOOLEAN, DATE, DURATION, ITERABLE_TEXT, MIXED_TEXT, LONG, START_DATE, START_TIME, TEXT, TEXT_LONG
   }
 
   public enum JSON_TYPE {
-    BOOLEAN, DATE, NUMBER, TEXT, TEXT_LONG, TIME
+    BOOLEAN, DATE, NUMBER, TEXT, MIXED_TEXT, TEXT_LONG, TIME
   }
 
   /** The id of a collection to validate values against. */
@@ -433,6 +439,74 @@ public class MetadataField<A> {
     };
     return new MetadataField<String>(inputID, outputID, label, readOnly, required, "", TYPE.DURATION, JSON_TYPE.TEXT,
             collection, collectionId, periodToJSON, jsonToPeriod, order, namespace);
+  }
+
+  /**
+   * Create a metadata field of type iterable String
+   *
+   * @param id
+   *          The identifier of the new metadata field
+   * @param label
+   *          The label of the new metadata field
+   * @param readOnly
+   *          Define if the new metadata field can be or not edited
+   * @param required
+   *          Define if the new metadata field is or not required
+   * @param collection
+   *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
+   *          be none.
+   * @param order
+   *          The ui order for the new field, 0 at the top and progressively down from there.
+   * @return the new metadata field
+   */
+  public static MetadataField<Iterable<String>> createMixedIterableStringMetadataField(String inputID,
+          Opt<String> outputID, String label, boolean readOnly, boolean required, Opt<Map<String, Object>> collection,
+          Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
+
+    Fn<Opt<Iterable<String>>, JValue> iterableToJSON = new Fn<Opt<Iterable<String>>, JValue>() {
+      @Override
+      public JValue ap(Opt<Iterable<String>> value) {
+        if (value.isNone())
+          return a();
+
+        Object val = value.get();
+        List<JValue> list = new ArrayList<JValue>();
+
+        if (val instanceof String) {
+          // The value is a string so we need to split it.
+          String stringVal = (String) val;
+          for (String entry : stringVal.split(",")) {
+            if (StringUtils.isNotBlank(entry))
+              list.add(vN(entry));
+          }
+        } else {
+          // The current value is just an iterable string.
+          for (Object v : value.get()) {
+            list.add(vN(v));
+          }
+        }
+        return a(list);
+      }
+    };
+
+    Fn<Object, Iterable<String>> jsonToIterable = new Fn<Object, Iterable<String>>() {
+      @Override
+      public Iterable<String> ap(Object arrayIn) {
+        JSONArray array = (JSONArray) arrayIn;
+        if (array == null)
+          return null;
+        String[] arrayOut = new String[array.size()];
+        for (int i = 0; i < array.size(); i++) {
+          arrayOut[i] = (String) array.get(i);
+        }
+        return Arrays.asList(arrayOut);
+      }
+
+    };
+
+    return new MetadataField<Iterable<String>>(inputID, outputID, label, readOnly, required, new ArrayList<String>(),
+            TYPE.MIXED_TEXT, JSON_TYPE.MIXED_TEXT, collection, collectionId, iterableToJSON, jsonToIterable, order,
+            namespace);
   }
 
   /**

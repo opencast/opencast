@@ -242,10 +242,11 @@ describe('Event controller', function () {
 
             this.role = 'ROLE_TEST';
 
-            $scope.access = {
-                episode_access: {
-                    current_acl: 123
-                }
+            $scope.policies = [];
+            $scope.policies[0] = {
+                role  : 'admin',
+                read  : true,
+                write : true
             };
 
             spyOn(EventAccessResource, 'save');
@@ -254,7 +255,7 @@ describe('Event controller', function () {
             expect(EventAccessResource.save).toHaveBeenCalledWith({
                 id: $scope.resourceId,
             }, {
-                acl: { ace: [] },
+                acl: { ace: [ { action : 'read', allow : true, role : 'admin' }, { action : 'write', allow : true, role : 'admin' } ] },
                 override: true
             });
         });

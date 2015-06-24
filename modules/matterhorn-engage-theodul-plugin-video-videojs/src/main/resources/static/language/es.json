@@ -1,0 +1,16 @@
+{
+  "value_locale":"es",
+  "error_AudioCodecNotSupported":"Error: El códec de audio no es compatible con este navegador",
+  "error_AudioElementNotSupported":"Error: Your browser does not support the audio element.",
+  "switchPlayer":"Cambiar reproductor",
+  "video":"Vídeo",
+  "video_short":"Vid.",
+  "openInPlayer":"Abrir en el reproductor",
+  "givenTime":"The given time",
+  "hasToBeSmallerThanDuration":"has to be smaller than the duration",
+  "msg_waitToSetTime":"Please wait setting a playback time until the video is loaded.",
+  "msg_startPlayingToSetTime":"Please start playing the video before setting a playback time.",
+  "msg_waitToSeek":"Seeking is not possible until the video is loaded.",
+  "msg_startPlayingToSeek":"Seeking is not possible before clicking on the Play button at least once.",
+  "chromeBuffer":"Se ha desactivado la comprobación del búfer debido a una limitación de Chrome. Es posible que esto afecte a la calidad de reproducción."
+}

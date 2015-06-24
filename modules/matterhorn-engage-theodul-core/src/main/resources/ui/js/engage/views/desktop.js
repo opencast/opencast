@@ -1,14 +1,19 @@
 /**
- * Copyright 2009-2011 The Regents of the University of California Licensed
- * under the Educational Community License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain a
- * copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- * http://www.osedu.org/licenses/ECL-2.0
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
  *
@@ -83,21 +88,6 @@ define(["jquery", "engage/core", "engage/models/engage", "engage/tab_logic"], fu
      * init logic function
      */
     var initDesktopView = function() {
-        // load bootstrap css
-        var link = $("<link>");
-        link.attr({
-            type: "text/css",
-            rel: "stylesheet",
-            href: "css/bootstrap/css/bootstrap.css"
-        });
-        $("head").append(link);
-        link = $("<link>");
-        link.attr({
-            type: "text/css",
-            rel: "stylesheet",
-            href: "css/bootstrap/css/bootstrap-responsive.css"
-        });
-        $("head").append(link);
         // build timeline plugins
         $("#" + id_engage_timeline_expand_btn).click(function() {
             $("#" + id_engage_timeline_plugin).slideToggle("fast");
@@ -130,7 +120,7 @@ define(["jquery", "engage/core", "engage/models/engage", "engage/tab_logic"], fu
             case id_engage_tab:
                 var tab_ref = plugin.name.replace(/ /g, "_");
                 // insert tab navigation line
-                var tabNavTag = "<li><a href=\"#" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + "\">" + (((translationData != null) && (translationData[plugin_name] != undefined)) ? translationData[plugin_name] : plugin.name) + "</a></li>";
+                var tabNavTag = "<li><a href=\"#" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + "\"><div id=\"engage_tab_" + plugin.name.replace(/\s/g,"_") + "\">" + (((translationData != null) && (translationData[plugin_name] != undefined)) ? translationData[plugin_name] : plugin.name) + "</div></a></li>";
                 $("#" + id_engage_tab_nav).prepend(tabNavTag);
                 // insert tab content
                 var tabTag = "<div class=\"" + class_tab_pane + "\" id=\"" + id_engage_tab_split1 + tab_ref + id_engage_tab_split2 + "\">" + plugin.templateProcessed + "</div>";

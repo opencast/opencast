@@ -1,21 +1,28 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.message.broker.impl;
 
-import static org.opencastproject.util.OsgiUtil.getCfg;
+import static org.opencastproject.util.OsgiUtil.getContextProperty;
+import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageSender;
@@ -27,12 +34,11 @@ import org.opencastproject.util.data.Option;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Dictionary;
 
 import javax.jms.BytesMessage;
 import javax.jms.Destination;
@@ -42,7 +48,7 @@ import javax.jms.Message;
 /**
  * A class built to send JMS messages through ActiveMQ.
  */
-public class MessageSenderImpl extends MessageBaseFacility implements ManagedService, MessageSender {
+public class MessageSenderImpl extends MessageBaseFacility implements MessageSender {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(MessageSenderImpl.class);
@@ -57,16 +63,19 @@ public class MessageSenderImpl extends MessageBaseFacility implements ManagedSer
   private ConfigurationAdmin configAdmin;
 
   /** OSGi component activate callback */
-  public void activate() throws Exception {
+  public void activate(ComponentContext cc) throws Exception {
     logger.info("MessageSender service is starting...");
+    final String url = getContextProperty(cc, ACTIVEMQ_BROKER_URL_KEY);
+    Option<String> username = getOptContextProperty(cc, ACTIVEMQ_BROKER_USERNAME_KEY);
+    Option<String> password = getOptContextProperty(cc, ACTIVEMQ_BROKER_PASSWORD_KEY);
 
-    Dictionary<?, ?> config = configAdmin.getConfiguration(SERVICE_PID).getProperties();
-    if (config != null) {
-      updated(config);
-    } else {
-      throw new IllegalStateException(String.format("Configuration for service with PID %s is missing.", SERVICE_PID));
+    logger.info("MessageSender is configured to connect with URL {}", url);
+    try {
+        disconnectMessageBroker();
+        connectMessageBroker(url, username, password);
+    } catch (JMSException e) {
+        throw new ConfigurationException(ACTIVEMQ_BROKER_URL_KEY, url, e);
     }
-
     logger.info("MessageSender service successfully started");
   }
 
@@ -171,22 +180,6 @@ public class MessageSenderImpl extends MessageBaseFacility implements ManagedSer
   public void sendObjectMessage(String destinationId, DestinationType type, Serializable object) {
     send(destinationId, type, Option.<Message> none(), Option.<String> none(), Option.<byte[]> none(),
             Option.<Integer> none(), Option.<Integer> none(), Option.option(object));
-  }
-
-  @SuppressWarnings("rawtypes")
-  @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
-    if (properties != null) {
-      final String url = getCfg(properties, ACTIVEMQ_BROKER_URL_KEY);
-      logger.info("MessageSender is configured to connect with URL {}", url);
-
-      try {
-        disconnectMessageBroker();
-        connectMessageBroker(url);
-      } catch (JMSException e) {
-        throw new ConfigurationException(ACTIVEMQ_BROKER_URL_KEY, null, e);
-      }
-    }
   }
 
   /** OSGi DI callback */

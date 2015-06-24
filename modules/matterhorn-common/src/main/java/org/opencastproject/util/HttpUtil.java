@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.util;
 
 import static org.opencastproject.util.EqualsUtil.eq;
@@ -109,7 +115,8 @@ public final class HttpUtil {
   }
 
   public static final Function<Tuple<String, String>, NameValuePair> param_ = new Function<Tuple<String, String>, NameValuePair>() {
-    @Override public NameValuePair apply(Tuple<String, String> p) {
+    @Override
+    public NameValuePair apply(Tuple<String, String> p) {
       return param(p);
     }
   };
@@ -122,8 +129,8 @@ public final class HttpUtil {
   };
 
   /**
-   * Return the content of the response as a string if its status code equals one of the given statuses.
-   * Throw an exception on an unexpected status.
+   * Return the content of the response as a string if its status code equals one of the given statuses. Throw an
+   * exception on an unexpected status.
    * <p/>
    * Function composition of {@link #getContentFn} and {@link #expect(int...)}.
    */
@@ -142,7 +149,8 @@ public final class HttpUtil {
 
   /** Return the content of the response as a string. */
   public static final Function<HttpResponse, String> getContentFn = new Function.X<HttpResponse, String>() {
-    @Override public String xapply(HttpResponse httpResponse) throws Exception {
+    @Override
+    public String xapply(HttpResponse httpResponse) throws Exception {
       final Header h = httpResponse.getEntity().getContentEncoding();
       if (h != null) {
         return IOUtils.toString(httpResponse.getEntity().getContent(), h.getValue());
@@ -159,7 +167,8 @@ public final class HttpUtil {
       public HttpResponse xapply(HttpResponse response) {
         final int sc = response.getStatusLine().getStatusCode();
         for (int s : status) {
-          if (sc == s) return response;
+          if (sc == s)
+            return response;
         }
         String responseBody;
         try {
@@ -167,7 +176,8 @@ public final class HttpUtil {
         } catch (IOException e) {
           responseBody = "";
         }
-        throw new RuntimeException("Returned status " + sc + " does not match any of the expected codes. " + responseBody);
+        throw new RuntimeException("Returned status " + sc + " does not match any of the expected codes. "
+                + responseBody);
       }
     };
   }

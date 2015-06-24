@@ -1,16 +1,22 @@
 /**
- * Copyright 2009-2011 The Regents of the University of California Licensed
- * under the Educational Community License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain a
- * copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- * http://www.osedu.org/licenses/ECL-2.0
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
+ *
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
@@ -84,7 +90,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var username = "Anonymous";
     var askedForLogin = false;
     var springSecurityLoginURL = "/j_spring_security_check";
-    var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
+    var springLoggedInStrCheck = "<title>Opencast – Login Page</title>";
     // shortcuts
     var shortcut_playPause = "playPause";
     var shortcut_seekLeft = "seekLeft";
@@ -118,19 +124,15 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     }
 
     function detectLanguage() {
-        return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+        var language = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+        return language.replace(/\-.*/,'');
     }
 
     function initTranslate(language) {
         var jsonstr = "";
 
-        if (language == "de") {
-            // console.log("Core: Chosing german translations");
-            jsonstr += path_language_de;
-        } else { // No other languages supported, yet
-            // console.log("Core: Chosing english translations");
-            jsonstr += path_language_en;
-        }
+        console.log("Controls: selecting language " + language);
+        jsonstr += "language/" + language + ".json";
         $.ajax({
             url: jsonstr,
             dataType: "json",
@@ -261,8 +263,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     function bindShortcutsToEvents() {
         // disable scrolling when pressing the space bar
         $(document).keydown(function(e) {
-            // space = 32, backspace = 8, page up = 73, page down = 81, enter = 10, carriage return = 13
-            if ((e.keyCode == 32) || (e.keyCode == 8) || (e.keyCode == 73) || (e.keyCode == 81) || (e.keyCode == 10)) {
+            // space = 32, backspace = 8, page up = 73, page down = 33, enter = 13
+            if (((e.keyCode == 32) || (e.keyCode == 8) || (e.keyCode == 33) || (e.keyCode == 34) || (e.keyCode == 13)) && ((e.target != $("input#username")[0]) && (e.target != $("input#password")[0]))) {
                 return false;
             }
         });
@@ -349,7 +351,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         });
         return all_plugins_loaded;
     }
-    
+
     function loadTemplate(plugin, plugin_name, plugin_path) {
         if (plugin.template !== "none") {
             // load template asynchronously
@@ -513,6 +515,107 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             }
             return evaluated_plugin_path;
         },
+        loadInfoMeModel: function(func) {
+            require(["engage/models/meInfo"], function(me) {
+                MeInfoModel = new me();
+                // wait that me infos are loaded
+                var intv = window.setInterval(function() {
+                    if (MeInfoModel.ready()) {
+                        window.clearInterval(intv);
+                        if (func && (typeof func === "function")) {
+                            func();
+                        }
+                    }
+                }, 15);
+            });
+        },
+        loadCoreUI: function() {
+            // switch view template and css rules for current player mode
+            // link tag for css file
+            var cssLinkTag = $("<link>");
+            var cssAttr = {
+                type: "text/css",
+                rel: "stylesheet"
+            };
+            engageCore.controls_top = MeInfoModel.getPositionControls() == "top"; // bottom else
+            engageCore.log("Core: Position of the controls is " + (engageCore.controls_top ? "top" : "bottom"));
+
+            // template obj
+            var core_template = "none";
+            // path to the require module with the view logic
+            var view_logic_path = "";
+            switch (engageCore.model.get("mode")) {
+                case "embed":
+                    cssAttr.href = "css/core_embed_style.css";
+                    core_template = "templates/core_embed.html";
+                    view_logic_path = "engage/views/embed";
+                    engageCore.model.embed = true;
+                    break;
+                case "mobile":
+                    cssAttr.href = "css/core_mobile_style.css";
+                    core_template = "templates/core_mobile.html";
+                    view_logic_path = "engage/views/mobile";
+                    engageCore.model.mobile = true;
+                    break;
+                case "desktop":
+                default:
+                    cssAttr.href = engageCore.controls_top ? "css/core_desktop_style_top.css" : "css/core_desktop_style_bottom.css";
+                    core_template = engageCore.controls_top ? "templates/core_desktop_top.html" : "templates/core_desktop_bottom.html";
+                    view_logic_path = "engage/views/desktop";
+                    engageCore.model.desktop = true;
+                    break;
+            }
+            cssLinkTag.attr(cssAttr);
+            // add css to DOM
+            $("head").append(cssLinkTag);
+            // load js view logic via require, see files in views/
+            require([view_logic_path], function(pluginView) {
+                // link view logic to the core
+                engageCore.pluginView = pluginView;
+                engageCore.loadCoreTemplate(core_template);
+            });
+        },
+        loadCoreTemplate: function(core_template) {
+            // get core template
+            $.get(core_template, function(template) {
+                // set template, render it and add it to DOM
+                engageCore.template = template;
+                $(engageCore.el).html(_.template(template)).trigger("create"); // variables do not work in here!
+                // run init function of the view
+                engageCore.pluginView.initView();
+                if (engageCore.model.get("pluginsInfo") && engageCore.model.browserSupported) {
+                    engageCore.loadPlugins();
+                    bindShortcutsToEvents(); // bind configured shortcuts to events
+                } else {
+                    engageCore.trigger(events.plugin_load_done.getName());
+                }
+            });
+        },
+        loadPlugins: function() {
+            engageCore.model.get("pluginsInfo").fetch({
+                success: function(pluginInfos) {
+                    if ((pluginInfos.get("pluginlist").plugins != undefined) && pluginInfos.get("pluginlist")) {
+                        numberOfPlugins = pluginInfos.get("pluginlist").plugins.length;
+                        if ($.isArray(pluginInfos.get("pluginlist").plugins)) {
+                            $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
+                                var plugin_name = value["name"];
+                                plugins_loaded[plugin_name] = false;
+                            });
+                            $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
+                                var plugin_name = value["name"];
+                                engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + value["static-path"] + "/") + "'...");
+                                loadPlugin("../../../plugin/" + value["static-path"] + "/", plugin_name);
+                            });
+                        } else {
+                            var plugin_name = pluginInfos.get("pluginlist").plugins["name"];
+                            plugins_loaded[plugin_name] = false;
+                            engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/") + "'...");
+                            loadPlugin("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/", plugin_name);
+                        }
+                    }
+                }
+            });
+        },
         initialize: function() {
             $("." + class_loading).show();
             $("#" + id_loading1).show();
@@ -533,96 +636,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
             this.model.mobile = false;
             // core init event
             this.dispatcher.on(events.coreInit.getName(), function() {
-                require(["engage/models/meInfo"], function(me) {
-                    MeInfoModel = new me();
-                    // wait that me infos are loaded
-                    var intv = window.setInterval(function() {
-                        if (MeInfoModel.ready()) {
-                            window.clearInterval(intv);
-                            // switch view template and css rules for current player mode
-                            // link tag for css file
-                            var cssLinkTag = $("<link>");
-                            var cssAttr = {
-                                type: "text/css",
-                                rel: "stylesheet"
-                            };
-                            engageCore.controls_top = MeInfoModel.getPositionControls() == "top"; // bottom else
-                            engageCore.log("Core: Position of the controls is " + (engageCore.controls_top ? "top" : "bottom"));
-
-                            // template obj
-                            var core_template = "none";
-                            // path to the require module with the view logic
-                            var view_logic_path = "";
-                            switch (engageCore.model.get("mode")) {
-                                case "embed":
-                                    cssAttr.href = "css/core_embed_style.css";
-                                    core_template = "templates/core_embed.html";
-                                    view_logic_path = "engage/views/embed";
-                                    engageCore.model.embed = true;
-                                    break;
-                                case "mobile":
-                                    cssAttr.href = "css/core_mobile_style.css";
-                                    core_template = "templates/core_mobile.html";
-                                    view_logic_path = "engage/views/mobile";
-                                    engageCore.model.mobile = true;
-                                    break;
-                                case "desktop":
-                                default:
-                                    cssAttr.href = engageCore.controls_top ? "css/core_desktop_style_top.css" : "css/core_desktop_style_bottom.css";
-                                    core_template = engageCore.controls_top ? "templates/core_desktop_top.html" : "templates/core_desktop_bottom.html";
-                                    view_logic_path = "engage/views/desktop";
-                                    engageCore.model.desktop = true;
-                                    break;
-                            }
-                            cssLinkTag.attr(cssAttr);
-                            // add css to DOM
-                            $("head").append(cssLinkTag);
-                            // load js view logic via require, see files in views/
-                            require([view_logic_path], function(pluginView) {
-                                // link view logic to the core
-                                engageCore.pluginView = pluginView;
-                                // get core template
-                                $.get(core_template, function(template) {
-                                    // set template, render it and add it to DOM
-                                    engageCore.template = template;
-                                    $(engageCore.el).html(_.template(template)).trigger("create"); // variables do not work in here!
-                                    // run init function of the view
-                                    engageCore.pluginView.initView();
-                                    if (engageCore.model.get("pluginsInfo") && engageCore.model.browserSupported) {
-                                        // BEGIN LOAD PLUGINS
-                                        engageCore.model.get("pluginsInfo").fetch({
-                                            success: function(pluginInfos) {
-                                                if ((pluginInfos.get("pluginlist").plugins != undefined) && pluginInfos.get("pluginlist")) {
-                                                    numberOfPlugins = pluginInfos.get("pluginlist").plugins.length;
-                                                    if ($.isArray(pluginInfos.get("pluginlist").plugins)) {
-                                                        $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
-                                                            var plugin_name = value["name"];
-                                                            plugins_loaded[plugin_name] = false;
-                                                        });
-                                                        $.each(pluginInfos.get("pluginlist").plugins, function(index, value) {
-                                                            var plugin_name = value["name"];
-                                                            engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + value["static-path"] + "/") + "'...");
-                                                            loadPlugin("../../../plugin/" + value["static-path"] + "/", plugin_name);
-                                                        });
-                                                    } else {
-                                                        var plugin_name = pluginInfos.get("pluginlist").plugins["name"];
-                                                        plugins_loaded[plugin_name] = false;
-                                                        engageCore.log("Core: Loading plugin '" + plugin_name + "' from '" + ("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/") + "'...");
-                                                        loadPlugin("../../../plugin/" + pluginInfos.get("pluginlist").plugins["static-path"] + "/", plugin_name);
-                                                    }
-                                                }
-                                            }
-                                        });
-                                        // END LOAD PLUGINS
-                                        bindShortcutsToEvents(); // bind configured shortcuts to events
-                                    } else {
-                                        engageCore.trigger(events.plugin_load_done.getName());
-                                    }
-                                });
-                            });
-                        }
-                    }, 15);
-                });
+                engageCore.loadInfoMeModel(engageCore.loadCoreUI);
             });
             // load plugins done, hide loading and show content
             this.dispatcher.on(events.mediaPackageModelError.getName(), function(str) {
@@ -698,7 +712,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             $("#" + id_browserWarning).show();
                             $("#" + id_btn_tryAnyway).click(function(e) {
                                 e.preventDefault();
-                                window.open(window.location.href + "&browser=all", "_self");
+                                window.location.href = window.location.href + "&browser=all";
                             });
                         }
                     }, loadingDelay2);

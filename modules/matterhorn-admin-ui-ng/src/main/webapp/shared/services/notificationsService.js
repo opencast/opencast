@@ -5,12 +5,24 @@ angular.module('adminNg.services')
         defaultDuration = 5000,
         uniqueId = 0;
     this.$get = ['$rootScope', function ($rootScope) {
-        var scope = $rootScope.$new();
+        var scope = $rootScope.$new(),
+            initContext = function (context) {
+                if (angular.isDefined(keyList[context])) {
+                    return notifications[context];
+                }
+
+                // initialize the arrays the first time
+                keyList[context] = [];
+                notifications[context] = {};
+
+                return notifications[context];
+            };
+
         scope.get = function (context) {
             if (!context) {
                 context = 'global';
             }
-            return notifications[context];
+            return notifications[context] || initContext(context);
         };
 
         scope.remove = function (id, context) {
@@ -36,7 +48,9 @@ angular.module('adminNg.services')
                     case 'error':
                     case 'success':
                     case 'warning':
-                        duration = defaultDuration;
+                        if (angular.isUndefined(duration)) {
+                            duration = defaultDuration;
+                        }
                         break;
                 }
             }
@@ -45,11 +59,7 @@ angular.module('adminNg.services')
                 context = 'global';
             }
 
-            if(!keyList[context]){
-                // initialize the arrays the first time
-                keyList[context] = [];
-                notifications[context] = {};
-            }
+            initContext(context);
 
             if(keyList[context].indexOf(key) < 0) {
                 // only add notification if not yet existent

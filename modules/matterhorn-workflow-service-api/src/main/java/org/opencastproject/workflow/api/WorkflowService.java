@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
@@ -273,10 +279,13 @@ public interface WorkflowService {
    *           if no paused workflow with this identifier exists
    * @throws WorkflowException
    *           if there is a problem processing the workflow
+   * @throws IllegalStateException
+   *           if the workflow with this identifier is not in the paused state
    * @throws UnauthorizedException
    *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
    */
-  WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowException, UnauthorizedException;
+  WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowException, IllegalStateException,
+          UnauthorizedException;
 
   /**
    * Resumes a suspended workflow instance, applying new properties to the workflow.
@@ -322,15 +331,25 @@ public interface WorkflowService {
 
   /**
    * Move workflows where the capture should have started from upcoming into failure status.
-   * @param buffer The amount of time in seconds to wait for a capture to move from Upcoming to Capturing
+   *
+   * @param buffer
+   *          The amount of time in seconds to wait for a capture to move from Upcoming to Capturing
+   * @throws IllegalArgumentException
+   *           invalid buffer value, it must be equal or greater than 0
    */
-  void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException;
+  void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException,
+          IllegalArgumentException;
 
   /**
    * Move workflows where the ingest has not been successful or is taking longer than expected into a failure status.
-   * @param buffer The amount of time in seconds to wait for an ingest to notify the workflow service.
+   *
+   * @param buffer
+   *          The amount of time in seconds to wait for an ingest to notify the workflow service.
+   * @throws IllegalArgumentException
+   *           invalid buffer value, it must be equal or greater than 0
    */
-  void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException;
+  void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException,
+          IllegalArgumentException;
 
   /**
    *

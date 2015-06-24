@@ -324,7 +324,7 @@
            ng-class="{active: theme-form.$valid, inactive: theme-form.$invalid}">
            {{ 'SUBMIT' | translate }}
         </a>
-        <a ng-click="navigateTo('summary', [generalForm, bumperForm, trailerForm])"
+        <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm,  trailerForm])"
            data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
         </a>
     </footer>

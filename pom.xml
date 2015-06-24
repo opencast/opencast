@@ -45,7 +45,6 @@
         <module>modules/matterhorn-authorization-manager</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-caption-api</module>
-        <module>modules/matterhorn-caption-remote</module>
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-admin-service-impl</module>
         <module>modules/matterhorn-capture-workflowoperation</module>
@@ -64,7 +63,6 @@
         <module>modules/matterhorn-distribution-workflowoperation</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-fileupload</module>
-        <module>modules/matterhorn-gstreamer-service-api</module>
         <module>modules/matterhorn-holdstate-workflowoperation</module>
         <module>modules/matterhorn-incident-workflowoperation</module>
         <module>modules/matterhorn-index-service</module>
@@ -107,8 +105,6 @@
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-workflowoperation</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
-        <module>modules/matterhorn-speech-recognition-workflowoperation</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-static</module>
@@ -127,18 +123,6 @@
         <module>modules/matterhorn-workflow-workflowoperation</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-workspace-api</module>
-        <module>modules/matterhorn-engage-theodul-api</module>
-        <module>modules/matterhorn-engage-theodul-core</module>
-        <module>modules/matterhorn-engage-theodul-plugin-controls</module>
-        <module>modules/matterhorn-engage-theodul-plugin-description</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-description</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-slidetext</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-shortcuts</module>
-        <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
-        <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-mhConnection</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-usertracking</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-notifications</module>
       </modules>
     </profile>
 
@@ -349,6 +333,18 @@
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
+        <module>modules/matterhorn-engage-theodul-api</module>
+        <module>modules/matterhorn-engage-theodul-core</module>
+        <module>modules/matterhorn-engage-theodul-plugin-controls</module>
+        <module>modules/matterhorn-engage-theodul-plugin-custom-mhConnection</module>
+        <module>modules/matterhorn-engage-theodul-plugin-custom-notifications</module>
+        <module>modules/matterhorn-engage-theodul-plugin-custom-usertracking</module>
+        <module>modules/matterhorn-engage-theodul-plugin-description</module>
+        <module>modules/matterhorn-engage-theodul-plugin-tab-description</module>
+        <module>modules/matterhorn-engage-theodul-plugin-tab-shortcuts</module>
+        <module>modules/matterhorn-engage-theodul-plugin-tab-slidetext</module>
+        <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
+        <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
         <module>modules/matterhorn-engage-ui</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
@@ -390,6 +386,18 @@
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
+        <module>modules/matterhorn-engage-theodul-api</module>
+        <module>modules/matterhorn-engage-theodul-core</module>
+        <module>modules/matterhorn-engage-theodul-plugin-controls</module>
+        <module>modules/matterhorn-engage-theodul-plugin-custom-mhConnection</module>
+        <module>modules/matterhorn-engage-theodul-plugin-custom-notifications</module>
+        <module>modules/matterhorn-engage-theodul-plugin-custom-usertracking</module>
+        <module>modules/matterhorn-engage-theodul-plugin-description</module>
+        <module>modules/matterhorn-engage-theodul-plugin-tab-description</module>
+        <module>modules/matterhorn-engage-theodul-plugin-tab-shortcuts</module>
+        <module>modules/matterhorn-engage-theodul-plugin-tab-slidetext</module>
+        <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
+        <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
         <module>modules/matterhorn-engage-ui</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
@@ -399,8 +407,8 @@
         <module>modules/matterhorn-metadata-api</module>
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-runtime-info-ui</module>
+        <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-feeds</module>
         <module>modules/matterhorn-search-service-impl</module>
@@ -492,7 +500,6 @@
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-impl</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-textanalyzer-api</module>
@@ -549,7 +556,6 @@
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-impl</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-textanalyzer-api</module>
@@ -598,7 +604,6 @@
         <module>modules/matterhorn-smil-impl</module>
         <module>modules/matterhorn-sox-api</module>
         <module>modules/matterhorn-sox-remote</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-textanalyzer-api</module>
@@ -783,27 +788,6 @@
     </profile>
 
     <profile>
-      <id>theodul</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-engage-theodul-api</module>
-        <module>modules/matterhorn-engage-theodul-core</module>
-        <module>modules/matterhorn-engage-theodul-plugin-controls</module>
-        <module>modules/matterhorn-engage-theodul-plugin-description</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-description</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-slidetext</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-shortcuts</module>
-        <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
-        <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-mhConnection</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-usertracking</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-notifications</module>
-      </modules>
-    </profile>
-
-    <profile>
       <id>server-management</id>
       <activation>
         <activeByDefault>false</activeByDefault>
@@ -818,7 +802,7 @@
     </profile>
 
     <profile>
-      <id>alternatives</id>
+      <id>extra</id>
       <activation>
         <activeByDefault>false</activeByDefault>
         <property>
@@ -826,12 +810,10 @@
         </property>
       </activation>
       <modules>
-        <module>modules/matterhorn-dictionary-none</module>
         <module>modules/matterhorn-dictionary-hunspell</module>
-        <module>modules/matterhorn-videosegmenter-ffmpeg</module>
-        <module>modules/matterhorn-gstreamer-service-api</module>
-        <module>modules/matterhorn-gstreamer-service-impl</module>
-        <module>modules/matterhorn-gstreamer-service-remote</module>
+        <module>modules/matterhorn-dictionary-none</module>
+        <module>modules/matterhorn-speech-recognition-service-api</module>
+        <module>modules/matterhorn-speech-recognition-workflowoperation</module>
       </modules>
     </profile>
 
@@ -1102,11 +1084,16 @@
       <plugin>
         <groupId>com.atlassian.maven.plugins</groupId>
         <artifactId>maven-clover2-plugin</artifactId>
-        <version>3.1.5</version>
+        <version>4.0.4</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
+      </plugin>
+      <plugin>
+         <groupId>com.github.eirslett</groupId>
+         <artifactId>frontend-maven-plugin</artifactId>
+         <version>0.0.23</version>
       </plugin>
     </plugins>
     <!-- This defines the global plugin configurations.  Plugins with configuration shared across multiple child poms
@@ -1139,7 +1126,6 @@
                   <pluginExecutionFilter>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <versionRange>[0.0.9,)</versionRange>
                     <goals>
                       <goal>install-node-and-npm</goal>
                       <goal>npm</goal>
@@ -1323,6 +1309,33 @@
               <goals>
                 <goal>pmd</goal>
                 <goal>cpd</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>com.github.klieber</groupId>
+          <artifactId>phantomjs-maven-plugin</artifactId>
+          <version>0.5</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>install</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <version>1.9.8</version>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.github.searls</groupId>
+          <artifactId>jasmine-maven-plugin</artifactId>
+          <version>2.0-beta-01</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>test</goal>
               </goals>
             </execution>
           </executions>
@@ -1827,7 +1840,7 @@
       <dependency>
         <groupId>com.entwinemedia.common</groupId>
         <artifactId>functional</artifactId>
-        <version>1.1</version>
+        <version>1.1.1</version>
       </dependency>
 
     </dependencies>
@@ -1855,9 +1868,9 @@
     <developer>
       <id>ruben.perez</id>
       <name>Ruben Perez Vazquez</name>
-      <email>rubenperez@teltek.es</email>
-      <organization>Teltek</organization>
-      <organizationUrl>http://www.teltek.es</organizationUrl>
+      <email>ruben.perez@uni-koeln.de</email>
+      <organization>University of Cologne</organization>
+      <organizationUrl>http://www.uni-koeln.de</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -2264,6 +2277,17 @@
       <email>lkiesow@uos.de</email>
       <organization>Fraunhofer IAIS, University of Osnabrueck</organization>
       <organizationUrl>http://www.uos.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>basil.brunner</id>
+      <name>Basil Brunner</name>
+      <email>basil@entwinemedia.com</email>
+      <organization>Entwine</organization>
+      <organizationUrl>http://entwinemedia.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>

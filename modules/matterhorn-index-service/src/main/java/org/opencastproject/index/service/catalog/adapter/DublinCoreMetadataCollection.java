@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.index.service.catalog.adapter;
 
 import org.opencastproject.index.service.exception.ListProviderException;
@@ -22,6 +28,7 @@ import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 
 import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -120,6 +127,19 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
         }
         addField(iterableTextField);
         break;
+      case MIXED_TEXT:
+        // Add an iterable text style field
+        MetadataField<Iterable<String>> mixedIterableTextField = MetadataField.createMixedIterableStringMetadataField(
+                metadataField.getInputID(), Opt.some(metadataField.getOutputID()), metadataField.getLabel(),
+                metadataField.isReadOnly(), metadataField.isRequired(),
+                getCollection(metadataField, listProvidersService), metadataField.getCollectionID(),
+                metadataField.getOrder(), metadataField.getNamespace());
+        if (StringUtils.isNotBlank(value)) {
+          List<String> valueList = Arrays.asList(StringUtils.split(value, ","));
+          mixedIterableTextField.setValue(valueList);
+        }
+        addField(mixedIterableTextField);
+        break;
       case LONG:
         MetadataField<Long> longField = MetadataField.createLongMetadataField(metadataField.getInputID(),
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
@@ -140,7 +160,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
         }
         addField(textField);
         break;
-     case TEXT_LONG:
+      case TEXT_LONG:
         MetadataField<String> textLongField = MetadataField.createTextLongMetadataField(metadataField.getInputID(),
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
                 metadataField.isRequired(), getCollection(metadataField, listProvidersService),

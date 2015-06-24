@@ -30,6 +30,7 @@ angular.module('adminNg.directives')
         scope: {
             params:     '=',
             collection: '=',
+            mixed:      '=',
             save:       '='
         },
         link: function (scope, element) {
@@ -62,7 +63,7 @@ angular.module('adminNg.directives')
                 var value = event.target.value;
                 if (event.keyCode === 13) {
                     // ENTER
-                    if (scope.collection[scope.value]) {
+                    if (scope.mixed || scope.collection[scope.value]) {
                         scope.addValue(scope.params.value, scope.value);
                     }
                 } else if (event.keyCode === 27) {
@@ -73,6 +74,14 @@ angular.module('adminNg.directives')
                     scope.collection = scope.collection;
                 }
                 event.stopPropagation();
+            };
+
+            scope.getText = function (value) {
+                if (angular.isDefined(scope.collection[value])) {
+                    return scope.collection[value];
+                } else {
+                    return value;
+                }
             };
 
             scope.submit = function () {

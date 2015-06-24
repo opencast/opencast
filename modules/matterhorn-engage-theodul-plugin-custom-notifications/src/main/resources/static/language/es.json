@@ -1,0 +1,13 @@
+{
+  "value_locale":"es",
+  "value_dateFormatFull":"Do de MMMM de YYYY, h:mm:ss a",
+  "error_videoLoading":"El video está cargando. Por favor, espere un momento.",
+  "error_audioLoading":"El audio está cargando. Por favor, espere un momento.",
+  "msg_videoLoadedSuccessfully":"El vídeo se ha cargado correctamente.",
+  "msg_audioLoadedSuccessfully":"El audio se ha cargado correctamente.",
+  "msg_videoBuffering":"El vídeo se está cargando. Por favor, espere un momento.",
+  "msg_videoBufferedSuccessfullyAndAutoplaying":"El vídeo se ha cargado correctamente y se está reproduciendo automáticamente.",
+  "msg_videoBufferedSuccessfully":"El vídeo se ha cargado correctamente.",
+  "error":"Error",
+  "error_AudioCodecNotSupported":"Error: El códec de audio no es compatible con este navegador"
+}

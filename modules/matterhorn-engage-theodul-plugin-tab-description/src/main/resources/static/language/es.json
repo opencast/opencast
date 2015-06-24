@@ -1,0 +1,13 @@
+{
+  "value_locale":"es",
+  "value_dateFormatFull":"Do de MMMM de YYYY, h:mm:ss a",
+  "title":"Título",
+  "noTitle":"Sin título",
+  "creator":"Creador",
+  "presenter":"Colaborador",
+  "views":"Vistas",
+  "series":"Serie",
+  "recordingDate":"Fecha de grabación",
+  "description":"Descripción",
+  "noDescriptionAvailable":"No hay ninguna descripción disponible."
+}

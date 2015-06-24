@@ -19,6 +19,7 @@ module.exports = function (config) {
             '../../main/webapp/lib/angular-sortable.js',
             '../../main/webapp/lib/underscore-1.5.2.js',
             '../../main/webapp/lib/video-js/video.js',
+            '../../main/webapp/lib/moment.min.js',
 
             '../../main/webapp/app.js',
             '../../main/webapp/shared/filters/filters.js',

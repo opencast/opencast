@@ -61,6 +61,7 @@
             <Import-Package>
               javax.servlet.http,
               org.apache.commons.logging,
+              org.opencastproject.security.api,
               org.springframework.security.core.userdetails,
               org.springframework.security.provisioning,
               org.springframework.security.web.authentication.preauth,

@@ -1,18 +1,23 @@
 /**
-* Copyright 2009-2013 The Regents of the University of California
-* Licensed under the Educational Community License, Version 2.0
-* (the "License"); you may not use this file except in compliance
-* with the License. You may obtain a copy of the License at
-*
-* http://www.osedu.org/licenses/ECL-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an "AS IS"
-* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
-* or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*
-*/
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
 
 'use strict';
 
@@ -92,15 +97,26 @@ angular.module('adminNg.services')
                 return hours + ':' + minutes + ':' + seconds;
             },
 
+            humanizeTime: function (hour, minute) {
+                return moment().hour(hour).minute(minute).format('LT');
+            },
+
             /**
-             * Transform the given date into a time in seconds
-             *
-             * @param {Date} date The formated date from timeline
-             * @returns {number} Date converted to time in seconds
+             * Transform the UTC time string ('HH:mm') to a date object
+             * @param  {String} utcTimeString the UTC time string
+             * @return {Date}               the date object based on the string
              */
-            timeToSeconds: function (date) {
-                var time = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds() + date.getMilliseconds() / 1000;
-                return Math.round(Number(time));
+            parseUTCTimeString: function (utcTimeString) {
+                    var dateUTC = new Date(0),
+                        timeParts;
+
+                    timeParts = utcTimeString.split(':');
+                    if (timeParts.length === 2) {
+                        dateUTC.setUTCHours(parseInt(timeParts[0]));
+                        dateUTC.setUTCMinutes(parseInt(timeParts[1]));
+                    }
+
+                    return dateUTC;
             },
 
             /**
@@ -117,28 +133,21 @@ angular.module('adminNg.services')
              *      to the obj's time.
              */
             toZuluTimeString: function (obj, duration) {
-                var date, dateParts, hour, minute;
-                dateParts = this.getDateParts(obj);
+                var momentDate,
+                    dateParts = this.getDateParts(obj);
+                    
+                if (obj.hour) {
+                    dateParts.hour = obj.hour;
+                    dateParts.minute = obj.minute;
+                }
 
-                if (this.stringIsEmpty(dateParts.year) || this.stringIsEmpty(dateParts.month) || this.stringIsEmpty(dateParts.day)) {
-                    return '';
+                momentDate = moment(dateParts);
+
+                if (duration) {
+                    momentDate.add(parseInt(duration.hour, 10), 'h').add(parseInt(duration.minute, 10), 'm');
                 }
-                if (!duration) {
-                    if (!obj.hour) {
-                        // no time - we return midnight of that day
-                        return new Date(Date.UTC(dateParts.year, dateParts.month, dateParts.day)).toISOString().replace('.000', '');
-                    }
-                    else {
-                        hour = obj.hour,
-                        minute = obj.minute;
-                    }
-                }
-                else {
-                    hour = parseInt(obj.hour, 10) + parseInt(duration.hour, 10);
-                    minute = parseInt(obj.minute, 10) + parseInt(duration.minute, 10);
-                }
-                date = new Date(dateParts.year, dateParts.month, dateParts.day, '' + hour, '' + minute, '0');
-                return date.toISOString().replace('.000', '');
+
+                return momentDate.toISOString().replace('.000', '');
             },
 
             /**
@@ -149,20 +158,19 @@ angular.module('adminNg.services')
              *     { date: '2015-01-02' } or "2015-01-02"
              */
             getDateParts: function(obj) {
-                var day, month, parts, year;
-                if (angular.isString(obj)) {
-                    parts = obj.split('-');
-                } else {
-                    parts = obj.date.split('-');
+                var dateStr = obj,
+                    dateParts;
+
+                if (angular.isDefined(obj.date) ) {
+                    dateStr = obj.date;
                 }
-                year = parts[0];
-                month = parseInt(parts[1], 10) - 1; // -1 as the month are 0-11 in the Date object
-                month = '' + month;
-                day = parts[2];
+
+                dateParts = dateStr.split('-');
+
                 return {
-                    year : year,
-                    month : month,
-                    day : day
+                    year  : parseInt(dateParts[0], 10),
+                    month : parseInt(dateParts[1], 10) - 1,
+                    day   : parseInt(dateParts[2], 10)
                 };
             },
 
@@ -170,7 +178,7 @@ angular.module('adminNg.services')
              * Checks a string to see if it is empty or undefined.
              */
             stringIsEmpty: function(str) {
-                return (!str || 0 === str.length);
+                return (!str || (angular.isString(str) && 0 === str.length));
             },
 
             /**

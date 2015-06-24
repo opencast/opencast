@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.data.json.Jsons.f;
@@ -38,6 +44,7 @@ import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.RestUtil.splitCommaSeparatedParam;
 import static org.opencastproject.util.RestUtil.R.badRequest;
+import static org.opencastproject.util.RestUtil.R.conflict;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
@@ -98,7 +105,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.Jsons.Val;
@@ -115,6 +122,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
+import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Stream;
@@ -254,7 +262,7 @@ public class SeriesEndpoint {
 
   protected void activate(ComponentContext cc) {
     if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
       logger.debug("Configured server url is {}", ccServerUrl);
       if (ccServerUrl != null)
         this.serverUrl = ccServerUrl;
@@ -331,6 +339,8 @@ public class SeriesEndpoint {
     if (StringUtils.isBlank(seriesId))
       return RestUtil.R.badRequest("Path parameter series ID is missing");
 
+    boolean hasProcessingEvents = hasProcessingEvents(seriesId);
+
     // Add all available ACLs to the response
     JSONArray systemAclsJson = new JSONArray();
     List<ManagedAcl> acls = getAclService().getAcls();
@@ -361,6 +371,7 @@ public class SeriesEndpoint {
       seriesAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(seriesAccessControl));
       seriesAccessJson.put("acl", AccessControlParser.toJsonSilent(seriesAccessControl));
       seriesAccessJson.put("transitions", transitionsJson);
+      seriesAccessJson.put("locked", hasProcessingEvents);
     } catch (SeriesException e) {
       logger.error("Unable to get ACL from series {}: {}", seriesId, ExceptionUtils.getStackTrace(e));
       return RestUtil.R.serverError();
@@ -1092,6 +1103,7 @@ public class SeriesEndpoint {
           @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error") })
   public Response applyAclToSeries(@PathParam("seriesId") String seriesId, @FormParam("acl") String acl,
           @DefaultValue("false") @FormParam("override") boolean override) throws SearchIndexException {
+
     AccessControlList accessControlList;
     try {
       accessControlList = AccessControlParser.parseAcl(acl);
@@ -1103,6 +1115,12 @@ public class SeriesEndpoint {
     Opt<Series> series = getSeries(seriesId);
     if (series.isNone())
       return notFound("Cannot find a series with id {}", seriesId);
+
+    if (hasProcessingEvents(seriesId)) {
+      logger.warn("Can not update the ACL from series {}. Events being part of the series are currently processed.",
+              seriesId);
+      return conflict();
+    }
 
     try {
       if (getAclService()
@@ -1116,6 +1134,33 @@ public class SeriesEndpoint {
       logger.error("Error applying acl to series {}", seriesId);
       return serverError();
     }
+  }
+
+  /**
+   * Check if the series with the given Id has events being currently processed
+   * 
+   * @param seriesId
+   *          the series Id
+   * @return true if events being part of the series are currently processed
+   */
+  private boolean hasProcessingEvents(String seriesId) {
+    EventSearchQuery query = new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
+    long elementsCount = 0;
+    query.withSeriesId(seriesId);
+
+    try {
+      query.withWorkflowState(WorkflowInstance.WorkflowState.RUNNING.toString());
+      SearchResult<Event> events = searchIndex.getByQuery(query);
+      elementsCount = events.getHitCount();
+      query.withWorkflowState(WorkflowInstance.WorkflowState.INSTANTIATED.toString());
+      events = searchIndex.getByQuery(query);
+      elementsCount += events.getHitCount();
+    } catch (SearchIndexException e) {
+      logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+
+    return elementsCount > 0;
   }
 
   private Course getCourseBySeries(String sId) throws ParticipationManagementDatabaseException {

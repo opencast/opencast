@@ -23,6 +23,7 @@
         "console"         : true,
         "window"          : true,
         "Backbone"        : true,
+        "moment"          : true,
         "handlbars"       : true,
         "_"               : true,
         "define"          : true,
@@ -56,10 +57,13 @@
         "by"              : false,
         "browser"         : false,
         "location"        : false,
-        "Element": false,
-        "vis": false,
-        "PlayerAdapter": false,
-        "videojs": false
+        "Element"         : false,
+        "vis"             : false,
+        "PlayerAdapter"   : false,
+        "videojs"         : false,
+        "moment"          : true,
+        "$location"       : true,
+        "$window"         : true
     },
     "ignores": ["src/main/webapp/lib/**/*"]
 }

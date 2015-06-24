@@ -1,10 +1,10 @@
 angular.module('adminNg.resources')
 .factory('SeriesResource', ['$resource', 'Language', 'ResourceHelper', function ($resource, Language, ResourceHelper) {
 
-    return $resource('/admin-ng/series/:target', {}, {
+    return $resource('/admin-ng/series/:id', { id: '@id' }, {
         query: {
             method: 'GET',
-            params: { target: 'series.json' },
+            params: { id: 'series.json' },
             isArray: false,
             transformResponse: function (data) {
                 return ResourceHelper.parseResponse(data, function (r) {
@@ -21,7 +21,7 @@ angular.module('adminNg.resources')
         },
         create: {
             method: 'POST',
-            params: { target: 'new' },
+            params: { id: 'new' },
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             transformRequest: function (data) {
                 if (angular.isUndefined(data)) {

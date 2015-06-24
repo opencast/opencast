@@ -221,6 +221,7 @@
     <property name="principalRequestHeader" value="eppn"/>
     <property name="authenticationManager" ref="authenticationManager" />
     <property name="userDetailsService" ref="userDetailsService" />
+    <property name="userDirectoryService" ref="userDirectoryService" />
     <property name="shibbolethLoginHandler" ref="feideLoginHandler" />
     <property name="exceptionIfHeaderMissing" value="false" />
   </bean>
@@ -247,6 +248,9 @@
   <!-- Obtain services from the OSGI service registry -->
   <osgi:reference id="userDetailsService" cardinality="1..1"
     interface="org.springframework.security.core.userdetails.UserDetailsService" />
+
+  <osgi:reference id="userDirectoryService" cardinality="1..1"
+    interface="org.opencastproject.security.api.UserDirectoryService" />
 
   <osgi:reference id="securityService" cardinality="1..1"
 	  interface="org.opencastproject.security.api.SecurityService" />

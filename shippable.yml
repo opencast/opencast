@@ -1,6 +1,4 @@
-build_image: shippableimages/ubuntu1204_java
-
-cache: true
+build_image: shippableimages/ubuntu1404_java
 
 language: java
 
@@ -9,23 +7,32 @@ jdk:
    - oraclejdk8
 
 before_install:
-  - apt-get update
-  - apt-get install --quiet -y tesseract-ocr tesseract-ocr-deu hunspell hunspell-de-de sox maven curl
-  - apt-get install --quiet -y gstreamer0.10-ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-plugins-cutter
-  - apt-get install --quiet -y gstreamer0.10-plugins-ugly gstreamer0.10-plugins-base gstreamer0.10-plugins-good
-  - apt-get install --quiet -y gstreamer0.10-gnonlin libglib2.0-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
+  - shippable_retry sudo apt-get update
+  - shippable_retry sudo apt-get install --quiet -y tesseract-ocr tesseract-ocr-deu hunspell hunspell-de-de sox curl
+  - echo Install Maven 3.2.5 Binary Package
+  - sudo rm -rf apache-maven-* /opt/apache-maven-* /usr/bin/mvn
+  - shippable_retry curl -O http://mirror.serversupportforum.de/apache/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.tar.gz
+  - tar xf apache-maven-3.2.5-bin.tar.gz
+  - sudo mv apache-maven-3.2.5 /opt/
+  - sudo ln -s /opt/apache-maven-3.2.5/bin/mvn /usr/bin/mvn
+  - echo Install latest static FFmpeg build
   - rm -rf /tmp/ffmpeg.tar.xz ffmpeg-*
-  - curl -s $(curl -s http://johnvansickle.com/ffmpeg/ | grep 64bit-static.tar.xz | grep -v git | cut -d'"' -f2) -o /tmp/ffmpeg.tar.xz
+  - shippable_retry curl -s $(curl -s http://johnvansickle.com/ffmpeg/ | grep 64bit-static.tar.xz | grep -v git | cut -d'"' -f2) -o /tmp/ffmpeg.tar.xz
   - tar -xf /tmp/ffmpeg.tar.xz
-  - mv ffmpeg-*-64bit-static/ff* /usr/bin/
+  - sudo mv ffmpeg-*-64bit-static/ff* /usr/bin/
+  - echo Switch Java version
   - if [[ $SHIPPABLE_JDK_VERSION == "openjdk7" ]] ; then export JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64"; export PATH="$PATH:/usr/lib/jvm/java-7-openjdk-amd64/bin"; export java_path="/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java"; fi
   - if [[ $SHIPPABLE_JDK_VERSION == "oraclejdk8" ]] ; then export JAVA_HOME="/usr/lib/jvm/java-8-oracle"; export PATH="$PATH:/usr/lib/jvm/java-8-oracle/bin"; export java_path="/usr/lib/jvm/java-8-oracle/jre/bin/java"; fi
   - update-alternatives --set java $java_path
+  - echo Get Maven Dependency Bundle
+  - shippable_retry curl -O http://data.lkiesow.de/opencast/repository.tar.xz
+  - tar xf repository.tar.xz
+  - rm -rf ~/.m2
+  - mkdir -p ~/.m2/
+  - mv repository ~/.m2/
 
 install:
-  - java -version
-  - javac -version
-  - echo $JAVA_HOME
-  - mvn --batch-mode clean install -DskipTests=true -Dall -P '!capture'
+  - mvn --version
+  - mvn --batch-mode clean install -DskipTests=true -Dall
 
-script: mvn --batch-mode test -Dall -P '!capture'
+script: mvn --batch-mode test -Dall -Dsurefire.rerunFailingTestsCount=2 -DskipJasmineTests=True

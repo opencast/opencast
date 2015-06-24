@@ -11,6 +11,10 @@ angular.module('adminNg.resources')
             // of the request.
             headers: { 'Content-Type': undefined },
 
+            responseType: 'text',
+
+            transformResponse: [],
+
             transformRequest: function (data) {
                 if (angular.isUndefined(data)) {
                     return data;
@@ -70,6 +74,17 @@ angular.module('adminNg.resources')
                         return JsHelper.assembleRrule(src.SCHEDULE_MULTIPLE);
                     })(data.source);
                 }
+
+                // Remove useless information for the request
+                angular.forEach(data.metadata, function (catalog) {
+                    angular.forEach(catalog.fields, function (field) {
+                            delete field.collection;                        
+                            delete field.label;
+                            delete field.presentableValue;
+                            delete field.readOnly;
+                            delete field.required;
+                    });
+                });
 
                 // Add metadata form field
                 fd.append('metadata', JSON.stringify({

@@ -57,8 +57,15 @@ angular.module('adminNg.services')
         };
 
         this.isValid = function () {
-            // Is always true, the series can have an empty ACL
-            return true;
+             var hasRights = false;
+
+             angular.forEach(me.ud.policies, function (policy) {
+                if (policy.read && policy.write) {
+                    hasRights = true;
+                }
+             });
+            
+            return hasRights;
         };
         
         me.acls  = ResourcesListResource.get({ resource: 'ACL' });

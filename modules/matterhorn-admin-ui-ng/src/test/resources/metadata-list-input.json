@@ -22,7 +22,7 @@
                 "id": "presenter",
                 "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTER",
                 "readOnly": false,
-                "type": "text",
+                "type": "mixed_text",
                 "value": [
                     "Matt Smith",
                     "Chuck Norris"
@@ -57,7 +57,7 @@
                 "id": "contributor",
                 "label": "EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
                 "readOnly": false,
-                "type": "text",
+                "type": "mixed_text",
                 "value": [
                     "Franz Kafka",
                     "A. Morris"

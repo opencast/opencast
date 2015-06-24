@@ -12,6 +12,33 @@ angular.module('adminNg.directives')
             requiredRole: '@'
         },
         link: function (scope, element) {
+
+            /**
+             * Format the value to a presentable string. 
+             * The arrays are presented the as comma separated list of items.
+             * 
+             * @param  {Object} value The source value
+             * @return {String}       The formated value
+             */
+            var present = function (value) {
+                if (value instanceof Array) {
+                    var presentableValue = '';
+
+                    angular.forEach(value, function (item, index) {
+                        presentableValue += item;
+                        if ((index + 1) < value.length) {
+                            presentableValue += ', ';
+                        }
+                    });
+
+                    return presentableValue;
+                } else {
+                    return value;
+                }
+            };
+            
+            scope.mixed = false;
+
             if (scope.params.readOnly) {
                 scope.mode = 'readOnly';
             } else {
@@ -35,6 +62,9 @@ angular.module('adminNg.directives')
                     } else {
                         if (scope.params.value instanceof Array) {
                             if (scope.collection) {
+                                if (scope.params.type === 'mixed_text') {
+                                    scope.mixed = true;
+                                }
                                 scope.mode = 'multiSelect';
                             } else {
                                 scope.mode = 'multiValue';
@@ -49,10 +79,12 @@ angular.module('adminNg.directives')
                     }
                 }
             }
+            
             if (scope.mode !== 'readOnly') {
                 element.addClass('editable');
+            } else {
+                scope.presentableValue = present(scope.params.value);
             }
-
         }
     };
 }]);

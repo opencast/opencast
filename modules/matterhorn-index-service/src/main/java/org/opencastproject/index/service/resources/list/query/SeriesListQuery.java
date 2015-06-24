@@ -1,27 +1,32 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.index.service.resources.list.query;
 
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter.SourceType;
-import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
 import org.opencastproject.index.service.resources.list.provider.AclListProvider;
+import org.opencastproject.index.service.resources.list.provider.ContributorsListProvider;
 import org.opencastproject.index.service.resources.list.provider.LanguagesListProvider;
 import org.opencastproject.index.service.resources.list.provider.SeriesListProvider;
-import org.opencastproject.index.service.resources.list.provider.UsersListProvider;
 import org.opencastproject.index.service.util.FiltersUtils;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
@@ -75,15 +80,9 @@ public class SeriesListQuery extends ResourceListQueryImpl {
 
   public SeriesListQuery() {
     super();
-    this.availableFilters.add(createAccessPolicyFilter(Option.<String> none()));
     this.availableFilters.add(createContributorsFilter(Option.<String> none()));
     this.availableFilters.add(createCreationDateFilter(Option.<Tuple<Date, Date>> none()));
-    this.availableFilters.add(createCreatorFilter(Option.<String> none()));
-    this.availableFilters.add(createLanguageFilter(Option.<String> none()));
-    this.availableFilters.add(createLicenseFilter(Option.<String> none()));
     this.availableFilters.add(createOrganizersFilter(Option.<String> none()));
-    this.availableFilters.add(createSubjectFilter(Option.<String> none()));
-    this.availableFilters.add(createTitleFilter(Option.<String> none()));
   }
 
   /**
@@ -278,7 +277,7 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createContributorsFilter(Option<String> contributor) {
     return FiltersUtils.generateFilter(contributor, FILTER_CONTRIBUTORS_NAME, FILTER_CONTRIBUTORS_LABEL,
-            SourceType.SELECT, Option.some(UsersListProvider.NAME));
+            SourceType.SELECT, Option.some(ContributorsListProvider.DEFAULT));
   }
 
   /**
@@ -290,7 +289,7 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createCreatorFilter(Option<String> creator) {
     return FiltersUtils.generateFilter(creator, FILTER_CREATOR_NAME, FILTER_CREATOR_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.NAME));
+            Option.some(ContributorsListProvider.DEFAULT));
   }
 
   /**
@@ -326,7 +325,7 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createLicenseFilter(Option<String> license) {
     return FiltersUtils.generateFilter(license, FILTER_LICENSE_NAME, FILTER_LICENSE_LABEL, SourceType.SELECT,
-            Option.some(ListProvidersServiceImpl.LICENSES));
+            Option.some("LICENSES"));
   }
 
   /**
@@ -338,7 +337,7 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createOrganizersFilter(Option<String> organizer) {
     return FiltersUtils.generateFilter(organizer, FILTER_ORGANIZERS_NAME, FILTER_ORGANIZERS_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.NAME));
+            Option.some(ContributorsListProvider.DEFAULT));
   }
 
   /**

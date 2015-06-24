@@ -9,7 +9,7 @@ describe('Access Step in New Event Wizard', function () {
 
     describe('Access state', function () {
         it('accepts', function () {
-            expect(NewEventAccess.isValid()).toBeTruthy();
+            expect(NewEventAccess.isValid()).toBeFalsy();
         });
     });
 });

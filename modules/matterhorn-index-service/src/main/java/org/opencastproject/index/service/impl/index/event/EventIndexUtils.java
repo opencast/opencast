@@ -1,20 +1,28 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 
+
 package org.opencastproject.index.service.impl.index.event;
+
+import static org.opencastproject.index.service.util.ListProviderUtil.splitStringList;
 
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.series.Series;
@@ -156,6 +164,10 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.BLACKLISTED, event.getBlacklisted(), true);
     if (event.getSchedulingStatus() != null)
       metadata.addField(EventIndexSchema.SCHEDULING_STATUS, event.getSchedulingStatus(), true);
+    if (event.getRecordingStatus() != null)
+      metadata.addField(EventIndexSchema.RECORDING_STATUS, event.getRecordingStatus(), true);
+
+    metadata.addField(EventIndexSchema.EVENT_STATUS, event.getEventStatus(), true);
 
     metadata.addField(EventIndexSchema.HAS_COMMENTS, event.hasComments(), true);
     metadata.addField(EventIndexSchema.HAS_OPEN_COMMENTS, event.hasOpenComments(), true);
@@ -361,8 +373,8 @@ public final class EventIndexUtils {
     }
 
     // TODO: Add support for language
-    event.setContributors(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY));
-    event.setPresenters(dc.get(DublinCore.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY));
+    event.setContributors(splitStringList(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY)));
+    event.setPresenters(splitStringList(dc.get(DublinCore.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY)));
     return event;
   }
 

@@ -1,0 +1,6 @@
+{
+  "value_locale":"es",
+  "error_mediaPackageInformationNotLoaded":"Existen dos causas posibles para este error:<ul><li>Los vídeos ya no están disponibles<\/li><li>Los vídeos están protegidos y se requiere iniciar sesión<\/li><\/ul>",
+  "error_noMediaInformationAvailable":"No hay información disponible sobre los vídeos.",
+  "error_endpointNotAvailable":"The search service is currently not available."
+}

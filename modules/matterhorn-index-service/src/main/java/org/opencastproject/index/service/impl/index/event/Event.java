@@ -1,25 +1,33 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.index.service.impl.index.event;
 
+import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.index.service.impl.index.IndexObject;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.mapped.Configuration;
@@ -60,7 +68,8 @@ import javax.xml.transform.stream.StreamSource;
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration", "trackMimetypes",
         "trackStreamResolutions", "trackFlavors", "metadataFlavors", "metadataMimetypes", "attachmentFlavors",
         "reviewStatus", "reviewDate", "optedOut", "blacklisted", "hasComments", "hasOpenComments", "hasPreview",
-        "publications", "publicationFlavors", "workflowScheduledDate", "archiveVersion", "schedulingStatus" })
+        "publications", "publicationFlavors", "workflowScheduledDate", "archiveVersion", "schedulingStatus",
+        "recordingStatus", "eventStatus" })
 @XmlRootElement(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class Event implements IndexObject {
@@ -77,6 +86,31 @@ public class Event implements IndexObject {
 
   /** The name of the surrounding XML tag to wrap a result of multiple events */
   public static final String XML_SURROUNDING_TAG = "events";
+
+  /** The mapping of recording and workflow states */
+  private static final Map<String, String> workflowStatusMapping = new HashMap<>();
+  private static final Map<String, String> recordingStatusMapping = new HashMap<>();
+
+  static {
+    recordingStatusMapping.put(RecordingState.CAPTURING, "EVENTS.EVENTS.STATUS.RECORDING");
+    recordingStatusMapping.put(RecordingState.CAPTURE_FINISHED, "EVENTS.EVENTS.STATUS.RECORDING");
+    recordingStatusMapping.put(RecordingState.MANIFEST, "EVENTS.EVENTS.STATUS.INGESTING");
+    recordingStatusMapping.put(RecordingState.MANIFEST_FINISHED, "EVENTS.EVENTS.STATUS.INGESTING");
+    recordingStatusMapping.put(RecordingState.COMPRESSING, "EVENTS.EVENTS.STATUS.INGESTING");
+    recordingStatusMapping.put(RecordingState.UPLOADING, "EVENTS.EVENTS.STATUS.INGESTING");
+    recordingStatusMapping.put(RecordingState.UPLOAD_FINISHED, "EVENTS.EVENTS.STATUS.INGESTING");
+    recordingStatusMapping.put(RecordingState.CAPTURE_ERROR, "EVENTS.EVENTS.STATUS.RECORDING_FAILURE");
+    recordingStatusMapping.put(RecordingState.MANIFEST_ERROR, "EVENTS.EVENTS.STATUS.RECORDING_FAILURE");
+    recordingStatusMapping.put(RecordingState.COMPRESSING_ERROR, "EVENTS.EVENTS.STATUS.RECORDING_FAILURE");
+    recordingStatusMapping.put(RecordingState.UPLOAD_ERROR, "EVENTS.EVENTS.STATUS.RECORDING_FAILURE");
+    workflowStatusMapping.put(WorkflowState.INSTANTIATED.toString(), "EVENTS.EVENTS.STATUS.PENDING");
+    workflowStatusMapping.put(WorkflowState.RUNNING.toString(), "EVENTS.EVENTS.STATUS.PROCESSING");
+    workflowStatusMapping.put(WorkflowState.PAUSED.toString(), "EVENTS.EVENTS.STATUS.PAUSED");
+    workflowStatusMapping.put(WorkflowState.SUCCEEDED.toString(), "EVENTS.EVENTS.STATUS.PROCESSED");
+    workflowStatusMapping.put(WorkflowState.FAILING.toString(), "EVENTS.EVENTS.STATUS.PROCESSED");
+    workflowStatusMapping.put(WorkflowState.FAILED.toString(), "EVENTS.EVENTS.STATUS.PROCESSING_FAILURE");
+    workflowStatusMapping.put(WorkflowState.STOPPED.toString(), "EVENTS.EVENTS.STATUS.PROCESSING_CANCELED");
+  }
 
   /** The identifier */
   @XmlElement(name = "identifier")
@@ -204,6 +238,10 @@ public class Event implements IndexObject {
   @XmlElement(name = "attachment_flavor")
   private List<String> attachmentFlavors = null;
 
+  /** The status of the event */
+  @XmlElement(name = "event_status")
+  private String eventStatus = null;
+
   /** The event review status */
   @XmlElement(name = "review_status")
   private String reviewStatus = ReviewStatus.UNSENT.toString();
@@ -250,6 +288,10 @@ public class Event implements IndexObject {
   @XmlElement(name = "scheduling_status")
   private String schedulingStatus = null;
 
+  /** The recording status of the event */
+  @XmlElement(name = "recording_status")
+  private String recordingStatus = null;
+
   /** The archive version of the event */
   @XmlElement(name = "archive_version")
   private Long archiveVersion = null;
@@ -275,6 +317,7 @@ public class Event implements IndexObject {
   public Event(String identifier, String organization) {
     this.identifier = identifier;
     this.organization = organization;
+    updateEventStatus();
   }
 
   /**
@@ -569,6 +612,7 @@ public class Event implements IndexObject {
    */
   public void setWorkflowState(WorkflowState workflowState) {
     this.workflowState = workflowState == null ? null : workflowState.toString();
+    updateEventStatus();
   }
 
   /**
@@ -837,6 +881,7 @@ public class Event implements IndexObject {
     this.optedOut = optedOut;
 
     updateSchedulingStatus();
+    updateEventStatus();
   }
 
   /**
@@ -858,6 +903,7 @@ public class Event implements IndexObject {
     this.blacklisted = blacklisted;
 
     updateSchedulingStatus();
+    updateEventStatus();
   }
 
   /**
@@ -1057,7 +1103,7 @@ public class Event implements IndexObject {
    *          the scheduling status
    */
   public void setSchedulingStatus(String status) {
-    this.schedulingStatus = status == null ? null : status.toString();
+    this.schedulingStatus = status;
   }
 
   /**
@@ -1075,6 +1121,30 @@ public class Event implements IndexObject {
     }
   }
 
+  private void updateEventStatus() {
+    if (getWorkflowId() != null) {
+      eventStatus = workflowStatusMapping.get(getWorkflowState());
+      return;
+    }
+
+    if (getRecordingStatus() != null) {
+      eventStatus = recordingStatusMapping.get(getRecordingStatus());
+      return;
+    }
+
+    if (BooleanUtils.isTrue(getBlacklisted())) {
+      eventStatus = "EVENTS.EVENTS.STATUS.BLACKLISTED";
+      return;
+    }
+
+    if (BooleanUtils.isTrue(getOptedOut())) {
+      eventStatus = "EVENTS.EVENTS.STATUS.OPTEDOUT";
+      return;
+    }
+
+    eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
+  }
+
   /**
    * Returns the scheduling status
    *
@@ -1082,6 +1152,36 @@ public class Event implements IndexObject {
    */
   public String getSchedulingStatus() {
     return schedulingStatus;
+  }
+
+  /**
+   * Sets the recording status
+   *
+   * @param recordingStatus
+   *          the recording status
+   */
+  public void setRecordingStatus(String recordingStatus) {
+    this.recordingStatus = recordingStatus;
+    updateEventStatus();
+  }
+
+  /**
+   * Returns the recording status
+   *
+   * @return the recording status
+   */
+  public String getRecordingStatus() {
+    return recordingStatus;
+  }
+
+  /**
+   * Returns the event status
+   *
+   * @return the event status
+   */
+  public String getEventStatus() {
+    updateEventStatus();
+    return eventStatus;
   }
 
   /**

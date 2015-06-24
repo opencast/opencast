@@ -1,5 +1,5 @@
 describe('Events controller', function () {
-    var $scope, EventsResource;
+    var $scope, EventsResource, $httpBackend;
 
     beforeEach(module('adminNg'));
     beforeEach(module(function ($provide) {
@@ -11,10 +11,11 @@ describe('Events controller', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function ($rootScope, $controller, _EventsResource_) {
+    beforeEach(inject(function ($rootScope, $controller, _EventsResource_, _$httpBackend_) {
         $scope = $rootScope.$new();
         EventsResource = _EventsResource_;
         $controller('EventsCtrl', {$scope: $scope});
+        $httpBackend = _$httpBackend_;
     }));
 
     it('instantiates', function () {
@@ -24,10 +25,12 @@ describe('Events controller', function () {
     describe('#delete', function () {
 
         it('deletes the event', function () {
-            var event = { $delete: jasmine.createSpy() };
-            $scope.table.delete(event);
+            $httpBackend.expectGET('/admin-ng/resources/events/filters.json').respond('[]');
+            $httpBackend.expectDELETE('/admin-ng/event/12').respond('12');
 
-            expect(event.$delete).toHaveBeenCalled();
+            $scope.table.delete(12);
+ 
+            $httpBackend.flush();
         });
     });
 });

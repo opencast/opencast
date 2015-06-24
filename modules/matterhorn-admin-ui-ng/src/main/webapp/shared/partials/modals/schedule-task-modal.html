@@ -74,10 +74,12 @@
                             not-empty-selection
                             ng-model="processing.ud.workflow"
                             ng-model-options="{ allowInvalid: true }"
-                            ng-options="w.title for (obj, w) in processing.workflows"
+                            ng-options="w.title for w in processing.workflows"
                             data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW' | translate }}"
                             no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW_EMPTY' | translate }}'"
-                        />
+                            >
+                          <option value=""></option>
+                        </select>
 
                         <div id="new-event-workflow-configuration"
                              class="checkbox-container"
