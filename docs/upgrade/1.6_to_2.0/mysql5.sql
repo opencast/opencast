@@ -49,63 +49,63 @@ ADD COLUMN email varchar(256) DEFAULT NULL AFTER `name`;
 -- Fix naming conventions
 
 ALTER TABLE mh_host_registration
-DROP CONSTRAINT UNQ_mh_host_registration_0,
+DROP INDEX UNQ_mh_host_registration_0,
 ADD CONSTRAINT UNQ_mh_host_registration UNIQUE (host);
 
 ALTER TABLE mh_service_registration
-DROP CONSTRAINT UNQ_mh_service_registration_0,
+DROP INDEX UNQ_mh_service_registration_0,
 ADD CONSTRAINT UNQ_mh_service_registration UNIQUE (host_registration, service_type);
 
 ALTER TABLE mh_service_registration
-DROP CONSTRAINT FK_service_registration_host_registration,
+DROP FOREIGN KEY FK_service_registration_host_registration,
 ADD CONSTRAINT FK_mh_service_registration_host_registration FOREIGN KEY (host_registration) REFERENCES mh_host_registration (id) ON DELETE CASCADE;
 
 ALTER TABLE mh_job_argument
-DROP CONSTRAINT FK_job_argument_id,
+DROP FOREIGN KEY FK_job_argument_id,
 ADD CONSTRAINT FK_mh_job_argument_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE;
 
 ALTER TABLE mh_job_context
-DROP CONSTRAINT UNQ_mh_job_context_0,
+DROP INDEX UNQ_job_context_0,
 ADD CONSTRAINT UNQ_mh_job_context UNIQUE (id, name);
 
 ALTER TABLE mh_job_context
-DROP CONSTRAINT FK_job_context_id,
+DROP FOREIGN KEY FK_job_context_id,
 ADD CONSTRAINT FK_mh_job_context_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE;
 
 ALTER TABLE mh_job_mh_service_registration
-DROP CONSTRAINT mhjobmhservice_registrationservicesRegistration_id,
+DROP FOREIGN KEY mhjobmhservice_registrationservicesRegistration_id,
 ADD CONSTRAINT FK_mh_job_mh_service_registration_servicesRegistration_id FOREIGN KEY (servicesRegistration_id) REFERENCES mh_service_registration (id) ON DELETE CASCADE;
 
 ALTER TABLE mh_job_mh_service_registration
 DROP INDEX IX_mh_job_mh_service_registration_service_registration_id,
-ADD INDEX IX_mh_job_mh_service_registration_servicesRegistration_id ON mh_job_mh_service_registration (servicesRegistration_id);
+ADD INDEX IX_mh_job_mh_service_registration_servicesRegistration_id (servicesRegistration_id);
 
 ALTER TABLE mh_incident
-DROP CONSTRAINT FK_job_incident_jobid,
+DROP FOREIGN KEY FK_job_incident_jobid,
 ADD CONSTRAINT FK_mh_incident_jobid FOREIGN KEY (jobid) REFERENCES mh_job (id) ON DELETE CASCADE;
 
 ALTER TABLE mh_acl_managed_acl
-DROP CONSTRAINT UNQ_mh_acl_managed_acl_0,
-ADD CONSTRAINT UNQ_mh_acl_managed_acl (name, organization_id);
+DROP INDEX UNQ_mh_acl_managed_acl_0,
+ADD CONSTRAINT UNQ_mh_acl_managed_acl UNIQUE (name, organization_id);
 
 ALTER TABLE mh_acl_episode_transition
-DROP CONSTRAINT UNQ_mh_acl_episode_transition_0,
+DROP INDEX UNQ_mh_acl_episode_transition_0,
 ADD CONSTRAINT UNQ_mh_acl_episode_transition UNIQUE (episode_id, organization_id, application_date);
 
 ALTER TABLE mh_acl_series_transition
-DROP CONSTRAINT UNQ_mh_acl_series_transition_0,
+DROP INDEX UNQ_mh_acl_series_transition_0,
 ADD CONSTRAINT UNQ_mh_acl_series_transition UNIQUE (series_id, organization_id, application_date);
 
 ALTER TABLE mh_role
-DROP CONSTRAINT UNQ_mh_role_0,
+DROP INDEX UNQ_mh_role_0,
 ADD CONSTRAINT UNQ_mh_role UNIQUE (name, organization);
 
 ALTER TABLE mh_group
-DROP CONSTRAINT UNQ_mh_group_0,
+DROP INDEX UNQ_mh_group_0,
 ADD CONSTRAINT UNQ_mh_group UNIQUE (group_id, organization);
 
 ALTER TABLE mh_group_role
-DROP CONSTRAINT UNQ_mh_group_role_0,
+DROP INDEX UNQ_mh_group_role_0,
 ADD CONSTRAINT UNQ_mh_group_role UNIQUE (group_id, role_id);
 
 ALTER TABLE mh_group_member
@@ -113,19 +113,19 @@ CHANGE JpaGroup_id group_id bigint(20) NOT NULL,
 CHANGE MEMBERS member varchar(255) DEFAULT NULL;
 
 ALTER TABLE mh_user
-DROP CONSTRAINT UNQ_mh_user_0,
+DROP INDEX UNQ_mh_user_0,
 ADD CONSTRAINT UNQ_mh_user UNIQUE (username, organization);
 
 ALTER TABLE mh_user_role
-DROP CONSTRAINT UNQ_mh_user_role_0,
+DROP INDEX UNQ_mh_user_role_0,
 ADD CONSTRAINT UNQ_mh_user_role UNIQUE (user_id, role_id);
 
 ALTER TABLE mh_user_ref
-DROP CONSTRAINT UNQ_mh_user_ref_0,
+DROP INDEX UNQ_mh_user_ref_0,
 ADD CONSTRAINT UNQ_mh_user_ref UNIQUE (username, organization);
 
 ALTER TABLE mh_user_ref_role
-DROP CONSTRAINT UNQ_mh_user_ref_role_0,
+DROP INDEX UNQ_mh_user_ref_role_0,
 ADD CONSTRAINT UNQ_mh_user_ref_role UNIQUE (user_id, role_id);
 
 -- Create New Tables
