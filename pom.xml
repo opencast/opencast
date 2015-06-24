@@ -414,7 +414,6 @@
         <module>modules/matterhorn-search-service-feeds</module>
         <module>modules/matterhorn-search-service-impl</module>
         <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-impl</module>
         <module>modules/matterhorn-series-service-remote</module>
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-static-file-service-api</module>
