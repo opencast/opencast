@@ -18,13 +18,13 @@
     <dependency>
       <groupId>org.apache.karaf.features</groupId>
       <artifactId>framework</artifactId>
-      <version>3.0.3</version>
+      <version>${karaf.version}</version>
       <type>kar</type>
     </dependency>
     <dependency>
       <groupId>org.apache.karaf.features</groupId>
       <artifactId>standard</artifactId>
-      <version>3.0.3</version>
+      <version>${karaf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
@@ -32,7 +32,7 @@
     <dependency>
       <groupId>org.opencastproject.assemblies</groupId>
       <artifactId>opencast-karaf-features</artifactId>
-      <version>2.1-SNAPSHOT</version>
+      <version>${project.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
@@ -61,7 +61,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>2.6</version>
         <executions>
           <execution>
             <id>process-resources</id>
@@ -74,7 +73,7 @@
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
-        <version>3.0.3</version>
+        <version>${karaf.version}</version>
         <extensions>true</extensions>
         <configuration>
           <!-- no startupFeatures -->
