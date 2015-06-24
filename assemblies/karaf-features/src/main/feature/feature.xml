@@ -12,8 +12,8 @@
     <bundle>mvn:org.apache.felix/org.apache.felix.webconsole.plugins.ds/1.0.0</bundle>
 
     <!-- OSGi specifications -->
-    <bundle>mvn:org.osgi/org.osgi.compendium/4.2.0</bundle>
-    <bundle>mvn:org.osgi/org.osgi.enterprise/4.2.0</bundle>
+    <bundle>mvn:org.osgi/org.osgi.compendium/${osgi.compendium.version}</bundle>
+    <bundle>mvn:org.osgi/org.osgi.enterprise/${osgi.enterprise.version}</bundle>
 
     <!-- General specifications -->
     <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
