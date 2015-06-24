@@ -805,6 +805,10 @@
         <module>modules/matterhorn-dictionary-none</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-speech-recognition-workflowoperation</module>
+        <module>modules/matterhorn-execute-api</module>
+        <module>modules/matterhorn-execute-impl</module>
+        <module>modules/matterhorn-execute-operations</module>
+        <module>modules/matterhorn-execute-remote</module>
       </modules>
     </profile>
 
