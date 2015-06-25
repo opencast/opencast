@@ -55,7 +55,6 @@
         <module>modules/matterhorn-composer-workflowoperation</module>
         <module>modules/matterhorn-conductor</module>
         <module>modules/matterhorn-cover-image-api</module>
-        <module>modules/matterhorn-cover-image-impl</module>
         <module>modules/matterhorn-cover-image-workflowoperation</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-deprecated-workflowoperation</module>
