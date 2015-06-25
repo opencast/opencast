@@ -15,22 +15,19 @@
  */
 package org.opencastproject.engage.theodul.manager.impl;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-import javax.servlet.Servlet;
+import static org.joda.time.DateTimeConstants.MILLIS_PER_SECOND;
+
 import org.opencastproject.engage.theodul.api.EngagePlugin;
 import org.opencastproject.engage.theodul.api.EngagePluginManager;
 import org.opencastproject.engage.theodul.api.EngagePluginRegistration;
 import org.opencastproject.engage.theodul.api.EngagePluginRestService;
+import org.opencastproject.kernel.rest.RestPublisher;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.rest.StaticResource;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
@@ -39,6 +36,16 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.Servlet;
 
 /**
  * A service that tracks the de-/registration of Theodul Player Plugins and
@@ -62,6 +69,20 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
       throw new RuntimeException(ex);
     }
     log.info("Activated. Listening for Theodul Plugins. filter=" + pluginServiceFilter);
+  }
+
+  private BundleContext getKernelBundleContext() {
+    BundleContext context = FrameworkUtil.getBundle(RestPublisher.class).getBundleContext();
+    while (context == null) {
+      log.info("Waiting for the kernel bundle to become active...");
+      try {
+        Thread.sleep(MILLIS_PER_SECOND);
+      } catch (InterruptedException e) {
+        log.warn("Interrupted while waiting for kernel bundle");
+      }
+      context = FrameworkUtil.getBundle(RestPublisher.class).getBundleContext();
+    }
+    return context;
   }
 
   protected void deactivate(ComponentContext cc) {
@@ -92,14 +113,14 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
         }
         break;
       default:
-          break;
+        break;
     }
   }
 
   private void installPlugin(ServiceReference sref) throws IllegalArgumentException {
     PluginData plugin = new PluginData(sref);
 
-    // try to install static resources if availabel
+    // try to install static resources if available
     if (plugin.providesStaticResources()) {
       try {
         plugin.setStaticResourceRegistration(installStaticResources(plugin));
@@ -108,7 +129,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
       }
     }
 
-    // try to install REST endpoint if availabel
+    // try to install REST endpoint if available
     if (plugin.providesRestEndpoint()) {
       try {
         plugin.setRestEndpointRegistration(installRestEndpoint(plugin));
@@ -145,7 +166,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     Dictionary<String, String> props = new Hashtable<String, String>();
     props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
     props.put("alias", PLUGIN_URL_PREFIX + plugin.getStaticResourcesPath());
-    return bundleContext.registerService(Servlet.class.getName(), staticResource, props);
+    return getKernelBundleContext().registerService(Servlet.class.getName(), staticResource, props);
   }
 
   /** Publishes the REST endpoint implemented by the plugin bundle.
@@ -158,7 +179,11 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     props.put("service.description", plugin.getDescription());
     props.put("opencast.service.type", "org.opencast.engage.plugin." + Integer.toString(plugin.getPluginID()));
     props.put("opencast.service.path", PLUGIN_URL_PREFIX + plugin.getRestPath());
-    return bundleContext.registerService(EngagePluginRestService.class.getName(), service, props);
+
+    // Note: Due to a limitation in Pax Web 3.x which does not allow to share a HTTP client between bundles, the
+    // servlets all need to be registered in the context of the kernel bundle.
+    // See https://ops4j1.jira.com/browse/PAXWEB-558 for more details.
+    return getKernelBundleContext().registerService(EngagePluginRestService.class.getName(), service, props);
   }
 
   private void uninstallPlugin(ServiceReference sref) {
