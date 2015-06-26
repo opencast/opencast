@@ -1,0 +1,35 @@
+.df-input-base {
+    position: relative;
+    box-sizing: border-box;
+
+    @include transition-property(width, padding, visibility, opacity);
+    @include transition-duration(300ms);
+    @include transition-timing-function(ease-in-out);
+    @include transition-delay(80ms);
+
+    float: left;
+    width: 0px;
+    height: $df-height;
+    visibility: hidden;
+    opacity: 0;
+
+    $border: $thin-border-stroke #c9d0d3;
+    border-top: $border;
+    border-bottom: $border;
+    background-color: #f7f7f7;
+
+    .js-df-state-new-filter & {
+        min-width: 290px;
+        visibility: visible;
+        opacity: 1;
+    }
+}
+
+.df-input-inner-container {
+    min-width: 290px;
+    height: 40px;
+    padding: 0 5px;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}

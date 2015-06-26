@@ -6,7 +6,6 @@
 
     <div ng-show="editMode">
         <select ng-model="params.value" ng-change="submit()">
-            <option ng-if="!params.required" value=""></option>
             <option ng-repeat="(item, label) in collection"
                 ng-required="params.required"
                 name="{{ params.name }}"

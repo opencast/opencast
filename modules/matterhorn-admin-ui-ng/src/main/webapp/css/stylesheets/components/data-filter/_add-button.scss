@@ -1,0 +1,39 @@
+.df-add-button {
+    box-sizing: border-box;
+    @include btn(white);
+    @include fa-icon($fa-plus, before, inline-block, 0 8px 0 0, 0, inherit, 11px);
+
+    @include transition-property(width, padding, border-radius);
+    @include transition-duration(200ms);
+    @include transition-timing-function(ease-in);
+
+    float: left;
+    padding: 12px 10px;
+    width: 92px;
+    height: $df-height;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: none;
+
+    // Z Axis positioning for transitioning label
+    position: relative;
+    z-index: 2;
+
+    // Transition Properties for @include fa-icon(...); mixin
+    &:before {
+        @include transition(color 200ms ease-in);
+    }
+
+    .js-df-state-new-filter & {
+        @include fa-icon($fa-plus, before, inline-block, 0, 0, #c9d0d3, 11px);
+
+        width: 25px;
+        padding: 12px 5px;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+
+        > span {
+            display: none;
+        }
+    }
+}

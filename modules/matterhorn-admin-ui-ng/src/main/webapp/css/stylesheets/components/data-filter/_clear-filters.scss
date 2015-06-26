@@ -1,0 +1,49 @@
+.df-clear-filters {
+    width: 40px;
+    height: 40px;
+    pointer-events: none; // allows scroll through object
+
+    // overlaying positioning
+    position: absolute;
+    top: 0;
+    right: 0;
+    @include background-image(linear-gradient(right, #F7F7F7 50%, rgba(#F7F7F7, 0)));
+
+    .df-clear-button {
+        display: block;
+        position: absolute;
+        top: 11px;
+        right: 8px;
+        cursor: pointer;
+        pointer-events: auto;
+        @include fa-icon($fa-close, before, inline-block, 0, 0, $medium-prim-color, 10px);
+        font-family: "Open Sans", sans-serif;
+        color: #555;
+
+        @include transition-property(visibility, opacity);
+        @include transition-duration(300ms);
+        @include transition-timing-function(ease-in-out);
+        @include transition-delay(160ms);
+
+        &:before {
+            @include transition(color 250ms ease-in-out);
+        }
+
+        &:hover {
+            @include fa-icon-color(before, $alt-red);
+        }
+    }
+
+    &.disabled .df-clear-button {
+        @include fa-icon-color(before, $light-prim-color);
+
+        &:hover {
+            @include fa-icon-color(before, $light-prim-color);
+        }
+    }
+
+    .js-df-state-new-filter & {
+        visibility: visible;
+        opacity: 1;
+    }
+}

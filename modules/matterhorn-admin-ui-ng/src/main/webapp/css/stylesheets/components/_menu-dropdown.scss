@@ -1,0 +1,48 @@
+// Extend Menu Dropdown
+// Base Style for Menu Dropdowns
+
+%menu-dropdown-base {
+
+    // Base Properties
+    $padding: 8px 0;
+    $background-color: rgba($white, 0.98    );
+    $border-stroke: 1px;
+    $border-color: rgba($black, 0.1);
+    $border-radius: $main-border-radius;
+    $box-shadow: 0 1px 3px rgba($black, 0.1), 0 0 1px $border-stroke rgba($black, 0.1);
+    $point-width: 7px;
+    $point-height: 7px;
+    $point-position-from-right: 10px;
+
+    // Link Properties (List Items)
+    $link-hover-color: rgba($black, 0.05);
+    $link-padding: 8px 15px;
+    $link-transition-property: background, color;
+    $link-transition-duration: 250ms;
+    $link-transition-timing-function: ease-in;
+
+    // ----------------------------------------
+
+    padding: $padding;
+    background: $background-color;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+
+    a {
+        overflow: hidden;
+        display: block;
+        padding: $link-padding;
+        @include transition-property($link-transition-property);
+        @include transition-duration(250ms);
+        @include transition-timing-function(ease-in);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &:hover {
+            background: $link-hover-color;
+        }
+    }
+
+    // Top Point
+    @include triangle-point(top, $point-width, $point-height, $point-position-from-right, $background-color, $border-stroke, $border-color);
+}

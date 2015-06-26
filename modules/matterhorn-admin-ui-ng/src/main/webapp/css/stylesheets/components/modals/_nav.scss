@@ -1,0 +1,52 @@
+.modal .modal-nav {
+
+    $height: 50px;
+    width: 100%;
+    height: $height;
+    background: $modal-nav-bg-color;
+    border-bottom: 1px solid $modal-nav-border-color;
+
+    > a {
+        $width: 100px;
+        width: $width;
+        display: inline-block;
+        text-align: center;
+        position: relative;
+        line-height: $height;
+        color: $modal-nav-link-color;
+        font-size: 13px;
+
+        &:first-child {
+            margin-left: 3px;
+        }
+
+        &:hover {
+            color: $modal-nav-link-active-color;
+        }
+
+        &.active {
+            color: $modal-nav-link-active-color;
+            font-weight: 600;
+
+            $size: 8px;
+            $position-from-right: ($width/2) - $size;
+
+            @include triangle-point(bottom, $size, $size, $position-from-right, $off-white, 1px, $modal-nav-border-color, -8px);
+        }
+
+        // Notifiction
+        > i.notification {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            right: 0px;
+            background: #db3232;
+            line-height: 14px;
+            color: #fff;
+            font-size: 10px;
+            font-weight: bold;
+        }
+    }
+}

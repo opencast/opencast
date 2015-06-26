@@ -1,0 +1,42 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    font-family: $font-stack;
+}
+
+body {
+    background: $body-background;
+    font-size: 14px;
+    font-family: $font-stack;
+    position: relative;
+    color: $global-text-color;
+
+    &.login-body {
+        @include radial-gradient($off-white, #d8dfe4);
+    }
+}
+
+// Resets
+
+a {
+    color: $color-link;
+    text-decoration: none;
+
+    &:hover {
+        color: $color-link-hover;
+    }
+}
+
+
+strong {
+    font-weight: 600;
+}
+
+textarea,
+input,
+button {
+    &:focus {
+        outline: none;
+    }
+}

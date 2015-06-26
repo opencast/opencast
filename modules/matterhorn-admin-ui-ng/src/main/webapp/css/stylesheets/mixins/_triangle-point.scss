@@ -1,0 +1,52 @@
+@mixin triangle-point($position, $width, $height, $position-from-right: 10px, $background-color: $white, $border-stroke: 1px, $border-color: darken($main-border-color, 5%), $position-from-origin: 1) {
+
+    @if $position == top {
+
+        &:before,
+        &:after {
+            content: "";
+            position: absolute;
+            right: $position-from-right;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        	border-width: 0 $width $height $width;
+        }
+
+        &:after {
+            top: - ($height + $position-from-origin);
+            border-color: transparent transparent $border-color transparent;
+        }
+
+        &:before {
+            top: - (($height + $position-from-origin) - $border-stroke);
+            border-color: transparent transparent $background-color transparent;
+            z-index: $z-100;
+        }
+    }
+
+    @if $position == bottom {
+
+        &:before,
+        &:after {
+            content: "";
+            position: absolute;
+            right: $position-from-right;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        	border-width: 0 $width $height $width;
+        }
+
+        &:after {
+            bottom: - ($height + $position-from-origin);
+            border-color: transparent transparent $border-color transparent;
+        }
+
+        &:before {
+            bottom: - (($height + $position-from-origin) + $border-stroke);
+            border-color: transparent transparent $background-color transparent;
+            z-index: $z-100;
+        }
+    }
+}

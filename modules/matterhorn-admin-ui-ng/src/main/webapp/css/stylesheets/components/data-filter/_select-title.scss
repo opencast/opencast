@@ -1,0 +1,22 @@
+.df-select-title {
+    @include fa-icon($fa-sort, after, inline-block, 0, 0 0 0 5px, inherit, 11px);
+
+    &:after {
+        position: relative;
+        top: 1px;
+    }
+
+    &.df-select-complete {
+        color: $bright-blue;
+
+        &:after {
+            color: $light-prim-color;
+        }
+    }
+
+    .js-df-state-ready & {
+        &:after {
+            display: none;
+        }
+    }
+}

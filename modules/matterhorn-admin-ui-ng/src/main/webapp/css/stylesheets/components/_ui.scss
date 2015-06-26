@@ -1,0 +1,9 @@
+// Global info link
+.a-info-circle {
+    color: $l-blue;
+    font-size: 14px;
+}
+
+.plus-icon-circle {
+    @include fa-icon($fa-plus, before, inline-block, 0, 0, $l-blue, 17px);
+}

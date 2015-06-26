@@ -1,0 +1,48 @@
+// DF Dropdown Container
+.df-select-options {
+    visibility: hidden;
+    opacity: 0;
+
+    // Layout
+    position: absolute;
+    z-index: $z-50;
+    top: 32px;
+    left: 5px;
+    min-width: 100px;
+    padding: 5px 0;
+
+    // Type
+    text-align: left;
+
+    // Styles
+    border: $thin-border-stroke lighten($main-border-color, 8%);
+    border-radius: $main-border-radius;
+    background: rgba($white, 0.98);
+    box-shadow: 0 1px 3px rgba($black, 0.06);
+
+    @include transition-property(visibility, opacity);
+    @include transition-duration(100ms);
+    @include transition-timing-function(ease-in);
+
+    a {
+        display: block;
+        color: $medium-prim-color;
+        font-size: 10px;
+        font-weight: $weight-semibold;
+        line-height: 11px;
+        padding: 5px 10px;
+        text-shadow: none;
+        cursor: pointer;
+
+        @include transition-property(color, background);
+        @include transition-duration(50ms);
+        @include transition-timing-function(ease-in);
+
+        // ----------------------------------------
+
+        &:hover {
+            color: $white;
+            background: $bright-blue;
+        }
+    }
+}
