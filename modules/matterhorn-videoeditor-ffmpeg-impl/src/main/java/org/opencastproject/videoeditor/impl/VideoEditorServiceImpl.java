@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.videoeditor.impl;
 
 import org.opencastproject.inspection.api.MediaInspectionException;
@@ -176,6 +182,20 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     } catch (URISyntaxException ex) {
       throw new ProcessFailedException("Source URI " + sourceTrackUri + " is not valid.");
     }
+    // inspect input file to retrieve media information
+    Job inspectionJob = null;
+    Track sourceTrack = null;
+    try {
+      inspectionJob = inspect(job, new URI(sourceTrackUri));
+      sourceTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+    } catch (URISyntaxException e) {
+      throw new ProcessFailedException("Source URI " + sourceTrackUri + " is not valid.");
+    } catch (MediaInspectionException e) {
+      throw new ProcessFailedException("Media inspection of " + sourceTrackUri + " failed", e);
+    } catch (MediaPackageException e) {
+      throw new ProcessFailedException("Deserialization of source track " + sourceTrackUri + " failed", e);
+    }
+
     // get output file extension
     String outputFileExtension = properties.getProperty(VideoEditorProperties.DEFAULT_EXTENSION, ".mp4");
     outputFileExtension = properties.getProperty(VideoEditorProperties.OUTPUT_FILE_EXTENSION, outputFileExtension);
@@ -255,7 +275,8 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       // TODO: Each clips could have a region id, relative to the root-layout
       // Then each clip is zoomed/panned/padded to WxH befor concatenation
       FFmpegEdit ffmpeg = new FFmpegEdit(properties);
-      error = ffmpeg.processEdits(inputfile, outputPath.getAbsolutePath(), outputResolution, cleanclips);
+      error = ffmpeg.processEdits(inputfile, outputPath.getAbsolutePath(), outputResolution, cleanclips,
+              sourceTrack.hasAudio(), sourceTrack.hasVideo());
 
       if (error != null) {
         FileUtils.deleteQuietly(tempDirectory);
@@ -277,7 +298,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       //logger.debug("Copied the edited file from " + outputPath.toString() + " to workspace at " + String.format("%s-%s%s", sourceTrackFlavor.getType(), newTrackId, outputFileExtension) + " returns  " + newTrackURI.toString());
 
       // inspect new Track
-      Job inspectionJob = null;
       try {
           inspectionJob = inspect(job,newTrackURI);
       } catch (MediaInspectionException e) {

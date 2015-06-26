@@ -17,6 +17,7 @@
     <properties>
         <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
         <checkstyle.skip>false</checkstyle.skip>
+        <skipJasmineTests>true</skipJasmineTests>
     </properties>
   
     <dependencies>

@@ -21,7 +21,7 @@
       description="Cut the recording according to the edit decision list">
       <configurations>
         <configuration key="source-flavors">*/work</configuration>
-        <configuration key="smil-flavors">smil/*</configuration>
+        <configuration key="smil-flavors">smil/cutting</configuration>
         <configuration key="target-smil-flavor">smil/cutting</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
         <configuration key="interactive">false</configuration>
@@ -118,7 +118,7 @@
         description="Concatenate presenter track with intro and outro videos">
         <configurations>
           <configuration key="source-flavor-part-0">branding/bumper</configuration>
-          <configuration key="source-flavor-part-1">presenter/work</configuration>
+          <configuration key="source-flavor-part-1">presenter/trimmed</configuration>
           <configuration key="source-flavor-part-1-mandatory">true</configuration>
           <configuration key="source-flavor-part-2">branding/trailer</configuration>
           <configuration key="target-flavor">presenter/themed</configuration>
@@ -135,7 +135,7 @@
         description="Concatenate presentation track with intro and outro videos">
         <configurations>
           <configuration key="source-flavor-part-0">branding/bumper</configuration>
-          <configuration key="source-flavor-part-1">presentation/work</configuration>
+          <configuration key="source-flavor-part-1">presentation/trimmed</configuration>
           <configuration key="source-flavor-part-1-mandatory">true</configuration>
           <configuration key="source-flavor-part-2">branding/trailer</configuration>
           <configuration key="target-flavor">presentation/themed</configuration>

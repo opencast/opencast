@@ -23,6 +23,11 @@
     }
   },
   "NOTIFICATIONS":{
+    "ACL_ADDED":"Les droits d'accès ont été créés",
+    "ACL_NOT_SAVED":"Les droits d'accès n'ont pas pu être enregistrés",
+    "ACL_UPDATED":"Les droits d'accès ont été mis à jour",
+    "ACL_DELETED":"Les droits d'accès ont été supprimés",
+    "ACL_NOT_DELETED":"Les droits d'accès n'ont pas pu être supprimés",
     "USER_ADDED":"L'utilisateur a été créé",
     "USER_UPDATED":"L'utilisateur a été mis à jour",
     "USER_NOT_SAVED":"L'utilisateur n'a pas pu être enregistré",
@@ -67,6 +72,9 @@
     "EMAIL_NOT_SENT":"Le message n'a pas pu être envoyé",
     "CONFLICT_DETECTED":"Conflit de programmation: les données sélectionnées entrent en conflit avec un événement existant. Veuillez changer l'emplacement ou les dates.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Les événements existants dans cette série devront être retraités",
+    "SERIES_ACL_MISSING_READWRITE_ROLE":"Sélectionner au moins un role avec permission de lecture et écriture.",
+    "EVENT_ACL_MISSING_READWRITE_ROLE":"Sélectionner au moins un role avec permission de lecture et écriture.",
+    "SERIES_ACL_LOCKED":"Modification des droits d'accès n'est pas autorisée lorsque des opérations sont en cours d'exécution sur un événement appartenant à cette série",
     "THEME_NAME_ALREADY_TAKEN":"Ce nom est déjà utilisé",
     "THEME_NAME_EMPTY":"Le nom ne peux pas rester vide",
     "BUMPER_UPLOAD_ERROR":"Erreur lors de l'envoi du ficher",
@@ -83,7 +91,9 @@
     "TASK_NOT_CREATED":"La tâche n'a pas pu être créée",
     "VIDEO_CUT_NOT_SAVED":"Les informations n'ont pas pu être enregistrées",
     "VIDEO_CUT_SAVED":"Les informations ont été enregistrées",
-    "VIDEO_CUT_PROCESSING":"La vidéo est en cours de traitement..."
+    "VIDEO_CUT_PROCESSING":"La vidéo est en cours de traitement...",
+    "SERVER_UNRESPONSIVE":"Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
+    "SERVICE_UNAVAILABLE":"Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Actions",
@@ -101,8 +111,10 @@
         "CAPTION":"Supprimer"
       }
     },
-    "DELETE_WARNING_LINE1":"Une fois supprimés toutes les métadonnées, les fichiers audio et vidéo seront supprimés et rendus irrécupérable.",
-    "DELETE_WARNING_LINE2":"",
+    "DELETE_EVENTS_WARNING_LINE1":"Une fois supprimés, toutes les métadonnées, les fichiers audio et vidéo seront supprimés et rendus irrécupérable.",
+    "DELETE_EVENTS_WARNING_LINE2":"",
+    "DELETE_SERIES_WARNING_LINE1":"Une fois supprimées, toutes les métadonnées seront rendues irrécupérables.",
+    "DELETE_SERIES_WARNING_LINE2":"",
     "SCHEDULE_TASK":{
       "CAPTION":"Démarrer tâche",
       "GENERAL":{
@@ -317,6 +329,21 @@
         "BLACKLISTED":"Bloqué",
         "OPTED_OUT":"Abstention"
       },
+      "STATUS":{
+        "SCHEDULED":"Programmé",
+        "OPTEDOUT":"Abstention",
+        "BLACKLISTED":"Bloqué",
+        "RECORDING":"Enregistrement en cours",
+        "UPLOADING":"Transfert",
+        "INGESTING":"Préparation",
+        "PENDING":"En attente",
+        "PROCESSING":"Traitement en cours",
+        "PAUSED":"Suspendu",
+        "PROCESSED":"Terminé",
+        "RECORDING_FAILURE":"Erreur d'enregistrement",
+        "PROCESSING_FAILURE":"Erreur de traitement",
+        "PROCESSING_CANCELED":"Traitement annulé"
+      },
       "DETAILS":{
         "HEADER":"Détails de l'événement {{resourceId}}",
         "TABS":{
@@ -336,7 +363,9 @@
           "OPTED_OUT":"Abstention",
           "CUSTOM":"Personnalisé",
           "ENGAGE":"Engage",
-          "YOUTUBE":"Youtube"
+          "YOUTUBE":"Youtube",
+          "OAIPMH":"OAI-PMH",
+          "SELECT_WORKFLOW":"Sélectionner Workflow"
         },
         "MEDIA":{
           "TRIM_MEDIA":"Couper",
@@ -357,7 +386,26 @@
         },
         "ACCESS":{
           "CAPTION":"Droits d'accès",
-          "SELECTPLACEHOLDER":"Selectionner les droits d'accès"
+          "DESCRIPTION":"",
+          "TEMPLATES":{
+            "TITLE":"Modèles "
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Droits d'accès",
+            "DESCRIPTION":"",
+            "LABEL":"Séléctionner un modèle",
+            "EMPTY":"Aucun modèle trouvé",
+            "ROLE":"Rôle",
+            "WRITE":"Ecriture",
+            "READ":"Lecture",
+            "ACTION":"Actions",
+            "NEW":"Ajouter",
+            "DETAILS":"Détails"
+          },
+          "ROLES":{
+            "LABEL":"Sélectionner un rôle",
+            "EMPTY":"Aucun rôle trouvé"
+          }
         },
         "COMMENTS":{
           "CAPTION":"Commentaires",
@@ -485,7 +533,7 @@
           },
           "ACCESS_POLICY":{
             "TITLE":"Droits d'accès",
-            "DESCRIPTION":"",
+            "DESCRIPTION":"At least one role with Read and Write permissions is required.",
             "LABEL":"Séléctionner un modèle",
             "EMPTY":"Aucun modèle trouvé",
             "ROLE":"Rôle",
@@ -741,6 +789,78 @@
         "CREATOR":"Auteur",
         "IN_USE":"En cours d'utilisation",
         "ACTION":"Actions"
+      },
+      "NEW":{
+        "CAPTION":"Nouveaux droits d'accès",
+        "TABS":{
+          "SUMMARY":"Résumé",
+          "METADATA":"Métadonnées",
+          "ACCESS":"Droits d'accès"
+        },
+        "METADATA":{
+          "TITLE":"Métadonnées",
+          "NAME":{
+            "CAPTION":"Nom",
+            "PLACEHOLDER":"Nom..."
+          }
+        },
+        "ACCESS":{
+          "CAPTION":"Droits d'accès",
+          "TEMPLATES":{
+            "TITLE":"Modèles "
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Droits d'accès",
+            "LABEL":"Séléctionner un modèle",
+            "EMPTY":"Aucun modèle trouvé",
+            "ROLE":"Rôle",
+            "WRITE":"Ecriture",
+            "READ":"Lecture",
+            "ACTION":"Actions",
+            "NEW":"Nouvelle ligne",
+            "DETAILS":"Détails"
+          },
+          "ROLES":{
+            "LABEL":"Sélectionner un rôle",
+            "EMPTY":"Aucun rôle trouvé"
+          }
+        }
+      },
+      "DETAILS":{
+        "HEADER":"Détails des droits d'accès",
+        "TABS":{
+          "SUMMARY":"Résumé",
+          "METADATA":"Métadonnées",
+          "ACCESS":"Droite d'accès"
+        },
+        "METADATA":{
+          "TITLE":"Métadonnées",
+          "NAME":{
+            "CAPTION":"Nom",
+            "PLACEHOLDER":"Nom..."
+          }
+        },
+        "ACCESS":{
+          "CAPTION":"Droits d'accès",
+          "TEMPLATES":{
+            "TITLE":"Modèles "
+          },
+          "ACCESS_POLICY":{
+            "TITLE":"Droits d'accès",
+            "LABEL":"Séléctionner un modèle",
+            "EMPTY":"Aucun modèle trouvé",
+            "ROLE":"Rôle",
+            "WRITE":"Ecriture",
+            "READ":"Lecture",
+            "ACTION":"Actions",
+            "NEW":"Nouvelle ligne",
+            "DETAILS":"Détails"
+          },
+          "ROLES":{
+            "LABEL":"Sélectionner un rôle",
+            "EMPTY":"Aucun rôle trouvé"
+          }
+        }
       }
     },
     "BLACKLISTS":{
@@ -1033,10 +1153,10 @@
   "LOGIN":{
     "WELCOME":"Bienvenue sur Opencast",
     "REMEMBER":"Mémoriser mes informations de connexion sur cet ordinateur",
-    "USERNAME":"Adresse de courriel...",
+    "USERNAME":"Nom d'utilisateur...",
     "PASSWORD":"Mot de passe...",
     "LOGIN":"Login",
-    "ERROR":"E-mail et \/ ou mot de passe incorrects"
+    "ERROR":"Nom d'utilisateur et\/ou mot de passe incorrects"
   },
   "TABLE_FILTERS":{
     "CLEAR":"Supprimer tous les filtres",

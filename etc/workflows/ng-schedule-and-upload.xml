@@ -20,17 +20,17 @@
         </style>
         <div id="workflow-configuration">
           <fieldset>
-            <legend>Mark the recording for:</legend>
+            <legend>Add a comment that the recording needs:</legend>
             <ul>
               <li>
                 <span>
-                  <input id="flagForCutting" name="flagForCutting" type="checkbox" checked="checked" class="configField" value="true" />
+                  <input id="flagForCutting" name="flagForCutting" type="checkbox" class="configField" value="true" />
                   <span>&nbsp;Cutting</span>
                 </span>
               </li>
               <li>
                 <span>
-                  <input id="flagForReview" name="flagForReview" type="checkbox" checked="checked" class="configField" value="true" />
+                  <input id="flagForReview" name="flagForReview" type="checkbox" class="configField" value="true" />
                   <span>&nbsp;Review</span>
                 </span>
               </li>

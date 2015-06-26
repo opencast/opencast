@@ -87,8 +87,8 @@
       description="Detecting silence">
       <configurations>
         <configuration key="source-flavors">*/audio</configuration>
-        <configuration key="smil-flavor-subtype">smil</configuration>
-        <configuration key="reference-tracks-flavor">*/preview</configuration>
+        <configuration key="smil-flavor-subtype">silence</configuration>
+        <configuration key="reference-tracks-flavor">*/work</configuration>
       </configurations>
     </operation>
 
@@ -99,9 +99,8 @@
       id="tag"
       description="Preparing silence detection for preview">
       <configurations>
-        <configuration key="source-flavors">*/smil</configuration>
-        <configuration key="target-flavor">smil/preview</configuration>
-        <configuration key="target-tags">+preview</configuration>
+        <configuration key="source-flavors">*/silence</configuration>
+        <configuration key="target-tags">+archive</configuration>
       </configurations>
     </operation>
 
