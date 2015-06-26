@@ -76,6 +76,7 @@ ECLIPSE_LOGLEVEL="CONFIG"
 FELIX_CONFIG_DIR=/opt/matterhorn/etc
 FELIX_WORK_DIR=/opt/matterhorn/work
 FELIX_CACHE_DIR=$FELIX_WORK_DIR/felix-cache
+MATTERHORN_TEMP_DIR=$FELIX_WORK_DIR/tmp
 ADD_OPTS=""
 if [ -f $MATTERHORN/lib/matterhorn/matterhorn-capture-agent-impl*.jar ]
 then
@@ -135,10 +136,13 @@ JETTY="-Dorg.mortbay.jetty.Request.maxFormContentSize=1000000"
 DISABLE_PHONEHOME="-Dnet.sf.ehcache.skipUpdateCheck=true"
 DISABLE_PHONEHOME="${DISABLE_PHONEHOME} -Dorg.terracotta.quartz.skipUpdateCheck=true"
 
+# Configure temporary files
+JAVA="-Djava.io.tmpdir=$MATTERHORN_TEMP_DIR"
+
 # Set memory allocation options
 # -XX:MaxPermSize has been removed in OpenJDK >= 8
 # Hence we should remove this options once we discontinue support for Java 7
-JAVA="-Xms1g -Xmx1g -XX:MaxPermSize=256m"
+JAVA="${JAVA} -Xms1g -Xmx1g -XX:MaxPermSize=256m"
 ( [ "$1" == '--daemon' ] || [ "$1" == '--notty' ] ) && GOSH="-Dgosh.args='--noshutdown -c noop=true'"
 
 MATTERHORN_OPTS="$GOSH $DEBUG $FELIX $GRAPHICS $JETTY $JAVA $LOGGING $JMX $DISABLE_PHONEHOME $ADD_OPTS"

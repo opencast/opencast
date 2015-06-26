@@ -12,9 +12,10 @@ General Configuration
  - [Database Configuration](database.md)
  - [Encoding Profile Configuration](encoding.md)
  - [Logging and Privacy Configuration](logging.and.privacy.md)
+ - [Message Broker Configuration](message-broker.md)
  - [Multi Tenancy Configuration](multi.tenancy.md)
  - [Security Configuration](security.md)
-   - [CAS Security Configuration](security.cas.md)
+    - [CAS Security Configuration](security.cas.md)
  - [Workflow Configuration](workflow.md)
 
 Additional Documentation

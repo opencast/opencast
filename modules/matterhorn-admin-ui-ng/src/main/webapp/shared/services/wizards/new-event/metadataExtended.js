@@ -95,7 +95,35 @@ angular.module('adminNg.services')
             me.metadata = NewEventMetadataResource.get(me.postProcessMetadata);
         };
 
+        this.getFiledCatalogs = function () { 
+            var catalogs = [];
+
+            angular.forEach(me.ud, function(catalog) {
+                var empty = true;
+                angular.forEach(catalog.fields, function (field) {
+                    if (angular.isDefined(field.presentableValue) && field.presentableValue !=='') {
+                        empty = false;
+                    }
+                });
+
+                if (!empty) {
+                    catalogs.push(catalog);
+                }
+            });
+
+            return catalogs;
+        };
+
         this.getUserEntries = function () {
+            angular.forEach(me.ud, function(catalog) {
+                catalog.empty = true;
+                angular.forEach(catalog.fields, function (field) {
+                    if (angular.isDefined(field.presentableValue) && field.presentableValue !=='') {
+                        catalog.empty = false;
+                    }
+                });
+            });
+
             return me.ud;
         };
     };
