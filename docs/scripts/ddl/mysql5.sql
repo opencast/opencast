@@ -90,7 +90,7 @@ CREATE TABLE mh_host_registration (
   maintenance TINYINT(1) DEFAULT 0 NOT NULL,
   online TINYINT(1) DEFAULT 1 NOT NULL,
   active TINYINT(1) DEFAULT 1 NOT NULL,
-  max_jobs INTEGER NOT NULL,
+  max_load INTEGER NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_host_registration_0 UNIQUE (host)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -139,6 +139,7 @@ CREATE TABLE mh_job (
   processor_service BIGINT,
   parent BIGINT,
   root BIGINT,
+  job_load FLOAT NOT NULL DEFAULT 1.0,
   PRIMARY KEY (id),
   CONSTRAINT FK_mh_job_creator_service FOREIGN KEY (creator_service) REFERENCES mh_service_registration (id) ON DELETE CASCADE,
   CONSTRAINT FK_mh_job_processor_service FOREIGN KEY (processor_service) REFERENCES mh_service_registration (id) ON DELETE CASCADE,
