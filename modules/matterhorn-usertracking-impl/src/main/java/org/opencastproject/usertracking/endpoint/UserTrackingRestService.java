@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.usertracking.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
@@ -174,6 +180,29 @@ public class UserTrackingRestService {
   public UserActionListImpl getUserActionsAsJson(@QueryParam("id") String id, @QueryParam("type") String type,
           @QueryParam("day") String day, @QueryParam("limit") int limit, @QueryParam("offset") int offset) {
     return getUserActionsAsXml(id, type, day, limit, offset); // same logic, different @Produces annotation
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_XML)
+  @Path("/stats.xml")
+  @RestQuery(name = "statsasxml", description = "Get the statistics for an episode", returnDescription = "The statistics.", restParameters = { @RestParameter(name = "id", description = "The ID of the single episode to return the statistics for, if it exists", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the episode's statistics") })
+  public StatsImpl statsAsXml(@QueryParam("id") String mediapackageId) {
+    StatsImpl s = new StatsImpl();
+    s.setMediapackageId(mediapackageId);
+    try {
+      s.setViews(usertrackingService.getViews(mediapackageId));
+    } catch (UserTrackingException e) {
+      throw new WebApplicationException(e);
+    }
+    return s;
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/stats.json")
+  @RestQuery(name = "statsasjson", description = "Get the statistics for an episode", returnDescription = "The statistics.", restParameters = { @RestParameter(name = "id", description = "The ID of the single episode to return the statistics for, if it exists", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the episode's statistics") })
+  public StatsImpl statsAsJson(@QueryParam("id") String mediapackageId) {
+    return statsAsXml(mediapackageId); // same logic, different @Produces annotation
   }
 
   @GET

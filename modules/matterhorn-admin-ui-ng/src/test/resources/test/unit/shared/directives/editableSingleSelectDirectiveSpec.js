@@ -1,7 +1,7 @@
 describe('adminNg.directives.adminNgEditableSingleSelect', function () {
     var $compile, $rootScope, $timeout, element;
 
-    beforeEach(module('adminNg.directives'));
+    beforeEach(module('adminNg'));
     beforeEach(module('adminNg.filters'));
     beforeEach(module('shared/partials/editableSingleSelect.html'));
 

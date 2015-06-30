@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ng-partial-ingest</id>
+  <title>Ingest asset</title>
+  <tags/>
+  <description/>
+
+  <configuration_panel></configuration_panel>
+
+  <operations>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Finalize ingest                                                   -->
+    <!--                                                                   -->
+    <!-- Ingest the external elements, apply access control entries,       -->
+    <!-- inspect the media and tag everything for archival.                -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Ingest elements from external working file repositories and file servers -->
+
+    <operation
+      id="ingest-download"
+      exception-handler-workflow="ng-partial-error"
+      description="Ingesting external elements">
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Inspect the media -->
+
+    <operation
+      id="inspect"
+      exception-handler-workflow="ng-partial-error"
+      description="Inspecting audio and video streams">
+      <configurations>
+        <configuration key="overwrite">false</configuration>
+        <configuration key="accept-no-media">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Apply access control lists from series to the mediapackage -->
+
+    <operation
+      id="apply-acl"
+      exception-handler-workflow="ng-partial-error"
+      description="Applying access control entries">
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Tag for archival                                                  -->
+    <!--                                                                   -->
+    <!-- Tag the recording sources, metadata and access control lists for  -->
+    <!-- archival.                                                         -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Tag the incoming source material for archival -->
+
+    <operation
+      id="tag"
+      description="Tagging source material for archival">
+      <configurations>
+        <configuration key="source-flavors">*/*</configuration>
+        <configuration key="target-tags">+archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag the incoming metadata catalogs for publishing -->
+
+    <operation
+      id="tag"
+      description="Tagging metadata catalogs for publication">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

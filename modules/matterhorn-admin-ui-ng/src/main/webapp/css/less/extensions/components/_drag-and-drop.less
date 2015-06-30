@@ -1,3 +1,23 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
 .drag-drop-items {
     .box-sizing();
     padding: 15px 10px;
@@ -18,7 +38,7 @@
         margin: 10px 0;
         box-shadow: 0 0 0 rgba(0,0,0,0);
         .transition(box-shadow .3s ease-in-out);
-        
+
         .title {
             padding: 10px;
             padding-left: 32px;
@@ -27,25 +47,25 @@
         &:hover {
             #gradient > .vertical(#fff, darken(#f3f5f6, 2%));
         }
-        
+
         &:active,
         &.being-dragged {
-            #gradient > .vertical(darken(#fff, 2%), darken(#f3f5f6, 3%)); 
+            #gradient > .vertical(darken(#fff, 2%), darken(#f3f5f6, 3%));
             cursor: move;
             .border(darken(@main-border-color, 5%));
             box-shadow: 0 0 4px rgba(0,0,0,0.1);
         }
-            
+
         &:first-child {
-           margin-top: 0; 
+           margin-top: 0;
         }
-        
+
         &:last-child {
-           margin-bottom: 50px; 
+           margin-bottom: 50px;
         }
-        
+
         // Grip Dots
-        
+
         &:before {
             width: 13px;
             height: 14px;
@@ -55,9 +75,9 @@
             left: 10px;
             .retina-image("@{img-path}grip.png", "@{img-path}grip@2x.png", 13px, 14px);
         }
-        
+
         // Item Move Buttons
-        
+
         .move-item {
             height: 17px;
             width: 17px;
@@ -68,7 +88,7 @@
             &.add {
                 .retina-image("@{img-path}plus-icon.png", "@{img-path}plus-icon@2x.png", 17px, 17px);
             }
-        
+
             &.remove {
                 .retina-image("@{img-path}remove-icon.png", "@{img-path}remove-icon@2x.png", 17px, 17px);
             }

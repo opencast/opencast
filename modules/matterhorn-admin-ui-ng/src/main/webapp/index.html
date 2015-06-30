@@ -6,6 +6,7 @@
         <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
         <link type="text/css" href="css/main.css" rel="stylesheet">
         <link type="text/css" href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="shortcut icon" href="img/favicon.ico">
         <script>
             window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>')
         </script>
@@ -22,8 +23,7 @@
     <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
         <header ng-controller="NavCtrl" class="primary-header">
             <div class="header-branding">
-                <div class="text-logo">Opencast</div>
-                <div class="logo-tag">Beta</div>
+                <img src="img/opencast_logo_white.png" width="100px" height="20px" alt="Opencast logo" />
             </div>
             <nav id="nav-dd-container" class="nav-dd-container">
                 <div class="nav-dd" id="lang-dd" old-admin-ng-dropdown="">
@@ -191,7 +191,7 @@
         <script src="shared/services/wizards/new-series/metadataExtended.js"></script>
         <script src="shared/services/wizards/new-series/theme.js"></script>
         <script src="shared/services/wizards/new-series/states.js"></script>
-        <script src="shared/services/wizards/new-series/summary.js"></script>        
+        <script src="shared/services/wizards/new-series/summary.js"></script>
         <script src="shared/services/wizards/new-acl/access.js"></script>
         <script src="shared/services/wizards/new-acl/metadata.js"></script>
         <script src="shared/services/wizards/new-acl/states.js"></script>
@@ -201,6 +201,7 @@
         <script src="shared/services/playerAdapterFactoryHtml5.js"></script>
         <script src="shared/services/playerAdapterFactoryVideoJs.js"></script>
         <script src="shared/services/playerAdapter.js"></script>
+        <script src="shared/services/httpInterceptor.js"></script>
         <script src="shared/filters/filters.js"></script>
         <script src="shared/filters/localizeDateFilter.js"></script>
         <script src="shared/filters/arrayFilter.js"></script>

@@ -1,8 +1,17 @@
 describe('adminNg.directives.adminNgEditableMultiSelect', function () {
     var $compile, $rootScope, $timeout, element;
 
-    beforeEach(module('adminNg.directives'));
+    beforeEach(module('adminNg'));
     beforeEach(module('shared/partials/editableMultiSelect.html'));
+
+    beforeEach(module(function ($provide) {
+        var service = {
+            configureFromServer: function () {},
+            formatDate: function (val, date) { return date; },
+            formatTime: function (val, date) { return date; }
+        };
+        $provide.value('Language', service);
+    }));
 
     beforeEach(inject(function (_$rootScope_, _$compile_, _$timeout_) {
         $rootScope = _$rootScope_;
