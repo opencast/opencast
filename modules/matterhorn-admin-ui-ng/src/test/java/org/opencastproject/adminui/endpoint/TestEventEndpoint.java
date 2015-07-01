@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.adminui.endpoint;
 
 import static org.opencastproject.pm.api.Person.person;
@@ -26,6 +32,7 @@ import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.endpoint.AbstractEventEndpointTest.TestEnv;
+import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.api.UriRewriter;
@@ -152,6 +159,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -233,7 +241,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     env.setIndex(searchIndex);
 
     // Preview subtype
-    env.setPreviewSubtype(PREVIEW_SUBTYPE);
+    AdminUIConfiguration adminUIConfiguration = new AdminUIConfiguration();
+    Hashtable<String, String> dictionary = new Hashtable<String, String>();
+    dictionary.put(AdminUIConfiguration.OPT_PREVIEW_SUBTYPE, PREVIEW_SUBTYPE);
+    adminUIConfiguration.updated(dictionary);
+    env.setAdminUIConfiguration(adminUIConfiguration);
 
     // acl
     final String anonymousRole = securityService.getOrganization().getAnonymousRole();
@@ -532,10 +544,10 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     EventCommentService eventCommentService = EasyMock.createNiceMock(EventCommentService.class);
     EasyMock.expect(eventCommentService.getComments(EasyMock.anyString())).andReturn(Arrays.asList(comment, comment2))
-    .anyTimes();
+            .anyTimes();
     EasyMock.expect(eventCommentService.getComment(EasyMock.anyString(), EasyMock.anyLong())).andReturn(comment2);
     EasyMock.expect(eventCommentService.updateComment(EasyMock.anyString(), EasyMock.anyObject(Comment.class)))
-    .andReturn(comment2);
+            .andReturn(comment2);
     EasyMock.replay(eventCommentService);
     env.setEventCommentService(eventCommentService);
 
@@ -965,8 +977,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public String getPreviewSubtype() {
-    return env.getPreviewSubtype();
+  public AdminUIConfiguration getAdminUIConfiguration() {
+    return env.getAdminUIConfiguration();
   }
 
 }

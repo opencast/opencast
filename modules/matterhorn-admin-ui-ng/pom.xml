@@ -410,6 +410,7 @@
                         </Export-Package>
                         <Service-Component>
                             OSGI-INF/acl_endpoint.xml,
+                            OSGI-INF/adminui_configuration.xml,
                             OSGI-INF/blacklist_endpoint.xml,
                             OSGI-INF/captureagents_endpoint.xml,
                             OSGI-INF/email_endpoint.xml,

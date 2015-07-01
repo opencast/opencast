@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.adminui.endpoint;
 
 import static com.jayway.restassured.RestAssured.given;
@@ -20,6 +26,7 @@ import static org.junit.Assert.assertThat;
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 
+import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.opencast.OpencastArchive;
@@ -495,6 +502,7 @@ public class AbstractEventEndpointTest {
   }
 
   public static final class TestEnv {
+    private AdminUIConfiguration adminUIConfiguration;
     private Workspace workspace;
     private WorkflowService workflowService;
     private OpencastArchive archive;
@@ -515,7 +523,6 @@ public class AbstractEventEndpointTest {
     private AdminUISearchIndex index;
     private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
     private CommonEventCatalogUIAdapter episodeCatalogUIAdapter;
-    private String previewSubtype;
 
     public Workspace getWorkspace() {
       return workspace;
@@ -661,12 +668,12 @@ public class AbstractEventEndpointTest {
       return index;
     }
 
-    public void setPreviewSubtype(String subtype) {
-      this.previewSubtype = subtype;
+    public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
+      this.adminUIConfiguration = adminUIConfiguration;
     }
 
-    public String getPreviewSubtype() {
-      return previewSubtype;
+    public AdminUIConfiguration getAdminUIConfiguration() {
+      return adminUIConfiguration;
     }
 
     public EventCatalogUIAdapter getEpisodeCatalogUIAdapter() {

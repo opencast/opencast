@@ -41,11 +41,89 @@ installation of ActiveMQ, but that can be changed with:
 
 ### Security
 
-*To be determined!*
+ActiveMQ can secure its message queues with user name and password access. This section will go through the steps of
+setting up a configured username and password. On the [ActiveMQ security site](http://activemq.apache.org/security.html)
+there are more details about using alternative authentication and authorization providers.
 
-Ideas:
+#### Create ActiveMQ Admin User
 
- - Limit `transportConnectores` (see `activemq.xml`) to certain hosts. This may require ActiveMQ to use multiple hosts.
-   Have a look at the Matterhorn mailing list for the ongoing discussion.
+First, you need to create a new user that will have access to the queues. This is configured in the `user.properties`
+configuration file in the configuration directory for ActiveMQ. It is a list of the format `username = password` so, for
+example, we could create a new admin user with the following file contents:
 
-Do not forget that ActiveMQ uses TCP port 61616 (default configuration) for communication which you might have to allow in your firewall.
+    admin=password
+
+#### Create ActiveMQ Admin Group
+
+The next step is to provide a group that will have our user in it and will secure access to the message queues. This is
+configured in the file `groups.properties` in the configuration directory for ActiveMQ. It is a list of the format
+`group = user1,user2,…`. For example:
+
+    groups=user1,user2,user3
+
+To set-up our new user to be a part of the admins group:
+
+    admins=admin
+
+#### Configure Users and Groups Configuration Files
+
+Next, we need to make sure that ActiveMQ is using our `user.properties` and `group.properties` files to authenticate and
+authorize users. The `login.conf` file should be in the ActivemQ configuration directory and contain:
+
+    activemq {
+        org.apache.activemq.jaas.PropertiesLoginModule required
+        org.apache.activemq.jaas.properties.user="users.properties"
+        org.apache.activemq.jaas.properties.group="groups.properties";
+    };
+
+#### Configure Message Broker Security
+
+The final step to secure the ActiveMQ queues is to limit them with a group. This can be done by editing the
+`activemq.xml` configuration file in the ActiveMQ configuration directory. Inside this configuration file, we need to
+add some XML in between the tags:
+
+    <broker></broker>
+
+We will add the following plugin configuration:
+
+    <plugins>
+        <jaasAuthenticationPlugin configuration="activemq" />
+        <authorizationPlugin>
+            <map>
+                <authorizationMap>
+                    <authorizationEntries>
+                        <authorizationEntry queue=">" read="admins" write="admins" admin="admins" />
+                        <authorizationEntry topic=">" read="admins" write="admins" admin="admins" />
+                        <authorizationEntry topic="ActiveMQ.Advisory.>" read="admins" write="admins" admin="admins"/>
+                    </authorizationEntries>
+                </authorizationMap>
+            </map>
+        </authorizationPlugin>
+    </plugins>
+
+The `jaasAuthenticationPlugin` configures the broker to use our `login.conf` file to do the authentication.
+
+    <jaasAuthenticationPlugin configuration="activemq" />
+
+ The property:
+
+    configuration=activemq
+
+needs to match the name given for surrounding object in `login.conf` i.e. activemq{};
+
+The `authorizationEntry` gives read, write and admin access to only those members in the group admins for queues and topics.
+
+##### Configure Matterhorn to Connect with Username and Password to Message Broker
+
+Now that we have secured the queues, Opencast will complain that it is unable to connect, using the current username and
+password. The username and password used above need to be added to the `config.properties` file of Opencast.  There are
+two properties to set:
+
+    activemq.broker.username=admin
+    activemq.broker.password=password
+
+## Firewall
+
+Do not forget that ActiveMQ uses the TCP port 61616 (default configuration) for communication.  You probably want to
+allow communication over this port in your firewall on a distributed setup, or to explicitly forbid public access on an
+all-in-one installation.
