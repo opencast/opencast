@@ -21,5 +21,6 @@ site_dir: 'site'
 
 pages:
 - ['index.md', 'Home']
+- ['license.md', 'Licenses and Legal Matters']
 - ['proposal-log.md', 'Proposal Log']
 - ['packaging.md', 'Packaging']
