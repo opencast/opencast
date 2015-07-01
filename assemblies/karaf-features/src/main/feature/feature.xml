@@ -54,7 +54,7 @@
     <bundle>mvn:org.apache.tika/tika-core/1.1</bundle>
     <bundle>mvn:org.codehaus.jettison/jettison/1.3.1</bundle>
     <bundle>mvn:org.jdom/com.springsource.org.jdom/1.0.0</bundle>
-    <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/1.1</bundle>
+    <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
 
     <!-- Spring Framework / Security -->
     <bundle>mvn:org.springframework.osgi/spring-osgi-core/1.2.1</bundle>

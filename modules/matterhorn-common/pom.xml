@@ -16,11 +16,6 @@
   <dependencies>
     <!-- Matterhorn -->
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-json</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
     </dependency>
@@ -48,6 +43,11 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient-osgi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+      <version>${json-simple.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
