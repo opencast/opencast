@@ -374,8 +374,10 @@
       <modules>
         <module>modules/matterhorn-annotation-api</module>
         <module>modules/matterhorn-annotation-impl</module>
+        <module>modules/matterhorn-archive-api</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-engage-theodul-api</module>
@@ -391,6 +393,7 @@
         <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
         <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
         <module>modules/matterhorn-engage-ui</module>
+        <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
         <module>modules/matterhorn-message-broker-api</module>
@@ -399,6 +402,7 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-runtime-info</module>
+        <module>modules/matterhorn-scheduler-api</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-feeds</module>
         <module>modules/matterhorn-search-service-impl</module>
@@ -509,6 +513,7 @@
         </property>
       </activation>
       <modules>
+        <module>modules/matterhorn-archive-api</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-caption-api</module>
         <module>modules/matterhorn-caption-impl</module>
@@ -528,6 +533,7 @@
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-runtime-info-ui</module>
+        <module>modules/matterhorn-scheduler-api</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
         <module>modules/matterhorn-silencedetection-api</module>
@@ -1014,7 +1020,7 @@
       <plugin>
         <groupId>com.atlassian.maven.plugins</groupId>
         <artifactId>maven-clover2-plugin</artifactId>
-        <version>3.1.5</version>
+        <version>4.0.4</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -1678,7 +1684,7 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.5</version>
+        <version>1.9</version>
       </dependency>
 
       <dependency>

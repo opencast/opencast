@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 
 package org.opencastproject.adminui.endpoint;
 
@@ -25,7 +31,9 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
+import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.archive.api.Archive;
 import org.opencastproject.archive.api.ArchiveException;
@@ -40,10 +48,10 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.mediapackage.track.TrackImpl;
+import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
@@ -51,6 +59,7 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.data.Tuple;
@@ -83,8 +92,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -106,15 +116,8 @@ public class ToolsEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ToolsEndpoint.class);
 
-  private static final String DEFAULT_SOURCE_TRACK_FLAVOR = "*/work";
-  private static final String DEFAULT_PREVIEW_PUBLICATION_FLAVOR_SUBTYPE = "preview";
-  private static final String DEFAULT_WAVEFORM_PUBLICATION_FLAVOR_SUBTYPE = "waveform";
-
   /** The default file name for generated Smil catalogs. */
-  static final String TARGET_FILE_NAME = "cut.smil";
-
-  /** The flavor for the SMIL cutting catalog */
-  static final MediaPackageElementFlavor SMIL_CATALOG_FLAVOR = new MediaPackageElementFlavor("smil", "cutting");
+  private static final String TARGET_FILE_NAME = "cut.smil";
 
   /** The Json key for the cutting details object. */
   private static final String CONCAT_KEY = "concat";
@@ -138,6 +141,7 @@ public class ToolsEndpoint {
   private final JSONParser parser = new JSONParser();
 
   // service references
+  private AdminUIConfiguration adminUIConfiguration;
   private AdminUISearchIndex searchIndex;
   private Archive<?> archive;
   private HttpMediaPackageElementProvider mpElementProvider;
@@ -145,6 +149,11 @@ public class ToolsEndpoint {
   private SmilService smilService;
   private WorkflowService workflowService;
   private Workspace workspace;
+
+  /** OSGi DI. */
+  void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
+    this.adminUIConfiguration = adminUIConfiguration;
+  }
 
   /** OSGi DI */
   void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
@@ -183,8 +192,7 @@ public class ToolsEndpoint {
 
   @GET
   @Path("{mediapackageid}.json")
-  @RestQuery(name = "getAvailableTools", description = "Returns a list of tools which are currently available for the given media package.", returnDescription = "A JSON array with tools identifiers", pathParameters = { @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "Available tools evaluated", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(name = "getAvailableTools", description = "Returns a list of tools which are currently available for the given media package.", returnDescription = "A JSON array with tools identifiers", pathParameters = { @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "Available tools evaluated", responseCode = HttpServletResponse.SC_OK) })
   public Response getAvailableTools(@PathParam("mediapackageid") final String mediaPackageId) {
     final List<JValue> jTools = new ArrayList<JValue>();
     if (isEditorAvailable(mediaPackageId))
@@ -212,24 +220,19 @@ public class ToolsEndpoint {
                   @Override
                   public Boolean ap(Publication pub) {
                     return pub.getFlavor() != null
-                            && DEFAULT_PREVIEW_PUBLICATION_FLAVOR_SUBTYPE.equals(pub.getFlavor().getSubtype());
+                            && adminUIConfiguration.getPreviewSubtype().equals(pub.getFlavor().getSubtype());
                   }
                 }).toList();
-        final Collection<Track> sourceTracks = getEditorSourceTrackSelector().select(mp, false);
 
-        // Collect previews
+        // Collect previews and tracks
         List<JValue> jPreviews = new ArrayList<JValue>();
+        List<JValue> jTracks = new ArrayList<JValue>();
         for (Publication pub : previewPublications) {
           jPreviews.add(j(f("uri", v(pub.getURI().toString()))));
-        }
 
-        // Collect tracks
-        List<JValue> jTracks = new ArrayList<JValue>();
-        for (Track track : sourceTracks) {
-          JObjectWrite jTrack = j(f("id", v(track.getIdentifier())), f("flavor", v(track.getFlavor().toString())),
-                  f("mimetype", v(track.getMimeType().toString())));
+          JObjectWrite jTrack = j(f("id", v(pub.getIdentifier())), f("flavor", v(pub.getFlavor().getType())));
           // Check if there's a waveform for the current track
-          Opt<Publication> optWaveform = getWaveformForTrack(mp, track);
+          Opt<Publication> optWaveform = getWaveformForTrack(mp, pub);
           if (optWaveform.isSome()) {
             jTracks.add(jTrack.merge(j(f("waveform", v(optWaveform.get().getURI().toString())))));
           } else {
@@ -347,8 +350,21 @@ public class ToolsEndpoint {
     for (String trackId : editingInfo.getConcatTracks()) {
       Track track = mediaPackage.getTrack(trackId);
       if (track == null) {
-        throw new IllegalStateException(format("The track '%s' doesn't exist in media package '%s'", trackId,
-                mediaPackage));
+        for (Publication p : mediaPackage.getPublications()) {
+          if (trackId.equals(p.getIdentifier())) {
+            // Create temporal track from publication element
+            TrackImpl t = TrackImpl.fromURI(p.getURI());
+            t.setFlavor(p.getFlavor());
+            t.setDuration(mediaPackage.getDuration());
+            t.setIdentifier(p.getIdentifier());
+            t.addStream(new VideoStreamImpl());
+            track = t;
+            break;
+          }
+        }
+        if (track == null)
+          throw new IllegalStateException(format("The track '%s' doesn't exist in media package '%s'", trackId,
+                  mediaPackage));
       }
       tracks.add(track);
     }
@@ -377,6 +393,8 @@ public class ToolsEndpoint {
    *           if the SMIL catalog cannot be read or not be written to the archive
    */
   MediaPackage addSmilToArchive(MediaPackage mediaPackage, final Smil smil) throws IOException {
+    final String catalogId = "editor-cutting-information";
+    Catalog catalog = mediaPackage.getCatalog(catalogId);
 
     URI smilURI;
     try (InputStream is = IOUtils.toInputStream(smil.toXML(), "UTF-8")) {
@@ -389,11 +407,20 @@ public class ToolsEndpoint {
       throw new IOException(e);
     }
 
-    MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-    Catalog catalog = (Catalog) mpeBuilder.elementFromURI(smilURI, MediaPackageElement.Type.Catalog,
-            SMIL_CATALOG_FLAVOR);
-    catalog.setIdentifier(smil.getId());
-    mediaPackage.add(catalog);
+    if (catalog == null) {
+      MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+      catalog = (Catalog) mpeBuilder.elementFromURI(smilURI, MediaPackageElement.Type.Catalog,
+              adminUIConfiguration.getSmilCatalogFlavor());
+      mediaPackage.add(catalog);
+    }
+    catalog.setURI(smilURI);
+    catalog.setIdentifier(catalogId);
+    catalog.setMimeType(MimeTypes.XML);
+    for (String tag : adminUIConfiguration.getSmilCatalogTags()) {
+      catalog.addTag(tag);
+    }
+    // setting the URI to a new source so the checksum will most like be invalid
+    catalog.setChecksum(null);
 
     try {
       // FIXME SWITCHP-333: Start in new thread
@@ -470,7 +497,7 @@ public class ToolsEndpoint {
    * @param track
    *          the track
    */
-  private Opt<Publication> getWaveformForTrack(final MediaPackage mp, final Track track) {
+  private Opt<Publication> getWaveformForTrack(final MediaPackage mp, final Publication track) {
     List<Publication> pubs = Stream.$(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
       @Override
       public Boolean ap(Publication pub) {
@@ -478,7 +505,7 @@ public class ToolsEndpoint {
           return false;
 
         return track.getFlavor().getType().equals(pub.getFlavor().getType())
-                && pub.getFlavor().getSubtype().equals(DEFAULT_WAVEFORM_PUBLICATION_FLAVOR_SUBTYPE);
+                && pub.getFlavor().getSubtype().equals(adminUIConfiguration.getWaveformSubtype());
       }
     }).toList();
 
@@ -513,10 +540,6 @@ public class ToolsEndpoint {
 
   /**
    * Analyzes the media package and tries to get information about segments out of it.
-   * <p>
-   * There are two possible sources for tracks:
-   * <li>An existing SMIL cutting catalog
-   * <li>A MPEG-7 catalog
    *
    * @param mediaPackageId
    *          the media package identifier
@@ -527,23 +550,85 @@ public class ToolsEndpoint {
 
     if (optMP.isSome()) {
       MediaPackage mp = optMP.get();
-      for (Catalog smilCatalog : mp.getCatalogs(SMIL_CATALOG_FLAVOR)) {
+      List<Tuple<Long, Long>> segments = new ArrayList<>();
+      for (Catalog smilCatalog : mp.getCatalogs(adminUIConfiguration.getSmilCatalogFlavor())) {
         try {
           Smil smil = smilService.fromXml(workspace.get(smilCatalog.getURI())).getSmil();
-          return getSegmentsFromSmil(smil);
+          segments = mergeSegments(segments, getSegmentsFromSmil(smil));
         } catch (NotFoundException e) {
           logger.warn("File '{}' could not be loaded by workspace service: {}", smilCatalog.getURI(), getStackTrace(e));
         } catch (IOException e) {
           logger.warn("Reading file '{}' from workspace service failed: {}", smilCatalog.getURI(), getStackTrace(e));
         } catch (SmilException e) {
-          logger.warn("Error while parsing SMIL catalog found in media package '{}': {}", mediaPackageId,
-                  getStackTrace(e));
+          logger.warn("Error while parsing SMIL catalog '{}': {}", smilCatalog.getURI(), getStackTrace(e));
         }
       }
+
+      if (!segments.isEmpty())
+        return segments;
+
+      // Read from silence detection flavors
+      for (Catalog smilCatalog : mp.getCatalogs(adminUIConfiguration.getSmilSilenceFlavor())) {
+        try {
+          Smil smil = smilService.fromXml(workspace.get(smilCatalog.getURI())).getSmil();
+          segments = mergeSegments(segments, getSegmentsFromSmil(smil));
+        } catch (NotFoundException e) {
+          logger.warn("File '{}' could not be loaded by workspace service: {}", smilCatalog.getURI(), getStackTrace(e));
+        } catch (IOException e) {
+          logger.warn("Reading file '{}' from workspace service failed: {}", smilCatalog.getURI(), getStackTrace(e));
+        } catch (SmilException e) {
+          logger.warn("Error while parsing SMIL catalog '{}': {}", smilCatalog.getURI(), getStackTrace(e));
+        }
+      }
+
+      // Check for single segment to ignore
+      if (segments.size() == 1) {
+        Tuple<Long, Long> singleSegment = segments.get(0);
+        if (singleSegment.getA() == 0 && singleSegment.getB() >= mp.getDuration())
+          segments.remove(0);
+      }
+
+      if (!segments.isEmpty())
+        return segments;
     }
 
     // Return an empty list if no segments could be found
     return Collections.emptyList();
+  }
+
+  protected List<Tuple<Long, Long>> mergeSegments(List<Tuple<Long, Long>> segments, List<Tuple<Long, Long>> segments2) {
+    // Merge conflicting segments
+    List<Tuple<Long, Long>> mergedSegments = mergeInternal(segments, segments2);
+
+    // Sort segments
+    Collections.sort(mergedSegments, new Comparator<Tuple<Long, Long>>() {
+      @Override
+      public int compare(Tuple<Long, Long> t1, Tuple<Long, Long> t2) {
+        return t1.getA().compareTo(t2.getA());
+      }
+    });
+
+    return mergedSegments;
+  }
+
+  private List<Tuple<Long, Long>> mergeInternal(List<Tuple<Long, Long>> segments, List<Tuple<Long, Long>> segments2) {
+    for (Iterator<Tuple<Long, Long>> it = segments.iterator(); it.hasNext();) {
+      Tuple<Long, Long> seg = it.next();
+      for (Iterator<Tuple<Long, Long>> it2 = segments2.iterator(); it2.hasNext();) {
+        Tuple<Long, Long> seg2 = it2.next();
+        long combinedStart = Math.max(seg.getA(), seg2.getA());
+        long combinedEnd = Math.min(seg.getB(), seg2.getB());
+        if (combinedEnd > combinedStart) {
+          it.remove();
+          it2.remove();
+          List<Tuple<Long, Long>> newSegments = new ArrayList<Tuple<Long, Long>>(segments);
+          newSegments.add(tuple(combinedStart, combinedEnd));
+          return mergeInternal(newSegments, segments2);
+        }
+      }
+    }
+    segments.addAll(segments2);
+    return segments;
   }
 
   /**
@@ -573,24 +658,6 @@ public class ToolsEndpoint {
       }
     }
     return segments;
-  }
-
-  /**
-   * Returns a {@link TrackSelector} to select the preview tracks of a {@link MediaPackage}.
-   */
-  private TrackSelector getEditorPreviewsTrackSelector() {
-    final TrackSelector previewTracksSelector = new TrackSelector();
-    previewTracksSelector.addFlavor(DEFAULT_PREVIEW_PUBLICATION_FLAVOR_SUBTYPE);
-    return previewTracksSelector;
-  }
-
-  /**
-   * Returns a {@link TrackSelector} to select the editor source tracks of a {@link MediaPackage}.
-   */
-  private TrackSelector getEditorSourceTrackSelector() {
-    final TrackSelector sourceTrackSelector = new TrackSelector();
-    sourceTrackSelector.addFlavor(DEFAULT_SOURCE_TRACK_FLAVOR);
-    return sourceTrackSelector;
   }
 
   /** Provides access to the parsed editing information */
