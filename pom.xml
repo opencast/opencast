@@ -2495,6 +2495,18 @@
       <name>Eclipselink Repo</name>
       <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
     </repository>
+    <!-- ServiceMix repo -->
+    <repository>
+      <id>servicemix</id>
+      <name>Apache ServiceMix Repository</name>
+      <url>http://svn.apache.org/repos/asf/servicemix/m2-repo</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
     <!-- these are here as a backup in case the matterhorn nexus repository is down -->
     <!-- <repository> <id>com.springsource.repository.bundles.release</id> <name>SpringSource Enterprise Bundle Repository
       - SpringSource Bundle Releases</name> <url>http://repository.springsource.com/maven/bundles/release</url> <releases> <enabled>true</enabled>
