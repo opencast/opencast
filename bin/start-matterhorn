@@ -25,7 +25,7 @@ MATTERHORN_TEMP_DIR="${FELIX_WORK_DIR}/tmp"
 
 # Check lib dir exists
 [ -d "$OPENCAST_HOME_DIR/lib/matterhorn" ] || \
-  ( echo 'ERROR: Could nor find Opencast jars. Exiting...' && exit )
+  ( echo 'ERROR: Opencast jars not found at $OPENCAST_HOME_DIR/lib/matterhorn. Exiting...' && exit )
 
 ###
 # The following is for the actual Opencast start
@@ -61,7 +61,7 @@ DISABLE_PHONEHOME="-Dnet.sf.ehcache.skipUpdateCheck=true"
 DISABLE_PHONEHOME="${DISABLE_PHONEHOME} -Dorg.terracotta.quartz.skipUpdateCheck=true"
 
 # Configure temporary files
-JAVA="-Djava.io.tmpdir=$OPENCAST_HOME_DIR_TEMP_DIR"
+JAVA="-Djava.io.tmpdir=$OPENCAST_TEMP_DIR"
 
 # Set memory allocation options
 # -XX:MaxPermSize has been removed in OpenJDK >= 8
@@ -77,5 +77,5 @@ rm -rf $FELIX_CACHE_DIR
 
 set -o monitor
 pushd $OPENCAST_HOME_DIR &> /dev/null
-java $OPENCAST_HOME_DIR_OPTS -jar $OPENCAST_HOME_DIR/bin/felix.jar $FELIX_CACHE_DIR
+java $OPENCAST_OPTS -jar $OPENCAST_HOME_DIR/bin/felix.jar $FELIX_CACHE_DIR
 popd &> /dev/null
