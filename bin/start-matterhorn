@@ -12,8 +12,7 @@ echo
 
 # Load default configuration
 OPENCAST_HOME_DIR=$(cd $(dirname "$0")/.. && pwd -P)
-echo "  Using Opencast installation at $OPENCAST_HOME_DIR"
-echo
+echo "Using Opencast installation at $OPENCAST_HOME_DIR"
 
 LOGDIR=$OPENCAST_HOME_DIR/logs
 LOGLEVEL="WARN"
@@ -68,9 +67,10 @@ JAVA="-Djava.io.tmpdir=$OPENCAST_TEMP_DIR"
 # Hence we should remove this options once we discontinue support for Java 7
 JAVA="${JAVA} -Xms1g -Xmx1g -XX:MaxPermSize=256m"
 
+# Configure debug access
 DEBUG="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"
 
-MATTERHORN_OPTS="$GOSH $DEBUG $FELIX $GRAPHICS $JETTY $JAVA $LOGGING $JMX $DISABLE_PHONEHOME $ADD_OPTS"
+OPENCAST_OPTS="$GOSH $DEBUG $FELIX $GRAPHICS $JETTY $JAVA $LOGGING $JMX $DISABLE_PHONEHOME $ADD_OPTS"
 
 # Make sure matterhorn bundles are reloaded
 rm -rf $FELIX_CACHE_DIR
