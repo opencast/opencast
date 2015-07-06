@@ -190,20 +190,26 @@ ocSecurity = new (function() {
 		  table.find('input.role_search').each(function () {
 		    var $field = $(this);
 		    var value = $.trim($field.attr('id'));
-        var canWrite = ($field.parents('tr').find('input[name|="priv_write"]:checked').length > 0 ? "true" : "false");
-        var canRead = ($field.parents('tr').find('input[name|="priv_read"]:checked').length > 0 ? "true" : "false"); 
+        var canWrite = $field.parents('tr').find('input[name|="priv_write"]:checked').length > 0;
+        var canRead = $field.parents('tr').find('input[name|="priv_read"]:checked').length > 0;
 		    //check whether there is a value and entered value is a valid role
 		    if (value != "" && _.contains(roleList, value)) {
-		        out += '<ace>';
-		        out += '<role>' + value + '</role>';
-		        out += '<action>read</action>';
-		        out += '<allow>' + canRead + '</allow>';
-		        out += '</ace>';
-		        out += '<ace>';
-		        out += '<role>' + value + '</role>';
-		        out += '<action>write</action>';
-		        out += '<allow>' + canWrite + '</allow>';
-		        out += '</ace>';
+					// only create an ACL entry if canRead is true since the workflow service does not support denial rules
+					if (canRead) {
+						out += '<ace>';
+						out += '<role>' + value + '</role>';
+						out += '<action>read</action>';
+						out += '<allow>' + canRead + '</allow>';
+						out += '</ace>';
+					}
+					// only create an ACL entry if canWrite is true since the workflow service does not support denial rules
+					if (canWrite) {
+						out += '<ace>';
+						out += '<role>' + value + '</role>';
+						out += '<action>write</action>';
+						out += '<allow>' + canWrite + '</allow>';
+						out += '</ace>';
+					}
 		    }
 		  });
 		  out += '</acl>';
