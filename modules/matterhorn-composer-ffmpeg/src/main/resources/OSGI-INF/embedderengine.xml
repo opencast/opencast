@@ -3,8 +3,7 @@
   xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
   name="org.opencastproject.composer.impl.EmbedderEngineFactoryImpl"
   immediate="true"
-  activate="activate"
-  deactivate="deactivate">
+  activate="activate">
     <implementation class="org.opencastproject.composer.impl.EmbedderEngineFactoryImpl" />
     <property name="service.description" value="QT SUbtitle Embedder Engine Factory" />
     <service>
