@@ -18,7 +18,7 @@
  * the License.
  *
  */
- 
+
 package org.opencastproject.coverimage.impl;
 
 import static org.junit.Assert.assertNotNull;

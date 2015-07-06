@@ -18,7 +18,7 @@
  * the License.
  *
  */
- 
+
 package org.opencastproject.coverimage.impl.endpoint;
 
 import org.opencastproject.coverimage.CoverImageException;

@@ -18,7 +18,7 @@
  * the License.
  *
  */
- 
+
 package org.opencastproject.coverimage.remote;
 
 import org.opencastproject.coverimage.CoverImageException;

@@ -18,7 +18,7 @@
  * the License.
  *
  */
- 
+
 package org.opencastproject.coverimage.impl;
 
 import org.opencastproject.security.api.OrganizationDirectoryService;
