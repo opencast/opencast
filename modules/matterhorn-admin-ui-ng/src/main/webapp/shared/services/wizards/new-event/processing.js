@@ -38,6 +38,7 @@ angular.module('adminNg.services')
 
         // Listener for the workflow selection
         this.changeWorkflow = function () {
+            me.changingWorkflow = true;
             workflowConfigEl = angular.element(idConfigElement);
             if (angular.isDefined(me.ud.workflow)) {
                 updateConfigurationPanel(me.ud.workflow.configuration_panel);
@@ -45,6 +46,7 @@ angular.module('adminNg.services')
                 updateConfigurationPanel();
             }
             me.save();
+            me.changingWorkflow = false;
         };
 
         // Get the workflow configuration
