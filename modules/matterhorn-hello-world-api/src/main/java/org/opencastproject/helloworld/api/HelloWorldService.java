@@ -21,14 +21,20 @@ package org.opencastproject.helloworld.api;
  */
 public interface HelloWorldService {
 
+  /**
+   * Outputs "Hello World!"
+   *
+   * @return String with the text
+   */
+  String helloWorld();
 
   /**
-   * Outputs "Hello World" or "Hello " + name
+   * Outputs "Hello!" or "Hello " + name
    *
    * @param name
    *          name of the person to greet
    * @return String with the text
    */
-  String helloWorld(String name);
+  String helloName(String name);
 
 }

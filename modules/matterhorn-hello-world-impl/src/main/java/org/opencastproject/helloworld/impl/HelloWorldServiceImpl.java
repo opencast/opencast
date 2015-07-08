@@ -21,21 +21,23 @@ import org.slf4j.LoggerFactory;
 import org.opencastproject.helloworld.api.HelloWorldService;
 
 /**
- * A simple tutorial class to learn mor about Matterhorn
+ * A simple tutorial class to learn about Matterhorn Services
  */
-public class HelloWorldServiceImpl implements
-HelloWorldService {
+public class HelloWorldServiceImpl implements HelloWorldService {
 
-  /** The logger */
+  /** The module specific logger */
   private static final Logger logger = LoggerFactory.getLogger(HelloWorldServiceImpl.class);
 
-  public String helloWorld(String name) {
-    if (name == null) {
-      logger.info("No name provided.");
-      return "Hello World!";
-    }
-    logger.info("Name is {}.", name);
-    return "Hello " + name + "!";
+  public String helloWorld() {
+    logger.info("Hello World");
+    return "Hello World";
   }
 
+  public String helloName(String name) {
+    logger.info("Name is {}.", name);
+    if ("".equals(name)) {
+      return "Hello!";
+    }
+    return "Hello " + name + "!";
+  }
 }

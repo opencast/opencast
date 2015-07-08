@@ -16,48 +16,38 @@
 package org.opencastproject.helloworld.impl;
 
 import org.opencastproject.helloworld.api.HelloWorldService;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Assert;
 
 /**
  * Test class for Hello World Tutorial
  */
-public class HelloWorldTest {
+public class HelloWorldServiceTest {
 
   private HelloWorldService service;
 
-
   /**
    * Setup for the Hello World Service
-   *
-   * @throws Exception
-   *           if setup fails
    */
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     service = new HelloWorldServiceImpl();
-  }
-
-  /**
-   * @throws java.io.File.IOException
-   */
-  @After
-  public void tearDown() throws Exception {
-    service = null;
   }
 
   @Test
   public void testHelloWorld() throws Exception {
-
-    assertNotNull(service.helloWorld(null));
-    assertNotNull(service.helloWorld("John"));
-
-    assertEquals(service.helloWorld(null), "Hello World!");
-    assertEquals(service.helloWorld("Tom"), "Hello Tom!");
+    Assert.assertEquals("Hello World", service.helloWorld());
   }
 
+  @Test
+  public void testHelloNameEmpty() throws Exception {
+    Assert.assertEquals("Hello!", service.helloName(""));
+  }
+
+  @Test
+  public void testHelloName() throws Exception {
+    Assert.assertEquals("Hello Johannes!", service.helloName("Johannes"));
+  }
 }
