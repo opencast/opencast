@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -142,8 +143,15 @@ public final class JobBarrier {
 
   private void suspendWaiterJob() {
     if (this.waiter != null) {
-      this.waiter.setStatus(Job.Status.WAITING);
       try {
+        this.waiter.setStatus(Job.Status.WAITING);
+        List<Long> blockedForJobs = new LinkedList<Long>();
+        for (Job j : jobs) {
+          blockedForJobs.add(j.getId());
+          j.setBlockingJobId(this.waiter.getId());
+          this.serviceRegistry.updateJob(j);
+        }
+        this.waiter.setBlockedJobIds(blockedForJobs);
         this.serviceRegistry.updateJob(this.waiter);
       } catch (ServiceRegistryException e) {
         logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}", this.waiter, e.getMessage());
@@ -157,8 +165,13 @@ public final class JobBarrier {
 
   private void wakeWaiterJob() {
     if (this.waiter != null) {
-      this.waiter.setStatus(Job.Status.RUNNING);
       try {
+        this.waiter.setStatus(Job.Status.RUNNING);
+        for (Job j : jobs) {
+          j.setBlockingJobId(null);
+          this.serviceRegistry.updateJob(j);
+        }
+        this.waiter.setBlockedJobIds(null);
         this.serviceRegistry.updateJob(this.waiter);
       } catch (ServiceRegistryException e) {
         logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}", this.waiter, e.getMessage());
@@ -302,6 +315,9 @@ public final class JobBarrier {
                 case INSTANTIATED:
                 case RUNNING:
                   logger.trace("{} is still in the works", job);
+                  break;
+                case WAITING:
+                  logger.trace("{} is waiting", job);
                   break;
                 default:
                   logger.error("Unhandled job status '{}' found", jobStatus);

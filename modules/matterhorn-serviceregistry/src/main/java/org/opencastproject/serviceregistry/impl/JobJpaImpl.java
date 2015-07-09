@@ -390,6 +390,24 @@ public class JobJpaImpl extends JaxbJob {
     return super.jobLoad;
   }
 
+  @Column(name = "blocking_job_list")
+  @OrderColumn(name = "job_index")
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "mh_blocking_job", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
+  @XmlElement(name = "jobId")
+  @XmlElementWrapper(name = "blockingJobId")
+  @Override
+  public List<Long> getBlockedJobIds() {
+    return blockedJobIds;
+  }
+
+  @Override
+  @Column(name = "blocking_job")
+  @XmlElement(name = "blockingJobId")
+  public Long getBlockingJobId() {
+    return blockingJobId;
+  }
+
   @Override
   public void setDispatchable(boolean dispatchable) {
     super.setDispatchable(dispatchable);

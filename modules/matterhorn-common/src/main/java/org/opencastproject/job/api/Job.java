@@ -288,4 +288,32 @@ public interface Job {
    * @return the job's load
    */
   Float getJobLoad();
+
+  /**
+   * Gets the list of job IDs that are blocking this job from continuing
+   * 
+   * @return the list of Job IDs that are blocking this job
+   */
+  List<Long> getBlockedJobIds();
+
+  /**
+   * Sets the list of job IDs that are blocking this job from continuing
+   * 
+   * @param list the list of Job IDs that are blocking this job
+   */
+  void setBlockedJobIds(List<Long> list);
+
+  /**
+   * Gets which job, if any, this job is blocking
+   * 
+   * @return the Job ID this job is blocking, or null
+   */
+  Long getBlockingJobId();
+
+  /**
+   * Sets which job this job is blocking
+   * 
+   * @param jobId the ID of the job this job is blocking, or null if it is not blocking anything
+   */
+  void setBlockingJobId(Long jobId);
 }

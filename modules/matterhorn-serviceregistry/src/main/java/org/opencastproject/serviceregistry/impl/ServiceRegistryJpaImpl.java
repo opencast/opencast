@@ -964,6 +964,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     fromDb.setVersion(job.getVersion());
     fromDb.setOperation(job.getOperation());
     fromDb.setArguments(job.getArguments());
+    fromDb.setBlockedJobIds(job.getBlockedJobIds());
+    fromDb.setBlockingJobId(job.getBlockingJobId());
     if (job.getDateCreated() == null) {
       job.setDateCreated(now);
       fromDb.setDateCreated(now);

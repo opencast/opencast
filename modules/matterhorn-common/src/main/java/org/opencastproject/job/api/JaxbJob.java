@@ -25,6 +25,7 @@ import static org.opencastproject.job.api.Job.FailureReason.NONE;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -113,6 +114,12 @@ public class JaxbJob implements Job {
 
   /** The load value for this job.  This should be roughly the number of cores that this job occupies while running. */
   protected Float jobLoad = 1.0f;
+
+  /** The list of job IDs that are blocking this job from continuing. */
+  protected List<Long> blockedJobIds = new LinkedList<Long>();
+
+  /** The job that this job is blocking from continuing. */
+  protected Long blockingJobId = null;
 
   /** Default constructor needed by jaxb */
   public JaxbJob() {
@@ -636,6 +643,28 @@ public class JaxbJob implements Job {
    */
   public void setJobLoad(Float newLoad) {
     this.jobLoad = newLoad;
+  }
+
+  @Override
+  @XmlElement(name = "jobId")
+  @XmlElementWrapper(name = "blockingJobId")
+  public List<Long> getBlockedJobIds() {
+    return blockedJobIds;
+  }
+
+  @Override
+  public void setBlockedJobIds(List<Long> list) {
+    blockedJobIds = list;
+  }
+
+  @Override
+  @XmlElement(name = "blockingJobId")
+  public Long getBlockingJobId() {
+    return blockingJobId;
+  }
+
+  public void setBlockingJobId(Long jobId) {
+    this.blockingJobId = jobId;
   }
 
   /**
