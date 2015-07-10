@@ -45,6 +45,10 @@ Required:
     ffmpeg >= 2.5
     maven >= 3.1
 
+> *Note that by default Ubuntu and Debian ship Libav and installing the `ffmpeg` package from the default repository
+> will not get you FFmpeg. If you are unsure about where to get FFmpeg, please refer to the [FFmpeg
+> website](http://ffmpeg.org).*
+
 Required (not necessarily on the same machine):
 
     ActiveMQ >= 5.10 (older versions untested)
