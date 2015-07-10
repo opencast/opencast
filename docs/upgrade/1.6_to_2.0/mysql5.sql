@@ -25,7 +25,7 @@ CREATE INDEX IX_mh_user_session_user_id ON mh_user_session (user_id);
 
 ALTER TABLE mh_organization_property MODIFY value TEXT(65535);
 
-ALTER TABLE mh_search ADD COLUMN 'series_id' VARCHAR(128) AFTER 'id';
+ALTER TABLE mh_search ADD COLUMN series_id VARCHAR(128) AFTER id;
 
 -- Alter Existing Tables
 -- Adding default values for the columns that will be overwritten at startup
