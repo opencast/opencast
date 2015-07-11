@@ -109,6 +109,11 @@
         <module>modules/matterhorn-textanalyzer-workflowoperation</module>
         <module>modules/matterhorn-themes-workflowoperation</module>
         <module>modules/matterhorn-themes</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videoeditor-api</module>
         <module>modules/matterhorn-videoeditor-workflowoperation</module>
@@ -216,7 +221,7 @@
         <module>modules/matterhorn-distribution-service-acl</module>
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download</module>
-        <module>modules/matterhorn-distribution-service-streaming</module>
+        <module>modules/matterhorn-distribution-service-streaming-wowza</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
@@ -256,7 +261,7 @@
         <module>modules/matterhorn-distribution-service-acl</module>
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download</module>
-        <module>modules/matterhorn-distribution-service-streaming</module>
+        <module>modules/matterhorn-distribution-service-streaming-wowza</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>

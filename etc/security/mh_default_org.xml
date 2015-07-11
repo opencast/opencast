@@ -181,6 +181,7 @@
 
     <!-- Secure the system management URLs for admins only -->
     <sec:intercept-url pattern="/services/*" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/signing/**" access="ROLE_ADMIN" />
     <sec:intercept-url pattern="/system/**" access="ROLE_ADMIN" />
     <sec:intercept-url pattern="/config/**" access="ROLE_ADMIN" />
 

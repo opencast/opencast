@@ -130,6 +130,8 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.urlsigning.exception.UrlSigningException;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.MatterhornConstants;
@@ -235,6 +237,11 @@ public abstract class AbstractEventEndpoint {
 
   private static final int CREATED_BY_UI_ORDER = 14;
 
+  protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
+
+  /** The default time before a piece of signed content expires. 2 Hours. */
+  protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
+
   public abstract WorkflowService getWorkflowService();
 
   public abstract AdminUISearchIndex getIndex();
@@ -277,6 +284,10 @@ public abstract class AbstractEventEndpoint {
   public abstract EventCatalogUIAdapter getEpisodeCatalogUIAdapter();
 
   public abstract AdminUIConfiguration getAdminUIConfiguration();
+
+  public abstract long getUrlSigningExpireDuration();
+
+  public abstract UrlSigningService getUrlSigningService();
 
   /** Default server URL */
   protected String serverUrl = "http://localhost:8080";
@@ -1201,7 +1212,7 @@ public abstract class AbstractEventEndpoint {
     if (mpOpt.isSome()) {
       for (Track track : mpOpt.get().getTracks()) {
         tracksJSON.add(j(f("id", vN(track.getIdentifier())), f("type", vN(track.getFlavor().toString())),
-                f("mimetype", vN(track.getMimeType())), f("url", vN(track.getURI()))));
+                f("mimetype", vN(track.getMimeType())), f("url", vN(signUrl(track.getURI())))));
       }
     }
 
@@ -1255,7 +1266,7 @@ public abstract class AbstractEventEndpoint {
       }
       result = j(f("id", vN(track.getIdentifier())), f("type", vN(track.getElementType())),
               f("duration", vN(track.getDuration())), f("mimetype", vN(track.getMimeType())),
-              f("flavor", vN(track.getFlavor())), f("url", vN(track.getURI())),
+              f("flavor", vN(track.getFlavor())), f("url", vN(signUrl(track.getURI()))),
               f("description", vN(track.getDescription())), f("tags", vN(StringUtils.join(track.getTags(), ","))),
               f("streams", j(f("audio", a(audioStreamsJSON)), f("video", a(videoStreamsJSON)))));
     }
@@ -1281,7 +1292,7 @@ public abstract class AbstractEventEndpoint {
         attachement.getMediaPackage();
         attachementsJSON.add(j(f("id", vN(attachement.getIdentifier())),
                 f("type", vN(attachement.getFlavor().toString())), f("mimetype", vN(attachement.getMimeType())),
-                f("tags", vN(StringUtils.join(attachement.getTags(), ","))), f("url", vN(attachement.getURI()))));
+                f("tags", vN(StringUtils.join(attachement.getTags(), ","))), f("url", vN(signUrl(attachement.getURI())))));
       }
     }
 
@@ -2154,14 +2165,26 @@ public abstract class AbstractEventEndpoint {
     return j(fields);
   }
 
-  private static final Fn<Publication, JObjectWrite> publicationToJson = new Fn<Publication, JObjectWrite>() {
+  private final Fn<Publication, JObjectWrite> publicationToJson = new Fn<Publication, JObjectWrite>() {
     @Override
     public JObjectWrite ap(Publication publication) {
       Opt<String> channel = Opt.nul(PUBLICATION_CHANNELS.get(publication.getChannel()));
       return j(f("name", v(channel.or("EVENTS.EVENTS.DETAILS.GENERAL.CUSTOM"))),
-              f("url", v(publication.getURI().toString())));
+              f("url", v(signUrl(publication.getURI()).toString())));
     }
   };
+
+  private URI signUrl(URI url) {
+    if (getUrlSigningService().accepts(url.toString())) {
+      try {
+        return URI.create(getUrlSigningService().sign(url.toString(), getUrlSigningExpireDuration(), null, null));
+      } catch (UrlSigningException e) {
+        logger.warn("Unable to sign url '{}': {}", url, ExceptionUtils.getStackTrace(e));
+      }
+    }
+    return url;
+  }
+
 
   private final Function<Recording, List<Person>> getRecipients = new Function<Recording, List<Person>>() {
     @Override

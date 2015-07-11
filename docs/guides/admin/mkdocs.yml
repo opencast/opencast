@@ -18,6 +18,9 @@ site_dir: 'site'
 pages:
 - ['index.md', 'Administration Guide']
 
+# overview
+- ['overview/stream-security.md', 'Overview', 'Stream Security']
+
 # installation
 - ['installation/index.md', 'Installation', 'Installation Home']
 - ['installation/multiple-servers.md', 'Installation', 'Multiple Servers']
@@ -36,6 +39,7 @@ pages:
 - ['configuration/multi.tenancy.md', 'Configuration', 'Multi Tenancy']
 - ['configuration/security.md', 'Configuration', 'Security']
 - ['configuration/security.cas.md', 'Configuration', 'Security - CAS']
+- ['configuration/stream-security.md', 'Configuration', 'Stream Security']
 - ['configuration/workflow.md', 'Configuration', 'Workflow']
 - ['configuration/configuration.files.and.keys.md', 'Configuration', 'Configuration Files and Keys']
 

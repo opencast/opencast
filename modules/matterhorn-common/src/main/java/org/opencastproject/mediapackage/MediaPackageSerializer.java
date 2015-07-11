@@ -34,8 +34,10 @@ public interface MediaPackageSerializer {
    * @param uri
    *          the url to encode
    * @return the encoded path
+   * @throws URISyntaxException
+   *           if the resulting URI contains syntax errors
    */
-  String encodeURI(URI uri);
+  URI encodeURI(URI uri) throws URISyntaxException;
 
   /**
    * This method is called every time a url is being read from a media package manifest. By implementing this method,
@@ -47,7 +49,18 @@ public interface MediaPackageSerializer {
    * @return the resolved url
    * @throws URISyntaxException
    *           if the path cannot be converted into a url
+   * @throws URISyntaxException
+   *           if the resulting URI contains syntax errors
    */
-  URI resolvePath(String path) throws URISyntaxException;
+  URI decodeURI(URI path) throws URISyntaxException;
+
+  /**
+   * Identifies the serializer ranking number. The ranking is respected when multiple serializers are chained. When
+   * encoding an URI, the serializer with the highest ranking is used first. If an URI needs to be decoded, the ranking
+   * is used in the opposite direction.
+   *
+   * @return The service ranking number.
+   */
+  int getRanking();
 
 }

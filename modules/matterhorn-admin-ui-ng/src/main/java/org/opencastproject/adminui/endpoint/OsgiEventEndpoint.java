@@ -39,21 +39,29 @@ import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.Log;
+import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Stream;
+import com.entwinemedia.fn.data.Opt;
+
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
 
 import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
 @Path("/")
-public class OsgiEventEndpoint extends AbstractEventEndpoint {
+public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedService {
 
   private AclServiceFactory aclServiceFactory;
   private AdminUISearchIndex index;
@@ -72,11 +80,13 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   private SchedulerService schedulerService;
   private SecurityService securityService;
   private SeriesService seriesService;
+  private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
   private Workspace workspace;
   private AdminUIConfiguration adminUIConfiguration;
 
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
+  private long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
   @Override
   public AdminUIConfiguration getAdminUIConfiguration() {
@@ -87,6 +97,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
     this.adminUIConfiguration = adminUIConfiguration;
   }
+
 
   @Override
   public OpencastArchive getArchive() {
@@ -293,11 +304,42 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
     return Stream.$(catalogUIAdapters).filter(organizationFilter._2(organization)).toList();
   }
 
+  @Override
+  public UrlSigningService getUrlSigningService() {
+    return urlSigningService;
+  }
+
+  /** OSGi DI. */
+  public void setUrlSigningService(UrlSigningService urlSigningService) {
+    this.urlSigningService = urlSigningService;
+  }
+
   private static final Fn2<EventCatalogUIAdapter, String, Boolean> organizationFilter = new Fn2<EventCatalogUIAdapter, String, Boolean>() {
     @Override
     public Boolean ap(EventCatalogUIAdapter catalogUIAdapter, String organization) {
       return organization.equals(catalogUIAdapter.getOrganization());
     }
   };
+
+  @Override
+  public void updated(Dictionary properties) throws ConfigurationException {
+    Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
+            .map(com.entwinemedia.fn.fns.Strings.toLongF);
+    if (expiration.isSome()) {
+      expireSeconds = expiration.get();
+      logger.info("The property {} has been configured to expire signed URLs in {}.",
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+    } else {
+      expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+      logger.info(
+              "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+    }
+  }
+
+  @Override
+  public long getUrlSigningExpireDuration() {
+   return expireSeconds;
+  }
 
 }

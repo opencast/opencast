@@ -30,6 +30,7 @@ import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.data.Tuple.tuple;
 
@@ -52,6 +53,8 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
+import org.opencastproject.security.urlsigning.exception.UrlSigningException;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
@@ -59,8 +62,10 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
+import org.opencastproject.util.Log;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -84,6 +89,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -94,6 +101,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.List;
 
@@ -105,6 +113,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -112,9 +121,11 @@ import javax.xml.bind.JAXBException;
 
 @Path("/")
 @RestService(name = "toolsService", title = "Tools API Service", notes = "", abstractText = "Provides a location for the tools API.")
-public class ToolsEndpoint {
+public class ToolsEndpoint implements ManagedService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ToolsEndpoint.class);
+
+  protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
   /** The default file name for generated Smil catalogs. */
   private static final String TARGET_FILE_NAME = "cut.smil";
@@ -137,6 +148,11 @@ public class ToolsEndpoint {
   /** Tag that marks workflow for being used from the editor tool */
   private static final String EDITOR_WORKFLOW_TAG = "editor";
 
+  /** The default time before a piece of signed content expires. 2 Hours. */
+  protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
+
+  private long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+
   /** A parser for handling JSON documents inside the body of a request. **/
   private final JSONParser parser = new JSONParser();
 
@@ -147,6 +163,7 @@ public class ToolsEndpoint {
   private HttpMediaPackageElementProvider mpElementProvider;
   private IndexService index;
   private SmilService smilService;
+  private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
   private Workspace workspace;
 
@@ -181,6 +198,11 @@ public class ToolsEndpoint {
   }
 
   /** OSGi DI */
+  void setUrlSigningService(UrlSigningService urlSigningService) {
+    this.urlSigningService = urlSigningService;
+  }
+
+  /** OSGi DI */
   void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
@@ -188,6 +210,24 @@ public class ToolsEndpoint {
   /** OSGi DI */
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  /** OSGi callback if properties file is present */
+  @SuppressWarnings("rawtypes")
+  @Override
+  public void updated(Dictionary properties) throws ConfigurationException {
+    Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
+            .map(com.entwinemedia.fn.fns.Strings.toLongF);
+    if (expiration.isSome()) {
+      expireSeconds = expiration.get();
+      logger.info("The property {} has been configured to expire signed URLs in {}.",
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+    } else {
+      expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+      logger.info(
+              "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+    }
   }
 
   @GET
@@ -228,13 +268,37 @@ public class ToolsEndpoint {
         List<JValue> jPreviews = new ArrayList<JValue>();
         List<JValue> jTracks = new ArrayList<JValue>();
         for (Publication pub : previewPublications) {
-          jPreviews.add(j(f("uri", v(pub.getURI().toString()))));
+          String publicationUri;
+          if (urlSigningService.accepts(pub.getURI().toString())) {
+            try {
+              publicationUri = urlSigningService.sign(pub.getURI().toString(), expireSeconds, null, null);
+            } catch (UrlSigningException e) {
+              logger.error("Error while trying to sign the preview urls because: {}", ExceptionUtils.getStackTrace(e));
+              throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+            }
+          } else {
+            publicationUri = pub.getURI().toString();
+          }
+          jPreviews.add(j(f("uri", v(publicationUri))));
 
           JObjectWrite jTrack = j(f("id", v(pub.getIdentifier())), f("flavor", v(pub.getFlavor().getType())));
           // Check if there's a waveform for the current track
           Opt<Publication> optWaveform = getWaveformForTrack(mp, pub);
           if (optWaveform.isSome()) {
-            jTracks.add(jTrack.merge(j(f("waveform", v(optWaveform.get().getURI().toString())))));
+            String waveformUri;
+            if (urlSigningService.accepts(optWaveform.get().getURI().toString())) {
+              try {
+                waveformUri = urlSigningService.sign(optWaveform.get().getURI().toString(), expireSeconds, null, null);
+              } catch (UrlSigningException e) {
+                logger.error("Error while trying to sign the waveform urls because: {}",
+                        ExceptionUtils.getStackTrace(e));
+                throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+              }
+            } else {
+              waveformUri = optWaveform.get().getURI().toString();
+            }
+
+            jTracks.add(jTrack.merge(j(f("waveform", v(waveformUri)))));
           } else {
             jTracks.add(jTrack);
           }
