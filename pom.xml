@@ -195,6 +195,11 @@
         <module>modules/matterhorn-serviceregistry</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
@@ -239,6 +244,11 @@
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-static</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
@@ -278,6 +288,11 @@
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-static</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workflow-service-api</module>
@@ -315,6 +330,11 @@
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workspace-api</module>
       </modules>
@@ -365,6 +385,11 @@
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-usertracking-api</module>
         <module>modules/matterhorn-usertracking-impl</module>
@@ -423,6 +448,11 @@
         <module>modules/matterhorn-solr</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-usertracking-api</module>
         <module>modules/matterhorn-usertracking-impl</module>
@@ -462,6 +492,11 @@
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-static-file-service-api</module>
         <module>modules/matterhorn-static-file-service-impl</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-webconsole</module>
         <module>modules/matterhorn-workspace-api</module>
       </modules>
@@ -509,6 +544,11 @@
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
         <module>modules/matterhorn-textextractor-tesseract</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videoeditor-api</module>
         <module>modules/matterhorn-videoeditor-ffmpeg-impl</module>
@@ -565,6 +605,11 @@
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-impl</module>
         <module>modules/matterhorn-textextractor-tesseract</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-userdirectory</module>
         <module>modules/matterhorn-videoeditor-api</module>
         <module>modules/matterhorn-videoeditor-ffmpeg-impl</module>
@@ -610,6 +655,11 @@
         <module>modules/matterhorn-static-file-service-impl</module>
         <module>modules/matterhorn-textanalyzer-api</module>
         <module>modules/matterhorn-textanalyzer-remote</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-videoeditor-api</module>
         <module>modules/matterhorn-videoeditor-remote</module>
         <module>modules/matterhorn-videosegmenter-api</module>
@@ -630,6 +680,11 @@
       <modules>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-json</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-impl</module>
         <module>modules/matterhorn-workspace-api</module>
@@ -710,6 +765,11 @@
         <module>modules/matterhorn-workspace-api</module>
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-oaipmh</module>
+        <module>modules/matterhorn-urlsigning-common</module>
+        <module>modules/matterhorn-urlsigning-service-api</module>
+        <module>modules/matterhorn-urlsigning-service-impl</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+        <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
       </modules>
     </profile>
 
