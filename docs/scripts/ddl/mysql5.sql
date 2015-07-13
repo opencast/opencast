@@ -140,6 +140,7 @@ CREATE TABLE mh_job (
   parent BIGINT,
   root BIGINT,
   job_load FLOAT NOT NULL DEFAULT 1.0,
+  blocking_job BIGINT,
   PRIMARY KEY (id),
   CONSTRAINT FK_mh_job_creator_service FOREIGN KEY (creator_service) REFERENCES mh_service_registration (id) ON DELETE CASCADE,
   CONSTRAINT FK_mh_job_processor_service FOREIGN KEY (processor_service) REFERENCES mh_service_registration (id) ON DELETE CASCADE,
@@ -167,6 +168,13 @@ CREATE TABLE mh_job_argument (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_job_argument_id ON mh_job_argument (id);
+
+CREATE TABLE mh_blocking_job (
+  id BIGINT NOT NULL,
+  blocking_job_list BIGINT,
+  job_index INTEGER,
+  CONSTRAINT FK_blocking_job_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_job_context (
   id BIGINT NOT NULL,
