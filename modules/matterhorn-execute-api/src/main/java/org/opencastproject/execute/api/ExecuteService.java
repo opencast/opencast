@@ -50,6 +50,9 @@ public interface ExecuteService {
   /** Name of the form parameter in the REST endpoints that contains the command arguments */
   String PARAMS_FORM_PARAM = "params";
 
+  /** Name of the form parameter in the REST endpoints that contains the load estimate */
+  String LOAD_FORM_PARAM = "load";
+
   /** Name of the form parameter in the REST endpoints that contains the serialized input element */
   String INPUT_ELEM_FORM_PARAM = "inputElement";
 

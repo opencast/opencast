@@ -122,10 +122,10 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
         return Response.status(Response.Status.BAD_REQUEST).build();
       } else if ((inputElementStr != null) && (inputMpStr == null)) {
         MediaPackageElement inputElement = MediaPackageElementParser.getFromXml(inputElementStr);
-        retJob = service.execute(exec, params, inputElement, outputFileName, expectedType);
+        retJob = service.execute(exec, params, inputElement, outputFileName, expectedType, load);
       } else if ((inputElementStr == null) && (inputMpStr != null)) {
         MediaPackage inputMp = MediaPackageParser.getFromXml(inputMpStr);
-        retJob = service.execute(exec, params, inputMp, outputFileName, expectedType);
+        retJob = service.execute(exec, params, inputMp, outputFileName, expectedType, load);
       } else {
         logger.error("Not input MediaPackage OR not input MediaPackageElement");
         return Response.status(Response.Status.BAD_REQUEST).build();

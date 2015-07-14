@@ -149,8 +149,9 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * {@inheritDoc}
-   * 
-   * @see org.opencastproject.textanalyzer.api.ExecuteService#execute(String, String)
+   *
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
+   *                                                             org.opencastproject.mediapackage.MediaPackageElement)
    */
   @Override
   public Job execute(String exec, String params, MediaPackageElement inElement) throws ExecuteException {
@@ -197,7 +198,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    *           if an internal error occurs
    */
   @Override
-  public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type expectedType)
+  public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type expectedType, float load)
           throws ExecuteException, IllegalArgumentException {
 
     logger.debug("Creating Execute Job for command: {}", exec);
@@ -234,11 +235,11 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * {@inheritDoc}
-   * 
-   * @see org.opencastproject.execute.api.ExecuteService#executeOnce(java.lang.String, java.lang.String,
-   *      org.opencastproject.mediapackage.MediaPackage, java.lang.String,
-   *      org.opencastproject.mediapackage.MediaPackageElement.Type,
-   *      org.opencastproject.mediapackage.MediaPackageElementFlavor, java.lang.String[])
+   *
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
+   *                                                             org.opencastproject.mediapackage.MediaPackage,
+   *                                                             java.lang.String,
+   *                                                             org.opencastproject.mediapackage.MediaPackageElement.Type)
    */
   @Override
   public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type expectedType)
@@ -673,6 +674,22 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  @Override
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws org.osgi.service.cm.ConfigurationException {
+    String jobLoadString = StringUtils.trimToNull((String) properties.get(EXECUTE_JOB_LOAD_KEY));
+    if (jobLoadString != null) {
+      try {
+        executeJobLoad = Float.parseFloat(jobLoadString);
+        logger.info("Set ingest file job load to {}", executeJobLoad);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set default execute job loads to {}. {} must be a float", jobLoadString,
+                DEFAULT_EXECUTE_JOB_LOAD);
+        executeJobLoad = DEFAULT_EXECUTE_JOB_LOAD;
+        logger.info("Set default execute job load to default of {}", executeJobLoad);
+      }
+    }
   }
 
 }
