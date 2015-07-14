@@ -29,7 +29,7 @@ CREATE INDEX IX_mh_organization_node_port ON mh_organization_node (port);
 CREATE TABLE mh_organization_property (
   organization VARCHAR(128) NOT NULL,
   name VARCHAR(255) NOT NULL,
-  value VARCHAR(255),
+  value TEXT(65535),
   PRIMARY KEY (organization, name),
   CONSTRAINT FK_mh_organization_property_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

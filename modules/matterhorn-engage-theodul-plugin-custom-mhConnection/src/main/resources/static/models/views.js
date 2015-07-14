@@ -34,8 +34,6 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
         }
     });
 
-    /* TODO: Wait for the new usertracking service...
-
     var USERTRACKING_ENDPOINT = "/usertracking";
     var USERTRACKING_ENDPOINT_STATS = "/stats.json";
 
@@ -85,8 +83,6 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
             }
         }
     });
-
-    */
 
     return ViewsModel;
 });
