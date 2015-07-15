@@ -194,10 +194,10 @@ CREATE TABLE mh_comment_reply (
 CREATE INDEX IX_mh_comment_reply_author ON mh_comment_reply (author);
 
 CREATE TABLE mh_comment_mh_comment_reply (
-  Comment_id BIGINT(20) NOT NULL,
+  comment_id BIGINT(20) NOT NULL,
   replies_id BIGINT(20) NOT NULL,
-  PRIMARY KEY (Comment_id,replies_id),
-  CONSTRAINT FK_mh_comment_mh_comment_reply_Comment_id FOREIGN KEY (Comment_id) REFERENCES mh_comment (id),
+  PRIMARY KEY (comment_id,replies_id),
+  CONSTRAINT FK_mh_comment_mh_comment_reply_comment_id FOREIGN KEY (comment_id) REFERENCES mh_comment (id),
   CONSTRAINT FK_mh_comment_mh_comment_reply_replies_id FOREIGN KEY (replies_id) REFERENCES mh_comment_reply (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -223,11 +223,11 @@ CREATE INDEX IX_mh_message_signature_organization ON mh_message_signature (organ
 CREATE INDEX IX_mh_message_signature_name ON mh_message_signature (name);
 
 CREATE TABLE mh_message_signature_mh_comment (
-  MessageSignature_id BIGINT(20) NOT NULL,
+  message_signature_id BIGINT(20) NOT NULL,
   comments_id BIGINT(20) NOT NULL,
-  PRIMARY KEY (MessageSignature_id, comments_id),
+  PRIMARY KEY (message_signature_id, comments_id),
   CONSTRAINT FK_mh_message_signature_mh_comment_comments_id FOREIGN KEY (comments_id) REFERENCES mh_comment (id) ON DELETE CASCADE,
-  CONSTRAINT FK_mh_message_signature_mh_comment_MessageSignature_id FOREIGN KEY (MessageSignature_id) REFERENCES mh_message_signature (id) ON DELETE CASCADE
+  CONSTRAINT FK_mh_message_signature_mh_comment_message_signature_id FOREIGN KEY (message_signature_id) REFERENCES mh_message_signature (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_message_template (
@@ -249,10 +249,10 @@ CREATE INDEX IX_mh_message_template_organization ON mh_message_template (organiz
 CREATE INDEX IX_mh_message_template_name ON mh_message_template (name);
 
 CREATE TABLE mh_message_template_mh_comment (
-  MessageTemplate_id BIGINT(20) NOT NULL,
+  message_template_id BIGINT(20) NOT NULL,
   comments_id BIGINT(20) NOT NULL,
-  PRIMARY KEY (MessageTemplate_id, comments_id),
-  CONSTRAINT FK_mh_message_template_mh_comment_MessageTemplate_id FOREIGN KEY (MessageTemplate_id) REFERENCES mh_message_template (id) ON DELETE CASCADE,
+  PRIMARY KEY (message_template_id, comments_id),
+  CONSTRAINT FK_mh_message_template_mh_comment_message_template_id FOREIGN KEY (message_template_id) REFERENCES mh_message_template (id) ON DELETE CASCADE,
   CONSTRAINT FK_mh_message_template_mh_comment_comments_id FOREIGN KEY (comments_id) REFERENCES mh_comment (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
