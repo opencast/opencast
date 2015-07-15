@@ -85,6 +85,7 @@ public class MessageTemplateDto {
   @Column(name = "hidden", nullable = false)
   private boolean hidden = false;
 
+  @Column(name = "template_type")
   @Enumerated(EnumType.STRING)
   private TemplateType.Type type;
 

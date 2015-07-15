@@ -547,7 +547,7 @@ CREATE TABLE mh_message_template (
   creation_date DATETIME NOT NULL,
   subject VARCHAR(255) NOT NULL,
   name VARCHAR(255) NOT NULL,
-  TYPE VARCHAR(255) DEFAULT NULL,
+  template_type VARCHAR(255) DEFAULT NULL,
   creator_username VARCHAR(255) NOT NULL,
   hidden TINYINT(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
