@@ -26,11 +26,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-comments</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -163,27 +158,26 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.empulse.eclipselink</groupId>
+        <artifactId>staticweave-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-              org.opencastproject.comments;version=${project.version},
-              org.opencastproject.comments.persistence;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
-              org.opencastproject.messages;version=${project.version},
-              org.opencastproject.messages.persistence;version=${project.version}
+              org.opencastproject.messages
             </Export-Package>
             <Service-Component>
               OSGI-INF/mail-service.xml
             </Service-Component>
-            <JPA-PersistenceUnits>
-              org.opencastproject.messages
-            </JPA-PersistenceUnits>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

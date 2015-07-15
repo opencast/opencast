@@ -23,6 +23,7 @@ package org.opencastproject.serviceregistry.remote;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 
+import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.JaxbJobList;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -390,7 +391,7 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
     final HttpPut put = put("job/" + job.getId() + ".xml");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-      params.add(new BasicNameValuePair("job", JobParser.toXml(job)));
+      params.add(new BasicNameValuePair("job", JobParser.toXml(new JaxbJob(job))));
       put.setEntity(new UrlEncodedFormEntity(params));
     } catch (UnsupportedEncodingException e) {
       throw new ServiceRegistryException("Can not url encode post parameters", e);

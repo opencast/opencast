@@ -22,6 +22,7 @@
 package org.opencastproject.serviceregistry.impl;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.impl.jpa.HostRegistrationJpaImpl;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
@@ -36,22 +37,18 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.component.ComponentContext;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import javax.management.ObjectInstance;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
-import javax.persistence.spi.PersistenceProvider;
 
 public class ServiceRegistryJpaImplTest {
   private Query query = null;
   private EntityTransaction tx = null;
   private EntityManager em = null;
   private EntityManagerFactory emf = null;
-  private Map<String, Object> persistenceProperties = null;
-  private PersistenceProvider persistenceProvider = null;
   private BundleContext bundleContext = null;
   private ComponentContext cc = null;
   private ServiceRegistryJpaImpl serviceRegistryJpaImpl = null;
@@ -63,8 +60,6 @@ public class ServiceRegistryJpaImplTest {
     setUpEntityTransaction();
     setUpEntityManager();
     setUpEntityManagerFactory();
-    setUpPersistenceProperties();
-    setUpPersistenceProvider();
     // Setup context settings
     setupBundleContext();
     setupComponentContext();
@@ -107,24 +102,9 @@ public class ServiceRegistryJpaImplTest {
     EasyMock.replay(emf);
   }
 
-  @SuppressWarnings("unchecked")
-  public void setUpPersistenceProperties() {
-    persistenceProperties = EasyMock.createMock(Map.class);
-  }
-
-  public void setUpPersistenceProvider() {
-    persistenceProvider = EasyMock.createMock(PersistenceProvider.class);
-    EasyMock.expect(
-            persistenceProvider
-                    .createEntityManagerFactory("org.opencastproject.serviceregistry", persistenceProperties))
-            .andReturn(emf);
-    EasyMock.replay(persistenceProvider);
-  }
-
   public void setUpServiceRegistryJpaImpl() {
     serviceRegistryJpaImpl = new ServiceRegistryJpaImpl();
-    serviceRegistryJpaImpl.setPersistenceProperties(persistenceProperties);
-    serviceRegistryJpaImpl.setPersistenceProvider(persistenceProvider);
+    serviceRegistryJpaImpl.setEntityManagerFactory(emf);
   }
 
   private void setupBundleContext() throws InvalidSyntaxException {

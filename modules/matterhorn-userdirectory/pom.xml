@@ -26,6 +26,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common-jpa-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-message-broker-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -58,7 +63,7 @@
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.core</artifactId>
-      <scope>test</scope>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -84,11 +89,6 @@
       <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
       <version>1.5</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>c3p0</groupId>
-      <artifactId>c3p0</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -133,9 +133,6 @@
               OSGI-INF/user_endpoint.xml,
               OSGI-INF/userid-role-provider.xml
             </Service-Component>
-            <JPA-PersistenceUnits>
-              org.opencastproject.userdirectory
-            </JPA-PersistenceUnits>
           </instructions>
         </configuration>
       </plugin>

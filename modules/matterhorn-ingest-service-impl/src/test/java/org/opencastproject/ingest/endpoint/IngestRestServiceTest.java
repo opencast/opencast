@@ -21,6 +21,8 @@
 
 package org.opencastproject.ingest.endpoint;
 
+import static org.opencastproject.util.persistencefn.PersistenceUtil.mkTestEntityManagerFactory;
+
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -30,30 +32,20 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import junit.framework.Assert;
 
 import org.apache.commons.fileupload.MockHttpServletRequest;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyVetoException;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletInputStream;
@@ -62,30 +54,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 public class IngestRestServiceTest {
-  private static final Logger logger = LoggerFactory.getLogger(IngestRestServiceTest.class);
   protected IngestRestService restService;
-  private ComboPooledDataSource pooledDataSource = null;
-  private File testDir = null;
   private LimitVerifier limitVerifier;
 
   @Before
   public void setUp() throws Exception {
-    testDir = new File("./target", "ingest-rest-service-test");
-    if (testDir.exists()) {
-      FileUtils.deleteQuietly(testDir);
-      logger.info("Removing  " + testDir.getAbsolutePath());
-    } else {
-      logger.info("Didn't Delete " + testDir.getAbsolutePath());
-    }
-    testDir.mkdir();
-
-    setupPooledDataSource();
-
-    Map<String, Object> props = setupPersistenceProperties();
 
     restService = new IngestRestService();
-    restService.setPersistenceProvider(new PersistenceProvider());
-    restService.setPersistenceProperties(props);
 
     // Create a mock ingest service
     IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
@@ -119,29 +94,8 @@ public class IngestRestServiceTest {
 
     // Set the service, and activate the rest endpoint
     restService.setIngestService(ingestService);
+    restService.setEntityManagerFactory(mkTestEntityManagerFactory(IngestRestService.PERSISTENCE_UNIT));
     restService.activate(null);
-  }
-
-  private Map<String, Object> setupPersistenceProperties() {
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-    return props;
-  }
-
-  private void setupPooledDataSource() throws PropertyVetoException {
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + System.currentTimeMillis());
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    pooledDataSource.close();
   }
 
   @Test
@@ -180,17 +134,9 @@ public class IngestRestServiceTest {
   }
 
   public void setupAndTestLimit(String limit, int expectedLimit, boolean expectedEnabled) {
-    try {
-      setupPooledDataSource();
-    } catch (PropertyVetoException e) {
-      e.printStackTrace();
-    }
-
-    Map<String, Object> props = setupPersistenceProperties();
 
     restService = new IngestRestService();
-    restService.setPersistenceProvider(new PersistenceProvider());
-    restService.setPersistenceProperties(props);
+    restService.setEntityManagerFactory(mkTestEntityManagerFactory(IngestRestService.PERSISTENCE_UNIT));
 
     // Create a mock ingest service
     IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
@@ -245,17 +191,8 @@ public class IngestRestServiceTest {
   }
 
   public void setupAndTestIngestingLimit(String limit, int numberOfIngests, int expectedOK, int expectedBusy) {
-    try {
-      setupPooledDataSource();
-    } catch (PropertyVetoException e) {
-      Assert.fail("Test failed due to exception " + e.getMessage());
-    }
-
-    Map<String, Object> props = setupPersistenceProperties();
-
     restService = new IngestRestService();
-    restService.setPersistenceProvider(new PersistenceProvider());
-    restService.setPersistenceProperties(props);
+    restService.setEntityManagerFactory(mkTestEntityManagerFactory(IngestRestService.PERSISTENCE_UNIT));
     restService.setIngestService(setupAddZippedMediaPackageIngestService());
     restService.activate(setupAddZippedMediaPackageComponentContext(limit));
 

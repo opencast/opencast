@@ -21,6 +21,8 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
@@ -29,7 +31,7 @@ import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.matterhorn.search.impl.SearchResultImpl;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.messages.persistence.MailServiceException;
+import org.opencastproject.messages.MailServiceException;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -45,12 +47,9 @@ import org.opencastproject.themes.persistence.ThemesServiceDatabaseException;
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl;
 import org.opencastproject.util.data.Option;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.Ignore;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -58,10 +57,8 @@ import org.osgi.service.component.ComponentContext;
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Map;
 
 import javax.ws.rs.Path;
 
@@ -90,20 +87,6 @@ public class TestThemesEndpoint extends ThemesEndpoint {
   }
 
   private void setupServices() throws Exception {
-    long currentTime = System.currentTimeMillis();
-
-    ComboPooledDataSource pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + currentTime);
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     user = new JaxbUser("test", null, "Test User", "test@test.com", "test", new DefaultOrganization(),
             new HashSet<JaxbRole>());
 
@@ -148,8 +131,8 @@ public class TestThemesEndpoint extends ThemesEndpoint {
     EasyMock.replay(adminUISearchIndex);
 
     themesServiceDatabaseImpl = new ThemesServiceDatabaseImpl();
-    themesServiceDatabaseImpl.setPersistenceProvider(new PersistenceProvider());
-    themesServiceDatabaseImpl.setPersistenceProperties(props);
+    themesServiceDatabaseImpl
+            .setEntityManagerFactory(newTestEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
     themesServiceDatabaseImpl.setUserDirectoryService(userDirectoryService);
     themesServiceDatabaseImpl.setSecurityService(securityService);
     themesServiceDatabaseImpl.setMessageSender(messageSender);

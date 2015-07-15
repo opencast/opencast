@@ -46,29 +46,23 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Implements {@link SearchServiceDatabase}. Defines permanent storage for series.
  */
 public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
+  /** JPA persistence unit name */
+  public static final String PERSISTENCE_UNI = "org.opencastproject.search.impl.persistence";
+
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceDatabaseImpl.class);
-
-  /** Persistence provider set by OSGi */
-  protected PersistenceProvider persistenceProvider;
-
-  /** Persistence properties used to create {@link EntityManagerFactory} */
-  protected Map<String, Object> persistenceProperties;
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
@@ -76,60 +70,20 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /** The security service */
   protected SecurityService securityService;
 
-  /** Whether the persistence provider has been set */
-  private boolean hasPersistence = false;
+  /** OSGi DI */
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
+  }
 
-  /** Whether the persistence properties have been set */
-  private boolean hasPersistenceProperties = false;
-
- /**
+  /**
    * Creates {@link EntityManagerFactory} using persistence provider and properties passed via OSGi.
    *
    * @param cc
-   * @throws SearchServiceDatabaseException 
+   * @throws SearchServiceDatabaseException
    */
   public void activate(ComponentContext cc) throws SearchServiceDatabaseException {
     logger.info("Activating persistence manager for search service");
-    emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.search.impl.persistence",
-            persistenceProperties);
-    this.hasPersistence = true;
-    if (this.hasPersistenceProperties) {
-      this.populateSeriesData();
-    }
-  }
-
-  /**
-   * Closes entity manager factory.
-   *
-   * @param cc
-   */
-  public void deactivate(ComponentContext cc) {
-    emf.close();
-  }
-
-  /**
-   * OSGi callback to set persistence properties.
-   *
-   * @param persistenceProperties
-   *          persistence properties
-   * @throws SearchServiceDatabaseException 
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) throws SearchServiceDatabaseException {
-    this.persistenceProperties = persistenceProperties;
-    this.hasPersistenceProperties = true;
-    if (this.hasPersistence) {
-      this.populateSeriesData();
-    }
-  }
-
-  /**
-   * OSGi callback to set persistence provider.
-   *
-   * @param persistenceProvider
-   *          {@link PersistenceProvider} object
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
+    this.populateSeriesData();
   }
 
   /**
@@ -179,7 +133,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    */
   @Override
   public void deleteMediaPackage(String mediaPackageId, Date deletionDate) throws SearchServiceDatabaseException,
-          NotFoundException {
+  NotFoundException {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -258,7 +212,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    */
   @Override
   public AccessControlList getAccessControlList(String mediaPackageId) throws NotFoundException,
-          SearchServiceDatabaseException {
+  SearchServiceDatabaseException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();

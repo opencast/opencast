@@ -25,7 +25,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.adminui.usersettings.persistence.UserSettingDto;
 import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceException;
-import org.opencastproject.comments.persistence.CommentDto;
 import org.opencastproject.messages.persistence.MessageSignatureDto;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -88,10 +87,10 @@ public class UserSettingsServiceTest {
   private List<MessageSignatureDto> createSignatureList(int signatureCount) {
     LinkedList<MessageSignatureDto> signatures = new LinkedList<MessageSignatureDto>();
     for (int i = 0; i < signatureCount; i++) {
-      MessageSignatureDto messageSignatureDto = new MessageSignatureDto(NAME_PREFIX + i, ORG, USER_NAME, SENDER_PREFIX
-              + i, SENDER_NAME_PREFIX + i, REPLY_TO_PREFIX + i, REPLY_TO_PREFIX + 1, SIGNATURE_PREFIX + i,
-              creationDate, new LinkedList<CommentDto>());
-      signatures.add(messageSignatureDto);
+//      MessageSignatureDto messageSignatureDto = new MessageSignatureDto(NAME_PREFIX + i, ORG, USER_NAME, SENDER_PREFIX
+//              + i, SENDER_NAME_PREFIX + i, REPLY_TO_PREFIX + i, REPLY_TO_PREFIX + 1, SIGNATURE_PREFIX + i,
+//              creationDate, new LinkedList<CommentDto>());
+//      signatures.add(messageSignatureDto);
     }
     return signatures;
   }

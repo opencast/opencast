@@ -21,13 +21,16 @@
 
 package org.opencastproject.serviceregistry.impl;
 
+import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Arrays.mkString;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.functions.Booleans.eq;
-import static org.opencastproject.util.persistence.PersistenceUtil.newPersistenceEnvironment;
 
+import org.opencastproject.job.impl.jpa.JobJpaImpl;
+import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.FailureReason;
 import org.opencastproject.job.api.Job.Status;
@@ -45,16 +48,14 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
+import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.persistence.PersistenceEnv;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -62,11 +63,10 @@ import org.junit.Test;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 public class JobTest {
 
@@ -77,7 +77,6 @@ public class JobTest {
   private static final String REMOTEHOST = "http://remotehost:8080";
   private static final String PATH = "/path";
 
-  private ComboPooledDataSource pooledDataSource = null;
   private ServiceRegistryJpaImpl serviceRegistry = null;
 
   private ServiceRegistrationJpaImpl regType1Localhost = null;
@@ -89,28 +88,16 @@ public class JobTest {
 
   @Before
   public void setUp() throws Exception {
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + System.currentTimeMillis());
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
+    final EntityManagerFactory emf = newTestEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT);
 
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
-    final PersistenceProvider pp = new PersistenceProvider();
     serviceRegistry = new ServiceRegistryJpaImpl();
-    serviceRegistry.setPersistenceProvider(pp);
-    serviceRegistry.setPersistenceProperties(props);
+    serviceRegistry.setEntityManagerFactory(emf);
     serviceRegistry.activate(null);
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
-            .andReturn(organization).anyTimes();
+    .andReturn(organization).anyTimes();
     EasyMock.replay(organizationDirectoryService);
     serviceRegistry.setOrganizationDirectoryService(organizationDirectoryService);
 
@@ -133,7 +120,7 @@ public class JobTest {
     regType2Localhost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_2, LOCALHOST, PATH);
     regType2Remotehost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_2, REMOTEHOST, PATH);
 
-    penv = newPersistenceEnvironment(pp.createEntityManagerFactory("org.opencastproject.serviceregistry", props));
+    penv = persistenceEnvironment(emf);
   }
 
   @After
@@ -143,7 +130,6 @@ public class JobTest {
     serviceRegistry.unRegisterService(JOB_TYPE_2, LOCALHOST);
     serviceRegistry.unRegisterService(JOB_TYPE_2, REMOTEHOST);
     serviceRegistry.deactivate();
-    pooledDataSource.close();
   }
 
   @Test
@@ -367,13 +353,13 @@ public class JobTest {
         return serviceRegistry.getCountPerHostService(em);
       }
     });
-    assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,RUNNING,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,RUNNING,2"))); // <-- 2 jobs, one of them is the
-                                                                             // dispatchable job
-    assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,FINISHED,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,FINISHED,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing1,FINISHED,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing1,RUNNING,2")));
+    assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,2,1")));
+    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,2,2"))); // <-- 2 jobs, one of them is the
+    // dispatchable job
+    assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,3,1")));
+    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,3,1")));
+    assertTrue(jpql.exists(eq("http://localhost:8080,testing1,3,1")));
+    assertTrue(jpql.exists(eq("http://localhost:8080,testing1,2,2")));
     assertEquals(6, jpql.value().size());
   }
 
@@ -465,7 +451,7 @@ public class JobTest {
     JobJpaImpl job = new JobJpaImpl();
     job.setPayload(payload);
 
-    String marshalledJob = JobParser.toXml(job);
+    String marshalledJob = JobParser.toXml(new JaxbJob(job));
     Job unmarshalledJob = JobParser.parseJob(marshalledJob);
 
     Assert.assertEquals("json from unmarshalled job should remain unchanged", StringUtils.trim(payload),
@@ -478,7 +464,7 @@ public class JobTest {
     JobJpaImpl job = new JobJpaImpl();
     job.setPayload(payload);
 
-    String marshalledJob = JobParser.toXml(job);
+    String marshalledJob = JobParser.toXml(new JaxbJob(job));
     Job unmarshalledJob = JobParser.parseJob(marshalledJob);
 
     Assert.assertEquals("xml from unmarshalled job should remain unchanged", StringUtils.trim(payload),
@@ -499,7 +485,7 @@ public class JobTest {
 
   @Test
   public void testVersionIncrements() throws Exception {
-    Job job = (JobJpaImpl) serviceRegistry.createJob(JOB_TYPE_1, "some_operation", null, null, false);
+    Job job = serviceRegistry.createJob(JOB_TYPE_1, "some_operation", null, null, false);
     Assert.assertEquals("Newly created jobs shuold have a version of 1", 1, job.getVersion());
 
     job = serviceRegistry.getJob(job.getId());

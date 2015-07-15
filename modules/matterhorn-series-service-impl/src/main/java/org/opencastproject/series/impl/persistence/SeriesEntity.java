@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -46,6 +48,7 @@ import javax.persistence.Table;
  *
  */
 @Entity(name = "SeriesEntity")
+@Access(AccessType.FIELD)
 @Table(name = "mh_series")
 @NamedQueries({
         @NamedQuery(name = "Series.findAll", query = "select s from SeriesEntity s"),
@@ -79,7 +82,7 @@ public class SeriesEntity {
   @Column(name = "opt_out")
   protected boolean optOut = false;
 
-  @ElementCollection
+  @ElementCollection(targetClass = String.class)
   @MapKeyColumn(name = "name")
   @Column(name = "value")
   @CollectionTable(name = "mh_series_property", joinColumns = {

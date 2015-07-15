@@ -27,7 +27,7 @@ import org.opencastproject.matterhorn.search.impl.AbstractSearchQuery;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.security.api.User;
-import org.opencastproject.userdirectory.JpaRole;
+import org.opencastproject.security.impl.jpa.JpaRole;
 
 import org.apache.commons.lang.StringUtils;
 

@@ -490,40 +490,6 @@ CREATE TABLE mh_email_configuration (
 
 CREATE INDEX IX_mh_email_configuration_organization ON mh_email_configuration (organization);
 
-CREATE TABLE mh_comment (
-  id BIGINT(20) NOT NULL,
-  creation_date DATETIME NOT NULL,
-  author VARCHAR(255) NOT NULL,
-  text VARCHAR(255) NOT NULL,
-  reason VARCHAR(255) DEFAULT NULL,
-  modification_date DATETIME NOT NULL,
-  resolved_status TINYINT(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_mh_comment_author ON mh_comment (author);
-CREATE INDEX IX_mh_comment_resolved_status ON mh_comment (resolved_status);
-
-CREATE TABLE mh_comment_reply (
-  id BIGINT(20) NOT NULL,
-  creation_date DATETIME NOT NULL,
-  author VARCHAR(255) NOT NULL,
-  text VARCHAR(255) NOT NULL,
-  modification_date DATETIME NOT NULL,
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_mh_comment_reply_author ON mh_comment_reply (author);
-
-CREATE TABLE mh_comment_mh_comment_reply (
-  Comment_id BIGINT(20) NOT NULL,
-  replies_id BIGINT(20) NOT NULL,
-  PRIMARY KEY (Comment_id,replies_id),
-  KEY FK_mh_comment_mh_comment_reply_replies_id (replies_id),
-  CONSTRAINT FK_mh_comment_mh_comment_reply_Comment_id FOREIGN KEY (Comment_id) REFERENCES mh_comment (id),
-  CONSTRAINT FK_mh_comment_mh_comment_reply_replies_id FOREIGN KEY (replies_id) REFERENCES mh_comment_reply (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE mh_message_signature (
   id BIGINT(20) NOT NULL,
   organization VARCHAR(128) NOT NULL,
@@ -543,15 +509,6 @@ CREATE TABLE mh_message_signature (
 CREATE INDEX IX_mh_message_signature_organization ON mh_message_signature (organization);
 CREATE INDEX IX_mh_message_signature_name ON mh_message_signature (name);
 
-CREATE TABLE mh_message_signature_mh_comment (
-  MessageSignature_id BIGINT(20) NOT NULL,
-  comments_id BIGINT(20) NOT NULL,
-  PRIMARY KEY (MessageSignature_id, comments_id),
-  KEY mh_message_signature_mh_comment_comments_id (comments_id),
-  CONSTRAINT mh_message_signature_mh_comment_comments_id FOREIGN KEY (comments_id) REFERENCES mh_comment (id) ON DELETE CASCADE,
-  CONSTRAINT mhmessagesignaturemhcommentMessageSignature_id FOREIGN KEY (MessageSignature_id) REFERENCES mh_message_signature (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE mh_message_template (
   id BIGINT(20) NOT NULL,
   organization VARCHAR(128) NOT NULL,
@@ -569,28 +526,6 @@ CREATE TABLE mh_message_template (
 
 CREATE INDEX IX_mh_message_template_organization ON mh_message_template (organization);
 CREATE INDEX IX_mh_message_template_name ON mh_message_template (name);
-
-CREATE TABLE mh_message_template_mh_comment (
-  MessageTemplate_id BIGINT(20) NOT NULL,
-  comments_id BIGINT(20) NOT NULL,
-  PRIMARY KEY (MessageTemplate_id, comments_id),
-  KEY FK_mh_message_template_mh_comment_comments_id (comments_id),
-  CONSTRAINT mhmessagetemplatemh_commentMessageTemplate_id FOREIGN KEY (MessageTemplate_id) REFERENCES mh_message_template (id) ON DELETE CASCADE,
-  CONSTRAINT mh_message_template_mh_comment_comments_id FOREIGN KEY (comments_id) REFERENCES mh_comment (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Admin UI next generation
---
-CREATE TABLE mh_event_mh_comment (
-  id BIGINT(20) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  event VARCHAR(128) NOT NULL,
-  comment BIGINT(20) NOT NULL,
-  PRIMARY KEY (id),
-  KEY FK_mh_event_mh_comment_comment (comment),
-  CONSTRAINT FK_mh_event_mh_comment_comment FOREIGN KEY (comment) REFERENCES mh_comment (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_series_elements (
   series VARCHAR(128) NOT NULL,

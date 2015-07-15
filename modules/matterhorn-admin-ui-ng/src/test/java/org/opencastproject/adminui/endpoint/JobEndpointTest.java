@@ -41,11 +41,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class JobEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestJobEndpoint.class);

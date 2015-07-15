@@ -21,12 +21,14 @@
 
 package org.opencastproject.userdirectory;
 
-import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaRole;
+import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PasswordEncoder;
 import org.opencastproject.util.data.Monadics;
@@ -44,14 +46,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Manages and locates users using JPA.
@@ -60,6 +60,8 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaUserAndRoleProvider.class);
+
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
   /** The user provider name */
   public static final String PROVIDER_NAME = "matterhorn";
@@ -76,9 +78,6 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   /** The delimiter for the User cache */
   private static final String DELIMITER = ";==;";
 
-  /** The JPA provider */
-  protected PersistenceProvider persistenceProvider = null;
-
   /** The security service */
   protected SecurityService securityService = null;
 
@@ -88,22 +87,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
 
-  /**
-   * @param persistenceProvider
-   *          the persistenceProvider to set
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
-  }
-
-  protected Map<String, Object> persistenceProperties;
-
-  /**
-   * @param persistenceProperties
-   *          the persistenceProperties to set
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
   /**
@@ -136,18 +122,6 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
         return user == null ? nullToken : user;
       }
     });
-
-    // Set up persistence
-    emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.userdirectory", persistenceProperties);
-  }
-
-  /**
-   * Callback for deactivation of this component.
-   */
-  public void deactivate() {
-    if (emf != null && emf.isOpen()) {
-      emf.close();
-    }
   }
 
   /**

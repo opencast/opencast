@@ -26,12 +26,12 @@ import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.toList;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.kernel.security.persistence.OrganizationDatabase;
 import org.opencastproject.kernel.security.persistence.OrganizationDatabaseException;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 

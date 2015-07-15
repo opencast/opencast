@@ -25,6 +25,8 @@ import org.opencastproject.annotation.api.Annotation;
 
 import java.util.Date;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,6 +49,7 @@ import javax.xml.bind.annotation.XmlType;
  * A JAXB-annotated implementation of {@link Annotation}
  */
 @Entity(name = "Annotation")
+@Access(AccessType.FIELD)
 @Table(name = "mh_annotation")
 @NamedQueries({
 
@@ -125,80 +128,99 @@ public class AnnotationImpl implements Annotation {
   public AnnotationImpl() {
   }
 
+  @Override
   public Long getAnnotationId() {
     return annotationId;
   }
 
+  @Override
   public void setAnnotationId(Long annotationId) {
     this.annotationId = annotationId;
   }
 
+  @Override
   public String getMediapackageId() {
     return mediapackageId;
   }
 
+  @Override
   public void setMediapackageId(String mediapackageId) {
     this.mediapackageId = mediapackageId;
   }
 
+  @Override
   public String getUserId() {
     return userId;
   }
 
+  @Override
   public void setUserId(String userId) {
     this.userId = userId;
   }
 
+  @Override
   public String getSessionId() {
     return sessionId;
   }
 
+  @Override
   public void setSessionId(String sessionId) {
     this.sessionId = sessionId;
   }
 
+  @Override
   public int getInpoint() {
     return inpoint;
   }
 
+  @Override
   public void setInpoint(int inpoint) {
     this.inpoint = inpoint;
     updateLength();
   }
 
+  @Override
   public int getOutpoint() {
     return outpoint;
   }
 
+  @Override
   public void setOutpoint(int outpoint) {
     this.outpoint = outpoint;
     updateLength();
   }
 
+  @Override
   public int getLength() {
     return length;
   }
 
+  @Override
   public String getType() {
     return type;
   }
 
+  @Override
   public void setType(String type) {
     this.type = type;
   }
 
+  @Override
   public String getValue() {
     return value;
   }
 
+  @Override
   public void setValue(String value) {
     this.value = value;
   }
 
+  @Override
   public Date getCreated() {
     return created;
   }
 
+  @Override
   public void setCreated(Date created) {
     this.created = created;
   }
@@ -207,10 +229,12 @@ public class AnnotationImpl implements Annotation {
     this.length = this.outpoint - this.inpoint;
   }
 
+  @Override
   public Boolean getPrivate() {
     return this.privateAnnotation;
   }
 
+  @Override
   public void setPrivate(Boolean isPrivate) {
     this.privateAnnotation = isPrivate;
   }

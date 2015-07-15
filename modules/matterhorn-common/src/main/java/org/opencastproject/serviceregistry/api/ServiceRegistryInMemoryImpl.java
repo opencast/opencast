@@ -402,7 +402,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
       throw new IllegalArgumentException("Job cannot be null");
     synchronized (jobs) {
       try {
-        jobs.put(job.getId(), JobParser.toXml(job));
+        jobs.put(job.getId(), JobParser.toXml(new JaxbJob(job)));
       } catch (IOException e) {
         throw new IllegalStateException("Error serializing job", e);
       }
@@ -589,7 +589,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countOfAbnormalServices()
    */
   @Override
@@ -714,7 +714,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
             logger.error("Error dispatching job " + job, e);
           } finally {
             try {
-              jobs.put(job.getId(), JobParser.toXml(job));
+              jobs.put(job.getId(), JobParser.toXml(new JaxbJob(job)));
             } catch (IOException e) {
               throw new IllegalStateException("Error unmarshaling job", e);
             }

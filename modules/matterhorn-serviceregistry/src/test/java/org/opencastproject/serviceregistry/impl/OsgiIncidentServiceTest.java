@@ -21,21 +21,17 @@
 
 package org.opencastproject.serviceregistry.impl;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
 import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.job.impl.jpa.JobJpaImpl;
 import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceEnvs;
 import org.opencastproject.util.persistence.PersistenceUtil;
-import org.opencastproject.util.persistence.Queries;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.easymock.EasyMock;
@@ -120,16 +116,15 @@ public class OsgiIncidentServiceTest {
     // manually create and store a job bypassing the service registry because the JPA implementation of the registry
     // is not very test friendly
     final JobJpaImpl job = new JobJpaImpl();
+    job.setId(1L);
     job.setCreator("creator");
     job.setOrganization("organization");
     job.setProcessingHost("localhost");
     job.setJobType("org.opencastproject.service");
-    final JobJpaImpl pjob = penv.tx(Queries.persist(job));
-    jobs.put(pjob.getId(), pjob);
-    assertThat(pjob.getId(), is(not(0L)));
-    incidents.record(pjob, Incident.Severity.FAILURE, 1511);
+    jobs.put(job.getId(), job);
+    incidents.record(job, Incident.Severity.FAILURE, 1511);
     // retrieve the job incident
-    final List<Incident> incidents = incidentService.getIncidentsOfJob(Immutables.list(pjob.getId()));
+    final List<Incident> incidents = incidentService.getIncidentsOfJob(Immutables.list(job.getId()));
     assertEquals(1, incidents.size());
     assertEquals(Incident.Severity.FAILURE, incidents.get(0).getSeverity());
     assertEquals("localhost", incidents.get(0).getProcessingHost());

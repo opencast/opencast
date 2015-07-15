@@ -95,7 +95,7 @@ public final class JobParser {
    * @throws IOException
    *           if parsing fails
    */
-  public static String toXml(Job job) throws IOException {
+  public static String toXml(JaxbJob job) throws IOException {
     try {
       Marshaller marshaller = jaxbContext.createMarshaller();
       Writer writer = new StringWriter();

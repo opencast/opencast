@@ -21,7 +21,7 @@
 
 package org.opencastproject.capture.admin.impl;
 
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.fail;
 import static org.opencastproject.capture.admin.api.AgentState.IDLE;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
 import static org.opencastproject.capture.admin.api.RecordingState.CAPTURING;
@@ -37,42 +37,31 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import junit.framework.Assert;
-
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.cm.ConfigurationException;
 
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
 public class CaptureAgentStateServiceImplTest {
   private CaptureAgentStateServiceImpl service = null;
   private Properties capabilities;
-  private ComboPooledDataSource pooledDataSource = null;
-  private long timestamp = -1L;
-  private long random = -1L;
 
   @Before
   public void setUp() throws Exception {
-    timestamp = System.currentTimeMillis();
-    random = Math.abs(new Random().nextLong());
     setupService();
 
     capabilities = new Properties();
@@ -83,25 +72,13 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   private void setupService() throws Exception {
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + timestamp + "_" + random);
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
 
     service = new CaptureAgentStateServiceImpl();
-    service.setPersistenceProvider(new PersistenceProvider());
-    service.setPersistenceProperties(props);
+    service.setEntityManagerFactory(PersistenceUtil.newTestEntityManagerFactory(CaptureAgentStateServiceImpl.PERSISTENCE_UNIT));
 
     WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(workflowService.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject()))
-            .andReturn(new WorkflowSetImpl()).anyTimes();
+    .andReturn(new WorkflowSetImpl()).anyTimes();
     EasyMock.replay(workflowService);
     service.setWorkflowService(workflowService);
 
@@ -122,7 +99,6 @@ public class CaptureAgentStateServiceImplTest {
   @After
   public void tearDown() {
     service.deactivate();
-    pooledDataSource.close();
   }
 
   @Test
@@ -350,10 +326,9 @@ public class CaptureAgentStateServiceImplTest {
 
     // Shut down the service completely
     service.deactivate();
-    service = null;
 
     // Restart the service with the same configuration as before
-    setupService();
+    service.activate(null);
 
     Assert.assertEquals(3, service.getKnownAgents().size());
 

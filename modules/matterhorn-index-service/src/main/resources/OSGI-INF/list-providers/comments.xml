@@ -9,6 +9,6 @@
     <provide interface="org.opencastproject.index.service.resources.list.api.ResourceListProvider"/>
   </service>
   
-  <reference name="EventCommentService" interface="org.opencastproject.comments.events.EventCommentService"
+  <reference name="EventCommentService" interface="org.opencastproject.event.comment.EventCommentService"
     cardinality="1..1" policy="static" bind="setEventCommentService"/>
 </scr:component>

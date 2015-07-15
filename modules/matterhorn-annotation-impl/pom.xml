@@ -110,6 +110,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.empulse.eclipselink</groupId>
+        <artifactId>staticweave-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -120,13 +124,13 @@
               org.opencastproject.annotation.api;version=${project.version},
               *;resolution:=optional
             </Import-Package>
-            <JPA-PersistenceUnits>
-              org.opencastproject.annotation
-            </JPA-PersistenceUnits>
             <Service-Component>
               OSGI-INF/annotation-service.xml,
               OSGI-INF/annotation-service-rest.xml
             </Service-Component>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

@@ -22,11 +22,9 @@
 package org.opencastproject.adminui.usersettings;
 
 import static org.junit.Assert.assertThat;
-import static org.opencastproject.util.data.Collections.nil;
 import static org.opencastproject.util.data.Option.none;
 
 import org.opencastproject.adminui.endpoint.SeriesEndpointTest;
-import org.opencastproject.comments.Comment;
 import org.opencastproject.kernel.mail.EmailAddress;
 import org.opencastproject.messages.MessageSignature;
 import org.opencastproject.security.api.User;
@@ -38,12 +36,13 @@ import org.joda.time.DateTimeZone;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.Test;
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.LinkedList;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class UserSettingsTest {
   @Test
@@ -71,10 +70,10 @@ public class UserSettingsTest {
     Option<EmailAddress> replyTo = none();
     DateTime dateTime = new DateTime(1401465634101L);
     dateTime.toDateTime(DateTimeZone.UTC);
-    MessageSignature messageSignature = new MessageSignature(10L, "Adam McKenzie", creator, sender, replyTo,
-            "This is the signature", dateTime.toDate(), nil(Comment.class));
+//    MessageSignature messageSignature = new MessageSignature(10L, "Adam McKenzie", creator, sender, replyTo,
+//            "This is the signature", dateTime.toDate(), nil(Comment.class));
     Collection<MessageSignature> signatures = new LinkedList<MessageSignature>();
-    signatures.add(messageSignature);
+//    signatures.add(messageSignature);
 
     UserSetting userSetting = new UserSetting(98, "Test Key", "Test Value");
     UserSettings userSettings = new UserSettings();

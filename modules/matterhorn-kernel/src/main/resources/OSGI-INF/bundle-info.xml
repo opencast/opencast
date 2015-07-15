@@ -17,17 +17,12 @@
     <service>
       <provide interface="org.opencastproject.kernel.bundleinfo.BundleInfoDb" />
     </service>
-    <reference name="persistenceProvider"
-               interface="javax.persistence.spi.PersistenceProvider"
-               cardinality="1..1"
-               policy="static"
-               bind="setPersistenceProvider" />
-    <reference name="persistenceProperties"
-               interface="java.util.Map"
-               cardinality="1..1"
-               policy="static"
-               target="(type=persistence)"
-               bind="setPersistenceProperties" />
+    <reference name="entityManagerFactory"
+        interface="javax.persistence.EntityManagerFactory"
+        target="(osgi.unit.name=org.opencastproject.kernel)"
+        cardinality="1..1"
+        policy="static"
+        bind="setEntityManagerFactory" />
   </scr:component>
 
   <scr:component name="org.opencastproject.kernel.bundleinfo.OsgiBundleInfoRestEndpoint" immediate="true">

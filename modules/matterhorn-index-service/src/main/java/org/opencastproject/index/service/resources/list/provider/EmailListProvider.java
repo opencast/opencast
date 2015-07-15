@@ -26,8 +26,8 @@ import org.opencastproject.index.service.resources.list.api.ResourceListProvider
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.util.ListProviderUtil;
 import org.opencastproject.messages.MailService;
+import org.opencastproject.messages.MailServiceException;
 import org.opencastproject.messages.MessageTemplate;
-import org.opencastproject.messages.persistence.MailServiceException;
 import org.opencastproject.security.api.Organization;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -46,6 +46,7 @@ import java.util.Map;
 public class EmailListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(EmailListProvider.class);
+
   /** All list providers will start with this prefix. */
   public static final String PROVIDER_PREFIX = "email";
   /** The filter to match a template name exactly. */

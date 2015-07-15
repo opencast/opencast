@@ -97,6 +97,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.empulse.eclipselink</groupId>
+        <artifactId>staticweave-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -108,6 +112,7 @@
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
+              org.opencastproject.oaipmh;version=${project.version},
               <!--org.opencastproject.oaipmh.server.OaiDcMetadataProvider;version=${project.version},-->
               <!--org.opencastproject.oaipmh.server.MetadataProvider;version=${project.version}-->
             </Export-Package>
@@ -118,7 +123,9 @@
               OSGI-INF/matterhorn-harvester.xml,
               OSGI-INF/matterhorn-record-handler.xml
             </Service-Component>
-            <JPA-PersistenceUnits>org.opencastproject.oaipmh.harvester</JPA-PersistenceUnits>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

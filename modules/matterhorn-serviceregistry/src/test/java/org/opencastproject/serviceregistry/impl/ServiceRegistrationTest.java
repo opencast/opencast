@@ -21,6 +21,7 @@
 
 package org.opencastproject.serviceregistry.impl;
 
+import org.opencastproject.job.impl.jpa.JobJpaImpl;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -34,20 +35,17 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceState;
+import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.util.UrlSupport;
-
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import junit.framework.Assert;
+import org.opencastproject.util.persistence.PersistenceUtil;
 
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
+import org.junit.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +60,6 @@ public class ServiceRegistrationTest {
   private static final String PATH_1 = "/path1";
   private static final String PATH_2 = "/path2";
 
-  private ComboPooledDataSource pooledDataSource = null;
   private ServiceRegistryJpaImpl serviceRegistry = null;
 
   private ServiceRegistrationJpaImpl regType1Localhost = null;
@@ -71,27 +68,15 @@ public class ServiceRegistrationTest {
 
   @Before
   public void setUp() throws Exception {
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + System.currentTimeMillis());
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     serviceRegistry = new ServiceRegistryJpaImpl();
-    serviceRegistry.setPersistenceProvider(new PersistenceProvider());
-    serviceRegistry.setPersistenceProperties(props);
+    serviceRegistry.setEntityManagerFactory(PersistenceUtil
+            .newTestEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT));
     serviceRegistry.activate(null);
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
-            .andReturn(organization).anyTimes();
+    .andReturn(organization).anyTimes();
     EasyMock.replay(organizationDirectoryService);
     serviceRegistry.setOrganizationDirectoryService(organizationDirectoryService);
 
@@ -127,7 +112,6 @@ public class ServiceRegistrationTest {
     serviceRegistry.unRegisterService(JOB_TYPE_1, REMOTEHOST_1);
     serviceRegistry.unRegisterService(JOB_TYPE_1, REMOTEHOST_2);
     serviceRegistry.deactivate();
-    pooledDataSource.close();
   }
 
   @Test

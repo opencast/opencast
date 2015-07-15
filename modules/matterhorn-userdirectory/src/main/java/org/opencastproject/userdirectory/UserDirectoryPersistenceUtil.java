@@ -21,8 +21,11 @@
 
 package org.opencastproject.userdirectory;
 
-import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.security.api.Role;
+import org.opencastproject.security.impl.jpa.JpaGroup;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaRole;
+import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.HashSet;
@@ -137,9 +140,8 @@ public final class UserDirectoryPersistenceUtil {
       if (u == null) {
         em.persist(user);
       } else {
-        u.password = user.getPassword();
-        u.roles = user.roles;
-        user = em.merge(u);
+        user.setId(u.getId());
+        user = em.merge(user);
       }
       tx.commit();
       return user;
@@ -452,7 +454,7 @@ public final class UserDirectoryPersistenceUtil {
   }
 
   public static void removeGroup(String groupId, String orgId, EntityManagerFactory emf) throws NotFoundException,
-          Exception {
+  Exception {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -490,7 +492,7 @@ public final class UserDirectoryPersistenceUtil {
    * @throws Exception
    */
   public static void deleteUser(String username, String orgId, EntityManagerFactory emf) throws NotFoundException,
-          Exception {
+  Exception {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {

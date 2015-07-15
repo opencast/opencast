@@ -18,36 +18,28 @@
  * the License.
  *
  */
-
 package org.opencastproject.messages.persistence;
 
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.RequireUtil.nullOrNotEmpty;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 
-import org.opencastproject.comments.persistence.CommentDto;
 import org.opencastproject.kernel.mail.EmailAddress;
 import org.opencastproject.messages.MessageSignature;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.data.Option;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -102,16 +94,13 @@ public class MessageSignatureDto {
   @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
 
-  @OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.REMOVE })
-  private List<CommentDto> comments = new ArrayList<CommentDto>();
-
   /** Default constructor */
   public MessageSignatureDto() {
   }
 
   /** Creates a message signature */
   public MessageSignatureDto(String name, String organization, String creator, String sender, String senderName,
-          String replyTo, String replyToName, String signature, Date creationDate, List<CommentDto> comments) {
+          String replyTo, String replyToName, String signature, Date creationDate) {
     this.name = notEmpty(name, "name");
     this.organization = notEmpty(organization, "organization");
     this.creator = notNull(creator, "creator");
@@ -121,7 +110,6 @@ public class MessageSignatureDto {
     this.replyToName = nullOrNotEmpty(replyToName, "replyToName");
     this.signature = notNull(signature, "signature");
     this.creationDate = notNull(creationDate, "creationDate");
-    this.comments = new ArrayList<CommentDto>(notNull(comments, "comments"));
   }
 
   /**
@@ -262,47 +250,6 @@ public class MessageSignatureDto {
   }
 
   /**
-   * Sets the comment list
-   *
-   * @param comments
-   *          the comment list
-   */
-  public void setComments(List<CommentDto> comments) {
-    this.comments = notNull(comments, "comments");
-  }
-
-  /**
-   * Returns the comment list
-   *
-   * @return the comment list
-   */
-  public List<CommentDto> getComments() {
-    return comments;
-  }
-
-  /**
-   * Add a comment to the signature
-   *
-   * @param comment
-   *          the comment to add to this signature
-   * @return true if this collection changed as a result of the call
-   */
-  public boolean addComment(CommentDto comment) {
-    return comments.add(notNull(comment, "comment"));
-  }
-
-  /**
-   * Remove a comment from the signature
-   *
-   * @param comment
-   *          the comment to remove from this signature
-   * @return true if this collection changed as a result of the call
-   */
-  public boolean removeComment(CommentDto comment) {
-    return comments.remove(notNull(comment, "comment"));
-  }
-
-  /**
    * Returns the business object of this message signature
    *
    * @return the business object model of this message signature
@@ -316,7 +263,6 @@ public class MessageSignatureDto {
     }
 
     User user = userDirectoryService.loadUser(creator);
-    return new MessageSignature(id, name, user, new EmailAddress(sender, senderName), reply, signature, creationDate,
-            mlist(comments).map(CommentDto.toComment.curry(userDirectoryService)).value());
+    return new MessageSignature(id, name, user, new EmailAddress(sender, senderName), reply, signature, creationDate);
   }
 }

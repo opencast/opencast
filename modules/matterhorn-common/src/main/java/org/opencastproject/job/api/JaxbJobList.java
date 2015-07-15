@@ -52,7 +52,7 @@ public class JaxbJobList {
   public JaxbJobList(Collection<Job> jobs) {
     if (jobs != null) {
       for (Job job : jobs) {
-        this.jobs.add((JaxbJob) job);
+        this.jobs.add(new JaxbJob(job));
       }
     }
   }
@@ -73,10 +73,6 @@ public class JaxbJobList {
   }
 
   public void add(Job job) {
-    if (job instanceof JaxbJob) {
-      jobs.add((JaxbJob) job);
-    } else {
-      throw new IllegalArgumentException("Jobs must be an instance of JaxbJob");
-    }
+    jobs.add(new JaxbJob(job));
   }
 }

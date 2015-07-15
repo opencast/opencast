@@ -13,11 +13,13 @@
   <prerequisites>
     <maven>3.0.4</maven>
   </prerequisites>
+
   <properties>
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <checkstyle.skip>false</checkstyle.skip>
+    <eclipselink.version>2.6.0</eclipselink.version>
     <jmeter.version>2.4</jmeter.version>
     <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
   </properties>
@@ -48,9 +50,9 @@
         <module>modules/matterhorn-capture-admin-service-api</module>
         <module>modules/matterhorn-capture-admin-service-impl</module>
         <module>modules/matterhorn-capture-workflowoperation</module>
-        <module>modules/matterhorn-comments</module>
         <module>modules/matterhorn-comments-workflowoperation</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-composer-workflowoperation</module>
         <module>modules/matterhorn-conductor</module>
@@ -59,6 +61,7 @@
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-workflowoperation</module>
         <module>modules/matterhorn-dublincore</module>
+        <module>modules/matterhorn-event-comment</module>
         <module>modules/matterhorn-fileupload</module>
         <module>modules/matterhorn-holdstate-workflowoperation</module>
         <module>modules/matterhorn-incident-workflowoperation</module>
@@ -80,7 +83,6 @@
         <module>modules/matterhorn-metadata</module>
         <module>modules/matterhorn-mpeg7</module>
         <module>modules/matterhorn-notification-workflowoperation</module>
-        <module>modules/matterhorn-participation-api</module>
         <module>modules/matterhorn-presets</module>
         <module>modules/matterhorn-publication-service-api</module>
         <module>modules/matterhorn-runtime-dependencies</module>
@@ -133,6 +135,7 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-ingest-service-api</module>
@@ -170,6 +173,7 @@
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-ingest-service-api</module>
@@ -212,6 +216,7 @@
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-distribution-service-acl</module>
         <module>modules/matterhorn-distribution-service-api</module>
@@ -252,6 +257,7 @@
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-distribution-service-acl</module>
         <module>modules/matterhorn-distribution-service-api</module>
@@ -291,6 +297,7 @@
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-distribution-service-acl-remote</module>
         <module>modules/matterhorn-distribution-service-api</module>
@@ -328,6 +335,7 @@
         <module>modules/matterhorn-annotation-impl</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-engage-theodul-api</module>
@@ -382,6 +390,7 @@
         <module>modules/matterhorn-archive-api</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
@@ -437,6 +446,7 @@
       <modules>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-distribution-service-api</module>
         <module>modules/matterhorn-distribution-service-download-remote</module>
@@ -475,6 +485,7 @@
         <module>modules/matterhorn-caption-api</module>
         <module>modules/matterhorn-caption-impl</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-db</module>
@@ -529,6 +540,7 @@
         <module>modules/matterhorn-caption-api</module>
         <module>modules/matterhorn-caption-impl</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-db</module>
@@ -583,6 +595,7 @@
         <module>modules/matterhorn-caption-api</module>
         <module>modules/matterhorn-caption-remote</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-composer-service-remote</module>
         <module>modules/matterhorn-inspection-service-api</module>
@@ -624,6 +637,7 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-impl</module>
@@ -642,6 +656,7 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-working-file-repository-service-api</module>
         <module>modules/matterhorn-working-file-repository-service-remote</module>
@@ -660,6 +675,7 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
@@ -678,6 +694,7 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-serviceregistry-remote</module>
@@ -694,6 +711,7 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-impl</module>
@@ -718,6 +736,7 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-dataloader</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
@@ -739,6 +758,7 @@
       </activation>
       <modules>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-security-ldap</module>
         <module>modules/matterhorn-userdirectory-ldap</module>
@@ -1092,17 +1112,19 @@
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
       <plugin>
-         <groupId>com.github.eirslett</groupId>
-         <artifactId>frontend-maven-plugin</artifactId>
-         <version>0.0.23</version>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>0.0.23</version>
       </plugin>
     </plugins>
-    <!-- This defines the global plugin configurations.  Plugins with configuration shared across multiple child poms
-         should be configured here, and then referenced in the child. -->
+    <!-- This defines the global plugin configurations. Plugins with configuration
+      shared across multiple child poms should be configured here, and then referenced
+      in the child. -->
     <pluginManagement>
       <plugins>
         <!-- Fix eclipse (indigo) maven integration -->
-        <!-- See http://wiki.eclipse.org/M2E_plugin_execution_not_covered for more information -->
+        <!-- See http://wiki.eclipse.org/M2E_plugin_execution_not_covered for
+          more information -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
@@ -1127,6 +1149,7 @@
                   <pluginExecutionFilter>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
+                    <versionRange>[0.0.23,)</versionRange>
                     <goals>
                       <goal>install-node-and-npm</goal>
                       <goal>npm</goal>
@@ -1149,6 +1172,21 @@
                   </pluginExecutionFilter>
                   <action>
                     <execute />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>de.empulse.eclipselink</groupId>
+                    <artifactId>staticweave-maven-plugin</artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>weave</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>true</runOnIncremental>
+                    </execute>
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -1300,7 +1338,7 @@
           <artifactId>maven-pmd-plugin</artifactId>
           <version>3.3</version>
           <configuration>
-            <!--<includeTests>true</includeTests>-->
+            <!--<includeTests>true</includeTests> -->
             <typeResolution>true</typeResolution>
             <targetJdk>1.7</targetJdk>
           </configuration>
@@ -1313,6 +1351,31 @@
               </goals>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>de.empulse.eclipselink</groupId>
+          <artifactId>staticweave-maven-plugin</artifactId>
+          <version>1.0.0</version>
+          <executions>
+            <execution>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>weave</goal>
+              </goals>
+              <configuration>
+                <persistenceXMLLocation>META-INF/persistence.xml
+                </persistenceXMLLocation>
+                <logLevel>FINE</logLevel>
+              </configuration>
+            </execution>
+          </executions>
+          <dependencies>
+            <dependency>
+              <groupId>org.eclipse.persistence</groupId>
+              <artifactId>org.eclipse.persistence.jpa</artifactId>
+              <version>${eclipselink.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>com.github.klieber</groupId>
@@ -1429,7 +1492,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>17.0</version>
+        <version>18.0</version>
       </dependency>
 
       <dependency>
@@ -1438,11 +1501,11 @@
         <version>1.0-rc2-patched</version>
       </dependency>
 
-        <dependency>
-          <groupId>org.apache.servicemix.bundles</groupId>
-          <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
-          <version>1.8.5_1</version>
-        </dependency>
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
+        <version>1.8.5_1</version>
+      </dependency>
 
       <!-- OSGi -->
       <dependency>
@@ -1501,31 +1564,37 @@
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.core</artifactId>
-        <version>2.0.2</version>
+        <version>${eclipselink.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.jpa</artifactId>
-        <version>2.0.2</version>
+        <version>${eclipselink.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.jpa.jpql</artifactId>
+        <version>${eclipselink.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.asm</artifactId>
-        <version>2.0.2</version>
+        <version>${eclipselink.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.antlr</artifactId>
-        <version>2.0.2</version>
+        <version>${eclipselink.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>javax.persistence</artifactId>
-        <version>2.0.3</version>
+        <version>2.1.0</version>
       </dependency>
 
       <!-- CXF -->
@@ -2520,17 +2589,18 @@
         <enabled>true</enabled>
       </releases>
     </repository>
-      <repository>
-        <id>entwine</id>
-        <name>Entwine Repo</name>
-        <url>http://maven.entwinemedia.com/content/repositories/releases</url>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>
-        <releases>
-          <enabled>true</enabled>
-        </releases>
-      </repository>
+    <repository>
+      <id>entwine</id>
+      <name>Entwine Repo</name>
+      <url>http://maven.entwinemedia.com/content/repositories/releases
+      </url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
     <repository>
       <id>opencast.snapshots</id>
       <name>Opencast SNAPSHOTS</name>
@@ -2558,19 +2628,32 @@
       <name>Eclipselink Repo</name>
       <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
     </repository>
-    <!-- these are here as a backup in case the matterhorn nexus repository is down -->
-    <!-- <repository> <id>com.springsource.repository.bundles.release</id> <name>SpringSource Enterprise Bundle Repository
-      - SpringSource Bundle Releases</name> <url>http://repository.springsource.com/maven/bundles/release</url> <releases> <enabled>true</enabled>
-      </releases> </repository> <repository> <id>com.springsource.repository.bundles.external</id> <name>SpringSource Enterprise
-      Bundle Repository - External Bundle Releases</name> <url>http://repository.springsource.com/maven/bundles/external</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>ops4j</id> <name>OPS4J Repository</name> <url>http://repository.ops4j.org/maven2</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>apache.incubating</id> <name>Apache Incubating
-      Repository</name> <url>http://people.apache.org/repo/m2-incubating-repository</url> <releases> <enabled>true</enabled> </releases>
-      </repository> <repository> <id>codehaus-release-repo</id> <name>Codehaus Release Repo</name> <url>http://repository.codehaus.org</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>modularity-releases</id> <name>Modularity Releases
-      Repository</name> <url>http://m2.modularity.net.au/releases</url> <releases> <enabled>true</enabled> </releases> </repository>
-      <repository> <id>sonatype-repository</id> <name>Sonatype Public Repo</name> <url>http://repository.sonatype.org/content/groups/public/</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>EclipseLink Repo</id> <url>http://mirrors.ibiblio.org/pub/mirrors/eclipse/rt/eclipselink/maven.repo</url>
+    <repository>
+      <id>eclipse-gemini</id>
+      <name>Eclipse Gemini Maven repository</name>
+      <url>http://download.eclipse.org/gemini/mvn/</url>
+    </repository>
+    <!-- these are here as a backup in case the matterhorn nexus repository
+      is down -->
+    <!-- <repository> <id>com.springsource.repository.bundles.release</id>
+      <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+      <url>http://repository.springsource.com/maven/bundles/release</url> <releases>
+      <enabled>true</enabled> </releases> </repository> <repository> <id>com.springsource.repository.bundles.external</id>
+      <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+      <url>http://repository.springsource.com/maven/bundles/external</url> <releases>
+      <enabled>true</enabled> </releases> </repository> <repository> <id>ops4j</id>
+      <name>OPS4J Repository</name> <url>http://repository.ops4j.org/maven2</url>
+      <releases> <enabled>true</enabled> </releases> </repository> <repository>
+      <id>apache.incubating</id> <name>Apache Incubating Repository</name> <url>http://people.apache.org/repo/m2-incubating-repository</url>
+      <releases> <enabled>true</enabled> </releases> </repository> <repository>
+      <id>codehaus-release-repo</id> <name>Codehaus Release Repo</name> <url>http://repository.codehaus.org</url>
+      <releases> <enabled>true</enabled> </releases> </repository> <repository>
+      <id>modularity-releases</id> <name>Modularity Releases Repository</name>
+      <url>http://m2.modularity.net.au/releases</url> <releases> <enabled>true</enabled>
+      </releases> </repository> <repository> <id>sonatype-repository</id> <name>Sonatype
+      Public Repo</name> <url>http://repository.sonatype.org/content/groups/public/</url>
+      <releases> <enabled>true</enabled> </releases> </repository> <repository>
+      <id>EclipseLink Repo</id> <url>http://mirrors.ibiblio.org/pub/mirrors/eclipse/rt/eclipselink/maven.repo</url>
       <releases> <enabled>true</enabled> </releases> </repository> -->
   </repositories>
 </project>
