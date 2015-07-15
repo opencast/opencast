@@ -21,6 +21,8 @@
 
 package org.opencastproject.composer.impl.endpoint;
 
+import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
+
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EmbedderException;
 import org.opencastproject.composer.api.EncoderException;
@@ -42,6 +44,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.JsonObj;
+import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
@@ -337,33 +340,45 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("image")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "image", description = "Starts an image extraction process, based on the specified encoding profile ID and the source track", restParameters = {
-          @RestParameter(description = "The number of seconds (many numbers can be specified, separated by semicolon) into the video to extract the image", isRequired = true, name = "time", type = Type.STRING, defaultValue = "1"),
           @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
-          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "player-preview.http") }, reponses = {
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "player-preview.http"),
+          @RestParameter(description = "The number of seconds (many numbers can be specified, separated by semicolon) into the video to extract the image", isRequired = false, name = "time", type = Type.STRING),
+          @RestParameter(description = "An optional set of key=value\\n properties", isRequired = false, name = "properties", type = TEXT) }, reponses = {
           @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+          @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "The image extraction job")
   public Response image(@FormParam("sourceTrack") String sourceTrackXml, @FormParam("profileId") String profileId,
-          @FormParam("time") String times) throws Exception {
+          @FormParam("time") String times, @FormParam("properties") LocalHashMap localMap) throws Exception {
     // Ensure that the POST parameters are present
     if (StringUtils.isBlank(sourceTrackXml) || StringUtils.isBlank(profileId))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack and profileId must not be null").build();
-
-    // parse time codes
-    double[] timeArray;
-    try {
-      timeArray = parseTimeArray(times);
-    } catch (Exception e) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("could not parse times: invalid format").build();
-    }
 
     // Deserialize the source track
     MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(sourceTrackXml);
     if (!Track.TYPE.equals(sourceTrack.getElementType()))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack element must be of type track").build();
 
+    boolean timeBased = false;
+    double[] timeArray = null;
+    if (StringUtils.isNotBlank(times)) {
+      // parse time codes
+      try {
+        timeArray = parseTimeArray(times);
+      } catch (Exception e) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("could not parse times: invalid format").build();
+      }
+      timeBased = true;
+    } else if (localMap == null) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
     try {
       // Asynchronously encode the specified tracks
-      Job job = composerService.image((Track) sourceTrack, profileId, timeArray);
+      Job job;
+      if (timeBased) {
+        job = composerService.image((Track) sourceTrack, profileId, timeArray);
+      } else {
+        job = composerService.image((Track) sourceTrack, profileId, localMap.getMap());
+      }
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to extract image(s): " + e.getMessage());
@@ -402,8 +417,8 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "The resolution size of the resulting video as JSON", isRequired = true, name = "compositeSize", type = Type.STRING),
           @RestParameter(description = "The lower source track containing the lower video", isRequired = true, name = "lowerTrack", type = Type.TEXT),
           @RestParameter(description = "The lower layout containing the JSON definition of the layout", isRequired = true, name = "lowerLayout", type = Type.TEXT),
-          @RestParameter(description = "The upper source track containing the upper video", isRequired = true, name = "upperTrack", type = Type.TEXT),
-          @RestParameter(description = "The upper layout containing the JSON definition of the layout", isRequired = true, name = "upperLayout", type = Type.TEXT),
+          @RestParameter(description = "The upper source track containing the upper video", isRequired = false, name = "upperTrack", type = Type.TEXT),
+          @RestParameter(description = "The upper layout containing the JSON definition of the layout", isRequired = false, name = "upperLayout", type = Type.TEXT),
           @RestParameter(description = "The watermark source attachment containing watermark image", isRequired = false, name = "watermarkTrack", type = Type.TEXT),
           @RestParameter(description = "The watermark layout containing the JSON definition of the layout", isRequired = false, name = "watermarkLayout", type = Type.TEXT),
           @RestParameter(description = "The background color", isRequired = false, name = "background", type = Type.TEXT, defaultValue = "black"),
@@ -418,8 +433,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
           @FormParam("background") @DefaultValue("black") String background) throws Exception {
     // Ensure that the POST parameters are present
     if (StringUtils.isBlank(compositeSizeJson) || StringUtils.isBlank(lowerTrackXml)
-            || StringUtils.isBlank(lowerLayoutJson) || StringUtils.isBlank(upperTrackXml)
-            || StringUtils.isBlank(upperLayoutJson) || StringUtils.isBlank(profileId))
+            || StringUtils.isBlank(lowerLayoutJson) || StringUtils.isBlank(profileId))
       return Response.status(Response.Status.BAD_REQUEST).entity("One of the required parameters must not be null")
               .build();
 
@@ -430,12 +444,15 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).entity("lowerTrack element must be of type track").build();
     LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>((Track) lowerTrack, lowerLayout);
 
-    MediaPackageElement upperTrack = MediaPackageElementParser.getFromXml(upperTrackXml);
-    Layout upperLayout = Serializer.layout(JsonObj.jsonObj(upperLayoutJson));
-    if (!Track.TYPE.equals(upperTrack.getElementType()))
-      return Response.status(Response.Status.BAD_REQUEST).entity("upperTrack element must be of type track").build();
-    LaidOutElement<Track> upperLaidOutElement = new LaidOutElement<Track>((Track) upperTrack, upperLayout);
-
+    Option<LaidOutElement<Track>> upperLaidOutElement = Option.<LaidOutElement<Track>> none();
+    if (StringUtils.isNotBlank(upperTrackXml)) {
+      MediaPackageElement upperTrack = MediaPackageElementParser.getFromXml(upperTrackXml);
+      Layout upperLayout = Serializer.layout(JsonObj.jsonObj(upperLayoutJson));
+      if (!Track.TYPE.equals(upperTrack.getElementType())) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("upperTrack element must be of type track").build();
+      }
+      upperLaidOutElement = Option.option(new LaidOutElement<Track>((Track) upperTrack, upperLayout));
+    }
     Option<LaidOutElement<Attachment>> watermarkLaidOutElement = Option.<LaidOutElement<Attachment>> none();
     if (StringUtils.isNotBlank(watermarkAttachmentXml)) {
       Layout watermarkLayout = Serializer.layout(JsonObj.jsonObj(watermarkLayoutJson));

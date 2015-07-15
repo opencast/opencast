@@ -1,0 +1,15 @@
+<?xml version="1.1" encoding="UTF-8" standalone="yes"?>
+<smil xmlns="http://www.w3.org/ns/SMIL" baseProfile="Language" version="3.0">
+	<head/>
+	<body>
+		<par dur="84s">
+			<seq dur="88730ms">
+				<video src="source2/video_2013-10-28T08_09_41_702.mov" begin="6860ms" dur="35133ms"/>
+				<video src="source2/video_2013-10-28T08_10_15_702.mov" begin="40860ms" dur="47867ms"/>
+			</seq>
+			<seq dur="84s">
+				<video src="source1/mux_2013-10-28T08_09_34_841.mov" begin="0s" dur="84000ms"/>
+			</seq>
+		</par>
+	</body>
+</smil>

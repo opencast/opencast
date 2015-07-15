@@ -212,6 +212,18 @@ public class StaticFileServiceImpl implements StaticFileService {
     }
   }
 
+  @Override
+  public Long getContentLength(String uuid) throws NotFoundException {
+    final String org = securityService.getOrganization().getId();
+    try {
+      Path file = getFile(org, uuid);
+      return Files.size(file);
+    } catch (IOException e) {
+      logger.warn("Error while reading file: {}", getStackTrace(e));
+      throw new NotFoundException(e);
+    }
+  }
+
   /**
    * Returns a {@link DirectoryStream.Filter} to filter the entries of a directory and only return items which filename
    * starts with the UUID.

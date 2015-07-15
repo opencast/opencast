@@ -41,6 +41,16 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-smil-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-smil-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workspace-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -104,6 +114,7 @@
               OSGI-INF/operations/encode.xml,
               OSGI-INF/operations/image-to-video.xml,
               OSGI-INF/operations/image.xml,
+              OSGI-INF/operations/partial-import.xml,
               OSGI-INF/operations/prepare-av.xml,
               OSGI-INF/operations/segmentpreviews.xml,
               OSGI-INF/operations/watermark.xml

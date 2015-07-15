@@ -25,6 +25,25 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <skip>${checkstyle.skip}</skip>
+          <!-- disabled checking external w3c SMIL interfaces -->
+          <excludes>
+            org/w3c/**
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -36,6 +55,7 @@
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
+              org.w3c.dom.smil;version=${project.version},
               org.opencastproject.smil.api.*;version=${project.version},
               org.opencastproject.smil.entity.api*;version=${project.version},
               org.opencastproject.smil.entity.media.api.*;version=${project.version},

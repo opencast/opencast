@@ -1,0 +1,17 @@
+<?xml version="1.1" encoding="UTF-8" standalone="yes"?>
+<smil xmlns="http://www.w3.org/ns/SMIL" baseProfile="Language" version="3.0" xml:id="s-fa4c7ae6-526c-4b4d-a1ac-65d092a0c307">
+	<head xml:id="h-2f809409-729d-46d4-86da-af7b9b128ac4">
+		<meta name="media-package-id" content="c2322982-be6f-408d-ace8-293e2c30ab21" xml:id="meta-860149d1-37cb-4754-8104-9c0c1e8468f6"/>
+		<meta name="track-duration" content="10440ms" xml:id="meta-a68769d9-32a3-40c0-9ab0-ea44a85b0f8d"/>
+		<paramGroup xml:id="pg-540213b0-c560-43d9-a109-d535328d7f1f">
+			<param value="70bdcd1a-339a-4758-8cc6-0caa98ae3179" name="track-id" valuetype="data" xml:id="param-8c4a5f0e-264b-42f7-a3da-08a12ad6e6f2"/>
+			<param value="http://localhost:8080/files/mediapackage/c2322982-be6f-408d-ace8-293e2c30ab21/e27265ed-cab1-47a9-bf76-86c2b541a55e/vonly_short.mov" name="track-src" valuetype="data" xml:id="param-6c476505-4430-46c3-830b-74ade48065f6"/>
+			<param value="presenter/work" name="track-flavor" valuetype="data" xml:id="param-a7b7a0f7-d2fd-49ff-a5f0-717c6dd037d0"/>
+		</paramGroup>
+	</head>
+	<body xml:id="b-0f906032-44c2-4a2b-9952-bc7079d35b97">
+		<par xml:id="par-c75b465a-b845-4d82-be4b-b7ad41021197">
+			<video src="http://localhost:8080/files/mediapackage/c2322982-be6f-408d-ace8-293e2c30ab21/e27265ed-cab1-47a9-bf76-86c2b541a55e/vonly_short.mov" paramGroup="pg-540213b0-c560-43d9-a109-d535328d7f1f" clipEnd="10440ms" clipBegin="0ms" xml:id="v-55b2a5fe-2f6f-4549-a04d-08511cb4beb4"/>
+		</par>
+	</body>
+</smil>

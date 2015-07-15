@@ -77,24 +77,6 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
   }
 
   /**
-   * Construct an audio stream from another audio stream
-   *
-   * @param s
-   */
-  public AudioStreamImpl(AudioStreamImpl s) {
-    this.bitdepth = s.bitdepth;
-    this.bitrate = s.bitrate;
-    this.channels = s.channels;
-    this.device = s.device;
-    this.encoder = s.encoder;
-    this.identifier = s.identifier;
-    this.samplingrate = s.samplingrate;
-    this.pkLevDb = s.pkLevDb;
-    this.rmsLevDb = s.rmsLevDb;
-    this.rmsPkDb = s.rmsPkDb;
-  }
-
-  /**
    * @see org.opencastproject.mediapackage.ManifestContributor#toManifest(org.w3c.dom.Document,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
@@ -102,6 +84,13 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     Element node = document.createElement("audio");
     // Stream ID
     node.setAttribute("id", getIdentifier());
+
+    // Frame count
+    if (frameCount != null) {
+      Element frameCountNode = document.createElement("framecount");
+      frameCountNode.appendChild(document.createTextNode(Long.toString(frameCount)));
+      node.appendChild(frameCountNode);
+    }
 
     // Device
     Element deviceNode = document.createElement("device");
@@ -202,6 +191,15 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     if (StringUtils.isEmpty(sid))
       sid = streamIdHint;
     AudioStreamImpl as = new AudioStreamImpl(sid);
+
+    // Frame count
+    try {
+      String frameCount = (String) xpath.evaluate("framecount/text()", node, XPathConstants.STRING);
+      if (!StringUtils.isBlank(frameCount))
+        as.frameCount = new Long(frameCount.trim());
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("Frame count was malformatted: " + e.getMessage());
+    }
 
     // bit depth
     try {

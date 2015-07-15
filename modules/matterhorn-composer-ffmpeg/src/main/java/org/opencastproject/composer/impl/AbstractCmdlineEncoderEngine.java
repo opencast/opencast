@@ -145,27 +145,34 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
           throws EncoderException {
 
     List<File> extractedImages = new LinkedList<File>();
-    for (double time : times) {
-      Map<String, String> params = new HashMap<String, String>();
-      if (properties != null) {
-        params.putAll(properties);
-      }
+    try {
+      if (times != null && times.length > 0) {
+        for (double time : times) {
+          Map<String, String> params = new HashMap<String, String>();
+          if (properties != null) {
+            params.putAll(properties);
+          }
 
-      DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
-      ffmpegFormat.setDecimalSeparator('.');
-      DecimalFormat df = new DecimalFormat("0.000", ffmpegFormat);
-      params.put("time", df.format(time));
-      try {
-        for (File image : process(null, mediaSource, format, params)) {
+          DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
+          ffmpegFormat.setDecimalSeparator('.');
+          DecimalFormat df = new DecimalFormat("0.000", ffmpegFormat);
+          params.put("time", df.format(time));
+
+          for (File image : process(null, mediaSource, format, params)) {
+            extractedImages.add(image);
+          }
+        }
+      } else {
+        for (File image : process(null, mediaSource, format, properties)) {
           extractedImages.add(image);
         }
-      } catch (Exception e) {
-        cleanup(extractedImages);
-        if (e instanceof EncoderException) {
-          throw (EncoderException) e;
-        } else {
-          throw new EncoderException("Image extraction failed", e);
-        }
+      }
+    } catch (Exception e) {
+      cleanup(extractedImages);
+      if (e instanceof EncoderException) {
+        throw (EncoderException) e;
+      } else {
+        throw new EncoderException("Image extraction failed", e);
       }
     }
 
@@ -219,7 +226,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
     final String outDir = parentFile.getAbsoluteFile().getParent();
     final String outSuffix = processParameters(profile.getSuffix());
     final String outFileName = FilenameUtils.getBaseName(parentFile.getName())
-            + (params.containsKey("time") ? "_" + properties.get("time") : "")
+            + (params.containsKey("time") ? "_" + properties.get("time").replace('.', '_') : "")
             // generate random name if multiple jobs are producing file with identical name (MH-7673)
             + "_" + UUID.randomUUID().toString();
     params.put("out.dir", outDir);
@@ -361,6 +368,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
     List<String> arguments = buildArgumentList(profile);
     for (String arg : arguments) {
       String result = arg;
+      // TODO Handle several passes of embedded parameters in case a substitution results in another variable.
       for (Map.Entry<String, String> e : params.entrySet()) {
         result = result.replace("#{" + e.getKey() + "}", e.getValue());
       }
