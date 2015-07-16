@@ -46,7 +46,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.PostLoad;
 import javax.persistence.PreUpdate;
@@ -64,7 +63,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-/** A long running, asynchronously executed job. This concrete implementations adds JPA annotations to {@link JaxbJob}. */
+/**
+ * A long running, asynchronously executed job. This concrete implementations adds JPA annotations to {@link JaxbJob}.
+ */
 @Entity(name = "Job")
 @Access(AccessType.PROPERTY)
 @Table(name = "mh_job")
@@ -83,7 +84,7 @@ import javax.xml.bind.annotation.XmlType;
         @NamedQuery(name = "Job.undispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = false and "
                 + "j.status in :statuses order by j.dateCreated"),
         @NamedQuery(name = "Job.processinghost.status", query = "SELECT j FROM Job j "
-                + "where j.status in :statuses and j.processorServiceRegistration is not null and "
+                + "where j.status = :status and j.processorServiceRegistration is not null and "
                 + "j.processorServiceRegistration.serviceType = :serviceType and "
                 + "j.processorServiceRegistration.hostRegistration.baseUrl = :host order by j.dateCreated"),
         @NamedQuery(name = "Job.root.children", query = "SELECT j FROM Job j WHERE j.rootJob.id = :id ORDER BY j.dateCreated"),
@@ -94,8 +95,6 @@ import javax.xml.bind.annotation.XmlType;
         // Job count queries
         @NamedQuery(name = "Job.count", query = "SELECT COUNT(j) FROM Job j "
                 + "where j.status = :status and j.creatorServiceRegistration.serviceType = :serviceType"),
-        @NamedQuery(name = "Job.count.all", query = "SELECT COUNT(j) FROM Job j"),
-        @NamedQuery(name = "Job.count.nullType", query = "SELECT COUNT(j) FROM Job j " + "where j.status = :status"),
         @NamedQuery(name = "Job.count.nullStatus", query = "SELECT COUNT(j) FROM Job j "
                 + "where j.creatorServiceRegistration.serviceType = :serviceType"),
         @NamedQuery(name = "Job.countByHost", query = "SELECT COUNT(j) FROM Job j "
@@ -158,7 +157,9 @@ public class JobJpaImpl extends JaxbJob {
     super(job);
   }
 
-  /** Constructor with everything needed for a newly instantiated job. */
+  /**
+   * Constructor with everything needed for a newly instantiated job.
+   */
   public JobJpaImpl(User user, Organization organization, ServiceRegistrationJpaImpl creatorServiceRegistration,
           String operation, List<String> arguments, String payload, boolean dispatchable) {
     this();
@@ -189,6 +190,11 @@ public class JobJpaImpl extends JaxbJob {
     this.parentJob = parentJob;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.Job#getId()
+   */
   @Id
   @GeneratedValue
   @Column(name = "id")
@@ -221,7 +227,7 @@ public class JobJpaImpl extends JaxbJob {
     return super.getUri();
   }
 
-  @OneToMany(mappedBy = "parentJob", fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.REFRESH,
+  @OneToMany(mappedBy = "parentJob", fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.REFRESH,
           CascadeType.MERGE })
   public List<JobJpaImpl> getChildJobs() {
     return childJobs;
@@ -231,6 +237,11 @@ public class JobJpaImpl extends JaxbJob {
     this.childJobs = jobs;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.JaxbJob#getVersion()
+   */
   @Column(name = "instance_version")
   @Version
   @XmlAttribute
@@ -239,6 +250,11 @@ public class JobJpaImpl extends JaxbJob {
     return super.getVersion();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.Job#getStatus()
+   */
   @Column(name = "status")
   @XmlAttribute
   @Override
@@ -256,7 +272,7 @@ public class JobJpaImpl extends JaxbJob {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.job.api.Job#getJobType()
+   * @see org.opencastproject.job.api.Job#getType()
    */
   @Transient
   @XmlAttribute(name = "type")
@@ -265,6 +281,11 @@ public class JobJpaImpl extends JaxbJob {
     return jobType;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.JaxbJob#getOperation()
+   */
   @Lob
   @Column(name = "operation", length = 65535)
   @XmlAttribute
@@ -273,10 +294,15 @@ public class JobJpaImpl extends JaxbJob {
     return operation;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.JaxbJob#getArguments()
+   */
   @Lob
   @Column(name = "argument", length = 2147483647)
   @OrderColumn(name = "argument_index")
-  @ElementCollection(fetch = FetchType.LAZY)
+  @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "mh_job_argument", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
   @XmlElement(name = "arg")
   @XmlElementWrapper(name = "args")
@@ -285,6 +311,11 @@ public class JobJpaImpl extends JaxbJob {
     return arguments;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.Job#getProcessingHost()
+   */
   @Transient
   @XmlElement
   @Override
@@ -292,6 +323,11 @@ public class JobJpaImpl extends JaxbJob {
     return processingHost;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.JaxbJob#getCreatedHost()
+   */
   @Transient
   @XmlElement
   @Override
@@ -299,6 +335,11 @@ public class JobJpaImpl extends JaxbJob {
     return createdHost;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.Job#getDateCompleted()
+   */
   @Column(name = "date_completed")
   @Temporal(TemporalType.TIMESTAMP)
   @XmlElement
@@ -307,6 +348,11 @@ public class JobJpaImpl extends JaxbJob {
     return dateCompleted;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.Job#getDateCreated()
+   */
   @Column(name = "date_created")
   @Temporal(TemporalType.TIMESTAMP)
   @XmlElement
@@ -315,6 +361,11 @@ public class JobJpaImpl extends JaxbJob {
     return dateCreated;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.Job#getDateStarted()
+   */
   @Column(name = "date_started")
   @Temporal(TemporalType.TIMESTAMP)
   @XmlElement
@@ -323,7 +374,9 @@ public class JobJpaImpl extends JaxbJob {
     return dateStarted;
   }
 
-  /** @return the queueTime */
+  /**
+   * @return the queueTime
+   */
   @Column(name = "queue_time")
   @XmlElement
   @Override
@@ -331,7 +384,9 @@ public class JobJpaImpl extends JaxbJob {
     return queueTime;
   }
 
-  /** @return the runTime */
+  /**
+   * @return the runTime
+   */
   @Column(name = "run_time")
   @XmlElement
   @Override
@@ -339,6 +394,11 @@ public class JobJpaImpl extends JaxbJob {
     return runTime;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.JaxbJob#getPayload()
+   */
   @Lob
   @Column(name = "payload", length = 16777215)
   @XmlElement
@@ -347,6 +407,11 @@ public class JobJpaImpl extends JaxbJob {
     return super.getPayload();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.JaxbJob#setPayload(java.lang.String)
+   */
   @Override
   public void setPayload(String payload) {
     super.setPayload(payload);
@@ -364,7 +429,9 @@ public class JobJpaImpl extends JaxbJob {
     super.setDispatchable(dispatchable);
   }
 
-  /** @return the serviceRegistration where this job was created */
+  /**
+   * @return the serviceRegistration where this job was created
+   */
   @ManyToOne
   @JoinColumn(name = "creator_service")
   public ServiceRegistrationJpaImpl getCreatorServiceRegistration() {
@@ -384,7 +451,9 @@ public class JobJpaImpl extends JaxbJob {
     }
   }
 
-  /** @return the processorServiceRegistration */
+  /**
+   * @return the processorServiceRegistration
+   */
   @ManyToOne
   @JoinColumn(name = "processor_service")
   public ServiceRegistrationJpaImpl getProcessorServiceRegistration() {
@@ -463,13 +532,20 @@ public class JobJpaImpl extends JaxbJob {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.JaxbJob#getContext()
+   */
   @Transient
   @Override
   public JaxbJobContext getContext() {
     return context;
   }
 
-  /** @return the properties */
+  /**
+   * @return the properties
+   */
   @Transient
   // TODO: remove to re-enable job context properties
   public List<JobPropertyJpaImpl> getProperties() {
@@ -484,7 +560,9 @@ public class JobJpaImpl extends JaxbJob {
     this.properties = properties;
   }
 
-  /** @return the parentJob */
+  /**
+   * @return the parentJob
+   */
   @JoinColumn(name = "parent", referencedColumnName = "id", nullable = true)
   public JobJpaImpl getParentJob() {
     return parentJob;
@@ -502,11 +580,9 @@ public class JobJpaImpl extends JaxbJob {
     this.parentJob = parentJob;
   }
 
-  /** @return the rootJob */
   /**
    * @return the rootJob
    */
-  @OneToOne(fetch = FetchType.LAZY, targetEntity = JobJpaImpl.class, optional = true)
   @JoinColumn(name = "root", referencedColumnName = "id", nullable = true)
   public JobJpaImpl getRootJob() {
     return rootJob;
@@ -524,7 +600,9 @@ public class JobJpaImpl extends JaxbJob {
     this.rootJob = rootJob;
   }
 
-  /** @return the servicesRegistration */
+  /**
+   * @return the servicesRegistration
+   */
   public List<ServiceRegistrationJpaImpl> getServicesRegistration() {
     return servicesRegistration;
   }

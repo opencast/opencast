@@ -26,9 +26,9 @@ import java.util.Date;
 public class SeriesQuery {
 
   /** Maximum number of results returned */
-  protected int count;
+  protected long count;
   /** Start page number */
-  protected int startPage;
+  protected long startPage;
   /** Free text search */
   protected String text;
   /** Series id search */
@@ -108,7 +108,7 @@ public class SeriesQuery {
    * @param count
    * @return
    */
-  public SeriesQuery setCount(int count) {
+  public SeriesQuery setCount(long count) {
     this.count = count;
     return this;
   }
@@ -119,7 +119,7 @@ public class SeriesQuery {
    * @param startPage
    * @return
    */
-  public SeriesQuery setStartPage(int startPage) {
+  public SeriesQuery setStartPage(long startPage) {
     this.startPage = startPage;
     return this;
   }
@@ -344,7 +344,7 @@ public class SeriesQuery {
    *
    * @return
    */
-  public int getCount() {
+  public long getCount() {
     return count;
   }
 
@@ -353,7 +353,7 @@ public class SeriesQuery {
    *
    * @return
    */
-  public int getStartPage() {
+  public long getStartPage() {
     return startPage;
   }
 

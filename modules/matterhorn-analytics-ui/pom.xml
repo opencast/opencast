@@ -1,12 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-admin-ui</artifactId>
+  <groupId>org.opencastproject</groupId>
+  <artifactId>matterhorn-analytics-ui</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-admin-ui</name>
+  <name>matterhorn-analytics-ui</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.6.0</version>
+    <version>1.4.4</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -17,12 +19,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-metadata-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -67,31 +63,8 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
+        <version>2.4.1</version>
         <executions>
-          <execution>
-            <id>copy-player</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/ui</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/player/</directory>
-                  <includes>
-                    <include>engage-hybrid-player/**</include>
-                    <include>style/**</include>
-                    <include>embed.html</include>
-                    <include>preview.xml</include>
-                    <include>Videodisplay.swf/</include>
-                    <include>playerProductInstall.swf/</include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
           <execution>
             <id>copy-jquery</id>
             <phase>validate</phase>
@@ -102,7 +75,7 @@
               <outputDirectory>${basedir}/target/classes/ui/jquery</outputDirectory>
               <resources>
                 <resource>
-                  <directory>../../shared-resources/js/jquery/</directory>
+                  <directory>../../shared-resources/jquery/</directory>
                   <includes>
                     <include> **/** </include>
                   </includes>
@@ -226,27 +199,6 @@
             </configuration>
           </execution>
           <execution>
-            <id>copy-templates</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/ui/templates</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/templates/</directory>
-                  <includes>
-                    <include>common-data.tpl</include>
-                    <include>processing-instructions.tpl</include>
-                    <include>additional-description.tpl</include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
             <id>copy-xsl</id>
             <phase>validate</phase>
             <goals>
@@ -265,39 +217,23 @@
               </resources>
             </configuration>
           </execution>
-          <execution>
-            <id>copy-json</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/ui/json</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/json/</directory>
-                  <includes>
-                    <include> **/** </include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.0.1</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Bundle-Activator>org.opencastproject.analytics.ui.Activator</Bundle-Activator>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
-              org.opencastproject.rest;version=${project.version}
+              org.opencastproject.rest;version=${project.version},
+              org.osgi.framework.*,
+              org.slf4j.*
             </Import-Package>
-            <Private-Package>ui.*, uitests.*</Private-Package>
-            <Http-Alias>/admin</Http-Alias>
+            <Http-Alias>/analytics</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>
           </instructions>
@@ -306,33 +242,34 @@
     </plugins>
   </build>
   <reporting>
-    <plugins>
-      <plugin>
-        <groupId>gr.abiss.mvn.plugins</groupId>
-        <artifactId>maven-jstools-plugin</artifactId>
-        <version>0.7</version>
-        <inherited>false</inherited>
-        <configuration>
-          <!-- the default is src/main/js -->
-          <jsDir>${basedir}/src/main/resources/ui/js</jsDir>
-          <!-- this is actually the default -->
-          <includes>**/*.js</includes>
-          <!-- maybe you need to exclude compressed JS files -->
-          <excludes>**/*-compressed.js</excludes>
-          <!-- this is actually the default -->
-          <caseSensitive>true</caseSensitive>
-          <!-- for more configuration properties, see the goals documentation -->
-        </configuration>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <!-- include the desired reports -->
-              <report>jslint</report>
-              <!--<report>jsdoc</report>-->
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-    </plugins>
-  </reporting>
+		<plugins>
+			<plugin>
+				<groupId>gr.abiss.mvn.plugins</groupId>
+				<artifactId>maven-jstools-plugin</artifactId>
+				<version>0.7</version>
+				<inherited>false</inherited>
+				<configuration>
+					<!-- the default is src/main/js -->
+					<jsDir>${basedir}/src/main/resources/ui/js</jsDir>
+					<!-- this is actually the default -->
+					<includes>**/*.js</includes>
+					<!-- maybe you need to exclude compressed JS files -->
+					<excludes>**/*-compressed.js</excludes>
+					<!-- this is actually the default -->
+					<caseSensitive>true</caseSensitive>
+					<!-- for more configuration properties, see the goals documentation -->
+				</configuration>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<!-- include the desired reports -->
+							<report>jslint</report>
+							<report>jsdoc</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
+

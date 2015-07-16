@@ -60,8 +60,6 @@ public class DelegatingAuthenticationEntryPoint implements AuthenticationEntryPo
         } else {
           request.getSession().setAttribute(INITIAL_REQUEST_PATH, requestUri + "?" + queryString);
         }
-      } else {
-        request.getSession().removeAttribute(INITIAL_REQUEST_PATH);
       }
       userEntryPoint.commence(request, response, authException);
     }

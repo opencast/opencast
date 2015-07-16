@@ -17,11 +17,12 @@
 package org.opencastproject.util;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.FileSupport.deleteHierarchyIfEmpty;
 import static org.opencastproject.util.FileSupport.isParent;
 import static org.opencastproject.util.PathSupport.path;
+
+import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -32,9 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
-/**
- * Test class for {@link FileSupport}
- */
 public class FileSupportTest {
   private File fileToLink;
   private File linkLocation;
@@ -50,13 +48,13 @@ public class FileSupportTest {
     linkLocation = new File(fileSupportTestsDirectory.getAbsolutePath(), "link-location");
     // Create test directory
     FileUtils.forceMkdir(fileSupportTestsDirectory);
-    assertTrue("Can't read from test directory " + fileSupportTestsDirectory.getAbsolutePath(),
+    Assert.assertTrue("Can't read from test directory " + fileSupportTestsDirectory.getAbsolutePath(),
             fileSupportTestsDirectory.canRead());
-    assertTrue("Can't write to test directory " + fileSupportTestsDirectory.getAbsolutePath(),
+    Assert.assertTrue("Can't write to test directory " + fileSupportTestsDirectory.getAbsolutePath(),
             fileSupportTestsDirectory.canWrite());
     // Create file that we could link.
     FileUtils.touch(fileToLink);
-    assertTrue("Can't read from file directory " + fileToLink.getAbsolutePath(), fileToLink.canRead());
+    Assert.assertTrue("Can't read from file directory " + fileToLink.getAbsolutePath(), fileToLink.canRead());
   }
 
   @After
@@ -71,34 +69,58 @@ public class FileSupportTest {
 
   @Test
   public void supportsLinkingReturnsTrueOnAppropriateFile() {
-    assertTrue(FileSupport.supportsLinking(fileToLink, linkLocation));
+    Assert.assertTrue(FileSupport.supportsLinking(fileToLink, linkLocation));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void supportsLinkingReturnsFalseOnMissingFile() {
-    FileSupport.supportsLinking(linkLocation, fileToLink);
+    try {
+      FileSupport.supportsLinking(linkLocation, fileToLink);
+      Assert.fail();
+    } catch (IllegalArgumentException e) {
+      // If exception is thrown then this test has succeeded.
+    }
+  }
+
+  @Test
+  public void linkContentTestWithoutForce() throws IOException {
+    FileSupport.linkContent(fileSupportTestsDirectory, fileSupportTestsDestinationDirectory, false);
+  }
+
+  @Test
+  public void linkContentTestWithForce() throws IOException {
+    FileUtils.forceMkdir(fileSupportTestsDestinationDirectory);
+    FileSupport.linkContent(fileSupportTestsDirectory, fileSupportTestsDestinationDirectory, true);
   }
 
   @Test
   public void linkTestWithoutForce() throws IOException {
-    assertNotNull(FileSupport.link(fileToLink, linkLocation, false));
-    assertTrue(linkLocation.exists());
+    Assert.assertNotNull(FileSupport.link(fileToLink, linkLocation, false));
   }
 
   @Test
   public void linkTestWithForce() throws IOException {
-    assertNotNull(FileSupport.link(fileToLink, linkLocation, true));
-    assertTrue(linkLocation.exists());
+    Assert.assertNotNull(FileSupport.link(fileToLink, linkLocation, true));
   }
 
-  @Test(expected = IOException.class)
-  public void missingLinkTestFailsWithoutForce() throws Exception {
-    FileSupport.link(linkLocation, fileToLink, false);
+  @Test
+  public void missingLinkTestFailsWithoutForce() {
+    try {
+      Assert.assertNull(FileSupport.link(linkLocation, fileToLink, false));
+      Assert.fail();
+    } catch (IOException e) {
+      // Test should have IOException.
+    }
   }
 
-  @Test(expected = IOException.class)
-  public void missingLinkTestFailsWithForce() throws Exception {
-    FileSupport.link(linkLocation, fileToLink, true);
+  @Test
+  public void missingLinkTestFailsWithForce() {
+    try {
+      Assert.assertNull(FileSupport.link(linkLocation, fileToLink, true));
+      Assert.fail();
+    } catch (IOException e) {
+      // Test should have IOException.
+    }
   }
 
   @Test
