@@ -55,7 +55,7 @@ public class LanguagesListProvider implements ResourceListProvider {
 
     for (String local : languagesISO) {
       Locale obj = new Locale(local);
-      languages.put(obj.getLanguage(), obj.getDisplayLanguage());
+      languages.put(obj.getISO3Language(), obj.getDisplayLanguage());
     }
   }
 
