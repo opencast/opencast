@@ -24,6 +24,7 @@ Release Documentation
 The Matterhorn Release Documentation is the official Matterhorn documentation
 for each release. It contains:
 
+ - [Release Notes](release.notes.md)
  - [Installation Guides](installation/index.md)
  - [Configuration Guides](configuration/index.md)
     - [Basic Configuration](configuration/basic.md)
