@@ -435,11 +435,6 @@ public class IndexServiceImpl implements IndexService {
 
       if (sourceMetadata != null
               && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
-        Date start = new Date(DateTimeSupport.fromUTC((String) sourceMetadata.get("start")));
-        Date end = new Date(DateTimeSupport.fromUTC((String) sourceMetadata.get("end")));
-        DublinCoreValue period = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(start, end), Precision.Second);
-        String inputs = (String) sourceMetadata.get("inputs");
-
         Properties configuration;
         try {
           configuration = getCaptureAgentStateService().getAgentConfiguration((String) sourceMetadata.get("device"));
@@ -449,8 +444,21 @@ public class IndexServiceImpl implements IndexService {
           throw new IllegalArgumentException("Unable to parse device");
         }
         caProperties.putAll(configuration);
-        String agentTimeZone = configuration.getProperty("capture.device.timezone.offset");
+        String agentTimeZone = configuration.getProperty("capture.device.timezone");
         dc.set(DublinCores.OC_PROPERTY_AGENT_TIMEZONE, agentTimeZone);
+
+        Date start = new Date(DateTimeSupport.fromUTC((String) sourceMetadata.get("start")));
+        Date end = new Date(DateTimeSupport.fromUTC((String) sourceMetadata.get("end")));
+
+        String duration = (String) sourceMetadata.get("duration");
+        if (StringUtils.isNotBlank(duration))
+          dc.set(DublinCores.OC_PROPERTY_DURATION, duration);
+        else
+          throw new IllegalArgumentException("The duration property is missing.");
+
+        DublinCoreValue period = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(start, end), Precision.Second);
+        String inputs = (String) sourceMetadata.get("inputs");
+
         dc.set(DublinCore.PROPERTY_TEMPORAL, period);
         caProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, inputs);
       }
