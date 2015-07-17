@@ -168,8 +168,9 @@ public final class JobBarrier {
       try {
         this.waiter.setStatus(Job.Status.RUNNING);
         for (Job j : jobs) {
-          j.setBlockingJobId(null);
-          this.serviceRegistry.updateJob(j);
+          Job updatedJob = this.serviceRegistry.getJob(j.getId());
+          updatedJob.setBlockingJobId(null);
+          this.serviceRegistry.updateJob(updatedJob);
         }
         this.waiter.setBlockedJobIds(null);
         this.serviceRegistry.updateJob(this.waiter);
