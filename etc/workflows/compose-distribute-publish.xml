@@ -425,18 +425,8 @@
         <configuration key="height">1080</configuration>
         <configuration key="posterimage-flavor">presenter/player+preview</configuration>
         <configuration key="target-flavor">image/cover</configuration>
+        <configuration key="target-tags">archive</configuration>
      </configurations>
-    </operation>
-
-    <!-- tag cover image for archival -->
-
-    <operation
-      id="tag"
-      description="Tagging cover image for archival">
-      <configurations>
-        <configuration key="source-flavors">image/cover</configuration>
-        <configuration key="target-tags">+archive</configuration>
-      </configurations>
     </operation>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
