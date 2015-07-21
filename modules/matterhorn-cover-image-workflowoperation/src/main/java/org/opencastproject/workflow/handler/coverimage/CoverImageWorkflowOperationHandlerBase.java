@@ -18,7 +18,7 @@
  * the License.
  *
  */
- 
+
 package org.opencastproject.workflow.handler.coverimage;
 
 import org.opencastproject.coverimage.CoverImageException;
@@ -37,6 +37,7 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -79,6 +80,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
   private static final String POSTERIMAGE_FLAVOR = "posterimage-flavor";
   private static final String POSTERIMAGE_URL = "posterimage";
   private static final String TARGET_FLAVOR = "target-flavor";
+  private static final String TARGET_TAGS = "target-tags";
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
@@ -95,6 +97,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     CONFIG_OPTIONS.put(POSTERIMAGE_FLAVOR, "Poster image flavor");
     CONFIG_OPTIONS.put(POSTERIMAGE_URL, "URL to a poster image");
     CONFIG_OPTIONS.put(TARGET_FLAVOR, "Target flavor");
+    CONFIG_OPTIONS.put(TARGET_TAGS, "Target tags");
   }
 
   /** Returns a cover image service */
@@ -174,6 +177,18 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       URI attachmentUri = getWorkspace().moveTo(coverImage.getURI(), mediaPackage.getIdentifier().compact(),
               UUID.randomUUID().toString(), COVERIMAGE_FILENAME);
       coverImage.setURI(attachmentUri);
+
+      coverImage.setMimeType(MimeTypes.PNG);
+
+      // Add tags
+      final String targetTags = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS));
+      if (targetTags != null) {
+        for (String tag : asList(targetTags)) {
+          logger.trace("Tagging image with '{}'", tag);
+          if (StringUtils.trimToNull(tag) != null)
+            coverImage.addTag(tag);
+        }
+      }
 
       mediaPackage.add(coverImage);
     } catch (MediaPackageException e) {
