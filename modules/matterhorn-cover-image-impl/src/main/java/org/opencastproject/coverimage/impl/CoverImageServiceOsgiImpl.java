@@ -18,7 +18,7 @@
  * the License.
  *
  */
- 
+
 package org.opencastproject.coverimage.impl;
 
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -73,6 +73,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
     // and prevents JPEGRegistryEntry.handleStream from breaking when used on a non Sun/Oracle JDK
     JPEGRegistryEntry entry = new JPEGRegistryEntry() {
 
+      @Override
       public float getPriority() {
         // higher than that of JPEGRegistryEntry (which is 1000)
         return 500;
@@ -88,6 +89,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
        * @param needRawData
        *          If true the image returned should not have any default color correction the file may specify applied.
        */
+      @Override
       public Filter handleStream(InputStream inIS, ParsedURL origURL, boolean needRawData) {
         // Code from org.apache.batik.ext.awt.image.codec.jpeg.JPEGRegistryEntry#handleStream
         // Reading image with ImageIO to prevent NoClassDefFoundError on OpenJDK
@@ -105,6 +107,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
         }
 
         Thread t = new Thread() {
+          @Override
           public void run() {
             Filter filt;
             try {

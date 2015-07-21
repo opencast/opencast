@@ -18,7 +18,7 @@
  * the License.
  *
  */
- 
+
 package org.opencastproject.coverimage;
 
 import org.opencastproject.job.api.Job;

@@ -18,7 +18,7 @@
  * the License.
  *
  */
- 
+
 package org.opencastproject.workflow.handler.coverimage;
 
 import org.opencastproject.coverimage.CoverImageService;
