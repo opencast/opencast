@@ -94,6 +94,7 @@ public final class MimeTypes {
   public static final MimeType ZIP;
   public static final MimeType JAR;
   public static final MimeType SMIL;
+  public static final MimeType PNG;
 
   // Initialize common mime types
   static {
@@ -112,6 +113,7 @@ public final class MimeTypes {
     ZIP = MimeTypes.parseMimeType("application/zip");
     JAR = MimeTypes.parseMimeType("application/java-archive");
     SMIL = MimeTypes.parseMimeType("application/smil");
+    PNG = MimeTypes.parseMimeType("image/png");
     // initialize from file
     InputStream is = null;
     InputStreamReader isr = null;
