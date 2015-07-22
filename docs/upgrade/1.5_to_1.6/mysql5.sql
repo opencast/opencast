@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS mh_job_mh_service_registration (
   INDEX IX_mh_job_mh_service_registration_service_registration_id (servicesRegistration_id),
   CONSTRAINT FK_mh_job_mh_service_registration_Job_id FOREIGN KEY (Job_id) REFERENCES mh_job (id) ON DELETE CASCADE,
   CONSTRAINT mhjobmhservice_registrationservicesRegistration_id FOREIGN KEY (servicesRegistration_id) REFERENCES mh_service_registration (id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_incident (
   id BIGINT NOT NULL,

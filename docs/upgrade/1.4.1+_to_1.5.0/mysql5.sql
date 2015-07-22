@@ -11,7 +11,7 @@ CREATE TABLE mh_role (
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_role_0 UNIQUE (name, organization),
   CONSTRAINT FK_mh_role_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_role_pk ON mh_role (name, organization);
 
@@ -28,7 +28,7 @@ CREATE TABLE mh_user (
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_user_0 UNIQUE (username, organization),
   CONSTRAINT FK_mh_user_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Make mh_user temporary auto incrementable to fill it with the old mh_user table entries.
 ALTER TABLE mh_user MODIFY id bigint(20) NOT NULL AUTO_INCREMENT;
@@ -42,7 +42,7 @@ CREATE TABLE mh_user_role (
   CONSTRAINT UNQ_mh_user_role_0 UNIQUE (user_id, role_id),
   CONSTRAINT FK_mh_user_role_role_id FOREIGN KEY (role_id) REFERENCES mh_role (id),
   CONSTRAINT FK_mh_user_role_user_id FOREIGN KEY (user_id) REFERENCES mh_user (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Create a temporary join table from the old mh_user and mh_role table.
 CREATE TEMPORARY TABLE IF NOT EXISTS mh_user_role_tmp AS (SELECT u.username, u.organization, role FROM mh_user_tmp AS u, mh_role_tmp AS r WHERE r.username = u.username AND r.organization = u.organization);
@@ -65,12 +65,12 @@ CREATE TABLE mh_group (
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_group_0 UNIQUE (group_id, organization),
   CONSTRAINT FK_mh_group_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_group_member (
   JpaGroup_id bigint(20) NOT NULL,
   MEMBERS varchar(255) DEFAULT NULL
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_group_role (
   group_id bigint(20) NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE mh_group_role (
   CONSTRAINT UNQ_mh_group_role_0 UNIQUE (group_id, role_id),
   CONSTRAINT FK_mh_group_role_group_id FOREIGN KEY (group_id) REFERENCES mh_group (id),
   CONSTRAINT FK_mh_group_role_role_id FOREIGN KEY (role_id) REFERENCES mh_role (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_acl_managed_acl (
   pk BIGINT(20) NOT NULL,
@@ -88,7 +88,7 @@ CREATE TABLE mh_acl_managed_acl (
   organization_id VARCHAR(128) NOT NULL,
   PRIMARY KEY (pk),
   CONSTRAINT UNQ_mh_acl_managed_acl_0 UNIQUE (name, organization_id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_acl_episode_transition (
   pk BIGINT(20) NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE mh_acl_episode_transition (
   PRIMARY KEY (pk),
   CONSTRAINT UNQ_mh_acl_episode_transition_0 UNIQUE (episode_id, organization_id, application_date),
   CONSTRAINT FK_mh_acl_episode_transition_managed_acl_fk FOREIGN KEY (managed_acl_fk) REFERENCES mh_acl_managed_acl (pk)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_acl_series_transition (
   pk BIGINT(20) NOT NULL,
@@ -117,7 +117,7 @@ CREATE TABLE mh_acl_series_transition (
   PRIMARY KEY (pk),
   CONSTRAINT UNQ_mh_acl_series_transition_0 UNIQUE (series_id, organization_id, application_date),
   CONSTRAINT FK_mh_acl_series_transition_managed_acl_fk FOREIGN KEY (managed_acl_fk) REFERENCES mh_acl_managed_acl (pk)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_user_ref (
   id bigint(20) NOT NULL,
@@ -130,7 +130,7 @@ CREATE TABLE mh_user_ref (
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_user_ref_0 UNIQUE (username, organization),
   CONSTRAINT FK_mh_user_ref_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_user_ref_role (
   user_id bigint(20) NOT NULL,
@@ -139,7 +139,7 @@ CREATE TABLE mh_user_ref_role (
   CONSTRAINT UNQ_mh_user_ref_role_0 UNIQUE (user_id, role_id),
   CONSTRAINT FK_mh_user_ref_role_role_id FOREIGN KEY (role_id) REFERENCES mh_role (id),
   CONSTRAINT FK_mh_user_ref_role_user_id FOREIGN KEY (user_id) REFERENCES mh_user_ref (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Change type of field 'payload' in table 'mh_job' from TEXT to MEDIUMTEXT, see MH-10139
 ALTER TABLE mh_job MODIFY COLUMN payload MEDIUMTEXT;
