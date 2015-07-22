@@ -456,7 +456,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
         Engage.on(plugin.events.setZoomLevel.getName(), function(level){
             if (Number(level).toFixed(1) >= 1.0) {
-              
+
 
               var topTrans = Number($("video").css("top").replace("px", ""));
               var leftTrans = Number($("video").css("left").replace("px", ""));
@@ -592,13 +592,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
         Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
+        if (videoDisplays.length == 1) {
+          registerZoomLevelEvents();
+        }
+
         if (videoDisplays.length > 0) {
             var nr = tuples.length;
 
             // set first videoDisplay as master
             registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
-            registerZoomLevelEvents();
-
 
             if (nr >= 2) {
                 registerSynchronizeEvents();
