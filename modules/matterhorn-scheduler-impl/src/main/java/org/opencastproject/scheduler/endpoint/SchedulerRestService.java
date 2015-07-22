@@ -938,9 +938,10 @@ public class SchedulerRestService {
       if (StringUtils.isNotBlank(ifNoneMatch) && ifNoneMatch.equals(lastModified)) {
         return Response.notModified(lastModified).expires(null).build();
       }
-      SchedulerQuery filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId);
+      SchedulerQuery filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId)
+              .setEndsFrom(DateTime.now().minusHours(1).toDate());
       if (endDate != null)
-        filter.setEndsFrom(DateTime.now().minusHours(1).toDate()).setStartsTo(endDate);
+        filter.setStartsTo(endDate);
 
       String result = service.getCalendar(filter);
       if (!result.isEmpty()) {
