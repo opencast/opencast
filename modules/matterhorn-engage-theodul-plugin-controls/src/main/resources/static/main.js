@@ -84,7 +84,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         movePiP: new Engage.Event("Video:movePiP", "moves the smaller picture over the larger to the different corners", "handler"),
         togglePiP: new Engage.Event("Video:togglePiP", "switches between PiP and next to each other layout", "handler"),
         setZoomLevel: new Engage.Event("Video:setZoomLevel", "sets the zoom level", "trigger"),
-        zoomReset: new Engage.Event("Video:resetZoom", "resets position and zoom level", "trigger")
+        zoomReset: new Engage.Event("Video:resetZoom", "resets position and zoom level", "trigger"),
+        zoomChange: new Engage.Event("Video:zoomChange", "zoom level has changed", "handler")
     };
 
     var isDesktopMode = false;
@@ -591,26 +592,23 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         } else {
             Basil.set(storage_zoomLevel, "1.0");
             $("#" + id_zoomLevelIndicator).html("1.0");
-            Engage.trigger(plugin.events.setZoomLevel.getName(), "1");
+            Engage.trigger(plugin.events.setZoomLevel.getName(), 1.0);
         }
 
         /* Events for Button */
         $("#" + id_zoomLevel1).click(function(event) {
             event.preventDefault();
-            Engage.trigger(plugin.events.setZoomLevel.getName(), "1");
-            $("#" + id_zoomLevelIndicator).html("1.0");
+            Engage.trigger(plugin.events.setZoomLevel.getName(), 1.0);
         });
 
         $("#" + id_zoomLevel15).click(function(event) {
             event.preventDefault();
-            Engage.trigger(plugin.events.setZoomLevel.getName(), "1.5");
-            $("#" + id_zoomLevelIndicator).html("1.5");
+            Engage.trigger(plugin.events.setZoomLevel.getName(), 1.5);
         });
 
         $("#" + id_zoomLevel2).click(function(event) {
             event.preventDefault();
-            Engage.trigger(plugin.events.setZoomLevel.getName(), "2");
-            $("#" + id_zoomLevelIndicator).html("2.0");
+            Engage.trigger(plugin.events.setZoomLevel.getName(), 2.0);
         });
 
         $("#" + id_zoomReset).click(function(event) {
@@ -618,6 +616,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.trigger(plugin.events.zoomReset.getName(), true);
         });
 
+        Engage.on(plugin.events.zoomChange.getName(), function(level){
+            $("#" + id_zoomLevelIndicator).html(String(Number(level).toFixed(1)));
+        });
         /* Events for Keys */
 
     }

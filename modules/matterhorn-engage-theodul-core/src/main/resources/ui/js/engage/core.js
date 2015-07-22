@@ -14,7 +14,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "engage/models/engage", "engage/event"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, EngageModel, EngageEvent) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "mousewheel", "engage/models/engage", "engage/event"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, Mousewheel, EngageModel, EngageEvent) {
     "use strict";
 
     var events = {
@@ -44,7 +44,11 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         moveUp: new EngageEvent("Video:moveUp", "moves video up", "trigger"),
         moveDown: new EngageEvent("Video:moveDown", "moves video down", "trigger"),
         moveLeft: new EngageEvent("Video:moveLeft", "moves video left", "trigger"),
-        moveRight: new EngageEvent("Video:moveRight", "moves video right", "trigger")
+        moveRight: new EngageEvent("Video:moveRight", "moves video right", "trigger"),
+        moveHorizontal: new EngageEvent("Video:moveHorizontal", "move video horizontal", "trigger"),
+        moveVertical: new EngageEvent("Video:moveVertical", "move video vertical", "trigger"),
+        zoomIn: new EngageEvent("Video:zoomIn", "zooms in video", "trigger"),
+        zoomOut: new EngageEvent("Video:zoomOut", "zooms out video", "trigger"),
     };
 
     /* change these variables */
@@ -116,6 +120,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var shortcut_moveRight = "moveRight";
     var shortcut_moveUp = "moveUp";
     var shortcut_moveDown = "moveDown";
+    var shortcut_zoomIn = "zoomIn";
+    var shortcut_zoomOut = "zoomOut";
 
     var basilOptions = {
         namespace: "mhStorage"
@@ -272,6 +278,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     // binds configured shortcuts (see MH org config) to corresponding events
     function bindShortcutsToEvents() {
+
         // disable scrolling when pressing the space bar
         $(document).keydown(function(e) {
             // space = 32, backspace = 8, page up = 73, page down = 33, enter = 13
@@ -374,30 +381,39 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     });
                     break;
                 case shortcut_moveLeft:
-                    console.log("Shortcut moveLeft trigger");
                     Mousetrap.bind(val.key, function() {
-                        console.log(val.key);
-                        engageCore.trigger(events.moveLeft.getName(), true);
+                        //engageCore.trigger(events.moveLeft.getName(), true);
+                        engageCore.trigger(events.moveHorizontal.getName(), 10);
                     });
                     break;
                 case shortcut_moveRight:
                     Mousetrap.bind(val.key, function() {
-                        console.log(val.key);
-                        engageCore.trigger(events.moveRight.getName(), true);
+                        //engageCore.trigger(events.moveRight.getName(), true);
+                        engageCore.trigger(events.moveHorizontal.getName(), -10);
                     });
                     break;
                 case shortcut_moveUp:
                     Mousetrap.bind(val.key, function() {
-                        console.log(val.key);
-                        engageCore.trigger(events.moveUp.getName(), true);
+                        //engageCore.trigger(events.moveUp.getName(), true);
+                        engageCore.trigger(events.moveVertical.getName(), 10);
                     });
                     break;
                 case shortcut_moveDown:
                     Mousetrap.bind(val.key, function() {
-                        console.log(val.key);
-                        engageCore.trigger(events.moveDown.getName(), true);
+                        //engageCore.trigger(events.moveDown.getName(), true);
+                        engageCore.trigger(events.moveVertical.getName(), -10);
                     });
-                    break;  
+                    break;
+                case shortcut_zoomIn:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.zoomIn.getName(), true);
+                    });
+                    break;
+                case shortcut_zoomOut:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.zoomOut.getName(), true);
+                    });
+                    break;
                 default:
                     break;
             }
