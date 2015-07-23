@@ -102,6 +102,9 @@
     <bundle>mvn:org.opencastproject/matterhorn-composer-ffmpeg/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-composer-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-composer-workflowoperation/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-cover-image-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-cover-image-impl/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-cover-image-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-conductor/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dataloader/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-db/${project.version}</bundle>
