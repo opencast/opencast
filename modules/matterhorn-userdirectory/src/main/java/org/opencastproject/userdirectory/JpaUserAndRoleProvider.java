@@ -289,7 +289,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganization(
             (JpaOrganization) user.getOrganization(), emf);
     user = new JpaUser(user.getUsername(), encodedPassword, organization, user.getName(), user.getEmail(),
-            user.getProvider(), true, roles);
+            user.getProvider(), user.isManageable(), roles);
 
     // Then save the user
     EntityManager em = null;
@@ -374,6 +374,12 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       return a;
     }
   };
+
+  @Override
+  public long countUsers() {
+    String orgId = securityService.getOrganization().getId();
+    return UserDirectoryPersistenceUtil.countUsers(orgId, emf);
+  }
 
   @Override
   public void invalidate(String userName) {

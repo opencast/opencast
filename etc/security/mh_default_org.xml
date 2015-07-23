@@ -363,6 +363,10 @@
   <osgi:reference id="securityService" cardinality="1..1"
                   interface="org.opencastproject.security.api.SecurityService" />
 
+  <!-- Uncomment to enable external users e.g. used together shibboleth -->
+  <!-- <osgi:reference id="userReferenceProvider" cardinality="1..1"
+                  interface="org.opencastproject.userdirectory.JpaUserReferenceProvider"  /> -->
+
   <osgi:reference id="userDirectoryService" cardinality="1..1"
                   interface="org.opencastproject.security.api.UserDirectoryService" />
 

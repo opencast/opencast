@@ -35,6 +35,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -44,6 +46,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 /**
  * Provides a sorted set of known users
@@ -70,29 +74,38 @@ public class UserEndpoint {
   @Path("users.xml")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(name = "allusersasxml", description = "Returns a list of users", returnDescription = "Returns a XML representation of the list of user accounts", restParameters = {
-          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
-  public JaxbUserList getUsersAsXml(@QueryParam("limit") int limit, @QueryParam("offset") int offset)
-          throws IOException {
+          @RestParameter(description = "The search query, must be at lest 3 characters long.", isRequired = false, name = "query", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
+  public Response getUsersAsXml(@QueryParam("query") String queryString, @QueryParam("limit") int limit,
+          @QueryParam("offset") int offset) throws IOException {
     if (limit < 1)
       limit = 100;
 
+    String query = "%";
+    if (StringUtils.isNotBlank(queryString)) {
+      if (queryString.trim().length() < 3)
+        return Response.status(Status.BAD_REQUEST).build();
+      query = queryString;
+    }
+
     JaxbUserList userList = new JaxbUserList();
-    for (Iterator<User> i = userDirectoryService.findUsers("%", offset, limit); i.hasNext();) {
+    for (Iterator<User> i = userDirectoryService.findUsers(query, offset, limit); i.hasNext();) {
       userList.add(i.next());
     }
-    return userList;
+    return Response.ok(userList).build();
   }
 
   @GET
   @Path("users.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "allusersasjson", description = "Returns a list of users", returnDescription = "Returns a JSON representation of the list of user accounts", restParameters = {
-          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
-  public JaxbUserList getUsersAsJson(@QueryParam("limit") int limit, @QueryParam("offset") int offset)
-          throws IOException {
-    return getUsersAsXml(limit, offset);
+          @RestParameter(description = "The search query, must be at lest 3 characters long.", isRequired = false, name = "query", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
+  public Response getUsersAsJson(@QueryParam("query") String queryString, @QueryParam("limit") int limit,
+          @QueryParam("offset") int offset) throws IOException {
+    return getUsersAsXml(queryString, limit, offset);
   }
 
   @GET

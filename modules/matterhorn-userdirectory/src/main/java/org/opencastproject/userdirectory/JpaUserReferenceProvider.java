@@ -437,6 +437,21 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
   }
 
   @Override
+  public long countUsers() {
+    String orgId = securityService.getOrganization().getId();
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("UserReference.countAll");
+      q.setParameter("org", orgId);
+      return ((Number) q.getSingleResult()).longValue();
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
   public void invalidate(String userName) {
     String orgId = securityService.getOrganization().getId();
     cache.invalidate(userName.concat(DELIMITER).concat(orgId));

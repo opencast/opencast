@@ -119,7 +119,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Persist an user
-   *
+   * 
    * @param user
    *          the user to persist
    * @param emf
@@ -340,6 +340,28 @@ public final class UserDirectoryPersistenceUtil {
   }
 
   /**
+   * Returns the total of users
+   *
+   * @param organizationId
+   *          the organization id
+   * @param emf
+   *          the entity manager factory
+   * @return the total number of users
+   */
+  public static long countUsers(String organizationId, EntityManagerFactory emf) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("User.countAll");
+      q.setParameter("org", organizationId);
+      return ((Number) q.getSingleResult()).longValue();
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
    * Returns a list of users by a search query if set or all users if search query is <code>null</code>
    *
    * @param orgId
@@ -479,7 +501,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Delete the user with given name in the given organization
-   *
+   * 
    * @param username
    *          the name of the user to delete
    * @param orgId

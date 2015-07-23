@@ -76,11 +76,11 @@ public class JpaUser implements User {
   @Column(name = "email")
   protected String email;
 
-  @Transient
-  protected String provider;
+  @Column(name = "manageable")
+  protected boolean manageable = true;
 
   @Transient
-  protected boolean manageable = true;
+  protected String provider;
 
   @Lob
   @Column(name = "password", length = 65535)
@@ -299,4 +299,9 @@ public class JpaUser implements User {
   public boolean isManageable() {
     return manageable;
   }
+
+  public void setManageable(boolean isManageable) {
+    this.manageable = isManageable;
+  }
+
 }

@@ -425,6 +425,7 @@ CREATE TABLE mh_user (
   name varchar(256) DEFAULT NULL,
   email varchar(256) DEFAULT NULL,
   organization varchar(128) DEFAULT NULL,
+  manageable TINYINT(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_user_0 UNIQUE (username, organization),
   CONSTRAINT FK_mh_user_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE

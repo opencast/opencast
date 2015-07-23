@@ -21,8 +21,6 @@
 
 package org.opencastproject.kernel.userdirectory;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -30,13 +28,15 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
-import org.opencastproject.util.PasswordEncoder;
 
+import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.StreamOp;
+
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -56,43 +56,31 @@ import java.util.regex.Pattern;
  */
 public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
-  /** The logger */
+  /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(InMemoryUserAndRoleProvider.class);
 
-  /** The roles associated with the matterhorn system account */
-  public static final String[] MH_SYSTEM_ROLES = new String[] { GLOBAL_ADMIN_ROLE };
+  public static final String PROVIDER_NAME = "system";
 
-  public static final String PROVIDER_NAME = "matterhorn-in-memory";
+  /** The digest user */
+  public static final String DIGEST_USER_NAME = "System User";
 
+  /** Configuration key for the digest user */
+  public static final String DIGEST_USER_KEY = "org.opencastproject.security.digest.user";
+
+  /** Configuration key for the digest password */
+  public static final String DIGEST_PASSWORD_KEY = "org.opencastproject.security.digest.pass";
+
+  /** The list of in-memory users */
+  private final List<User> inMemoryUsers = new ArrayList<User>();
+
+  /** The organization directory */
   protected OrganizationDirectoryService orgDirectoryService;
 
+  /** The security service */
   protected SecurityService securityService;
 
   private String digestUsername;
   private String digestUserPass;
-  private String adminUsername;
-  private String adminUserPass;
-  private String adminUserRoles;
-
-  /**
-   * Sets a reference to the organization directory service.
-   *
-   * @param organizationDirectory
-   *          the organization directory
-   */
-  public void setOrganizationDirectoryService(OrganizationDirectoryService orgDirectoryService) {
-    this.orgDirectoryService = orgDirectoryService;
-  }
-
-  /**
-   * Sets a reference to the security service.
-   *
-   * @param securityService
-   *          the security service
-   */
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
 
   /**
    * Callback to activate the component.
@@ -101,14 +89,15 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    *          the declarative services component context
    */
   protected void activate(ComponentContext cc) {
-    digestUsername = cc.getBundleContext().getProperty("org.opencastproject.security.digest.user");
-    digestUserPass = cc.getBundleContext().getProperty("org.opencastproject.security.digest.pass");
-    adminUsername = StringUtils
-            .trimToNull(cc.getBundleContext().getProperty("org.opencastproject.security.admin.user"));
-    adminUserPass = StringUtils
-            .trimToNull(cc.getBundleContext().getProperty("org.opencastproject.security.admin.pass"));
-    adminUserRoles = StringUtils.trimToNull(cc.getBundleContext().getProperty(
-            "org.opencastproject.security.admin.roles"));
+    digestUsername = StringUtils.trimToNull(cc.getBundleContext().getProperty(DIGEST_USER_KEY));
+    if (digestUsername == null)
+      logger.warn("Digest username has not been configured ({})", DIGEST_USER_KEY);
+    digestUserPass = StringUtils.trimToNull(cc.getBundleContext().getProperty(DIGEST_PASSWORD_KEY));
+    if (digestUsername == null)
+      logger.warn("Digest password has not been configured ({})", DIGEST_PASSWORD_KEY);
+
+    // Create the digest user
+    createSystemUsers();
   }
 
   @Override
@@ -116,49 +105,32 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
     return PROVIDER_NAME;
   }
 
-  private List<User> getAdminUsers(Organization org) {
-    List<User> users = new ArrayList<User>();
+  /**
+   * Creates the system digest user.
+   */
+  private void createSystemUsers() {
+    for (Organization organization : orgDirectoryService.getOrganizations()) {
+      JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
 
-    JaxbOrganization organization = JaxbOrganization.fromOrganization(org);
-    JaxbRole orgAdminRole = new JaxbRole(org.getAdminRole(), organization);
-    JaxbRole orgAnonymousRole = new JaxbRole(org.getAnonymousRole(), organization);
+      // Create the digest auth user with a clear text password
+      Set<JaxbRole> roleList = new HashSet<JaxbRole>();
+      for (String roleName : SecurityConstants.GLOBAL_SYSTEM_ROLES) {
+        roleList.add(new JaxbRole(roleName, jaxbOrganization));
+      }
 
-    // Create the digest auth user with a clear text password
-    Set<JaxbRole> roleList = new HashSet<JaxbRole>();
-    roleList.add(orgAdminRole);
-    roleList.add(orgAnonymousRole);
-    for (String roleName : MH_SYSTEM_ROLES) {
-      roleList.add(new JaxbRole(roleName, organization));
-    }
-
-    // Add the roles as defined in the system configuration
-    if (StringUtils.isNotBlank(adminUserRoles)) {
-      for (String roleName : StringUtils.split(adminUserRoles, ',')) {
-        roleList.add(new JaxbRole(StringUtils.trim(roleName), organization));
+      // Create the digest user
+      if (digestUsername != null && digestUserPass != null) {
+        logger.info("Creating the system digest user");
+        User digestUser = new JaxbUser(digestUsername, digestUserPass, DIGEST_USER_NAME, null, getName(), true,
+                jaxbOrganization, roleList);
+        inMemoryUsers.add(digestUser);
       }
     }
-
-    User digestUser = new JaxbUser(digestUsername, digestUserPass, "Digest User", null, getName(), true, organization,
-            roleList);
-    users.add(digestUser);
-
-    // Create the admin user with an encoded password for use in the UI, if necessary
-    if (adminUsername != null && adminUserPass != null) {
-
-      // Encode the password
-      String encodedPass = PasswordEncoder.encode(adminUserPass, adminUsername);
-
-      JaxbUser adminUser = new JaxbUser(adminUsername, encodedPass, "Admin User", null, getName(), true, organization,
-              roleList);
-      users.add(adminUser);
-    }
-
-    return users;
   }
 
   @Override
   public Iterator<User> getUsers() {
-    return getAdminUsers(securityService.getOrganization()).iterator();
+    return Stream.$(inMemoryUsers).filter(filterByCurrentOrg()).iterator();
   }
 
   /**
@@ -169,7 +141,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
   @Override
   public Iterator<Role> getRoles() {
     Stream<Role> roles = Stream.empty();
-    for (User user : getAdminUsers(securityService.getOrganization())) {
+    for (User user : Stream.$(inMemoryUsers).filter(filterByCurrentOrg())) {
       roles = roles.append(user.getRoles()).sort(roleComparator);
     }
     return roles.iterator();
@@ -182,7 +154,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public User loadUser(String userName) {
-    for (User user : getAdminUsers(securityService.getOrganization())) {
+    for (User user : Stream.$(inMemoryUsers).filter(filterByCurrentOrg())) {
       if (user.getUsername().equals(userName))
         return user;
     }
@@ -229,11 +201,11 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
     // Find all users from the user providers
     Stream<User> users = Stream.empty();
-    for (User user : getAdminUsers(securityService.getOrganization())) {
+    for (User user : Stream.$(inMemoryUsers).filter(filterByCurrentOrg())) {
       if (like(user.getUsername(), query))
         users = users.append(Stream.single(user)).sort(userComparator);
     }
-    return users.drop(offset).apply(limit > 0 ? StreamOp.<User>id().take(limit) : StreamOp.<User>id()).iterator();
+    return users.drop(offset).apply(limit > 0 ? StreamOp.<User> id().take(limit) : StreamOp.<User> id()).iterator();
   }
 
   @Override
@@ -248,13 +220,18 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
       if (like(role.getName(), query) || like(role.getDescription(), query))
         roles = roles.append(Stream.single(role)).sort(roleComparator);
     }
-    return roles.drop(offset).apply(limit > 0 ? StreamOp.<Role>id().take(limit) : StreamOp.<Role>id()).iterator();
+    return roles.drop(offset).apply(limit > 0 ? StreamOp.<Role> id().take(limit) : StreamOp.<Role> id()).iterator();
   }
 
   private boolean like(String string, final String query) {
     String regex = query.replace("_", ".").replace("%", ".*?");
     Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     return p.matcher(string).matches();
+  }
+
+  @Override
+  public long countUsers() {
+    return Stream.$(inMemoryUsers).filter(filterByCurrentOrg()).getSizeHint();
   }
 
   @Override
@@ -275,5 +252,34 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
       return user1.getUsername().compareTo(user2.getUsername());
     }
   };
+
+  private Fn<User, Boolean> filterByCurrentOrg() {
+    return new Fn<User, Boolean>() {
+      @Override
+      public Boolean ap(User user) {
+        return user.getOrganization().equals(securityService.getOrganization());
+      }
+    };
+  }
+
+  /**
+   * Sets a reference to the organization directory service.
+   *
+   * @param organizationDirectory
+   *          the organization directory
+   */
+  void setOrganizationDirectoryService(OrganizationDirectoryService orgDirectoryService) {
+    this.orgDirectoryService = orgDirectoryService;
+  }
+
+  /**
+   * Sets a reference to the security service.
+   *
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
 
 }

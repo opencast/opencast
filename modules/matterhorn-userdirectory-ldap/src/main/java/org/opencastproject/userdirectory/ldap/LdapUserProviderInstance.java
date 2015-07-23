@@ -287,6 +287,12 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   }
 
   @Override
+  public long countUsers() {
+    // TODO implement LDAP count users
+    return 0;
+  }
+
+  @Override
   public void invalidate(String userName) {
     cache.invalidate(userName);
   }
