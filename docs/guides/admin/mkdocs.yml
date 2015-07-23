@@ -6,10 +6,6 @@ repo_url: https://bitbucket.org/opencast-community/matterhorn/src/develop/docs/g
 # Default theme used is readthedocs
 theme: readthedocs
 
-# Some of the themes elements can be overridded by elements in this folder
-# Note: this is currently not working in on ReadTheDocs
-theme_dir: 'theme_override'
-
 # The directory that contain the source .md files
 docs_dir: 'docs'
 
@@ -77,6 +73,7 @@ pages:
 - ['workflowoperationhandlers/compose-woh.md', 'Workflow Operation Handlers', 'Compose WOH']
 - ['workflowoperationhandlers/composite-woh.md', 'Workflow Operation Handlers', 'Composite WOH']
 - ['workflowoperationhandlers/concat-woh.md', 'Workflow Operation Handlers', 'Concat WOH']
+- ['workflowoperationhandlers/coverimage-woh.md', 'Workflow Operation Handlers', 'Cover Image WOH']
 - ['workflowoperationhandlers/defaults-woh.md', 'Workflow Operation Handlers', 'Defaults WOH']
 - ['workflowoperationhandlers/editor-woh.md', 'Workflow Operation Handlers', 'Editor WOH']
 - ['workflowoperationhandlers/email-woh.md', 'Workflow Operation Handlers', 'Email WOH']
