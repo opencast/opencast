@@ -382,7 +382,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     function registerZoomLevelEvents() {
 
-        $("video").on('mousewheel', function(event) {
+      var selector = "video"
+      Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function(number) {
+        if (number > 1) {
+          selector = ".videoFocused video"
+        }
+      })
+
+        $(selector).on('mousewheel', function(event) {
             event.preventDefault();
             if (event.deltaY > 0) {
                 Engage.trigger(events.setZoomLevel.getName(), zoomLevel + 0.1);
@@ -395,8 +402,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         var lastEvent = null;
 
         /* Grab Video */
-        $("video").mousedown(function() {
-            $("video").mousemove(function(event){
+        $(selector).mousedown(function() {
+            $(selector).mousemove(function(event){
                 if (lastEvent != null) {
                     // Movement
                     var x_move = lastEvent.pageX - event.pageX;
@@ -407,61 +414,45 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 lastEvent = event;
             });
             $("body").mouseup(function(event){
-                $("video").off("mousemove");
+                $(selector).off("mousemove");
                 lastEvent = null;
             });
         });
 
         Engage.on(plugin.events.moveHorizontal.getName(), function(step) {
-            var offset = $('video').css("left");
-            var left = $('video').position().left / 2;
+            var offset = $(selector).css("left");
+            var left = $(selector).position().left / 2;
 
             offset = offset.replace("px", "");
             offset = Number(offset);
 
-            console.log("Step: " + step);
-            console.log("Left: " + left);
-            console.log("Offset: " + offset);
-
-            console.log("1: " + !(($('video').position().left + step) > 0));
-            console.log("2: " + ((offset + step) < left));
-
-            if (!(($('video').position().left + step) > 0)
+            if (!(($(selector).position().left + step) > 0)
                 && !((offset + step) < left)) {
-                $('video').css("left", (offset + step) + "px");
+                $(selector).css("left", (offset + step) + "px");
             };
 
         });
 
         Engage.on(plugin.events.moveVertical.getName(), function(step) {
-            console.log("Move vertical: " + step);
-            var top = $('video').position().top / 2;
-            var offset = $('video').css("top");
+
+            var top = $(selector).position().top / 2;
+            var offset = $(selector).css("top");
 
             offset = offset.replace("px", "");
             offset = Number(offset);
 
-            console.log("Top: " + top);
-            console.log("Offset: " + offset);
-            console.log("Step: " + step);
-
-            console.log("1: " + !(($('video').position().top + step) > 0));
-            console.log("2: " + !((top - (offset - step)) > 0));
-
             if (!((offset + step) < top)
-                && !(($('video').position().top + step) > 0)) {
-                $('video').css("top", (offset + step) + "px");
+                && !(($(selector).position().top + step) > 0)) {
+                $(selector).css("top", (offset + step) + "px");
             };
         });
 
         Engage.on(plugin.events.setZoomLevel.getName(), function(level){
             if (Number(level).toFixed(1) >= 1.0) {
+                var topTrans = Number($(selector).css("top").replace("px", ""));
+                var leftTrans = Number($(selector).css("left").replace("px", ""));
 
-
-              var topTrans = Number($("video").css("top").replace("px", ""));
-              var leftTrans = Number($("video").css("left").replace("px", ""));
-
-                var leftOffset = ($("video").width() * level - $("video").width()) / 2
+                var leftOffset = ($(selector).width() * level - $(selector).width()) / 2
                 leftOffset = leftOffset - Math.abs(leftTrans);
                 if (leftOffset < 0) {
                   /* Links/Rechts überschritten beim zoomen */
@@ -473,7 +464,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                   }
                 }
 
-                var topOffset = ($("video").height() * level - $("video").height()) / 2
+                var topOffset = ($(selector).height() * level - $(selector).height()) / 2
                 topOffset = topOffset - Math.abs(topTrans);
                 if (topOffset < 0) {
                   /* Oben/Unten überschritten beim zoomen */
@@ -486,14 +477,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
 
                 zoomLevel = level;
-                $('video')[0].style.transform = "scale("+level+")";
+                $(selector)[0].style.transform = "scale("+level+")";
                 Engage.trigger(plugin.events.zoomChange.getName(), zoomLevel);
             };
         });
 
         Engage.on(plugin.events.zoomReset.getName(), function() {
-           $('video').css("top", "0px");
-           $('video').css("left", "0px");
+           $(selector).css("top", "0px");
+           $(selector).css("left", "0px");
            zoomLevel = 1.0;
            Engage.trigger(plugin.events.setZoomLevel.getName(), zoomLevel);
         });
@@ -505,6 +496,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         Engage.on(plugin.events.zoomOut.getName(), function() {
             Engage.trigger(plugin.events.setZoomLevel.getName(), zoomLevel - 0.1);
         });
+
+
     }
 
     function changeQuality(q) {
@@ -590,11 +583,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
         $("." + class_vjsposter).show();
 
-        Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
+        registerZoomLevelEvents();
 
-        if (videoDisplays.length == 1) {
-          registerZoomLevelEvents();
-        }
+        Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
         if (videoDisplays.length > 0) {
             var nr = tuples.length;

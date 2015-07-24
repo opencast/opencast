@@ -1,3 +1,7 @@
+#canvastag {
+  position: absolute;
+}
+
 .videojs_wrapper {
     width: 100%;
     position: relative;
