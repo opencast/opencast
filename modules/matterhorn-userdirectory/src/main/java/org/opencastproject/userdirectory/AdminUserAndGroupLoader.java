@@ -26,6 +26,7 @@ import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryListener;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
@@ -173,6 +174,12 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
           JpaGroup systemAdminGroup = (JpaGroup) groupRoleProvider.loadGroup(adminGroupId, org.getId());
           Set<JpaRole> systemAdminRoles = new HashSet<JpaRole>();
           Set<String> systemAdminRolesIds = new HashSet<String>();
+
+          // Add global system roles as defined in the code base
+          for (String role : SecurityConstants.GLOBAL_SYSTEM_ROLES) {
+            systemAdminRoles.add(new JpaRole(role, org));
+            systemAdminRolesIds.add(role);
+          }
 
           // Add roles as defined in the code base
           for (String role : loadGroupRoles(SYSTEM_ADMIN_FILE)) {
