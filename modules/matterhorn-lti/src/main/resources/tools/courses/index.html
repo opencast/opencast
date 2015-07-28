@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+  <head>
+    <title>Recordings</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="img/favicon.ico">
+    <!-- styles -->
+    <link rel="stylesheet" type="text/css" href="../shared/css/player-multi-hybrid/opencast-reset.css" />
+    <link rel="stylesheet" type="text/css" href="css/oc.search.browse.css" />
+    <link rel="stylesheet" type="text/css" href="../shared/css/player/shared.css">
+    <link rel="stylesheet" type="text/css" href="css/lti.recordings.css" />
+    <link rel="stylesheet" type="text/css" href="../shared/css/lti.css" />
+    <link rel="stylesheet" type="text/css" href="css/slider.css" />
+    <!-- scripts -->
+    <script type="text/javascript" src="../shared/js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="../shared/js/jquery/plugins/jquery.utils.js"></script>
+    <script type="text/javascript" src="../shared/js/ext/moment.min.js"></script>
+    <script type="text/javascript" src="../shared/js/ext/date.helper.js"></script>
+    <script type="text/javascript" src="js/lti.recordings.js"></script>
+    <script type="text/javascript" src="js/slider.js"></script>
+    <script type="text/javascript" src="../shared/js/lti.js"></script>
+  </head>
+  <body>
+      <div class="lti-outer">
+          <div class="lti_links">
+              <ul>
+                  <li><a>Recordings</a></li>
+                  <li ><a style="display:none">Manage</a></li>
+                  <li><a style="display:none">Upload</a></li>
+                  <li><a style="display:none">Schedule</a></li>
+              </ul>
+          </div>
+
+          <div class="lti-oc-holder">
+              <div class="lti-oc-top-section">
+                  <div class="lti-oc-title">
+                      <h2>Recordings</h2>
+                  </div>
+
+                  <!--
+                  <div class="lti-oc-search-bar">
+                      <form action="index.html">
+                          <label id="skip" for="searchField">Search Field</label>
+                          <input id="searchField" type="text" name="q" value=""/><input id="searchSubmit" type="submit" value="Search" />
+                      </form>
+                  </div>
+                  -->
+              </div>
+
+              <div class="lti-oc-recent">
+                  <span>Most recent broadcasts</span>
+              </div>
+
+              <div class="lti-oc-previous">
+                  <span>Previous broadcasts</span>
+                  <div class="lti-oc-slider-holder"></div>
+              </div>
+          </div>
+      </div>
+  </body>
+</html>
