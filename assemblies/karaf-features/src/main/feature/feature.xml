@@ -37,8 +37,8 @@
     <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-csv/1.0</bundle>
     <bundle>mvn:org.apache.cxf/cxf-bundle-jaxrs/2.2.9</bundle>
-    <bundle>mvn:org.apache.httpcomponents/httpclient-osgi/4.5</bundle>
-    <bundle>mvn:org.apache.httpcomponents/httpcore-osgi/4.4.1</bundle>
+    <bundle>mvn:org.apache.httpcomponents/httpclient-osgi/${httpcomponents-httpclient.version}</bundle>
+    <bundle>mvn:org.apache.httpcomponents/httpcore-osgi/${httpcomponents-httpcore.version}</bundle>
     <bundle>mvn:org.apache.neethi/neethi/3.0.1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/5.2_3</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/3.1_7</bundle>

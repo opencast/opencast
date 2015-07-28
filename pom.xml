@@ -25,6 +25,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <commons-compress.version>1.9</commons-compress.version>
+    <httpcomponents-httpcore.version>4.4.1</httpcomponents-httpcore.version>
+    <httpcomponents-httpclient.version>4.5</httpcomponents-httpclient.version>
     <jmeter.version>2.4</jmeter.version>
     <json-simple.version>1.1</json-simple.version>
     <osgi.compendium.version>4.2.0</osgi.compendium.version>
