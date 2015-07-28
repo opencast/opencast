@@ -17,7 +17,10 @@
 
   <modules>
     <module>karaf-features</module>
+    <module>karaf-dist-admin</module>
     <module>karaf-dist-allinone</module>
+    <module>karaf-dist-presentation</module>
+    <module>karaf-dist-worker</module>
   </modules>
 
   <build>
