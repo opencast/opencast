@@ -1,123 +1,23 @@
 Install Across Multiple Servers
 ===============================
 
-*Note that this is not a comprehensive guide of all possible ways to install Matterhorn. It is more like a guide to good
+*Note that this is not a comprehensive guide of all possible ways to install Opencast. It is more like a guide to good
 practice and presents what a lot of people are running.*
 
-Step 1: Install Matterhorn
+Step 1: Install Opencast
 --------------------------
 
-For a distributed set-up you basically only need to put the right modules onto the right node in the Matterhorn system.
-To make things less complicated, these modules are grouped together as profiles which you can directly build and
-install.
+Beside running Opencast on a single server as an 'all-in-one' installation, several nodes can be used to serve different
+purposes. A common setup could look like this:
 
-If you want to build Matterhorn yourself, you can invoke the build process for certain modules by using mavens `-P`
-option. For example the following command will build the three profiles called worker-standalone, serviceregistry and
-workspace (These are the profiles needed for a worker node):
+* 1 **admin** node (it's currently not supported to have more than one admin node)
+* 1 or more **worker** nodes
+* 1 or more **presentation** nodes
 
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Pworker-standalone,serviceregistry,workspace
+For all of the three listed node profiles, there is a pre-defined Opencast distribution that is built as part of the 'assemblies' sub-project.
+The resulting archives just need to be extracted. Please refer to the Install from Source
 
-If you are using the Matterhorn RPM repository instead, you can do the same by installing the profile packages like
-this:
-
-    yum install opencast-matterhorn14-profile-worker-standalone \
-      opencast-matterhorn14-profile-serviceregistry \
-      opencast-matterhorn14-profile-workspace
-
-To make things easier, the repository also contains a set of predefined distribution packages which will automatically
-install all dependencies for a given node type. For example, to install a Matterhorn worker node:
-
-    yum install opencast-matterhorn14-distribution-worker
-
-This is the general idea behind a distributed set-up of Matterhorn. The following list will now give a list of examples
-about how you could distribute Matterhorn over a given set of machines and what you need to install for that.  You
-should be aware that these examples are not the only possible ways of setting up Matterhorn. They are, however, a good
-way to start.
-
-   *What is not specified in this list is the location of the database and the storage server. You can place them either
-   on one of the Matterhorn nodes or create a dedicated machine for them. The latter will obviously give you more
-   performance.*
-
-
-### All-In-One
-
-This is the default set-up described in the basic installation guides. It works fine for testing purposes should,
-however, not be used in production. It is not distributed but is listed here to have a comprehensive list of necessary
-profiles. For an All-In-One system the following profiles need to be installed:
-
-    admin, dist, engage, worker, workspace, serviceregistry, directory-db
-
-Maven build command:
-
-    mvn clean install -DdeployTo=/path/to/matterhorn/
-
-RPM Repository installation:
-
-    yum install opencast-matterhorn14-distribution-default
-
-
-### Two-Server Set-up
-
-This set-up is the minimum set-up recommended for productive use. It will separate the distribution layer from the
-administrative and working layer. This means that even if one server is under heavy load as videos are processed, etc.
-it will not effect the distribution and users should still be able to watch videos smoothly. However, it might happen
-that under heavy load the handling of the administrative ui gets a bit rough.
-
-Necessary profiles to build:
-
-    admin-worker: admin,workspace,dist-stub,engage-stub,worker,serviceregistry
-    engage: engage-standalone,serviceregistry,dist-standalone,workspace
-
-Maven build commands:
-
-    # admin-worker
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Padmin,workspace,dist-stub,engage-stub,worker,serviceregistry
-    # engage
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Pengage-standalone,serviceregistry,dist-standalone,workspace
-
-RPM Repository installation:
-
-    # admin-worker
-    yum install opencast-matterhorn14-distribution-admin-worker
-    # engage
-    yum install opencast-matterhorn14-distribution-engage
-
-
-### Three (or more) Server Set-up
-
-While in the last example we have created one combined node for both the administrative tools and the workers, in this
-example we will split this node into dedicated worker and admin nodes. Using this set-up it is easy to increase the
-systems performance simply by adding further worker nodes to the system.
-
-Necessary profiles to build:
-
-    admin: admin,workspace,dist-stub,engage-stub,worker-stub,serviceregistry
-    worker: serviceregistry,workspace,worker-standalone
-    engage: engage-standalone,serviceregistry,dist-standalone,workspace
-
-Maven build commands:
-
-    # admin
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Padmin,workspace,dist-stub,engage-stub,worker-stub,serviceregistry
-    # worker
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Pserviceregistry,workspace,worker-standalone
-    # engage
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Pengage-standalone,serviceregistry,dist-standalone,workspace
-
-RPM Repository installation:
-
-    # admin
-    yum install opencast-matterhorn14-distribution-admin
-    # worker
-    yum install opencast-matterhorn14-distribution-worker
-    # engage
-    yum install opencast-matterhorn14-distribution-engage
+Please follow the next steps to ensure the different nodes are working in harmony.
 
 
 Step 2: Set-Up NFS Server
