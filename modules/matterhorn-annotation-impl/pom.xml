@@ -116,10 +116,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Import-Package>
-              org.opencastproject.annotation.api;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <JPA-PersistenceUnits>
               org.opencastproject.annotation
             </JPA-PersistenceUnits>

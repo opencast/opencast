@@ -84,7 +84,8 @@
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
             <Import-Package>
-              org.opencastproject.feed.impl;version=${project.version}, *
+              org.opencastproject.feed.impl;version=${project.version},
+              *
             </Import-Package>
             <Service-Component>
               OSGI-INF/feed-scanner.xml

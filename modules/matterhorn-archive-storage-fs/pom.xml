@@ -59,11 +59,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-              org.opencastproject.archive.api;version=${project.version},
-              org.opencastproject.archive.base.*;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
             </Export-Package>
             <Service-Component>

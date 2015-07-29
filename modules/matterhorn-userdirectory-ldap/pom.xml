@@ -119,11 +119,18 @@
               org.springframework.security.ldap
             </Private-Package>
             <Import-Package>
-              org.osgi.service.cm,
+              !com.ibm.wsspi.uow,
+              !javax.ejb,
+              !javax.el,
+              !javax.inject,
+              !javax.resource.*,
+              !joptsimple,
               !netscape.ldap.ber.stream,
-              com.sun.jndi.ldap,
-              com.sun.net.ssl.internal.ssl,
-              *;resolution:=optional
+              !org.apache.directory.*,
+              !org.aspectj.*,
+              !org.springframework.jdbc.datasource,
+              !org.springframework.orm.hibernate3,
+              *
             </Import-Package>
             <Service-Component>
               OSGI-INF/ldap-user-factory.xml

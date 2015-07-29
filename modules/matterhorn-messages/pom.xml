@@ -169,11 +169,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-              org.opencastproject.comments;version=${project.version},
-              org.opencastproject.comments.persistence;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.messages;version=${project.version},
               org.opencastproject.messages.persistence;version=${project.version}
