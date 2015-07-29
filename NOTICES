@@ -991,7 +991,7 @@ matterhorn-execute-impl
   org.slf4j                              slf4j-log4j12                                    MIT License
 
 
-matterhorn-execute-operations
+matterhorn-execute-workflowoperation
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
   org.slf4j                              slf4j-log4j12                                    MIT License
