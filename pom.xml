@@ -56,6 +56,8 @@
         <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-composer-workflowoperation</module>
         <module>modules/matterhorn-conductor</module>
+        <module>modules/matterhorn-cover-image-api</module>
+        <module>modules/matterhorn-cover-image-workflowoperation</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-deprecated-workflowoperation</module>
         <module>modules/matterhorn-distribution-service-api</module>
@@ -488,6 +490,8 @@
         <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-composer-service-api</module>
+        <module>modules/matterhorn-cover-image-api</module>
+        <module>modules/matterhorn-cover-image-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dictionary-api</module>
         <module>modules/matterhorn-dictionary-regexp</module>
@@ -543,6 +547,8 @@
         <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-composer-service-api</module>
+        <module>modules/matterhorn-cover-image-api</module>
+        <module>modules/matterhorn-cover-image-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dictionary-api</module>
         <module>modules/matterhorn-dictionary-regexp</module>
@@ -598,6 +604,8 @@
         <module>modules/matterhorn-common-jpa-impl</module>
         <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-composer-service-remote</module>
+        <module>modules/matterhorn-cover-image-api</module>
+        <module>modules/matterhorn-cover-image-remote</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-remote</module>
         <module>modules/matterhorn-json</module>

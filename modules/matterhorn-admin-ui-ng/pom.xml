@@ -373,22 +373,7 @@
                         <Http-Welcome>index.html</Http-Welcome>
                         <Import-Package>
                             org.opencastproject.index.service.message,
-                            org.opencastproject.matterhorn.search.impl;version=${project.version},
-                            org.opencastproject.rest;version=${project.version},
-                            org.opencastproject.metadata.dublincore;version=${project.version},
-                            org.opencastproject.security.api,
-                            org.opencastproject.util.doc.rest,
-                            org.opencastproject.util,
-                            javax.servlet,
-                            javax.servlet.http,
-                            javax.ws.rs,
-                            org.apache.commons.lang,
-                            org.osgi.service.component,
-                            org.json.simple,
-                            org.json.simple.parser,
-                            org.osgi.framework,
-                            org.slf4j,
-                            *;resolution:=optional
+                            *
                         </Import-Package>
                         <Private-Package>
                             net.fortuna.ical4j.*,

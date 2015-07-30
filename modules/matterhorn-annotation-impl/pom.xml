@@ -120,10 +120,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Import-Package>
-              org.opencastproject.annotation.api;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Service-Component>
               OSGI-INF/annotation-service.xml,
               OSGI-INF/annotation-service-rest.xml

@@ -190,13 +190,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Import-Package>
-              org.opencastproject.archive.api;version=${project.version},
-              org.opencastproject.mediapackage.*;version=${project.version},
-              org.opencastproject.message.broker.api.index;version=${project.version},
-              org.opencastproject.solr;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.archive.base;version=${project.version},
               org.opencastproject.archive.base.endpoint;version=${project.version},

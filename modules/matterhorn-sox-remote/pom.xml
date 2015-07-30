@@ -92,9 +92,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>org.opencastproject.sox.remote;version=${project.version}</Export-Package>
             <Service-Component>
               OSGI-INF/sox-service-remote.xml
