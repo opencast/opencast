@@ -34,7 +34,9 @@ public interface UrlSigningVerifier {
    *          The optional client ip of the machine making the request.
    * @param baseUrl
    *          The location of the resource being requested
+   * @param strict
+   *          Whether the full resource URI should be compared or only the path to the resource
    * @return A {@link ResourceRequest} object with the status of it being a valid request.
    */
-  ResourceRequest verify(String queryString, String clientIp, String baseUrl) throws UrlSigningException;
+  ResourceRequest verify(String queryString, String clientIp, String baseUrl, boolean strict) throws UrlSigningException;
 }

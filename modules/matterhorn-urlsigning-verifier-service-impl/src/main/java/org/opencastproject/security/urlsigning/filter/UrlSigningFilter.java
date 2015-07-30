@@ -56,6 +56,9 @@ public class UrlSigningFilter implements Filter, ManagedService {
   /** The property in the configuration file to enable or disable this filter. */
   public static final String ENABLE_FILTER_CONFIG_KEY = "enabled";
 
+  /** The property in the configuration file to enable or disable strict checking of the resource. */
+  public static final String STRICT_FILTER_CONFIG_KEY = "strict";
+
   private static final Logger logger = LoggerFactory.getLogger(UrlSigningFilter.class);
 
   private UrlSigningVerifier urlSigningVerifier;
@@ -63,6 +66,8 @@ public class UrlSigningFilter implements Filter, ManagedService {
   private List<String> urlRegularExpressions = new LinkedList<String>();
 
   private boolean enabled = true;
+
+  private boolean strict = true;
 
   /** OSGi DI */
   public void setUrlSigningVerifier(UrlSigningVerifier urlSigningVerifier) {
@@ -116,7 +121,7 @@ public class UrlSigningFilter implements Filter, ManagedService {
     ResourceRequest resourceRequest;
     try {
       resourceRequest = urlSigningVerifier.verify(httpRequest.getQueryString(), httpRequest.getRemoteAddr(),
-              httpRequest.getRequestURL().toString());
+              httpRequest.getRequestURL().toString(), strict);
 
       if (resourceRequest == null) {
         logger.error("Unable to process httpRequest '{}' because we got a null object as the verification.",
@@ -200,6 +205,21 @@ public class UrlSigningFilter implements Filter, ManagedService {
       logger.info(
               "The UrlSigningFilter is enabled by default. Use the '{}' property in its properties file to enable or disable it.",
               ENABLE_FILTER_CONFIG_KEY);
+    }
+
+    Option<String> strictFilterConfig = OsgiUtil.getOptCfg(properties, STRICT_FILTER_CONFIG_KEY);
+    if (strictFilterConfig.isSome()) {
+      strict = Boolean.parseBoolean(strictFilterConfig.get());
+      if (strict) {
+        logger.info("The UrlSigningFilter is configured to use strict checking of resource URLs.");
+      } else {
+        logger.info("The UrlSigningFilter is configured to not use strict checking of resource URLs.");
+      }
+    } else {
+      strict = true;
+      logger.info(
+              "The UrlSigningFilter is using strict checking of resource URLs by default. Use the '{}' property in its properties file to enable or disable it.",
+              STRICT_FILTER_CONFIG_KEY);
     }
 
     // Clear the current set of keys

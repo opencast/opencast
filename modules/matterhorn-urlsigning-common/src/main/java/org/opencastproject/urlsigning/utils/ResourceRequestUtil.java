@@ -33,6 +33,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -212,9 +213,12 @@ public final class ResourceRequestUtil {
    *          The base uri for the resource.
    * @param encryptionKeys
    *          The available encryption key ids and their keys.
+   * @param strict
+   *          If false it will only compare the path to the resource instead of the entire URL including scheme,
+   *          hostname, port etc.
    */
   public static ResourceRequest resourceRequestFromQueryString(String queryString, String clientIp, String resourceUri,
-          Properties encryptionKeys) {
+          Properties encryptionKeys, boolean strict) {
     ResourceRequest resourceRequest = new ResourceRequest();
     List<NameValuePair> queryParameters = parseQueryString(queryString);
 
@@ -264,14 +268,36 @@ public final class ResourceRequestUtil {
               clientIp, resourceRequest.getPolicy().getClientIpAddress()));
       return resourceRequest;
     }
+
     // If the resource value in the policy doesn't match the requested resource return a Forbidden 403.
-    if (!policy.getResource().equals(resourceUri)) {
+    if (strict && !policy.getResource().equals(resourceUri)) {
       resourceRequest.setStatus(Status.Forbidden);
       resourceRequest.setRejectionReason(String.format(
               "Forbidden because resource trying to be accessed '%s' doesn't match policy resource '%s'", resourceUri,
               resourceRequest.getPolicy().getBaseUrl()));
       return resourceRequest;
+    } else if (!strict) {
+      try {
+        String requestedPath = new URI(resourceUri).getPath();
+        String policyPath = new URI(policy.getResource()).getPath();
+        if (!policyPath.equals(requestedPath)) {
+          resourceRequest.setStatus(Status.Forbidden);
+          resourceRequest.setRejectionReason(String.format(
+                  "Forbidden because resource trying to be accessed '%s' doesn't match policy resource '%s'", resourceUri,
+                  resourceRequest.getPolicy().getBaseUrl()));
+          return resourceRequest;
+        }
+      } catch (URISyntaxException e) {
+        resourceRequest.setStatus(Status.Forbidden);
+        resourceRequest
+        .setRejectionReason(String
+                .format("Forbidden because either the policy or requested URI cannot be parsed. Policy Path: '%s' and Request Path: '%s'. Unable to sign policy because: %s",
+                        policy.getResource(),
+                        resourceUri, ExceptionUtils.getStackTrace(e)));
+        return resourceRequest;
+      }
     }
+
     // Check the dates of the policy to make sure that it is still valid. If it is no longer valid give an Gone return
     // value of 410.
     if (new DateTime(DateTimeZone.UTC).isAfter(policy.getValidUntil().getMillis())) {

@@ -46,7 +46,7 @@ public class UrlSigningVerifierImplTest {
 
     // Test with no configured keys
     UrlSigningVerifierImpl urlSigningVerifierImpl = new UrlSigningVerifierImpl();
-    ResourceRequest result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL);
+    ResourceRequest result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL, true);
     assertEquals(Status.Forbidden, result.getStatus());
 
     // Test no matching key
@@ -55,7 +55,7 @@ public class UrlSigningVerifierImplTest {
     keys.put(UrlSigningVerifierImpl.ID_PREFIX + ".1", "otherKey");
     keys.put(UrlSigningVerifierImpl.KEY_PREFIX + ".1", "ThisIsTheOtherKey");
     urlSigningVerifierImpl.updated(keys);
-    result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL);
+    result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL, true);
     assertEquals(Status.Forbidden, result.getStatus());
 
     // Test only matching keys
@@ -64,7 +64,7 @@ public class UrlSigningVerifierImplTest {
     keys.put(UrlSigningVerifierImpl.ID_PREFIX + ".1", keyId);
     keys.put(UrlSigningVerifierImpl.KEY_PREFIX + ".1", key);
     urlSigningVerifierImpl.updated(keys);
-    result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL);
+    result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL, true);
     assertEquals(Status.Ok, result.getStatus());
 
     // Test matching and non-matching keys
@@ -75,7 +75,7 @@ public class UrlSigningVerifierImplTest {
     keys.put(UrlSigningVerifierImpl.ID_PREFIX + ".2", keyId);
     keys.put(UrlSigningVerifierImpl.KEY_PREFIX + ".2", key);
     urlSigningVerifierImpl.updated(keys);
-    result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL);
+    result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL, true);
     assertEquals(Status.Ok, result.getStatus());
 
     // Test correct key id and wrong key
@@ -86,7 +86,7 @@ public class UrlSigningVerifierImplTest {
     keys.put(UrlSigningVerifierImpl.ID_PREFIX + ".2", keyId);
     keys.put(UrlSigningVerifierImpl.KEY_PREFIX + ".2", "The Wrong Key");
     urlSigningVerifierImpl.updated(keys);
-    result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL);
+    result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL, true);
     assertEquals(Status.Forbidden, result.getStatus());
   }
 }

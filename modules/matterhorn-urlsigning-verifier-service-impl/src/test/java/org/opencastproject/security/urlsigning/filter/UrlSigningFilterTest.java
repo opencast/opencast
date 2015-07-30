@@ -200,7 +200,7 @@ public class UrlSigningFilterTest {
 
     // Setup the Mock Url Signing Service
     UrlSigningVerifier urlSigningVerifier = EasyMock.createMock(UrlSigningVerifier.class);
-    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl)).andReturn(acceptedRequest);
+    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true)).andReturn(acceptedRequest);
     EasyMock.replay(urlSigningVerifier);
 
     UrlSigningFilter filter = new UrlSigningFilter();
@@ -242,7 +242,7 @@ public class UrlSigningFilterTest {
 
     // Setup the Mock Url Signing Service
     UrlSigningVerifier urlSigningVerifier = EasyMock.createMock(UrlSigningVerifier.class);
-    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl))
+    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true))
             .andThrow(UrlSigningException.internalProviderError());
     EasyMock.replay(urlSigningVerifier);
 
@@ -284,7 +284,7 @@ public class UrlSigningFilterTest {
 
     // Setup the Mock Url Signing Service
     UrlSigningVerifier urlSigningVerifier = EasyMock.createMock(UrlSigningVerifier.class);
-    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl)).andReturn(acceptedRequest);
+    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true)).andReturn(acceptedRequest);
     EasyMock.replay(urlSigningVerifier);
 
     UrlSigningFilter filter = new UrlSigningFilter();
@@ -325,7 +325,7 @@ public class UrlSigningFilterTest {
 
     // Setup the Mock Url Signing Service
     UrlSigningVerifier urlSigningVerifier = EasyMock.createMock(UrlSigningVerifier.class);
-    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl)).andReturn(acceptedRequest);
+    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true)).andReturn(acceptedRequest);
     EasyMock.replay(urlSigningVerifier);
 
     UrlSigningFilter filter = new UrlSigningFilter();
@@ -366,7 +366,7 @@ public class UrlSigningFilterTest {
 
     // Setup the Mock Url Signing Service
     UrlSigningVerifier urlSigningVerifier = EasyMock.createMock(UrlSigningVerifier.class);
-    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl)).andReturn(acceptedRequest);
+    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true)).andReturn(acceptedRequest);
     EasyMock.replay(urlSigningVerifier);
 
     UrlSigningFilter filter = new UrlSigningFilter();

@@ -89,38 +89,36 @@ public class ResourceRequestUtilTest {
   public void testAuthenticateDuplicateProperties() {
     // Test duplicate query properties.
     String twoOrgs = ResourceRequest.ENCRYPTION_ID_KEY + "=org1&" + ResourceRequest.ENCRYPTION_ID_KEY + "=org2";
-    // assertEquals(Status.BadRequest, EntwineStreamSecurityWowzaPlugin.authenticate(twoOrgs, clientIp, null, null,
-    // properties));
+
     assertEquals(Status.BadRequest,
-            ResourceRequestUtil.resourceRequestFromQueryString(twoOrgs, clientIp, null, properties).getStatus());
+            ResourceRequestUtil.resourceRequestFromQueryString(twoOrgs, clientIp, null, properties, true).getStatus());
 
     String twoPolicies = ResourceRequest.POLICY_KEY + "=policy1&" + ResourceRequest.POLICY_KEY + "=policy2";
-    assertEquals(Status.BadRequest,
-            ResourceRequestUtil.resourceRequestFromQueryString(twoPolicies, clientIp, null, properties).getStatus());
+    assertEquals(Status.BadRequest, ResourceRequestUtil
+            .resourceRequestFromQueryString(twoPolicies, clientIp, null, properties, true).getStatus());
 
     String twoSignatures = ResourceRequest.SIGNATURE_KEY + "=signature1&" + ResourceRequest.SIGNATURE_KEY
             + "=signature1";
-    assertEquals(Status.BadRequest,
-            ResourceRequestUtil.resourceRequestFromQueryString(twoSignatures, clientIp, null, properties).getStatus());
+    assertEquals(Status.BadRequest, ResourceRequestUtil
+            .resourceRequestFromQueryString(twoSignatures, clientIp, null, properties, true).getStatus());
   }
 
   @Test
   public void testAuthenticateMissingProperties() {
     // Test Missing query properties
     String missingOrg = ResourceRequest.POLICY_KEY + "=policy&" + ResourceRequest.SIGNATURE_KEY + "=signature";
-    assertEquals(Status.BadRequest,
-            ResourceRequestUtil.resourceRequestFromQueryString(missingOrg, clientIp, null, properties).getStatus());
+    assertEquals(Status.BadRequest, ResourceRequestUtil
+            .resourceRequestFromQueryString(missingOrg, clientIp, null, properties, true).getStatus());
 
     String missingPolicy = ResourceRequest.ENCRYPTION_ID_KEY + "=organization&" + ResourceRequest.SIGNATURE_KEY
             + "=signature";
-    assertEquals(Status.BadRequest,
-            ResourceRequestUtil.resourceRequestFromQueryString(missingPolicy, clientIp, null, properties).getStatus());
+    assertEquals(Status.BadRequest, ResourceRequestUtil
+            .resourceRequestFromQueryString(missingPolicy, clientIp, null, properties, true).getStatus());
 
     String missingSignature = ResourceRequest.ENCRYPTION_ID_KEY + "=organization&" + ResourceRequest.POLICY_KEY
             + "=policy";
-    assertEquals(Status.BadRequest,
-            ResourceRequestUtil.resourceRequestFromQueryString(missingSignature, clientIp, null, properties)
-            .getStatus());
+    assertEquals(Status.BadRequest, ResourceRequestUtil
+            .resourceRequestFromQueryString(missingSignature, clientIp, null, properties, true).getStatus());
   }
 
   @Test
@@ -136,69 +134,65 @@ public class ResourceRequestUtilTest {
     String signature = PolicyUtils.getPolicySignature(matchingPolicy, key);
 
     // Test non-existant encryption key is forbidden.
-    String wrongEncryptionKeyId = ResourceRequest.ENCRYPTION_ID_KEY + "=" + "WrongId" + "&"
-            + ResourceRequest.POLICY_KEY + "=" + PolicyUtils.toBase64EncodedPolicy(matchingPolicy) + "&"
-            + ResourceRequest.SIGNATURE_KEY + "=" + signature;
-    assertEquals(
-            Status.Forbidden,
-            ResourceRequestUtil.resourceRequestFromQueryString(wrongEncryptionKeyId, clientIp, matchingResource,
-                    properties).getStatus());
+    String wrongEncryptionKeyId = ResourceRequest.ENCRYPTION_ID_KEY + "=" + "WrongId" + "&" + ResourceRequest.POLICY_KEY
+            + "=" + PolicyUtils.toBase64EncodedPolicy(matchingPolicy) + "&" + ResourceRequest.SIGNATURE_KEY + "="
+            + signature;
+    assertEquals(Status.Forbidden,
+            ResourceRequestUtil
+                    .resourceRequestFromQueryString(wrongEncryptionKeyId, clientIp, matchingResource, properties, true)
+                    .getStatus());
 
     // Test non matching resource results is forbidden.
     String nonMatching = ResourceRequest.ENCRYPTION_ID_KEY + "=organization&" + ResourceRequest.POLICY_KEY + "="
             + PolicyUtils.toBase64EncodedPolicy(nonMatchingPolicy) + "&" + ResourceRequest.SIGNATURE_KEY + "="
             + signature;
-    assertEquals(Status.Forbidden,
-            ResourceRequestUtil.resourceRequestFromQueryString(nonMatching, clientIp, matchingResource, properties)
-            .getStatus());
+    assertEquals(Status.Forbidden, ResourceRequestUtil
+            .resourceRequestFromQueryString(nonMatching, clientIp, matchingResource, properties, true).getStatus());
 
     // Test non-matching client ip results in forbidden.
     Policy wrongClientPolicy = Policy.mkPolicyValidWithIP(matchingResource, before, "10.0.0.255");
     String wrongClient = ResourceRequestUtil.policyToResourceRequestQueryString(wrongClientPolicy, keyId, key);
-    assertEquals(Status.Forbidden,
-            ResourceRequestUtil.resourceRequestFromQueryString(wrongClient, clientIp, matchingResource, properties)
-            .getStatus());
+    assertEquals(Status.Forbidden, ResourceRequestUtil
+            .resourceRequestFromQueryString(wrongClient, clientIp, matchingResource, properties, true).getStatus());
 
     // Test matching client ip results in ok.
     Policy rightClientPolicy = Policy.mkPolicyValidWithIP(matchingResource, before, clientIp);
     String rightClient = ResourceRequestUtil.policyToResourceRequestQueryString(rightClientPolicy, keyId, key);
-    assertEquals(Status.Ok,
-            ResourceRequestUtil.resourceRequestFromQueryString(rightClient, clientIp, matchingResource, properties)
-            .getStatus());
+    assertEquals(Status.Ok, ResourceRequestUtil
+            .resourceRequestFromQueryString(rightClient, clientIp, matchingResource, properties, true).getStatus());
 
     // Test not yet DateGreaterThan results in gone
     Policy wrongDateGreaterThanPolicy = Policy.mkPolicyValidFrom(matchingResource, before, before);
     String wrongDateGreaterThan = ResourceRequestUtil.policyToResourceRequestQueryString(wrongDateGreaterThanPolicy,
             keyId, key);
-    assertEquals(
-            Status.Gone,
-            ResourceRequestUtil.resourceRequestFromQueryString(wrongDateGreaterThan, clientIp, matchingResource,
-                    properties).getStatus());
+    assertEquals(Status.Gone,
+            ResourceRequestUtil
+                    .resourceRequestFromQueryString(wrongDateGreaterThan, clientIp, matchingResource, properties, true)
+                    .getStatus());
 
     // Test after DateGreaterThan results in ok
     Policy rightDateGreaterThanPolicy = Policy.mkPolicyValidFrom(matchingResource, before, after);
     String rightDateGreaterThan = ResourceRequestUtil.policyToResourceRequestQueryString(rightDateGreaterThanPolicy,
             keyId, key);
-    assertEquals(
-            Status.Ok,
-            ResourceRequestUtil.resourceRequestFromQueryString(rightDateGreaterThan, clientIp, matchingResource,
-                    properties).getStatus());
+    assertEquals(Status.Ok,
+            ResourceRequestUtil
+                    .resourceRequestFromQueryString(rightDateGreaterThan, clientIp, matchingResource, properties, true)
+                    .getStatus());
 
     // Test before DateLessThan results in gone
     Policy wrongDateLessThanPolicy = Policy.mkSimplePolicy(matchingResource, after);
     String wrongDateLessThan = ResourceRequestUtil.policyToResourceRequestQueryString(wrongDateLessThanPolicy, keyId,
             key);
-    assertEquals(
-            Status.Gone,
-            ResourceRequestUtil.resourceRequestFromQueryString(wrongDateLessThan, clientIp, matchingResource,
-                    properties).getStatus());
+    assertEquals(Status.Gone,
+            ResourceRequestUtil
+                    .resourceRequestFromQueryString(wrongDateLessThan, clientIp, matchingResource, properties, true)
+                    .getStatus());
 
     // Test matching results in ok.
     String matching = ResourceRequest.ENCRYPTION_ID_KEY + "=" + keyId + "&" + ResourceRequest.POLICY_KEY + "="
             + PolicyUtils.toBase64EncodedPolicy(matchingPolicy) + "&" + ResourceRequest.SIGNATURE_KEY + "=" + signature;
-    assertEquals(Status.Ok,
-            ResourceRequestUtil.resourceRequestFromQueryString(matching, clientIp, matchingResource, properties)
-            .getStatus());
+    assertEquals(Status.Ok, ResourceRequestUtil
+            .resourceRequestFromQueryString(matching, clientIp, matchingResource, properties, true).getStatus());
   }
 
   @Test
@@ -209,5 +203,38 @@ public class ResourceRequestUtilTest {
     assertFalse(ResourceRequestUtil.isSigned(new URI(noQueryString)));
     assertFalse(ResourceRequestUtil.isSigned(new URI(wrongQueryString)));
     assertTrue(ResourceRequestUtil.isSigned(new URI(signed)));
+  }
+
+  @Test
+  public void testNonStrictResourceChecking() throws Exception {
+    DateTime before = new DateTime(DateTimeZone.UTC);
+    before = before.plus(2 * 60 * 60 * 1000L);
+    String hostname = "signed.host.com";
+    String path = "/path/to/resource";
+    String rtmpResource = "rtmp://" + hostname + path;
+    String httpResource = "http://" + hostname + path;
+    String portResource = "rtmp://" + hostname + ":8080" + path;
+    String differentHostnameResource = "rtmp://different.host.com" + path;
+
+    Policy differentScheme = Policy.mkSimplePolicy(rtmpResource, before);
+    String signature = PolicyUtils.getPolicySignature(differentScheme, key);
+    String differentSchemeQueryString = ResourceRequest.ENCRYPTION_ID_KEY + "=default&" + ResourceRequest.POLICY_KEY + "="
+            + PolicyUtils.toBase64EncodedPolicy(differentScheme) + "&" + ResourceRequest.SIGNATURE_KEY + "="
+            + signature;
+
+    assertEquals(Status.Ok, ResourceRequestUtil
+            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, httpResource, properties, false).getStatus());
+    assertEquals(Status.Forbidden, ResourceRequestUtil
+            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, httpResource, properties, true).getStatus());
+
+    assertEquals(Status.Ok, ResourceRequestUtil
+            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, portResource, properties, false).getStatus());
+    assertEquals(Status.Forbidden, ResourceRequestUtil
+            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, portResource, properties, true).getStatus());
+
+    assertEquals(Status.Ok, ResourceRequestUtil
+            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, differentHostnameResource, properties, false).getStatus());
+    assertEquals(Status.Forbidden, ResourceRequestUtil
+            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, differentHostnameResource, properties, true).getStatus());
   }
 }
