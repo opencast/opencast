@@ -33,7 +33,7 @@ will give you a basic configuration with all queues set-up and accepting connect
 61616.`Simply replace the default ActiveMQ configuration, usually located at `/etc/activemq/activemq.xml`, with this
 file.
 
-Then configure the ActiveMQ connectvion in the `config.properties`. The default configuration points to a local
+Then configure the ActiveMQ connectvion in the `custom.properties`. The default configuration points to a local
 installation of ActiveMQ, but that can be changed with:
 
     activemq.broker.url = failover://tcp://example.opencast.org:61616
@@ -116,7 +116,7 @@ The `authorizationEntry` gives read, write and admin access to only those member
 ##### Configure Matterhorn to Connect with Username and Password to Message Broker
 
 Now that we have secured the queues, Opencast will complain that it is unable to connect, using the current username and
-password. The username and password used above need to be added to the `config.properties` file of Opencast.  There are
+password. The username and password used above need to be added to the `custom.properties` file of Opencast.  There are
 two properties to set:
 
     activemq.broker.username=admin

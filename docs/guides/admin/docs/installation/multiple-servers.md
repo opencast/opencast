@@ -123,7 +123,7 @@ You did already set-up and configured your database and message broker in the la
 configuration you have to do. First of all you should follow the Basic Configuration guide which will tell you how to
 set the login credentials etc. After that continue with the following steps:
 
-### config.properties
+### custom.properties
 
 Set the server URL to the public url of each server (admin URL on admin, worker URL on worker, engage URL on engage, …).
 This may either be this nodes IP address or preferable its domain name:

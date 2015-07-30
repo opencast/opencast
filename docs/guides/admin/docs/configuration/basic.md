@@ -5,18 +5,18 @@ This guide will help you to change the basic configuration settings which are re
 for each Opencast installation. This is basically what you should do directly after you installed Opencast on your
 machine.
 
-All these settings are made in the `config.properties` file. It can be found directly in you Opencast configuration
-directory. In most cases, that should be either `/etc/matterhorn/config.properties` or
-`/opt/matterhorn/etc/config.properties`. Open this file using the editor of your choice, e.g.:
+All these settings are made in the `custom.properties` file. It can be found directly in your Opencast configuration
+directory. In most cases, that should be either `/etc/matterhorn/custom.properties` or
+`/opt/matterhorn/etc/custom.properties`. Open this file using the editor of your choice, e.g.:
 
-    vim /etc/matterhorn/config.properties
+    vim /etc/matterhorn/custom.properties
 
 
 Step 1: Setting the Server URL
 ------------------------------
 
 The first thing you should do is to set the server URL. To do that, find the property org.opencastproject.server.url in
-your config.properties configuration file. This key is set to http://localhost:8080 by default.  That will only allow
+your custom.properties configuration file. This key is set to http://localhost:8080 by default.  That will only allow
 access from the local machine. You should change this if your server should be accessible within a network. Set it to
 your domain name or IP address like:
 
