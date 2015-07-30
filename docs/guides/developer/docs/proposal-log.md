@@ -15,6 +15,39 @@ response signals agreement. Apart from that committers may vote with:
 Passed Proposals
 ----------------
 
+### Moving away from the 3rd party scripts
+Proposed by Greg Logan <gregorydlogan@gmail.com>, Passed on Fri, 24 Jul 2015 15:00:00 UTC
+
+    Hi folks,
+
+    As it stands right now we depend on the 3rd party tool script to
+    install a great many of our 3rd party dependencies.  These are
+    utilities like tesseract, ffmpeg, sox, etc.  This script is maintained
+    by Matjaz, in his own time.  I'd like to take a moment to thank him
+    for a doing a great job on a particularly annoying aspect of
+    supporting our work!  I know it hasn't been easy, especially
+    supporting vast number of different OS versions!
+
+    With the release of 2.0 I noticed that our 3rd party tool script is
+    becoming both a little out of date, and difficult to maintain.  I took
+    a quick look around and it seems like *most* of our dependencies are
+    available from normal distribution repositories for Debian based
+    systems, and I'm told that there is a similar situation for Redhat
+    based systems.  I am unsure of how many of our users are running
+    Matterhorn on Mac, but I would hope that our developers who are
+    working on Mac would be able to provide instructions and/or binaries
+    for those users.  The only dependency where there might be a universal
+    sticking point is ffmpeg (due to patent concerns), however ffmpeg
+    builds a full static binary with each release, so I assume we can
+    either depend on this and/or cache them somewhere.
+
+    What this means is that we can potentially remove the 3rd party script
+    from our repository.  I hereby #propose we find a way to do that,
+    which would remove the 3rd party script from the repository and
+    replace it with a number of new steps in the install documentation.
+
+
+
 ### Requirement Specification
 Proposed by Lars Kiesow <lkiesow@uos.de>, Passed on Thu, 16 Apr 2015 15:55:31 UTC
 
