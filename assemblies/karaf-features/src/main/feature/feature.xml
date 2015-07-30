@@ -372,4 +372,14 @@
     <bundle>mvn:org.opencastproject/matterhorn-workflow-service-remote/${project.version}</bundle>
   </feature>
 
+  <feature name="opencast-contrib-cas" version="${project.version}">
+    <bundle>mvn:net.sourceforge.nekohtml/com.springsource.org.cyberneko.html/1.9.13</bundle>
+    <bundle>mvn:org.apache.xml/com.springsource.org.apache.xml.security/1.4.2</bundle>
+    <bundle>mvn:org.jasig.cas/com.springsource.org.jasig.cas.client/3.1.12</bundle>
+    <bundle>mvn:org.openid4java/com.springsource.org.openid4java/0.9.5</bundle>
+    <bundle>mvn:org.opensaml/com.springsource.org.opensaml/1.1.0</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-cas/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-openid/3.1.0.RELEASE</bundle>
+  </feature>
+
 </features>
