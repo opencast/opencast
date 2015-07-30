@@ -53,7 +53,7 @@ CREATE TABLE mh_organization (
   name VARCHAR(255),
   admin_role VARCHAR(255),
   PRIMARY KEY (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_organization_node (
   organization VARCHAR(128) NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE mh_organization_node (
   name VARCHAR(255),
   PRIMARY KEY (organization, port, name),
   CONSTRAINT FK_mh_organization_node_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_episode_episode (
   id VARCHAR(128) NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE mh_episode_episode (
   modification_date DATETIME,
   PRIMARY KEY (id, version, organization),
   CONSTRAINT FK_mh_episode_episode_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_episode_episode_mediapackage ON mh_episode_episode (id);
 CREATE INDEX IX_mh_episode_episode_version ON mh_episode_episode (version);
@@ -89,7 +89,7 @@ CREATE TABLE mh_episode_asset (
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_episode_asset_0 UNIQUE (organization, mediapackage, mediapackageelement, version),
   CONSTRAINT FK_mh_episode_asset_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_episode_asset_mediapackage ON mh_episode_asset (mediapackage);
 CREATE INDEX IX_mh_episode_asset_checksum ON mh_episode_asset (checksum);
@@ -99,7 +99,7 @@ CREATE TABLE mh_episode_version_claim (
  mediapackage VARCHAR(128) NOT NULL,
  last_claimed BIGINT(20) NOT NULL,
  PRIMARY KEY (mediapackage)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_episode_version_claim_mediapackage ON mh_episode_version_claim (mediapackage);
 CREATE INDEX IX_mh_episode_version_claim_last_claimed ON mh_episode_version_claim (last_claimed);
@@ -110,13 +110,13 @@ CREATE TABLE IF NOT EXISTS mh_user (
   organization VARCHAR(128) NOT NULL,
   password TEXT(65535),
   PRIMARY KEY (username, organization)  
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE  IF NOT EXISTS mh_role (
   username VARCHAR(128) NOT NULL,
   organization VARCHAR(128) NOT NULL,
   role TEXT(65535)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_role_pk ON mh_role (username, organization);
 
@@ -131,7 +131,7 @@ CREATE TABLE mh_search (
   modification_date DATETIME,
   PRIMARY KEY (id),
   CONSTRAINT FK_mh_search_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 
@@ -158,7 +158,7 @@ CREATE TABLE mh_organization_property (
   value VARCHAR(255),
   PRIMARY KEY (organization, name),
   CONSTRAINT FK_mh_organization_property_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_organization_property_pk ON mh_organization_property (organization);
 
@@ -173,7 +173,7 @@ CREATE TABLE mh_job_mh_service_registration (
   KEY `mhjobmhservice_registrationservicesRegistration_id` (`servicesRegistration_id`),
   CONSTRAINT `FK_mh_job_mh_service_registration_Job_id` FOREIGN KEY (`Job_id`) REFERENCES `mh_job` (`id`),
   CONSTRAINT `mhjobmhservice_registrationservicesRegistration_id` FOREIGN KEY (`servicesRegistration_id`) REFERENCES `mh_service_registration` (`id`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- MH-8854 user_action text fields
 
