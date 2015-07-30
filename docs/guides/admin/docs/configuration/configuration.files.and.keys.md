@@ -14,9 +14,6 @@ Default and custom feed definitions should be placed in <opencast_home>/etc/feed
 ### Workflow Definitions
 Custom workflow definitions should be placed in <opencast_home>/etc/workflows. The file names should follow the pattern *.xml.
 
-### OSGi Bundles
-Additional OSGi bundles should be placed in <opencast_home>/lib/matterhorn. <opencast_home>/etc/load should be reserved for the default configuration.
-
 ### Inbox
 Media files placed in <opencast_home>/inbox will be copied to the Matterhorn working file repository and made available in the Admin Tools > Uploading Recording user interface, via the File Location menu.
 
