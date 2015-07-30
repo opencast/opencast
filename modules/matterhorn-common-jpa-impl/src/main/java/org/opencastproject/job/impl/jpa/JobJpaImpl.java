@@ -515,7 +515,10 @@ public class JobJpaImpl implements Job {
     context = new JaxbJobContext();
     if (rootJob != null) {
       context.setId(rootJob.getId());
+      rootJobId = rootJob.getId();
     }
+    if (parentJob != null)
+      parentJobId = parentJob.getId();
     if (properties != null) {
       for (JobPropertyJpaImpl property : properties) {
         context.getProperties().put(property.getName(), property.getValue());
