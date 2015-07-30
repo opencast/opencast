@@ -45,6 +45,11 @@ public class UrlSigningVerifierImpl implements UrlSigningVerifier, ManagedServic
   private Properties keys = new Properties();
 
   @Override
+  public ResourceRequest verify(String queryString, String clientIp, String baseUri) {
+    return ResourceRequestUtil.resourceRequestFromQueryString(queryString, clientIp, baseUri, getKeys(), true);
+  }
+
+  @Override
   public ResourceRequest verify(String queryString, String clientIp, String baseUri, boolean strict) {
     return ResourceRequestUtil.resourceRequestFromQueryString(queryString, clientIp, baseUri, getKeys(), strict);
   }
