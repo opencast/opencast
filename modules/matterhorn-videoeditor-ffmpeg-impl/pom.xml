@@ -28,9 +28,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.videoeditor-ffmpeg.impl.*;version=${project.version},
               org.opencastproject.videoeditor-ffmpeg.endpoint.*;version=${project.version},

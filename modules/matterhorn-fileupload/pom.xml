@@ -82,10 +82,6 @@
               org.opencastproject.fileupload.api;version=${project.version},
               org.opencastproject.fileupload.service;version=${project.version} 
             </Export-Package>
-            <Import-Package>
-               org.opencastproject.workspace.api;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Service-Component>
               OSGI-INF/fileupload-service.xml,
               OSGI-INF/fileupload-service-rest.xml

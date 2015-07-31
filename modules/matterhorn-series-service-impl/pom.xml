@@ -152,13 +152,6 @@
               org.opencastproject.series.impl;version=${project.version},
               org.opencastproject.series.endpoint;version=${project.version}
             </Export-Package>
-            <Import-Package>
-              org.opencastproject.message.broker.api.index;version=${project.version},
-              org.opencastproject.rest;version=${project.version},
-              org.opencastproject.metadata.dublincore;version=${project.version},
-              org.opencastproject.solr;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Service-Component>
               OSGI-INF/series-service-index.xml,
               OSGI-INF/series-service-persistence.xml,

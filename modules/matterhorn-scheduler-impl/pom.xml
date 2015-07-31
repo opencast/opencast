@@ -192,12 +192,8 @@
               org.opencastproject.scheduler.endpoint;version=${project.version}
             </Export-Package>
             <Import-Package>
-              org.opencastproject.rest;version=${project.version},
-              org.opencastproject.metadata.dublincore;version=${project.version},
-              org.opencastproject.message.broker.api.index;version=${project.version},
-              org.opencastproject.scheduler.api;version=${project.version},
               org.w3c.dom;version=0,
-              *;resolution:=optional
+              *
             </Import-Package>
             <Private-Package>
               net.fortuna.ical4j.*;-split-package:=merge-last

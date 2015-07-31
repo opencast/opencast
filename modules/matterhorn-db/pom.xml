@@ -77,7 +77,10 @@
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
             <Bundle-Activator>org.opencastproject.db.Activator</Bundle-Activator>
             <Import-Package>
-                *;resolution:=optional
+                !org.apache.lucene.*,
+                !org.jboss.resource.adapter.jdbc.*,
+                org.w3c.dom;version=0,
+                *
              </Import-Package>
             <Embed-Dependency>
               c3p0;inline=true,
