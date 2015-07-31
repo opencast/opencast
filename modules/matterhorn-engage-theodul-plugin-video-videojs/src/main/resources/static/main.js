@@ -386,12 +386,23 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         var lastEvent = null;
         var videoFocused = true;
         var singleVideo = true;
+        var zoomLevels = Array();
+
+        // TODO: Save Zoomlevels for > 1 Videos
 
         Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function(number) {
             if (number > 1) {
                 selector = ".videoFocused video";
                 videoFocused = false;
                 singleVideo = false;
+            }
+        })
+
+        Engage.on(plugin.events.togglePiP.getName(), function(pip){
+            if (pip) {
+                selector = ".videoFocusedPiP video";
+            } else {
+                selector = ".videoFocused video";
             }
         })
 
@@ -415,7 +426,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
         $(selector).mousedown(function() {
             $(selector).mousemove(function(event) {
-                if (lastEvent != null) {
+                if (lastEvent != null && singleVideo) {
                     // Movement
                     var x_move = lastEvent.pageX - event.pageX;
                     var y_move = lastEvent.pageY - event.pageY;
