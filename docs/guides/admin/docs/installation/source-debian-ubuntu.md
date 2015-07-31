@@ -1,18 +1,18 @@
 Install from Source (Debian, Ubuntu)
 ====================================
 
-These instructions outline how to install an all in one Matterhorn system on Ubuntu 12.04 with LTS.
+These instructions outline how to install an all in one Opencast system on Ubuntu 12.04 with LTS.
 
-Preparatiom
+Preparation
 -----------
 
-Create a dedicated Matterhorn user.
+Create a dedicated Opencast user.
 
     useradd -d /opt/matterhorn matterhorn
 
-Get Matterhorn source:
+Get Opencast source:
 
-You can get the Matterhorn source code by either downloading a tarball of the source code or by cloning the Git
+You can get the Opencast source code by either downloading a tarball of the source code or by cloning the Git
 repository. The latter option is more flexible, it is easier to upgrade and in general preferred for developers. The
 prior option, the tarball download, needs less tools and you do not have to download nearly as much as with Git.
 
@@ -29,7 +29,7 @@ https://bitbucket.org/opencast-community/matterhorn/downloads#tag-downloads
 Cloning the Git repository:
 
     git clone https://bitbucket.org/opencast-community/matterhorn.git
-    cd matterhorn
+    cd opencast
     git tag   <-  List all available versions
     git checkout TAG   <-  Switch to desired version
 
@@ -37,13 +37,17 @@ Cloning the Git repository:
 Install Dependencies
 --------------------
 
-Please make sure to install the following dependencies:
+Please make sure to install the following dependencies. Note that not all dependencies are in the system repositories.
 
 Required:
 
     openjdk-7-jdk or openjdk-8-jdk
     ffmpeg >= 2.5
     maven >= 3.1
+
+> *Note that by default Ubuntu and Debian ship Libav and installing the `ffmpeg` package from the default repository
+> will not get you FFmpeg. If you are unsure about where to get FFmpeg, please refer to the [FFmpeg
+> website](http://ffmpeg.org).*
 
 Required (not necessarily on the same machine):
 
@@ -61,18 +65,20 @@ Required for audio normalization (optional):
 
     sox >= 14.4
 
+### Dependency Download
 
-Configure
----------
+Pre-built versions of most dependencies that are not in the repositories can be downloaded from the respective project
+website:
 
-Please follow the steps of the [Basic Configuration guide](../configuration/basic.md). It will help you to set your
-hostname, login information, …
+ - [Get FFmpeg](http://ffmpeg.org/download.html)
+ - [(Get Apache Maven](https://maven.apache.org/download.cgi)
+ - [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
 
 
-Building Matterhorn
--------------------
+Building Opencast
+-----------------
 
-Make sure everything belongs to the user `matterhorn`:
+Make sure everything belongs to the user `matterhorn` (you may choose a different name):
 
     sudo chown -R matterhorn:matterhorn /opt/matterhorn
 
@@ -86,10 +92,17 @@ Compile the source code:
     mvn clean install -DdeployTo=/opt/matterhorn
 
 
-Running Matterhorn
-------------------
+Configure
+---------
 
-Install Matterhorn start script and man-page for installations in /opt:
+Please follow the steps of the [Basic Configuration guide](../configuration/basic.md). It will help you to set your
+hostname, login information, …
+
+
+Running Opencast
+----------------
+
+Install Opencast start script and man-page for installations in `/opt`:
 
     cd /opt/matterhorn/docs/scripts/init/opt
     sudo ./install.sh
@@ -97,30 +110,29 @@ Install Matterhorn start script and man-page for installations in /opt:
 This will install the start script along with either a SysV-Init script or a
 systemd unit file.
 
-Now you can start Matterhorn by running
+Now you can start Opencast by running
 
     sudo matterhorn --interactive
 
 Browse to [http://localhost:8080] to get to the admin interface.
 
 
-Run Matterhorn as Service
--------------------------
+Run Opencast as Service
+-----------------------
 
-Usually, you do not want to run Matterhorn in interactive mode but as system
-service to make sure matterhorn is run only once on a system and is started
-automatically.
+Usually, you do not want to run Opencast in interactive mode but as system service to make sure Opencast is run only
+once on a system and is started automatically.
 
 SysV-Init:
 
-    # Start Matterhorn
+    # Start Opencast
     sudo service matterhorn start
     # Autostart after reboot
     sudo chkconfig --level 345 matterhorn on
 
 Systemd:
 
-    # Start Matterhorn
+    # Start Opencast
     sudo systemctl start matterhorn
     # Autostart after reboot
     sudo systemctl enable matterhorn

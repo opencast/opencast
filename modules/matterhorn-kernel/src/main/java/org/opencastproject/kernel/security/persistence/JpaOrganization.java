@@ -77,7 +77,7 @@ public class JpaOrganization implements Organization {
 
   @ElementCollection
   @MapKeyColumn(name = "name")
-  @Column(name = "value")
+  @Column(name = "value", length = 65535)
   @CollectionTable(name = "mh_organization_property", joinColumns = @JoinColumn(name = "organization"))
   protected Map<String, String> properties;
 

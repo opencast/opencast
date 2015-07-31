@@ -811,6 +811,10 @@
         <module>modules/matterhorn-dictionary-none</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-speech-recognition-workflowoperation</module>
+        <module>modules/matterhorn-execute-api</module>
+        <module>modules/matterhorn-execute-impl</module>
+        <module>modules/matterhorn-execute-operations</module>
+        <module>modules/matterhorn-execute-remote</module>
       </modules>
     </profile>
 
@@ -1744,7 +1748,7 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.5</version>
+        <version>1.9</version>
       </dependency>
 
       <dependency>
