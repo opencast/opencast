@@ -2,7 +2,7 @@
     "error": "Error",
     "error_unknown": "An error occurred. Please reload the page.",
     "reloadPage": "Reload page",
-    "loginInformation": "Log in with your Matterhorn user account",
+    "loginInformation": "Log in with your Opencast user account",
     "login": "Log in",
     "enterUsernamePassword": "Please enter your username and password:",
     "username": "Username",

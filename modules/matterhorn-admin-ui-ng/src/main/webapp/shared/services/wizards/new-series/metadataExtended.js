@@ -84,6 +84,25 @@ angular.module('adminNg.services')
             }
         };
 
+        this.getFiledCatalogs = function () { 
+            var catalogs = [];
+
+            angular.forEach(me.ud, function(catalog) {
+                var empty = true;
+                angular.forEach(catalog.fields, function (field) {
+                    if (angular.isDefined(field.presentableValue) && field.presentableValue !=='') {
+                        empty = false;
+                    }
+                });
+
+                if (!empty) {
+                    catalogs.push(catalog);
+                }
+            });
+
+            return catalogs;
+        };
+
         this.reset = function () {
             me.ud = {};
             me.requiredMetadata = {};

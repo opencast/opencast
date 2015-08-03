@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.opencastproject.workflow.handler.coverimage.CoverImageWorkflowOperationHandler" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.coverimage.CoverImageWorkflowOperationHandler" />
+  <property name="service.description" value="Cover Image Workflow Operation Handler" />
+  <property name="workflow.operation" value="cover-image" />
+
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+
+  <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" policy="static" bind="setServiceRegistry" />
+  <reference name="Workspace" cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace" policy="static" bind="setWorkspace" />
+  <reference name="MetadataService" cardinality="1..1" interface="org.opencastproject.metadata.api.StaticMetadataService" target="(metadata.source=dublincore)" policy="static" bind="setStaticMetadataService" />
+  <reference name="CoverImageService" cardinality="1..1" interface="org.opencastproject.coverimage.CoverImageService" policy="static" bind="setCoverImageService" />
+  <reference name="DublinCoreCatalogService" cardinality="1..1" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService" policy="static" bind="setDublinCoreCatalogService" />
+</scr:component>

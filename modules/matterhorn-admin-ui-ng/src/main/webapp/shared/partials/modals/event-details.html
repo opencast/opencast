@@ -640,7 +640,7 @@
                                     <td>{{ item.status }}</td>
                                     <td>{{ item.title }}</td>
                                     <td>{{ item.description }}</td>
-                                    <td><a class="details-link" ng-click="openSubTab('operation-details', 'EventWorkflowOperationDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">Details</a></td>
+                                    <td><a class="details-link" ng-click="openSubTab('operation-details', 'EventWorkflowOperationDetailsResource', $index)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">Details</a></td>
                                 </tr>
                             </tbody>
                         </table>

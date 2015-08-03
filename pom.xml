@@ -4,7 +4,7 @@
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
   <packaging>pom</packaging>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>2.1-SNAPSHOT</version>
   <name>matterhorn</name>
   <description>The Opencast Project's Matterhorn software is a media capture, processing, and distribution system</description>
   <url>http://opencastproject.org</url>
@@ -54,6 +54,8 @@
         <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-composer-workflowoperation</module>
         <module>modules/matterhorn-conductor</module>
+        <module>modules/matterhorn-cover-image-api</module>
+        <module>modules/matterhorn-cover-image-workflowoperation</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-deprecated-workflowoperation</module>
         <module>modules/matterhorn-distribution-service-api</module>
@@ -379,8 +381,10 @@
       <modules>
         <module>modules/matterhorn-annotation-api</module>
         <module>modules/matterhorn-annotation-impl</module>
+        <module>modules/matterhorn-archive-api</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-engage-theodul-api</module>
@@ -396,6 +400,7 @@
         <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
         <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
         <module>modules/matterhorn-engage-ui</module>
+        <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
@@ -406,6 +411,7 @@
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-runtime-info</module>
+        <module>modules/matterhorn-scheduler-api</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-feeds</module>
         <module>modules/matterhorn-search-service-impl</module>
@@ -473,6 +479,8 @@
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-composer-service-api</module>
+        <module>modules/matterhorn-cover-image-api</module>
+        <module>modules/matterhorn-cover-image-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dictionary-api</module>
         <module>modules/matterhorn-dictionary-regexp</module>
@@ -520,12 +528,15 @@
         </property>
       </activation>
       <modules>
+        <module>modules/matterhorn-archive-api</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-caption-api</module>
         <module>modules/matterhorn-caption-impl</module>
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-composer-ffmpeg</module>
         <module>modules/matterhorn-composer-service-api</module>
+        <module>modules/matterhorn-cover-image-api</module>
+        <module>modules/matterhorn-cover-image-impl</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dictionary-api</module>
         <module>modules/matterhorn-dictionary-regexp</module>
@@ -541,6 +552,7 @@
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-runtime-info-ui</module>
+        <module>modules/matterhorn-scheduler-api</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
         <module>modules/matterhorn-silencedetection-api</module>
@@ -579,6 +591,8 @@
         <module>modules/matterhorn-common</module>
         <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-composer-service-remote</module>
+        <module>modules/matterhorn-cover-image-api</module>
+        <module>modules/matterhorn-cover-image-remote</module>
         <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-inspection-service-remote</module>
         <module>modules/matterhorn-json</module>
@@ -805,6 +819,10 @@
         <module>modules/matterhorn-dictionary-none</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-speech-recognition-workflowoperation</module>
+        <module>modules/matterhorn-execute-api</module>
+        <module>modules/matterhorn-execute-impl</module>
+        <module>modules/matterhorn-execute-operations</module>
+        <module>modules/matterhorn-execute-remote</module>
       </modules>
     </profile>
 
@@ -1075,7 +1093,7 @@
       <plugin>
         <groupId>com.atlassian.maven.plugins</groupId>
         <artifactId>maven-clover2-plugin</artifactId>
-        <version>3.1.5</version>
+        <version>4.0.4</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -1300,6 +1318,33 @@
               <goals>
                 <goal>pmd</goal>
                 <goal>cpd</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>com.github.klieber</groupId>
+          <artifactId>phantomjs-maven-plugin</artifactId>
+          <version>0.5</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>install</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <version>1.9.8</version>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.github.searls</groupId>
+          <artifactId>jasmine-maven-plugin</artifactId>
+          <version>2.0-beta-01</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>test</goal>
               </goals>
             </execution>
           </executions>
@@ -1711,13 +1756,13 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.5</version>
+        <version>1.9</version>
       </dependency>
 
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.6</version>
+        <version>1.10</version>
       </dependency>
 
       <dependency>
@@ -1832,9 +1877,9 @@
     <developer>
       <id>ruben.perez</id>
       <name>Ruben Perez Vazquez</name>
-      <email>rubenperez@teltek.es</email>
-      <organization>Teltek</organization>
-      <organizationUrl>http://www.teltek.es</organizationUrl>
+      <email>ruben.perez@uni-koeln.de</email>
+      <organization>University of Cologne</organization>
+      <organizationUrl>http://www.uni-koeln.de</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>

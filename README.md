@@ -1,10 +1,10 @@
-Opencast Matterhorn
-===================
+Opencast
+========
 
 Open Source Lecture Capture & Video Management for Education
 
-Matterhorn is a free, open-source platform to support the management of
-educational audio and video content. Institutions will use Matterhorn to
+Opencast is a free, open-source platform to support the management of
+educational audio and video content. Institutions can use Opencast to
 produce lecture recordings, manage existing video, serve designated
 distribution channels, and provide user interfaces to engage students with
 educational videos.
@@ -13,9 +13,13 @@ educational videos.
 Installation
 ------------
 
-Installation instructions can be found at:
+Installation instructions can be found locally at
 
-* [Matterhorn Release Docs for Development Branch](https://opencast.jira.com/wiki/display/MHTRUNK/Install)
+    docs/guides/admin/docs
+
+or on our documentation server at:
+
+ * [Opencast Documentation](http://docs.opencast.org)
 
 
 Community
