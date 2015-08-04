@@ -557,6 +557,10 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
     if (jobLoad != null) {
       try {
         captionJobLoad = Float.parseFloat(jobLoad);
+        if (captionJobLoad < 0) {
+          logger.warn("Caption converting job load set to less than 0, defaulting to 0");
+          captionJobLoad = 0.0f;
+        }
         logger.info("Set caption job load to {}", captionJobLoad);
       } catch (NumberFormatException e) {
         logger.warn("Can not set caption job loads to {}. {} must be a float", jobLoad,

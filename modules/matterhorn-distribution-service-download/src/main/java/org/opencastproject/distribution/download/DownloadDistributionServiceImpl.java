@@ -588,6 +588,10 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
     if (distributeStringJobLoad != null) {
       try {
         distributeJobLoad = Float.parseFloat(distributeStringJobLoad);
+        if (distributeJobLoad < 0) {
+          logger.warn("Distribute job load set to less than 0, defaulting to 0");
+          distributeJobLoad = 0.0f;
+        }
         logger.info("Set distribute job load to {}", distributeJobLoad);
       } catch (NumberFormatException e) {
         logger.warn("Can not set distribute job loads to {}. {} must be a float", distributeStringJobLoad,
@@ -601,6 +605,10 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
     if (retractStringJobLoad != null) {
       try {
         retractJobLoad = Float.parseFloat(retractStringJobLoad);
+        if (retractJobLoad < 0) {
+          logger.warn("Retract job load set to less than 0, defaulting to 0");
+          retractJobLoad = 0.0f;
+        }
         logger.info("Set retract job load to {}", retractJobLoad);
       } catch (NumberFormatException e) {
         logger.warn("Can not set retract job loads to {}. {} must be a float", retractStringJobLoad,

@@ -54,6 +54,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -81,6 +82,12 @@ import javax.xml.bind.JAXBException;
  * Implementation of VideoeditorService using FFMPEG
  */
 public class VideoEditorServiceImpl extends AbstractJobProducer implements VideoEditorService, ManagedService {
+
+  public static final String JOB_LOAD_KEY = "job.load.videoeditor";
+
+  private static final float DEFAULT_JOB_LOAD = 2.0f;
+
+  private float jobload = DEFAULT_JOB_LOAD;
 
   /**
    * The logging instance
@@ -388,7 +395,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         for (SmilMediaParam param : paramGroup.getParams()) {
           if (SmilMediaParam.PARAM_NAME_TRACK_ID.equals(param.getName())) {
             jobs.add(serviceRegistry.createJob(getJobType(), Operation.PROCESS_SMIL.toString(),
-                    Arrays.asList(smil.toXML(), paramGroup.getId())));
+                    Arrays.asList(smil.toXML(), paramGroup.getId()), jobload));
           }
         }
       }
@@ -455,6 +462,22 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       this.properties.put(key, properties.get(key));
     }
     logger.debug("Properties updated!");
+
+    try {
+      String loadString = StringUtils.trimToNull((String) properties.get(JOB_LOAD_KEY));
+      if (loadString != null) {
+        jobload = Float.parseFloat(loadString);
+        if (jobload < 0) {
+          logger.warn("Video editor job load set to less than 0, defaulting to 0");
+          jobload = 0.0f;
+        }
+        logger.info("Job load set to {}", jobload);
+      } else {
+        logger.debug("No load value setting detected, defaulting to {}", jobload);
+      }
+    } catch (NumberFormatException e) {
+      logger.debug("Job load value malformed, defaulting to {}", jobload);
+    }
   }
 
   public void setMediaInspectionService(MediaInspectionService inspectionService) {

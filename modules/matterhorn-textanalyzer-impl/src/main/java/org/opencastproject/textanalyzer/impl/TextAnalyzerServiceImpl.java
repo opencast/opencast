@@ -485,6 +485,10 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
     if (jobLoad != null) {
       try {
         analysisJobLoad = Float.parseFloat(jobLoad);
+        if (analysisJobLoad < 0) {
+          logger.warn("Text analyzer job load set to less than 0, defaulting to 0");
+          analysisJobLoad = 0.0f;
+        }
         logger.info("Set analysis job load to {}", analysisJobLoad);
       } catch (NumberFormatException e) {
         logger.warn("Can not set analysis job loads to {}. {} must be a float", jobLoad,

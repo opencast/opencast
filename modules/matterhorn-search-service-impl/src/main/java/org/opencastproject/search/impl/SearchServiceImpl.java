@@ -690,6 +690,10 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     if (addJobLoadString != null) {
       try {
         addJobLoad = Float.parseFloat(addJobLoadString);
+        if (addJobLoad < 0) {
+          logger.warn("Add job load set to less than 0, defaulting to 0");
+          addJobLoad = 0.0f;
+        }
         logger.info("Set add job load to {}", addJobLoad);
       } catch (NumberFormatException e) {
         logger.warn("Can not set add job loads to {}. {} must be a float", addJobLoadString,
@@ -703,6 +707,10 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     if (deleteJobLoadString != null) {
       try {
         deleteJobLoad = Float.parseFloat(deleteJobLoadString);
+        if (deleteJobLoad < 0) {
+          logger.warn("Delete job load set to less than 0, defaulting to 0");
+          deleteJobLoad = 0.0f;
+        }
         logger.info("Set delete job load to {}", deleteJobLoad);
       } catch (NumberFormatException e) {
         logger.warn("Can not set delete job loads to {}. {} must be a float", deleteJobLoadString,

@@ -291,6 +291,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (cc != null && StringUtils.isNotBlank(cc.getBundleContext().getProperty(OPT_MAXLOAD))) {
         try {
           maxLoad = Float.parseFloat(cc.getBundleContext().getProperty(OPT_MAXLOAD));
+          logger.info("Max load has been manually to {}", maxLoad);
         } catch (NumberFormatException e) {
           logger.warn("Configuration key '{}' is not an integer. Falling back to the number of cores ({})",
                   OPT_MAXLOAD, maxLoad);

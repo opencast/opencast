@@ -64,6 +64,12 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
    */
   private static final Logger logger = LoggerFactory.getLogger(SilenceDetectionServiceImpl.class);
 
+  public static final String JOB_LOAD_KEY = "job.load.videoeditor.silencedetection";
+
+  private static final float DEFAULT_JOB_LOAD = 2.0f;
+
+  private float jobload = DEFAULT_JOB_LOAD;
+
   private static enum Operation {
 
     SILENCE_DETECTION
@@ -130,7 +136,8 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
       return serviceRegistry.createJob(
               getJobType(),
               Operation.SILENCE_DETECTION.toString(),
-              arguments);
+              arguments,
+              jobload);
 
     } catch (ServiceRegistryException ex) {
       throw new SilenceDetectionFailedException("Unable to create job! " + ex.getMessage());
@@ -255,6 +262,22 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
       this.properties.put(key, properties.get(key));
     }
     logger.debug("Properties updated!");
+
+    try {
+      String loadString = StringUtils.trimToNull((String) properties.get(JOB_LOAD_KEY));
+      if (loadString != null) {
+        jobload = Float.parseFloat(loadString);
+        if (jobload < 0) {
+          logger.warn("Silence detection job load set to less than 0, defaulting to 0");
+          jobload = 0.0f;
+        }
+        logger.info("Job load set to {}", jobload);
+      } else {
+        logger.debug("No load value setting detected, defaulting to {}", jobload);
+      }
+    } catch (NumberFormatException e) {
+      logger.debug("Job load value malformed, defaulting to {}", jobload);
+    }
   }
 
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {

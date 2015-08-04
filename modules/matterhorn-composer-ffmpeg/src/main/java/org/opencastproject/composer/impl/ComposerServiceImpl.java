@@ -77,6 +77,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,13 +92,14 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 /** FFMPEG based implementation of the composer service api. */
-public class ComposerServiceImpl extends AbstractJobProducer implements ComposerService {
+public class ComposerServiceImpl extends AbstractJobProducer implements ComposerService, ManagedService {
   /**
    * Error codes
    */
@@ -129,6 +132,15 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /** The collection name */
   public static final String COLLECTION = "composer";
+
+  /** The load introduced on the system by creating a caption job */
+  public static final float DEFAULT_CAPTION_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_CAPTION_JOB_LOAD} */
+  public static final String CAPTION_JOB_LOAD_KEY = "job.load.caption.embed";
+
+  /** The load introduced on the system by creating a caption job */
+  private float captionJobLoad = DEFAULT_CAPTION_JOB_LOAD;
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -1298,7 +1310,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
     }
 
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Caption.toString(), args);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Caption.toString(), args, captionJobLoad);
     } catch (ServiceRegistryException e) {
       throw new EmbedderException("Unable to create a job", e);
     }
@@ -2016,6 +2028,26 @@ logger.info("Starting parallel encode with profile {} ", profileId);
   @Override
   protected OrganizationDirectoryService getOrganizationDirectoryService() {
     return organizationDirectoryService;
+  }
+
+  @Override
+  public void updated(Dictionary properties) throws ConfigurationException {
+    String jobLoad = StringUtils.trimToNull((String) properties.get(CAPTION_JOB_LOAD_KEY));
+    if (jobLoad != null) {
+      try {
+        captionJobLoad = Float.parseFloat(jobLoad);
+        if (captionJobLoad < 0) {
+          logger.warn("Caption embedding job load set to less than 0, defaulting to 0");
+          captionJobLoad = 0.0f;
+        }
+        logger.info("Set caption job load to {}", captionJobLoad);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set caption job loads to {}. {} must be a float", jobLoad,
+                CAPTION_JOB_LOAD_KEY);
+        captionJobLoad = DEFAULT_CAPTION_JOB_LOAD;
+        logger.info("Set caption job load to default of {}", captionJobLoad);
+      }
+    }
   }
 
 }

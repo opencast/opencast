@@ -133,6 +133,10 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
     if (inspectStringJobLoad != null) {
       try {
         inspectJobLoad = Float.parseFloat(inspectStringJobLoad);
+        if (inspectJobLoad < 0) {
+          logger.warn("Inspect job load set to less than 0, defaulting to 0");
+          inspectJobLoad = 0.0f;
+        }
         logger.info("Set inspect job load to {}", inspectJobLoad);
       } catch (NumberFormatException e) {
         logger.warn("Can not set inspect job loads to {}. {} must be a float", inspectStringJobLoad,
@@ -146,6 +150,10 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
     if (enrichStringJobLoad != null) {
       try {
         enrichJobLoad = Float.parseFloat(enrichStringJobLoad);
+        if (enrichJobLoad < 0) {
+          logger.warn("Enrich job load set to less than 0, defaulting to 0");
+          enrichJobLoad = 0.0f;
+        }
         logger.info("Set enrich job load to {}", enrichJobLoad);
       } catch (NumberFormatException e) {
         logger.warn("Can not set enrich job loads to {}. {} must be a float", enrichStringJobLoad,

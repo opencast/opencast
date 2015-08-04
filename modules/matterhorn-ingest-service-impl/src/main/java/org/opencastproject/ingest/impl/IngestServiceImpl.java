@@ -580,7 +580,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               JOB_TYPE,
               INGEST_TRACK_FROM_URI,
               Arrays.asList(uri.toString(), flavor == null ? null : flavor.toString(),
-                      MediaPackageParser.getAsXml(mediaPackage)), null, false);
+                      MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -657,7 +657,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG_FROM_URI,
-              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false);
+              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -785,7 +785,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT_FROM_URI,
-              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false);
+              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -1435,6 +1435,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     if (fileStringJobLoad != null) {
       try {
         ingestFileJobLoad = Float.parseFloat(fileStringJobLoad);
+        if (ingestFileJobLoad < 0) {
+          logger.warn("File ingest job load set to less than 0, defaulting to 0");
+          ingestFileJobLoad = 0.0f;
+        }
         logger.info("Set ingest file job load to {}", ingestFileJobLoad);
       } catch (NumberFormatException e) {
         logger.warn("Can not set ingest file job loads to {}. {} must be a float", fileStringJobLoad,
@@ -1448,6 +1452,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     if (ingestStringZipJobLoad != null) {
       try {
         ingestZipJobLoad = Float.parseFloat(ingestStringZipJobLoad);
+        if (ingestZipJobLoad < 0) {
+          logger.warn("Zip ingest job load set to less than 0, defaulting to 0");
+          ingestZipJobLoad = 0.0f;
+        }
         logger.info("Set ingest zip job load to {}", ingestZipJobLoad);
       } catch (NumberFormatException e) {
         logger.warn("Can not set ingest zip job loads to {}. {} must be a float", ingestZipJobLoad,

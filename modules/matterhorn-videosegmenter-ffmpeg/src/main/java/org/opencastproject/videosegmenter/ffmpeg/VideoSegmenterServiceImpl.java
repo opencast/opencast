@@ -107,6 +107,15 @@ VideoSegmenterService, ManagedService {
   /** Default value for the number of pixels that may change between two frames without considering them different */
   public static final float DEFAULT_CHANGES_THRESHOLD = 0.05f; // 5% change
 
+  /** The load introduced on the system by creating a caption job */
+  public static final float DEFAULT_SEGMENTER_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_CAPTION_JOB_LOAD} */
+  public static final String SEGMENTER_JOB_LOAD_KEY = "job.load.videosegmenter";
+
+  /** The load introduced on the system by creating a caption job */
+  private float segmenterJobLoad = DEFAULT_SEGMENTER_JOB_LOAD;
+
   /** The logging facility */
   protected static final Logger logger = LoggerFactory
     .getLogger(VideoSegmenterServiceImpl.class);
@@ -186,6 +195,23 @@ VideoSegmenterService, ManagedService {
       }
     }
 
+    String jobLoad = StringUtils.trimToNull((String) properties.get(SEGMENTER_JOB_LOAD_KEY));
+    if (jobLoad != null) {
+      try {
+        segmenterJobLoad = Float.parseFloat(jobLoad);
+        if (segmenterJobLoad < 0) {
+          logger.warn("Video segmenter job load set to less than 0, defaulting to 0");
+          segmenterJobLoad = 0.0f;
+        }
+        logger.info("Set video segmenter job load to {}", segmenterJobLoad);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set caption job loads to {}. {} must be a float", jobLoad,
+                SEGMENTER_JOB_LOAD_KEY);
+        segmenterJobLoad = DEFAULT_SEGMENTER_JOB_LOAD;
+        logger.info("Set caption job load to default of {}", segmenterJobLoad);
+      }
+    }
+
   }
 
   /**
@@ -198,7 +224,7 @@ VideoSegmenterService, ManagedService {
     try {
       return serviceRegistry.createJob(JOB_TYPE,
           Operation.Segment.toString(),
-          Arrays.asList(MediaPackageElementParser.getAsXml(track)));
+          Arrays.asList(MediaPackageElementParser.getAsXml(track)), segmenterJobLoad);
     } catch (ServiceRegistryException e) {
       throw new VideoSegmenterException("Unable to create a job", e);
     }

@@ -682,6 +682,10 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     if (jobLoadString != null) {
       try {
         executeJobLoad = Float.parseFloat(jobLoadString);
+        if (executeJobLoad < 0) {
+          logger.warn("Execute job load set to less than 0, defaulting to 0");
+          executeJobLoad = 0.0f;
+        }
         logger.info("Set ingest file job load to {}", executeJobLoad);
       } catch (NumberFormatException e) {
         logger.warn("Can not set default execute job loads to {}. {} must be a float", jobLoadString,

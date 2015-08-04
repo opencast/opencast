@@ -67,6 +67,24 @@ import java.util.UUID;
  */
 public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer implements YouTubePublicationService, ManagedService {
 
+  /** The load on the system introduced by creating a publish job */
+  public static final float DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD = 1.0f;
+
+  /** The load on the system introduced by creating a retract job */
+  public static final float DEFAULT_YOUTUBE_RETRACT_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD} */
+  public static final String YOUTUBE_PUBLISH_LOAD_KEY = "job.load.youtube.publish";
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_YOUTUBE_RETRACT_JOB_LOAD} */
+  public static final String YOUTUBE_RETRACT_LOAD_KEY = "job.load.youtube.retract";
+
+  /** The load on the system introduced by creating a publish job */
+  private float youtubePublishJobLoad = DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD;
+
+  /** The load on the system introduced by creating a retract job */
+  private float youtubeRetractJobLoad = DEFAULT_YOUTUBE_RETRACT_JOB_LOAD;
+
   /** Time to wait between polling for status (milliseconds.) */
   private static final long POLL_MILLISECONDS = 30L * 1000L;
 
@@ -168,6 +186,40 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
     } catch (final Exception e) {
       throw new ConfigurationException("Failed to load YouTube v3 properties", dataStore, e);
     }
+
+    String publishJobLoad = StringUtils.trimToNull((String) properties.get(YOUTUBE_PUBLISH_LOAD_KEY));
+    if (publishJobLoad != null) {
+      try {
+        youtubePublishJobLoad = Float.parseFloat(publishJobLoad);
+        if (youtubePublishJobLoad < 0) {
+          logger.warn("Youtube publish job load set to less than 0, defaulting to 0");
+          youtubePublishJobLoad = 0.0f;
+        }
+        logger.info("Set YouTube publish job load to {}", youtubePublishJobLoad);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set YouTube publish job loads to {}. {} must be a float", publishJobLoad,
+                YOUTUBE_PUBLISH_LOAD_KEY);
+        youtubePublishJobLoad = DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD;
+        logger.info("Set YouTube publish job load to default of {}", youtubePublishJobLoad);
+      }
+    }
+
+    String retractJobLoad = StringUtils.trimToNull((String) properties.get(YOUTUBE_RETRACT_LOAD_KEY));
+    if (retractJobLoad != null) {
+      try {
+        youtubeRetractJobLoad = Float.parseFloat(retractJobLoad);
+        if (youtubeRetractJobLoad < 0) {
+          logger.warn("Youtube retract job load set to less than 0, defaulting to 0");
+          youtubeRetractJobLoad = 0.0f;
+        }
+        logger.info("Set YouTube retract job load to {}", youtubePublishJobLoad);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set YouTube retract job loads to {}. {} must be a float", retractJobLoad,
+                YOUTUBE_RETRACT_LOAD_KEY);
+        youtubeRetractJobLoad = DEFAULT_YOUTUBE_RETRACT_JOB_LOAD;
+        logger.info("Set YouTube retract job load to default of {}", youtubeRetractJobLoad);
+      }
+    }
   }
 
   @Override
@@ -175,7 +227,7 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
     if (mediaPackage.contains(track)) {
       try {
         final List<String> args = Arrays.asList(MediaPackageParser.getAsXml(mediaPackage), track.getIdentifier());
-        return serviceRegistry.createJob(JOB_TYPE, Operation.Publish.toString(), args);
+        return serviceRegistry.createJob(JOB_TYPE, Operation.Publish.toString(), args, youtubePublishJobLoad);
       } catch (ServiceRegistryException e) {
         throw new PublicationException("Unable to create a job for track: " + track.toString(), e);
       }
@@ -265,7 +317,7 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
     try {
       List<String> arguments = new ArrayList<String>();
       arguments.add(MediaPackageParser.getAsXml(mediaPackage));
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(), arguments);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(), arguments, youtubeRetractJobLoad);
     } catch (ServiceRegistryException e) {
       throw new PublicationException("Unable to create a job", e);
     }
