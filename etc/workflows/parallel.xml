@@ -143,10 +143,13 @@
     <!-- Apply ACL from series to the mediapackage -->
 
     <operation
-      id="apply-acl"
+      id="series"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Applying access control entries">
+      <configurations>
+        <configuration key="apply-acl">true</configuration>
+      </configurations>
     </operation>
     
     <!-- Tag the incoming source material for archival -->
