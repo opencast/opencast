@@ -24,7 +24,7 @@ The following table contains the workflow operations that are available in an ou
 |email			|Sends email notifications at any part of a workflow	|[Documentation](email-woh.md)|
 |republish		|Republishes elements to search				|[Documentation](republish-woh.md)|
 |tag			|Modify the tag sets of media package elements		|[Documentation](tag-woh.md)|
-|apply-acl		|Apply ACL rom series to the mediapackage		|[Documentation](applyacl-woh.md)|
+|series		|Apply series to the mediapackage		|[Documentation](series-woh.md)|
 |inspect			|Inspect the media (check if it is valid)		|[Documentation](inspect-woh.md)|
 |prepare-av		|Preparing audio and video work versions		|[Documentation](prepareav-woh.md)|
 |compose			|Encode media files using FFmpeg			|[Documentation](compose-woh.md)|

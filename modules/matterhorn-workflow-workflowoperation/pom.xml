@@ -21,6 +21,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-index-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workflow-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -81,7 +86,6 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/operations/append.xml,
-              OSGI-INF/operations/apply-acl.xml,
               OSGI-INF/operations/caption.xml,
               OSGI-INF/operations/cleanup.xml,
               OSGI-INF/operations/cli.xml,
@@ -91,6 +95,7 @@
               OSGI-INF/operations/error-handler.xml,
               OSGI-INF/operations/failing.xml,
               OSGI-INF/operations/include.xml,
+              OSGI-INF/operations/series.xml,
               OSGI-INF/operations/tag.xml,
               OSGI-INF/operations/zip.xml
             </Service-Component>
