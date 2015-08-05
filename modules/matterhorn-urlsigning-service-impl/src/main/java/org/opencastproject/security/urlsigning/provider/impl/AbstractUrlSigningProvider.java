@@ -172,7 +172,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
       try {
         addKeyEntry(keyIdValue, urlValue, keyValue);
         getLogger().info("{} will handle uris that start with '{}' with the key id '{}'",
-                new Object[] { this.toString(), keyIdValue, urlValue });
+                new Object[] { this.toString(), urlValue, keyIdValue });
       } catch (IllegalStateException e) {
         throw new ConfigurationException(urlValue, e.getMessage());
       }
