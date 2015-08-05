@@ -338,7 +338,7 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
   }
 
   @Override
-  public Job createJob(String type, String operation, float jobLoad) throws ServiceRegistryException {
+  public Job createJob(String type, String operation, Float jobLoad) throws ServiceRegistryException {
     return createJob(type, operation, null, null, true, jobLoad);
   }
 
@@ -348,7 +348,7 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
   }
 
   @Override
-  public Job createJob(String type, String operation, List<String> arguments, float jobLoad) throws ServiceRegistryException {
+  public Job createJob(String type, String operation, List<String> arguments, Float jobLoad) throws ServiceRegistryException {
     return createJob(type, operation, arguments, null, true, jobLoad);
   }
 
@@ -359,7 +359,7 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
   }
 
   @Override
-  public Job createJob(String type, String operation, List<String> arguments, String payload, float jobLoad)
+  public Job createJob(String type, String operation, List<String> arguments, String payload, Float jobLoad)
           throws ServiceRegistryException {
     return createJob(type, operation, arguments, payload, true, jobLoad);
   }
@@ -371,7 +371,7 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
   }
 
   @Override
-  public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, float jobLoad)
+  public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, Float jobLoad)
           throws ServiceRegistryException {
     return createJob(type, operation, arguments, payload, queueable, getCurrentJob(), jobLoad);
   }
@@ -384,7 +384,7 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
 
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
-          Job parentJob, float jobLoad) throws ServiceRegistryException {
+          Job parentJob, Float jobLoad) throws ServiceRegistryException {
     final HttpPost post = post("job");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();

@@ -375,7 +375,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String, float)
    */
   @Override
-  public Job createJob(String type, String operation, float jobLoad) throws ServiceRegistryException {
+  public Job createJob(String type, String operation, Float jobLoad) throws ServiceRegistryException {
     return createJob(this.hostName, type, operation, null, null, true, getCurrentJob(), jobLoad);
   }
 
@@ -397,7 +397,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *      java.util.List, float)
    */
   @Override
-  public Job createJob(String type, String operation, List<String> arguments, float jobLoad)
+  public Job createJob(String type, String operation, List<String> arguments, Float jobLoad)
           throws ServiceRegistryException {
     return createJob(this.hostName, type, operation, arguments, null, true, getCurrentJob(), jobLoad);
   }
@@ -421,7 +421,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *      java.util.List, java.lang.String, float)
    */
   @Override
-  public Job createJob(String type, String operation, List<String> arguments, String payload, float jobLoad)
+  public Job createJob(String type, String operation, List<String> arguments, String payload, Float jobLoad)
           throws ServiceRegistryException {
     return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob(), jobLoad);
   }
@@ -446,7 +446,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable,
-          float jobLoad) throws ServiceRegistryException {
+          Float jobLoad) throws ServiceRegistryException {
     return createJob(this.hostName, type, operation, arguments, payload, dispatchable, getCurrentJob(), jobLoad);
   }
 
@@ -469,7 +469,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable,
-          Job parentJob, float jobLoad) throws ServiceRegistryException {
+          Job parentJob, Float jobLoad) throws ServiceRegistryException {
     return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob, jobLoad);
   }
 

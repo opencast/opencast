@@ -345,7 +345,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
           float)
    */
   @Override
-  public Job createJob(String type, String operation, float jobLoad) throws ServiceRegistryException {
+  public Job createJob(String type, String operation, Float jobLoad) throws ServiceRegistryException {
     return createJob(type, operation, null, null, true, 1.0f);
   }
 
@@ -367,7 +367,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
           java.util.List, float)
    */
   @Override
-  public Job createJob(String type, String operation, List<String> arguments, float jobLoad)
+  public Job createJob(String type, String operation, List<String> arguments, Float jobLoad)
           throws ServiceRegistryException {
     return createJob(type, operation, arguments, null, true, jobLoad);
   }
@@ -391,7 +391,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
           java.util.List, java.lang.String, float)
    */
   @Override
-  public Job createJob(String type, String operation, List<String> arguments, String payload, float jobLoad)
+  public Job createJob(String type, String operation, List<String> arguments, String payload, Float jobLoad)
           throws ServiceRegistryException {
     return createJob(type, operation, arguments, payload, true, jobLoad);
   }
@@ -416,7 +416,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    */
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
-          float jobLoad) throws ServiceRegistryException {
+          Float jobLoad) throws ServiceRegistryException {
     return createJob(type, operation, arguments, payload, queueable, null, jobLoad);
   }
 
@@ -440,7 +440,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    */
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
-          Job parentJob, float jobLoad) throws ServiceRegistryException {
+          Job parentJob, Float jobLoad) throws ServiceRegistryException {
     if (getServiceRegistrationsByType(type).size() == 0)
       logger.warn("Service " + type + " not available");
 

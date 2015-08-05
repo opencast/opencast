@@ -213,7 +213,7 @@ public interface ServiceRegistry {
    * @throws ServiceRegistryException
    *           if there is a problem creating the job
    */
-  Job createJob(String type, String operation, float jobLoad) throws ServiceRegistryException;
+  Job createJob(String type, String operation, Float jobLoad) throws ServiceRegistryException;
 
   /**
    * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
@@ -257,7 +257,7 @@ public interface ServiceRegistry {
    * @throws ServiceRegistryException
    *           if there is a problem creating the job
    */
-  Job createJob(String type, String operation, List<String> arguments, float jobLoad) throws ServiceRegistryException;
+  Job createJob(String type, String operation, List<String> arguments, Float jobLoad) throws ServiceRegistryException;
 
   /**
    * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
@@ -305,7 +305,7 @@ public interface ServiceRegistry {
    * @throws ServiceRegistryException
    *           if there is a problem creating the job
    */
-  Job createJob(String type, String operation, List<String> arguments, String payload, float jobLoad)
+  Job createJob(String type, String operation, List<String> arguments, String payload, Float jobLoad)
           throws ServiceRegistryException;
 
   /**
@@ -363,7 +363,7 @@ public interface ServiceRegistry {
    * @throws ServiceRegistryException
    *           if there is a problem creating the job
    */
-  Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, float jobLoad)
+  Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, Float jobLoad)
           throws ServiceRegistryException;
 
   /**
@@ -416,7 +416,7 @@ public interface ServiceRegistry {
    *           if there is a problem creating the job
    */
   Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, Job parentJob,
-                float jobLoad)
+                Float jobLoad)
           throws ServiceRegistryException;
 
   /**

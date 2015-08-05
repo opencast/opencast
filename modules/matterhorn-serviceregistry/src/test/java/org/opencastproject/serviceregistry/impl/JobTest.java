@@ -548,7 +548,7 @@ public class JobTest {
   @Test
   public void testJobsQueuedOnServiceUnregistration() throws Exception {
     // Create a job
-    JobJpaImpl job = (JobJpaImpl) serviceRegistry.createJob(JOB_TYPE_1, "some operation", null, null, false, null);
+    JobJpaImpl job = (JobJpaImpl) serviceRegistry.createJob(JOB_TYPE_1, "some operation", null, null, false, 1.0f);
 
     // Set its status to running on a localhost
     job.setStatus(Status.RUNNING);
@@ -618,19 +618,19 @@ public class JobTest {
 
   @Test
   public void testRemoveJobsWithoutParent() throws Exception {
-    Job jobRunning = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, null);
+    Job jobRunning = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, 1.0f);
     jobRunning.setStatus(Status.RUNNING);
     serviceRegistry.updateJob(jobRunning);
 
-    Job jobFinished = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, null);
+    Job jobFinished = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, 1.0f);
     jobFinished.setStatus(Status.FINISHED);
     serviceRegistry.updateJob(jobFinished);
 
-    Job jobFailed = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, null);
+    Job jobFailed = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, 1.0f);
     jobFailed.setStatus(Status.FAILED, FailureReason.NONE);
     serviceRegistry.updateJob(jobFailed);
 
-    Job parent = serviceRegistry.createJob(JOB_TYPE_1, "START_OPERATION", null, null, false, null);
+    Job parent = serviceRegistry.createJob(JOB_TYPE_1, "START_OPERATION", null, null, false, 1.0f);
     parent.setStatus(Status.FAILED);
     serviceRegistry.updateJob(parent);
 

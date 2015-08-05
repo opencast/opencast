@@ -21,12 +21,12 @@
 
 package org.opencastproject.publication.youtube;
 
-import com.google.api.services.youtube.model.Playlist;
-import com.google.api.services.youtube.model.PlaylistItem;
-import com.google.api.services.youtube.model.Video;
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -40,18 +40,20 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.api.services.youtube.model.Playlist;
+import com.google.api.services.youtube.model.PlaylistItem;
+import com.google.api.services.youtube.model.Video;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Properties;
-
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
 
 public class YouTubeV3PublicationServiceImplTest {
 
@@ -94,7 +96,7 @@ public class YouTubeV3PublicationServiceImplTest {
     expect(youTubeService.addVideoToMyChannel(anyObject(VideoUpload.class))).andReturn(new Video()).once();
     expect(youTubeService.addPlaylistItem(anyObject(String.class), anyObject(String.class))).andReturn(new PlaylistItem()).once();
 
-    expect(registry.createJob(anyObject(String.class), anyObject(String.class), anyObject(List.class))).andReturn(new JaxbJob()).once();
+    expect(registry.createJob(anyObject(String.class), anyObject(String.class), anyObject(List.class), anyObject(Float.class))).andReturn(new JaxbJob()).once();
     replay(youTubeService, orgDirectory, security, registry, userDirectoryService, workspace);
     service.publish(mediaPackage, mediaPackage.getTracks()[0]);
   }
