@@ -31,6 +31,8 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,6 +49,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class ResourceRequestUtil {
   private static final Logger logger = LoggerFactory.getLogger(ResourceRequestUtil.class);
+
+  private static final DateTimeFormatter humanReadableFormat = DateTimeFormat.forPattern("yyyy-MM-dd kk:mm:ss Z").withZoneUTC();
 
   private ResourceRequestUtil() {
   }
@@ -302,17 +306,19 @@ public final class ResourceRequestUtil {
     // value of 410.
     if (new DateTime(DateTimeZone.UTC).isAfter(policy.getValidUntil().getMillis())) {
       resourceRequest.setStatus(Status.Gone);
-      resourceRequest.setRejectionReason(String.format(
-              "The resource is gone because now '%s' is after the expiry time of %s", new DateTime(DateTimeZone.UTC),
-              new DateTime(policy.getValidUntil().getMillis())));
+      resourceRequest.setRejectionReason(
+              String.format("The resource is gone because now '%s' is after the expiry time of '%s'",
+                      humanReadableFormat.print(new DateTime(DateTimeZone.UTC)),
+                      humanReadableFormat.print(new DateTime(policy.getValidUntil().getMillis(), DateTimeZone.UTC))));
       return resourceRequest;
     }
     if (policy.getValidFrom().isPresent()
             && new DateTime(DateTimeZone.UTC).isBefore(policy.getValidFrom().get().getMillis())) {
       resourceRequest.setStatus(Status.Gone);
-      resourceRequest.setRejectionReason(String.format(
-              "The resource is gone because now '%s' is before the available time of ", new DateTime(DateTimeZone.UTC),
-              policy.getValidFrom().get()));
+      resourceRequest.setRejectionReason(
+              String.format("The resource is gone because now '%s' is before the available time of ",
+                      humanReadableFormat.print(new DateTime(DateTimeZone.UTC)),
+                      humanReadableFormat.print(policy.getValidFrom().get())));
       return resourceRequest;
     }
     // If all of the above conditions pass, then allow the video to be played.
