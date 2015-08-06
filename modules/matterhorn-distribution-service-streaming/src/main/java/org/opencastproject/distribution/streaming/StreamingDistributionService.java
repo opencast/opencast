@@ -22,7 +22,11 @@
 package org.opencastproject.distribution.streaming;
 
 import static java.lang.String.format;
+import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 import static org.opencastproject.util.PathSupport.path;
+import static org.opencastproject.util.UrlSupport.concat;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
@@ -33,6 +37,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -40,29 +45,36 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.RequireUtil;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.opencastproject.mediapackage.track.TrackImpl;
 
-/**
- * Distributes media to the local media delivery directory.
- */
+/** Distributes media to the local media delivery directory. */
 public class StreamingDistributionService extends AbstractJobProducer implements DistributionService {
-
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionService.class);
 
@@ -72,10 +84,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   /** List of available operations on jobs */
   private enum Operation {
     Distribute, Retract
-  };
-
-  /** Default distribution directory */
-  public static final String DEFAULT_DISTRIBUTION_DIR = "opencast" + File.separator;
+  }
 
   /** The workspace reference */
   protected Workspace workspace = null;
@@ -92,18 +101,9 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService = null;
 
-  /** The distribution directory */
-  protected File distributionDirectory = null;
+  private Option<Locations> locations = none();
 
-  /** The base URL for streaming */
-  protected String streamingUrl = null;
-
-  /** Compatibility mode for nginx and maybe other streaming servers*/
-  protected boolean flvCompatibilityMode = false;
-
-  /**
-   * Creates a new instance of the streaming distribution service.
-   */
+  /** Creates a new instance of the streaming distribution service. */
   public StreamingDistributionService() {
     super(JOB_TYPE);
   }
@@ -111,35 +111,32 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   protected void activate(ComponentContext cc) {
     // Get the configured streaming and server URLs
     if (cc != null) {
-      streamingUrl = StringUtils.trimToNull(cc.getBundleContext().getProperty("org.opencastproject.streaming.url"));
-      if (streamingUrl == null)
-        logger.warn("Stream url was not set (org.opencastproject.streaming.url)");
-      else
-        logger.info("streaming url is {}", streamingUrl);
-
-      String distributionDirectoryPath = StringUtils.trimToNull(cc.getBundleContext().getProperty(
-              "org.opencastproject.streaming.directory"));
-      if (distributionDirectoryPath == null)
-        logger.warn("Streaming distribution directory must be set (org.opencastproject.streaming.directory)");
-      else {
-        distributionDirectory = new File(distributionDirectoryPath);
-        if (!distributionDirectory.isDirectory()) {
-          try {
-            FileUtils.forceMkdir(distributionDirectory);
-          } catch (IOException e) {
-            throw new IllegalStateException("Distribution directory does not exist and can't be created", e);
+      for (final String streamingUrl : getOptContextProperty(cc, "org.opencastproject.streaming.url")) {
+        for (final String distributionDirectoryPath : getOptContextProperty(cc,
+                "org.opencastproject.streaming.directory")) {
+          final File distributionDirectory = new File(distributionDirectoryPath);
+          if (!distributionDirectory.isDirectory()) {
+            try {
+              FileUtils.forceMkdir(distributionDirectory);
+            } catch (IOException e) {
+              throw new IllegalStateException("Distribution directory does not exist and can't be created", e);
+            }
           }
+          String compatibility = StringUtils
+                  .trimToNull(cc.getBundleContext().getProperty("org.opencastproject.streaming.flvcompatibility"));
+          boolean flvCompatibilityMode = false;
+          if (compatibility != null) {
+            flvCompatibilityMode = Boolean.parseBoolean(compatibility);
+            logger.info("Streaming distribution is using FLV compatibility mode");
+          }
+          locations = some(new Locations(URI.create(streamingUrl), distributionDirectory, flvCompatibilityMode));
+          logger.info("Streaming url is {}", streamingUrl);
+          logger.info("Streaming distribution directory is {}", distributionDirectory);
+          return;
         }
+        logger.info("No streaming distribution directory configured (org.opencastproject.streaming.directory)");
       }
-
-      String compatibility = StringUtils.trimToNull(cc.getBundleContext().getProperty(
-              "org.opencastproject.streaming.flvcompatibility"));
-      if (compatibility != null) {
-        flvCompatibilityMode = Boolean.parseBoolean(compatibility);
-        logger.info("Streaming distribution is using FLV compatibility mode");
-      }
-
-      logger.info("Streaming distribution directory is {}", distributionDirectory);
+      logger.info("No streaming url configured (org.opencastproject.streaming.url)");
     }
   }
 
@@ -150,21 +147,15 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    *      org.opencastproject.mediapackage.MediaPackage, String)
    */
   @Override
-  public Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException,
-          MediaPackageException {
-    if (mediapackage == null)
-      throw new MediaPackageException("Mediapackage must be specified");
-    if (elementId == null)
-      throw new MediaPackageException("Element ID must be specified");
-    if (channelId == null)
-      throw new MediaPackageException("Channel ID must be specified");
+  public Job distribute(String channelId, MediaPackage mediapackage, String elementId)
+          throws DistributionException, MediaPackageException {
+    if (locations.isNone())
+      return null;
 
-    if (StringUtils.isBlank(streamingUrl))
-      throw new IllegalStateException("Stream url must be set (org.opencastproject.streaming.url)");
-    if (distributionDirectory == null)
-      throw new IllegalStateException(
-              "Streaming distribution directory must be set (org.opencastproject.streaming.directory)");
-
+    RequireUtil.notNull(mediapackage, "mediapackage");
+    RequireUtil.notNull(elementId, "elementId");
+    RequireUtil.notNull(channelId, "channelId");
+    //
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(),
               Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId));
@@ -176,37 +167,33 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   /**
    * Distribute a Mediapackage element to the download distribution service.
    *
-   * @param mediapackage
+   * @param mp
    *          The media package that contains the element to distribute.
-   * @param elementId
+   * @param mpeId
    *          The id of the element that should be distributed contained within the media package.
    * @return A reference to the MediaPackageElement that has been distributed.
    * @throws DistributionException
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
    *           cannot be copied or another unexpected exception occurs.
    */
-  public MediaPackageElement distributeElement(String channelId, final MediaPackage mediapackage, String elementId)
+
+  private MediaPackageElement distributeElement(String channelId, final MediaPackage mp, String mpeId)
           throws DistributionException {
-    if (mediapackage == null)
-      throw new IllegalArgumentException("Mediapackage must be specified");
-    if (elementId == null)
-      throw new IllegalArgumentException("Element ID must be specified");
-    if (channelId == null)
-      throw new IllegalArgumentException("Channel ID must be specified");
-
-    final MediaPackageElement element = mediapackage.getElementById(elementId);
-
+    RequireUtil.notNull(channelId, "channelId");
+    RequireUtil.notNull(mp, "mp");
+    RequireUtil.notNull(mpeId, "mpeId");
+    //
+    final MediaPackageElement element = mp.getElementById(mpeId);
+    // Make sure the element exists
+    if (element == null) {
+      throw new IllegalStateException("No element " + mpeId + " found in media package");
+    }
     // Streaming servers only deal with tracks
     if (!MediaPackageElement.Type.Track.equals(element.getElementType())) {
-      logger.debug("Skipping {} {} for distribution to the streaming server", element.getElementType().toString()
-              .toLowerCase(), element.getIdentifier());
+      logger.debug("Skipping {} {} for distribution to the streaming server",
+              element.getElementType().toString().toLowerCase(), element.getIdentifier());
       return null;
     }
-
-    // Make sure the element exists
-    if (mediapackage.getElementById(elementId) == null)
-      throw new IllegalStateException("No element " + elementId + " found in mediapackage");
-
     try {
       File source;
       try {
@@ -216,35 +203,37 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       } catch (IOException e) {
         throw new DistributionException("Error loading " + element.getURI() + " from the workspace", e);
       }
-      File destination = getDistributionFile(channelId, mediapackage, element);
 
+      // Try to find a duplicated element source
+      try {
+        source = findDuplicatedElementSource(source, mp.getIdentifier().compact());
+      } catch (IOException e) {
+        logger.warn("Unable to find duplicated source {}: {}", source, ExceptionUtils.getMessage(e));
+      }
+
+      final File destination = locations.get().createDistributionFile(securityService.getOrganization().getId(),
+              channelId, mp.getIdentifier().compact(), element.getIdentifier(), element.getURI());
       // Put the file in place
       try {
         FileUtils.forceMkdir(destination.getParentFile());
       } catch (IOException e) {
         throw new DistributionException("Unable to create " + destination.getParentFile(), e);
       }
-      logger.info("Distributing {} to {}", elementId, destination);
+      logger.info("Distributing {} to {}", mpeId, destination);
 
       try {
         FileSupport.link(source, destination, true);
       } catch (IOException e) {
         throw new DistributionException("Unable to copy " + source + " to " + destination, e);
       }
-
       // Create a representation of the distributed file in the mediapackage
       final MediaPackageElement distributedElement = (MediaPackageElement) element.clone();
-      try {
-        distributedElement.setURI(getDistributionUri(channelId, mediapackage, element));
-      } catch (URISyntaxException e) {
-        throw new DistributionException("Distributed element produces an invalid URI", e);
-      }
+      distributedElement.setURI(locations.get().createDistributionUri(securityService.getOrganization().getId(),
+              channelId, mp.getIdentifier().compact(), element.getIdentifier(), element.getURI()));
       distributedElement.setIdentifier(null);
-      ((TrackImpl)distributedElement).setTransport(TrackImpl.StreamingProtocol.RTMP);
-
+      ((TrackImpl) distributedElement).setTransport(TrackImpl.StreamingProtocol.RTMP);
       logger.info("Finished distribution of {}", element);
       return distributedElement;
-
     } catch (Exception e) {
       logger.warn("Error distributing " + element, e);
       if (e instanceof DistributionException) {
@@ -263,13 +252,13 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    */
   @Override
   public Job retract(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
-    if (mediaPackage == null)
-      throw new IllegalArgumentException("Mediapackage must be specified");
-    if (elementId == null)
-      throw new IllegalArgumentException("Element ID must be specified");
-    if (channelId == null)
-      throw new IllegalArgumentException("Channel ID must be specified");
+    if (locations.isNone())
+      return null;
 
+    RequireUtil.notNull(mediaPackage, "mediaPackage");
+    RequireUtil.notNull(elementId, "elementId");
+    RequireUtil.notNull(channelId, "channelId");
+    //
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
               Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), elementId));
@@ -283,48 +272,45 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    *
    * @param channelId
    *          the channel id
-   * @param mediapackage
+   * @param mp
    *          the mediapackage
-   * @param elementId
+   * @param mpeId
    *          the element identifier
    * @return the retracted element or <code>null</code> if the element was not retracted
    */
-  protected MediaPackageElement retractElement(String channelId, MediaPackage mediapackage, String elementId)
+  private MediaPackageElement retractElement(final String channelId, final MediaPackage mp, final String mpeId)
           throws DistributionException {
-
-    if (mediapackage == null)
-      throw new IllegalArgumentException("Mediapackage must be specified");
-    if (elementId == null)
-      throw new IllegalArgumentException("Element ID must be specified");
-
+    RequireUtil.notNull(channelId, "channelId");
+    RequireUtil.notNull(mp, "mp");
+    RequireUtil.notNull(mpeId, "elementId");
     // Make sure the element exists
-    final MediaPackageElement element = mediapackage.getElementById(elementId);
-    if (element == null)
-      throw new IllegalStateException("No element " + elementId + " found in mediapackage");
-
+    final MediaPackageElement mpe = mp.getElementById(mpeId);
+    if (mpe == null) {
+      throw new IllegalStateException("No element " + mpeId + " found in media package");
+    }
     try {
-      final File elementFile = getDistributionFile(channelId, mediapackage, element);
-      final File mediapackageDir = getMediaPackageDirectory(channelId, mediapackage);
-
-      // Does the file exist? If not, the current element has not been distributed to this channel
-      // or has been removed otherwise
-      if (!elementFile.exists())
-        return element;
-
-      // Try to remove the file and - if possible - the parent folder
-      FileUtils.forceDelete(elementFile);
-      File elementDir = elementFile.getParentFile();
-      if (elementDir != null && elementDir.isDirectory() && elementDir.list().length == 0) {
-        FileSupport.delete(elementDir);
+      for (final File mpeFile : locations.get().getDistributionFileFrom(mpe.getURI())) {
+        logger.info("Retracting element {} from {}", mpe, mpeFile);
+        // Does the file exist? If not, the current element has not been distributed to this channel
+        // or has been removed otherwise
+        if (mpeFile.exists()) {
+          // Try to remove the file and - if possible - the parent folder
+          final File parentDir = mpeFile.getParentFile();
+          FileUtils.forceDelete(mpeFile);
+          FileSupport.deleteHierarchyIfEmpty(new File(locations.get().getBaseDir()), parentDir);
+          logger.info("Finished retracting element {} of media package {}", mpeId, mp);
+          return mpe;
+        } else {
+          logger.info(format("Element %s@%s has already been removed from publication channel %s", mpeId,
+                  mp.getIdentifier(), channelId));
+          return mpe;
+        }
       }
-      if (mediapackageDir.isDirectory() && mediapackageDir.list().length == 0) {
-        FileSupport.delete(mediapackageDir);
-      }
-      logger.info("Finished rectracting element {} of media package {}", elementId, mediapackage);
-
-      return element;
+      // could not extract a file from the element's URI
+      logger.info(format("Element %s has not been published to publication channel %s", mpe.getURI(), channelId));
+      return mpe;
     } catch (Exception e) {
-      logger.warn("Error retracting element " + elementId + " of mediapackage " + mediapackage, e);
+      logger.warn(format("Error retracting element %s of media package %s", mpeId, mp), e);
       if (e instanceof DistributionException) {
         throw (DistributionException) e;
       } else {
@@ -332,72 +318,6 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       }
     }
 
-  }
-
-  /**
-   * Gets the destination file to copy the contents of a mediapackage element.
-   *
-   * @return The file to copy the content to
-   */
-  protected File getDistributionFile(String channelId, MediaPackage mp, MediaPackageElement element) {
-    String uriString = element.getURI().toString();
-    final String directoryName = distributionDirectory.getAbsolutePath();
-    if (uriString.startsWith(streamingUrl)) {
-      if (uriString.lastIndexOf(".") < (uriString.length() - 4)) {
-        if (uriString.contains("mp4:")) {
-          uriString += ".mp4";
-          uriString = uriString.replace("mp4:", "");
-        } else if (uriString.contains("flv:")) {
-          uriString += ".flv";
-          uriString = uriString.replace("flv:", "");
-        } else if (uriString.contains("mp3:")) {
-          uriString += ".mp3";
-          uriString = uriString.replace("mp3:", "");
-        } else {
-          uriString += ".flv";
-        }
-      }
-      String[] splitUrl = uriString.substring(streamingUrl.length() + 1).split("/");
-      if (splitUrl.length < 4) {
-        logger.warn(format(
-                "Malformed URI %s. Must be of format .../{channelId}/{mediapackageId}/{elementId}/{fileName}."
-                        + " Trying URI without channelId", uriString));
-        return new File(path(directoryName, splitUrl[0], splitUrl[1], splitUrl[2]));
-      } else {
-        return new File(path(directoryName, splitUrl[0], splitUrl[1], splitUrl[2], splitUrl[3]));
-      }
-    }
-    return new File(path(directoryName, channelId, mp.getIdentifier().compact(), element.getIdentifier(),
-            FilenameUtils.getName(uriString)));
-  }
-
-  /**
-   * Gets the directory containing the distributed files for this mediapackage.
-   *
-   * @return the filesystem directory
-   */
-  protected File getMediaPackageDirectory(String channelId, MediaPackage mediaPackage) {
-    return new File(distributionDirectory, path(channelId, mediaPackage.getIdentifier().compact()));
-  }
-
-  /**
-   * Gets the URI for the element to be distributed.
-   *
-   * @return The resulting URI after distribution
-   * @throws URISyntaxException
-   *           if the concrete implementation tries to create a malformed uri
-   */
-  protected URI getDistributionUri(String channelId, MediaPackage mp, MediaPackageElement element)
-          throws URISyntaxException {
-    String elementId = element.getIdentifier();
-    String fileName = FilenameUtils.getBaseName(element.getURI().toString());
-    String tag = FilenameUtils.getExtension(element.getURI().toString()) + ":";
-
-    // removes the tag for flv files, but keeps it for all others (mp4 needs it)
-    if (flvCompatibilityMode && "flv:".equals(tag))
-    tag = "";
-
-    return new URI(UrlSupport.concat(streamingUrl, tag + channelId, mp.getIdentifier().compact(), elementId, fileName));
   }
 
   /**
@@ -420,11 +340,8 @@ public class StreamingDistributionService extends AbstractJobProducer implements
           MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, elementId);
           return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
         case Retract:
-          MediaPackageElement retractedElement = null;
-          if (distributionDirectory != null && StringUtils.isNotBlank(streamingUrl)) {
-            retractedElement = retractElement(channelId, mediapackage, elementId);
-          }
-          return (retractedElement != null) ? MediaPackageElementParser.getAsXml(retractedElement) : null;
+          return locations.isSome()
+                  ? MediaPackageElementParser.getAsXml(retractElement(channelId, mediapackage, elementId)) : null;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
@@ -525,5 +442,224 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   @Override
   protected OrganizationDirectoryService getOrganizationDirectoryService() {
     return organizationDirectoryService;
+  }
+
+  /**
+   * Try to find the same file being already distributed in one of the other channels
+   *
+   * @param source
+   *          the source file
+   * @param mpId
+   *          the element's mediapackage id
+   * @return the found duplicated file or the given source if nothing has been found
+   * @throws IOException
+   *           if an I/O error occurs
+   */
+  private File findDuplicatedElementSource(final File source, final String mpId) throws IOException {
+    String orgId = securityService.getOrganization().getId();
+    final Path rootPath = new File(path(locations.get().getBaseDir(), orgId)).toPath();
+
+    if (!Files.exists(rootPath))
+      return source;
+
+    List<Path> mediaPackageDirectories = new ArrayList<>();
+    try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(rootPath)) {
+      for (Path path : directoryStream) {
+        Path mpDir = new File(path.toFile(), mpId).toPath();
+        if (Files.exists(mpDir)) {
+          mediaPackageDirectories.add(mpDir);
+        }
+      }
+    }
+
+    if (mediaPackageDirectories.isEmpty())
+      return source;
+
+    final long size = Files.size(source.toPath());
+
+    final File[] result = new File[1];
+    for (Path p : mediaPackageDirectories) {
+      Files.walkFileTree(p, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          if (Files.isDirectory(file))
+            return FileVisitResult.CONTINUE;
+
+          if (size != attrs.size())
+            return FileVisitResult.CONTINUE;
+
+          if (size < 4096) {
+            if (!Arrays.equals(Files.readAllBytes(source.toPath()), Files.readAllBytes(file)))
+              return FileVisitResult.CONTINUE;
+
+          } else {
+            try (InputStream is1 = Files.newInputStream(source.toPath());
+                    InputStream is2 = Files.newInputStream(file)) {
+              if (!IOUtils.contentEquals(is1, is2))
+                return FileVisitResult.CONTINUE;
+            }
+          }
+          result[0] = file.toFile();
+          return FileVisitResult.TERMINATE;
+        }
+      });
+      if (result[0] != null)
+        break;
+    }
+    if (result[0] != null)
+      return result[0];
+
+    return source;
+  }
+
+  public static class Locations {
+    private final String baseUri;
+    private final String baseDir;
+
+    /** Compatibility mode for nginx and maybe other streaming servers */
+    private boolean flvCompatibilityMode = false;
+
+    /**
+     * @param baseUri
+     *          the base URL of the distributed streaming artifacts
+     * @param baseDir
+     *          the file system base directory below which streaming distribution artifacts are stored
+     */
+    public Locations(URI baseUri, File baseDir, boolean flvCompatibilityMode) {
+      this.flvCompatibilityMode = flvCompatibilityMode;
+      try {
+        final String ensureSlash = baseUri.getSchemeSpecificPart().endsWith("/") ? baseUri.getSchemeSpecificPart()
+                : baseUri.getSchemeSpecificPart() + "/";
+        this.baseUri = new URI(baseUri.getScheme(), ensureSlash, null).toString();
+        this.baseDir = baseDir.getAbsolutePath();
+      } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    public String getBaseUri() {
+      return baseUri;
+    }
+
+    public String getBaseDir() {
+      return baseDir;
+    }
+
+    public boolean isDistributionUrl(URI mpeUrl) {
+      return mpeUrl.toString().startsWith(baseUri);
+    }
+
+    public Option<URI> dropBase(URI mpeUrl) {
+      if (isDistributionUrl(mpeUrl)) {
+        return some(URI.create(mpeUrl.toString().substring(baseUri.length())));
+      } else {
+        return none();
+      }
+    }
+
+    /**
+     * Try to retrieve the distribution file from a distribution URI. This is the the inverse function of
+     * {@link #createDistributionUri(String, String, String, String, java.net.URI)}.
+     *
+     * @param mpeDistUri
+     *          the URI of a distributed media package element
+     * @see #createDistributionUri(String, String, String, String, java.net.URI)
+     * @see #createDistributionFile(String, String, String, String, java.net.URI)
+     */
+    public Option<File> getDistributionFileFrom(final URI mpeDistUri) {
+      // if the given URI is not a distribution URI there cannot be a corresponding file
+      for (URI distPath : dropBase(mpeDistUri)) {
+        // 0: orgId | [extension ":" ] orgId ;
+        // extension = "mp4" | ...
+        // 1: channelId
+        // 2: mediaPackageId
+        // 3: mediaPackageElementId
+        // 4: fileName
+        final String[] splitUrl = distPath.toString().split("/");
+        if (splitUrl.length == 5) {
+          final String[] split = splitUrl[0].split(":");
+          final String ext;
+          final String orgId;
+          if (split.length == 2) {
+            ext = split[0];
+            orgId = split[1];
+          } else {
+            ext = "flv";
+            orgId = split[0];
+          }
+          return some(new File(path(baseDir, orgId, splitUrl[1], splitUrl[2], splitUrl[3], splitUrl[4] + "." + ext)));
+        } else {
+          return none();
+        }
+      }
+      return none();
+    }
+
+    /**
+     * Create a file to distribute a media package element to.
+     *
+     * @param orgId
+     *          the id of the organization
+     * @param channelId
+     *          the id of the distribution channel
+     * @param mpId
+     *          the media package id
+     * @param mpeId
+     *          the media package element id
+     * @param mpeUri
+     *          the URI of the media package element to distribute
+     * @see #createDistributionUri(String, String, String, String, java.net.URI)
+     * @see #getDistributionFileFrom(java.net.URI)
+     */
+    public File createDistributionFile(final String orgId, final String channelId, final String mpId,
+            final String mpeId, final URI mpeUri) {
+      for (File f : getDistributionFileFrom(mpeUri)) {
+        return f;
+      }
+      return new File(path(baseDir, orgId, channelId, mpId, mpeId, FilenameUtils.getName(mpeUri.toString())));
+    }
+
+    /**
+     * Create a distribution URI for a media package element. This is the inverse function of
+     * {@link #getDistributionFileFrom(java.net.URI)}.
+     * <p/>
+     * Distribution URIs look like this:
+     *
+     * <pre>
+     * Flash video (flv)
+     *   rtmp://localhost/matterhorn-engage/mh_default_org/engage-player/9f411edb-edf5-4308-8df5-f9b111d9d346/bed1cdba-2d42-49b1-b78f-6c6745fb064a/Hans_Arp_1m10s
+     * H.264 (mp4)
+     *   rtmp://localhost/matterhorn-engage/mp4:mh_default_org/engage-player/9f411edb-edf5-4308-8df5-f9b111d9d346/bd4d5a48-41a8-4362-93dc-be41aaae77f8/Hans_Arp_1m10s
+     * </pre>
+     *
+     * @param orgId
+     *          the id of the organization
+     * @param channelId
+     *          the id of the distribution channel
+     * @param mpId
+     *          the media package id
+     * @param mpeId
+     *          the media package element id
+     * @param mpeUri
+     *          the URI of the media package element to distribute
+     * @see #createDistributionFile(String, String, String, String, java.net.URI)
+     * @see #getDistributionFileFrom(java.net.URI)
+     */
+    public URI createDistributionUri(final String orgId, String channelId, String mpId, String mpeId, URI mpeUri) {
+      // if the given media package element URI is already a distribution URI just return it
+      if (!isDistributionUrl(mpeUri)) {
+        final String ext = FilenameUtils.getExtension(mpeUri.toString());
+        final String fileName = FilenameUtils.getBaseName(mpeUri.toString());
+        String tag = "flv".equals(ext) ? "" : ext + ":";
+
+        // removes the tag for flv files, but keeps it for all others (mp4 needs it)
+        if (flvCompatibilityMode && "flv:".equals(tag))
+          tag = "";
+
+        return URI.create(concat(baseUri, tag + orgId, channelId, mpId, mpeId, fileName));
+      } else {
+        return mpeUri;
+      }
+    }
   }
 }

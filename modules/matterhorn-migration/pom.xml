@@ -21,7 +21,22 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-service-api</artifactId>
+      <artifactId>matterhorn-archive-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-search-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-search-service-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-oaipmh-persistence</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -69,6 +84,12 @@
     </dependency>
     <!-- Tests -->
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-archive-schema</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -92,7 +113,7 @@
               org.opencastproject.migration;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/incident-migration-service.xml
+              OSGI-INF/distribution-migration-service.xml
             </Service-Component>
           </instructions>
         </configuration>

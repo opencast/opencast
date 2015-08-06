@@ -30,6 +30,7 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
@@ -71,9 +72,10 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(String, org.opencastproject.mediapackage.MediaPackage, String)
-   *      java.lang.String)
+   * @see org.opencastproject.distribution.api.DistributionService#distribute(String,
+   *      org.opencastproject.mediapackage.MediaPackage, String) java.lang.String)
    */
+  @Override
   public Job distribute(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
@@ -83,14 +85,23 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     HttpResponse response = null;
     try {
       post.setEntity(new UrlEncodedFormEntity(params));
-      response = getResponse(post);
+      response = getResponse(post, HttpStatus.SC_OK, HttpStatus.SC_NO_CONTENT);
       if (response != null) {
-        logger.info("Distributing {} to {}", elementId, distributionChannel);
-        try {
-          return JobParser.parseJob(response.getEntity().getContent());
-        } catch (Exception e) {
-          throw new DistributionException("Unable to distribute mediapackage '" + elementId
-                  + "' using a remote distribution service", e);
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+          logger.info("Distributing {} to {}", elementId, distributionChannel);
+          try {
+            if (response.getEntity().getContentLength() > 0) {
+              return JobParser.parseJob(response.getEntity().getContent());
+            } else {
+              return null;
+            }
+          } catch (Exception e) {
+            throw new DistributionException("Unable to distribute mediapackage '" + elementId
+                    + "' using a remote distribution service", e);
+          }
+        } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
+          logger.info("No streaming service available for distribution");
+          return null;
         }
       }
     } catch (Exception e) {
@@ -106,7 +117,8 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.distribution.api.DistributionService#retract(String, org.opencastproject.mediapackage.MediaPackage, String)
+   * @see org.opencastproject.distribution.api.DistributionService#retract(String,
+   *      org.opencastproject.mediapackage.MediaPackage, String)
    */
   @Override
   public Job retract(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
@@ -118,14 +130,19 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     HttpResponse response = null;
     try {
       post.setEntity(new UrlEncodedFormEntity(params));
-      response = getResponse(post);
+      response = getResponse(post, HttpStatus.SC_OK, HttpStatus.SC_NO_CONTENT);
       if (response != null) {
-        logger.info("Retracting {} from {}", mediaPackage, distributionChannel);
-        try {
-          return JobParser.parseJob(response.getEntity().getContent());
-        } catch (Exception e) {
-          throw new DistributionException("Unable to retract mediapackage '" + mediaPackage
-                  + "' using a remote distribution service", e);
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+          logger.info("Retracting {} from {}", mediaPackage, distributionChannel);
+          try {
+            return JobParser.parseJob(response.getEntity().getContent());
+          } catch (Exception e) {
+            throw new DistributionException("Unable to retract mediapackage '" + mediaPackage
+                    + "' using a remote distribution service", e);
+          }
+        } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
+          logger.info("No streaming service available for retracting");
+          return null;
         }
       }
     } catch (Exception e) {
