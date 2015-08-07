@@ -388,7 +388,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         var singleVideo = true;
         var zoomLevels = Array();
 
+        //var videosources = Engage.model.get("mediaPackage").get("tracks");
+        //console.log(videosources);
         // TODO: Save Zoomlevels for > 1 Videos
+
+        //  console.log(Engage.model.get("mediaPackage"));
 
         Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function(number) {
             if (number > 1) {
@@ -399,28 +403,43 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         })
 
         Engage.on(plugin.events.togglePiP.getName(), function(pip){
-            if (pip) {
+            if (pip && videoFocused) {
                 selector = ".videoFocusedPiP video";
-            } else {
+            } else if(!pip && videoFocused){
                 selector = ".videoFocused video";
+            } else {
+                selector = "video";
             }
         })
 
-        Engage.on(plugin.events.resetLayout.getName(), function() {
+        Engage.on(plugin.events.resetLayout.getName(), function(v) {
             videoFocused = false;
+            selector = "video"
         })
 
         Engage.on(plugin.events.focusVideo.getName(), function(v) {
-            videoFocused = true;
+            if (isPiP && !videoFocused) {
+                videoFocused = true;
+                selector = ".videoFocusedPiP video";
+            } else if(!isPiP && !videoFocused) {
+                videoFocused = true;
+                selector = ".videoFocused video";
+            } else if(!isPiP && videoFocused) {
+                selector = ".videoFocused video";
+            } else if(isPiP && videoFocused) {
+                selector = ".videoFocusedPiP video";
+            } else {
+                selector = "video"
+            }
         })
 
         $(selector).on('mousewheel', function(event) {
             event.preventDefault();
             if (event.deltaY > 0) {
-                Engage.trigger(events.setZoomLevel.getName(), zoomLevel + 0.1);
+                Engage.trigger(events.setZoomLevel.getName(), 0.1);
             };
             if (event.deltaY < 0) {
-                Engage.trigger(events.setZoomLevel.getName(), zoomLevel - 0.1);
+                Engage.trigger(events.setZoomLevel.getName(), -0.1);
             };
         });
 
@@ -470,6 +489,19 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
 
         Engage.on(plugin.events.setZoomLevel.getName(), function(level) {
+            if (zoomLevels.indexOf($(selector)[0].id) == -1) {
+                if (1.0 + level >= 1.0) {
+                    level = (1.0 + level);
+                    zoomLevels.push($(selector)[0].id, Math.abs(level));
+                }
+            } else {
+                var before = zoomLevels[(zoomLevels.indexOf($(selector)[0].id) + 1)];
+                if (before + level >= 1.0) {
+                    level = (before + level);
+                    zoomLevels[(zoomLevels.indexOf($(selector)[0].id) + 1)] = Math.abs(level);
+                }
+            }
+
             if (Number(level).toFixed(1) >= 1.0 && (videoFocused || singleVideo)) {
                 var topTrans = Number($(selector).css("top").replace("px", ""));
                 var leftTrans = Number($(selector).css("left").replace("px", ""));
@@ -486,7 +518,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     }
                 }
 
-                var topOffset = ($(selector).height() * level - $(selector).height()) / 2
+                var topOffset = ($(selector).height() * level - $(selector).height()) / 2;
                 topOffset = topOffset - Math.abs(topTrans);
                 if (topOffset < 0) {
                     /* Oben/Unten überschritten beim zoomen */
@@ -513,11 +545,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
 
         Engage.on(plugin.events.zoomIn.getName(), function() {
-            Engage.trigger(plugin.events.setZoomLevel.getName(), zoomLevel + 0.1);
+            Engage.trigger(plugin.events.setZoomLevel.getName(), 0.1);
         });
 
         Engage.on(plugin.events.zoomOut.getName(), function() {
-            Engage.trigger(plugin.events.setZoomLevel.getName(), zoomLevel - 0.1);
+            Engage.trigger(plugin.events.setZoomLevel.getName(), -0.1);
         });
 
 
