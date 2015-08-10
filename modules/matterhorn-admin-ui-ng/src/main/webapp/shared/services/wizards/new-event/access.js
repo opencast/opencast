@@ -55,7 +55,7 @@ angular.module('adminNg.services')
 
                 $timeout(function () {
                     checkNotification();
-                 }, 100);
+                 }, 200);
             };
 
         me.isAccessState = true;
