@@ -388,12 +388,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         var singleVideo = true;
         var zoomLevels = Array();
 
-        //var videosources = Engage.model.get("mediaPackage").get("tracks");
-        //console.log(videosources);
-        // TODO: Save Zoomlevels for > 1 Videos
-
-        //  console.log(Engage.model.get("mediaPackage"));
-
         Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function(number) {
             if (number > 1) {
                 selector = ".videoFocused video";
@@ -402,10 +396,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
         })
 
-        Engage.on(plugin.events.togglePiP.getName(), function(pip){
+        Engage.on(plugin.events.togglePiP.getName(), function(pip) {
             if (pip && videoFocused) {
                 selector = ".videoFocusedPiP video";
-            } else if(!pip && videoFocused){
+            } else if (!pip && videoFocused) {
                 selector = ".videoFocused video";
             } else {
                 selector = "video";
@@ -421,12 +415,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             if (isPiP && !videoFocused) {
                 videoFocused = true;
                 selector = ".videoFocusedPiP video";
-            } else if(!isPiP && !videoFocused) {
+            } else if (!isPiP && !videoFocused) {
                 videoFocused = true;
                 selector = ".videoFocused video";
-            } else if(!isPiP && videoFocused) {
+            } else if (!isPiP && videoFocused) {
                 selector = ".videoFocused video";
-            } else if(isPiP && videoFocused) {
+            } else if (isPiP && videoFocused) {
                 selector = ".videoFocusedPiP video";
             } else {
                 selector = "video"
@@ -436,10 +430,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         $(selector).on('mousewheel', function(event) {
             event.preventDefault();
             if (event.deltaY > 0) {
-                Engage.trigger(events.setZoomLevel.getName(), 0.1);
+                Engage.trigger(events.setZoomLevel.getName(), [0.1]);
             };
             if (event.deltaY < 0) {
-                Engage.trigger(events.setZoomLevel.getName(), -0.1);
+                Engage.trigger(events.setZoomLevel.getName(), [-0.1]);
             };
         });
 
@@ -488,16 +482,30 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
         });
 
-        Engage.on(plugin.events.setZoomLevel.getName(), function(level) {
+        Engage.on(plugin.events.setZoomLevel.getName(), function(data) {
+
+            var level = data[0];
+            var fixed = data[1];
+
+            fixed = typeof fixed !== 'undefined' ? fixed : false;
+
+            if ($(selector)[0] === undefined || level === undefined) {
+                return;
+            }
+
             if (zoomLevels.indexOf($(selector)[0].id) == -1) {
                 if (1.0 + level >= 1.0) {
-                    level = (1.0 + level);
+                    if (!fixed) {
+                        level = (1.0 + level);
+                    }
                     zoomLevels.push($(selector)[0].id, Math.abs(level));
                 }
             } else {
                 var before = zoomLevels[(zoomLevels.indexOf($(selector)[0].id) + 1)];
                 if (before + level >= 1.0) {
-                    level = (before + level);
+                    if (!fixed) {
+                        level = (before + level);
+                    }
                     zoomLevels[(zoomLevels.indexOf($(selector)[0].id) + 1)] = Math.abs(level);
                 }
             }
@@ -537,19 +545,19 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
 
         Engage.on(plugin.events.zoomReset.getName(), function() {
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
             /* TODO: Reset each video */
             /*$(selector).css("top", "0px");
             $(selector).css("left", "0px");
-            zoomLevel = 1.0;
-            Engage.trigger(plugin.events.setZoomLevel.getName(), zoomLevel);*/
+            zoomLevel = 1.0;*/
         });
 
         Engage.on(plugin.events.zoomIn.getName(), function() {
-            Engage.trigger(plugin.events.setZoomLevel.getName(), 0.1);
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [0.1]);
         });
 
         Engage.on(plugin.events.zoomOut.getName(), function() {
-            Engage.trigger(plugin.events.setZoomLevel.getName(), -0.1);
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [-0.1]);
         });
 
 

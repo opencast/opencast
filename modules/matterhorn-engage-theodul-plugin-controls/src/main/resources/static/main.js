@@ -252,10 +252,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
-        
+
         Engage.log("Controls: selecting language " + language);
         jsonstr += "language/" + language + ".json";
-        
+
         $.ajax({
             url: jsonstr,
             dataType: "json",
@@ -559,10 +559,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 Engage.trigger(plugin.events.qualitySet.getName(), "high");
             });
             var q = Engage.model.get("quality");
-            $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));            
+            $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
         }
     }
-    
+
     function addLayoutEvents() {
         $("#" + id_pipLeft).click(function(e) {
             e.preventDefault();
@@ -579,7 +579,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         $("#" + id_pipOff).click(function(e) {
             e.preventDefault();
             $("#" + id_pipIndicator).html(translate("off", "off"));
-            Engage.trigger(plugin.events.togglePiP.getName(), false);            
+            Engage.trigger(plugin.events.togglePiP.getName(), false);
         });
     }
 
@@ -588,27 +588,27 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
         if (!zoom) {
             $("#" + id_zoomLevelIndicator).html(zoom);
-            Engage.trigger(plugin.events.setZoomLevel.getName(), zoom);
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [zoom, true]);
         } else {
             Basil.set(storage_zoomLevel, "1.0");
             $("#" + id_zoomLevelIndicator).html("1.0");
-            Engage.trigger(plugin.events.setZoomLevel.getName(), 1.0);
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
         }
 
         /* Events for Button */
         $("#" + id_zoomLevel1).click(function(event) {
             event.preventDefault();
-            Engage.trigger(plugin.events.setZoomLevel.getName(), 1.0);
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
         });
 
         $("#" + id_zoomLevel15).click(function(event) {
             event.preventDefault();
-            Engage.trigger(plugin.events.setZoomLevel.getName(), 1.5);
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [1.5, true]);
         });
 
         $("#" + id_zoomLevel2).click(function(event) {
             event.preventDefault();
-            Engage.trigger(plugin.events.setZoomLevel.getName(), 2.0);
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [2.0, true]);
         });
 
         $("#" + id_zoomReset).click(function(event) {
@@ -673,7 +673,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         } else {
             Engage.trigger(plugin.events.unmute.getName());
         }
-        
+
         var pipPos = Basil.get(storage_pip_pos);
         if (pipPos !== undefined) {
             Engage.trigger(plugin.events.movePiP.getName(), pipPos);
@@ -686,7 +686,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         if (focusVideo !== undefined ) {
 //            Engage.trigger(plugin.events.focusVideo.getName(), focusVideo);
             currentFocusFlavor = focusVideo;
-        }        
+        }
     }
 
     function initControlsEvents() {
@@ -849,7 +849,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             if (!isAudioOnly) {
                 enableFullscreenButton = true;
                 $("#" + id_fullscreen_button).removeClass("disabled");
-            }   
+            }
             Engage.trigger(plugin.events.movePiP.getName(), pipPos);
             Engage.trigger(plugin.events.togglePiP.getName(), pipStatus);
             if (videosInitialReadyness) {
@@ -934,11 +934,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     addQualityChangeEvents();
                 }
             });
+
             Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function(number) {
                 numberVideos = number;
-                if (number == 1) {
-                    addZoomEvents();
-                };
+
                 if (number > 1) {
                     if (controlsViewTopIfBottom) {
                         controlsViewTopIfBottom.render();
@@ -1007,6 +1006,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 }
             });
             Engage.on(plugin.events.ready.getName(), function() {
+                addZoomEvents();
                 if (!mediapackageError) {
                     videosReady = true;
                     ready();
@@ -1074,7 +1074,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
             Engage.on(plugin.events.togglePiP.getName(), function(pip) {
                 if (pip !== undefined) {
-                    Basil.set(storage_pip, pip);                    
+                    Basil.set(storage_pip, pip);
                     if (! pip) {
                         $("#" + id_pipIndicator).html(translate("off", "off"));
                     } else {
@@ -1086,7 +1086,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     }
                     pipStatus = pip;
                 }
-            });   
+            });
             Engage.on(plugin.events.focusVideo.getName(), function(flavor) {
                 if (flavor !== undefined && flavor !== null && flavor.indexOf("focus.") < 1) {
                     Basil.set(storage_focus_video, flavor);
@@ -1096,7 +1096,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.on(plugin.events.resetLayout.getName(), function() {
                 Basil.set(storage_focus_video, "focus.none1");
                 currentFocusFlavor = "focus.none2";
-            });          
+            });
 
             Engage.on(plugin.events.movePiP.getName(), function(pos) {
                 if (pos !== undefined) {
@@ -1109,7 +1109,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     pipPos = pos;
                 }
             });
-            
+
             loadStoredInitialValues();
         }
     }
