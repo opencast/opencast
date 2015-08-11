@@ -79,15 +79,23 @@ public class MediaInspector {
   private final Parser tikaParser;
   private final String ffprobePath;
 
-  public MediaInspector(Workspace workspace, Parser tikaParser, String ffprobePath) {
+  /** Whether the calculation of the frames is accurate or not */
+  private boolean accurateFrameCount;
+
+  public void setAccurateFrameCount(boolean accurateFrameCount) {
+    this.accurateFrameCount = accurateFrameCount;
+  }
+
+  public MediaInspector(Workspace workspace, Parser tikaParser, String ffprobePath, boolean accurateFrameCount) {
     this.workspace = workspace;
     this.tikaParser = tikaParser;
     this.ffprobePath = ffprobePath;
+    this.accurateFrameCount = accurateFrameCount;
   }
 
   /**
    * Inspects the element that is passed in as uri.
-   * 
+   *
    * @param trackURI
    *          the element uri
    * @return the inspected track
@@ -192,7 +200,7 @@ public class MediaInspector {
 
   /**
    * Enriches the given element's mediapackage.
-   * 
+   *
    * @param element
    *          the element to enrich
    * @param override
@@ -212,7 +220,7 @@ public class MediaInspector {
 
   /**
    * Enriches the track's metadata and can be executed in an asynchronous way.
-   * 
+   *
    * @param originalTrack
    *          the original track
    * @param override
@@ -333,7 +341,7 @@ public class MediaInspector {
   /**
    * Enriches the media package element metadata such as the mime type, the file size etc. The method mutates the
    * argument element.
-   * 
+   *
    * @param element
    *          the media package element
    * @param override
@@ -387,7 +395,7 @@ public class MediaInspector {
 
   /**
    * Asks the media analyzer to extract the file's metadata.
-   * 
+   *
    * @param file
    *          the file
    * @return the file container metadata
@@ -398,7 +406,7 @@ public class MediaInspector {
     if (file == null)
       throw new IllegalArgumentException("file to analyze cannot be null");
     try {
-      MediaAnalyzer analyzer = new FFmpegAnalyzer();
+      MediaAnalyzer analyzer = new FFmpegAnalyzer(accurateFrameCount);
       analyzer.setConfig(map(Tuple.<String, Object> tuple(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG, ffprobePath)));
       return analyzer.analyze(file);
     } catch (MediaAnalyzerException e) {
@@ -408,7 +416,7 @@ public class MediaInspector {
 
   /**
    * Adds the video related metadata to the track.
-   * 
+   *
    * @param track
    *          the track
    * @param metadata
@@ -441,7 +449,7 @@ public class MediaInspector {
 
   /**
    * Adds the audio related metadata to the track.
-   * 
+   *
    * @param track
    *          the track
    * @param metadata
@@ -473,7 +481,7 @@ public class MediaInspector {
   /**
    * Determines the content type of an input stream. This method reads part of the stream, so it is typically best to
    * close the stream immediately after calling this method.
-   * 
+   *
    * @param in
    *          the input stream
    * @return the content type

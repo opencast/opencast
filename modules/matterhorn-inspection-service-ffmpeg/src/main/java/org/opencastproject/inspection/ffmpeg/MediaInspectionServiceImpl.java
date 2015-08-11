@@ -34,8 +34,10 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.LoadUtil;
+import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.tika.parser.Parser;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -70,6 +72,9 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   private float enrichJobLoad = DEFAULT_ENRICH_JOB_LOAD;
 
   private static final Logger logger = LoggerFactory.getLogger(MediaInspectionServiceImpl.class);
+
+  /** The accurate frame count configuration key */
+  private static final String CFG_KEY_ACCURATE_FRAME_COUNT = "accurate_frame_count";
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -110,15 +115,11 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       logger.debug("FFprobe config binary: {}", path);
       ffprobeBinary = path;
     }
-    inspector = new MediaInspector(workspace, tikaParser, ffprobeBinary);
+    inspector = new MediaInspector(workspace, tikaParser, ffprobeBinary, false);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
-   */
   @Override
+  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
@@ -127,6 +128,12 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
             serviceRegistry);
     enrichJobLoad = LoadUtil.getConfiguredLoadValue(properties, ENRICH_JOB_LOAD_KEY, DEFAULT_ENRICH_JOB_LOAD,
             serviceRegistry);
+
+    for (String accurateFrameCountString : OsgiUtil.getOptCfg(properties, CFG_KEY_ACCURATE_FRAME_COUNT).toOpt()) {
+      boolean accurateFrameCount = BooleanUtils.toBoolean(accurateFrameCountString);
+      inspector.setAccurateFrameCount(accurateFrameCount);
+      logger.info("Set accurate frame count to {}", accurateFrameCount);
+    }
   }
 
   /**
