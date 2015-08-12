@@ -1,139 +1,128 @@
-URL Specification
+Stream Security Developer Docs
 =================
+To get an introduction to Stream Security before deploying please read the overview at:
 
-The streaming URLs are secured using 3 query string parameters added onto the usual URL path. There is the:
+* [Stream Security Overview](../admin/overview/stream-security)
 
-* Policy - Configures what resource is being requested and what the terms are for securing that resource
-* Signature - An encrypted version of the Policy to verify that the request is valid (hasn't been altered or on a different resource)
-* KeyID - The unique id for the encryption key to use
+# Opencast Signing Protocol
+The Signing Providers as well as the verification components that are developed by the Opencast community implement the policy and signature specified in the Opencast Signing Protocol. 
 
-#### Policy
+## Policy
+The policy is a Base64 encoded JSON document. A human-readable version of the JSON document looks like this:
 
-* It is in JSON format
-* It is Base 64 encoded
-* All whitespace characters must be removed
-* Contains the following properties
-     * Resource - (Required) - The base url of the resource being requested (without the signed query string parameters)
-     * DateLessThan - (Required) - Milliseconds since the Unix epoch when this resource will expire. If missing will return forbidden.
-     * DateGreaterThan - (Optional) - Milliseconds since the Unix epoch when this resource will become available
-     * IpAddress - (Optional) - The IP address that should match the client's IP address
-
-It will have the following JSON structure (Without the //Optional comments):
-
-    {
-      "Statement": {
-        "Resource":"http://mh-allinone.localdomain/engage/url/to/stream/resource.mp4",
-        "Condition":{
-          "DateLessThan":1425170777000,
-          "DateGreaterThan":1425084379000, // Optional
-          "IpAddress": "10.0.0.1" // Optional
-        }
-      }
+```json
+{
+  "Statement":{
+    "Resource":"http:\/\/opencast.org\/engage\/resource.mp4",
+    "Condition":{
+      "DateLessThan":1425170777000,
+      "DateGreaterThan":1425084379000,
+      "IpAddress":"10.0.0.1"
     }
+  }
+}
+```
 
+|Property Name|Property Description|
+|------|-----|
+|**Resource**| URL of the resource, must exactly match the requested URL including the schema. In case of a RTMP request, this is only the resource path, without the RTMP application name or the server.|
+|**DateLessThan**| Unix epoch that a resource should expire on in milliseconds|
+|DateGreaterThan | Unix epoch that a resource should become available in milliseconds|
+|IpAddress| Client's IP address that will be accessing the resource|
 
-#### Signature
+Properties in bold are mandatory.
 
-This is an SHA-256 HMAC hashed version of the policy JSON data and then encoded in Hex format.
+Before the JSON document is Base64 encoded, all whitespaces need to be removed. The above sample document would then look like this:
 
-#### KeyId
+```json
+{"Statement":{"Resource":"http:\/\/opencast.org\/engage\/resource.mp4","Condition":{"DateLessThan":1425170777000,"DateGreaterThan":1425084379000,"IpAddress":"10.0.0.1"}}}
+```
 
-The id of the encryption key used to sign this URL.
+The Base64-encoding must be performed in a URL safe way which means that instead of using the characters ‘+’ and ‘/’ they have to be replaced by '-' and '_' respectively. The example above would be encoded into:
 
+    eyJTdGF0ZW1lbnQiOnsiUmVzb3VyY2UiOiJodHRwOlwvXC9vcGVuY2FzdC5vcmdcL2VuZ2FnZVwvcmVzb3VyY2UubXA0IiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTQyNTE3MDc3NzAwMCwiRGF0ZUdyZWF0ZXJUaGFuIjoxNDI1MDg0Mzc5MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9fX0=
+The encoded policy must be sent to the server as a query parameter named ‘policy’, e.g.
 
+    http://opencast.org/engage/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiUmVzb3VyY2UiOiJodHRwOlwvXC9vcGVuY2FzdC5vcmdcL2VuZ2FnZVwvcmVzb3VyY2UubXA0IiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTQyNTE3MDc3NzAwMCwiRGF0ZUdyZWF0ZXJUaGFuIjoxNDI1MDg0Mzc5MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9fX0
 
-Process for Creating Signed URL
-===============================
+Note: Be aware that Base64 encoding can have up to two ‘=’ characters at the end of the string to pad a message to a necessary length divisible by 3. All components should be able to handle Base64 encoded strings with or without this padding (Resources signed by Opencast will have the padding characters URL encoded to ‘%3D’).
 
-## Inputs
+## Signature
+The signature is a hash-based message authentication code (HMAC) based on a secret key. The algorithm used is HMAC-SHA-256. Only the encoded policy needs to be taken as input for the hash-calculation.
 
-To sign a URL you need:
+The keys used are simple character strings without any special format. It could be something like ‘AbCdEfGh’, but it’s recommended to use a key with a length of 256 bit like ‘2195265EE84ED1E1324D31F37F7E3’. Each key must have a unique identifier, e.g. ‘key1’. In this example, the following key has been used:
 
-* URL for the resource
-* Key id and key secret value that will be used to sign the URL
-* The unix epoch that a resource should expire on in milliseconds, known as the *DateLessThan*
-* Optional unix epoch that a resource should become available in milliseconds, known as the *DateGreaterThan*
-* Optional client's ip address that will be accessing the resource
+Key ID: demoKeyOne
+Secret Key: 6EDB5EDDCF994B7432C371D7C274F
 
-For the purposes of this documentation we are going to use the following inputs:
+The HMAC for the signature from the previous section calculated based on the *demoKey1* is 
 
-* URL: http://mh-allinone.localdomain/engage/url/to/stream/resource.mp4
-* Key ID: demoKeyOne
-* Key Secret: 6EDB5EDDCF994B7432C371D7C274F
-* Valid from: 1425170777000
-* Valid until: 1425084379000
-* Client IP address: 10.0.0.1
+    c8712284aabc843f76a132a3a7c8997670414b2f89cb96b367d5f35d0f62a2e4
 
+The signature must also be sent as a query parameter that forms part of the resource request. The example from above would now look like this:
 
+    http://opencast.org/engage/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiUmVzb3VyY2UiOiJodHRwOlwvXC9vcGVuY2FzdC5vcmdcL2VuZ2FnZVwvcmVzb3VyY2UubXA0IiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTQyNTE3MDc3NzAwMCwiRGF0ZUdyZWF0ZXJUaGFuIjoxNDI1MDg0Mzc5MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9fX0&signature=c8712284aabc843f76a132a3a7c8997670414b2f89cb96b367d5f35d0f62a2e4
 
-## Create Policy
+The same is true for the key id, which needs to be included to determine which key was used to create the signature. 
 
-Create a JSON object without whitespace characters with the following structure and properties filled with the information from the input (DateGreaterThan or IpAddress are optional and can be omitted):
+    http://opencast.org/engage/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiUmVzb3VyY2UiOiJodHRwOlwvXC9vcGVuY2FzdC5vcmdcL2VuZ2FnZVwvcmVzb3VyY2UubXA0IiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTQyNTE3MDc3NzAwMCwiRGF0ZUdyZWF0ZXJUaGFuIjoxNDI1MDg0Mzc5MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9fX0&signature=c8712284aabc843f76a132a3a7c8997670414b2f89cb96b367d5f35d0f62a2e4&keyId=demoKeyOne
 
-    {
-       "Statement":{
-          "Resource":"http:\/\/mh-allinone.localdomain\/engage\/url\/to\/stream\/resource.mp4",
-          "Condition":{
-             "DateLessThan":1425170777000,
-             "DateGreaterThan":1425084379000,
-             "IpAddress":"10.0.0.1"
-          }
-       }
-    }
+# Signing URLs from a 3rd party system
+URL signatures also need to be issued for resources presented on and linked from a third party system (such as a custom video portal). There are two options for signing 3rd party system URLs:
 
-Your JSON implementation may or may not escape forward slashes, as both versions are part of the JSON specification they should both be supported by plugins. The final version would look like this:
+### Option #1: Use the existing URL Signing Service**
 
-    {"Statement":{"Resource":"http:\/\/mh-allinone.localdomain\/engage\/url\/to\/stream\/resource.mp4","Condition":{"DateLessThan":1425170777000,"DateGreaterThan":1425084379000,"IpAddress":"10.0.0.1"}}}
+If the third party system is based on Java, the existing URL Signing bundles/JARs can be reused. They do not have dependencies to other parts of Opencast and can therefore be used independently.
 
-To see an example of creating the policy JSON the function "public static JSONObject toJson(Policy policy)" in the class PolicyUtils creates the JSON object.
+These bundles are required:
 
+* matterhorn-urlsigning-common
+* matterhorn-urlsigning-service-api
+* matterhorn-urlsigning-service-impl
 
-## Encode Policy using Base64
+Code example:
+```java
+private UrlSigningService urlSigningService;
 
-The next step would be to encode the policy using Base64 with a URL safe format ('Instead of using +' and '/'  characters use  '-' and '_' respectively). The example above would be encoded into:
+/** OSGi DI */
+void setUrlSigningService(UrlSigningService service) {
+  this.urlSigningService = service;
+}
 
-    eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVHcmVhdGVyVGhhbiI6MTQyNTA4NDM3OTAwMDAwMCwiRGF0ZUxlc3NUaGFuIjoxNDI1MTcwNzc3MDAwMDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9LCJSZXNvdXJjZSI6Imh0dHA6XC9cL21oLWFsbGlub25lLmxvY2FsZG9tYWluXC9lbmdhZ2VcL3VybFwvdG9cL3N0cmVhbVwvcmVzb3VyY2UubXA0In19
+… 
 
-This will be the value for the query string parameter "policy" for the signed url. You can use a utility such as https://www.base64encode.org/ or https://www.base64decode.org/ to test that your implementation is creating the correct encoding.
+String urlToSign = “http://my.custom.url/with/path.mp4”;
+long signedUrlExpiresDuration = 60;
 
-To see an example of encoding the policy using Base64 there is the "public static String toBase64EncodedPolicy(Policy policy)" function in the PolicyUtils class.
+if (urlSigningService.accepts(urlToSign)) {
+  try {
+    String signedUrl = urlSigningService.sign(
+        urlToSign,
+        signedUrlExpiresDuration,
+        null,
+        null);
+    ...
+  } catch (UrlSigningException e) {
+    // handle exception
+  }
+}
+```
 
+### Option #2: Create custom URL Signing Service
 
-## Create Signature From Policy
+Based on the technical details outlined in the Opencast Signing Protocol, a URL Signing Service that is compatible with the other existing parts of the Stream Security system can be implemented.
 
-The signature is created using the SHA-256 HMAC (Spec: https://tools.ietf.org/html/rfc4868, wiki: https://en.wikipedia.org/wiki/Hash-based_message_authentication_code) hashing algorithm using the key secret and the JSON value of the policy (not Base64 encoded) as the message to be hashed. The resulting bytes then must be encoded into Hex format. You can use a tool such as http://www.freeformatter.com/hmac-generator.html to verify that the signature is being created correctly. The above policy example with the input key "6EDB5EDDCF994B7432C371D7C274F" would be hashed into:
+### Option #3: Give Access to Third Party Systems to Signing REST Endpoints
+Opencast servers that have been configured to use URL signing service will have two REST endpoints at http://admin.matterhorn.com:8080/signing/docs. The accepts endpoint will return true if the Opencast server can sign a particular URL. The sign endpoint will return a signed URL when the correct parameters are given. Due to the sensitive nature of these endpoints they are locked down to be only accessible by a user with ROLE_ADMIN privileges in the etc/security/mh_default_org.xml configuration file. Creating a new user with this role and accessing the endpoint using these credentials will allow a third party system to sign any URLs.
 
-    a37d6ba4e5819b2506c7d7e029aa558937cbdc586aa83b97d7c29a79d46cf3bd
+## Further information
 
+For an overview of Stream Security:
 
-## Build Query String For Signed URL
+* [Stream Security Overview](../admin/overview/stream-security)
 
-Now that we have the Base64 encoded policy and signature we can create the signed URL. We add to the original URL the policy, signature and key id as query string parameters. So in our example it would become:
+For further technical information like installation instructions, configuration guides, server plugins, please have a look at these documents:
 
-    http://mh-allinone.localdomain/engage/url/to/stream/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVHcmVhdGVyVGhhbiI6MTQyNTA4NDM3OTAwMCwiRGF0ZUxlc3NUaGFuIjoxNDI1MTcwNzc3MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9LCJSZXNvdXJjZSI6Imh0dHA6XC9cL21oLWFsbGlub25lLmxvY2FsZG9tYWluXC9lbmdhZ2VcL3VybFwvdG9cL3N0cmVhbVwvcmVzb3VyY2UubXA0In19&keyId=demoKeyOne&signature=a37d6ba4e5819b2506c7d7e029aa558937cbdc586aa83b97d7c29a79d46cf3bd
-
-To see an example there is a function "public static String digest(String plainText, String secretKey)" in the SHA256Util class that hashes a message and encodes it into Hex. Now this signed url contains all of the components required for a plugin to verify that a request is correct.
-
-
-Process for Verifying a Signed URL in a Plugin
-==============================================
-
-There is an example of verifying that a request is valid with a signed URL in the "public static ResourceRequest resourceRequestFromQueryString" function in the ResourceRequestUtil class.
-
-1. If any of the query string parameters are missing or are the wrong case / spelt incorrectly return a Bad Request 400.
-
-1. If there are multiple copies of any of the query string parameters return a Bad Request 400.
-
-1. Decode the Base 64 Encoded Policy (Two possible gotchas is that it should support both padded and unpadded Base 64 encoded strings, and make sure that your implementation supports URL safe encoding, "+" replaced by "-" and "/" replaced by "_"). Also verify that your JSON implementation can handle the resource having escaped forward slashes such as `http://mh-allinone.localdomain/engage/url/to/stream/resource.mp4` becoming: `http:\/\/mh-allinone.localdomain\/engage\/url\/to\/stream\/resource.mp4`. Example is in the class PolicyUtils in the function `public static Policy fromBase64EncodedPolicy(String encodedPolicy)`.
-
-1. If any of the required policy variables are missing return a Bad Request 400.
-
-1. If there is no encryption key that matches the KeyID known by the plugin return a Bad Request 400.
-
-1. Using the SHA-256 HMAC algorithm, hash the given Policy. The Policy & Signature must match exactly when encrypted using the secret key. If they don't match return a Forbidden 403. There is an example in the RequestResourceUtil class in the function ` protected static boolean policyMatchesSignature(Policy policy, String signature, String encryptionKey)`.
-
-1. If the client's IP address is specified, check it against the client's IP address, if it doesn't match return a Forbidden 403.
-
-1. Check the dates of the policy to make sure that it is still valid. If it is not currently valid because the link has expired or it is not yet available return a Gone 410.
-
-1. If all of the above conditions pass, then allow the request.
+* [Configuration & Testing](../admin/configuration/stream-security)
+* [Apache HTTPd Verification Component](https://bitbucket.org/entwinemedia/apache-httpd-stream-security-plugin)
+* [Wowza Verification Component](https://bitbucket.org/entwinemedia/wowza-stream-security-plugin)

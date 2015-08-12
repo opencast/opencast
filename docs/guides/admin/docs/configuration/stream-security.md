@@ -1,212 +1,213 @@
-Configuration
-=============
+Configuration of Stream Security
+================================
+To get an introduction to Stream Security before deploying please read the overview at:
 
-## Configuring Encryption Keys
-
-There are two new properties file at `${matterhorn.home}/etc/services/`
-
-    org.opencastproject.security.urlsigning.provider.impl.WowzaUrlSigningProvider.properties
-    org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider.properties
-
-These files controls how URLs are signed within Matterhorn. These properties files allows you to configure multiple encryption keys for signing URLs that are matched differently. There are more details in the configuration file itself but there are three properties to set key, id and url. For example we could have a configuration file such as:
+* [Stream Security Overview](../overview/stream-security.md)
 
 
-    # This configuration file is used to configure the signing of urls so that
-    # they will expire and can either only become available after a certain amount
-    # of time or restricted to a particular client IP.
+It is important to note that if Stream Security is enabled, all resources will be signed and protected, even ones that do not have any access restrictions defined in their ACL (“public ACLs”). Accessing resources with unsigned URLs will not be possible anymore.
 
-    # There are three values that need to be set for each type of url that will be
-    # secured. A suffix of numbers in order allow the configuration of several
-    # keys and urls.
+On a high level, to use Stream Security, these steps are required:
 
-    # There is the encryption key that is the 128 byte key used to sign the url. e.g. 0123456789abcdef
-    # key.1=0123456789abcdef
-    # There is the id that will identify which key to decode the signature with on the resource provider side. e.g. theId
-    # id.1=theId
-    # There is the url that will identify which urls that should be signed with this key. e.g. rtmp or http://hostname.com/
-    # url.1=rtmp
+* Install and configure the URL Signing Service and Signing Providers
+* Configure Opencast services (and, optionally, 3rd party services) that use the signing infrastructure to sign requests
+* Install and configure verification components
 
-    # To define a second key just add a number to the suffix. For example:
-    # key.2=0123456789abcdef
-    # id.2=AnotherKey
-    # url.2=http://hostname.com/
+# URL Signing Service
+## Installation
+There are three modules that are built by default and need to be present on each Opencast node in order to initiate URL signing:
 
-    # Demo Key No. 1
-    key.1=6EDB5EDDCF994B7432C371D7C274F
+* matterhorn-urlsigning-common
+* matterhorn-urlsigning-service-api
+* matterhorn-urlsigning-service-impl
+
+If these modules are present, the URL Signing Service will be started and available, to which the URL Signing Providers (GenericUrlSigningProvider and WowzaUrlSigningProvider by default) can then register themselves.
+
+## Configuration of Signing Providers
+The Signing Providers that come with Opencast each have their own configuration file:
+
+* GenericUrlSigningProvider: 
+
+    *etc/services/org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider.properties*
+
+* WowzaUrlSigningProvider: 
+
+    *etc/services/org.opencastproject.security.urlsigning.provider.impl.WowzaUrlSigningProvider.properties*
+ 
+Both Signing Providers follow the same configuration structure and support multiple configuration blocks, providing the settings for separate distributions (i.e. download or streaming servers, services or paths).
+
+Each configuration block consists of the following items:
+
+* **Key ID:** Key Identifier, e.g. ‘demoKeyOne’
+* **Key secret:** Key value, e.g. ‘25DA2BA549CB62EF297977845259A’. The key-length is not predefined, but a key length of at least 256 bit is recommended.
+* **URL prefix:** The URL Signing Provider will only sign URLs that start with this value. This allows to support multiple distributions and different key pairs.
+
+A typical configuration looks like this:
+
     id.1=demoKeyOne
-    url.1=http://mh-wowza
+    key.1=6EDB5EDDCF994B7432C371D7C274F
+    url.1=http://download.opencast.org/engage
 
-    # Demo Key No. 2
-    key.2=C843C21ECF59F2B38872A1BCAA774
+    id.2=demoKeyOne
+    key.2=6EDB5EDDCF994B7432C371D7C274F
+    url.2=http://download.opencast.org/custom
+
+The properties defined in the configuration file take a numeric suffix that must start at “1" and increase in single increments. In the example above these can be seen as: “.1” and “.2”. As soon as there is a missing number it will stop looking for further entries so be careful not to remove configurations with numbers lower than others. For example if there are configurations using number suffixes from 1 to 5, then commenting out the number 2 configurations will prevent the 3, 4, 5 configurations from being used.
+
+Note that id and key form a fixed pair, while the same key can be used in more than one configuration block.
+
+## Configuration of URL Signing Timeout Values
+Once Stream Security is turned on by configuring the signing providers, multiple different services within Opencast will be signing URLs, and while some services are signing on behalf of administrative users working in the Opencast administrative user interface, others are signing urls in order to grant access to learners playing back video content i.e. the functionality we have been talking about up to now.
+
+This section explains how to best configure urls to ensure that they expire at the right time. This might be required if the default valid times do not seem secure enough or is more secure than needed.
+
+### Signing for external access
+The lifetime of the signed URLs can be configured by setting a custom value for the property *url.signing.expires.seconds* that defines the validity in seconds. The default valid time is **7200 seconds or 2 hours**.
+
+The different services that are able to automatically sign URLs on behalf of users are located in etc/services and listed in the following table:
+
+
+| URLs That Are Signed      | Configuration File Name|
+|---------------------------|------------------------|
+|Video Player Content       | org.opencastproject.security.urlsigning.SigningMediaPackageSerializer.properties|
+|Admin UI Links             | org.opencastproject.adminui.endpoint.OsgiEventEndpoint.properties|
+|Preview and Editor Files   | org.opencastproject.adminui.endpoint.ToolsEndpoint.properties|
+
+The URLs will be signed by the first Signing Provider that will accept the URL’s path based upon the Signing Provider’s configuration. This makes it flexible to support many different scenarios. For example we could configure the Signing Provider to have one key for any URL that begins with a scheme, such as http, which would cover all of the URLs to be signed with a single key. Or it could also be configured so that each different scheme and hostname pair would have a different keys protecting each host’s URLs separately etc. Having the timing configurations separate from the key configuration allows the different types of URLs to be signed differently depending on the needs of the users without needing to configure this timing for all of the different keys. 
+
+### Signing for Opencast-internal access
+Signing of requests for internal use is performed by a core component called *TrustedHttpClientImpl*, which is used to establish all internal HTTP connections. More specifically, the HTTP client needs access to internal storage areas such as the working file repository as well as to distributed artifacts on the downloads and streaming servers, all of which are protected by verification components.
+
+The default expiration time for signed internal requests is **60 seconds**. This can be changed by setting a value in seconds for the *org.opencastproject.security.internal.url.signing.duration* property in the *config.properties* configuration file. Since those URLs are signed right before the request is made, the valid time of 60 seconds should be sufficiently long.
+
+## Configuration of verification components
+The verification components ensure that only valid and correctly signed URLs are accessible at any given time. URLs which are not properly signed or have expired will be rejected. 
+
+Out of the box, Opencast provides three different verification components, each supporting a different part of an Opencast based solution:
+
+* Apache HTTPd
+* Wowza streaming server
+* Opencast internal UrlSigningFilter
+
+The following section is dedicated to the installation and configuration of the Opencast internal UrlSigningFilter. You can find the installation and configuration of the [Apache HTTPd verification component here](https://bitbucket.org/entwinemedia/apache-httpd-stream-security-plugin) and the [Wowza verification component here](https://bitbucket.org/entwinemedia/wowza-stream-security-plugin). 
+
+### Configuration of Opencast verification filter
+The Servlet Filter providing the verification of requests to Opencast internal resources is implemented in these two bundles:
+
+* matterhorn-urlsigning-verifier-service-api
+* matterhorn-urlsigning-verifier-service-impl
+
+The filter uses a set of regular expressions to determine which requests to an Opencast instance need to be verified.
+
+#### Installation
+The bundles are built by default and as soon as they are running in Opencast, the filter is active, and ready to be enabled.
+
+#### Configuration
+Two things need to be configured for the Opencast verification filter:
+* key pairs used to verify the signatures
+* paths and endpoints that need to be protected
+
+The configuration is located at:
+
+*etc/services/org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl.properties.*
+
+First of all, the key pairs used to sign must be configured in order to allow the filter to verify the signatures. More than one key pair can be defined by increasing the counter (1, 2, 3, ...) in steps of 1. If you miss any numbers it will stop looking for further configurations.
+
+Example:
+
+    id.1=demoKeyOne
+    key.1=6EDB5EDDCF994B7432C371D7C274F
+
     id.2=demoKeyTwo
-    url.2=rtmp://mh-wowza
+    key.2=C843C21ECF59F2B38872A1BCAA774
 
-The .1 and .2 at the end of the keys means that there are two separate sets of encryption keys configured. You can have as many as you want that will match different URLs.
+As with the HTTPd component, the entries in this file need to have the same values for the Signing Providers configuration.
 
-* The **key** property: defines the [SHA-256 HMAC](http://en.wikipedia.org/wiki/Hash-based_message_authentication_code) secret key to be used to encrypt the policy of the url signing. In the example the key "0123456789abcdef" will be used to encrypt the policy for this url.
+The second step is to configure the filter defining the endpoints to be protected. The configuration file is located at:
 
-* The **id** property is what will let the streaming server know which encryption key to use to verify that it is a correctly signed URL. In the example "theId" will be sent to the streaming server to know which key to use so the same key / id pair must be configured on the streaming server.
+*etc/services/org.opencastproject.security.urlsigning.filter.UrlSigningFilter.properties*
 
-* The **url** property defines the beginning of the urls to sign with this encryption key. In the example the first key will be used for all urls that start with "http://mh-wowza" and the second encryption key will be used for all urls that start with "rtmp://mh-wowza".
+The configuration defaults to a set of regular expressions which match all of the endpoints that serve files, and avoid protecting endpoints that only serve data. Therefore, the remaining step is enabling the filter by setting the property “enabled” to “true” and determining whether strict or non-strict verification of the resource is required.
 
-The configuration file:
-    `org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider.properties`
-is designed to sign URLs that protect the REST endpoints on an Opencast node, such as an all-in-one, admin, worker, presenter etc., or to protect content on a download server such as using the Apache Httpd stream security plugin. The input URLs will be used as is, without manipulating them in any way so a request to `http://admin/files/collection/composer/video.mp4` would use that URL for the signing.
+The latter is similar to the corresponding configuration option in the [Apache HTTPd verification component](https://bitbucket.org/entwinemedia/apache-httpd-stream-security-plugin), where strict verification of resources means the entire URL will be considered when comparing the incoming request for a resource against the policy, including the scheme (http, https etc.), hostname and port. If turned off, only the path to the resource will be considered. So if the request is for a resource at “http://httpdserver:8080/the/full/path/video.mp4”, only the “/the/full/path/video.mp4” part of the URL will be checked against the policy’s path. As mentioned before, this is useful when using a load balancer so that the requested host name doesn’t have to match the actual hostname or if a video player is rewriting requests, e. g. by inserting the port number.
 
-The configuration file:
-    `org.opencastproject.security.urlsigning.provider.impl.WowzaUrlSigningProvider.properties`
-is designed to provide signed urls to protect content on a Wowza streaming server and alters the URL in a way that makes it compatible with the Wowza stream security plugin.
+Example:
 
-## Verifying that Matterhorn URL Signing is Working
-## Getting Signed URL
-
-### Creating Signed URL with Signing Endpoint
-
-1. Go to the signing endpoint at: [http://localhost:8080/signing/docs](http://localhost:8080/signing/docs)
-
-1. Make sure that your URL is supported by using the "accepts" endpoint and entering your media URL that is something like:
-`rtmp://streamingserver.tld/matterhorn-engage/mp4:engage-player/1a24ca82-ba8a-4030-8d26-65b7f91fa306/397c8689-9c18-4a14-b5a6-ef8aed6a5471/short` or `rtmp://streamingserver.tld/matterhorn-engage/sample.mp4`
-
-1. Either put the URL into the testing box or go to [http://localhost:8080/signing/accepts?baseUrl=rtmp://streamingserver.tld/matterhorn-engage/sample.mp4](http://localhost:8080/signing/accepts?baseUrl=rtmp://streamingserver.tld/matterhorn-engage/sample.mp4)
-
-1. Next get the url signed by entering the URL into the baseUrl text box and put the Unix Epoch time that this url should expire into the validUntil box (You can find the Unix Epoch value easily from this website: [http://www.epochconverter.com](http://www.epochconverter.com), the value should be input in seconds).
-
-1. Optionally put another Unix Epoch seconds into the validFrom when the url will become available.
-
-1. Optionally put an ip address into the ipAddr text box that will be the only ip that can view the video.
-
-1. Hit the submit button and it will return the signed URL such as:
-
-    ```
-    rtmp://streamingserver.tld/matterhorn-engage/sample.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVHcmVhdGVyVGhhbiI6MTQyNTA4NDM3OTAwMCwiRGF0ZUxlc3NUaGFuIjoxNDI1MTcwNzc3MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9LCJSZXNvdXJjZSI6InJ0bXA6XC9cL3N0cmVhbWluZ3NlcnZlci50bGRcL21hdHRlcmhvcm4tZW5nYWdlXC9zYW1wbGUubXA0In19&keyId=demoKeyOne&signature=6e5adff77f84a47c5c904d16609a28a359df05a0c08aeaba6c27e6dc85fabe42
-    ```
-
-### Creating Signed URL with Search Service
-
-1. Setup a UrlSigningService such as GenericUrlSigningProvider or WowzaUrlSigningProvider.
-1. Process a recording
-1. Go to the Search documentation at: http://localhost:8080/search/docs
-1. Use the http://localhost:8080/search/episode.json or http://localhost:8080/search/episode.xml to get the search results
-1. Find one of the signed urls that look like
-
-    ```
-    rtmp://streamingserver.tld/matterhorn-engage/sample.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVHcmVhdGVyVGhhbiI6MTQyNTA4NDM3OTAwMCwiRGF0ZUxlc3NUaGFuIjoxNDI1MTcwNzc3MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9LCJSZXNvdXJjZSI6InJ0bXA6XC9cL3N0cmVhbWluZ3NlcnZlci50bGRcL21hdHRlcmhvcm4tZW5nYWdlXC9zYW1wbGUubXA0In19&keyId=demoKeyOne&signature=6e5adff77f84a47c5c904d16609a28a359df05a0c08aeaba6c27e6dc85fabe42
-    ```
-
-## Protecting REST Endpoints That Serve Files With URL Signing
-Now that we have configured the signing of URLs we can protect the REST endpoints in Opencast that serve files directly to require a signed URL to access them.
-
-Make sure that you have configured keys, keyids and URLs that will match the Opencast hosts that you want to protect in the `org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider.properties` configuration file.
-
-The first step is to configure the keys that will be used to verify the requests for files. These keys need to have the same id and key value in the configuration file as has been configured in the URL Signing Provider but it doesn't require adding the url again. 
-
-So for example if the provider has been configured to use the key id `demoKeyOne` and key value `6EDB5EDDCF994B7432C371D7C274F` we would protect its REST endpoints by editing the configuration file `org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl.properties` in the `${matterhorn.home}/etc/services/` directory with contents such as:
-
-    # This configuration file is used to configure the verification of signed urls
-    # so that they will expire and can either only become available after a certain
-    # amount of time or restricted to a particular client IP.
-    # There are two values that need to be set for each possible key that will be
-    # used to sign urls, the id of the key and key itself. A suffix of numbers, in
-    # order, allow the configuration of several keys.
-
-    # There is the encryption key that is the 128 byte key used to sign the url. e.g.6EDB5EDDCF994B7432C371D7C274F
-    key.1=6EDB5EDDCF994B7432C371D7C274F
-
-    # There is the id that will identify which key to decode the signature with on the resource provider side. e.g. theId
-    id.1=demoKeyOne
-
-The `.1` after the key and id in the configuration file mean that you can have as many keys as required as long as you add them in ascending order (not skipping any numbers or it will stop looking for more). So the next one specified would have `.2` at the end, and then `.3` etc.
-
-The second step is to configure the filter with the endpoints to protect. The configuration file `org.opencastproject.security.urlsigning.filter.UrlSigningFilter.properties` in the `${matterhorn.home}/etc/services/` directory has been pre-configured with regular expressions that match all of the endpoints that serve files so the only step is to turn the filter on by setting the property `enabled` to true. So for example:
-
-    # Enable or disable the UrlSigningFilter.
     enabled=true
 
-    # This configuration file defines the urls that will be protected by the
-    # UrlSigningFilter filter. These endpoints will require a signed url by
-    # stream security before a file can be downloaded
+    strict=true
 
-    # Protects: /files/collection/{collectionId}/{fileName}
     url.regex.1=.*files\/collection\/.*
-
-    # Protects: /files/mediapackage/{mediaPackageID}/{mediaPackageElementID}
-    # and Protects: /files/mediapackage/{mediaPackageID}/{mediaPackageElementID}/{fileName}
     url.regex.2=.*files\/mediapackage\/.*
-
-    # Protects: /staticfiles/{uuid} but not /staticfiles/{uuid}/url
     url.regex.3=(?\=(.*staticfiles.*))(?=^(?!.*staticfiles.*url|.*docs.*).*$)(.*)
-
-    # Protects: /archive/archive/mediapackage/{mediaPackageID}/{mediaPackageElementID}/{version}
     url.regex.4=.*archive\/archive\/mediapackage\/.*\/.*\/.*
+    url.regex.5=.*static.*
 
-### Verifying That REST Endpoints Are Protected
-If you have configured your REST endpoints to be protected you can test that they need to be signed by going to the REST documentation for the endpoints (e.g. going to http://hostname/archive/docs, http://hostname/files/docs, http://hostname/staticfiles/docs) and trying to access the endpoints that should be protected. If you don't know any of the files for these particular services you can still test with files that don't exist. If you try to access files that don't exist (e.g. http://hostname/files/collection/wrongcollection/missingfile.txt) it should give you a bad request complaining that a stream security query string parameter is missing (policy, signature or keyid) before it will return that the file is missing. Take the same URL to the URL signing service REST documentation at http://hostname/signing/docs and verify that signing is setup correctly by using the `accepts` method to check that it will sign your URL (should return true). Then sign your URL by entering the test URL into the baseUrl parameter, and put the Unix Epoch time that this url should expire into the validUntil box (You can find the Unix Epoch value easily from this website: [http://www.epochconverter.com](http://www.epochconverter.com), the value should be input in seconds). Take the URL from the signing endpoint and it should now let you access the endpoint.
+# Testing
+Once all components of Stream Security are installed and properly configured, it is important to verify that the system is working as expected. It is especially important to try to access resources that should **not** be accessible.
 
-## Configure URL Signing Timeout Values
-There are many different services that are configured to sign URLs and this section will explain configuring all of them to expire at different times.
+There are ways to test in a structured way which will be explained below.
 
-### TrustedHttpClientImpl - URL Signing for Internal Requests
-This configuration setting can be used if a URL signing provider is configured for an Opencast host to protect its REST endpoints. For example if the UrlSigningFilter has been enabled on the Admin node in a cluster installation to protect its archive endpoints and a matching URL signing provider has been configured, then the TrustedHttpClientImpl will automatically sign any requests made to a URL that matches the provider's configuration. By default the signed URLs will expire in 60 seconds. This can be changed by setting a value in seconds for the `org.opencastproject.security.internal.url.signing.duration` property in the `config.properties` configuration file. As this is just a request from one Opencast host to another the request should be easily be started in 60 seconds.
+## Creating Signed URLs with Signing Endpoint
+The Signing Service provides a REST endpoint, which allows for the signing of arbitrary URLs. For manual use it’s recommended to visit the endpoint’s documentation page at: 
+http://localhost:8080/signing/docs
 
-### OsgiEventEndpoint - URL Signing for the Admin UI Links
-If a URL signing provider is configured the OsgiEventEndpoint will sign the links in the details of an event. By default the URLs that are protected in the Admin UI will remain valid for 2 hours. This can be changed by setting a value in seconds for `url.signing.expires.seconds` in the `org.opencastproject.adminui.endpoint.OsgiEventEndpoint.properties` configuration file.
+### Is the URL accepted?
+Check if the URL to be signed is accepted by the Signing Service (or by one of its Signing Providers respectively) by using the /signing/accepts endpoint. If that is not the case, the configuration of the Signing providers should be checked again to ensure that at least one signing provider is responsible for the URL in question.
 
-### ToolsEndpoint - URL Signing for Preview and Editor Files
-If a URL signing provider is configured the ToolsEndpoint will sign the links for media that is accessed through the preview and editor interfaces in the Admin UI. By default these URLs will remain valid for 2 hours. This can be overriden by setting a value in `url.signing.expires.seconds` in the `org.opencastproject.adminui.endpoint.ToolsEndpoint.properties` configuration file.
+If the service is fully operational, the response code will be **200 OK** and the response body either **true** (accepted) or **false** (refused).
 
-### SigningMediaPackageSerializer - URL Signing for the Search Service
-The SigningMediaPackageSerializer transparently signs all URLs that have a working URL signing provider configured. It is used by the search service to sign media that will be accessed by the player. By default, the signed URLs remain valid for 2 hours. This can be changed by setting a value for `url.signing.expires.seconds` in `org.opencastproject.security.urlsigning.SigningMediaPackageSerializer.properties` configuration file.
+### Signing the URL
+On the same documentation page URLs can be signed using the /signing/sign endpoint, and the access policy may be specified in that form as well. With this, several scenarios can be tested. Examples are:
 
+* URLs that have already expired or will expire at a known date
+* URLs that are not yet valid (if you provided a validFrom data in the access policy)
+* URLs that are missing some or all of the signing parameters (policy, keyId or signature)
+* URLs that are attempting to use signing parameters (policy and signature) from a different signed URL
 
+### Verifying the URL
+The signed URLs can then be passed to the appropriate testing tool (web browser, cURL, VLC, Flash player, …) to test the functionality of the verification component(s). The following table is the return codes associated with different rejection conditions:
 
-Server Plugins
-==============
+| Case | Return Code |
+| ---- | ----------- | 
+| If any of the query string parameters are missing or are the wrong case / spelt incorrectly | Bad Request (400) |
+| If any of the required policy variables are missing | Bad Request (400)|
+| No encryption key that matches the KeyID known by the plugin | Bad Request (400)|
+| The Policy and Signature don’t match in any way | Forbidden (403)|
+| If client IP is specified and doesn’t match | Forbidden (403)|
+| The current time has passed the DateGreaterThan, the time the URL expires | Gone (410)|
+| The current time is before the DateLessThan, the time the URL becomes available | Gone (410)|
 
-Stream Security only works if the server has the corresponding plugin installed. Currently, plugins for Wowza Streaming Server and Apache HTTPd are available. They can be found in their respective Git repositories:
+The components that verify a URL is signed will run before a request is checked to be valid, so if a non-existent URL is signed for example, the above conditions will need to be fixed before a missing (404) response code will be returned.
 
-* Wowza: [https://bitbucket.org/entwinemedia/wowza-stream-security-plugin](https://bitbucket.org/entwinemedia/wowza-stream-security-plugin)
-* Apache HTTPd: [https://bitbucket.org/entwinemedia/apache-httpd-stream-security-plugin](https://bitbucket.org/entwinemedia/apache-httpd-stream-security-plugin)
+### Inspect policy
 
+The generated policy which is added to the signed URLs can be inspected. It needs to be decoded from Base64 and the result must be a JSON document that contains exactly the values which have been passed during signing.
 
+Decoding this Base64 encoded policy:
 
-## Downloading A Resource From Apache Httpd
+    eyJTdGF0ZW1lbnQiOnsiUmVzb3VyY2UiOiJodHRwOlwvXC9vcGVuY2FzdC5vcmdcL2VuZ2FnZVwvcmVzb3VyY2UubXA0IiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTQyNTE3MDc3NzAwMCwiRGF0ZUdyZWF0ZXJUaGFuIjoxNDI1MDg0Mzc5MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9fX0
 
-Once you have acquired your signed URL, a video, audio or other resource can be downloaded by putting your signed URL into a browser for testing.
+would result in this JSON document (policy):
 
+```json 
+{"Statement":{"Resource":"http:\/\/opencast.org\/engage\/resource.mp4","Condition":{"DateLessThan":1425170777000,"DateGreaterThan":1425084379000,"IpAddress":"10.0.0.1"}}}
+```
 
-## Playing Wowza Signed URL
+Inspecting and modifying the policy is useful for advanced testing, such as:
+* URLs where the policy was modified after signing
+* URLs where the policy was modified and resigned with a different key
 
-The Wowza log files by default located at /usr/local/WowzaStreamingEngine/wowzastreamingengine_access.log and /usr/local/WowzaStreamingEngine/wowzastreamingengine_error.log will allow you to see if a request has been rejected so while testing it is useful to watch these log files for potential issues.
+## Further information
+For an overview of Stream Security:
 
-For example if the policy doesn't match the signature you will get an error message such as:
-2015-03-19    15:20:28    CDT    comment    server    WARN    200    -    Forbidden because policy and signature do not match. Policy: '{"Statement":{"Condition":{"DateLessThan":1584649115000},"Resource":"sample.mp4"}}' created Signature from this policy '9c6e42c2df91f7d9837813ba9d057d87b42f4addccd8b49d1ddf515acd01369e' and query string Signature: '577e05cdf7e37e3e04da9e60b497cf3a66cac9f54ece16b4f0639266a5ab1bea'
+* [Stream Security Overview](../overview/stream-security.md)
 
+For installation instructions for external verification components:
 
-### Testing Signed URL with Wowza Player
+* [Apache HTTPd Verification Component](https://bitbucket.org/entwinemedia/apache-httpd-stream-security-plugin)
+* [Wowza Verification Component](https://bitbucket.org/entwinemedia/wowza-stream-security-plugin)
 
-1. Get a Signed URL With the Steps Above
+For further developer information including the [Opencast Signing Protocol](../../developer/stream-security-insights#Opencast Signing Protocol), please read the information here:
 
-1. Go to: [http://www.wowza.com/resources/3.5.0/examples/LiveVideoStreaming/FlashRTMPPlayer/player.html](http://www.wowza.com/resources/3.5.0/examples/LiveVideoStreaming/FlashRTMPPlayer/player.html)
-
-1. Break the url into the host/application stream and the stream location. For the above example it breaks down into
-    * Server URL: `rtmp://streamingserver.tld/matterhorn-engage/`
-    * Stream URL: `sample.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVHcmVhdGVyVGhhbiI6MTQyNTA4NDM3OTAwMCwiRGF0ZUxlc3NUaGFuIjoxNDI1MTcwNzc3MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9LCJSZXNvdXJjZSI6InJ0bXA6XC9cL3N0cmVhbWluZ3NlcnZlci50bGRcL21hdHRlcmhvcm4tZW5nYWdlXC9zYW1wbGUubXA0In19&keyId=demoKeyOne&signature=6e5adff77f84a47c5c904d16609a28a359df05a0c08aeaba6c27e6dc85fabe42`
-
-1. Put the server url into the server text box and the stream url into the stream box and try playing the video by hitting connect
-
-
-### Testing Signed URL with VLC
-
-VLC will cut off the end of an extra long URL so if your server name and path is extra long you might notice in the Wowza logs that the resource URL being requested is shorter than the entire path. So for example instead of the resource being requested being:
-
-    rtmp://streamingserver.tld/matterhorn-engage/sample.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVHcmVhdGVyVGhhbiI6MTQyNTA4NDM3OTAwMCwiRGF0ZUxlc3NUaGFuIjoxNDI1MTcwNzc3MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9LCJSZXNvdXJjZSI6InJ0bXA6XC9cL3N0cmVhbWluZ3NlcnZlci50bGRcL21hdHRlcmhvcm4tZW5nYWdlXC9zYW1wbGUubXA0In19&keyId=demoKeyOne&signature=6e5adff77f84a47c5c904d16609a28a359df05a0c08aeaba6c27e6dc85fabe42
-
-It is instead:
-
-    rtmp://streamingserver.tld/matterhorn-engage/sample.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVHcmVhdGVyVGhhbiI6MTQyNTA4NDM3OTAwMCwiRGF0ZUxlc3NUaGFuIjoxNDI1MTcwNzc3MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9LCJSZXNvdXJjZSI6InJ0bXA6XC9cL3N0cmVhbWluZ3NlcnZlci50bGRcL21hdHRlcmhvcm4tZW5nYWdlXC9zYW1wbGUubXA0In19&keyId=demoKeyOne&signature=6e5adff77f
-
-
-1. Open VLC
-1. Choose open network
-1. Paste the signed url into the URL text box
-1. Click on Open
+* [Stream Security Developer Docs](../../developer/stream-security-insights) 
