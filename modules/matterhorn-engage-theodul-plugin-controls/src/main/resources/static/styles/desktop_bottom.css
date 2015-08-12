@@ -228,4 +228,8 @@
     -webkit-border-radius: 6px 0 6px 6px;
     -moz-border-radius: 6px 0 6px 6px;
     border-radius: 6px 0 6px 6px;
+
+#headerLogo {
+    height: 36px;
+    margin-top: -7px;
 }

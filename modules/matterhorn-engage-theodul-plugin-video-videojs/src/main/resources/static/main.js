@@ -1,16 +1,22 @@
 /**
- * Copyright 2009-2011 The Regents of the University of California Licensed
- * under the Educational Community License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain a
- * copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- * http://www.osedu.org/licenses/ECL-2.0
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
+ *
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
@@ -148,7 +154,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var dashPath = "lib/videojs/dash.min";
     var dashPluginPath = "lib/videojs/videojs-tech-dashjs"
     var videojs_swf_path = "lib/videojs/video-js.swf";
-    var videoDisplaySizeFactor = 1.1;
+    var videoDisplaySizeFactor = 1.3;
     var videoDisplaySizeTimesCheck = 100; // the smaller the factor, the higher the times check!
     var checkVideoDisplaySizeTimeout = 1500;
     var audioLoadTimeoutCheckDelay = 5000;
@@ -245,9 +251,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var focusedClass = "videoFocused";
     var isPiP = true;
     var pipPos = "left";
-
+    var foundQualities = undefined;
     var zoomLevel = 1.0;
-
 
 
     function initTranslate(language, funcSuccess, funcError) {
@@ -303,6 +308,130 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         return true;
     }
 
+    function filterTracksByTag(tracks, filterTags) {
+        if (filterTags == undefined) {
+            return tracks;
+        }
+        var filterTagsArray = filterTags.split(",");
+        var newTracksArray = new Array();
+
+        for (var i = 0; i < tracks.length; i++) {
+            var found = false;
+            for (var j = 0; j < tracks[i].tags.tag.length; j++) {
+                for (var k = 0; k < filterTagsArray.length; k++) {
+                    if (tracks[i].tags.tag[j] == filterTagsArray[k].trim()) {
+                        found = true;
+                        newTracksArray.push(tracks[i]);
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+        }
+
+        //avoid filtering to an empty list, better play something than nothing
+        if (newTracksArray.length < 1 ) {
+            return tracks;
+        }
+        return newTracksArray;
+    }
+
+    /**
+     * Lookup all tags that are in use
+     * @param {type} videoSources, List of still used tracks
+     * @param {type} keyword, substing that should be included in the tag
+     * @returns {Array}
+     */
+    function getTags(videoSources, keyword) {
+        if (videoSources === undefined) {
+            return;
+        }
+        var tagList = new Set();
+
+        for (var v in videoSources) {
+            for (var i = 0; i < videoSources[v].length; i++) {
+                for (var j = 0; j < videoSources[v][i].tags.tag.length; j++) {
+                    if (keyword !== undefined) {
+                        if (videoSources[v][i].tags.tag[j].indexOf(keyword) > 0) {
+                            tagList.add(videoSources[v][i].tags.tag[j]);
+                        }
+                    } else {
+                        tagList.add(videoSources[v][i].tags.tag[j]);
+                    }
+                }
+            }
+        }
+
+        return tagList;
+    }
+
+    /**
+     * Find the different video qualities
+     * @param {type} videoSources videoSources that are still in use
+     * @returns {undefined}
+     *
+     */
+    function getQualities(videoSources) {
+        // using a cache for qualities, as they probably do not change
+        if (foundQualities) {
+            return foundQualities;
+        }
+        var qualitesList = new Array();
+        var tagsList = getTags(videoSources, "-quality");
+        tagsList.forEach(function(quality, value) {
+            qualitesList.push(quality.substring(0, quality.indexOf("-quality")));
+        });
+        var tracks;
+        for (var source in videoSources) {
+            if (videoSources[source] !== undefined) {
+                tracks = videoSources[source];
+                break;
+            }
+        }
+        var sortedResolutionsList = new Array();
+        for (var i = 0; i< qualitesList.length; i++){
+            var currentTrack = filterTracksByTag(tracks, qualitesList[i] + "-quality")[0];
+            sortedResolutionsList.push([qualitesList[i], currentTrack.resolution.substring(0, currentTrack.resolution.indexOf("x"))]);
+        }
+        sortedResolutionsList.sort(compareQuality);
+        foundQualities = new Array();
+        for (var i = 0; i < sortedResolutionsList.length; i++){
+            foundQualities.push(sortedResolutionsList[i][0]);
+        }
+        return foundQualities;
+    }
+
+    function compareQuality (a, b) {
+        if (a && b) {
+            if (parseInt(a[1]) == parseInt(b[1])) {
+                return 0;
+            }
+            return parseInt(a[1]) > parseInt(b[1]) ? 1 : -1;
+        }
+        return 0;
+    }
+
+    function filterTracksByFormat(tracks, filterFormats) {
+        if (filterFormats == undefined) {
+            return tracks;
+        }
+        var filterFormatsArray = filterFormats.split(",");
+        var newTracksArray = new Array();
+
+        for (var i = 0; i < tracks.length; i++) {
+            for (var j = 0; j < filterFormatsArray.length; j++) {
+                var formatMimeType = Utils.preferredFormat(filterFormatsArray[j].trim());
+                if (formatMimeType == undefined) return tracks; // if illegal mimetypes are configured ignore config
+                if (tracks[i].mimetype == formatMimeType) {
+                    newTracksArray.push(tracks[i]);
+                    break;
+                }
+            }
+        }
+
+        return newTracksArray;
+    }
+
     function registerSynchronizeEvents() {
         // throw some important synchronize.js-events for other plugins
         $(document).on(event_sjs_allPlayersReady, function(event) {
@@ -339,39 +468,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
     }
 
-    function initSynchronize(showMsg) {
+    function initSynchronize() {
         $(document).trigger(event_sjs_debug, Engage.model.get("isDebug"));
-        if (Bowser.chrome) {
-            $(document).trigger(event_sjs_stopBufferChecker);
-            if (showMsg) {
-                Engage.trigger(plugin.events.customError.getName(), translate("chromeBuffer", "The buffer checker has been disabled due to Chrome limitations. It is possible that you will encounter problems with the video playback."));
-            }
-        }
-    }
-
-    function compareResolutions(a, b) {
-        var aspl = a.split("x");
-        var bspl = b.split("x");
-        aspl[0] = parseInt(aspl[0]);
-        bspl[0] = parseInt(bspl[0]);
-        aspl[1] = parseInt(aspl[1]);
-        bspl[1] = parseInt(bspl[1]);
-        if (aspl[0] == bspl[0]) {
-            if (aspl[1] == bspl[1]) {
-                return 0;
-            }
-            return aspl[1] > bspl[1] ? 1 : -1;
-        }
-        return aspl[0] > bspl[0] ? 1 : -1;
-    }
-
-    function getSortedMappedResolutionArray(resolutions) {
-        resolutions.sort(compareResolutions);
-        var maparr = [];
-        maparr["low"] = resolutions[0];
-        maparr["medium"] = resolutions[resolutions.length - 2];
-        maparr["high"] = resolutions[resolutions.length - 1];
-        return maparr;
+        $(document).trigger(event_sjs_stopBufferChecker);
     }
 
     function registerQualityChangeEvent() {
@@ -565,32 +664,30 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     function changeQuality(q) {
         if (q) {
+            var isPaused = videojs(globalVideoSource[0][0]).paused();
             Engage.trigger(plugin.events.pause.getName(), false);
-            q = q.toLowerCase();
-            if ((q == "low") || (q == "medium") || (q == "high")) {
-                Engage.model.set("quality", q);
-                Engage.log("Setting quality to: " + q);
-
-                var tuples = getSortedVideosourcesArray(globalVideoSource);
-                for (var i = 0; i < tuples.length; ++i) {
-                    var key = tuples[i][0];
-                    var value = tuples[i][1];
-
-                    for (var val in value[1]) {
-                        if (value[1][val].resolution) {
-                            if (mappedResolutions[q] == value[1][val].resolution) {
-                                videojs(value[0]).src(value[1][val].src);
-                                break;
-                            }
-                        }
+            var quality = q + "-quality";
+            Engage.model.set("quality", q);
+            Engage.log("Setting quality to: " + q);
+            var tuples = getSortedVideosourcesArray(globalVideoSource);
+            for (var i = 0; i < tuples.length; ++i) {
+                var key = tuples[i][0];
+                var value = tuples[i][1];
+                if (value[1][0]) {
+                    var track = filterTracksByTag(value[1], quality);
+                    if (track && track.length > 0) {
+                        videojs(value[0]).src(track[0].src);
                     }
                 }
-                if (pressedPlayOnce && (currentTime > 0)) {
-                    window.setTimeout(function() {
-                        initSynchronize(false);
-                        Engage.trigger(plugin.events.seek.getName(), currentTime);
-                    }, timer_qualitychange);
-                }
+            }
+            if (pressedPlayOnce && (currentTime > 0)) {
+                window.setTimeout(function() {
+                    initSynchronize(false);
+                    Engage.trigger(plugin.events.seek.getName(), currentTime);
+                    if (! isPaused) {
+                        Engage.trigger(plugin.events.play.getName());
+                    }
+                }, timer_qualitychange);
             }
         }
     }
@@ -607,20 +704,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
         }
 
-        var key_tmp = tuples[0][0];
-        var value_tmp = tuples[0][1];
-        var nr_res = 0;
-        var res_array = [];
-        for (var val in value_tmp) {
-            if (value_tmp[val].resolution) {
-                res_array[res_array.length] = value_tmp[val].resolution;
-            }
-            ++nr_res;
-        }
-        if (nr_res > 2) {
+        var qualities = getQualities(videoSources);
+
+        if (qualities.length > 1) {
             registerQualityChangeEvent();
-            mappedResolutions = getSortedMappedResolutionArray(res_array);
-            Engage.trigger(plugin.events.videoFormatsFound.getName(), mappedResolutions);
+            Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
             changeQuality(Engage.model.get("quality"));
         }
 
@@ -635,9 +723,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             });
             for (var i = 0; i < videoDisplays.length; ++i) {
                 $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
-
                 $("#" + videoDisplays[i]).css("position", "relative");
                 $("#" + videoDisplays[i]).css("overflow", "hidden");
+                
+                //$("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 90) + "%").addClass("auto-height");
             }
         } else {
             Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
@@ -668,7 +757,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     }
                     ++i;
                 }
-                initSynchronize(true);
+                initSynchronize();
             } else {
                 videosReady = true;
                 if (!isAudioOnly) {
@@ -677,8 +766,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
 
             if (videoDataView.model.get("type") != "audio") {
-                $(window).resize(function() {
+                $(window).resize(function(event, el) {
                     checkVideoDisplaySize();
+                    var factor = 0.01;
+                    while(!isElementVisible($('#engage_resize_container')) && factor <= 1.0){
+                        $('#'+id_engageContent).css("max-width", event.currentTarget.innerWidth / (videoDisplaySizeFactor + factor));
+                        factor += 0.01;
+                    }
                 });
             }
         }
@@ -930,7 +1024,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             isAudioOnly = videoDataView.model.get("type") == "audio";
             Engage.trigger(plugin.events.isAudioOnly.getName(), isAudioOnly);
 
-            if (videoSources && videoDisplays && aspectRatio) {
+            if (videoSources && videoDisplays) {
                 if (isEmbedMode) {
                     renderEmbed(videoDataView, videoSources, videoDisplays, aspectRatio);
                 } else if (isMobileMode) {
@@ -944,7 +1038,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             }
         }
-        checkVideoDisplaySize();
+        if (videoDataView.model.get("type") != "audio") {
+            checkVideoDisplaySize();
+        }
     }
 
     function prepareRenderingVideoDisplay(videoDataView) {
@@ -1054,6 +1150,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 $("#engage_video").height(height + 10);
             }
         }
+    }
+
+    function isElementVisible(elementToBeChecked) {
+        var TopView = $(window).scrollTop();
+        var BotView = TopView + $(window).height();
+        var TopElement = $(elementToBeChecked).offset().top;
+        var BotElement = TopElement + $(elementToBeChecked).height();
+        return ((BotElement <= BotView) && (TopElement >= TopView));
     }
 
     function clearAutoplay() {
@@ -1189,6 +1293,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 $("." + class_audioDisplayError).show();
             }, audioLoadTimeoutCheckDelay);
             audioPlayer_id.on("canplay", function() {
+                videosReady = true;
                 Engage.trigger(plugin.events.ready.getName());
                 window.clearTimeout(audioLoadTimeout);
             });
@@ -1318,7 +1423,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             Engage.on(plugin.events.volumeSet.getName(), function(volume) {
                 if ((volume >= 0) && (volume <= 1)) {
                     Engage.log("Video: Volume changed to " + volume);
-                    audioPlayer.volume(volume);
+                    audioPlayer.volume = volume;
                 }
             });
             Engage.on(plugin.events.volumeGet.getName(), function(callback) {
@@ -1875,11 +1980,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 videoSources[Utils.extractFlavorMainType(flavorsArray[i])] = [];
             }
 
-            var hasVideo = false
+            var hasVideo = false;
             var hasAudio = false;
 
             // look for video sources
             var duration = 0;
+            var allowedTags = Engage.model.get("meInfo").get("allowedtags");
+            var allowedFormats = Engage.model.get("meInfo").get("allowedformats");
+            mediaInfo.tracks = filterTracksByFormat(filterTracksByTag(mediaInfo.tracks, allowedTags), allowedFormats);
             if (mediaInfo.tracks) {
                 $(mediaInfo.tracks).each(function(i, track) {
                     if (track.mimetype && track.type && acceptFormat(track)) {
@@ -1900,7 +2008,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                                 src: track.url,
                                 type: track.mimetype,
                                 typemh: track.type,
-                                resolution: resolution
+                                resolution: resolution,
+                                tags: track.tags
                             });
                         } else if (track.mimetype.match(/audio/g)) {
                             hasAudio = true;
@@ -1910,7 +2019,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                             videoSources.audio.push({
                                 src: track.url,
                                 type: track.mimetype,
-                                typemh: track.type
+                                typemh: track.type,
+                                tags: track.tags
                             });
                         }
                     }
@@ -1969,6 +2079,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     }
 
     function compareVideoSources(a, b) {
+        if (a === undefined || b === undefined || a [1][0] === undefined ||
+                b[1][0] === undefined) {
+            return 0;
+        }
         var s1 = a[1][0].typemh;
         var s2 = b[1][0].typemh;
         if (s1 == mastervideotype) {

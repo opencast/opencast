@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ng-partial-error</id>
+  <description>Cleanup after a processing failure</description>
+  <operations>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Notify                                                            -->
+    <!--                                                                   -->
+    <!-- Add comments in order to mark the recording for review and send   -->
+    <!-- e-mails to administrators.                                        -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Mark the recording for review -->
+
+    <operation
+      id="comment"
+      fail-on-error="false"
+      description="Mark the recording for cutting">
+      <configurations>
+        <configuration key="description">Processing failed</configuration>
+        <configuration key="reason">EVENTS.COMMENTS.REASONS.PROCESSING_FAILURE</configuration>
+        <configuration key="action">create</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Send email -->
+
+    <operation
+      id="send-email"
+      fail-on-error="false"
+      description="Send e-mail notification">
+      <configurations>
+        <configuration key="to">root@localhost</configuration>
+        <configuration key="subject">Recording failed to process</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Preserve the current state                                        -->
+    <!--                                                                   -->
+    <!-- Create a zip file from the current state of the recording.        -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Zip the mediapackage -->
+
+    <operation
+      id="zip"
+      fail-on-error="false"
+      description="Preserve the current recording state">
+      <configurations>
+        <configuration key="zip-collection">failed.zips</configuration>
+        <configuration key="include-flavors">*/source,dublincore/*</configuration>
+        <configuration key="target-flavor">archive/zip</configuration>
+        <configuration key="compression">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Cleanup the temporary files from the working file repository -->
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+      <configurations>
+        <configuration key="preserve-flavors">archive/zip</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

@@ -1,52 +1,29 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.archive.storage;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.opencastproject.archive.api.Version;
-import org.opencastproject.archive.base.StoragePath;
-import org.opencastproject.archive.base.storage.DeletionSelector;
-import org.opencastproject.archive.base.storage.ElementStore;
-import org.opencastproject.archive.base.storage.ElementStoreException;
-import org.opencastproject.archive.base.storage.Source;
-import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.util.PathSupport;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
 
 import static org.apache.commons.io.FilenameUtils.EXTENSION_SEPARATOR;
 import static org.apache.commons.io.FilenameUtils.getExtension;
+import static org.apache.commons.lang.exception.ExceptionUtils.getMessage;
 import static org.opencastproject.util.FileSupport.link;
 import static org.opencastproject.util.IoSupport.file;
 import static org.opencastproject.util.PathSupport.path;
@@ -54,6 +31,34 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Strings.trimToNone;
+
+import org.opencastproject.archive.api.Version;
+import org.opencastproject.archive.base.StoragePath;
+import org.opencastproject.archive.base.storage.DeletionSelector;
+import org.opencastproject.archive.base.storage.ElementStore;
+import org.opencastproject.archive.base.storage.ElementStoreException;
+import org.opencastproject.archive.base.storage.Source;
+import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
 
 public class FileSystemElementStore implements ElementStore {
 
@@ -72,22 +77,16 @@ public class FileSystemElementStore implements ElementStore {
   /** The root directory for storing files */
   private String rootDirectory = null;
 
-  /** The http client */
-  private TrustedHttpClient httpClient;
+  private Workspace workspace;
 
-  /**
-   * Sets the trusted http client
-   * 
-   * @param httpClient
-   *          the http client
-   */
-  public void setHttpClient(TrustedHttpClient httpClient) {
-    this.httpClient = httpClient;
+  /** OSGi Di */
+  void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 
   /**
    * Service activator, called via declarative services configuration.
-   * 
+   *
    * @param cc
    *          the component context
    */
@@ -106,25 +105,30 @@ public class FileSystemElementStore implements ElementStore {
 
   @Override
   public void put(StoragePath storagePath, Source source) throws ElementStoreException {
-    InputStream in = null;
-    FileOutputStream output = null;
-    HttpResponse response = null;
+    // Retrieving the file from the workspace has the advantage that in most cases the file already exists in the local
+    // working file repository. In the very few cases where the file is not in the working file repository,
+    // this strategy leads to a minor overhead because the file not only gets downloaded and stored in the file system
+    // but also a hard link needs to be created (or if that's not possible, a copy of the file.
+    final File origin = getFileFromWorkspace(source);
     final File destination = createFile(storagePath, source);
     try {
       mkParent(destination);
-      final HttpGet getRequest = new HttpGet(source.getUri());
-      response = httpClient.execute(getRequest);
-      in = response.getEntity().getContent();
-      output = FileUtils.openOutputStream(destination);
-      IOUtils.copy(in, output);
-    } catch (Exception e) {
-      FileUtils.deleteQuietly(destination);
-      logger.error("Error storing source {} to archive {}", source.getUri(), destination.getAbsolutePath());
+      link(origin, destination);
+    } catch (IOException e) {
+      logger.error("Error while linking/copying file {} to {}: {}", new Object[] { origin, destination, getMessage(e) });
       throw new ElementStoreException(e);
-    } finally {
-      IOUtils.closeQuietly(output);
-      IOUtils.closeQuietly(in);
-      httpClient.close(response);
+    }
+  }
+
+  private File getFileFromWorkspace(Source source) {
+    try {
+      return workspace.get(source.getUri());
+    } catch (NotFoundException e) {
+      logger.error("Source file '{}' does not exist", source.getUri());
+      throw new ElementStoreException(e);
+    } catch (IOException e) {
+      logger.error("Error while getting file '{}' from workspace: {}", source.getUri(), getMessage(e));
+      throw new ElementStoreException(e);
     }
   }
 
@@ -181,7 +185,7 @@ public class FileSystemElementStore implements ElementStore {
 
   /**
    * Returns the directory file from a deletion selector
-   * 
+   *
    * @param sel
    *          the deletion selector
    * @return the directory file
@@ -233,18 +237,13 @@ public class FileSystemElementStore implements ElementStore {
 
   /** Create a file from a storage path and an optional extension. */
   private File createFile(StoragePath p, Option<String> extension) {
-    return file(
-            rootDirectory,
-            p.getOrganizationId(),
-            p.getMediaPackageId(),
-            p.getVersion().toString(),
-            extension.isSome() ? p.getAssetId() + EXTENSION_SEPARATOR + extension.get() : p
-                    .getAssetId());
+    return file(rootDirectory, p.getOrganizationId(), p.getMediaPackageId(), p.getVersion().toString(),
+            extension.isSome() ? p.getAssetId() + EXTENSION_SEPARATOR + extension.get() : p.getAssetId());
   }
 
   /**
    * Returns a file {@link Option} from a storage path if one is found or an empty {@link Option}
-   * 
+   *
    * @param storagePath
    *          the storage path
    * @return the file {@link Option}

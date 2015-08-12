@@ -1,20 +1,27 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.adminui.endpoint;
 
+import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.opencast.OpencastArchive;
@@ -39,21 +46,15 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Stream;
 
-import org.apache.commons.lang.StringUtils;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
-
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.List;
 
 import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
 @Path("/")
-public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedService {
+public class OsgiEventEndpoint extends AbstractEventEndpoint {
 
-  private static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
   private AclServiceFactory aclServiceFactory;
   private AdminUISearchIndex index;
   private AuthorizationService authorizationService;
@@ -73,9 +74,19 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   private SeriesService seriesService;
   private WorkflowService workflowService;
   private Workspace workspace;
-  private String previewSubtype;
+  private AdminUIConfiguration adminUIConfiguration;
 
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
+
+  @Override
+  public AdminUIConfiguration getAdminUIConfiguration() {
+    return adminUIConfiguration;
+  }
+
+  /** OSGi DI. */
+  public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
+    this.adminUIConfiguration = adminUIConfiguration;
+  }
 
   @Override
   public OpencastArchive getArchive() {
@@ -288,23 +299,5 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
       return organization.equals(catalogUIAdapter.getOrganization());
     }
   };
-
-  @Override
-  public String getPreviewSubtype() {
-    return previewSubtype;
-  }
-
-  @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
-    if (properties == null)
-      return;
-
-    // Preview subtype
-    previewSubtype = StringUtils.trimToNull((String)properties.get(OPT_PREVIEW_SUBTYPE));
-    if (previewSubtype != null)
-      logger.info("Preview subtype is '{}'", previewSubtype);
-    else
-      logger.warn("No preview ubtype configured");
-  }
 
 }

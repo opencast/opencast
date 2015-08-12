@@ -1,0 +1,22 @@
+
+
+site_name: Opencast - Developer Guide
+repo_url: https://bitbucket.org/opencast-community/matterhorn/src/develop/docs/guides/developer/docs
+
+# Default theme used is readthedocs
+theme: readthedocs
+
+# The directory that contain the source .md files
+docs_dir: 'docs'
+
+# The directory to which the site is built using mkdocs
+site_dir: 'site'
+
+# This needs to be listed in order to populate the left navigation and the TOC
+# Items will appear in this order
+
+pages:
+- ['index.md', 'Home']
+- ['license.md', 'Licenses and Legal Matters']
+- ['proposal-log.md', 'Proposal Log']
+- ['packaging.md', 'Packaging']

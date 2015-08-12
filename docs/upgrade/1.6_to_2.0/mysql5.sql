@@ -25,6 +25,8 @@ CREATE INDEX IX_mh_user_session_user_id ON mh_user_session (user_id);
 
 ALTER TABLE mh_organization_property MODIFY value TEXT(65535);
 
+ALTER TABLE mh_search ADD COLUMN series_id VARCHAR(128) AFTER id;
+
 -- Alter Existing Tables
 -- Adding default values for the columns that will be overwritten at startup
 ALTER TABLE mh_host_registration ADD COLUMN address VARCHAR(39) DEFAULT '127.0.0.1' NOT NULL;
@@ -63,8 +65,8 @@ CREATE TABLE mh_user_settings (
   id bigint(20) NOT NULL,
   setting_key VARCHAR(255) NOT NULL,
   setting_value text NOT NULL,
-  username varchar(128) DEFAULT NULL,
-  organization varchar(128) DEFAULT NULL,
+  username varchar(128) NOT NULL,
+  organization varchar(128) NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT FK_mh_user_setting_username FOREIGN KEY (username) REFERENCES mh_user (username),
   CONSTRAINT FK_mh_user_setting_org FOREIGN KEY (organization) REFERENCES mh_user (organization)

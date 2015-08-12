@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.index.service.resources.list.impl;
 
 import org.opencastproject.index.service.exception.ListProviderException;
@@ -35,8 +41,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class ListProvidersServiceImpl implements ListProvidersService {
-
-  public static final String LICENSES = "LICENSES";
 
   private static final Logger logger = LoggerFactory.getLogger(ListProvidersServiceImpl.class);
   private static final String FILTER_SUFFIX = "Filter";
@@ -76,25 +80,6 @@ public class ListProvidersServiceImpl implements ListProvidersService {
         list.put("Location 1", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION1");
         list.put("Location 2", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION2");
         list.put("Location 3", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION3");
-        return list;
-      }
-    });
-
-    // TODO create a file for each resource and made it dynamic
-
-    providers.put(LICENSES, new ResourceListProvider() {
-
-      @Override
-      public String[] getListNames() {
-        return new String[] { LICENSES };
-      }
-
-      @Override
-      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-        Map<String, Object> list = new HashMap<String, Object>();
-        list.put("CCND", "EVENTS.LICENSE.CCND");
-        list.put("GPL3", "EVENTS.LICENSE.GPL");
-        list.put("BSD", "EVENTS.LICENSE.BSD");
         return list;
       }
     });

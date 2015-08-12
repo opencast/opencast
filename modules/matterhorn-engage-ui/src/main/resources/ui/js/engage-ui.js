@@ -5,7 +5,7 @@ $(document).ready(function() {
     var playerEndpoint = "";
     var page = 1;
     var totalEntries = -1;
-    var bufferEntries = 6; // number of entries to load for one page.
+    var bufferEntries = 15; // number of entries to load for one page.
     var restData = "";
     var active = "episodes";
     var stack = new Array();
@@ -13,7 +13,7 @@ $(document).ready(function() {
     var tabIndexNumber = 100;
     var seriesRgbMax = new Array(220, 220, 220); //color range. 
     var seriesRgbOffset = new Array(20, 20, 20); //darkest possible color 
-    var title_enterUsernamePassword = "Login with your Matterhorn account";
+    var title_enterUsernamePassword = "Login with your Opencast account";
     var placeholder_username = "Username";
     var placeholder_password = "Password";
     var placeholder_rememberMe = "Remember me";
@@ -30,7 +30,7 @@ $(document).ready(function() {
     var defaultPlayerURL = "/engage/ui/watch.html";
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
-    var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
+    var springLoggedInStrCheck = "<title>Opencast – Login Page</title>";
     var $navbarEpisodes = "#navbarEpisodes";
     var $navbarSeries = "#navbarSeries";
     var $headerLogo = "#headerLogo";
@@ -312,7 +312,7 @@ $(document).ready(function() {
                         setAnonymousUser();
                     }
                     if (data.org && data.org.properties) {
-                        var logo = data.org.properties.logo_large ? data.org.properties.logo_large : "";
+                        var logo = data.org.properties.logo_mediamodule ? data.org.properties.logo_mediamodule : "";
                         $($headerLogo).attr("src", logo);
 
                         var player = data.org.properties.player ? data.org.properties.player : defaultPlayerURL;

@@ -6,7 +6,6 @@
     class="org.opencastproject.message.broker.impl.MessageReceiverImpl" />
   <property name="service.description" value="Message Broker Receiver" />
   <service>
-    <provide interface="org.osgi.service.cm.ManagedService" />
     <provide interface="org.opencastproject.message.broker.api.MessageReceiver" />
   </service>
   <reference name="config-admin" interface="org.osgi.service.cm.ConfigurationAdmin"

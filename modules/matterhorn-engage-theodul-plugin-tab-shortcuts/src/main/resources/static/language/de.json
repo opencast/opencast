@@ -2,8 +2,8 @@
   "displayShortcuts":"Tastaturkombinationen anzeigen",
   "shortcutsNotAvailable":"Es sind aktuelle keine Tastaturkombinationen verfügbar.",
   "shortcutOverview":"Tastaturkombinationen-Übersicht",
-  "name":"Tastaturkombinationsname",
-  "shortcut":"Tastaturkombination",
+  "name":"Funktion",
+  "shortcut":"Tastenkürzel",
   "fullscreen":"Vollbild aktivieren",
   "playPause":"Wiedergabe\/Pause",
   "playbackrateDecrease":"Wiedergaberate erhöhen",
@@ -44,4 +44,5 @@
   "focusNext": "Nächstes Video vergrößern",
   "togglePiP": "Bild in Bild ein/aus",
   "movePiP": "Bild in Bild verschieben"
+  "shortcuts":"Tastenkürzel"
 }

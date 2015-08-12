@@ -1,16 +1,22 @@
 /**
- * Copyright 2009-2011 The Regents of the University of California Licensed
- * under the Educational Community License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain a
- * copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- * http://www.osedu.org/licenses/ECL-2.0
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
+ *
  */
 /*jslint browser: true, nomen: true*/
 /*global define*/
@@ -92,6 +98,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var isEmbedMode = false;
     var isMobileMode = false;
 
+    var $headerLogo = "#headerLogo";
+    var $mediaModuleLink = "#mediamodulelink";
+
     // desktop, embed and mobile logic
     switch (Engage.model.get("mode")) {
         case "embed":
@@ -140,7 +149,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var embedHeightThree = 360;
     var embedHeightFour = 480;
     var embedHeightFive = 720;
-    var logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
+    var min_segment_duration = 5000;
+    var logoLink = false;
+    var logo = plugin_path + "images/logo.png";
+    var showEmbed = true;
 
     /* don't change these variables */
     var Utils;
@@ -239,7 +251,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var askedForLogin = false;
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
-    var springLoggedInStrCheck = "<title>Opencast Matterhorn – Login Page</title>";
+    var springLoggedInStrCheck = "<title>Opencast – Login Page</title>";
     var controlsViewTopIfBottom = undefined;
     var controlsView = undefined;
     var resolutions = undefined;
@@ -402,9 +414,30 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             if (!mediapackageError) {
                 duration = parseInt(this.model.get("duration"));
                 segments = Engage.model.get("mediaPackage").get("segments");
+
                 var pipPosition = pipPos;
                 if (!pipStatus) {
                     pipPosition = "off";
+                }
+
+                segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
+
+                if (Engage.model.get("meInfo")) {
+                    if (Engage.model.get("meInfo").get("logo_player")) {
+                        logo = Engage.model.get("meInfo").get("logo_player");
+                    }
+                    if (Engage.model.get("meInfo").get("link_mediamodule")) {
+                        logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
+                    }
+                    if (! Engage.model.get("meInfo").get("show_embed_links")) {
+                        showEmbed = false;
+                    }
+                }
+                var translatedQualites = new Array();
+                if (resolutions) {
+                    for (var i = 0; i < resolutions.length; i++) {
+                        translatedQualites[resolutions[i]] = translate(resolutions[i], resolutions[i]);
+                    }
                 }
 
                 var tempVars = {
@@ -435,19 +468,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_fullscreen: translate("fullscreen", "Fullscreen"),
                     str_qualityButton: translate("quality", "Quality"),
                     str_quality: translate("quality", "Quality"),
-                    str_qualityLow: translate("qualityLow", "Low"),
-                    str_qualityMedium: translate("qualityMedium", "Medium"),
-                    str_qualityHigh: translate("qualityHigh", "High"),
                     str_layoutButton: translate("layout", "Layout"),
                     str_pictureInPicture: translate("pictureInPicture", "Picture in Picture"),
                     str_left: translate("left", "left"),
                     str_right: translate("right", "right"),
                     str_off: translate("off", "off"),
+                    pip_position: translate(pipPosition, pipPosition),
+                    translatedqualities: translatedQualites,
                     hasqualities: resolutions !== undefined,
                     hasmultiplevideos: numberVideos > 1,
                     controlsTop: Engage.controls_top,
-                    pip_position: translate(pipPosition, pipPosition),
+                    //pip_position: translate(pipPosition, pipPosition),
                     str_zoomlevel: "1.0"
+                    logo: logo,
+                    show_embed: showEmbed
                 };
 
                 // compile template and load it
@@ -493,6 +527,17 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         },
         render: function() {
             if (!mediapackageError) {
+                if (Engage.model.get("meInfo")) {
+                    if (Engage.model.get("meInfo").get("logo_player")) {
+                        logo = Engage.model.get("meInfo").get("logo_player");
+                    }
+                    if (Engage.model.get("meInfo").get("link_mediamodule")) {
+                        logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
+                    }
+                    if (! Engage.model.get("meInfo").get("show_embed_links")) {
+                        showEmbed = false;
+                    }
+                }
                 var tempVars = {
                     plugin_path: this.pluginPath,
                     logoLink: logoLink,
@@ -501,7 +546,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_fullscreen: translate("fullscreen", "Fullscreen"),
                     loggedIn: false,
                     str_checkingStatus: translate("checkingLoginStatus", "Checking login status..."),
-                    str_loginLogout: translate("loginLogout", "Login/Logout")
+                    str_loginLogout: translate("loginLogout", "Login/Logout"),
+                    logo: logo,
+                    show_embed: showEmbed
                 };
 
                 // compile template and load into the html
@@ -543,24 +590,21 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function addQualityChangeEvents() {
         if (!mediapackageError) {
-            $("#" + id_qualityLow).click(function(e) {
-                e.preventDefault();
-                $("#" + id_qualityIndicator).html(translate("qualityLow", "Low"));
-                Engage.trigger(plugin.events.qualitySet.getName(), "low");
-            });
-            $("#" + id_qualityMedium).click(function(e) {
-                e.preventDefault();
-                $("#" + id_qualityIndicator).html(translate("qualityMedium", "Medium"));
-                Engage.trigger(plugin.events.qualitySet.getName(), "medium");
-            });
-            $("#" + id_qualityHigh).click(function(e) {
-                e.preventDefault();
-                $("#" + id_qualityIndicator).html(translate("qualityHigh", "High"));
-                Engage.trigger(plugin.events.qualitySet.getName(), "high");
-            });
+            for (var i = 0; i < resolutions.length; i++) {
+                var quality = resolutions[i];
+                addQualityListener(quality);
+            }
             var q = Engage.model.get("quality");
             $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
         }
+    }
+
+    function addQualityListener(quality) {
+        $("#quality" + quality).click(function(element) {
+                    element.preventDefault();
+                    $("#" + id_qualityIndicator).html(translate(quality, quality));
+                    Engage.trigger(plugin.events.qualitySet.getName(), quality);
+        });
     }
 
     function addLayoutEvents() {
@@ -629,7 +673,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         } else {
             str = Utils.replaceAll(str, "mode=desktop", "mode=embed");
         }
-        var code = "<iframe src=\"" + str + "\" style=\"border:0px #FFFFFF none;\" name=\"Opencast Matterhorn video player\" scrolling=\"no\" frameborder=\"0\" marginheight=\"0px\" marginwidth=\"0px\" width=\"" + ratioWidth + "\" height=\"" + ratioHeight + "\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\"></iframe>";
+        var code = "<iframe src=\"" + str + "\" style=\"border:0px #FFFFFF none;\" name=\"Opencast media player\" scrolling=\"no\" frameborder=\"0\" marginheight=\"0px\" marginwidth=\"0px\" width=\"" + ratioWidth + "\" height=\"" + ratioHeight + "\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\"></iframe>";
         code = Utils.escapeHtml(code);
         Engage.trigger(plugin.events.customOKMessage.getName(), "Copy the following code and paste it to the body of your html page: <div class=\"well well-sm well-alert\">" + code + "</div>");
     }
@@ -836,7 +880,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             embedHeightOne = 70;
 
             $("#" + id_embed0).html("Embed " + embedWidthOne + "x" + embedHeightOne);
-            $("#" + id_embed1 + ", " + "#" + id_embed2 + ", " + "#" + id_embed3 + ", " + "#" + id_embed4 + ", ").hide();
+            Utils.removeParentIfElementExists(id_embed1);
+            Utils.removeParentIfElementExists(id_embed2);
+            Utils.removeParentIfElementExists(id_embed3);
+            Utils.removeParentIfElementExists(id_embed4);
         }
 
         $("#" + id_embed_button).removeClass("disabled");

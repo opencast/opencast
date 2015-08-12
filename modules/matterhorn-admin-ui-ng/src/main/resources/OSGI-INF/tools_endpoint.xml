@@ -13,7 +13,12 @@
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.adminui.endpoint.ToolsEndpoint" />
   </service>
-  
+
+  <reference bind="setAdminUIConfiguration"
+             cardinality="1..1"
+             interface="org.opencastproject.adminui.impl.AdminUIConfiguration"
+             name="adminUIConfiguration"
+             policy="static" />
   <reference bind="setAdminUISearchIndex"
              cardinality="1..1"
              interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"

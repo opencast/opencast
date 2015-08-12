@@ -11,6 +11,10 @@ angular.module('adminNg.resources')
             // of the request.
             headers: { 'Content-Type': undefined },
 
+            responseType: 'text',
+
+            transformResponse: [],
+
             transformRequest: function (data) {
                 if (angular.isUndefined(data)) {
                     return data;
