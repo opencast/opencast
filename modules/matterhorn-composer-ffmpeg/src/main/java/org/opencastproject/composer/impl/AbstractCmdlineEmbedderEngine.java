@@ -33,6 +33,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -248,9 +249,12 @@ public abstract class AbstractCmdlineEmbedderEngine implements EmbedderEngine {
         // got element that can be inserted in array - find all corresponding elements
         String suffix = e.getKey().substring(arrayParameters.get(0).length());
         String arrayElement = template.replace("#{" + arrayParameters.get(0) + "}", e.getValue());
-        for (int i = 1; i < arrayParameters.size() && properties.containsKey(arrayParameters.get(i) + suffix); i++) {
+        Map<String, String> updatedProperties = new LinkedHashMap<String, String>();
+        updatedProperties.putAll(properties);
+        updatedProperties.put("param.index" + suffix, suffix);
+        for (int i = 1; i < arrayParameters.size() && updatedProperties.containsKey(arrayParameters.get(i) + suffix); i++) {
           arrayElement = arrayElement.replace("#{" + arrayParameters.get(i) + "}",
-                  properties.get(arrayParameters.get(i) + suffix));
+                  updatedProperties.get(arrayParameters.get(i) + suffix));
         }
         if (!arrayElement.matches("^#\\{.+?\\}$")) {
           buffer.append(arrayElement);
