@@ -429,7 +429,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     if (Engage.model.get("meInfo").get("link_mediamodule")) {
                         logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
                     }
-                    if (! Engage.model.get("meInfo").get("show_embed_links")) {
+                    if (!Engage.model.get("meInfo").get("show_embed_links")) {
                         showEmbed = false;
                     }
                 }
@@ -478,10 +478,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     hasqualities: resolutions !== undefined,
                     hasmultiplevideos: numberVideos > 1,
                     controlsTop: Engage.controls_top,
-                    //pip_position: translate(pipPosition, pipPosition),
-                    str_zoomlevel: "1.0"
                     logo: logo,
-                    show_embed: showEmbed
+                    show_embed: showEmbed,
+                    str_zoomlevel: "1.0"
                 };
 
                 // compile template and load it
@@ -534,7 +533,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     if (Engage.model.get("meInfo").get("link_mediamodule")) {
                         logoLink = window.location.protocol + "//" + window.location.host + "/engage/ui/index.html"; // link to the media module
                     }
-                    if (! Engage.model.get("meInfo").get("show_embed_links")) {
+                    if (!Engage.model.get("meInfo").get("show_embed_links")) {
                         showEmbed = false;
                     }
                 }
@@ -601,9 +600,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function addQualityListener(quality) {
         $("#quality" + quality).click(function(element) {
-                    element.preventDefault();
-                    $("#" + id_qualityIndicator).html(translate(quality, quality));
-                    Engage.trigger(plugin.events.qualitySet.getName(), quality);
+            element.preventDefault();
+            $("#" + id_qualityIndicator).html(translate(quality, quality));
+            Engage.trigger(plugin.events.qualitySet.getName(), quality);
         });
     }
 
@@ -660,12 +659,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.trigger(plugin.events.zoomReset.getName(), true);
         });
 
-        Engage.on(plugin.events.zoomChange.getName(), function(level){
+        Engage.on(plugin.events.zoomChange.getName(), function(level) {
             $("#" + id_zoomLevelIndicator).html(String(Number(level).toFixed(1)));
         });
         /* Events for Keys */
 
     }
+
     function triggerEmbedMessage(ratioWidth, ratioHeight) {
         var str = window.location.href;
         if (str.indexOf("mode=desktop") == -1) {
@@ -727,8 +727,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.trigger(plugin.events.togglePiP.getName(), pip);
         }
         var focusVideo = Basil.get(storage_focus_video);
-        if (focusVideo !== undefined ) {
-//            Engage.trigger(plugin.events.focusVideo.getName(), focusVideo);
+        if (focusVideo !== undefined) {
+            //            Engage.trigger(plugin.events.focusVideo.getName(), focusVideo);
             currentFocusFlavor = focusVideo;
         }
     }
@@ -1122,7 +1122,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.on(plugin.events.togglePiP.getName(), function(pip) {
                 if (pip !== undefined) {
                     Basil.set(storage_pip, pip);
-                    if (! pip) {
+                    if (!pip) {
                         $("#" + id_pipIndicator).html(translate("off", "off"));
                     } else {
                         if (pipPos === "left") {
