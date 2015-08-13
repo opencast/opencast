@@ -62,7 +62,7 @@ Once Stream Security is turned on by configuring the signing providers, multiple
 This section explains how to best configure urls to ensure that they expire at the right time. This might be required if the default valid times do not seem secure enough or is more secure than needed.
 
 ### Signing for external access
-The lifetime of the signed URLs can be configured by setting a custom value for the property *url.signing.expires.seconds* that defines the validity in seconds. The default valid time is **7200 seconds or 2 hours**.
+The lifetime of the signed URLs can be configured by setting a custom value for the property *url.signing.expires.seconds* that defines the validity in seconds. The default valid time is **7200 seconds or 2 hours**. The signed URLs can also be configured to restrict access to the user’s IP address by setting the property *url.signing.use.client.ip* to true. By default it is set to **false**.
 
 The different services that are able to automatically sign URLs on behalf of users are located in etc/services and listed in the following table:
 
