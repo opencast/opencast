@@ -119,6 +119,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
+import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.series.impl.SeriesServiceImpl;
@@ -989,7 +990,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
   @Override
   public long getUrlSigningExpireDuration() {
-    return DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+    return UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
   }
   @Override
   public UrlSigningService getUrlSigningService() {

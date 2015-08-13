@@ -24,10 +24,7 @@ import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
-import org.opencastproject.util.Log;
-import org.opencastproject.util.OsgiUtil;
-
-import com.entwinemedia.fn.data.Opt;
+import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -42,11 +39,6 @@ import java.util.Dictionary;
  * Implementation of a {@link MediaPackageSerializer} that will securely sign urls of a Mediapackage.
  */
 public class SigningMediaPackageSerializer implements MediaPackageSerializer, ManagedService {
-
-  protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
-
-  protected static final String URL_SIGNING_USE_CLIENT_IP = "url.signing.use.client.ip";
-
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SigningMediaPackageSerializer.class);
 
@@ -56,14 +48,9 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
   /** URL Signing Service for Securing Content. */
   private UrlSigningService urlSigningService;
 
-  /** The default time before a piece of signed content expires. 2 Hours. */
-  protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
+  private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
-  private long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
-
-  protected static final Boolean DEFAULT_SIGN_WITH_CLIENT_IP = false;
-
-  private Boolean signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
+  private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
 
   /** Signing of the URL should probably be something of the last things to do */
   public static final int RANKING = -1000;
@@ -88,34 +75,9 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
   @SuppressWarnings("rawtypes")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
-            .map(com.entwinemedia.fn.fns.Strings.toLongF);
-    if (expiration.isSome()) {
-      expireSeconds = expiration.get();
-      logger.info("The property {} has been configured to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
-    } else {
-      expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
-      logger.info(
-              "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
-    }
-
-    Opt<Boolean> useClientIP = OsgiUtil.getOptCfg(properties, URL_SIGNING_USE_CLIENT_IP).toOpt()
-            .map(com.entwinemedia.fn.fns.Booleans.parseBoolean);
-    if (useClientIP.isSome()) {
-      signWithClientIP = useClientIP.get();
-      if (signWithClientIP) {
-        logger.info("The property {} has been configured to sign urls with the client IP.", URL_SIGNING_USE_CLIENT_IP);
-      } else {
-        logger.info("The property {} has been configured to not sign urls with the client IP.",
-                URL_SIGNING_USE_CLIENT_IP);
-      }
-    } else {
-      signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
-      logger.info("The property {} has not been configured, so the default of signing urls with the client ip is {}.",
-              URL_SIGNING_USE_CLIENT_IP, signWithClientIP);
-    }
+    expireSeconds = UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
+    signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
+            this.getClass().getSimpleName());
   }
 
   /**

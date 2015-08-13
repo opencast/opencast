@@ -237,15 +237,6 @@ public abstract class AbstractEventEndpoint {
 
   private static final int CREATED_BY_UI_ORDER = 14;
 
-  protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
-
-  protected static final String URL_SIGNING_USE_CLIENT_IP = "url.signing.use.client.ip";
-
-  /** The default time before a piece of signed content expires. 2 Hours. */
-  protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
-
-  protected static final Boolean DEFAULT_SIGN_WITH_CLIENT_IP = false;
-
   public abstract WorkflowService getWorkflowService();
 
   public abstract AdminUISearchIndex getIndex();

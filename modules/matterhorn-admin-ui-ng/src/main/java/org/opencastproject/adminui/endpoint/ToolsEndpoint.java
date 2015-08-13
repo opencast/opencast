@@ -56,6 +56,7 @@ import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
+import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
@@ -63,10 +64,8 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -126,10 +125,6 @@ public class ToolsEndpoint implements ManagedService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ToolsEndpoint.class);
 
-  protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
-
-  protected static final String URL_SIGNING_USE_CLIENT_IP = "url.signing.use.client.ip";
-
   /** The default file name for generated Smil catalogs. */
   private static final String TARGET_FILE_NAME = "cut.smil";
 
@@ -151,14 +146,10 @@ public class ToolsEndpoint implements ManagedService {
   /** Tag that marks workflow for being used from the editor tool */
   private static final String EDITOR_WORKFLOW_TAG = "editor";
 
-  /** The default time before a piece of signed content expires. 2 Hours. */
-  protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
 
-  private long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+  private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
-  protected static final Boolean DEFAULT_SIGN_WITH_CLIENT_IP = false;
-
-  private Boolean signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
+  private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
 
   /** A parser for handling JSON documents inside the body of a request. **/
   private final JSONParser parser = new JSONParser();
@@ -229,35 +220,9 @@ public class ToolsEndpoint implements ManagedService {
   @SuppressWarnings("rawtypes")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
-            .map(com.entwinemedia.fn.fns.Strings.toLongF);
-    if (expiration.isSome()) {
-      expireSeconds = expiration.get();
-      logger.info("The property {} has been configured to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
-    } else {
-      expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
-      logger.info(
-              "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
-    }
-
-    Opt<Boolean> useClientIP = OsgiUtil.getOptCfg(properties, URL_SIGNING_USE_CLIENT_IP).toOpt()
-            .map(com.entwinemedia.fn.fns.Booleans.parseBoolean);
-    if (useClientIP.isSome()) {
-      signWithClientIP = useClientIP.get();
-      if (signWithClientIP) {
-        logger.info("The property {} has been configured to sign urls with the client IP.", URL_SIGNING_USE_CLIENT_IP);
-      } else {
-        logger.info("The property {} has been configured to not sign urls with the client IP.",
-                URL_SIGNING_USE_CLIENT_IP);
-      }
-    } else {
-      signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
-      logger.info("The property {} has not been configured, so the default of signing urls with the client ip is {}.",
-              URL_SIGNING_USE_CLIENT_IP, signWithClientIP);
-    }
-
+    expireSeconds = UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
+    signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
+            this.getClass().getSimpleName());
   }
 
   @GET

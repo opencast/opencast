@@ -17,8 +17,17 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-urlsigning-common</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.entwinemedia.common</groupId>
+      <artifactId>functional</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -34,7 +43,8 @@
             <Export-Package>
               org.opencastproject.security.urlsigning.exception,
               org.opencastproject.security.urlsigning.provider,
-              org.opencastproject.security.urlsigning.service
+              org.opencastproject.security.urlsigning.service,
+              org.opencastproject.security.urlsigning.utils
             </Export-Package>
           </instructions>
         </configuration>
