@@ -28,21 +28,14 @@ import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.util.IoSupport;
 
 import com.entwinemedia.fn.data.Opt;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.osgi.service.cm.ConfigurationException;
+
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
-import java.util.Properties;
 
 /**
  * Episode dublincore catalog implementation of a {@link AbstractEventsCatalogUIAdapter}
@@ -54,41 +47,9 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
 
   public static final String EPISODE_TITLE = "EVENTS.EVENTS.DETAILS.CATALOG.EPISODE";
 
-  private SecurityService securityService;
-
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
-  /** OSGi callback. */
-  public void activate() {
-    Properties episodeCatalogProperties = new Properties();
-    InputStream in = null;
-    try {
-      in = getClass().getResourceAsStream("/episode-catalog.properties");
-      episodeCatalogProperties.load(in);
-    } catch (IOException e) {
-      throw new ComponentException(e);
-    } finally {
-      IoSupport.closeQuietly(in);
-    }
-    try {
-      updated(episodeCatalogProperties);
-      logger.info("Activated episode dublin core catalog UI adapter");
-    } catch (ConfigurationException e) {
-      logger.error("Error while configuring: {}", ExceptionUtils.getStackTrace(e));
-      throw new IllegalStateException("The default series DublinCore catalog UI adapter has configuration problems", e);
-    }
-  }
-
   @Override
   public String getUITitle() {
     return EPISODE_TITLE;
-  }
-
-  @Override
-  public String getOrganization() {
-    return securityService.getOrganization().getId();
   }
 
   @Override

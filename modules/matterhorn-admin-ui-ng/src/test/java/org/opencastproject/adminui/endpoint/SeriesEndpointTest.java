@@ -153,7 +153,7 @@ public class SeriesEndpointTest {
 
   @Test
   public void testSeriesMessagesDateSortedAsc() throws ParseException, IOException {
-    JSONArray actual = (JSONArray) parser.parse(given().pathParam("seriesId", "uuid").expect()
+    JSONArray actual = (JSONArray) parser.parse(given().pathParam("seriesId", "identifier").expect()
             .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when()
             .get(rt.host("/{seriesId}/messages?sort=" + SortType.DATE)).asString());
     Assert.assertEquals(3, actual.size());
@@ -168,7 +168,7 @@ public class SeriesEndpointTest {
 
   @Test
   public void testSeriesMessagesDateSortedDesc() throws ParseException, IOException {
-    JSONArray actual = (JSONArray) parser.parse(given().pathParam("seriesId", "uuid").expect()
+    JSONArray actual = (JSONArray) parser.parse(given().pathParam("seriesId", "identifier").expect()
             .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when()
             .get(rt.host("/{seriesId}/messages?sort=" + SortType.DATE_DESC)).asString());
     Assert.assertEquals(3, actual.size());
@@ -183,7 +183,7 @@ public class SeriesEndpointTest {
 
   @Test
   public void testSeriesMessagesSenderSortedAsc() throws ParseException, IOException {
-    JSONArray actual = (JSONArray) parser.parse(given().pathParam("seriesId", "uuid").expect()
+    JSONArray actual = (JSONArray) parser.parse(given().pathParam("seriesId", "identifier").expect()
             .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when()
             .get(rt.host("/{seriesId}/messages?sort=" + SortType.SENDER)).asString());
     Assert.assertEquals(3, actual.size());

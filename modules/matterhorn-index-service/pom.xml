@@ -158,8 +158,6 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/catalog-ui-adapter-factory.xml,
-              OSGI-INF/common-event-catalog-ui-adapter.xml,
-              OSGI-INF/common-series-catalog-ui-adapter.xml,
               OSGI-INF/index_service.xml,
               OSGI-INF/list_providers_scanner.xml,
               OSGI-INF/list_providers_service.xml,
@@ -172,11 +170,9 @@
               OSGI-INF/list-providers/events.xml,
               OSGI-INF/list-providers/groups.xml,
               OSGI-INF/list-providers/jobs.xml,
-              OSGI-INF/list-providers/languages.xml,
               OSGI-INF/list-providers/participation.xml,
               OSGI-INF/list-providers/roles.xml,
               OSGI-INF/list-providers/series.xml,
-              OSGI-INF/list-providers/services.xml,
               OSGI-INF/list-providers/themes.xml,
               OSGI-INF/list-providers/users.xml,
               OSGI-INF/list-providers/workflows.xml

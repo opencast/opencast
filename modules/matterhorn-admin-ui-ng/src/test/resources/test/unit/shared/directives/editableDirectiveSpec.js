@@ -2,6 +2,7 @@ describe('adminNg.directives.adminNgEditable', function () {
     var $compile, $rootScope, $httpBackend, element;
 
     beforeEach(module('adminNg'));
+    beforeEach(module('adminNg.filters'));
     beforeEach(module('shared/partials/editable.html'));
     beforeEach(module('shared/partials/editableBooleanValue.html'));
     beforeEach(module('shared/partials/editableSingleValue.html'));

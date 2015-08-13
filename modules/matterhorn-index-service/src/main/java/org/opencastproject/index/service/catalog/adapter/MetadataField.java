@@ -42,6 +42,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,6 +114,9 @@ public class MetadataField<A> {
     BOOLEAN, DATE, NUMBER, TEXT, MIXED_TEXT, TEXT_LONG, TIME
   }
 
+  /** A parser for handling JSON values that are strings. **/
+  public static final JSONParser parser = new JSONParser();
+
   /** The id of a collection to validate values against. */
   private Opt<String> collectionID = Opt.none();
   /** The format to use for temporal date properties. */
@@ -142,7 +147,7 @@ public class MetadataField<A> {
 
   private Opt<A> value = Opt.none();
   private boolean updated = false;
-  private Opt<Map<String, Object>> collection = Opt.none();
+  private Opt<Map<String, String>> collection = Opt.none();
   private Fn<Opt<A>, JValue> valueToJSON;
   private Fn<Object, A> jsonToValue;
   private Opt<String> durationOutputID = Opt.none();
@@ -179,7 +184,7 @@ public class MetadataField<A> {
    *           if the id, label, type, valueToJSON or/and jsonToValue parameters is/are null
    */
   private MetadataField(String inputID, Opt<String> outputID, String label, boolean readOnly, boolean required,
-          A value, TYPE type, JSON_TYPE jsonType, Opt<Map<String, Object>> collection, Opt<String> collectionID,
+          A value, TYPE type, JSON_TYPE jsonType, Opt<Map<String, String>> collection, Opt<String> collectionID,
           Fn<Opt<A>, JValue> valueToJSON, Fn<Object, A> jsonToValue, Opt<Integer> order, Opt<String> namespace)
           throws IllegalArgumentException {
     if (valueToJSON == null)
@@ -218,7 +223,7 @@ public class MetadataField<A> {
    * @param collection
    *          The option of a limited list of possible values
    */
-  public void setCollection(Opt<Map<String, Object>> collection) {
+  public void setCollection(Opt<Map<String, String>> collection) {
     if (collection == null)
       this.collection = Opt.none();
     else {
@@ -246,7 +251,7 @@ public class MetadataField<A> {
     this.setValue(jsonToValue.ap(json));
   }
 
-  public Opt<Map<String, Object>> getCollection() {
+  public Opt<Map<String, String>> getCollection() {
     return collection;
   }
 
@@ -323,8 +328,87 @@ public class MetadataField<A> {
     };
 
     return new MetadataField<Boolean>(inputID, outputID, label, readOnly, required, null, TYPE.BOOLEAN,
-            JSON_TYPE.BOOLEAN, Opt.<Map<String, Object>> none(), Opt.<String> none(), booleanToJson, jsonToBoolean,
+            JSON_TYPE.BOOLEAN, Opt.<Map<String, String>> none(), Opt.<String> none(), booleanToJson, jsonToBoolean,
             order, namespace);
+  }
+
+  /**
+   * Creates a copy of a {@link MetadataField} and sets the value based upon a string.
+   *
+   * @param oldField
+   *          The field whose other values such as ids, label etc. will be copied.
+   * @param value
+   *          The value that will be interpreted as being from a JSON value.
+   * @return A new {@link MetadataField} with the value set
+   */
+  public static MetadataField<?> copyMetadataFieldWithValue(MetadataField<?> oldField, String value) {
+    MetadataField<?> newField = null;
+    switch (oldField.getType()) {
+      case BOOLEAN:
+        MetadataField<Boolean> booleanField = MetadataField.createBooleanMetadata(oldField.getInputID(),
+                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
+                oldField.getOrder(), oldField.getNamespace());
+        booleanField.fromJSON(value);
+        return booleanField;
+      case DATE:
+        MetadataField<Date> dateField = MetadataField.createDateMetadata(oldField.getInputID(),
+                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
+                oldField.getPattern().get(), oldField.getOrder(), oldField.getNamespace());
+        dateField.fromJSON(value);
+        return dateField;
+      case DURATION:
+        MetadataField<String> durationField = MetadataField.createDurationMetadataField(oldField.getInputID(),
+                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
+                oldField.getOrder(), oldField.getNamespace());
+        durationField.fromJSON(value);
+        return durationField;
+      case ITERABLE_TEXT:
+        MetadataField<Iterable<String>> iterableTextField = MetadataField.createIterableStringMetadataField(
+                oldField.getInputID(), Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(),
+                oldField.isRequired(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
+                oldField.getNamespace());
+        iterableTextField.fromJSON(value);
+        return iterableTextField;
+      case LONG:
+        MetadataField<Long> longField = MetadataField.createLongMetadataField(oldField.getInputID(),
+                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
+                oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(), oldField.getNamespace());
+        longField.fromJSON(value);
+        return longField;
+      case MIXED_TEXT:
+        MetadataField<Iterable<String>> mixedField = MetadataField.createMixedIterableStringMetadataField(
+                oldField.getInputID(), Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(),
+                oldField.isRequired(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
+                oldField.getNamespace());
+        mixedField.fromJSON(value);
+        return mixedField;
+      case START_DATE:
+        MetadataField<String> startDateField = MetadataField.createTemporalStartDateMetadata(oldField.getInputID(),
+                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
+                oldField.getPattern().get(), oldField.getOrder(), oldField.getNamespace());
+        startDateField.fromJSON(value);
+        return startDateField;
+      case START_TIME:
+        MetadataField<String> startTimeField = MetadataField.createTemporalStartTimeMetadata(oldField.getInputID(),
+                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
+                oldField.getPattern().get(), oldField.getOrder(), oldField.getNamespace());
+        startTimeField.fromJSON(value);
+        return startTimeField;
+      case TEXT:
+        MetadataField<String> textField = MetadataField.createTextMetadataField(oldField.getInputID(),
+                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
+                oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(), oldField.getNamespace());
+        textField.fromJSON(value);
+        return textField;
+      case TEXT_LONG:
+        MetadataField<String> textLongField = MetadataField.createTextLongMetadataField(oldField.getInputID(),
+                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
+                oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(), oldField.getNamespace());
+        textLongField.fromJSON(value);
+        return textLongField;
+      default:
+        return newField;
+    }
   }
 
   /**
@@ -380,7 +464,7 @@ public class MetadataField<A> {
     };
 
     MetadataField<Date> dateField = new MetadataField<Date>(inputID, outputID, label, readOnly, required, null,
-            TYPE.DATE, JSON_TYPE.DATE, Opt.<Map<String, Object>> none(), Opt.<String> none(), dateToJSON, jsonToDate,
+            TYPE.DATE, JSON_TYPE.DATE, Opt.<Map<String, String>> none(), Opt.<String> none(), dateToJSON, jsonToDate,
             order, namespace);
     if (StringUtils.isNotBlank(pattern)) {
       dateField.setPattern(Opt.some(pattern));
@@ -390,12 +474,12 @@ public class MetadataField<A> {
 
   public static MetadataField<String> createDurationMetadataField(String inputID, Opt<String> outputID, String label,
           boolean readOnly, boolean required, Opt<Integer> order, Opt<String> namespace) {
-    return createDurationMetadataField(inputID, outputID, label, readOnly, required, Opt.<Map<String, Object>> none(),
+    return createDurationMetadataField(inputID, outputID, label, readOnly, required, Opt.<Map<String, String>> none(),
             Opt.<String> none(), order, namespace);
   }
 
   public static MetadataField<String> createDurationMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Map<String, Object>> collection, Opt<String> collectionId,
+          boolean readOnly, boolean required, Opt<Map<String, String>> collection, Opt<String> collectionId,
           Opt<Integer> order, Opt<String> namespace) {
 
     Fn<Opt<String>, JValue> periodToJSON = new Fn<Opt<String>, JValue>() {
@@ -460,7 +544,7 @@ public class MetadataField<A> {
    * @return the new metadata field
    */
   public static MetadataField<Iterable<String>> createMixedIterableStringMetadataField(String inputID,
-          Opt<String> outputID, String label, boolean readOnly, boolean required, Opt<Map<String, Object>> collection,
+          Opt<String> outputID, String label, boolean readOnly, boolean required, Opt<Map<String, String>> collection,
           Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
 
     Fn<Opt<Iterable<String>>, JValue> iterableToJSON = new Fn<Opt<Iterable<String>>, JValue>() {
@@ -492,9 +576,19 @@ public class MetadataField<A> {
     Fn<Object, Iterable<String>> jsonToIterable = new Fn<Object, Iterable<String>>() {
       @Override
       public Iterable<String> ap(Object arrayIn) {
-        JSONArray array = (JSONArray) arrayIn;
+        JSONArray array;
+        if (arrayIn instanceof String) {
+          try {
+            array = (JSONArray) parser.parse((String) arrayIn);
+          } catch (ParseException e) {
+            throw new IllegalArgumentException("Unable to parse Mixed Iterable value into a JSONArray: {}", e);
+          }
+        } else {
+          array = (JSONArray) arrayIn;
+        }
+
         if (array == null)
-          return null;
+          return new ArrayList<String>();
         String[] arrayOut = new String[array.size()];
         for (int i = 0; i < array.size(); i++) {
           arrayOut[i] = (String) array.get(i);
@@ -528,7 +622,7 @@ public class MetadataField<A> {
    * @return the new metadata field
    */
   public static MetadataField<Iterable<String>> createIterableStringMetadataField(String inputID, Opt<String> outputID,
-          String label, boolean readOnly, boolean required, Opt<Map<String, Object>> collection,
+          String label, boolean readOnly, boolean required, Opt<Map<String, String>> collection,
           Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
 
     Fn<Opt<Iterable<String>>, JValue> iterableToJSON = new Fn<Opt<Iterable<String>>, JValue>() {
@@ -577,7 +671,7 @@ public class MetadataField<A> {
   }
 
   public static MetadataField<Long> createLongMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Map<String, Object>> collection, Opt<String> collectionId,
+          boolean readOnly, boolean required, Opt<Map<String, String>> collection, Opt<String> collectionId,
           Opt<Integer> order, Opt<String> namespace) {
 
     Fn<Opt<Long>, JValue> longToJSON = new Fn<Opt<Long>, JValue>() {
@@ -672,7 +766,7 @@ public class MetadataField<A> {
     };
 
     MetadataField<String> temporalStart = new MetadataField<String>(inputID, outputID, label, readOnly, required, null,
-            type, jsonType, Opt.<Map<String, Object>> none(), Opt.<String> none(), dateToJSON, jsonToDate, order,
+            type, jsonType, Opt.<Map<String, String>> none(), Opt.<String> none(), dateToJSON, jsonToDate, order,
             namespace);
     temporalStart.setPattern(Opt.some(pattern));
 
@@ -779,7 +873,7 @@ public class MetadataField<A> {
    * @return the new metadata field
    */
   public static MetadataField<String> createTextMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Map<String, Object>> collection, Opt<String> collectionId,
+          boolean readOnly, boolean required, Opt<Map<String, String>> collection, Opt<String> collectionId,
           Opt<Integer> order, Opt<String> namespace) {
     return createTextLongMetadataField(inputID, outputID, label, readOnly, required, collection, collectionId, order,
             JSON_TYPE.TEXT, namespace);
@@ -804,7 +898,7 @@ public class MetadataField<A> {
    * @return the new metadata field
    */
   public static MetadataField<String> createTextLongMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Map<String, Object>> collection, Opt<String> collectionId,
+          boolean readOnly, boolean required, Opt<Map<String, String>> collection, Opt<String> collectionId,
           Opt<Integer> order, Opt<String> namespace) {
     return createTextLongMetadataField(inputID, outputID, label, readOnly, required, collection, collectionId, order,
             JSON_TYPE.TEXT_LONG, namespace);
@@ -829,7 +923,7 @@ public class MetadataField<A> {
    * @return the new metadata field
    */
   private static MetadataField<String> createTextLongMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Map<String, Object>> collection, Opt<String> collectionId,
+          boolean readOnly, boolean required, Opt<Map<String, String>> collection, Opt<String> collectionId,
           Opt<Integer> order, JSON_TYPE jsonType, Opt<String> namespace) {
 
     Fn<Opt<String>, JValue> stringToJSON = new Fn<Opt<String>, JValue>() {

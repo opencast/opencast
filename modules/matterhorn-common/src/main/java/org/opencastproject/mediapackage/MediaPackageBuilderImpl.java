@@ -25,12 +25,15 @@ package org.opencastproject.mediapackage;
 import org.opencastproject.mediapackage.identifier.Id;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,9 +41,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class provides factory methods for the creation of media packages from manifest files, directories or from
@@ -167,7 +167,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
    * Rewrite the url elements using the serializer. Attention: This method modifies the given DOM!
    */
   private static void rewriteUrls(Node xml, MediaPackageSerializer serializer) throws XPathExpressionException,
-          URISyntaxException {
+  URISyntaxException {
     XPath xPath = XPathFactory.newInstance().newXPath();
     NodeList nodes = (NodeList) xPath.evaluate("//*[local-name() = 'url']", xml, XPathConstants.NODESET);
     for (int i = 0; i < nodes.getLength(); i++) {
@@ -175,14 +175,13 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
       if (uri != null) {
         String uriStr = uri.getNodeValue();
         String trimmedUriStr = uriStr.trim();
-        /* Warn the user if trimming is necessary as this means that the URI
-         * was technically invalid.
+        /*
+         * Warn the user if trimming is necessary as this means that the URI was technically invalid.
          */
         if (!trimmedUriStr.equals(uriStr)) {
-          logger.warn("Detected invalid URI. Trying to fix it by "
-              + "removing spaces from beginning/end.");
+          logger.warn("Detected invalid URI. Trying to fix it by " + "removing spaces from beginning/end.");
         }
-        uri.setNodeValue(serializer.resolvePath(trimmedUriStr).toString());
+        uri.setNodeValue(serializer.decodeURI(new URI(trimmedUriStr)).toString());
       }
     }
   }

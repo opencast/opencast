@@ -2,6 +2,7 @@ describe('adminNg.directives.wizardDirective', function () {
     var $compile, $rootScope, $parentScope, $scope, $timeout, $resource, $httpBackend, element, TestController;
 
     beforeEach(module('adminNg'));
+    beforeEach(module('adminNg.filters'));
     beforeEach(module('shared/partials/wizard.html'));
     beforeEach(module('shared/partials/notification.html'));
     beforeEach(module('shared/partials/notifications.html'));

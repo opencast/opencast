@@ -30,6 +30,7 @@ import org.opencastproject.index.service.resources.list.query.ResourceListQueryI
 
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JValue;
+
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -208,8 +209,8 @@ public abstract class AbstractMetadataCollection {
 
     // Add all of the fields that have an index to their location starting at the lowest value.
     for (MetadataField<?> orderedField : orderedFields) {
-      Integer index = orderedField.getOrder().get() < fieldsInOrder.size() ? orderedField.getOrder().get() : fieldsInOrder
-              .size();
+      Integer index = orderedField.getOrder().get() < fieldsInOrder.size() ? orderedField.getOrder().get()
+              : fieldsInOrder.size();
       fieldsInOrder.add(index, orderedField);
     }
   }
@@ -270,15 +271,15 @@ public abstract class AbstractMetadataCollection {
    * @throws IllegalArgumentException
    *           if the name or the listProviderService is null or the name blank.
    */
-  protected Opt<Map<String, Object>> getCollection(String name, ListProvidersService listProviderService) {
+  protected Opt<Map<String, String>> getCollection(String name, ListProvidersService listProviderService) {
     if (StringUtils.isBlank(name))
       throw new IllegalArgumentException("The listName must not be null or empty!");
     if (listProviderService == null)
       throw new IllegalArgumentException("The list provider must not be null!");
 
-    Opt<Map<String, Object>> list;
+    Opt<Map<String, String>> list;
     try {
-      list = Opt.some(listProviderService.getList(name, new ResourceListQueryImpl(), null));
+      list = Opt.some(listProviderService.getList(name, new ResourceListQueryImpl(), null, true));
     } catch (ListProviderException e) {
       logger.warn("Not able to find a value list with the name {}", name);
       list = Opt.none();

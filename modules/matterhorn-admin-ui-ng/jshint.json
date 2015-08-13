@@ -61,7 +61,6 @@
         "vis"             : false,
         "PlayerAdapter"   : false,
         "videojs"         : false,
-        "moment"          : true,
         "$location"       : true,
         "$window"         : true
     },

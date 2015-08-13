@@ -62,9 +62,6 @@ public interface EventIndexSchema extends IndexSchema {
   /** The attachment flavor */
   String ATTACHMENT_FLAVOR = "attachment_flavor";
 
-  /** The publication flavor */
-  String PUBLICATION_FLAVOR = "publication_flavor";
-
   /** The access policy */
   String ACCESS_POLICY = "access_policy";
 
@@ -101,9 +98,6 @@ public interface EventIndexSchema extends IndexSchema {
 
   /** The recording title */
   String TITLE = "title";
-
-  /** Boost values for ranking */
-  double TITLE_BOOST = 6.0;
 
   /** The recording start date */
   String START_DATE = "start_date";

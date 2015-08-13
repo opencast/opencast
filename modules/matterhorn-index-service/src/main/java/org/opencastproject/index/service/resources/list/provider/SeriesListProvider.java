@@ -58,7 +58,7 @@ public class SeriesListProvider implements ResourceListProvider {
   public static final String ACCESS_POLICY = PROVIDER_PREFIX + ".ACCESS_POLICY";
   public static final String CREATION_DATE = PROVIDER_PREFIX + ".CREATION_DATE";
 
-  private static final String[] NAMES = { PROVIDER_PREFIX, NAME, CONTRIBUTORS, SUBJECT };
+  private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, ORGANIZERS };
 
   private SeriesService seriesService;
 
@@ -79,10 +79,10 @@ public class SeriesListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
 
-    Map<String, Object> series = new HashMap<String, Object>();
+    Map<String, String> series = new HashMap<String, String>();
     SeriesQuery q = new SeriesQuery().setCount(Integer.MAX_VALUE);
 
     if (query != null) {
@@ -115,10 +115,10 @@ public class SeriesListProvider implements ResourceListProvider {
         String contributor = dc.getFirst(DublinCore.PROPERTY_CONTRIBUTOR);
         if (StringUtils.isNotBlank(contributor))
           series.put(contributor, contributor);
-      } else if (SUBJECT.equals(listName)) {
-        String subject = dc.getFirst(DublinCore.PROPERTY_SUBJECT);
-        if (StringUtils.isNotBlank(subject))
-          series.put(subject, subject);
+      } else if (ORGANIZERS.equals(listName)) {
+        String organizer = dc.getFirst(DublinCore.PROPERTY_CREATOR);
+        if (StringUtils.isNotBlank(organizer))
+          series.put(organizer, organizer);
       } else {
         series.put(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER), dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
       }

@@ -30,53 +30,43 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.comments.events.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.ingest.api.IngestService;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.Log;
+import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
+import com.entwinemedia.fn.data.Opt;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
+
+import java.util.Dictionary;
 
 import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
 @Path("/")
-public class OsgiEventEndpoint extends AbstractEventEndpoint {
+public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedService {
 
   private AclServiceFactory aclServiceFactory;
   private AdminUISearchIndex index;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
-  private CommonEventCatalogUIAdapter eventCatalogUIAdapter;
-  private DublinCoreCatalogService dublinCoreCatalogService;
   private EventCommentService eventCommentService;
   private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
   private IndexService indexService;
-  private IngestService ingestService;
   private JobEndpoint jobService;
-  private ListProvidersService listProviderService;
   private OpencastArchive archive;
   private ParticipationManagementDatabase participationManagementDatabase;
   private SchedulerService schedulerService;
   private SecurityService securityService;
-  private SeriesService seriesService;
   private WorkflowService workflowService;
-  private Workspace workspace;
   private AdminUIConfiguration adminUIConfiguration;
 
-  private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
+  private long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
   @Override
   public AdminUIConfiguration getAdminUIConfiguration() {
@@ -96,16 +86,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   /** OSGi DI. */
   public void setArchive(OpencastArchive archive) {
     this.archive = archive;
-  }
-
-  @Override
-  public Workspace getWorkspace() {
-    return workspace;
-  }
-
-  /** OSGi DI. */
-  public void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
   }
 
   @Override
@@ -139,16 +119,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public ListProvidersService getListProviderService() {
-    return listProviderService;
-  }
-
-  /** OSGi DI. */
-  public void setListProviderService(ListProvidersService listProviderService) {
-    this.listProviderService = listProviderService;
-  }
-
-  @Override
   public AclService getAclService() {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
@@ -159,16 +129,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public SeriesService getSeriesService() {
-    return this.seriesService;
-  }
-
-  /** OSGi DI. */
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
-  }
-
-  @Override
   public ParticipationManagementDatabase getPMPersistence() {
     return participationManagementDatabase;
   }
@@ -176,16 +136,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   /** OSGi DI. */
   public void setParticipationPersistence(ParticipationManagementDatabase participationManagementDatabase) {
     this.participationManagementDatabase = participationManagementDatabase;
-  }
-
-  @Override
-  public DublinCoreCatalogService getDublinCoreService() {
-    return dublinCoreCatalogService;
-  }
-
-  /** OSGi DI. */
-  public void setDublinCoreCatalogService(DublinCoreCatalogService dublineCoreCatalogService) {
-    this.dublinCoreCatalogService = dublineCoreCatalogService;
   }
 
   @Override
@@ -206,16 +156,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   /** OSGi DI. */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-  }
-
-  @Override
-  public IngestService getIngestService() {
-    return ingestService;
-  }
-
-  /** OSGi DI. */
-  public void setIngestService(IngestService ingestService) {
-    this.ingestService = ingestService;
   }
 
   @Override
@@ -268,36 +208,20 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
     this.index = index;
   }
 
-  /** OSGi DI. */
-  public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
-    this.eventCatalogUIAdapter = eventCatalogUIAdapter;
-  }
-
   @Override
-  public EventCatalogUIAdapter getEpisodeCatalogUIAdapter() {
-    return eventCatalogUIAdapter;
-  }
-
-  /** OSGi DI. */
-  public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
-    catalogUIAdapters.add(catalogUIAdapter);
-  }
-
-  /** OSGi DI. */
-  public void removeCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
-    catalogUIAdapters.remove(catalogUIAdapter);
-  }
-
-  @Override
-  public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
-    return Stream.$(catalogUIAdapters).filter(organizationFilter._2(organization)).toList();
-  }
-
-  private static final Fn2<EventCatalogUIAdapter, String, Boolean> organizationFilter = new Fn2<EventCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean ap(EventCatalogUIAdapter catalogUIAdapter, String organization) {
-      return organization.equals(catalogUIAdapter.getOrganization());
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+    Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
+            .map(com.entwinemedia.fn.fns.Strings.toLongF);
+    if (expiration.isSome()) {
+      expireSeconds = expiration.get();
+      logger.info("The property {} has been configured to expire signed URLs in {}.",
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+    } else {
+      expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+      logger.info(
+              "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
     }
-  };
+  }
 
 }

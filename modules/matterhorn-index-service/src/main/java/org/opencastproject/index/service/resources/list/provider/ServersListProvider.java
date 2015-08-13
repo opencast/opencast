@@ -68,16 +68,13 @@ public class ServersListProvider implements ResourceListProvider {
   };
 
   /** The names of the different list available through this provider */
-  private List<String> listNames;
+  private List<String> listNames = new ArrayList<String>();
 
   private ServiceRegistry serviceRegistry;
 
   private static final Logger logger = LoggerFactory.getLogger(ServersListProvider.class);
 
-  protected void activate(BundleContext bundleContext) {
-    logger.info("Servers list provider activated!");
-    listNames = new ArrayList<String>();
-
+  public ServersListProvider() {
     // Fill the list names
     for (SERVERS_FILTER_LIST value : SERVERS_FILTER_LIST.values()) {
       listNames.add(getListNameFromFilter(value));
@@ -85,6 +82,10 @@ public class ServersListProvider implements ResourceListProvider {
 
     // Standard list
     listNames.add(PROVIDER_PREFIX);
+  }
+
+  protected void activate(BundleContext bundleContext) {
+    logger.info("Servers list provider activated!");
   }
 
   /** OSGi callback for the service registry. */
@@ -98,9 +99,9 @@ public class ServersListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
-    Map<String, Object> list = new HashMap<String, Object>();
+    Map<String, String> list = new HashMap<String, String>();
 
     // Get list name
     SERVERS_FILTER_LIST listValue;
@@ -161,7 +162,7 @@ public class ServersListProvider implements ResourceListProvider {
         } catch (ServiceRegistryException e) {
           throw new ListProviderException("Not able to get the list of the hosts from the services registry");
         }
-        Map<String, Object> services = new HashMap<String, Object>();
+        Map<String, String> services = new HashMap<String, String>();
         for (ServiceStatistics serviceStat : servicesStatistics) {
           if (server.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
             String service = serviceStat.getServiceRegistration().getServiceType();

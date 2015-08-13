@@ -1,19 +1,19 @@
 <div ng-form="innerForm">
-    <span ng-show="!editMode" ng-click="editMode = true">{{ collection[params.value] | translate }}</span>
+    <span ng-show="!editMode" ng-click="editMode = true">{{ ((params.value === '' || params.value === null || angular.isUndefined(params.value)) ? 'SELECT_NO_OPTIONS' : getLabel(params.value)) | translate }}</span>
 
     <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-click="editMode = true"></i>
     <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
 
     <div ng-show="editMode">
-        <select ng-model="params.value" ng-change="submit()">
-            <option ng-if="!params.required" value=""></option>
-            <option ng-repeat="(item, label) in collection"
-                ng-required="params.required"
+
+        <select chosen
+                ng-model="params.value"
                 name="{{ params.name }}"
-                ng-selected="item === params.value"
-                value="{{ item }}">
-                {{ label | translate }}
-            </option>
+                ng-change="submit()"
+                ng-required="params.required"
+                data-width="'250px'"
+                ng-options="value as label|translate for (label, value) in collection">
+                <option value="" ng-selected="params.value === ''" ng-if="!params.required">-- {{ 'SELECT_NO_OPTIONS' | translate }} --</option>
         </select>
     </div>
 </div>

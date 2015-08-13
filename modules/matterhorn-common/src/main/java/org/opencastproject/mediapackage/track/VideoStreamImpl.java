@@ -70,6 +70,7 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     @XmlAttribute(name = "order")
     protected ScanOrder order;
 
+    @Override
     public String toString() {
       return type.toString();
     }
@@ -200,6 +201,7 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
    * @see org.opencastproject.mediapackage.ManifestContributor#toManifest(org.w3c.dom.Document,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
+  @Override
   public Node toManifest(Document document, MediaPackageSerializer serializer) {
     Element node = document.createElement("video");
     // Stream ID
@@ -272,14 +274,17 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     return node;
   }
 
+  @Override
   public Float getBitRate() {
     return bitRate;
   }
 
+  @Override
   public Float getFrameRate() {
     return frameRate;
   }
 
+  @Override
   public Integer getFrameWidth() {
     try {
       String[] s = resolution.trim().split("x");
@@ -291,6 +296,7 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     }
   }
 
+  @Override
   public Integer getFrameHeight() {
     try {
       String[] s = resolution.trim().split("x");
@@ -302,12 +308,14 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     }
   }
 
+  @Override
   public ScanType getScanType() {
-    return scanType.type;
+    return scanType != null ? scanType.type : null;
   }
 
+  @Override
   public ScanOrder getScanOrder() {
-    return scanType.order;
+    return scanType != null ? scanType.order : null;
   }
 
   // Setter

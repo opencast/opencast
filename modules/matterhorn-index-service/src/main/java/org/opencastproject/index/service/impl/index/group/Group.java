@@ -22,6 +22,7 @@
 package org.opencastproject.index.service.impl.index.group;
 
 import org.opencastproject.index.service.impl.index.IndexObject;
+import org.opencastproject.security.api.JaxbGroup;
 import org.opencastproject.util.IoSupport;
 
 import org.codehaus.jettison.json.JSONException;
@@ -60,7 +61,7 @@ import javax.xml.transform.stream.StreamSource;
  * Object wrapper for a group.
  */
 @XmlType(name = "group", namespace = IndexObject.INDEX_XML_NAMESPACE, propOrder = { "identifier", "name",
-        "description", "organization", "roles", "members" })
+        "description", "organization", "role", "roles", "members" })
 @XmlRootElement(name = "group", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class Group implements IndexObject {
@@ -78,6 +79,10 @@ public class Group implements IndexObject {
   /** The name for the group */
   @XmlElement(name = "name")
   private String name = null;
+
+  /** The name of the group role */
+  @XmlElement(name = "role")
+  private String role = null;
 
   /** The description */
   @XmlElement(name = "description")
@@ -108,6 +113,7 @@ public class Group implements IndexObject {
   public Group(String identifier, String organization) {
     this.identifier = identifier;
     this.organization = organization;
+    this.role = JaxbGroup.ROLE_PREFIX + identifier.toUpperCase();
   }
 
   /**
@@ -132,6 +138,7 @@ public class Group implements IndexObject {
     this.name = name;
     this.description = description;
     this.organization = organization;
+    this.role = JaxbGroup.ROLE_PREFIX + identifier.toUpperCase();
     this.roles = roles;
     this.members = members;
   }
@@ -146,6 +153,10 @@ public class Group implements IndexObject {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getRole() {
+    return role;
   }
 
   public String getDescription() {

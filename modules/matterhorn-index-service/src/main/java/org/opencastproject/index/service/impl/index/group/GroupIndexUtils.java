@@ -80,14 +80,12 @@ public final class GroupIndexUtils {
     metadata.addField(GroupIndexSchema.UID, group.getIdentifier(), true);
     metadata.addField(GroupIndexSchema.ORGANIZATION, group.getOrganization(), false);
     metadata.addField(GroupIndexSchema.OBJECT, group.toXML(), false);
-    if (StringUtils.trimToNull(group.getDescription()) != null) {
+    metadata.addField(GroupIndexSchema.ROLE, group.getRole(), true);
+    if (StringUtils.isNotBlank(group.getDescription())) {
       metadata.addField(GroupIndexSchema.DESCRIPTION, group.getDescription(), true);
     }
-    if (StringUtils.trimToNull(group.getName()) != null) {
+    if (StringUtils.isNotBlank(group.getName())) {
       metadata.addField(GroupIndexSchema.NAME, group.getName(), true);
-    }
-    if (StringUtils.trimToNull(group.getOrganization()) != null) {
-      metadata.addField(GroupIndexSchema.ORGANIZATION, group.getOrganization(), true);
     }
     if (group.getRoles() != null) {
       metadata.addField(GroupIndexSchema.ROLES, group.getRoles().toArray(), true);

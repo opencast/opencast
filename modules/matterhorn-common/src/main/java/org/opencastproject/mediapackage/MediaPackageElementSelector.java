@@ -22,6 +22,7 @@
 package org.opencastproject.mediapackage;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * A <code>MedikaPackageElementSelector</code> is the way to set up rules for extracting elements from a media package
@@ -36,8 +37,19 @@ public interface MediaPackageElementSelector<T extends MediaPackageElement> {
    *          the media package
    * @param withTagsAndFlavors
    *          define if the elements must match with flavors and tags, or just one of these parameters
-   * @return the selected element
+   * @return the selected elements
    */
   Collection<T> select(MediaPackage mediaPackage, boolean withTagsAndFlavors);
+
+  /**
+   * Returns the media package elements that are matched by this selector.
+   *
+   * @param elements
+   *          the elements to select from
+   * @param withTagsAndFlavors
+   *          define if the elements must match with flavors and tags, or just one of these parameters
+   * @return the selected elements
+   */
+  Collection<T> select(List<MediaPackageElement> elements, boolean withTagsAndFlavors);
 
 }

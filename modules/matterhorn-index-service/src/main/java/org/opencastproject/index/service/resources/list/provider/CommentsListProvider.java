@@ -79,9 +79,9 @@ public class CommentsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, String> result = new HashMap<String, String>();
 
     if (COMMENTS_FILTER_LIST.REASON.equals(listName)) {
       List<String> reasons;

@@ -1,0 +1,32 @@
+.modal footer {
+    width: 100%;
+    height: 60px;
+    @include border-bottom-radius($main-border-radius);
+    background: darken($body-background, 3%);
+    border-top: 1px solid $main-border-color;
+
+    a {
+        @include btn(green);
+
+        &.cancel {
+            @include btn(white);
+        }
+
+        &.danger {
+            @include btn(red);
+        }
+
+        margin: 13px 15px 0;
+        display: inline-block;
+        border-radius: $main-border-radius;
+        padding: 10px 20px !important;
+
+        &:first-child {
+            float: right;
+        }
+
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+    }
+}

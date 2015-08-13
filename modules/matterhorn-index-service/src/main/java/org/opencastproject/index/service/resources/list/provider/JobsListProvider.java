@@ -105,11 +105,11 @@ public class JobsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
 
     JobsListQueryImpl jobsQuery = (JobsListQueryImpl) query;
-    Map<String, Object> jobList = new HashMap<String, Object>();
+    Map<String, String> jobList = new HashMap<String, String>();
     int offset = 0;
     int limit = 0;
 

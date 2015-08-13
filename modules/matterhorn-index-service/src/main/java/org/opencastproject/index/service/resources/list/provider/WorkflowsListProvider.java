@@ -59,9 +59,9 @@ public class WorkflowsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
-    Map<String, Object> workflowsList = new HashMap<String, Object>();
+    Map<String, String> workflowsList = new HashMap<String, String>();
 
     WorkflowQuery q = new WorkflowQuery();
 

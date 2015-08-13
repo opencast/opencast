@@ -1,8 +1,10 @@
 angular.module('adminNg.services')
-.factory('NewEventAccess', ['ResourcesListResource', 'EventAccessResource', 'SeriesAccessResource', function (ResourcesListResource, EventAccessResource, SeriesAccessResource) {
+.factory('NewEventAccess', ['ResourcesListResource', 'EventAccessResource', 'SeriesAccessResource', 'Notifications', '$timeout',
+    function (ResourcesListResource, EventAccessResource, SeriesAccessResource, Notifications, $timeout) {
     var Access = function () {
 
         var me = this,
+            NOTIFICATION_CONTEXT = 'events-access',
             createPolicy = function (role) {
                 return {
                     role  : role,
@@ -29,6 +31,31 @@ angular.module('adminNg.services')
                 if (!loading) {
                     me.ud.accessSave();
                 }
+            },
+            checkNotification = function () {
+                if (me.unvalidRule) {
+                    if (!angular.isUndefined(me.notificationRules)) {
+                        Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
+                    }
+                    me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);
+                } else if (!angular.isUndefined(me.notificationRules)) {
+                    Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
+                    me.notificationRules = undefined;
+                }
+
+                if (!me.hasRights) {
+                    if (!angular.isUndefined(me.notificationRights)) {
+                        Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
+                    }
+                    me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);
+                } else if (!angular.isUndefined(me.notificationRights)) {
+                    Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
+                    me.notificationRights = undefined;
+                }
+
+                $timeout(function () {
+                    checkNotification();
+                 }, 200);
             };
 
         me.isAccessState = true;
@@ -97,16 +124,28 @@ angular.module('adminNg.services')
         };
 
         this.isValid = function () {
-             var hasRights = false;
+             var hasRights = false,
+                rulesValid = true;
 
              angular.forEach(me.ud.policies, function (policy) {
+                rulesValid = false;
+
                 if (policy.read && policy.write) {
                     hasRights = true;
                 }
+
+                if ((policy.read || policy.write) && !angular.isUndefined(policy.role)) {
+                    rulesValid = true;
+                }
              });
+
+            me.unvalidRule = !rulesValid;
+            me.hasRights = hasRights;
             
-            return hasRights;
+            return rulesValid && hasRights;
         };
+
+        checkNotification();
         
         me.acls  = ResourcesListResource.get({ resource: 'ACL' });
         me.roles = ResourcesListResource.get({ resource: 'ROLES' }); 

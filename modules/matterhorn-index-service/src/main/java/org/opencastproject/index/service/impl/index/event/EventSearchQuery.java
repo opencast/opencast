@@ -66,7 +66,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private final List<String> metadataFlavors = new ArrayList<String>();
   private final List<String> metadataMimetypes = new ArrayList<String>();
   private final List<String> attachmentFlavors = new ArrayList<String>();
-  private final List<String> publicationFlavors = new ArrayList<String>();
   private String accessPolicy = null;
   private String managedAcl = null;
   private String workflowState = null;
@@ -690,32 +689,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public String[] getAttachmentFlavor() {
     return attachmentFlavors.toArray(new String[attachmentFlavors.size()]);
-  }
-
-  /**
-   * Selects recording events with the given publication flavor.
-   * <p>
-   * Note that this method may be called multiple times to support selection of multiple recording events.
-   *
-   * @param publicationFlavor
-   *          the publication flavor
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withPublicationFlavor(String publicationFlavor) {
-    if (StringUtils.isBlank(publicationFlavor))
-      throw new IllegalArgumentException("Publication flavor cannot be null");
-    clearExpectations();
-    this.publicationFlavors.add(publicationFlavor);
-    return this;
-  }
-
-  /**
-   * Returns the list of publication flavors or an empty array if no track type have been specified.
-   *
-   * @return the attachement flavors
-   */
-  public String[] getPublicationFlavor() {
-    return publicationFlavors.toArray(new String[publicationFlavors.size()]);
   }
 
   /**

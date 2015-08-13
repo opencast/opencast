@@ -182,11 +182,6 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.ATTACHMENT_FLAVOR, query.getAttachmentFlavor(), true);
     }
 
-    // Publication flavors
-    if (query.getPublicationFlavor().length > 0) {
-      and(EventIndexSchema.PUBLICATION_FLAVOR, query.getPublicationFlavor(), true);
-    }
-
     // Access policy
     if (query.getAccessPolicy() != null) {
       and(EventIndexSchema.ACCESS_POLICY, query.getAccessPolicy(), true);

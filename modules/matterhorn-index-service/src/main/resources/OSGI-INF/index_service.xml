@@ -85,5 +85,10 @@
              interface="org.opencastproject.workspace.api.Workspace"
              name="workspace"
              policy="static" />
- 
+  <reference name="groupRoleProvider"
+             cardinality="1..1"
+             interface="org.opencastproject.userdirectory.JpaGroupRoleProvider"
+             bind="setGroupRoleProvider"
+             policy="static"  />
+
 </scr:component>

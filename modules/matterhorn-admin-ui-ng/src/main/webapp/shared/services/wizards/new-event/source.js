@@ -53,30 +53,8 @@ angular.module('adminNg.services')
 
         this.conflicts = [];
 
-        /*
-         * Creates an array containing the numberOfElements, starting from zero.
-         */
-        this.initArray = function (numberOfElements) {
-            var i, result = [];
-            for (i = 0; i < numberOfElements; i++) {
-                if (i < 10) {
-                    result.push({
-                        index: i,
-                        value: '0' + i
-                    });
-                }
-                else {
-                    result.push({
-                        index: i,
-                        value: '' + i
-                    });
-                }
-            }
-            return result;
-        };
-
-        this.hours = this.initArray(24);
-        this.minutes = this.initArray(60);
+        this.hours = JsHelper.initArray(24);
+        this.minutes = JsHelper.initArray(60);
 
         this.roomChanged = function () {
             me.ud[me.ud.type].device.inputMethods = {};
@@ -160,10 +138,12 @@ angular.module('adminNg.services')
         };
 
         this.checkConflicts = function () {
+            me.checkingConflicts = true;
             if (me.readyToPollConflicts()) {
                 ConflictCheckResource.check(me.ud[me.ud.type], me.noConflictsDetected, me.conflictsDetected);
                 me.updateWeekdays();
             }
+            me.checkingConflicts = false;
         };
 
         /**

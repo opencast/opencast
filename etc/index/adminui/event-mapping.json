@@ -89,9 +89,82 @@
 
             "archive_version": { "type" : "long", "store" : "no" },
 
-            "publication": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "publication": {
+                "type" : "nested",
+                "index" : "not_analyzed",
+                "properties": {
+                    "channel": { "type": "string"},
+                    "mimetype": { "type": "string"},
 
-            "publication_flavor": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+                    "attachment": {
+                        "type": "nested",
+                        "properties": {
+                            "id"  : { "type" : "string", "store" : "no" },
+                            "mimetype"  : { "type" : "string", "store" : "no" },
+                            "type"  : { "type" : "string", "store" : "no" },
+                            "tag": { "type" : "string", "store" : "no" },
+                            "url": { "type" : "string", "store" : "no" },
+                            "size": { "type" : "long", "store" : "no" },
+                            "checksum": {
+                                "type": "nested",
+                                "properties": {
+                                    "value": { "type" : "string", "store" : "no" },
+                                    "type": { "type" : "string", "store" : "no" }
+                                }
+                            }
+                        }
+                    },
+
+                    "catalog": {
+                        "type": "nested",
+                        "properties": {
+                            "id"  : { "type" : "string", "store" : "no" },
+                            "mimetype"  : { "type" : "string", "store" : "no" },
+                            "type"  : { "type" : "string", "store" : "no" },
+                            "tag": { "type" : "string", "store" : "no" },
+                            "url": { "type" : "string", "store" : "no" },
+                            "size": { "type" : "long", "store" : "no" },
+                            "checksum": {
+                                "type": "nested",
+                                "properties": {
+                                    "value": { "type" : "string", "store" : "no" },
+                                    "type": { "type" : "string", "store" : "no" }
+                                }
+                            }
+                        }
+                    },
+
+                    "track": {
+                        "type": "nested",
+                        "properties": {
+                            "duration"  : { "type" : "long", "store" : "no" },
+                            "transport" : { "type": "string", "store": "no"},
+                            "audio": {
+                                "type": "nested",
+                                "properties": {
+                                    "bitdepth": { "type": "integer", "store": "no"},
+                                    "channels": { "type": "integer", "store": "no"},
+                                    "samplingrate": { "type": "integer", "store": "no"},
+                                    "bitrate": { "type": "float", "store": "no"},
+                                    "peakleveldb": { "type": "float", "store": "no"},
+                                    "rmsleveldb": { "type": "float", "store": "no"},
+                                    "rmspeakdb": { "type": "float", "store": "no"}
+                                }
+                            },
+                            "video": {
+                                "type": "nested",
+                                "properties": {
+                                    "bitrate": { "type": "float", "store": "no"},
+                                    "framerate": { "type": "float", "store": "no"},
+                                    "resolution": { "type": "string", "store": "no"},
+                                    "scantype": { "type": "string", "store": "no"}
+                                }
+                            }
+                        }
+                    }
+
+                }
+            },
 
             "text": { "type" : "string", "index" : "analyzed", "store" : "no" },
             "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no" }

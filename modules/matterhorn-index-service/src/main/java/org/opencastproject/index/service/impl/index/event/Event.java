@@ -23,11 +23,13 @@ package org.opencastproject.index.service.impl.index.event;
 
 import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.index.service.impl.index.IndexObject;
+import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.mapped.Configuration;
@@ -40,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,8 +71,7 @@ import javax.xml.transform.stream.StreamSource;
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration", "trackMimetypes",
         "trackStreamResolutions", "trackFlavors", "metadataFlavors", "metadataMimetypes", "attachmentFlavors",
         "reviewStatus", "reviewDate", "optedOut", "blacklisted", "hasComments", "hasOpenComments", "hasPreview",
-        "publications", "publicationFlavors", "workflowScheduledDate", "archiveVersion", "schedulingStatus",
-        "recordingStatus", "eventStatus" })
+        "publications", "workflowScheduledDate", "archiveVersion", "schedulingStatus", "recordingStatus", "eventStatus" })
 @XmlRootElement(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class Event implements IndexObject {
@@ -105,9 +107,9 @@ public class Event implements IndexObject {
     recordingStatusMapping.put(RecordingState.UPLOAD_ERROR, "EVENTS.EVENTS.STATUS.RECORDING_FAILURE");
     workflowStatusMapping.put(WorkflowState.INSTANTIATED.toString(), "EVENTS.EVENTS.STATUS.PENDING");
     workflowStatusMapping.put(WorkflowState.RUNNING.toString(), "EVENTS.EVENTS.STATUS.PROCESSING");
+    workflowStatusMapping.put(WorkflowState.FAILING.toString(), "EVENTS.EVENTS.STATUS.PROCESSING");
     workflowStatusMapping.put(WorkflowState.PAUSED.toString(), "EVENTS.EVENTS.STATUS.PAUSED");
     workflowStatusMapping.put(WorkflowState.SUCCEEDED.toString(), "EVENTS.EVENTS.STATUS.PROCESSED");
-    workflowStatusMapping.put(WorkflowState.FAILING.toString(), "EVENTS.EVENTS.STATUS.PROCESSED");
     workflowStatusMapping.put(WorkflowState.FAILED.toString(), "EVENTS.EVENTS.STATUS.PROCESSING_FAILURE");
     workflowStatusMapping.put(WorkflowState.STOPPED.toString(), "EVENTS.EVENTS.STATUS.PROCESSING_CANCELED");
   }
@@ -273,12 +275,7 @@ public class Event implements IndexObject {
   /** The list of publications from this event */
   @XmlElementWrapper(name = "publications")
   @XmlElement(name = "publication")
-  private List<String> publications = null;
-
-  /** The list of publication flavors from this event */
-  @XmlElementWrapper(name = "publication_flavors")
-  @XmlElement(name = "publication_flavor")
-  private List<String> publicationFlavors = null;
+  private List<Publication> publications = new ArrayList<>();
 
   /** The workflow scheduled date of the event */
   @XmlElement(name = "workflow_scheduled_date")
@@ -1017,7 +1014,7 @@ public class Event implements IndexObject {
    *          the subtype
    */
   public void updatePreview(String previewSubtype) {
-    hasPreview = EventIndexUtils.subflavorMatches(publicationFlavors, previewSubtype);
+    hasPreview = EventIndexUtils.subflavorMatches(publications, previewSubtype);
   }
 
   /**
@@ -1026,7 +1023,7 @@ public class Event implements IndexObject {
    * @param publications
    *          the publications for this event
    */
-  public void setPublications(List<String> publications) {
+  public void setPublications(List<Publication> publications) {
     this.publications = publications;
   }
 
@@ -1035,27 +1032,8 @@ public class Event implements IndexObject {
    *
    * @return the publications
    */
-  public List<String> getPublications() {
+  public List<Publication> getPublications() {
     return publications;
-  }
-
-  /**
-   * Sets the list of application flavors.
-   *
-   * @param publicationFlavors
-   *          the publication flavors
-   */
-  public void setPublicationFlavors(List<String> publicationFlavors) {
-    this.publicationFlavors = publicationFlavors;
-  }
-
-  /**
-   * Returns the list of publication flavors.
-   *
-   * @return the list of publication flavors
-   */
-  public List<String> getPublicationFlavors() {
-    return this.publicationFlavors;
   }
 
   /**
@@ -1142,7 +1120,12 @@ public class Event implements IndexObject {
       return;
     }
 
-    eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
+    if (StringUtils.isNotBlank(getSchedulingStatus())) {
+      eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
+      return;
+    }
+
+    eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
   }
 
   /**
@@ -1218,8 +1201,8 @@ public class Event implements IndexObject {
    * @throws XMLStreamException
    * @throws JAXBException
    */
-  public static Event valueOfJson(InputStream json) throws IOException, JSONException, XMLStreamException,
-          JAXBException {
+  public static Event valueOfJson(InputStream json)
+          throws IOException, JSONException, XMLStreamException, JAXBException {
     // TODO Get this to work, it is currently returning null properties for all properties.
     if (context == null) {
       createJAXBContext();

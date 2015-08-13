@@ -23,21 +23,26 @@ package org.opencastproject.adminui.endpoint;
 
 import static org.junit.Assert.assertThat;
 
-import com.entwinemedia.fn.data.json.SimpleSerializer;
 import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
+import org.opencastproject.util.IoSupport;
+
+import com.entwinemedia.fn.data.json.SimpleSerializer;
 
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.junit.Before;
 import org.junit.Test;
+import org.osgi.service.component.ComponentException;
 
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Properties;
 
 import javax.ws.rs.WebApplicationException;
 
@@ -45,9 +50,20 @@ public class MetadataListTest {
   private CommonEventCatalogUIAdapter episodeDublinCoreCatalogUIAdapter;
 
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     episodeDublinCoreCatalogUIAdapter = new CommonEventCatalogUIAdapter();
-    episodeDublinCoreCatalogUIAdapter.activate();
+    Properties episodeCatalogProperties = new Properties();
+    InputStream in = null;
+    try {
+      in = getClass().getResourceAsStream("/episode-catalog.properties");
+      episodeCatalogProperties.load(in);
+    } catch (IOException e) {
+      throw new ComponentException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
+    }
+
+    episodeDublinCoreCatalogUIAdapter.updated(episodeCatalogProperties);
   }
 
   @Test

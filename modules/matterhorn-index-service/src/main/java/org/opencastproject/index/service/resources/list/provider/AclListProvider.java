@@ -63,8 +63,8 @@ public class AclListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-    Map<String, Object> aclsList = new HashMap<String, Object>();
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+    Map<String, String> aclsList = new HashMap<String, String>();
 
     List<ManagedAcl> acls = aclServiceFactory.serviceFor(organization).getAcls();
     for (ManagedAcl a : acls) {

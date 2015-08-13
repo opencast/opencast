@@ -1,5 +1,5 @@
 <div class="filters-container">
-    <input type="search" class="search expand"
+    <input type="text" class="search expand"
         placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate }}"
         ng-model="textFilter"
         ng-change="selectFilterTextValue('textFilter', textFilter)">
@@ -23,7 +23,7 @@
                     <select ng-model="filter.value"
                         ng-change="selectFilterSelectValue(selectedFilter, filter)">
                         <option></option>
-                        <option ng-repeat="(value, label) in filters.filters[selectedFilter].options"
+                        <option ng-repeat="(label, value) in filters.filters[selectedFilter].options"
                             value="{{ value }}">
                             {{ label | translate }}
                         </option>
@@ -42,7 +42,7 @@
                 class="ng-multi-value" ng-show="filter.value">
                 <span ng-switch on="filter.type">
                     <span ng-switch-when="select">
-                        {{ filter.label | translate }}: {{ filter.options[filter.value] | translate }}
+                        {{ filter.label | translate }}: {{ getOptionLabel(filter) | translate }}
                     </span>
                     <span ng-switch-when="period">
                         {{ filter.label | translate }}: {{ formatDateRange('short', filter.value) }}

@@ -25,25 +25,28 @@ package org.opencastproject.mediapackage.track;
 import org.opencastproject.mediapackage.AbstractMediaPackageElement;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.mediapackage.Stream;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import javax.xml.bind.annotation.XmlAttribute;
 
 /**
  * This class is the base implementation for a media track, which itself is part of a media package, representing e. g.
@@ -200,7 +203,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    *      MediaPackageSerializer)
    */
   @Override
-  public Node toManifest(Document document, MediaPackageSerializer serializer) {
+  public Node toManifest(Document document, MediaPackageSerializer serializer) throws MediaPackageException {
     Node node = super.toManifest(document, serializer);
 
     // duration
@@ -222,6 +225,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    *
    * @see org.opencastproject.mediapackage.Track#getDescription()
    */
+  @Override
   public String getDescription() {
     StringBuffer buf = new StringBuffer("");
     /*
@@ -261,10 +265,12 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   // }
 
   public static class Adapter extends XmlAdapter<TrackImpl, Track> {
+    @Override
     public TrackImpl marshal(Track mp) throws Exception {
       return (TrackImpl) mp;
     }
 
+    @Override
     public Track unmarshal(TrackImpl mp) throws Exception {
       return mp;
     }

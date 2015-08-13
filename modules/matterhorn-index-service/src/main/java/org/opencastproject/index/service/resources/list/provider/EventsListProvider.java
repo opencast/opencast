@@ -75,9 +75,9 @@ public class EventsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
-    Map<String, Object> list = new HashMap<String, Object>();
+    Map<String, String> list = new HashMap<String, String>();
 
     if (CONTRIBUTORS.equals(listName)) {
       for (String contributor : index.getEventContributors())

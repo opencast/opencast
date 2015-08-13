@@ -1,0 +1,150 @@
+.table-container.top-addon {
+
+    .main-tbl {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+}
+
+.action-bar {
+    @include clearfix();
+    border: 1px solid $main-border-color;
+    border-bottom: none;
+    border-top-left-radius: $main-border-radius;
+    border-top-right-radius: $main-border-radius;
+    @include linear-gradient(top, #fff, #f7f7f7);
+
+    $action-icon-margin: 0 4px 0 0;
+
+    .table-edit-action {
+        @include fa-icon($fa-pencil, before, inline-block, $action-icon-margin);
+    }
+
+    .table-export-action {
+        @include fa-icon($fa-external-link, before, inline-block, $action-icon-margin);
+    }
+
+    ul {
+        padding: 10px 12px 12px;
+        float: right;
+
+        li {
+            display: inline-block;
+            margin: 0 4px;
+
+            &:first-child {
+                margin-left: 0;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
+
+    a {
+        $highlight-blue: #3aa5ef;
+
+        color: $highlight-blue;
+        text-shadow: 0 1px 0 rgba($white, 0.75);
+
+        &:hover {
+            color: lighten($highlight-blue, 10%);
+        }
+    }
+}
+
+// Inline Dropdown
+// ----------------------------------------
+
+.inline-dropdown {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    cursor: pointer;
+    @include user-select(none);
+    width: 25px;
+    height: 22px;
+    @include btn(white);
+    box-shadow: none;
+
+    @include fa-icon($fa-ellipsis-v, before, inline-block);
+    &:before {
+        position: relative;
+        top: -13px;
+    }
+
+
+    // Popover Styles
+
+    ul {
+        $width: 80px;
+        $offset: 15px;
+        $vertical-position: -28px;
+
+        visibility: hidden;
+        opacity: 0;
+        position: absolute;
+        z-index: $max-z + 10;
+        min-width: $width;
+        top: $vertical-position;
+        left: (-($width)) - (3px + $offset);
+        padding: 4px 0;
+        background: $body-background;
+        border: $thin-border-stroke $main-border-color;
+        border-radius: $main-border-radius;
+        @include transition(visibility 200ms, opacity 200ms);
+
+        &:before,
+        &:after {
+            border: solid transparent;
+            content: "";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+            top: 40%;
+            border-width: 8px 0 8px 8px;
+            bottom: auto;
+        }
+
+        &:before {
+            right: -9px;
+            border-color: transparent #c9d0d3;
+        }
+
+        &:after {
+            right: -8px;
+            left: auto;
+            border-color: transparent #fafafa;
+        }
+
+        li {
+
+            a {
+                text-align: center;
+                font-size: 12px;
+                font-weight: 600;
+                display: block;
+                line-height: 16px;
+                text-shadow: 0 1px 0 $white;
+                padding: 8px 15px;
+            }
+
+            &:first-child a {
+                border-top-left-radius: $main-border-radius;
+                border-top-right-radius: $main-border-radius;
+            }
+
+            &:last-child a {
+                border-bottom-left-radius: $main-border-radius;
+                border-bottom-right-radius: $main-border-radius;
+            }
+        }
+    }
+
+    &.active ul {
+        visibility: visible;
+        opacity: 1;
+    }
+}

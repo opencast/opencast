@@ -1,8 +1,10 @@
 describe('adminNg.directives.adminNgEditableSingleValue', function () {
-    var $compile, $rootScope, $timeout, element;
+    var $compile, $rootScope, $timeout, element, JsHelper, $translate;
 
     beforeEach(module('adminNg.directives'));
     beforeEach(module('adminNg.filters'));
+    beforeEach(module('adminNg.services'));
+    beforeEach(module('pascalprecht.translate'));
     beforeEach(module('shared/partials/editableSingleValue.html'));
 
     beforeEach(module(function ($provide) {
@@ -14,14 +16,16 @@ describe('adminNg.directives.adminNgEditableSingleValue', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function (_$rootScope_, _$timeout_, _$compile_) {
+    beforeEach(inject(function (_$rootScope_, _$timeout_, _$compile_, _JsHelper_, _$translate_) {
         $rootScope = _$rootScope_;
         $compile = _$compile_;
         $timeout = _$timeout_;
+        JsHelper = _JsHelper_;
+        $translate = _$translate_;
     }));
 
     beforeEach(function () {
-        $rootScope.params = { value: 'original value' };
+        $rootScope.params = { value: 'original value', type: 'text' };
         $rootScope.save = jasmine.createSpy();
         element = $compile('<div admin-ng-editable-single-value params="params" save="save"></div>')($rootScope);
         $rootScope.$digest();

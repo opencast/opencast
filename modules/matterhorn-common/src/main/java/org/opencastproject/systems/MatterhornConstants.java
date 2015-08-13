@@ -31,4 +31,8 @@ public interface MatterhornConstants {
    */
   String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
 
+
+  /** The property key for the Admin UI documentation URL in the organization properties */
+  String ADMIN_DOC_URL_ORG_PROPERTY = "org.opencastproject.admin.documentation.url";
+
 }

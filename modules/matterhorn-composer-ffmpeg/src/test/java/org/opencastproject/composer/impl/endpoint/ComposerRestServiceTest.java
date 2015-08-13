@@ -144,7 +144,8 @@ public class ComposerRestServiceTest {
   }
 
   protected String generateVideoTrack() {
-    return "<track id=\"video1\" type=\"presentation/source\">\n" + "  <mimetype>video/quicktime</mimetype>\n"
+    return "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"video1\" type=\"presentation/source\">\n"
+            + "  <mimetype>video/quicktime</mimetype>\n"
             + "  <url>serverUrl/workflow/samples/camera.mpg</url>\n"
             + "  <checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum>\n"
             + "  <duration>14546</duration>\n" + "  <video>\n"
@@ -155,7 +156,8 @@ public class ComposerRestServiceTest {
   }
 
   protected String generateAudioTrack() {
-    return "<track id=\"audio1\" type=\"presentation/source\">\n" + "  <mimetype>audio/mp3</mimetype>\n"
+    return "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"audio1\" type=\"presentation/source\">\n"
+            + "  <mimetype>audio/mp3</mimetype>\n"
             + "  <url>serverUrl/workflow/samples/audio.mp3</url>\n"
             + "  <checksum type=\"md5\">950f9fa49caa8f1c5bbc36892f6fd062</checksum>\n"
             + "  <duration>10472</duration>\n" + "  <audio>\n" + "    <channels>2</channels>\n"

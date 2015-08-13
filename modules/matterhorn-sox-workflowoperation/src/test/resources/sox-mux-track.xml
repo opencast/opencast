@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:track type="presentation/video-audio" id="123958c3-923f-4b08-9caa-c5713d62a489">
+<ns2:track xmlns:ns2="http://mediapackage.opencastproject.org" type="presentation/video-audio" id="123958c3-923f-4b08-9caa-c5713d62a489">
 	<ns2:mimetype>video/x-flv</ns2:mimetype>
 	<ns2:tags />
 	<ns2:url>fooVideo.flv</ns2:url>

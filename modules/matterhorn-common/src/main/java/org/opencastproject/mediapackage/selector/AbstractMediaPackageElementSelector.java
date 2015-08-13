@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElementSelector;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -64,8 +65,14 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
    * @see org.opencastproject.mediapackage.MediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage,
    *      boolean)
    */
-  @SuppressWarnings("unchecked")
+  @Override
   public Collection<T> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {
+   return select(Arrays.asList(mediaPackage.getElements()), withTagsAndFlavors);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Collection<T> select(List<MediaPackageElement> elements, boolean withTagsAndFlavors) {
     Set<T> result = new LinkedHashSet<T>();
 
     // If no flavors and tags are set, return empty list
@@ -73,7 +80,7 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
       return result;
 
     Class type = getParametrizedType(result);
-    elementLoop: for (MediaPackageElement e : mediaPackage.getElements()) {
+    elementLoop: for (MediaPackageElement e : elements) {
 
       // Does the type match?
       if (type.isAssignableFrom(e.getClass())) {

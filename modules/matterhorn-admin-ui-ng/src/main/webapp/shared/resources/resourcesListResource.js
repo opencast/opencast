@@ -5,21 +5,23 @@ angular.module('adminNg.resources')
             method: 'GET',
             isArray: true,
             transformResponse: function (data) {
-            var result = [];
+              var result = [];
 
-            data = JSON.parse(data);
+              data = JSON.parse(data);
 
-            if (angular.isDefined(data)) {
-              angular.forEach(data, function(value, key) {
-                result.push({
-                  name: key,
-                  value: value
+              if (angular.isDefined(data)) {
+                angular.forEach(data, function(value, key) {
+
+                  result.push({
+                    name: key,
+                    value: value
+                  });
+
                 });
-              });
-            }
+              }
 
-            return result;
-          }
+              return result;
+            }
         }
       });
 }]);

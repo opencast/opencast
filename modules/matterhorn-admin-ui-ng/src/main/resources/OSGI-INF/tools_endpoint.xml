@@ -12,6 +12,7 @@
   <service>
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.adminui.endpoint.ToolsEndpoint" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
 
   <reference bind="setAdminUIConfiguration"

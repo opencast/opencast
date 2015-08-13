@@ -32,7 +32,7 @@ angular.module('adminNg.controllers')
                 label: 'EVENTS.EVENTS.TABLE.TITLE'
             }, {
                 name:  'presenter',
-                label: 'EVENTS.EVENTS.TABLE.CREATORS'
+                label: 'EVENTS.EVENTS.TABLE.PRESENTERS'
             }, {
                 name: 'series_name',
                 label: 'EVENTS.EVENTS.TABLE.SERIES'

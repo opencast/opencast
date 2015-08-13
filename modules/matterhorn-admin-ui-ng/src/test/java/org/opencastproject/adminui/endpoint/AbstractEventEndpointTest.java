@@ -34,20 +34,13 @@ import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.comments.events.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.ingest.api.IngestService;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase;
 import org.opencastproject.rest.NotFoundExceptionMapper;
 import org.opencastproject.rest.RestServiceTestEnv;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -61,9 +54,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
-import java.util.ArrayList;
-import java.util.List;
 
 // TODO re-ignore tests
 @Ignore
@@ -149,7 +139,7 @@ public class AbstractEventEndpointTest {
     String eventString = IOUtils.toString(getClass().getResource("/eventComment.json"));
 
     given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
-    .post(rt.host("{eventId}/comment"));
+            .post(rt.host("{eventId}/comment"));
 
     String result = given().pathParam("eventId", "asdasd").formParam("text", "Test").expect()
             .header("Location", "http://localhost:8080/asdasd/comment/65").statusCode(HttpStatus.SC_CREATED).when()
@@ -171,7 +161,7 @@ public class AbstractEventEndpointTest {
   @Test
   public void testDeleteEventComment() throws Exception {
     given().pathParam("eventId", "asdasd").pathParam("commentId", 33).expect().statusCode(HttpStatus.SC_NO_CONTENT)
-    .when().delete(rt.host("{eventId}/comment/{commentId}"));
+            .when().delete(rt.host("{eventId}/comment/{commentId}"));
   }
 
   @Test
@@ -179,7 +169,7 @@ public class AbstractEventEndpointTest {
     String eventString = IOUtils.toString(getClass().getResource("/eventCommentNoReply.json"));
 
     given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 77).expect()
-    .statusCode(HttpStatus.SC_NOT_FOUND).when().delete(rt.host("{eventId}/comment/{commentId}/{replyId}"));
+            .statusCode(HttpStatus.SC_NOT_FOUND).when().delete(rt.host("{eventId}/comment/{commentId}/{replyId}"));
 
     String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 78).expect()
             .statusCode(HttpStatus.SC_OK).when().delete(rt.host("{eventId}/comment/{commentId}/{replyId}")).asString();
@@ -190,11 +180,11 @@ public class AbstractEventEndpointTest {
   @Test
   public void testUpdateEventCommentReply() throws Exception {
     given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 78).expect()
-    .statusCode(HttpStatus.SC_BAD_REQUEST).when().put(rt.host("{eventId}/comment/{commentId}/{replyId}"));
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().put(rt.host("{eventId}/comment/{commentId}/{replyId}"));
 
     given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 77)
-    .formParam("text", "Text").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
-    .put(rt.host("{eventId}/comment/{commentId}/{replyId}"));
+            .formParam("text", "Text").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .put(rt.host("{eventId}/comment/{commentId}/{replyId}"));
 
     String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 78)
             .formParam("text", "Text").expect().statusCode(HttpStatus.SC_OK).when()
@@ -209,7 +199,7 @@ public class AbstractEventEndpointTest {
   @Test
   public void testCreateEventCommentReply() throws Exception {
     given().pathParam("eventId", "asdasd").pathParam("commentId", 33).expect().statusCode(HttpStatus.SC_BAD_REQUEST)
-    .when().post(rt.host("{eventId}/comment/{commentId}/reply"));
+            .when().post(rt.host("{eventId}/comment/{commentId}/reply"));
 
     String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).formParam("text", "Text")
             .formParam("resolved", true).expect().statusCode(HttpStatus.SC_OK).when()
@@ -237,13 +227,23 @@ public class AbstractEventEndpointTest {
     String metadataJson = IOUtils.toString(getClass().getResource("/eventMetadata.json"));
 
     given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
-    .put(rt.host("{eventId}/metadata"));
+            .put(rt.host("{eventId}/metadata"));
 
     given().pathParam("eventId", "asdasd").formParam("metadata", "adfasdf").expect()
-    .statusCode(HttpStatus.SC_BAD_REQUEST).when().put(rt.host("{eventId}/metadata"));
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().put(rt.host("{eventId}/metadata"));
 
     given().pathParam("eventId", "asdasd").formParam("metadata", metadataJson).expect().statusCode(HttpStatus.SC_OK)
-    .when().put(rt.host("{eventId}/metadata"));
+            .when().put(rt.host("{eventId}/metadata"));
+  }
+
+  @Test
+  public void testGetAssetList() throws Exception {
+    String assetString = IOUtils.toString(getClass().getResource("/assets.json"));
+
+    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
+            .get(rt.host("{eventId}/asset/assets.json")).asString();
+
+    assertThat(assetString, SameJSONAs.sameJSONAs(result));
   }
 
   @Test
@@ -251,30 +251,27 @@ public class AbstractEventEndpointTest {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventMedia.json"));
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/media")).asString();
+            .get(rt.host("{eventId}/asset/media/media.json")).asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
 
   @Test
-  public void testGetEventTrack() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventTrack.json"));
+  public void testGetEventCatalogs() throws Exception {
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventCatalogs.json"));
 
-    given().pathParam("eventId", "asdasd").pathParam("trackId", "publish-track-4").expect()
-    .statusCode(HttpStatus.SC_NOT_FOUND).when().get(rt.host("{eventId}/media/{trackId}"));
-
-    String result = given().pathParam("eventId", "asdasd").pathParam("trackId", "publish-track-2").expect()
-            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/media/{trackId}")).asString();
+    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
+            .get(rt.host("{eventId}/asset/catalog/catalogs.json")).asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
 
   @Test
   public void testGetEventAttachements() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventAttachment.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventAttachments.json"));
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/attachments")).asString();
+            .get(rt.host("{eventId}/asset/attachment/attachments.json")).asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
@@ -294,7 +291,7 @@ public class AbstractEventEndpointTest {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventWorkflow.json"));
 
     given().pathParam("eventId", "asdasd").pathParam("workflowId", "asdasd").expect()
-    .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host("{eventId}/workflows/{workflowId}"));
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host("{eventId}/workflows/{workflowId}"));
 
     String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 23).expect()
             .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/workflows/{workflowId}")).asString();
@@ -307,7 +304,7 @@ public class AbstractEventEndpointTest {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventOperations.json"));
 
     given().pathParam("eventId", "asdasd").pathParam("workflowId", "asdasd").expect()
-    .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host("{eventId}/workflows/{workflowId}/operations"));
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host("{eventId}/workflows/{workflowId}/operations"));
 
     String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 23).expect()
             .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/workflows/{workflowId}/operations")).asString();
@@ -339,7 +336,7 @@ public class AbstractEventEndpointTest {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventErrors.json"));
 
     given().pathParam("eventId", "asdasd").pathParam("workflowId", "asd").expect()
-    .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host("{eventId}/workflows/{workflowId}/errors"));
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host("{eventId}/workflows/{workflowId}/errors"));
 
     String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).expect()
             .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/workflows/{workflowId}/errors")).asString();
@@ -352,12 +349,12 @@ public class AbstractEventEndpointTest {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventError.json"));
 
     given().pathParam("eventId", "asdasd").pathParam("workflowId", "asd").pathParam("errorId", "asd").expect()
-    .statusCode(HttpStatus.SC_BAD_REQUEST).when()
-    .get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}"));
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when()
+            .get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}"));
 
     given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("errorId", "asd").expect()
-    .statusCode(HttpStatus.SC_BAD_REQUEST).when()
-    .get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}"));
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when()
+            .get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}"));
 
     String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("errorId", 1).expect()
             .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}"))
@@ -379,37 +376,37 @@ public class AbstractEventEndpointTest {
   @Test
   public void testAddEventTransition() throws Exception {
     given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
-    .post(rt.host("{eventId}/transitions"));
+            .post(rt.host("{eventId}/transitions"));
 
     given().pathParam("eventId", "asdasd").formParam("transition", "adsf").expect()
-    .statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("{eventId}/transitions"));
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("{eventId}/transitions"));
 
     String transition = "{\"id\": 1,\"application_date\": \"2014-06-05T15:00:00Z\", \"done\": false, \"acl_id\": 43, \"is_deleted\": false }";
 
     given().pathParam("eventId", "asdasd").formParam("transition", transition).expect()
-    .statusCode(HttpStatus.SC_NO_CONTENT).when().post(rt.host("{eventId}/transitions"));
+            .statusCode(HttpStatus.SC_NO_CONTENT).when().post(rt.host("{eventId}/transitions"));
   }
 
   @Test
   public void testUpdateEventTransition() throws Exception {
     given().pathParam("eventId", "asdasd").pathParam("transitionId", "adf").expect()
-    .statusCode(HttpStatus.SC_NOT_FOUND).when().put(rt.host("{eventId}/transitions/{transitionId}"));
+            .statusCode(HttpStatus.SC_NOT_FOUND).when().put(rt.host("{eventId}/transitions/{transitionId}"));
     given().pathParam("eventId", "asdasd").pathParam("transitionId", 5).expect().statusCode(HttpStatus.SC_BAD_REQUEST)
-    .when().put(rt.host("{eventId}/transitions/{transitionId}"));
+            .when().put(rt.host("{eventId}/transitions/{transitionId}"));
     given().pathParam("eventId", "asdasd").pathParam("transitionId", 5).formParam("transition", "adsf").expect()
-    .statusCode(HttpStatus.SC_BAD_REQUEST).when().put(rt.host("{eventId}/transitions/{transitionId}"));
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().put(rt.host("{eventId}/transitions/{transitionId}"));
 
     String transition = "{\"id\": 1,\"application_date\": \"2014-06-05T15:00:00Z\", \"done\": false, \"acl_id\": 43, \"is_deleted\": false }";
     given().pathParam("eventId", "asdasd").pathParam("transitionId", 5).formParam("transition", transition).expect()
-    .statusCode(HttpStatus.SC_NO_CONTENT).when().put(rt.host("{eventId}/transitions/{transitionId}"));
+            .statusCode(HttpStatus.SC_NO_CONTENT).when().put(rt.host("{eventId}/transitions/{transitionId}"));
   }
 
   @Test
   public void testDeleteEventTransition() throws Exception {
     given().pathParam("eventId", "asdasd").pathParam("transitionId", "adf").expect()
-    .statusCode(HttpStatus.SC_NOT_FOUND).when().delete(rt.host("{eventId}/transitions/{transitionId}"));
+            .statusCode(HttpStatus.SC_NOT_FOUND).when().delete(rt.host("{eventId}/transitions/{transitionId}"));
     given().pathParam("eventId", "asdasd").pathParam("transitionId", 5).expect().statusCode(HttpStatus.SC_NO_CONTENT)
-    .when().delete(rt.host("{eventId}/transitions/{transitionId}"));
+            .when().delete(rt.host("{eventId}/transitions/{transitionId}"));
   }
 
   @Test
@@ -450,7 +447,7 @@ public class AbstractEventEndpointTest {
   public void testGetNewConflicts() throws Exception {
     given().expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("new/conflicts"));
     given().formParam("metadata", "asdt").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
-    .post(rt.host("new/conflicts"));
+            .post(rt.host("new/conflicts"));
 
     String expected = IOUtils.toString(getClass().getResource("/conflicts.json"));
     String metadataString = IOUtils.toString(getClass().getResource("/conflictRequest.json"));
@@ -477,7 +474,7 @@ public class AbstractEventEndpointTest {
     String metadataString = IOUtils.toString(getClass().getResource("/createTasksRequest.json"));
 
     given().formParam("metadata", metadataString).expect().log().all().statusCode(HttpStatus.SC_CREATED).when()
-    .post(rt.host("task"));
+            .post(rt.host("task"));
   }
 
   // TODO test create event
@@ -503,34 +500,19 @@ public class AbstractEventEndpointTest {
 
   public static final class TestEnv {
     private AdminUIConfiguration adminUIConfiguration;
-    private Workspace workspace;
     private WorkflowService workflowService;
     private OpencastArchive archive;
     private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
     private JobEndpoint jobService;
-    private ListProvidersService listProviderService;
     private AclService aclService;
-    private SeriesService seriesService;
     private ParticipationManagementDatabase participationManagementDatabase;
-    private DublinCoreCatalogService dublinCoreCatalogService;
     private EventCommentService eventCommentService;
     private SecurityService securityService;
     private IndexService indexService;
-    private IngestService ingestService;
     private AuthorizationService authorizationService;
     private SchedulerService schedulerService;
     private CaptureAgentStateService captureAgentStateService;
     private AdminUISearchIndex index;
-    private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
-    private CommonEventCatalogUIAdapter episodeCatalogUIAdapter;
-
-    public Workspace getWorkspace() {
-      return workspace;
-    }
-
-    public void setWorkspace(Workspace workspace) {
-      this.workspace = workspace;
-    }
 
     public WorkflowService getWorkflowService() {
       return workflowService;
@@ -564,14 +546,6 @@ public class AbstractEventEndpointTest {
       this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
     }
 
-    public ListProvidersService getListProviderService() {
-      return listProviderService;
-    }
-
-    public void setListProviderService(ListProvidersService listProviderService) {
-      this.listProviderService = listProviderService;
-    }
-
     public AclService getAclService() {
       return aclService;
     }
@@ -580,28 +554,12 @@ public class AbstractEventEndpointTest {
       this.aclService = aclService;
     }
 
-    public SeriesService getSeriesService() {
-      return seriesService;
-    }
-
-    public void setSeriesService(SeriesService seriesService) {
-      this.seriesService = seriesService;
-    }
-
     public ParticipationManagementDatabase getPmPersistence() {
       return participationManagementDatabase;
     }
 
     public void setParticipationManagementDatabase(ParticipationManagementDatabase participationManagementDatabase) {
       this.participationManagementDatabase = participationManagementDatabase;
-    }
-
-    public DublinCoreCatalogService getDublinCoreService() {
-      return dublinCoreCatalogService;
-    }
-
-    public void setDublinCoreCatalogService(DublinCoreCatalogService dublinCoreCatalogService) {
-      this.dublinCoreCatalogService = dublinCoreCatalogService;
     }
 
     public EventCommentService getEventCommentService() {
@@ -626,14 +584,6 @@ public class AbstractEventEndpointTest {
 
     public void setIndexService(IndexService indexService) {
       this.indexService = indexService;
-    }
-
-    public IngestService getIngestService() {
-      return ingestService;
-    }
-
-    public void setIngestService(IngestService ingestService) {
-      this.ingestService = ingestService;
     }
 
     public AuthorizationService getAuthorizationService() {
@@ -674,26 +624,6 @@ public class AbstractEventEndpointTest {
 
     public AdminUIConfiguration getAdminUIConfiguration() {
       return adminUIConfiguration;
-    }
-
-    public EventCatalogUIAdapter getEpisodeCatalogUIAdapter() {
-      return episodeCatalogUIAdapter;
-    }
-
-    public void setEpisodeCatalogUIAdapter(CommonEventCatalogUIAdapter episodeCatalogUIAdapter) {
-      this.episodeCatalogUIAdapter = episodeCatalogUIAdapter;
-    }
-
-    public List<EventCatalogUIAdapter> getCatalogUIAdapters() {
-      return catalogUIAdapters;
-    }
-
-    public void setCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
-      catalogUIAdapters.add(catalogUIAdapter);
-    }
-
-    public void unsetCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
-      catalogUIAdapters.remove(catalogUIAdapter);
     }
 
   }

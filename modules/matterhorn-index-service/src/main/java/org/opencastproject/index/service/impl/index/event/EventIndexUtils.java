@@ -63,6 +63,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Utility implementation to deal with the conversion of recording events and its corresponding index data structures.
@@ -173,14 +175,12 @@ public final class EventIndexUtils {
     metadata.addField(EventIndexSchema.HAS_OPEN_COMMENTS, event.hasOpenComments(), true);
 
     if (event.getPublications() != null) {
-      List<String> publications = event.getPublications();
-      metadata.addField(EventIndexSchema.PUBLICATION, publications.toArray(new String[publications.size()]), true);
-    }
+      List<Publication> publications = event.getPublications();
+      HashMap<String, Object>[] publicationsArray = new HashMap[publications.size()];
+      for (int i = 0; i < publications.size(); i++)
+        publicationsArray[i] = generatePublicationDoc(publications.get(i));
 
-    if (event.getPublicationFlavors() != null) {
-      List<String> publicationFlavors = event.getPublicationFlavors();
-      metadata.addField(EventIndexSchema.PUBLICATION_FLAVOR,
-              publicationFlavors.toArray(new String[publicationFlavors.size()]), true);
+      metadata.addField(EventIndexSchema.PUBLICATION, publicationsArray, true);
     }
 
     if (event.getPresenters() != null) {
@@ -234,6 +234,80 @@ public final class EventIndexUtils {
     }
 
     return metadata;
+  }
+
+  private static void addObjectStringtToMap(HashMap<String, Object> map, String key, Object value) {
+    if (value == null) {
+      map.put(key, "");
+    } else {
+      map.put(key, value.toString());
+    }
+  }
+
+  /**
+   * Generate the document structure for the publication element
+   *
+   * @param publication
+   *          the source publication element
+   * @return a map representing the ES document structure of the publication element
+   */
+  private static HashMap<String, Object> generatePublicationDoc(Publication publication) {
+    HashMap<String, Object> pMap = new HashMap<String, Object>();
+
+    // Add first level elements
+    pMap.put(PublicationIndexSchema.CHANNEL, publication.getChannel());
+    addObjectStringtToMap(pMap, PublicationIndexSchema.MIMETYPE, publication.getMimeType());
+
+    // Attachments
+    Attachment[] attachments = publication.getAttachments();
+    HashMap<String, Object>[] attachmentsArray = new HashMap[attachments.length];
+    for (int i = 0; i < attachmentsArray.length; i++) {
+      Attachment attachment = attachments[i];
+      HashMap<String, Object> element = new HashMap<String, Object>();
+      element.put(PublicationIndexSchema.ELEMENT_ID, attachment.getIdentifier());
+      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_MIMETYPE, attachment.getMimeType());
+      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_TYPE, attachment.getElementType());
+      element.put(PublicationIndexSchema.ELEMENT_TAG, attachment.getTags());
+      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_URL, attachment.getURI());
+      element.put(PublicationIndexSchema.ELEMENT_SIZE, attachment.getSize());
+      attachmentsArray[i] = element;
+    }
+    pMap.put(PublicationIndexSchema.ATTACHMENT, attachmentsArray);
+
+    // Catalogs
+    Catalog[] catalogs = publication.getCatalogs();
+    HashMap<String, Object>[] catalogsArray = new HashMap[catalogs.length];
+    for (int i = 0; i < catalogsArray.length; i++) {
+      Catalog catalog = catalogs[i];
+      HashMap<String, Object> element = new HashMap<String, Object>();
+      element.put(PublicationIndexSchema.ELEMENT_ID, catalog.getIdentifier());
+      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_MIMETYPE, catalog.getMimeType());
+      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_TYPE, catalog.getElementType());
+      element.put(PublicationIndexSchema.ELEMENT_TAG, catalog.getTags());
+      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_URL, catalog.getURI());
+      element.put(PublicationIndexSchema.ELEMENT_SIZE, catalog.getSize());
+      catalogsArray[i] = element;
+    }
+    pMap.put(PublicationIndexSchema.CATALOG, catalogsArray);
+
+    // Tracks
+    Track[] tracks = publication.getTracks();
+    HashMap<String, Object>[] tracksArray = new HashMap[tracks.length];
+    for (int i = 0; i < tracksArray.length; i++) {
+      Track track = tracks[i];
+      HashMap<String, Object> element = new HashMap<String, Object>();
+      element.put(PublicationIndexSchema.ELEMENT_ID, track.getIdentifier());
+      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_MIMETYPE, track.getMimeType());
+      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_TYPE, track.getElementType());
+      element.put(PublicationIndexSchema.ELEMENT_TAG, track.getTags());
+      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_URL, track.getURI());
+      element.put(PublicationIndexSchema.ELEMENT_SIZE, track.getSize());
+      element.put(PublicationIndexSchema.TRACK_DURATION, track.getDuration());
+      tracksArray[i] = element;
+    }
+    pMap.put(PublicationIndexSchema.TRACK, tracksArray);
+
+    return pMap;
   }
 
   /**
@@ -427,15 +501,11 @@ public final class EventIndexUtils {
     event.setAttachmentFlavors(attachmentFlavors);
 
     // Publications
-    List<String> publications = new ArrayList<String>();
-    List<String> publicationFlavors = new ArrayList<String>();
+    List<Publication> publications = new ArrayList<Publication>();
     for (Publication p : mp.getPublications()) {
-      publications.add(p.getChannel());
-      if (p.getFlavor() != null)
-        publicationFlavors.add(p.getFlavor().toString());
+      publications.add(p);
     }
     event.setPublications(publications);
-    event.setPublicationFlavors(publicationFlavors);
 
     event.setSeriesName(mp.getSeriesTitle());
 
@@ -615,13 +685,40 @@ public final class EventIndexUtils {
   }
 
   /**
+   * Gets all of the MediaPackageElement's flavors.
+   *
+   * @param publications
+   *          The list of publication elements to get the flavors from.
+   * @return An array of {@link String} representation of the MediaPackageElementFlavors
+   */
+  private static String[] getPublicationFlavors(List<Publication> publications) {
+    Set<String> allPublicationFlavors = new TreeSet<String>();
+    for (Publication p : publications) {
+      for (Attachment attachment : p.getAttachments()) {
+        if (attachment.getFlavor() != null)
+          allPublicationFlavors.add(attachment.getFlavor().toString());
+      }
+      for (Catalog catalog : p.getCatalogs()) {
+        if (catalog.getFlavor() != null)
+          allPublicationFlavors.add(catalog.getFlavor().toString());
+      }
+      for (Track track : p.getTracks()) {
+        if (track.getFlavor() != null)
+          allPublicationFlavors.add(track.getFlavor().toString());
+      }
+    }
+    return allPublicationFlavors.toArray(new String[allPublicationFlavors.size()]);
+  }
+
+  /**
    * Returns <code>true</code> if the previewSubtype matches any of the publicationFlavors.
    *
    * @param publicationFlavors
    * @param previewSubtype
    * @return
    */
-  public static Boolean subflavorMatches(List<String> publicationFlavors, String previewSubtype) {
+  public static Boolean subflavorMatches(List<Publication> publications, String previewSubtype) {
+    String[] publicationFlavors = getPublicationFlavors(publications);
     if (publicationFlavors != null && previewSubtype != null) {
       final String subtype = "/" + previewSubtype;
       for (String flavor : publicationFlavors) {

@@ -21,6 +21,8 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
+
 import static org.opencastproject.kernel.mail.EmailAddress.emailAddress;
 import static org.opencastproject.messages.MessageSignature.messageSignature;
 import static org.opencastproject.util.data.Option.none;
@@ -44,8 +46,9 @@ import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
 import org.opencastproject.index.service.impl.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
+import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
+import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
-import org.opencastproject.index.service.resources.list.provider.LanguagesListProvider;
 import org.opencastproject.index.service.resources.list.provider.UsersListProvider;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchQuery.Order;
@@ -74,6 +77,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -103,6 +107,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.ws.rs.Path;
 
@@ -124,13 +129,23 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     EasyMock.expect(userDirectoryService.findUsers("%", 0, 0)).andReturn(users.iterator()).anyTimes();
     EasyMock.replay(userDirectoryService);
 
-    LanguagesListProvider languages = new LanguagesListProvider();
     UsersListProvider userListProvider = new UsersListProvider();
     userListProvider.setUserDirectoryService(userDirectoryService);
 
     ListProvidersServiceImpl listProvidersServiceImpl = new ListProvidersServiceImpl();
     listProvidersServiceImpl.addProvider(userListProvider);
-    listProvidersServiceImpl.addProvider(languages);
+    listProvidersServiceImpl.addProvider(new ResourceListProvider() {
+
+      @Override
+      public String[] getListNames() {
+        return new String[] { "LANGUAGES" };
+      }
+
+      @Override
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+        return new HashMap<String, String>();
+      }
+    });
     listProvidersServiceImpl.activate(null);
     return listProvidersServiceImpl;
   }
@@ -296,6 +311,10 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     setupIndex();
 
     CommonSeriesCatalogUIAdapter dublinCoreAdapter = new CommonSeriesCatalogUIAdapter();
+    Properties seriesCatalogProperties = getCatalogProperties(getClass(), "/series-catalog.properties");
+
+    dublinCoreAdapter.updated(seriesCatalogProperties);
+
     dublinCoreAdapter.setSeriesService(seriesService);
     dublinCoreAdapter.setListProvidersService(listProvidersService);
     dublinCoreAdapter.setSecurityService(securityService);
@@ -307,8 +326,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     indexServiceImpl.setAclServiceFactory(aclServiceFactory);
     indexServiceImpl.setSeriesService(seriesService);
 
-    this.addCatalogUIAdapter(dublinCoreAdapter);
-    this.setCommonSeriesCatalogUIAdapter(dublinCoreAdapter);
     this.setIndex(adminuiSearchIndex);
     this.setSeriesService(seriesService);
     this.setPersistence(persistence);

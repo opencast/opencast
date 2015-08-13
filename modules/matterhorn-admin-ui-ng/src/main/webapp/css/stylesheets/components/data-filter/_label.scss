@@ -1,0 +1,27 @@
+.df-label {
+    visibility: hidden;
+    opacity: 0;
+    margin-bottom: 3px;
+    font-size: 10px;
+    font-weight: $weight-semibold;
+    color: $medium-prim-color;
+
+    // Hide Behind Parent
+    position: relative;
+    z-index: -1;
+    @include transform(translateY(15px));
+
+    @include transition-property(visibility, opacity, transform);
+    @include transition-duration(300ms);
+    @include transition-timing-function(ease-in-out);
+    @include transition-delay(80ms);
+
+    .js-df-state-new-filter & {
+        visibility: visible;
+        opacity: 1;
+
+        // Reveal from origin
+        z-index: 1;
+        @include transform(translateY(0px));
+    }
+}

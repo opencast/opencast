@@ -12,7 +12,7 @@
 	</service>
 	
   <reference name="captureAgentService" interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
-    cardinality="1..1" policy="static" bind="setCaptureAgentService" unbind="unsetService" />
+    cardinality="1..1" policy="static" bind="setCaptureAgentService" />
    <reference bind="setParticipationPersistence"
              cardinality="0..1"
              interface="org.opencastproject.pm.api.persistence.ParticipationManagementDatabase"

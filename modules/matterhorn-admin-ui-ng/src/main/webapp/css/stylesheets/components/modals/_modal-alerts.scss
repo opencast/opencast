@@ -1,0 +1,55 @@
+// Warning Symbol Mixin
+@mixin warning-symbol($alert-type) {
+    p, a, h1, h2, h3, h4, h5, h6 {
+        &:first-child:before {
+            content: $fa-icon-warning-sign;
+            font-family: FontAwesome;
+            font-size: $modal-alert-fa-size;
+            color: '$state-${$alert-type}-text';
+            margin-right: 5px;
+        }
+    }
+}
+
+.modal-alert {
+    @include clearfix();
+    display: block;
+    padding: 15px 25px;
+    
+    p {
+        line-height: 18px;
+                
+        &:not(:last-child) {
+            margin-bottom: 10px;
+        }
+    }
+    
+    strong {
+        font-weight: 600;
+    }
+    
+    &.info {
+        @include alert-variant($state-info-bg, $state-info-border, $state-info-text);
+    }
+    
+    &.warning {
+        @include alert-variant($state-warning-bg, $state-warning-border, $state-warning-text);
+        @include warning-symbol(warning);
+    }
+    
+    &.success {
+        @include alert-variant($state-success-bg, $state-success-border, $state-success-text);
+    }
+    
+    &.danger {
+        @include alert-variant($state-danger-bg, $state-danger-border, $state-danger-text);
+        @include warning-symbol(danger);
+    }
+    
+    &.info,
+    &.warning,
+    &.success,
+    &.danger {
+        border-top: none;
+    }
+}

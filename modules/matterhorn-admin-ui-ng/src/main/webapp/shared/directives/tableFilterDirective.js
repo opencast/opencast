@@ -10,6 +10,18 @@ angular.module('adminNg.directives')
         link: function (scope) {
             scope.formatDateRange = Language.formatDateRange;
 
+            scope.getOptionLabel = function (filter) {
+                var optionLabel;
+
+                angular.forEach(filter.options, function (id, label) {
+                    if (id === filter.value) {
+                        optionLabel = label;
+                    }
+                });
+
+                return optionLabel;
+            };
+
             scope.restoreFilters = function () {
                 angular.forEach(scope.filters.filters, function (filter, name) {
                     filter.value = Storage.get('filter', scope.namespace)[name];

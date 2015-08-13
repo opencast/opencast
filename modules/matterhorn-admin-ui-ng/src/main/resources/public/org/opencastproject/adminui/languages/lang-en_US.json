@@ -8,6 +8,31 @@
    "SAVE":         "Save",
    "LOGOUT":       "Logout",
    "RESET":        "Reset",
+   "SELECT_NO_OPTIONS": "No option",
+   "LANGUAGES": {
+      "ARABIC":"Arabic",
+      "DANISH":"Danish",
+      "GERMAN":"German",
+      "GERMAN_CH":"Swiss German",
+      "FINNISH":"Finnish",
+      "HINDI":"Hindi",
+      "ITALIAN":"Italian",
+      "JAPANESE":"Japanese",
+      "DUTCH":"Dutch",
+      "NORWEGIAN":"Norwegian",
+      "FRENCH":"French",
+      "ENGLISH":"English",
+      "SPANISH":"Spanish",
+      "ROMANSH":"Romansh",
+      "POLISH":"Polish",
+      "PORTUGESE":"Portugese",
+      "SLOVENIAN":"Slovenian",
+      "SWEDISH":"Swedish",
+      "RUSSIAN":"Russian",
+      "TURKISH":"Turkish",
+      "UKRAINIAN":"Ukrainian",
+      "CHINESE":"Chinese"
+    },
    "PREFERENCES":  {
       "CAPTION": "Preferences",
       "PROFILE": "Profile",
@@ -21,6 +46,10 @@
         "SELECTED_COLUMNS": "Selected columns",
         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
+   },
+   "HELP":{
+     "REST_DOC":            "REST API Doc",
+     "USERS_GUIDE":         "User's Guide"
    },
    "NOTIFICATIONS": {
      "ACL_ADDED":           "The access policy has been created",
@@ -70,11 +99,16 @@
      "EMAIL_TEMPLATE_NAME_TAKEN": "This name is already in use",
      "EMAIL_SENT": "The message has been sent",
      "EMAIL_NOT_SENT": "The message could not be sent",
-     "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the room, dates or times.",
+     "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+     "INVALID_ACL_RULES":   "Rules have to contain a valid role and read or/and write right(s).",
+     "MISSING_ACL_RULES":   "At least one role with Read and Write permissions is required!",
+     "SAVED_ACL_RULES":   "The access rules have been saved.",
      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "The existing events in this series will need to be reprocessed",
      "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
+     "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
+     "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "THEME_NAME_ALREADY_TAKEN": "This name is already in use",
      "THEME_NAME_EMPTY": "The name cannot be empty",
      "BUMPER_UPLOAD_ERROR": "Error while uploading media",
@@ -235,7 +269,7 @@
            "CAPTION": "Source",
            "SELECT_SOURCE": "Select source",
            "PLACEHOLDER": {
-               "ROOM": "Room",
+               "LOCATION": "Location",
                "INPUTS": "Inputs",
                "HOUR": "Hour",
                "MINUTE": "Minute",
@@ -312,14 +346,13 @@
        "TABLE": {
          "CAPTION":  "Events",
          "TITLE":    "Title",
-         "CREATORS": "Presenter(s)",
+         "PRESENTERS": "Presenter(s)",
          "SERIES":   "Series",
          "DATE":     "Date",
          "START":    "Start",
          "STOP":     "Stop",
          "STATUS":   "Status",
          "LOCATION": "Location",
-         "AGENT":    "Agent",
          "ACTION":   "Actions",
          "FIRST":    "First",
          "LAST":     "Last",
@@ -358,7 +391,7 @@
            "METADATA":    "Metadata",
            "EXTENDED-METADATA":    "Metadata II",
            "MEDIA":       "Media",
-           "ATTACHMENTS": "Attachments",
+           "ASSETS": "Assets",
            "WORKFLOWS":   "Workflows",
            "ACCESS":      "Access policy",
            "COMMENTS":    "Comments"
@@ -391,6 +424,111 @@
            "TAGS":        "Tags",
            "LINK":        "Link"
          },
+         "ASSETS": {
+              "CAPTION" : "Assets",
+              "TYPE"    : "Type",
+              "SIZE"    : "Size",
+              "DETAILS" : "Details",
+              "ATTACHMENTS": {
+                  "TITLE": "Attachments",
+                  "CAPTION": "Attachments",
+                  "ID"       : "Id",
+                  "TYPE"     : "Type",
+                  "MIMETYPE" : "Mimetype",
+                  "TAGS"     : "Tags",
+                  "LINK"     : "Link",
+                  "DETAILS"  : {
+                    "TITLE"  : "Attachment details",
+                    "CAPTION": "Attachment details",
+                    "ID"       : "Id",
+                    "TYPE"     : "Type",
+                    "MIMETYPE" : "Mimetype",
+                    "TAGS"     : "Tags",
+                    "URL"     : "URL",
+                    "SIZE"     : "Size",
+                    "CHECKSUM" : "Checksum",
+                    "REFERENCE": "Reference"
+                  }
+              },
+              "CATALOGS": {
+                  "TITLE": "Catalogs",
+                  "CAPTION": "Catalogs",
+                  "ID"       : "Id",
+                  "TYPE"     : "Type",
+                  "MIMETYPE" : "Mimetype",
+                  "TAGS"     : "Tags",
+                  "LINK"     : "Link",
+                  "DETAILS"  : {
+                    "TITLE"  : "Catalog details",
+                    "CAPTION": "Catalog details",
+                    "ID"       : "Id",
+                    "TYPE"     : "Type",
+                    "MIMETYPE" : "Mimetype",
+                    "TAGS"     : "Tags",
+                    "URL"     : "URL",
+                    "SIZE"     : "Size",
+                    "CHECKSUM" : "Checksum",
+                    "REFERENCE": "Reference"
+                  }
+              },
+              "MEDIA": {
+                  "TITLE": "Media",
+                  "CAPTION": "Media",
+                  "ID": "ID",
+                  "TYPE": "Type",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS"     : "Tags",
+                  "LINK"     : "Link",
+                  "DETAILS": {
+                      "TITLE": "Media details",
+                      "ID": "ID",
+                      "TYPE": "Type",
+                      "MIMETYPE": "Mimetype",
+                      "URL": "URL",
+                      "RECORDING_DATE": "Recording date",
+                      "FLAVOR": "Flavor",
+                      "TAGS": "Tags",
+                      "DURATION": "Duration",
+                      "STREAM_AUDIO": "Audio streams",
+                      "STREAM_VIDEO": "Video streams",
+                      "CHANNELS": "Channels",
+                      "BITRATE": "Bitrate",
+                      "BITDEPTH": "Bitdepth",
+                      "SAMPLINGRATE": "Samplingrate",
+                      "FRAMECOUNT": "Framecount",
+                      "PEAKLEVELDB": "Peak level DB",
+                      "RMSLEVELDB": "RMS level DB",
+                      "RMSPEAKDB": "RMS speak DB",
+                      "FRAMERATE": "Framerate",
+                      "RESOLUTION": "Resolution",
+                      "SIZE": "Size",
+                      "SCANTYPE": "Scantype",
+                      "SCANORDER": "Scanorder"
+                  }
+               },
+              "PUBLICATIONS": {
+                  "TITLE"    : "Publications",
+                  "CAPTION"  : "Publications",
+                  "CHANNEL"  : "Channel",
+                  "ID"       : "Id",
+                  "TYPE"     : "Type",
+                  "MIMETYPE" : "Mimetype",
+                  "TAGS"     : "Tags",
+                  "LINK"     : "Link",
+                  "DETAILS"  : {
+                    "TITLE"  : "Publication details",
+                    "CAPTION": "Publication details",
+                    "ID"       : "Id",
+                    "TYPE"     : "Type",
+                    "MIMETYPE" : "Mimetype",
+                    "TAGS"     : "Tags",
+                    "URL"     : "URL",
+                    "SIZE"     : "Size",
+                    "CHANNEL"  : "Channel",
+                    "REFERENCE": "Reference"
+                  }
+              }
+          },
          "ACCESS": {
            "CAPTION": "Access policy",
            "DESCRIPTION": "",
@@ -427,7 +565,7 @@
          },
          "METADATA": {
            "TITLE":          "Title",
-           "UID":            "UID",
+           "ID":            "UID",
            "SERIES":         "Series",
            "RECORDING_DATE": "Recording date",
            "SUBJECT":        "Subject",
@@ -435,7 +573,7 @@
            "START_DATE":     "Start date",
            "START_TIME":     "Start time",
            "DURATION":       "Duration",
-           "AGENT":          "Agent",
+           "LOCATION":       "Location",
            "SOURCE":         "Source",
            "CREATED":        "Created",
            "CREATED_BY":     "Created by",
@@ -466,7 +604,8 @@
             "URL": "URL"
           },
          "WORKFLOW_DETAILS": {
-           "TITLE": "Workflow details"
+           "TITLE": "Workflow details",
+           "CONFIGURATION": "Workflow configuration"
          },
          "WORKFLOW_OPERATIONS": {
            "TITLE": "Workflow operations"
@@ -610,7 +749,7 @@
          },
          "METADATA": {
            "TITLE":          "Title",
-           "UID":            "UID",
+           "ID":            "UID",
            "SERIES":         "Series",
            "PUBLISHERS":     "Publisher(s)",
            "ORGANIZERS":     "Organizer(s)",

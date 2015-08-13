@@ -33,7 +33,7 @@ angular.module('adminNg.directives')
             width = calculateWidth(translation, element);
         }
         column.style = column.style || {};
-        column.style['min-width'] = (width + 22) + 'px';
+        column.style['min-width'] = (width + 40) + 'px';
     };
 
     return {

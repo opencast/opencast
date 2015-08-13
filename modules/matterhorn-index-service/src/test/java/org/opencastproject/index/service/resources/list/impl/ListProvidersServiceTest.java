@@ -56,9 +56,9 @@ public class ListProvidersServiceTest {
       }
 
       @Override
-      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
 
-        Map<String, Object> filteredList = new HashMap<String, Object>();
+        Map<String, String> filteredList = new HashMap<String, String>();
 
         int i = 0;
 
@@ -113,8 +113,8 @@ public class ListProvidersServiceTest {
     Assert.assertEquals(baseNumber + 2, listProviderService.getAvailableProviders().size());
     Assert.assertTrue(listProviderService.hasProvider(providerName1));
     Assert.assertTrue(listProviderService.hasProvider(providerName2));
-    Assert.assertEquals(list1, listProviderService.getList(providerName1, query, null));
-    Assert.assertEquals(list1, listProviderService.getList(providerName2, query, null));
+    Assert.assertEquals(list1, listProviderService.getList(providerName1, query, null, false));
+    Assert.assertEquals(list2, listProviderService.getList(providerName2, query, null, false));
 
     listProviderService.removeProvider(providerName2);
     Assert.assertEquals(baseNumber + 1, listProviderService.getAvailableProviders().size());
@@ -135,20 +135,20 @@ public class ListProvidersServiceTest {
 
     query.setLimit(2);
     query.setOffset(1);
-    Assert.assertEquals(2, listProviderService.getList(providerName1, query, null).size());
+    Assert.assertEquals(2, listProviderService.getList(providerName1, query, null, false).size());
 
     query.setLimit(1);
     query.setOffset(5);
-    Assert.assertEquals(0, listProviderService.getList(providerName1, query, null).size());
+    Assert.assertEquals(0, listProviderService.getList(providerName1, query, null, false).size());
 
     query.setLimit(2);
     query.setOffset(1);
-    Assert.assertEquals(2, listProviderService.getList(providerName1, query, null).size());
+    Assert.assertEquals(2, listProviderService.getList(providerName1, query, null, false).size());
 
     query.setLimit(12);
     query.setOffset(0);
     query.addFilter(new StringListFilter(TEST_FILTER_NAME, "test"));
-    Assert.assertEquals(3, listProviderService.getList(providerName1, query, null).size());
+    Assert.assertEquals(3, listProviderService.getList(providerName1, query, null, false).size());
 
     // query.setSortedBy(TEST_SORTBY);
     // Map<String, String> list = listProviderService.getList(providerName1, query, null);

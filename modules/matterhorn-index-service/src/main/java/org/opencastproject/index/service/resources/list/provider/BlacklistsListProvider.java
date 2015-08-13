@@ -76,9 +76,9 @@ public class BlacklistsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, String> result = new HashMap<String, String>();
 
     if (getListNameFromFilter(BLACKLISTS_FILTER_LIST.PERSON_NAME).equals(listName)) {
       List<Person> personList;

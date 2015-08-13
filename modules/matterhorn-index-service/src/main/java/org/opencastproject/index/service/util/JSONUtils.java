@@ -82,13 +82,13 @@ public final class JSONUtils {
    *          the source map
    * @return a new {@link JObjectWrite} generated with the map values
    */
-  public static JObjectWrite mapToJSON(Map<String, Object> map) {
+  public static JObjectWrite mapToJSON(Map<String, String> map) {
     if (map == null) {
       throw new IllegalArgumentException("Map must not be null!");
     }
 
     List<JField> fields = new ArrayList<JField>();
-    for (Entry<String, Object> item : map.entrySet()) {
+    for (Entry<String, String> item : map.entrySet()) {
       fields.add(f(item.getKey(), vN(item.getValue())));
     }
     return j(fields);
@@ -220,15 +220,15 @@ public final class JSONUtils {
       Option<String> listProviderName = f.getValuesListName();
 
       if (listProviderName.isSome()) {
-        Map<String, Object> values = null;
+        Map<String, String> values = null;
 
         if (!listProvidersService.hasProvider(listProviderName.get()))
-          values = new HashMap<String, Object>();
+          values = new HashMap<String, String>();
         else
-          values = listProvidersService.getList(listProviderName.get(), query, org);
+          values = listProvidersService.getList(listProviderName.get(), query, org, true);
 
         List<JField> valuesJSON = new ArrayList<JField>();
-        for (Entry<String, Object> entry : values.entrySet()) {
+        for (Entry<String, String> entry : values.entrySet()) {
           valuesJSON.add(f(entry.getKey(), vN(entry.getValue())));
         }
 

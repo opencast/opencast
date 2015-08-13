@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.data.json.Jsons.a;
@@ -40,18 +39,18 @@ import org.opencastproject.archive.api.ArchiveException;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
-import org.opencastproject.index.service.exception.InternalServerErrorException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.track.TrackImpl;
-import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
@@ -59,8 +58,10 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
+import org.opencastproject.util.Log;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -71,6 +72,7 @@ import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
@@ -84,6 +86,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -92,9 +96,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Dictionary;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -112,7 +119,7 @@ import javax.xml.bind.JAXBException;
 
 @Path("/")
 @RestService(name = "toolsService", title = "Tools API Service", notes = "", abstractText = "Provides a location for the tools API.")
-public class ToolsEndpoint {
+public class ToolsEndpoint implements ManagedService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ToolsEndpoint.class);
 
@@ -190,6 +197,24 @@ public class ToolsEndpoint {
     this.workspace = workspace;
   }
 
+  /** OSGi callback if properties file is present */
+  @SuppressWarnings("rawtypes")
+  @Override
+  public void updated(Dictionary properties) throws ConfigurationException {
+    Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
+            .map(com.entwinemedia.fn.fns.Strings.toLongF);
+    if (expiration.isSome()) {
+      expireSeconds = expiration.get();
+      logger.info("The property {} has been configured to expire signed URLs in {}.",
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+    } else {
+      expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+      logger.info(
+              "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+    }
+  }
+
   @GET
   @Path("{mediapackageid}.json")
   @RestQuery(name = "getAvailableTools", description = "Returns a list of tools which are currently available for the given media package.", returnDescription = "A JSON array with tools identifiers", pathParameters = { @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "Available tools evaluated", responseCode = HttpServletResponse.SC_OK) })
@@ -199,6 +224,33 @@ public class ToolsEndpoint {
       jTools.add(v("editor"));
 
     return RestUtils.okJson(j(f("available", a(jTools))));
+  }
+
+  private List<MediaPackageElement> getPreviewElementsFromPublication(Opt<Publication> publication) {
+    List<MediaPackageElement> previewElements = new LinkedList<MediaPackageElement>();
+    for (Publication p : publication) {
+      for (Attachment attachment : p.getAttachments()) {
+        if (elementHasPreviewFlavor(attachment)) {
+          previewElements.add(attachment);
+        }
+      }
+      for (Catalog catalog : p.getCatalogs()) {
+        if (elementHasPreviewFlavor(catalog)) {
+          previewElements.add(catalog);
+        }
+      }
+      for (Track track : p.getTracks()) {
+        if (elementHasPreviewFlavor(track)) {
+          previewElements.add(track);
+        }
+      }
+    }
+    return previewElements;
+  }
+
+  private Boolean elementHasPreviewFlavor(MediaPackageElement element) {
+    return element.getFlavor() != null
+            && adminUIConfiguration.getPreviewSubtype().equals(element.getFlavor().getSubtype());
   }
 
   @GET
@@ -215,29 +267,28 @@ public class ToolsEndpoint {
       final Opt<MediaPackage> optMP = getMediaPackage(mediaPackageId);
       if (optMP.isSome()) {
         final MediaPackage mp = optMP.get();
-        final List<Publication> previewPublications = Stream.mk(mp.getPublications())
-                .filter(new Fn<Publication, Boolean>() {
-                  @Override
-                  public Boolean ap(Publication pub) {
-                    return pub.getFlavor() != null
-                            && adminUIConfiguration.getPreviewSubtype().equals(pub.getFlavor().getSubtype());
-                  }
-                }).toList();
+        List<MediaPackageElement> previewPublications = getPreviewElementsFromPublication(getInternalPublication(mp));
 
         // Collect previews and tracks
         List<JValue> jPreviews = new ArrayList<JValue>();
         List<JValue> jTracks = new ArrayList<JValue>();
-        for (Publication pub : previewPublications) {
-          jPreviews.add(j(f("uri", v(pub.getURI().toString()))));
+        for (MediaPackageElement element : previewPublications) {
+          final URI elementUri = element.getURI();
+          jPreviews.add(j(f("uri", v(elementUri.toString()))));
 
-          JObjectWrite jTrack = j(f("id", v(pub.getIdentifier())), f("flavor", v(pub.getFlavor().getType())));
+          if (!Type.Track.equals(element.getElementType()))
+            continue;
+
+          JObjectWrite jTrack = j(f("id", v(element.getIdentifier())), f("flavor", v(element.getFlavor().getType())));
           // Check if there's a waveform for the current track
-          Opt<Publication> optWaveform = getWaveformForTrack(mp, pub);
+          Opt<Attachment> optWaveform = getWaveformForTrack(mp, element);
           if (optWaveform.isSome()) {
-            jTracks.add(jTrack.merge(j(f("waveform", v(optWaveform.get().getURI().toString())))));
+            final URI waveformUri = optWaveform.get().getURI();
+            jTracks.add(jTrack.merge(j(f("waveform", v(waveformUri.toString())))));
           } else {
             jTracks.add(jTrack);
           }
+
         }
 
         // Get existing segments
@@ -347,24 +398,27 @@ public class ToolsEndpoint {
     // Add tracks to the SMIL catalog
     ArrayList<Track> tracks = new ArrayList<>();
 
-    for (String trackId : editingInfo.getConcatTracks()) {
+    for (final String trackId : editingInfo.getConcatTracks()) {
       Track track = mediaPackage.getTrack(trackId);
       if (track == null) {
-        for (Publication p : mediaPackage.getPublications()) {
-          if (trackId.equals(p.getIdentifier())) {
-            // Create temporal track from publication element
-            TrackImpl t = TrackImpl.fromURI(p.getURI());
-            t.setFlavor(p.getFlavor());
-            t.setDuration(mediaPackage.getDuration());
-            t.setIdentifier(p.getIdentifier());
-            t.addStream(new VideoStreamImpl());
-            track = t;
-            break;
+        Opt<Track> trackOpt = getInternalPublication(mediaPackage).toStream().bind(new Fn<Publication, List<Track>>() {
+          @Override
+          public List<Track> ap(Publication a) {
+            return Arrays.asList(a.getTracks());
           }
-        }
-        if (track == null)
+        }).filter(new Fn<Track, Boolean>() {
+          @Override
+          public Boolean ap(Track a) {
+            if (trackId.equals(a.getIdentifier()))
+              return true;
+            return false;
+          }
+        }).head();
+        if (trackOpt.isNone())
           throw new IllegalStateException(format("The track '%s' doesn't exist in media package '%s'", trackId,
                   mediaPackage));
+
+        track = trackOpt.get();
       }
       tracks.add(track);
     }
@@ -434,6 +488,17 @@ public class ToolsEndpoint {
     return mediaPackage;
   }
 
+  private Opt<Publication> getInternalPublication(MediaPackage mp) {
+    return Stream.$(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
+      @Override
+      public Boolean ap(Publication a) {
+        if (InternalPublicationChannel.CHANNEL_ID.equals(a.getChannel()))
+          return true;
+        return false;
+      }
+    }).head();
+  }
+
   /**
    * Returns {@code true} if the media package is ready to be edited.
    *
@@ -460,7 +525,7 @@ public class ToolsEndpoint {
   private Opt<Event> getEvent(final String mediaPackageId) {
     try {
       return index.getEvent(mediaPackageId, searchIndex);
-    } catch (InternalServerErrorException e) {
+    } catch (SearchIndexException e) {
       logger.error("Error while reading event '{}' from search index: {}", mediaPackageId,
               ExceptionUtils.getStackTrace(e));
       return Opt.none();
@@ -479,7 +544,7 @@ public class ToolsEndpoint {
     if (optEvent.isSome()) {
       try {
         return index.getEventMediapackage(optEvent.get());
-      } catch (InternalServerErrorException e) {
+      } catch (WorkflowDatabaseException e) {
         logger.error("Error while retrieving media package '{}': {}", mediaPackageId, getStackTrace(e));
         return Opt.none();
       }
@@ -497,22 +562,22 @@ public class ToolsEndpoint {
    * @param track
    *          the track
    */
-  private Opt<Publication> getWaveformForTrack(final MediaPackage mp, final Publication track) {
-    List<Publication> pubs = Stream.$(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
+  private Opt<Attachment> getWaveformForTrack(final MediaPackage mp, final MediaPackageElement track) {
+    return Stream.$(getInternalPublication(mp)).bind(new Fn<Publication, List<Attachment>>() {
       @Override
-      public Boolean ap(Publication pub) {
-        if (track.getFlavor() == null || pub.getFlavor() == null)
+      public List<Attachment> ap(Publication a) {
+        return Arrays.asList(a.getAttachments());
+      }
+    }).filter(new Fn<Attachment, Boolean>() {
+      @Override
+      public Boolean ap(Attachment att) {
+        if (track.getFlavor() == null || att.getFlavor() == null)
           return false;
 
-        return track.getFlavor().getType().equals(pub.getFlavor().getType())
-                && pub.getFlavor().getSubtype().equals(adminUIConfiguration.getWaveformSubtype());
+        return track.getFlavor().getType().equals(att.getFlavor().getType())
+                && att.getFlavor().getSubtype().equals(adminUIConfiguration.getWaveformSubtype());
       }
-    }).toList();
-
-    for (Publication pub : pubs) {
-      return Opt.some(pub);
-    }
-    return Opt.none();
+    }).head();
   }
 
   /**
@@ -611,6 +676,16 @@ public class ToolsEndpoint {
     return mergedSegments;
   }
 
+  /**
+   * Merges two different segments lists together. Keeps untouched segments and combines touching segments by the
+   * overlapping points.
+   *
+   * @param segments
+   *          the first segments to be merge
+   * @param segments2
+   *          the second segments to be merge
+   * @return the merged segments
+   */
   private List<Tuple<Long, Long>> mergeInternal(List<Tuple<Long, Long>> segments, List<Tuple<Long, Long>> segments2) {
     for (Iterator<Tuple<Long, Long>> it = segments.iterator(); it.hasNext();) {
       Tuple<Long, Long> seg = it.next();

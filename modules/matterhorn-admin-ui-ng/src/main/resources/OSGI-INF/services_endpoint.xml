@@ -11,8 +11,7 @@
 	<service>
 		<provide interface="org.opencastproject.adminui.endpoint.ServicesEndpoint" />
 	</service>
-	
-	<reference name="listProvidersEndpoint"
-		interface="org.opencastproject.adminui.endpoint.ListProvidersEndpoint"
-		cardinality="1..1" policy="static" bind="setListProvidersEndpoint" />
+
+	<reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    cardinality="1..1" policy="static" bind="setServiceRegistry"/>
 </scr:component>

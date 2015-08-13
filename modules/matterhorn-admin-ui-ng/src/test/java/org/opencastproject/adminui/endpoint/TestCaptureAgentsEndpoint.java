@@ -50,8 +50,8 @@ import javax.ws.rs.Path;
 @Ignore
 public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
 
-  private ParticipationManagementDatabase pmService;
-  private CaptureAgentStateService captureAgentService;
+  private final ParticipationManagementDatabase pmService;
+  private final CaptureAgentStateService captureAgentService;
   private ArrayList<User> users;
   private User user1;
   private User user2;
@@ -102,16 +102,18 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
 
   private class TestAgent implements Agent {
 
-    private String name;
+    private final String name;
     private String state;
     private String url;
     private Long time;
+    private final boolean isManaged;
 
     public TestAgent(String name, String state, String url, Long time) {
       this.name = name;
       this.state = state;
       this.url = url;
       this.time = time;
+      this.isManaged = true;
     }
 
     @Override

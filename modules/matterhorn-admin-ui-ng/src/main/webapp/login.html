@@ -18,8 +18,8 @@
                         <div class="row">
                             <p>
                                 <span translate='LOGIN.WELCOME'></span><br />
-                                <span class="subtle-text">
-                                    Opencast Video Capture Software
+                                <span class="subtle-text" ng-if="version.version">
+                                    Opencast (v.{{ version.version }} - build: {{ version.buildNumber }})
                                 </span>
                             </p>
                         </div>
@@ -39,7 +39,7 @@
                             <div class="remember-me-toggle">
                                 <div class="remember-me-content">
                                     <div class="check-toggle">
-                                        <input type="checkbox" id="remember" name="_spring_security_remember_me" checked class="ios">
+                                        <input type="checkbox" id="remember" name="_spring_security_remember_me" checked>
                                     </div>
                                     <label for="remember" translate="LOGIN.REMEMBER">Remember me on this computer</label>
                                 </div>
@@ -51,8 +51,8 @@
                     </form>
                 </div>
 
-                <nav class="nav-dd-container" id="nav-dd-container">
-                    <div class="nav-dd" id="lang-dd" old-admin-ng-dropdown>
+                <nav class="login-nav nav-dd-container" id="nav-dd-container">
+                    <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown>
                         <div class="lang {{ currentLanguageCode }}"></div><span>{{ currentLanguageName }}</span>
                             <ul class="dropdown-ul">
                                 <li>
@@ -91,6 +91,7 @@
         <script src="shared/services/jsHelperService.js"></script>
         <script src="shared/resources/resources.js"></script>
         <script src="shared/resources/identityResource.js"></script>
+        <script src="shared/resources/versionResource.js"></script>
         <script src="shared/directives/oldDropdownDirective.js"></script>
     </body>
 </html>

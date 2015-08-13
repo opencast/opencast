@@ -32,6 +32,9 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.util.data.functions.Strings;
 
+import com.entwinemedia.fn.Fn;
+import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,6 +170,17 @@ public final class MimeTypes {
       return t;
     return mimeType(type, subtype);
   }
+
+  public static final Fn<String, Opt<MimeType>> toMimeType = new Fn<String, Opt<MimeType>>() {
+    @Override
+    public Opt<MimeType> ap(String name) {
+      try {
+        return Opt.some(fromString(name));
+      } catch (Exception e) {
+        return Opt.none();
+      }
+    }
+  };
 
   /**
    * Returns a mime type for the given type and subtype, e. g. <code>video/mj2</code>.

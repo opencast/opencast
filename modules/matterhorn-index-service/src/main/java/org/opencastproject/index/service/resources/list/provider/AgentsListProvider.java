@@ -62,8 +62,8 @@ public class AgentsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-    Map<String, Object> result = new HashMap<String, Object>();
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+    Map<String, String> result = new HashMap<String, String>();
 
     if (STATUS.equals(listName)) {
       for (String state : AgentState.KNOWN_STATES) {

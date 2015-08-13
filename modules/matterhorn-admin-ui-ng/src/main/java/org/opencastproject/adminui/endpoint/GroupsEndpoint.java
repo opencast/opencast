@@ -21,6 +21,11 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.f;
+import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.v;
+import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -28,46 +33,39 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang.StringUtils.trimToNull;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
-import static com.entwinemedia.fn.data.json.Jsons.a;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
-import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import com.entwinemedia.fn.data.json.JField;
-import com.entwinemedia.fn.data.json.JValue;
+import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.index.service.impl.index.group.Group;
 import org.opencastproject.index.service.util.RestUtils;
-import org.opencastproject.matterhorn.search.SearchQuery.Order;
-import org.opencastproject.matterhorn.search.SortCriterion;
-import org.opencastproject.security.api.Group;
-import org.opencastproject.security.api.Role;
+import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.matterhorn.search.SearchResult;
+import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.SmartIterator;
-import org.opencastproject.util.data.Option;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.lang.ObjectUtils;
+import com.entwinemedia.fn.data.Opt;
+import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.JValue;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.DELETE;
@@ -89,8 +87,8 @@ public class GroupsEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(GroupsEndpoint.class);
 
-  /** The internal role and user provider */
-  private JpaGroupRoleProvider jpaGroupRoleProvider;
+  /** The admin UI search index */
+  private AdminUISearchIndex searchIndex;
 
   /** The security service */
   private SecurityService securityService;
@@ -98,25 +96,27 @@ public class GroupsEndpoint {
   /** The user directory service */
   private UserDirectoryService userDirectoryService;
 
-  /**
-   * @param securityService
-   *          the securityService to set
-   */
+  /** The index service */
+  private IndexService indexService;
+
+  /** OSGi callback for the security service. */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  /**
-   * @param jpaGroupRoleProvider
-   *          the group role provider to set
-   */
-  public void setJpaGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
-    this.jpaGroupRoleProvider = jpaGroupRoleProvider;
+  /** OSGi callback for the index service. */
+  public void setIndexService(IndexService indexService) {
+    this.indexService = indexService;
   }
 
   /** OSGi callback for users services. */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
+  }
+
+  /** OSGi callback for the search index. */
+  public void setSearchIndex(AdminUISearchIndex searchIndex) {
+    this.searchIndex = searchIndex;
   }
 
   /** OSGi callback. */
@@ -132,71 +132,26 @@ public class GroupsEndpoint {
           @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: NAME, DESCRIPTION OR ROLE.  Add '_DESC' to reverse the sort order (e.g. NAME_DESC).", type = STRING),
           @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
-  public Response getGroupsAsJson(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
+  public Response getGroups(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
           @QueryParam("offset") int offset, @QueryParam("limit") int limit) throws IOException {
     if (limit < 1)
       limit = 100;
-    Option<String> optSort = Option.option(trimToNull(sort));
 
-    Map<String, String> filters = RestUtils.parseFilter(filter);
-    for (String name : filters.keySet()) {
-      // TODO
-      logger.debug("Groups filter name: {}", name);
-      logger.debug("Groups filter value: {}", filters.get(name));
+    Opt<String> optSort = Opt.nul(trimToNull(sort));
+
+    SearchResult<Group> results;
+    try {
+      results = indexService.getGroups(filter, Opt.some(limit), Opt.some(offset), optSort, searchIndex);
+    } catch (SearchIndexException e) {
+      logger.error("The External Search Index was not able to get the groups list: {}", ExceptionUtils.getStackTrace(e));
+      return RestUtil.R.serverError();
     }
-
-    // Filter agents by filter criteria
-    List<Group> filteredGroups = new ArrayList<Group>();
-    for (Iterator<Group> groupIterator = jpaGroupRoleProvider.getGroups(); groupIterator.hasNext();) {
-      Group group = groupIterator.next();
-      // // Filter list
-      // if ((filterName.isSome() && !filterName.get().equals(agent.getName()))
-      // || (filterStatus.isSome() && !filterStatus.get().equals(agent.getState()))
-      // || (filterLastUpdated.isSome() && filterLastUpdated.get() != agent.getLastHeardFrom()))
-      // continue;
-      filteredGroups.add(group);
-    }
-    int total = filteredGroups.size();
-
-    // Sort by name, description or role
-    if (optSort.isSome()) {
-      final Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
-      Collections.sort(filteredGroups, new Comparator<Group>() {
-        @Override
-        public int compare(Group group1, Group group2) {
-          for (SortCriterion criterion : sortCriteria) {
-            Order order = criterion.getOrder();
-            switch (criterion.getFieldName()) {
-              case "name":
-                if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(group2.getName(), group1.getName());
-                return ObjectUtils.compare(group1.getName(), group2.getName());
-              case "description":
-                if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(group2.getDescription(), group1.getDescription());
-                return ObjectUtils.compare(group1.getDescription(), group2.getDescription());
-              case "role":
-                if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(group2.getRole(), group1.getRole());
-                return ObjectUtils.compare(group1.getRole(), group2.getRole());
-              default:
-                logger.info("Unkown sort type: {}", criterion.getFieldName());
-                return 0;
-            }
-          }
-          return 0;
-        }
-
-      });
-    }
-
-    // Apply Limit and offset
-    filteredGroups = new SmartIterator<Group>(limit, offset).applyLimitAndOffset(filteredGroups);
 
     List<JValue> groupsJSON = new ArrayList<JValue>();
-    for (Group group : filteredGroups) {
+    for (SearchResultItem<Group> item : results.getItems()) {
+      Group group = item.getSource();
       List<JField> fields = new ArrayList<JField>();
-      fields.add(f("id", v(group.getGroupId())));
+      fields.add(f("id", v(group.getIdentifier())));
       fields.add(f("name", vN(group.getName())));
       fields.add(f("description", vN(group.getDescription())));
       fields.add(f("role", v(group.getRole())));
@@ -204,7 +159,7 @@ public class GroupsEndpoint {
       groupsJSON.add(j(fields));
     }
 
-    return okJsonList(groupsJSON, offset, limit, total);
+    return okJsonList(groupsJSON, offset, limit, results.getHitCount());
   }
 
   @DELETE
@@ -214,27 +169,21 @@ public class GroupsEndpoint {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found."),
           @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "An internal server error occured.") })
   public Response removeGroup(@PathParam("id") String groupId) throws NotFoundException {
-    return jpaGroupRoleProvider.removeGroup(groupId);
+    return indexService.removeGroup(groupId);
   }
 
   @POST
   @Path("")
-  @RestQuery(name = "createGroup", description = "Add a group", returnDescription = "Return the status codes", restParameters = {
+  @RestQuery(name = "createGroup", description = "Add a group", returnDescription = "Returns Created (201) if the group has been created", restParameters = {
           @RestParameter(name = "name", description = "The group name", isRequired = true, type = Type.STRING),
           @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, reponses = {
+          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = false, type = Type.TEXT) }, reponses = {
           @RestResponse(responseCode = SC_CREATED, description = "Group created"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long") })
   public Response createGroup(@FormParam("name") String name, @FormParam("description") String description,
           @FormParam("roles") String roles, @FormParam("users") String users) {
-
-    if (StringUtils.isEmpty(roles))
-      roles = "";
-    if (StringUtils.isEmpty(users))
-      users = "";
-
-    return jpaGroupRoleProvider.createGroup(name, description, roles, users);
+    return indexService.createGroup(name, description, roles, users);
   }
 
   @PUT
@@ -243,14 +192,14 @@ public class GroupsEndpoint {
           @RestParameter(name = "name", description = "The group name", isRequired = true, type = Type.STRING),
           @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, reponses = {
+          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = false, type = Type.TEXT) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "Group updated"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long") })
   public Response updateGroup(@PathParam("id") String groupId, @FormParam("name") String name,
           @FormParam("description") String description, @FormParam("roles") String roles,
           @FormParam("users") String users) throws NotFoundException {
-    return jpaGroupRoleProvider.updateGroup(groupId, name, description, roles, users);
+    return indexService.updateGroup(groupId, name, description, roles, users);
   }
 
   @GET
@@ -260,15 +209,15 @@ public class GroupsEndpoint {
           @RestResponse(responseCode = SC_OK, description = "Group updated"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long") })
-  public Response getGroup(@PathParam("id") String groupId) throws NotFoundException {
-
-    Group group = jpaGroupRoleProvider.loadGroup(groupId, securityService.getOrganization().getId());
-    if (group == null)
+  public Response getGroup(@PathParam("id") String groupId) throws NotFoundException, SearchIndexException {
+    Opt<Group> groupOpt = indexService.getGroup(groupId, searchIndex);
+    if (groupOpt.isNone())
       throw new NotFoundException("Group " + groupId + " does not exist.");
 
-    return RestUtils.okJson(j(f("id", v(group.getGroupId())), f("name", vN(group.getName())),
-            f("description", vN(group.getDescription())), f("roles", rolesToJSON(group.getRoles())),
-            f("users", membersToJSON(group.getMembers()))));
+    Group group = groupOpt.get();
+    return RestUtils.okJson(j(f("id", v(group.getIdentifier())), f("name", vN(group.getName())),
+            f("description", vN(group.getDescription())), f("role", vN(group.getRole())),
+            f("roles", rolesToJSON(group.getRoles())), f("users", membersToJSON(group.getMembers()))));
   }
 
   /**
@@ -278,11 +227,11 @@ public class GroupsEndpoint {
    *          the roles source
    * @return a JSON array ({@link JValue}) with the given roles
    */
-  private JValue rolesToJSON(Set<Role> roles) {
+  private JValue rolesToJSON(Set<String> roles) {
     List<JValue> rolesJSON = new ArrayList<JValue>();
 
-    for (Role role : roles) {
-      rolesJSON.add(v(role.getName()));
+    for (String role : roles) {
+      rolesJSON.add(v(role));
     }
     return a(rolesJSON);
   }

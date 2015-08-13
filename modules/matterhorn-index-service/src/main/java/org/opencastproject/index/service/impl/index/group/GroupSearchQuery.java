@@ -44,6 +44,7 @@ public class GroupSearchQuery extends AbstractSearchQuery {
   protected List<String> identifiers = new ArrayList<String>();
   private User user = null;
   private String name = null;
+  private String role = null;
   private String description = null;
   private Set<String> actions = new HashSet<String>();
   private String organization = null;
@@ -112,6 +113,28 @@ public class GroupSearchQuery extends AbstractSearchQuery {
    */
   public String getName() {
     return name;
+  }
+
+  /**
+   * Selects groups with the given role.
+   *
+   * @param role
+   *          the role
+   * @return the enhanced search query
+   */
+  public GroupSearchQuery withRole(String role) {
+    clearExpectations();
+    this.role = role;
+    return this;
+  }
+
+  /**
+   * Returns the group role.
+   *
+   * @return the name
+   */
+  public String getRole() {
+    return role;
   }
 
   /**
@@ -316,12 +339,33 @@ public class GroupSearchQuery extends AbstractSearchQuery {
   }
 
   /**
+   * Defines the sort order for the group by role.
+   *
+   * @param order
+   *          the order
+   * @return the enhanced search query
+   */
+  public GroupSearchQuery sortByRole(Order order) {
+    withSortOrder(GroupIndexSchema.ROLE, order);
+    return this;
+  }
+
+  /**
    * Returns the sort order for the group name.
    *
    * @return the sort order
    */
   public Order getGroupNameSortOrder() {
     return getSortOrder(GroupIndexSchema.NAME);
+  }
+
+  /**
+   * Returns the sort order for the group role.
+   *
+   * @return the sort order
+   */
+  public Order getGroupRoleSortOrder() {
+    return getSortOrder(GroupIndexSchema.ROLE);
   }
 
   @Override
@@ -333,6 +377,9 @@ public class GroupSearchQuery extends AbstractSearchQuery {
     }
     if (StringUtils.trimToNull(name) != null) {
       sb.append("name:'" + name + "' ");
+    }
+    if (StringUtils.trimToNull(role) != null) {
+      sb.append("role:'" + role + "' ");
     }
     if (StringUtils.trimToNull(description) != null) {
       sb.append("description:'" + description + "' ");

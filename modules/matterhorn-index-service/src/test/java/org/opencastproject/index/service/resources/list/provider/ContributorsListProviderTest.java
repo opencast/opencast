@@ -100,7 +100,7 @@ public class ContributorsListProviderTest {
 
       @Override
       public void invalidate(String userName) {
-        // TODO Auto-generated method stub
+        return;
       }
     };
 
@@ -125,7 +125,7 @@ public class ContributorsListProviderTest {
 
   @Test
   public void testListSimple() throws ListProviderException {
-    Map<String, Object> list = contributorsListProvider.getList(ContributorsListProvider.DEFAULT, null, null);
+    Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.DEFAULT, null, null);
     Assert.assertTrue(list.containsKey(user1.getName()));
     Assert.assertTrue(list.containsKey(user2.getName()));
     Assert.assertTrue(list.containsKey(user3.getName()));

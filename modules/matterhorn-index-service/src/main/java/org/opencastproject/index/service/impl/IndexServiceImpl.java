@@ -23,6 +23,7 @@ package org.opencastproject.index.service.impl;
 
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
 
+import org.opencastproject.archive.api.ArchiveException;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.opencast.OpencastArchive;
 import org.opencastproject.archive.opencast.OpencastQueryBuilder;
@@ -32,6 +33,9 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.comments.Comment;
+import org.opencastproject.comments.CommentException;
+import org.opencastproject.comments.CommentParser;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
@@ -42,21 +46,29 @@ import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatal
 import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.SeriesCatalogUIAdapter;
-import org.opencastproject.index.service.exception.InternalServerErrorException;
+import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.exception.MetadataParsingException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
+import org.opencastproject.index.service.impl.index.group.Group;
+import org.opencastproject.index.service.impl.index.group.GroupIndexSchema;
+import org.opencastproject.index.service.impl.index.group.GroupSearchQuery;
 import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
+import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
+import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchResult;
+import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement.Type;
+import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -64,6 +76,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -79,12 +92,17 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.util.SecurityContext;
+import org.opencastproject.series.api.SeriesException;
+import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.userdirectory.UserIdRoleProvider;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
+import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
@@ -123,13 +141,20 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 public class IndexServiceImpl implements IndexService {
 
@@ -139,122 +164,64 @@ public class IndexServiceImpl implements IndexService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(IndexServiceImpl.class);
+
   /** A parser for handling JSON documents inside the body of a request. **/
   private static final JSONParser parser = new JSONParser();
+
+  private final List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
+  private final List<SeriesCatalogUIAdapter> seriesCatalogUIAdapters = new ArrayList<SeriesCatalogUIAdapter>();
+  private EventCatalogUIAdapter eventCatalogUIAdapter;
+  private SeriesCatalogUIAdapter seriesCatalogUIAdapter;
 
   private AclServiceFactory aclServiceFactory;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
-  private CommonEventCatalogUIAdapter eventCatalogUIAdapter;
-  private final List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
   private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
   private IngestService ingestService;
   private OpencastArchive opencastArchive;
   private SchedulerService schedulerService;
   private SecurityService securityService;
-  private final List<SeriesCatalogUIAdapter> seriesCatalogUIAdapters = new ArrayList<SeriesCatalogUIAdapter>();
-  private SeriesCatalogUIAdapter commonSeriesCatalogUIAdapter;
+  private JpaGroupRoleProvider jpaGroupRoleProvider;
   private SeriesService seriesService;
   private WorkflowService workflowService;
   private Workspace workspace;
 
-  public AclService getAclService() {
-    return aclServiceFactory.serviceFor(securityService.getOrganization());
-  }
+  /** The single thread executor service */
+  private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
+  /** OSGi DI. */
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
 
-  public AuthorizationService getAuthorizationService() {
-    return authorizationService;
-  }
-
+  /** OSGi DI. */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
-  public CaptureAgentStateService getCaptureAgentStateService() {
-    return captureAgentStateService;
-  }
-
+  /** OSGi DI. */
   public void setCaptureAgentStateService(CaptureAgentStateService captureAgentStateService) {
     this.captureAgentStateService = captureAgentStateService;
   }
 
-  /** OSGi DI. */
+  /** OSGi callback to add the event dublincore {@link EventCatalogUIAdapter} instance. */
   public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
     this.eventCatalogUIAdapter = eventCatalogUIAdapter;
   }
 
-  public EventCatalogUIAdapter getEpisodeCatalogUIAdapter() {
-    return eventCatalogUIAdapter;
+  /** OSGi callback to add the series dublincore {@link SeriesCatalogUIAdapter} instance. */
+  public void setCommonSeriesCatalogUIAdapter(CommonSeriesCatalogUIAdapter seriesCatalogUIAdapter) {
+    this.seriesCatalogUIAdapter = seriesCatalogUIAdapter;
   }
 
-  /** OSGi DI. */
+  /** OSGi callback to add {@link EventCatalogUIAdapter} instance. */
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     eventCatalogUIAdapters.add(catalogUIAdapter);
   }
 
-  /** OSGi DI. */
+  /** OSGi callback to remove {@link EventCatalogUIAdapter} instance. */
   public void removeCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     eventCatalogUIAdapters.remove(catalogUIAdapter);
-  }
-
-  public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
-    return Stream.$(eventCatalogUIAdapters).filter(eventOrganizationFilter._2(organization)).toList();
-  }
-
-  private static final Fn2<EventCatalogUIAdapter, String, Boolean> eventOrganizationFilter = new Fn2<EventCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean ap(EventCatalogUIAdapter catalogUIAdapter, String organization) {
-      return organization.equals(catalogUIAdapter.getOrganization());
-    }
-  };
-
-  public HttpMediaPackageElementProvider getHttpMediaPackageElementProvider() {
-    return httpMediaPackageElementProvider;
-  }
-
-  public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
-    this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
-  }
-
-  public IngestService getIngestService() {
-    return ingestService;
-  }
-
-  public void setIngestService(IngestService ingestService) {
-    this.ingestService = ingestService;
-  }
-
-  public OpencastArchive getOpencastArchive() {
-    return opencastArchive;
-  }
-
-  public void setOpencastArchive(OpencastArchive opencastArchive) {
-    this.opencastArchive = opencastArchive;
-  }
-
-  public SchedulerService getSchedulerService() {
-    return schedulerService;
-  }
-
-  public void setSchedulerService(SchedulerService schedulerService) {
-    this.schedulerService = schedulerService;
-  }
-
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
-  /** OSGi callback to add the series dublincore {@link SeriesCatalogUIAdapter} instance. */
-  public void setCommonSeriesCatalogUIAdapter(CommonSeriesCatalogUIAdapter commonSeriesCatalogUIAdapter) {
-    this.commonSeriesCatalogUIAdapter = commonSeriesCatalogUIAdapter;
   }
 
   /** OSGi callback to add {@link SeriesCatalogUIAdapter} instance. */
@@ -267,6 +234,73 @@ public class IndexServiceImpl implements IndexService {
     seriesCatalogUIAdapters.remove(catalogUIAdapter);
   }
 
+  /** OSGi DI. */
+  public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
+    this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
+  }
+
+  /** OSGi DI. */
+  public void setIngestService(IngestService ingestService) {
+    this.ingestService = ingestService;
+  }
+
+  /** OSGi DI. */
+  public void setOpencastArchive(OpencastArchive opencastArchive) {
+    this.opencastArchive = opencastArchive;
+  }
+
+  /** OSGi DI. */
+  public void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
+  }
+
+  /** OSGi DI. */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  /** OSGi DI. */
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
+  }
+
+  /** OSGi DI. */
+  public void setWorkflowService(WorkflowService workflowService) {
+    this.workflowService = workflowService;
+  }
+
+  /** OSGi DI. */
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
+  /** OSGi DI. */
+  public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
+    this.jpaGroupRoleProvider = jpaGroupRoleProvider;
+  }
+
+  public AclService getAclService() {
+    return aclServiceFactory.serviceFor(securityService.getOrganization());
+  }
+
+  private static final Fn2<EventCatalogUIAdapter, String, Boolean> eventOrganizationFilter = new Fn2<EventCatalogUIAdapter, String, Boolean>() {
+    @Override
+    public Boolean ap(EventCatalogUIAdapter catalogUIAdapter, String organization) {
+      return organization.equals(catalogUIAdapter.getOrganization());
+    }
+  };
+
+  private static final Fn2<SeriesCatalogUIAdapter, String, Boolean> seriesOrganizationFilter = new Fn2<SeriesCatalogUIAdapter, String, Boolean>() {
+    @Override
+    public Boolean ap(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
+      return catalogUIAdapter.getOrganization().equals(organization);
+    }
+  };
+
+  public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
+    return Stream.$(eventCatalogUIAdapters).filter(eventOrganizationFilter._2(organization)).toList();
+  }
+
   /**
    * @param organization
    *          The organization to filter the results with.
@@ -276,44 +310,34 @@ public class IndexServiceImpl implements IndexService {
     return Stream.$(seriesCatalogUIAdapters).filter(seriesOrganizationFilter._2(organization)).toList();
   }
 
-  private static final Fn2<SeriesCatalogUIAdapter, String, Boolean> seriesOrganizationFilter = new Fn2<SeriesCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean ap(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
-      return catalogUIAdapter.getOrganization().equals(organization);
-    }
-  };
-
-  public SeriesService getSeriesService() {
-    return seriesService;
-  }
-
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
-  }
-
-  public WorkflowService getWorkflowService() {
-    return workflowService;
-  }
-
-  public void setWorkflowService(WorkflowService workflowService) {
-    this.workflowService = workflowService;
-  }
-
-  public Workspace getWorkspace() {
-    return workspace;
-  }
-
-  public void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
+  @Override
+  public List<EventCatalogUIAdapter> getEventCatalogUIAdapters() {
+    return new ArrayList<EventCatalogUIAdapter>(getEventCatalogUIAdapters(securityService.getOrganization().getId()));
   }
 
   @Override
-  public String createEvent(HttpServletRequest request) throws InternalServerErrorException, IllegalArgumentException {
+  public List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters() {
+    return new LinkedList<SeriesCatalogUIAdapter>(
+            getSeriesCatalogUIAdapters(securityService.getOrganization().getId()));
+  }
+
+  @Override
+  public EventCatalogUIAdapter getCommonEventCatalogUIAdapter() {
+    return eventCatalogUIAdapter;
+  }
+
+  @Override
+  public SeriesCatalogUIAdapter getCommonSeriesCatalogUIAdapter() {
+    return seriesCatalogUIAdapter;
+  }
+
+  @Override
+  public String createEvent(HttpServletRequest request) throws IndexServiceException {
     JSONObject metadataJson = null;
     MediaPackage mp = null;
     try {
       if (ServletFileUpload.isMultipartContent(request)) {
-        mp = getIngestService().createMediaPackage();
+        mp = ingestService.createMediaPackage();
 
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
@@ -330,13 +354,12 @@ public class IndexServiceImpl implements IndexService {
             }
           } else {
             if ("presenter".equals(item.getFieldName())) {
-              mp = getIngestService().addTrack(item.openStream(), item.getName(),
-                      MediaPackageElements.PRESENTER_SOURCE, mp);
+              mp = ingestService.addTrack(item.openStream(), item.getName(), MediaPackageElements.PRESENTER_SOURCE, mp);
             } else if ("presentation".equals(item.getFieldName())) {
-              mp = getIngestService().addTrack(item.openStream(), item.getName(),
-                      MediaPackageElements.PRESENTATION_SOURCE, mp);
+              mp = ingestService.addTrack(item.openStream(), item.getName(), MediaPackageElements.PRESENTATION_SOURCE,
+                      mp);
             } else if ("audio".equals(item.getFieldName())) {
-              mp = getIngestService().addTrack(item.openStream(), item.getName(),
+              mp = ingestService.addTrack(item.openStream(), item.getName(),
                       new MediaPackageElementFlavor("presenter-audio", "source"), mp);
             } else {
               logger.warn("Unknown field name found {}", item.getFieldName());
@@ -359,11 +382,12 @@ public class IndexServiceImpl implements IndexService {
       return createEvent(metadataJson, mp);
     } catch (Exception e) {
       logger.error("Unable to create event: {}", ExceptionUtils.getStackTrace(e));
-      throw new InternalServerErrorException(e.getMessage());
+      throw new IndexServiceException(e.getMessage());
     }
   }
 
-  protected String createEvent(JSONObject metadataJson, MediaPackage mp) throws ParseException, IOException,
+  @Override
+  public String createEvent(JSONObject metadataJson, MediaPackage mp) throws ParseException, IOException,
           MediaPackageException, IngestException, NotFoundException, SchedulerException, UnauthorizedException {
     if (metadataJson == null)
       throw new IllegalArgumentException("No metadata set");
@@ -396,7 +420,7 @@ public class IndexServiceImpl implements IndexService {
     InputStream inputStream = null;
     Properties caProperties = new Properties();
     try {
-      MetadataList metadataList = getMetadatListWithAllEventCatalogUIAdapters();
+      MetadataList metadataList = getMetadataListWithAllEventCatalogUIAdapters();
       metadataList.fromJSON(allEventMetadataJson.toJSONString());
       AbstractMetadataCollection eventMetadata = metadataList.getMetadataByAdapter(eventCatalogUIAdapter).get();
 
@@ -404,7 +428,7 @@ public class IndexServiceImpl implements IndexService {
       if (sourceMetadata != null
               && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
         try {
-          MetadataField<?> current = eventMetadata.getOutputFields().get("agent");
+          MetadataField<?> current = eventMetadata.getOutputFields().get("location");
           eventMetadata.updateStringField(current, (String) sourceMetadata.get("device"));
         } catch (Exception e) {
           logger.warn("Unable to parse device {}", sourceMetadata.get("device"));
@@ -423,34 +447,42 @@ public class IndexServiceImpl implements IndexService {
       metadataList.add(eventCatalogUIAdapter, eventMetadata);
       updateMediaPackageMetadata(mp, metadataList);
 
-      Option<DublinCoreCatalog> dcOpt = DublinCoreUtil.loadEpisodeDublinCore(getWorkspace(), mp);
+      Option<DublinCoreCatalog> dcOpt = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp);
       if (dcOpt.isSome()) {
         dc = dcOpt.get();
         // make sure to bind the OC_PROPERTY namespace
-        dc.addBindings(XmlNamespaceContext.mk(XmlNamespaceBinding.mk(DublinCores.OC_PROPERTY_NS_PREFIX,
-                DublinCores.OC_PROPERTY_NS_URI)));
+        dc.addBindings(XmlNamespaceContext
+                .mk(XmlNamespaceBinding.mk(DublinCores.OC_PROPERTY_NS_PREFIX, DublinCores.OC_PROPERTY_NS_URI)));
       } else {
         dc = DublinCores.mkOpencast();
       }
 
       if (sourceMetadata != null
               && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
-        Date start = new Date(DateTimeSupport.fromUTC((String) sourceMetadata.get("start")));
-        Date end = new Date(DateTimeSupport.fromUTC((String) sourceMetadata.get("end")));
-        DublinCoreValue period = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(start, end), Precision.Second);
-        String inputs = (String) sourceMetadata.get("inputs");
-
         Properties configuration;
         try {
-          configuration = getCaptureAgentStateService().getAgentConfiguration((String) sourceMetadata.get("device"));
+          configuration = captureAgentStateService.getAgentConfiguration((String) sourceMetadata.get("device"));
         } catch (Exception e) {
           logger.warn("Unable to parse device {}: because: {}", sourceMetadata.get("device"),
                   ExceptionUtils.getStackTrace(e));
           throw new IllegalArgumentException("Unable to parse device");
         }
         caProperties.putAll(configuration);
-        String agentTimeZone = configuration.getProperty("capture.device.timezone.offset");
+        String agentTimeZone = configuration.getProperty("capture.device.timezone");
         dc.set(DublinCores.OC_PROPERTY_AGENT_TIMEZONE, agentTimeZone);
+
+        Date start = new Date(DateTimeSupport.fromUTC((String) sourceMetadata.get("start")));
+        Date end = new Date(DateTimeSupport.fromUTC((String) sourceMetadata.get("end")));
+
+        String duration = (String) sourceMetadata.get("duration");
+        if (StringUtils.isNotBlank(duration))
+          dc.set(DublinCores.OC_PROPERTY_DURATION, duration);
+        else
+          throw new IllegalArgumentException("The duration property is missing.");
+
+        DublinCoreValue period = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(start, end), Precision.Second);
+        String inputs = (String) sourceMetadata.get("inputs");
+
         dc.set(DublinCore.PROPERTY_TEMPORAL, period);
         caProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, inputs);
       }
@@ -466,13 +498,12 @@ public class IndexServiceImpl implements IndexService {
       Catalog[] catalogs = mp.getCatalogs(MediaPackageElements.EPISODE);
       if (catalogs.length > 0) {
         Catalog catalog = catalogs[0];
-        URI uri = getWorkspace().put(mp.getIdentifier().toString(), catalog.getIdentifier(), "dublincore.xml",
-                inputStream);
+        URI uri = workspace.put(mp.getIdentifier().toString(), catalog.getIdentifier(), "dublincore.xml", inputStream);
         catalog.setURI(uri);
         // setting the URI to a new source so the checksum will most like be invalid
         catalog.setChecksum(null);
       } else {
-        mp = getIngestService().addCatalog(inputStream, "dublincore.xml", MediaPackageElements.EPISODE, mp);
+        mp = ingestService.addCatalog(inputStream, "dublincore.xml", MediaPackageElements.EPISODE, mp);
       }
     } catch (MetadataParsingException e) {
       logger.warn("Unable to parse event metadata {}", allEventMetadataJson.toJSONString());
@@ -501,24 +532,24 @@ public class IndexServiceImpl implements IndexService {
     switch (type) {
       case UPLOAD:
       case UPLOAD_LATER:
-        mp = getAuthorizationService().setAcl(mp, AclScope.Episode, acl).getA();
+        mp = authorizationService.setAcl(mp, AclScope.Episode, acl).getA();
         configuration.put("workflowDefinitionId", workflowTemplate);
-        WorkflowInstance ingest = getIngestService().ingest(mp, workflowTemplate, configuration);
-        return Long.toString(ingest.getId());
+        WorkflowInstance ingest = ingestService.ingest(mp, workflowTemplate, configuration);
+        return mp.getIdentifier().compact();
       case SCHEDULE_SINGLE:
-        getIngestService().discardMediaPackage(mp);
-        Long id = getSchedulerService().addEvent(dc, configuration);
-        getSchedulerService().updateCaptureAgentMetadata(caProperties, Tuple.tuple(id, dc));
-        getSchedulerService().updateAccessControlList(id, acl);
+        ingestService.discardMediaPackage(mp);
+        Long id = schedulerService.addEvent(dc, configuration);
+        schedulerService.updateCaptureAgentMetadata(caProperties, Tuple.tuple(id, dc));
+        schedulerService.updateAccessControlList(id, acl);
         return Long.toString(id);
       case SCHEDULE_MULTIPLE:
-        getIngestService().discardMediaPackage(mp);
+        ingestService.discardMediaPackage(mp);
         // try to create event and it's recurrences
-        Long[] createdIDs = getSchedulerService().addReccuringEvent(dc, configuration);
+        Long[] createdIDs = schedulerService.addReccuringEvent(dc, configuration);
         for (long createdId : createdIDs) {
-          getSchedulerService().updateCaptureAgentMetadata(caProperties,
-                  Tuple.tuple(createdId, getSchedulerService().getEventDublinCore(createdId)));
-          getSchedulerService().updateAccessControlList(createdId, acl);
+          schedulerService.updateCaptureAgentMetadata(caProperties,
+                  Tuple.tuple(createdId, schedulerService.getEventDublinCore(createdId)));
+          schedulerService.updateAccessControlList(createdId, acl);
         }
         return StringUtils.join(createdIDs, ",");
       default:
@@ -529,35 +560,100 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public MetadataList updateCommonEventMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, InternalServerErrorException, NotFoundException, UnauthorizedException {
+          throws IllegalArgumentException, WorkflowDatabaseException, IndexServiceException, SearchIndexException,
+          NotFoundException, UnauthorizedException {
     MetadataList metadataList;
     try {
-      metadataList = getMetadatListWithCommonEventCatalogUIAdapter();
+      metadataList = getMetadataListWithCommonEventCatalogUIAdapter();
       metadataList.fromJSON(metadataJSON);
     } catch (Exception e) {
       logger.warn("Not able to parse the event metadata {}: {}", metadataJSON, ExceptionUtils.getStackTrace(e));
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
-    return updateEventMetadata(id, metadataJSON, index, metadataList);
+    return updateEventMetadata(id, metadataList, index);
   }
 
   @Override
   public MetadataList updateAllEventMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, InternalServerErrorException, NotFoundException, UnauthorizedException {
+          throws IllegalArgumentException, WorkflowDatabaseException, IndexServiceException, NotFoundException,
+          SearchIndexException, UnauthorizedException {
     MetadataList metadataList;
     try {
-      metadataList = getMetadatListWithAllEventCatalogUIAdapters();
+      metadataList = getMetadataListWithAllEventCatalogUIAdapters();
       metadataList.fromJSON(metadataJSON);
     } catch (Exception e) {
       logger.warn("Not able to parse the event metadata {}: {}", metadataJSON, ExceptionUtils.getStackTrace(e));
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
-    return updateEventMetadata(id, metadataJSON, index, metadataList);
+    return updateEventMetadata(id, metadataList, index);
   }
 
-  protected MetadataList updateEventMetadata(String id, String metadataJSON, AbstractSearchIndex index,
-          MetadataList metadataList) throws IllegalArgumentException, InternalServerErrorException, NotFoundException,
-          UnauthorizedException {
+  @Override
+  public void removeCatalogByFlavor(Event event, MediaPackageElementFlavor flavor)
+          throws WorkflowDatabaseException, IndexServiceException, NotFoundException, UnauthorizedException {
+    Opt<MediaPackage> mpOpt = getEventMediapackage(event);
+    if (mpOpt.isSome()) {
+      Catalog[] catalogs = mpOpt.get().getCatalogs(flavor);
+      if (catalogs.length == 0) {
+        throw new NotFoundException(String.format("Cannot find a catalog with flavor '%s' for event with id '%s'.",
+                flavor.toString(), event.getIdentifier()));
+      }
+      for (Catalog catalog : catalogs) {
+        mpOpt.get().remove(catalog);
+      }
+      switch (getEventSource(event)) {
+        case WORKFLOW:
+          WorkflowInstance workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
+          workflowInstance.setMediaPackage(mpOpt.get());
+          try {
+            updateWorkflowInstance(workflowInstance);
+          } catch (WorkflowException e) {
+            logger.error("Unable to remove catalog with flavor {} by updating workflow event {} because {}",
+                    new Object[] { flavor, event.getIdentifier(), ExceptionUtils.getStackTrace(e) });
+            throw new IndexServiceException("Unable to update workflow event " + event.getIdentifier());
+          }
+          break;
+        case ARCHIVE:
+          opencastArchive.add(mpOpt.get());
+          break;
+        case SCHEDULE:
+          // Ignoring as there are no mediapackages attached to scheduled items
+          throw new IllegalStateException(
+                  "Unable to remove a catalog from a Scheduled event as there is no mediapackage.");
+        default:
+          throw new IndexServiceException(
+                  String.format("Unable to handle event source type '%s'", getEventSource(event)));
+      }
+    }
+  }
+
+  @Override
+  public void removeCatalogByFlavor(Series series, MediaPackageElementFlavor flavor)
+          throws NotFoundException, IndexServiceException {
+    if (series == null) {
+      throw new IllegalArgumentException("The series cannot be null.");
+    }
+    if (flavor == null) {
+      throw new IllegalArgumentException("The flavor cannot be null.");
+    }
+    boolean found = false;
+    try {
+      found = seriesService.deleteSeriesElement(series.getIdentifier(), flavor.getType());
+    } catch (SeriesException e) {
+      throw new IndexServiceException(String.format("Unable to delete catalog from series '%s' with type '%s'",
+              series.getIdentifier(), flavor.getType()), e);
+    }
+
+    if (!found) {
+      throw new NotFoundException(String.format("Unable to find a catalog for series '%s' with flavor '%s'",
+              series.getIdentifier(), flavor));
+    }
+  }
+
+  @Override
+  public MetadataList updateEventMetadata(String id, MetadataList metadataList, AbstractSearchIndex index)
+          throws IllegalArgumentException, WorkflowDatabaseException, IndexServiceException, SearchIndexException,
+          NotFoundException, UnauthorizedException {
     Opt<Event> optEvent = getEvent(id, index);
     if (optEvent.isNone())
       throw new NotFoundException("Cannot find an event with id " + id);
@@ -571,7 +667,7 @@ public class IndexServiceImpl implements IndexService {
         try {
           if (mpOpt.isNone()) {
             logger.error("No mediapackage found for workflow event {}!", id);
-            throw new InternalServerErrorException("No mediapackage found for workflow event {}!" + id);
+            throw new IndexServiceException("No mediapackage found for workflow event {}!" + id);
           }
           mediaPackage = mpOpt.get();
           updateMediaPackageMetadata(mediaPackage, metadataList);
@@ -580,44 +676,167 @@ public class IndexServiceImpl implements IndexService {
           updateWorkflowInstance(workflowInstance);
         } catch (WorkflowDatabaseException e) {
           logger.error("Unable to update workflow event {} with metadata {} because {}", new Object[] { id,
-                  metadataJSON, ExceptionUtils.getStackTrace(e) });
-          throw new InternalServerErrorException("Unable to update workflow event " + id);
+                  RestUtils.getJsonStringSilent(metadataList.toJSON()), ExceptionUtils.getStackTrace(e) });
+          throw new IndexServiceException("Unable to update workflow event " + id);
         } catch (WorkflowException e) {
           logger.error("Unable to update workflow event {} with metadata {} because {}", new Object[] { id,
-                  metadataJSON, ExceptionUtils.getStackTrace(e) });
-          throw new InternalServerErrorException("Unable to update workflow event " + id);
+                  RestUtils.getJsonStringSilent(metadataList.toJSON()), ExceptionUtils.getStackTrace(e) });
+          throw new IndexServiceException("Unable to update workflow event " + id);
         }
         break;
       case ARCHIVE:
         if (mpOpt.isNone()) {
           logger.error("No mediapackage found for archived event {}!", id);
-          throw new InternalServerErrorException("No mediapackage found for archived event {}!" + id);
+          throw new IndexServiceException("No mediapackage found for archived event {}!" + id);
         }
-
         mediaPackage = mpOpt.get();
         updateMediaPackageMetadata(mediaPackage, metadataList);
-        getOpencastArchive().add(mediaPackage);
+        opencastArchive.add(mediaPackage);
         break;
       case SCHEDULE:
         try {
-          Long eventId = getSchedulerService().getEventId(event.getIdentifier());
-          dc = getSchedulerService().getEventDublinCore(eventId);
-          Opt<AbstractMetadataCollection> abstractMetadata = metadataList
-                  .getMetadataByAdapter(getEpisodeCatalogUIAdapter());
+          Long eventId = schedulerService.getEventId(event.getIdentifier());
+          dc = schedulerService.getEventDublinCore(eventId);
+          Opt<AbstractMetadataCollection> abstractMetadata = metadataList.getMetadataByAdapter(eventCatalogUIAdapter);
           if (abstractMetadata.isSome()) {
             DublinCoreMetadataUtil.updateDublincoreCatalog(dc, abstractMetadata.get());
           }
-          getSchedulerService().updateEvent(eventId, dc, new HashMap<String, String>());
+          schedulerService.updateEvent(eventId, dc, new HashMap<String, String>());
         } catch (SchedulerException e) {
           logger.error("Unable to update scheduled event {} with metadata {} because {}", new Object[] { id,
-                  metadataJSON, ExceptionUtils.getStackTrace(e) });
-          throw new InternalServerErrorException("Unable to update scheduled event " + id);
+                  RestUtils.getJsonStringSilent(metadataList.toJSON()), ExceptionUtils.getStackTrace(e) });
+          throw new IndexServiceException("Unable to update scheduled event " + id);
         }
         break;
       default:
         logger.error("Unkown event source!");
     }
     return metadataList;
+  }
+
+  @Override
+  public AccessControlList updateEventAcl(String id, AccessControlList acl, AbstractSearchIndex index)
+          throws IllegalArgumentException, WorkflowDatabaseException, IndexServiceException, SearchIndexException,
+          NotFoundException {
+    Opt<Event> optEvent = getEvent(id, index);
+    if (optEvent.isNone())
+      throw new NotFoundException("Cannot find an event with id " + id);
+
+    Event event = optEvent.get();
+    Opt<MediaPackage> mpOpt = getEventMediapackage(event);
+    MediaPackage mediaPackage;
+    switch (getEventSource(event)) {
+      case WORKFLOW:
+        // Not updating the acl as the workflow might have already passed the point of distribution.
+        throw new IllegalArgumentException("Unable to update the ACL of this event as it is currently processing.");
+      case ARCHIVE:
+        if (mpOpt.isNone()) {
+          logger.error("No mediapackage found for archived event {}!", id);
+          throw new IndexServiceException("No mediapackage found for archived event {}!" + id);
+        }
+        mediaPackage = mpOpt.get();
+        mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
+        opencastArchive.add(mediaPackage);
+        return acl;
+      case SCHEDULE:
+        try {
+          Long eventId = schedulerService.getEventId(event.getIdentifier());
+          schedulerService.updateAccessControlList(eventId, acl);
+        } catch (SchedulerException e) {
+          throw new IndexServiceException("Unable to update the acl for the scheduled event", e);
+        }
+        return acl;
+      default:
+        logger.error("Unknown event source '{}' unable to update ACL!", getEventSource(event));
+        throw new IndexServiceException(
+                String.format("Unable to update the ACL as '{}' is an unknown event source.", getEventSource(event)));
+    }
+  }
+
+  @Override
+  public SearchResult<Group> getGroups(String filter, Opt<Integer> optLimit, Opt<Integer> optOffset,
+          Opt<String> optSort, AbstractSearchIndex index) throws SearchIndexException {
+    GroupSearchQuery query = new GroupSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
+
+    // Parse the filters
+    if (StringUtils.isNotBlank(filter)) {
+      for (String f : filter.split(",")) {
+        String[] filterTuple = f.split(":");
+        if (filterTuple.length < 2) {
+          logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
+          continue;
+        }
+
+        String name = filterTuple[0];
+        String value = filterTuple[1];
+
+        if (GroupsListQuery.FILTER_NAME_NAME.equals(name))
+          query.withName(value);
+      }
+    }
+
+    if (optSort.isSome()) {
+      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+      for (SortCriterion criterion : sortCriteria) {
+        switch (criterion.getFieldName()) {
+          case GroupIndexSchema.NAME:
+            query.sortByName(criterion.getOrder());
+            break;
+          case GroupIndexSchema.ROLE:
+            query.sortByRole(criterion.getOrder());
+            break;
+          case GroupIndexSchema.MEMBERS:
+            query.sortByMembers(criterion.getOrder());
+            break;
+          case GroupIndexSchema.ROLES:
+            query.sortByRoles(criterion.getOrder());
+            break;
+          default:
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+      }
+    }
+
+    if (optLimit.isSome())
+      query.withLimit(optLimit.get());
+    if (optOffset.isSome())
+      query.withOffset(optOffset.get());
+
+    return index.getByQuery(query);
+  }
+
+  @Override
+  public Opt<Group> getGroup(String id, AbstractSearchIndex index) throws SearchIndexException {
+    SearchResult<Group> result = index
+            .getByQuery(new GroupSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
+                    .withIdentifier(id));
+
+    // If the results list if empty, we return already a response.
+    if (result.getPageSize() == 0) {
+      logger.debug("Didn't find event with id {}", id);
+      return Opt.<Group> none();
+    }
+    return Opt.some(result.getItems()[0].getSource());
+  }
+
+  @Override
+  public Response removeGroup(String id) throws NotFoundException {
+    return jpaGroupRoleProvider.removeGroup(id);
+  }
+
+  @Override
+  public Response updateGroup(String id, String name, String description, String roles, String members)
+          throws NotFoundException {
+    return jpaGroupRoleProvider.updateGroup(id, name, description, roles, members);
+  }
+
+  @Override
+  public Response createGroup(String name, String description, String roles, String members) {
+    if (StringUtils.isEmpty(roles))
+      roles = "";
+    if (StringUtils.isEmpty(members))
+      members = "";
+    return jpaGroupRoleProvider.createGroup(name, description, roles, members);
   }
 
   /**
@@ -629,28 +848,95 @@ public class IndexServiceImpl implements IndexService {
    * @throws SearchIndexException
    */
   @Override
-  public Opt<Event> getEvent(String id, AbstractSearchIndex index) throws InternalServerErrorException {
-    SearchResult<Event> result;
-    try {
-      result = index.getByQuery(new EventSearchQuery(getSecurityService().getOrganization().getId(),
-              getSecurityService().getUser()).withIdentifier(id));
-      // If the results list if empty, we return already a response.
-      if (result.getPageSize() == 0) {
-        logger.debug("Didn't find event with id {}", id);
-        return Opt.<Event> none();
-      }
-      return Opt.some(result.getItems()[0].getSource());
-    } catch (IllegalStateException e) {
-      logger.error("Unable to get event with id {} because {}", id, ExceptionUtils.getStackTrace(e));
-      throw new InternalServerErrorException(e.getMessage(), e);
-    } catch (SearchIndexException e) {
-      logger.error("Unable to get event with id {} because {}", id, ExceptionUtils.getStackTrace(e));
-      throw new InternalServerErrorException(e.getMessage(), e);
+  public Opt<Event> getEvent(String id, AbstractSearchIndex index) throws SearchIndexException {
+    SearchResult<Event> result = index
+            .getByQuery(new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
+                    .withIdentifier(id));
+    // If the results list if empty, we return already a response.
+    if (result.getPageSize() == 0) {
+      logger.debug("Didn't find event with id {}", id);
+      return Opt.<Event> none();
     }
+    return Opt.some(result.getItems()[0].getSource());
   }
 
   @Override
-  public void updateWorkflowInstance(WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException {
+  public boolean removeEvent(String id) throws NotFoundException, UnauthorizedException {
+    boolean unauthorizedScheduler = false;
+    boolean notFoundScheduler = false;
+    boolean removedScheduler = true;
+    try {
+      schedulerService.removeEvent(schedulerService.getEventId(id));
+    } catch (NotFoundException e) {
+      notFoundScheduler = true;
+    } catch (UnauthorizedException e) {
+      unauthorizedScheduler = true;
+    } catch (SchedulerException e) {
+      removedScheduler = false;
+      logger.error("Unable to remove the event '{}' from scheduler service: {}", id, ExceptionUtils.getStackTrace(e));
+    }
+
+    boolean unauthorizedWorkflow = false;
+    boolean notFoundWorkflow = false;
+    boolean removedWorkflow = true;
+    try {
+      WorkflowQuery workflowQuery = new WorkflowQuery().withMediaPackage(id);
+      WorkflowSet workflowSet = workflowService.getWorkflowInstances(workflowQuery);
+      if (workflowSet.size() == 0)
+        notFoundWorkflow = true;
+      for (WorkflowInstance instance : workflowSet.getItems()) {
+        workflowService.stop(instance.getId());
+        workflowService.remove(instance.getId());
+      }
+    } catch (NotFoundException e) {
+      notFoundWorkflow = true;
+    } catch (UnauthorizedException e) {
+      unauthorizedWorkflow = true;
+    } catch (WorkflowDatabaseException e) {
+      removedWorkflow = false;
+      logger.error("Unable to remove the event '{}' because removing workflow failed: {}", id,
+              ExceptionUtils.getStackTrace(e));
+    } catch (WorkflowException e) {
+      removedWorkflow = false;
+      logger.error("Unable to remove the event '{}' because removing workflow failed: {}", id,
+              ExceptionUtils.getStackTrace(e));
+    }
+
+    boolean unauthorizedArchive = false;
+    boolean notFoundArchive = false;
+    boolean removedArchive = true;
+    try {
+      OpencastResultSet archiveRes = opencastArchive.find(
+              OpencastQueryBuilder.query().mediaPackageId(id).onlyLastVersion(true),
+              httpMediaPackageElementProvider.getUriRewriter());
+      if (archiveRes.size() > 0) {
+        opencastArchive.delete(id);
+      } else {
+        notFoundArchive = true;
+      }
+    } catch (ArchiveException e) {
+      if (e.isCauseNotAuthorized()) {
+        unauthorizedArchive = true;
+      } else if (e.isCauseNotFound()) {
+        notFoundArchive = true;
+      } else {
+        removedArchive = false;
+        logger.error("Unable to remove the event '{}' from the archive: {}", id, ExceptionUtils.getStackTrace(e));
+      }
+    }
+
+    if (notFoundScheduler && notFoundWorkflow && notFoundArchive)
+      throw new NotFoundException("Event id " + id + " not found.");
+
+    if (unauthorizedScheduler || unauthorizedWorkflow || unauthorizedArchive)
+      throw new UnauthorizedException("Not authorized to remove event id " + id);
+
+    return removedScheduler && removedWorkflow && removedArchive;
+  }
+
+  @Override
+  public void updateWorkflowInstance(WorkflowInstance workflowInstance)
+          throws WorkflowException, UnauthorizedException {
     // Only update the workflow if the instance is in a working state
     if (WorkflowInstance.WorkflowState.FAILED.equals(workflowInstance.getState())
             || WorkflowInstance.WorkflowState.FAILING.equals(workflowInstance.getState())
@@ -660,11 +946,11 @@ public class IndexServiceImpl implements IndexService {
               workflowInstance.getState(), workflowInstance.getMediaPackage().getIdentifier().toString());
       return;
     }
-    getWorkflowService().update(workflowInstance);
+    workflowService.update(workflowInstance);
   }
 
   @Override
-  public Opt<MediaPackage> getEventMediapackage(Event event) throws InternalServerErrorException {
+  public Opt<MediaPackage> getEventMediapackage(Event event) throws WorkflowDatabaseException {
     switch (getEventSource(event)) {
       case WORKFLOW:
         WorkflowInstance currentWorkflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
@@ -674,9 +960,9 @@ public class IndexServiceImpl implements IndexService {
         }
         return Opt.none();
       case ARCHIVE:
-        final OpencastResultSet archiveRes = getOpencastArchive().find(
+        final OpencastResultSet archiveRes = opencastArchive.find(
                 OpencastQueryBuilder.query().mediaPackageId(event.getIdentifier()).onlyLastVersion(true),
-                getHttpMediaPackageElementProvider().getUriRewriter());
+                httpMediaPackageElementProvider.getUriRewriter());
         if (archiveRes.size() > 0) {
           logger.debug("Found event in archive with id {}", event.getIdentifier());
           return Opt.some(archiveRes.getItems().get(0).getMediaPackage());
@@ -685,7 +971,7 @@ public class IndexServiceImpl implements IndexService {
       case SCHEDULE:
         return Opt.none();
       default:
-        throw new InternalServerErrorException("Unknown event type!");
+        throw new IllegalStateException("Unknown event type!");
     }
   }
 
@@ -695,7 +981,7 @@ public class IndexServiceImpl implements IndexService {
    * @param event
    *          the event
    * @return the source type
-   * @throws InternalServerErrorException
+   * @throws IndexServiceException
    *           Thrown if there is an issue getting the workflow for the event.
    */
   @Override
@@ -713,40 +999,21 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public WorkflowInstance getCurrentWorkflowInstance(String mpId) throws InternalServerErrorException {
+  public WorkflowInstance getCurrentWorkflowInstance(String mpId) throws WorkflowDatabaseException {
     WorkflowQuery query = new WorkflowQuery().withMediaPackage(mpId);
-    try {
-      WorkflowSet workflowInstances = getWorkflowService().getWorkflowInstances(query);
-      if (workflowInstances.size() == 0) {
-        logger.info("No workflow instance found for mediapackage {}.", mpId);
-        return null;
-      }
-
-      // Get the newest workflow instance
-      // TODO This presuppose knowledge of the Database implementation and should be fixed sooner or later!
-      WorkflowInstance workflowInstance = workflowInstances.getItems()[0];
-      for (WorkflowInstance instance : workflowInstances.getItems()) {
-        if (instance.getId() > workflowInstance.getId())
-          workflowInstance = instance;
-      }
-      return workflowInstance;
-    } catch (WorkflowDatabaseException e) {
-      throw new InternalServerErrorException("Unable to get the current workflow instance for " + mpId, e);
+    WorkflowSet workflowInstances = workflowService.getWorkflowInstances(query);
+    if (workflowInstances.size() == 0) {
+      logger.info("No workflow instance found for mediapackage {}.", mpId);
+      return null;
     }
-  }
-
-  private MetadataList getMetadatListWithCommonEventCatalogUIAdapter() {
-    MetadataList metadataList = new MetadataList();
-    metadataList.add(eventCatalogUIAdapter, eventCatalogUIAdapter.getRawFields());
-    return metadataList;
-  }
-
-  private MetadataList getMetadatListWithAllEventCatalogUIAdapters() {
-    MetadataList metadataList = new MetadataList();
-    for (EventCatalogUIAdapter catalogUIAdapter : getEventCatalogUIAdapters()) {
-      metadataList.add(catalogUIAdapter, catalogUIAdapter.getRawFields());
+    // Get the newest workflow instance
+    // TODO This presuppose knowledge of the Database implementation and should be fixed sooner or later!
+    WorkflowInstance workflowInstance = workflowInstances.getItems()[0];
+    for (WorkflowInstance instance : workflowInstances.getItems()) {
+      if (instance.getId() > workflowInstance.getId())
+        workflowInstance = instance;
     }
-    return metadataList;
+    return workflowInstance;
   }
 
   private static Function<ManagedAcl, AccessControlList> toAcl = new Function<ManagedAcl, AccessControlList>() {
@@ -766,13 +1033,7 @@ public class IndexServiceImpl implements IndexService {
     }
   };
 
-  private List<EventCatalogUIAdapter> getEventCatalogUIAdapters() {
-    return new ArrayList<EventCatalogUIAdapter>(getEventCatalogUIAdapters(getSecurityService().getOrganization()
-            .getId()));
-  }
-
-  @Override
-  public void updateMediaPackageMetadata(MediaPackage mp, MetadataList metadataList) {
+  private void updateMediaPackageMetadata(MediaPackage mp, MetadataList metadataList) {
     List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
     if (catalogUIAdapters.size() > 0) {
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
@@ -785,8 +1046,48 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public String createSeries(String metadata) throws IllegalArgumentException, InternalServerErrorException,
-          UnauthorizedException {
+  public String createSeries(MetadataList metadataList, Map<String, String> options, Opt<AccessControlList> optAcl,
+          Opt<Long> optThemeId) throws IndexServiceException {
+    DublinCoreCatalog dc = DublinCores.mkOpencast();
+    dc.set(PROPERTY_IDENTIFIER, UUID.randomUUID().toString());
+    dc.set(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(new Date(), Precision.Second));
+    for (Entry<String, String> entry : options.entrySet()) {
+      dc.set(new EName(DublinCores.OC_PROPERTY_NS_URI, entry.getKey()), entry.getValue());
+    }
+
+    Opt<AbstractMetadataCollection> seriesMetadata = metadataList
+            .getMetadataByFlavor(MediaPackageElements.SERIES.toString());
+    if (seriesMetadata.isSome()) {
+      DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata.get());
+    }
+
+    AccessControlList acl;
+    if (optAcl.isSome()) {
+      acl = optAcl.get();
+    } else {
+      acl = new AccessControlList();
+    }
+
+    String seriesId;
+    try {
+      DublinCoreCatalog createdSeries = seriesService.updateSeries(dc);
+      seriesId = createdSeries.getFirst(PROPERTY_IDENTIFIER);
+      seriesService.updateAccessControl(seriesId, acl);
+      for (Long id : optThemeId)
+        seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(id));
+    } catch (Exception e) {
+      logger.error("Unable to create new series: {}", ExceptionUtils.getStackTrace(e));
+      throw new IndexServiceException("Unable to create new series");
+    }
+
+    updateSeriesMetadata(seriesId, metadataList);
+
+    return seriesId;
+  }
+
+  @Override
+  public String createSeries(String metadata)
+          throws IllegalArgumentException, IndexServiceException, UnauthorizedException {
     JSONObject metadataJson = null;
     try {
       metadataJson = (JSONObject) new JSONParser().parse(metadata);
@@ -836,8 +1137,8 @@ public class IndexServiceImpl implements IndexService {
       throw new IllegalArgumentException("Not able to parse the series metadata");
     }
 
-    Opt<AbstractMetadataCollection> seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES
-            .toString());
+    Opt<AbstractMetadataCollection> seriesMetadata = metadataList
+            .getMetadataByFlavor(MediaPackageElements.SERIES.toString());
     if (seriesMetadata.isSome()) {
       DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata.get());
     }
@@ -862,7 +1163,7 @@ public class IndexServiceImpl implements IndexService {
         seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(id));
     } catch (Exception e) {
       logger.error("Unable to create new series: {}", ExceptionUtils.getStackTrace(e));
-      throw new InternalServerErrorException("Unable to create new series");
+      throw new IndexServiceException("Unable to create new series");
     }
 
     updateSeriesMetadata(seriesId, metadataList);
@@ -872,8 +1173,9 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public Opt<Series> getSeries(String seriesId, AbstractSearchIndex searchIndex) throws SearchIndexException {
-    SearchResult<Series> result = searchIndex.getByQuery(new SeriesSearchQuery(securityService.getOrganization()
-            .getId(), securityService.getUser()).withIdentifier(seriesId));
+    SearchResult<Series> result = searchIndex
+            .getByQuery(new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
+                    .withIdentifier(seriesId));
     // If the results list if empty, we return already a response.
     if (result.getPageSize() == 0) {
       logger.debug("Didn't find series with id {}", seriesId);
@@ -883,29 +1185,134 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
+  public void removeSeries(String id) throws NotFoundException, SeriesException, UnauthorizedException {
+    SeriesQuery seriesQuery = new SeriesQuery();
+    seriesQuery.setSeriesId(id);
+    DublinCoreCatalogList dublinCoreCatalogList = seriesService.getSeries(seriesQuery);
+    if (dublinCoreCatalogList.size() == 0) {
+      throw new NotFoundException();
+    }
+    seriesService.deleteSeries(id);
+  }
+
+  @Override
   public MetadataList updateCommonSeriesMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, InternalServerErrorException, NotFoundException, UnauthorizedException {
+          throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException {
     MetadataList metadataList = getMetadataListWithCommonSeriesCatalogUIAdapters();
     return updateSeriesMetadata(id, metadataJSON, index, metadataList);
   }
 
   @Override
   public MetadataList updateAllSeriesMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, InternalServerErrorException, NotFoundException, UnauthorizedException {
+          throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException {
     MetadataList metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
     return updateSeriesMetadata(id, metadataJSON, index, metadataList);
   }
 
+  @Override
+  public void updateCommentCatalog(final Event event, final List<Comment> comments) throws Exception {
+    final Opt<MediaPackage> mpOpt = getEventMediapackage(event);
+    if (mpOpt.isNone())
+      return;
+
+    final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
+            securityService.getUser());
+    executorService.execute(new Runnable() {
+      @Override
+      public void run() {
+        securityContext.runInContext(new Effect0() {
+          @Override
+          protected void run() {
+            try {
+              MediaPackage mediaPackage = mpOpt.get();
+              updateMediaPackageCommentCatalog(mediaPackage, comments);
+              switch (getEventSource(event)) {
+                case WORKFLOW:
+                  logger.info("Update workflow mediapacakge {} with updated comments catalog.", event.getIdentifier());
+                  WorkflowInstance workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
+                  workflowInstance.setMediaPackage(mediaPackage);
+                  updateWorkflowInstance(workflowInstance);
+                  break;
+                case ARCHIVE:
+                  logger.info("Update archive mediapacakge {} with updated comments catalog.", event.getIdentifier());
+                  opencastArchive.add(mediaPackage);
+                  break;
+                default:
+                  logger.error("Unkown event source {}!", event.getSource().toString());
+              }
+            } catch (Exception e) {
+              logger.error("Unable to update event {} comment catalog: {}", event.getIdentifier(),
+                      ExceptionUtils.getStackTrace(e));
+            }
+          }
+        });
+      }
+    });
+  }
+
+  private void updateMediaPackageCommentCatalog(MediaPackage mediaPackage, List<Comment> comments)
+          throws CommentException, IOException {
+    // Get the comments catalog
+    Catalog[] commentCatalogs = mediaPackage.getCatalogs(MediaPackageElements.COMMENTS);
+    Catalog c = null;
+    if (commentCatalogs.length == 1)
+      c = commentCatalogs[0];
+
+    if (comments.size() > 0) {
+      // If no comments catalog found, create a new one
+      if (c == null) {
+        c = (Catalog) MediaPackageElementBuilderFactory.newInstance().newElementBuilder().newElement(Type.Catalog,
+                MediaPackageElements.COMMENTS);
+        c.setIdentifier(UUID.randomUUID().toString());
+        mediaPackage.add(c);
+      }
+
+      // Update comments catalog
+      InputStream in = null;
+      try {
+        String commentCatalog = CommentParser.getAsXml(comments);
+        in = IOUtils.toInputStream(commentCatalog, "UTF-8");
+        URI uri = workspace.put(mediaPackage.getIdentifier().toString(), c.getIdentifier(), "comments.xml", in);
+        c.setURI(uri);
+        // setting the URI to a new source so the checksum will most like be invalid
+        c.setChecksum(null);
+      } finally {
+        IOUtils.closeQuietly(in);
+      }
+    } else {
+      // Remove comments catalog
+      if (c != null) {
+        mediaPackage.remove(c);
+        try {
+          workspace.delete(c.getURI());
+        } catch (NotFoundException e) {
+          logger.warn("Comments catalog {} not found to delete!", c.getURI());
+        }
+      }
+    }
+  }
+
+  @Override
+  public void changeOptOutStatus(String eventId, boolean optout, AbstractSearchIndex index)
+          throws NotFoundException, SchedulerException, SearchIndexException {
+    Opt<Event> optEvent = getEvent(eventId, index);
+    if (optEvent.isNone())
+      throw new NotFoundException("Cannot find an event with id " + eventId);
+
+    schedulerService.updateOptOutStatus(eventId, optout);
+    logger.debug("Setting event {} to opt out status of {}", eventId, optout);
+  }
+
   public MetadataList updateSeriesMetadata(String seriesID, String metadataJSON, AbstractSearchIndex index,
-          MetadataList metadataList) throws IllegalArgumentException, InternalServerErrorException, NotFoundException,
-          UnauthorizedException {
+          MetadataList metadataList)
+                  throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException {
     try {
       Opt<Series> optSeries = getSeries(seriesID, index);
       if (optSeries.isNone())
         throw new NotFoundException("Cannot find a series with id " + seriesID);
     } catch (SearchIndexException e) {
       logger.error("Unable to get a series with id {} because: {}", seriesID, ExceptionUtils.getStackTrace(e));
-      throw new InternalServerErrorException("Cannot use search service to find Series");
+      throw new IndexServiceException("Cannot use search service to find Series");
     }
     try {
       metadataList.fromJSON(metadataJSON);
@@ -924,8 +1331,8 @@ public class IndexServiceImpl implements IndexService {
    */
   private MetadataList getMetadataListWithCommonSeriesCatalogUIAdapters() {
     MetadataList metadataList = new MetadataList();
-    metadataList.add(commonSeriesCatalogUIAdapter.getFlavor(), commonSeriesCatalogUIAdapter.getUITitle(),
-            commonSeriesCatalogUIAdapter.getRawFields());
+    metadataList.add(seriesCatalogUIAdapter.getFlavor(), seriesCatalogUIAdapter.getUITitle(),
+            seriesCatalogUIAdapter.getRawFields());
     return metadataList;
   }
 
@@ -933,10 +1340,26 @@ public class IndexServiceImpl implements IndexService {
    * @return A {@link MetadataList} with all of the available CatalogUIAdapters empty {@link AbstractMetadataCollection}
    *         available
    */
-  private MetadataList getMetadataListWithAllSeriesCatalogUIAdapters() {
+  @Override
+  public MetadataList getMetadataListWithAllSeriesCatalogUIAdapters() {
     MetadataList metadataList = new MetadataList();
-    for (SeriesCatalogUIAdapter adapter : getSeriesCatalogUIAdapters(securityService.getOrganization().getId())) {
+    for (SeriesCatalogUIAdapter adapter : getSeriesCatalogUIAdapters()) {
       metadataList.add(adapter.getFlavor(), adapter.getUITitle(), adapter.getRawFields());
+    }
+    return metadataList;
+  }
+
+  private MetadataList getMetadataListWithCommonEventCatalogUIAdapter() {
+    MetadataList metadataList = new MetadataList();
+    metadataList.add(eventCatalogUIAdapter, eventCatalogUIAdapter.getRawFields());
+    return metadataList;
+  }
+
+  @Override
+  public MetadataList getMetadataListWithAllEventCatalogUIAdapters() {
+    MetadataList metadataList = new MetadataList();
+    for (EventCatalogUIAdapter catalogUIAdapter : getEventCatalogUIAdapters()) {
+      metadataList.add(catalogUIAdapter, catalogUIAdapter.getRawFields());
     }
     return metadataList;
   }

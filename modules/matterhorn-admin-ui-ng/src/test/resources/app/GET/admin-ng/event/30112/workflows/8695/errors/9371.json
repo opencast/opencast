@@ -1,0 +1,16 @@
+{
+  "id": 9371,
+  "job_id": 200,
+  "service_type": "org.opencastproject.ingest",
+  "processing_host": "ingest00",
+  "timestamp": "2014-10-24T16:35:45+02:00",
+  "severity": "FAILURE",
+  "title": "Error message 9371",
+  "description": "A NullPointerException occurred somewhere.",
+  "details": [
+    {
+      "name": "NullPointerException",
+      "value": "Error: [$resource:badcfg] object\nhttp://errors.angularjs.org/1.2.13/$resource/badcfg?p0=array\n  at /Users/mh/modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/angular-resource.min.js:9\n  at /Users/mh/modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/angular.js:11033\n  at /Users/mh/modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/angular.js:11033\n  at /Users/mh/modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/angular.js:11119\n  at /Users/mh/modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/angular.js:12045\n  at /Users/mh/modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/angular.js:11871\n  at /Users/mh/modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/angular.js:12151\n  at done (/Users/mh/modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/angular.js:7909)\n  at handleResponse (/Users/mh/modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/angular-mocks.js:1131)\n  at /Users/mh/modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/angular-mocks.js:1462\n  at /Users/mh/modules/matterhorn-admin-ui-ng/src/test/resources/test/unit/shared/resources/eventErrorsResourceSpec.js:16"
+    }
+  ]
+}

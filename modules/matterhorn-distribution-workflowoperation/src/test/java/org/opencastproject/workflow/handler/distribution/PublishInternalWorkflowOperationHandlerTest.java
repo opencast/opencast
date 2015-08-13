@@ -22,10 +22,10 @@
 package org.opencastproject.workflow.handler.distribution;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.opencastproject.workflow.handler.distribution.PublishInternalWorkflowOperationHandler.CHANNEL_ID;
-import static org.opencastproject.workflow.handler.distribution.PublishInternalWorkflowOperationHandler.SOURCE_FLAVORS;
-import static org.opencastproject.workflow.handler.distribution.PublishInternalWorkflowOperationHandler.SOURCE_TAGS;
+import static org.opencastproject.workflow.handler.distribution.ConfigurablePublishWorkflowOperationHandler.CHANNEL_ID_KEY;
+import static org.opencastproject.workflow.handler.distribution.ConfigurablePublishWorkflowOperationHandler.SOURCE_FLAVORS;
+import static org.opencastproject.workflow.handler.distribution.ConfigurablePublishWorkflowOperationHandler.SOURCE_TAGS;
+import static org.opencastproject.workflow.handler.distribution.InternalPublicationChannel.CHANNEL_ID;
 
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
@@ -36,6 +36,8 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Publication;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 
@@ -65,7 +67,7 @@ public class PublishInternalWorkflowOperationHandlerTest {
   public void testStart() throws Exception {
 
     // Override the waitForStatus method to not block the jobs
-    PublishInternalWorkflowOperationHandler woh = new PublishInternalWorkflowOperationHandler() {
+    ConfigurablePublishWorkflowOperationHandler woh = new ConfigurablePublishWorkflowOperationHandler() {
       @Override
       protected Result waitForStatus(long timeout, Job... jobs) {
         HashMap<Job, Status> map = Stream.mk(jobs).foldl(new HashMap<Job, Status>(),
@@ -87,7 +89,8 @@ public class PublishInternalWorkflowOperationHandlerTest {
 
     WorkflowOperationInstance woi = EasyMock.createNiceMock(WorkflowOperationInstance.class);
     EasyMock.expect(woi.getConfiguration(SOURCE_FLAVORS)).andStubReturn("*/preview");
-    EasyMock.expect(woi.getConfiguration(SOURCE_TAGS)).andStubReturn("internal");
+    EasyMock.expect(woi.getConfiguration(SOURCE_TAGS)).andStubReturn(CHANNEL_ID);
+    EasyMock.expect(woi.getConfiguration(CHANNEL_ID_KEY)).andStubReturn(CHANNEL_ID);
     EasyMock.replay(woi);
 
     WorkflowInstance wi = EasyMock.createNiceMock(WorkflowInstance.class);
@@ -122,27 +125,26 @@ public class PublishInternalWorkflowOperationHandlerTest {
 
     woh.setDownloadDistributionService(distribution);
 
+    Organization org = EasyMock.createNiceMock(Organization.class);
+    EasyMock.expect(org.getProperties()).andStubReturn(new HashMap<String, String>());
+    EasyMock.replay(org);
+
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andStubReturn(org);
+    EasyMock.replay(securityService);
+
+    woh.setSecurityService(securityService);
+
     MediaPackage result = woh.start(wi, null).getMediaPackage();
     Publication[] publications = result.getPublications();
-    assertEquals(2, publications.length);
-
-    for (Publication pub : publications) {
-      // general assertions
-      assertEquals(CHANNEL_ID, pub.getChannel());
-
-      switch (pub.getURI().toString()) {
-        case TRACK1_DISTRIBUTION_URI:
-          assertEquals("presentation/preview", pub.getFlavor().toString());
-          break;
-        case WAVEFORM_DISTRIBUTION_URI:
-          assertEquals("image/waveform", pub.getFlavor().toString());
-          break;
-        default:
-          fail("Found unexpected publication: " + pub);
-          break;
-      }
-    }
-
+    assertEquals(1, publications.length);
+    assertEquals(CHANNEL_ID, publications[0].getChannel());
+    assertEquals(1, publications[0].getAttachments().length);
+    assertEquals(WAVEFORM_DISTRIBUTION_URI, publications[0].getAttachments()[0].getURI().toString());
+    assertEquals("image/waveform", publications[0].getAttachments()[0].getFlavor().toString());
+    assertEquals(1, publications[0].getTracks().length);
+    assertEquals(TRACK1_DISTRIBUTION_URI, publications[0].getTracks()[0].getURI().toString());
+    assertEquals("presentation/preview", publications[0].getTracks()[0].getFlavor().toString());
   }
 
 }

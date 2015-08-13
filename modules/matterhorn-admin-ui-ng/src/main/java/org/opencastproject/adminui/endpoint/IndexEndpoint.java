@@ -85,7 +85,7 @@ public class IndexEndpoint {
   @POST
   @Path("recreateIndex")
   @RestQuery(name = "recreateIndex", description = "Repopulates the Admin UI Index directly from the Services", returnDescription = "OK if repopulation has started", reponses = { @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
-  public Response getCatalogAdapters() {
+  public Response recreateIndex() {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
             securityService.getUser());
     executor.execute(new Runnable() {

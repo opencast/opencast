@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.index.service.exception.InternalServerErrorException;
+import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
@@ -54,8 +54,10 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -66,6 +68,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
 import org.junit.Test;
+import org.osgi.service.component.ComponentException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,6 +76,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Map;
+import java.util.Properties;
 
 public class IndexServiceImplTest {
 
@@ -88,11 +92,8 @@ public class IndexServiceImplTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNullMetadataExpectsIllegalArgumentException() throws IllegalArgumentException,
-          InternalServerErrorException, ConfigurationException, MediaPackageException, HandleException, IOException,
+          IndexServiceException, ConfigurationException, MediaPackageException, HandleException, IOException,
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
-    String testResourceLocation = "/events/create-event.json";
-    String metadataJson = IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation));
-
     MediaPackage mediapackage = EasyMock.createMock(MediaPackage.class);
     EasyMock.replay(mediapackage);
 
@@ -107,7 +108,7 @@ public class IndexServiceImplTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputEmptyJsonExpectsIllegalArgumentException() throws IllegalArgumentException,
-          InternalServerErrorException, ConfigurationException, MediaPackageException, HandleException, IOException,
+          IndexServiceException, ConfigurationException, MediaPackageException, HandleException, IOException,
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
           org.json.simple.parser.ParseException {
     JSONObject metadataJson = (JSONObject) parser.parse("{}");
@@ -126,7 +127,7 @@ public class IndexServiceImplTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNoSourceExpectsIllegalArgumentException() throws IllegalArgumentException,
-          InternalServerErrorException, ConfigurationException, MediaPackageException, HandleException, IOException,
+          IndexServiceException, ConfigurationException, MediaPackageException, HandleException, IOException,
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
           org.json.simple.parser.ParseException {
     String testResourceLocation = "/events/create-event-no-source.json";
@@ -147,7 +148,7 @@ public class IndexServiceImplTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNoProcessingExpectsIllegalArgumentException() throws IllegalArgumentException,
-          InternalServerErrorException, ConfigurationException, MediaPackageException, HandleException, IOException,
+          IndexServiceException, ConfigurationException, MediaPackageException, HandleException, IOException,
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
           org.json.simple.parser.ParseException {
     String testResourceLocation = "/events/create-event-no-processing.json";
@@ -168,7 +169,7 @@ public class IndexServiceImplTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNoWorkflowExpectsIllegalArgumentException() throws IllegalArgumentException,
-          InternalServerErrorException, ConfigurationException, MediaPackageException, HandleException, IOException,
+          IndexServiceException, ConfigurationException, MediaPackageException, HandleException, IOException,
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
           org.json.simple.parser.ParseException {
     String testResourceLocation = "/events/create-event-no-workflow.json";
@@ -189,7 +190,7 @@ public class IndexServiceImplTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNoMetadataExpectsIllegalArgumentException() throws IllegalArgumentException,
-          InternalServerErrorException, ConfigurationException, MediaPackageException, HandleException, IOException,
+          IndexServiceException, ConfigurationException, MediaPackageException, HandleException, IOException,
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
           org.json.simple.parser.ParseException {
     String testResourceLocation = "/events/create-event-no-metadata.json";
@@ -209,13 +210,13 @@ public class IndexServiceImplTest {
   }
 
   @Test
-  public void testCreateEventInputNormalExpectsCreatedEvent() throws IllegalArgumentException,
-          InternalServerErrorException, ConfigurationException, MediaPackageException, HandleException, IOException,
-          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
-          org.json.simple.parser.ParseException, URISyntaxException {
+  public void testCreateEventInputNormalExpectsCreatedEvent() throws IllegalArgumentException, IndexServiceException,
+          ConfigurationException, MediaPackageException, HandleException, IOException, IngestException, ParseException,
+          NotFoundException, SchedulerException, UnauthorizedException, org.json.simple.parser.ParseException,
+          URISyntaxException, org.osgi.service.cm.ConfigurationException {
     String expectedTitle = "Test Event Creation";
     String username = "akm220";
-    String org = "org1";
+    String org = "mh_default_org";
     String[] creators = new String[] {};
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-event.json";
@@ -250,8 +251,19 @@ public class IndexServiceImplTest {
 
     // Create Common Event Catalog UI Adapter
     CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter();
-    commonEventCatalogUIAdapter.activate();
-    commonEventCatalogUIAdapter.setSecurityService(securityService);
+
+    Properties episodeCatalogProperties = new Properties();
+    InputStream in = null;
+    try {
+      in = getClass().getResourceAsStream("/episode-catalog.properties");
+      episodeCatalogProperties.load(in);
+    } catch (IOException e) {
+      throw new ComponentException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
+    }
+
+    commonEventCatalogUIAdapter.updated(episodeCatalogProperties);
     commonEventCatalogUIAdapter.setWorkspace(workspace);
 
     // Setup mediapackage.
@@ -322,7 +334,8 @@ public class IndexServiceImplTest {
 
   @Test(expected = NotFoundException.class)
   public void testUpdateEventInputNoEventExpectsNotFound() throws IOException, IllegalArgumentException,
-          InternalServerErrorException, NotFoundException, UnauthorizedException, SearchIndexException {
+          IndexServiceException, NotFoundException, UnauthorizedException, SearchIndexException,
+          WorkflowDatabaseException {
     String org = "org1";
     String testResourceLocation = "/events/update-event.json";
     String eventId = "event-1";
@@ -351,13 +364,13 @@ public class IndexServiceImplTest {
     EasyMock.expect(securityService.getUser()).andReturn(user);
     EasyMock.replay(securityService);
 
-    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
-    indexServiceImpl.setSecurityService(securityService);
-    indexServiceImpl.updateAllEventMetadata(eventId, metadataJson, abstractIndex);
+    IndexServiceImpl indexService = new IndexServiceImpl();
+    indexService.setSecurityService(securityService);
+    indexService.updateAllEventMetadata(eventId, metadataJson, abstractIndex);
   }
 
-  public void testUpdateEvent() throws IOException, IllegalArgumentException, InternalServerErrorException,
-          NotFoundException, UnauthorizedException, SearchIndexException {
+  public void testUpdateEvent() throws IOException, IllegalArgumentException, IndexServiceException, NotFoundException,
+          UnauthorizedException, SearchIndexException, WorkflowDatabaseException {
     String org = "org1";
     String testResourceLocation = "/events/update-event.json";
     String eventId = "event-1";

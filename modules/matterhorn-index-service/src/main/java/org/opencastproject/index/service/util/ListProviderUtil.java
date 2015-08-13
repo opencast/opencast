@@ -30,8 +30,10 @@ import org.json.simple.JSONAware;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 public final class ListProviderUtil {
@@ -48,15 +50,15 @@ public final class ListProviderUtil {
    *          If the sorting should be done ascendantly (true) or not
    * @return a sorted map
    */
-  public static Map<String, Object> sortMapByValue(Map<String, Object> map, boolean asc) {
-    TreeMap<String, Object> treeMap = new TreeMap<String, Object>(new ValueComparer(map, asc));
+  public static Map<String, String> sortMapByValue(Map<String, String> map, boolean asc) {
+    TreeMap<String, String> treeMap = new TreeMap<String, String>(new ValueComparer(map, asc));
     treeMap.putAll(map);
     return treeMap;
   }
 
   /** inner class to sort the map **/
   private static class ValueComparer implements Comparator<String> {
-    private Map<String, Object> baseMap = null;
+    private Map<String, String> baseMap = null;
     private boolean ascending = true;
 
     /**
@@ -67,7 +69,7 @@ public final class ListProviderUtil {
      * @param ascending
      *          If the sorting should be done ascendantly (true) or not
      */
-    public ValueComparer(Map<String, Object> data, boolean ascending) {
+    public ValueComparer(Map<String, String> data, boolean ascending) {
       super();
       this.baseMap = data;
       this.ascending = ascending;
@@ -94,13 +96,13 @@ public final class ListProviderUtil {
    *          The query
    * @return the filtered map
    */
-  public static Map<String, Object> filterMap(Map<String, Object> map, ResourceListQuery query) {
+  public static Map<String, String> filterMap(Map<String, String> map, ResourceListQuery query) {
     if (noActionRequired(query))
       return map;
 
     int limit = query.getLimit().getOrElse(0);
     int offset = query.getOffset().getOrElse(0);
-    SmartIterator<Object> si = new SmartIterator<Object>(limit, offset);
+    SmartIterator<String> si = new SmartIterator<String>(limit, offset);
     return si.applyLimitAndOffset(map);
   }
 
@@ -132,6 +134,22 @@ public final class ListProviderUtil {
         outputList.addAll(Arrays.asList(item.split(",")));
     }
     return outputList;
+  }
+
+  /**
+   * Invert the key & value in the given map
+   *
+   * @param map
+   *          the map to invert
+   * @return an inverted map
+   */
+  public static Map<String, String> invertMap(Map<String, String> map) {
+    Map<String, String> inv = new HashMap<String, String>();
+
+    for (Entry<String, String> entry : map.entrySet())
+      inv.put(entry.getValue(), entry.getKey());
+
+    return inv;
   }
 
 }

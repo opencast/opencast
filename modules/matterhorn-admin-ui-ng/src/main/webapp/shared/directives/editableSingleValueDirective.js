@@ -20,7 +20,7 @@
    </doc:example>
  */
 angular.module('adminNg.directives')
-.directive('adminNgEditableSingleValue', ['$timeout', function ($timeout) {
+.directive('adminNgEditableSingleValue', ['$timeout', 'JsHelper', function ($timeout, JsHelper) {
     return {
         restrict: 'A',
         templateUrl: 'shared/partials/editableSingleValue.html',
@@ -30,6 +30,41 @@ angular.module('adminNg.directives')
             save:       '='
         },
         link: function (scope, element) {
+                // Parse the given time string (HH:mm) to separate the minutes / hours 
+            var parseTime = function (dateStr) {
+                    var date = JsHelper.parseUTCTimeString(dateStr);
+                    if (angular.isDate(date)) {
+                        scope.params.hours = date.getHours();
+                        scope.params.minutes = date.getMinutes();
+                    }
+                },
+                // Check if the given value has two digits otherwise add a 0
+                ensureTwoDigits = function (intValue) {
+                    return (intValue < 10 ? '0' : '') + intValue;
+                },
+                // Format the value to be presented as string
+                present = function (params) {
+                    switch (params.type) {
+                        case 'time': 
+                            if (angular.isUndefined(params.hours)) {
+                                parseTime(params.value);
+                            }
+                            return ensureTwoDigits(params.hours) + ':' + ensureTwoDigits(params.minutes);
+                        default:
+                            return params.value;
+                    }
+                };
+
+            scope.editMode = false;
+            
+            if (scope.params.type === 'time') {
+                scope.hours = JsHelper.initArray(24);
+                scope.minutes = JsHelper.initArray(60);
+                parseTime(scope.params.value);
+            }
+
+            scope.presentableValue = present(scope.params);
+
             scope.enterEditMode = function () {
                 // Store the original value for later comparision or undo
                 if (!angular.isDefined(scope.original)) {
@@ -50,6 +85,9 @@ angular.module('adminNg.directives')
                 } else if (event.keyCode === 27) {
                     // Restore original value on ESC
                     scope.params.value = scope.original;
+                    if (scope.params.type === 'time') {
+                        parseTime(scope.params.value);
+                    }
                     scope.editMode = false;
                     // Prevent the modal from closing.
                     event.stopPropagation();
@@ -57,13 +95,24 @@ angular.module('adminNg.directives')
             };
 
             scope.submit = function () {
+                if (scope.params.type === 'time') {
+                    var newDate = new Date(0);
+                    newDate.setHours(scope.params.hours, scope.params.minutes);
+                    scope.params.value = ensureTwoDigits(newDate.getUTCHours()) + ':' +
+                                         ensureTwoDigits(newDate.getUTCMinutes());
+                }
+
                 // Prevent submission if value has not changed.
                 if (scope.params.value === scope.original) { return; }
 
+                scope.presentableValue = present(scope.params);
                 scope.editMode = false;
 
                 scope.save(scope.params.id, function () {
                     scope.original = scope.params.value;
+                    if (scope.params.type === 'time') {
+                        parseTime(scope.params.value);
+                    }
                 });
             };
 

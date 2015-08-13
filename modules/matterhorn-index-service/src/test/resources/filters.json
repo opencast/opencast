@@ -1,12 +1,12 @@
 {
     "contributors": {
         "label": "FILTERS.SERIES.CONTRIBUTORS.LABEL",
-        "type": "select",
         "options": {
-            "contributor1": "My first contributor",
-            "contributor2": "My second contributor",
-            "contributor3": "My third contributor"
-        }
+            "My first contributor": "contributor1",
+            "My second contributor": "contributor2",
+            "My third contributor": "contributor3"
+        },
+        "type": "select"
     },
     "textFilter": {
         "label": "FREETEXT.LABEL",

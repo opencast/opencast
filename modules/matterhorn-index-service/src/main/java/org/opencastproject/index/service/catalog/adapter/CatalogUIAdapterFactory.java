@@ -23,15 +23,20 @@ package org.opencastproject.index.service.catalog.adapter;
 
 import static java.lang.String.format;
 import static org.opencastproject.util.OsgiUtil.getCfg;
+import static org.opencastproject.util.OsgiUtil.getOptCfg;
 
-import com.entwinemedia.fn.Prelude;
+import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEventDCCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
+import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.ConfigurableSeriesDCCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.SeriesCatalogUIAdapter;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.entwinemedia.fn.Prelude;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -59,6 +64,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
   public static final String CONF_ORGANIZATION_KEY = "organization";
   public static final String CONF_FLAVOR_KEY = "flavor";
   public static final String CONF_TITLE_KEY = "title";
+  public static final String CONF_COMMON_METADATA_KEY = "common-metadata";
 
   private static final String CATALOG_TYPE_EVENTS = "events";
   private static final String CATALOG_TYPE_SERIES = "series";
@@ -98,6 +104,8 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
   @Override
   public void updated(String pid, @SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     final String type = getCfg(properties, CONF_TYPE_KEY);
+    Option<String> optCommonMetadata = getOptCfg(properties, CONF_COMMON_METADATA_KEY);
+    final boolean isCommonMetadata = optCommonMetadata.isSome() ? Boolean.parseBoolean(optCommonMetadata.get()) : false;
 
     // Check for valid configuration values
     if (!(CATALOG_TYPE_EVENTS.equalsIgnoreCase(type) || CATALOG_TYPE_SERIES.equalsIgnoreCase(type))) {
@@ -111,16 +119,29 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
           ServiceRegistration serviceRegistration = adapterServiceRegistrations.get(pid);
           ConfigurableEventDCCatalogUIAdapter adapter = (ConfigurableEventDCCatalogUIAdapter) bundleContext
                   .getService(serviceRegistration.getReference());
-
           adapter.updated(properties);
         } else {
-          ConfigurableEventDCCatalogUIAdapter adapter = new ConfigurableEventDCCatalogUIAdapter();
+          ConfigurableEventDCCatalogUIAdapter adapter;
+          String[] adapterClassesNames;
+          if (isCommonMetadata) {
+            if (bundleContext.getServiceReference(CommonEventCatalogUIAdapter.class.getName()) != null)
+              throw new ConfigurationException(CONF_COMMON_METADATA_KEY, format(
+                      "Only one common metadata catalog adapter is allowed for the type '%s'", CATALOG_TYPE_EVENTS));
+
+            adapter = new CommonEventCatalogUIAdapter();
+            adapterClassesNames = new String[] { CommonEventCatalogUIAdapter.class.getName(),
+                    EventCatalogUIAdapter.class.getName() };
+          } else {
+            adapter = new ConfigurableEventDCCatalogUIAdapter();
+            adapterClassesNames = new String[] { EventCatalogUIAdapter.class.getName() };
+          }
+
           adapter.setListProvidersService(listProvidersService);
           adapter.setWorkspace(workspace);
           adapter.updated(properties);
 
-          ServiceRegistration configurationRegistration = bundleContext.registerService(
-                  EventCatalogUIAdapter.class.getName(), adapter, null);
+          ServiceRegistration configurationRegistration = bundleContext.registerService(adapterClassesNames, adapter,
+                  null);
           adapterServiceRegistrations.put(pid, configurationRegistration);
         }
         break;
@@ -132,13 +153,26 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
                   .getService(serviceRegistration.getReference());
           adapter.updated(properties);
         } else {
-          ConfigurableSeriesDCCatalogUIAdapter adapter = new ConfigurableSeriesDCCatalogUIAdapter();
+          ConfigurableSeriesDCCatalogUIAdapter adapter;
+          String[] adapterClassesNames;
+          if (isCommonMetadata) {
+            if (bundleContext.getServiceReference(CommonSeriesCatalogUIAdapter.class.getName()) != null)
+              throw new ConfigurationException(CONF_COMMON_METADATA_KEY, format(
+                      "Only one common metadata catalog adapter is allowed for the type '%s'", CATALOG_TYPE_SERIES));
+
+            adapter = new CommonSeriesCatalogUIAdapter();
+            adapterClassesNames = new String[] { CommonSeriesCatalogUIAdapter.class.getName(),
+                    SeriesCatalogUIAdapter.class.getName() };
+          } else {
+            adapter = new ConfigurableSeriesDCCatalogUIAdapter();
+            adapterClassesNames = new String[] { SeriesCatalogUIAdapter.class.getName() };
+          }
           adapter.setListProvidersService(listProvidersService);
           adapter.setSeriesService(seriesService);
           adapter.updated(properties);
 
-          ServiceRegistration adapterServiceRegistration = bundleContext.registerService(
-                  SeriesCatalogUIAdapter.class.getName(), adapter, null);
+          ServiceRegistration adapterServiceRegistration = bundleContext.registerService(adapterClassesNames, adapter,
+                  null);
           adapterServiceRegistrations.put(pid, adapterServiceRegistration);
         }
         break;
