@@ -287,7 +287,7 @@ public class ServiceRegistryEndpoint {
 
   @GET
   @Path("health")
-  @RestQuery(name = "health", description = "Checks the status of the registred services", returnDescription = "Returns NO_CONTENT if services are in a proper state", restParameters = {
+  @RestQuery(name = "health", description = "Checks the status of the registered services", returnDescription = "Returns NO_CONTENT if services are in a proper state", restParameters = {
           @RestParameter(name = "serviceType", isRequired = false, type = Type.STRING, description = "The service type identifier"),
           @RestParameter(name = "host", isRequired = false, type = Type.STRING, description = "The host, including the http(s) protocol") }, reponses = {
           @RestResponse(responseCode = SC_NO_CONTENT, description = "Every service is in a proper state."),
