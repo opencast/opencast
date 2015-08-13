@@ -58,10 +58,8 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -201,18 +199,7 @@ public class ToolsEndpoint implements ManagedService {
   @SuppressWarnings("rawtypes")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
-            .map(com.entwinemedia.fn.fns.Strings.toLongF);
-    if (expiration.isSome()) {
-      expireSeconds = expiration.get();
-      logger.info("The property {} has been configured to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
-    } else {
-      expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
-      logger.info(
-              "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
-    }
+
   }
 
   @GET
