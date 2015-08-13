@@ -87,6 +87,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
 
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
   private long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+  private Boolean signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
 
   @Override
   public AdminUIConfiguration getAdminUIConfiguration() {
@@ -335,11 +336,32 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
               "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
               URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
     }
+
+    Opt<Boolean> useClientIP = OsgiUtil.getOptCfg(properties, URL_SIGNING_USE_CLIENT_IP).toOpt()
+            .map(com.entwinemedia.fn.fns.Booleans.parseBoolean);
+    if (useClientIP.isSome()) {
+      signWithClientIP = useClientIP.get();
+      if (signWithClientIP) {
+        logger.info("The property {} has been configured to sign urls with the client IP.", URL_SIGNING_USE_CLIENT_IP);
+      } else {
+        logger.info("The property {} has been configured to not sign urls with the client IP.",
+                URL_SIGNING_USE_CLIENT_IP);
+      }
+    } else {
+      signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
+      logger.info("The property {} has not been configured, so the default of signing urls with the client ip is {}.",
+              URL_SIGNING_USE_CLIENT_IP, signWithClientIP);
+    }
   }
 
   @Override
   public long getUrlSigningExpireDuration() {
    return expireSeconds;
+  }
+
+  @Override
+  public Boolean signWithClientIP() {
+   return signWithClientIP;
   }
 
 }

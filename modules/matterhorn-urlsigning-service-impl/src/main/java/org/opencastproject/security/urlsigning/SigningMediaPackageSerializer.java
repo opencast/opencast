@@ -21,6 +21,7 @@
 package org.opencastproject.security.urlsigning;
 
 import org.opencastproject.mediapackage.MediaPackageSerializer;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.util.Log;
@@ -44,8 +45,13 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
+  protected static final String URL_SIGNING_USE_CLIENT_IP = "url.signing.use.client.ip";
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SigningMediaPackageSerializer.class);
+
+  /** Security service to use for the client's IP address */
+  private SecurityService securityService;
 
   /** URL Signing Service for Securing Content. */
   private UrlSigningService urlSigningService;
@@ -55,6 +61,10 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
 
   private long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
+  protected static final Boolean DEFAULT_SIGN_WITH_CLIENT_IP = false;
+
+  private Boolean signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
+
   /** Signing of the URL should probably be something of the last things to do */
   public static final int RANKING = -1000;
 
@@ -62,6 +72,11 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
    * Creates a new and unconfigured package serializer that will not be able to perform any redirecting.
    */
   public SigningMediaPackageSerializer() {
+  }
+
+  /** OSGi DI */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /** OSGi callback for UrlSigningService */
@@ -84,6 +99,22 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
       logger.info(
               "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
               URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+    }
+
+    Opt<Boolean> useClientIP = OsgiUtil.getOptCfg(properties, URL_SIGNING_USE_CLIENT_IP).toOpt()
+            .map(com.entwinemedia.fn.fns.Booleans.parseBoolean);
+    if (useClientIP.isSome()) {
+      signWithClientIP = useClientIP.get();
+      if (signWithClientIP) {
+        logger.info("The property {} has been configured to sign urls with the client IP.", URL_SIGNING_USE_CLIENT_IP);
+      } else {
+        logger.info("The property {} has been configured to not sign urls with the client IP.",
+                URL_SIGNING_USE_CLIENT_IP);
+      }
+    } else {
+      signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
+      logger.info("The property {} has not been configured, so the default of signing urls with the client ip is {}.",
+              URL_SIGNING_USE_CLIENT_IP, signWithClientIP);
     }
   }
 
@@ -135,7 +166,11 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
     String path = uri.toString();
     if (urlSigningService != null && urlSigningService.accepts(path)) {
       try {
-        path = urlSigningService.sign(path, expireSeconds, null, null);
+        String clientIP = null;
+        if (signWithClientIP) {
+          clientIP = securityService.getUserIP();
+        }
+        path = urlSigningService.sign(path, expireSeconds, null, clientIP);
       } catch (UrlSigningException e) {
         logger.debug("Unable to sign url '" + path + "' so not adding a signed query string.");
       }

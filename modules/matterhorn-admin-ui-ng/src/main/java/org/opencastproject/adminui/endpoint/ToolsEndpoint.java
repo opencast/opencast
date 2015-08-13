@@ -53,6 +53,7 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.smil.api.SmilException;
@@ -127,6 +128,8 @@ public class ToolsEndpoint implements ManagedService {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
+  protected static final String URL_SIGNING_USE_CLIENT_IP = "url.signing.use.client.ip";
+
   /** The default file name for generated Smil catalogs. */
   private static final String TARGET_FILE_NAME = "cut.smil";
 
@@ -153,6 +156,10 @@ public class ToolsEndpoint implements ManagedService {
 
   private long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
+  protected static final Boolean DEFAULT_SIGN_WITH_CLIENT_IP = false;
+
+  private Boolean signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
+
   /** A parser for handling JSON documents inside the body of a request. **/
   private final JSONParser parser = new JSONParser();
 
@@ -162,6 +169,7 @@ public class ToolsEndpoint implements ManagedService {
   private Archive<?> archive;
   private HttpMediaPackageElementProvider mpElementProvider;
   private IndexService index;
+  private SecurityService securityService;
   private SmilService smilService;
   private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
@@ -190,6 +198,11 @@ public class ToolsEndpoint implements ManagedService {
   /** OSGi DI */
   void setIndexService(IndexService index) {
     this.index = index;
+  }
+
+  /** OSGi DI */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /** OSGi DI */
@@ -228,6 +241,23 @@ public class ToolsEndpoint implements ManagedService {
               "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
               URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
     }
+
+    Opt<Boolean> useClientIP = OsgiUtil.getOptCfg(properties, URL_SIGNING_USE_CLIENT_IP).toOpt()
+            .map(com.entwinemedia.fn.fns.Booleans.parseBoolean);
+    if (useClientIP.isSome()) {
+      signWithClientIP = useClientIP.get();
+      if (signWithClientIP) {
+        logger.info("The property {} has been configured to sign urls with the client IP.", URL_SIGNING_USE_CLIENT_IP);
+      } else {
+        logger.info("The property {} has been configured to not sign urls with the client IP.",
+                URL_SIGNING_USE_CLIENT_IP);
+      }
+    } else {
+      signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
+      logger.info("The property {} has not been configured, so the default of signing urls with the client ip is {}.",
+              URL_SIGNING_USE_CLIENT_IP, signWithClientIP);
+    }
+
   }
 
   @GET
@@ -271,7 +301,11 @@ public class ToolsEndpoint implements ManagedService {
           String publicationUri;
           if (urlSigningService.accepts(pub.getURI().toString())) {
             try {
-              publicationUri = urlSigningService.sign(pub.getURI().toString(), expireSeconds, null, null);
+              String clientIP = null;
+              if (signWithClientIP) {
+                clientIP = securityService.getUserIP();
+              }
+              publicationUri = urlSigningService.sign(pub.getURI().toString(), expireSeconds, null, clientIP);
             } catch (UrlSigningException e) {
               logger.error("Error while trying to sign the preview urls because: {}", ExceptionUtils.getStackTrace(e));
               throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);

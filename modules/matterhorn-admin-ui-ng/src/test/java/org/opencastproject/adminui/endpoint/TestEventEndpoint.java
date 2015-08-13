@@ -996,4 +996,9 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     return env.getUrlSigningService();
   }
 
+  @Override
+  public Boolean signWithClientIP() {
+    return false;
+  }
+
 }

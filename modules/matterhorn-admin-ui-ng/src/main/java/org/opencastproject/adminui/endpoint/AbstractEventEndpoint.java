@@ -239,8 +239,12 @@ public abstract class AbstractEventEndpoint {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
+  protected static final String URL_SIGNING_USE_CLIENT_IP = "url.signing.use.client.ip";
+
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
+
+  protected static final Boolean DEFAULT_SIGN_WITH_CLIENT_IP = false;
 
   public abstract WorkflowService getWorkflowService();
 
@@ -288,6 +292,8 @@ public abstract class AbstractEventEndpoint {
   public abstract long getUrlSigningExpireDuration();
 
   public abstract UrlSigningService getUrlSigningService();
+
+  public abstract Boolean signWithClientIP();
 
   /** Default server URL */
   protected String serverUrl = "http://localhost:8080";
@@ -2177,7 +2183,11 @@ public abstract class AbstractEventEndpoint {
   private URI signUrl(URI url) {
     if (getUrlSigningService().accepts(url.toString())) {
       try {
-        return URI.create(getUrlSigningService().sign(url.toString(), getUrlSigningExpireDuration(), null, null));
+        String clientIP = null;
+        if (signWithClientIP()) {
+          clientIP = getSecurityService().getUserIP();
+        }
+        return URI.create(getUrlSigningService().sign(url.toString(), getUrlSigningExpireDuration(), null, clientIP));
       } catch (UrlSigningException e) {
         logger.warn("Unable to sign url '{}': {}", url, ExceptionUtils.getStackTrace(e));
       }
