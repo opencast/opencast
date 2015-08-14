@@ -39,7 +39,7 @@ Both Signing Providers follow the same configuration structure and support multi
 Each configuration block consists of the following items:
 
 * **Key ID:** Key Identifier, e.g. ‘demoKeyOne’
-* **Key secret:** Key value, e.g. ‘25DA2BA549CB62EF297977845259A’. The key-length is not predefined, but a key length of at least 256 bit is recommended.
+* **Key secret:** Key value, e.g. ‘25DA2BA549CB62EF297977845259A’. The key-length is not predefined, but a key length of at least 128 bit is recommended. Any larger value will not increase security of the underlying algorithm.
 * **URL prefix:** The URL Signing Provider will only sign URLs that start with this value. This allows to support multiple distributions and different key pairs.
 
 A typical configuration looks like this:
