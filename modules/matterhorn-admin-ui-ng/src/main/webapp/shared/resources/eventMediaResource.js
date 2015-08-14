@@ -9,7 +9,7 @@ angular.module('adminNg.resources')
             for(var i = 0; i < media.length; i++){
                 var item = media[i];
                 var url = item.url;
-                item.mediaFileName = url.substring(url.lastIndexOf('/')+1);
+                item.mediaFileName = url.substring(url.lastIndexOf('/')+1).split('?')[0];
             }
 
         } catch (e) { }
