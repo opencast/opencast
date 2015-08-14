@@ -20,11 +20,7 @@
  */
 package org.opencastproject.security.urlsigning.utils;
 
-import org.opencastproject.util.Log;
-import org.opencastproject.util.OsgiUtil;
-
-import com.entwinemedia.fn.data.Opt;
-
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,21 +77,27 @@ public final class UrlSigningServiceOsgiUtil {
   public static long getUpdatedSigningExpiration(@SuppressWarnings("rawtypes") Dictionary properties, String className,
           String key, long defaultExpiry) {
     long expireSeconds = defaultExpiry;
-    Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
-            .map(com.entwinemedia.fn.fns.Strings.toLongF);
-    if (expiration.isSome()) {
-      expireSeconds = expiration.get();
-      logger.info("For the class {} the property '{}' has been configured to expire signed URLs in {}.", new Object[] {
-              className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds) });
+    Object dictionaryValue = properties.get(URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY);
+    if (dictionaryValue != null) {
+      try {
+        expireSeconds = Long.parseLong(dictionaryValue.toString());
+        logger.info("For the class {} the property '{}' has been configured to expire signed URLs in {} seconds.",
+                new Object[] { className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, expireSeconds });
+      } catch (NumberFormatException e) {
+        logger.warn(
+                "For the class {} unable to parse when a stream should expire from '{}' so using default '{}' because: {}",
+                new Object[] { className, dictionaryValue, defaultExpiry,
+                        ExceptionUtils.getStackTrace(e) });
+        expireSeconds = defaultExpiry;
+      }
     } else {
-      expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
       logger.info(
-              "For the class {} the property '{}' has not been configured, so the default is being used to expire signed URLs in {}.",
-              new Object[] { className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY,
-                      Log.getHumanReadableTimeString(expireSeconds) });
+              "For the class {} the property '{}' has not been configured, so the default is being used to expire signed URLs in {} seconds.",
+              new Object[] { className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, expireSeconds });
     }
     return expireSeconds;
   }
+
 
   /**
    * Get whether a signed URL should contain the client's IP from a {@link Dictionary}. Uses the
@@ -127,19 +129,17 @@ public final class UrlSigningServiceOsgiUtil {
   public static boolean getUpdatedSignWithClientIP(@SuppressWarnings("rawtypes") Dictionary properties,
           String className, String key, boolean defaultSignWithIP) {
     boolean signWithClientIP = defaultSignWithIP;
-    Opt<Boolean> useClientIP = OsgiUtil.getOptCfg(properties, URL_SIGNING_USE_CLIENT_IP).toOpt()
-            .map(com.entwinemedia.fn.fns.Booleans.parseBoolean);
-    if (useClientIP.isSome()) {
-      signWithClientIP = useClientIP.get();
-      if (signWithClientIP) {
-        logger.info("For the class {} the property '{}' has been configured to sign urls with the client IP.", className,
-                URL_SIGNING_USE_CLIENT_IP);
-      } else {
-        logger.info("For the class {} the property '{}' has been configured to not sign urls with the client IP.",
-                className, URL_SIGNING_USE_CLIENT_IP);
-      }
+    Object dictionaryValue = properties.get(URL_SIGNING_USE_CLIENT_IP);
+    if (dictionaryValue != null) {
+        signWithClientIP = Boolean.parseBoolean(dictionaryValue.toString());
+        if (signWithClientIP) {
+          logger.info("For the class {} the property '{}' has been configured to sign urls with the client IP.", className,
+                  URL_SIGNING_USE_CLIENT_IP);
+        } else {
+          logger.info("For the class {} the property '{}' has been configured to not sign urls with the client IP.",
+                  className, URL_SIGNING_USE_CLIENT_IP);
+        }
     } else {
-      signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
       logger.info(
               "For the class {} the property '{}' has not been configured, so the default of signing urls with the client ip is {}.",
               new Object[] { className, URL_SIGNING_USE_CLIENT_IP, signWithClientIP });
