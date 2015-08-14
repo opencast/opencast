@@ -91,6 +91,12 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   /** The key in the properties file that defines the streaming url. */
   protected static final String STREAMING_URL_KEY = "org.opencastproject.streaming.url";
 
+  /** The key in the properties file that defines the streaming port. */
+  protected static final String STREAMING_PORT_KEY = "org.opencastproject.streaming.port";
+
+  /** The default value for the streaming server's port. */
+  private static final String DEFAULT_PORT = "1935";
+
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionService.class);
 
@@ -129,6 +135,9 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   /** The base URL for adaptive streaming */
   protected String adaptiveStreamingUrl = null;
 
+  /** The base port for streaming */
+  protected String port = DEFAULT_PORT;
+
   /** The set of supported streaming formats to distribute. */
   private Set<String> supportedFormats = getDefaultSupportedFormatSet();
 
@@ -142,13 +151,22 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   protected void activate(ComponentContext cc) {
     // Get the configured streaming and server URLs
     if (cc != null) {
+      Option<String> streamingPort = OsgiUtil.getOptContextProperty(cc, STREAMING_PORT_KEY);
+      if (streamingPort.isSome()) {
+        port = streamingPort.get();
+        logger.info("The streaming port for key '{}' has been configured to '{}'", STREAMING_PORT_KEY, port);
+      } else {
+        port = DEFAULT_PORT;
+        logger.info("The streaming port for key '{}' has not been configured, using default '{}'", STREAMING_PORT_KEY, port);
+      }
+
       streamingUrl = StringUtils.trimToNull(cc.getBundleContext().getProperty(STREAMING_URL_KEY));
       if (streamingUrl == null)
         logger.warn("Stream url was not set (org.opencastproject.streaming.url)");
       else {
         try {
           URI sUri = new URI(streamingUrl);
-          adaptiveStreamingUrl = "http://" + sUri.getHost() + ":1935" + sUri.getPath();
+          adaptiveStreamingUrl = "http://" + sUri.getHost() + ":" + port + sUri.getPath();
         } catch (URISyntaxException ex) {
           logger.warn("Streaming URL {} could not be parsed", streamingUrl);
         }
