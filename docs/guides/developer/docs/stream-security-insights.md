@@ -124,5 +124,5 @@ For an overview of Stream Security:
 For further technical information like installation instructions, configuration guides, server plugins, please have a look at these documents:
 
 * [Configuration & Testing](../admin/configuration/stream-security)
-* [Apache HTTPd Verification Component](https://bitbucket.org/entwinemedia/apache-httpd-stream-security-plugin)
-* [Wowza Verification Component](https://bitbucket.org/entwinemedia/wowza-stream-security-plugin)
+* [Apache HTTPd Verification Component](https://bitbucket.org/opencast-community/apache-httpd-stream-security-plugin)
+* [Wowza Verification Component](https://bitbucket.org/opencast-community/wowza-stream-security-plugin)

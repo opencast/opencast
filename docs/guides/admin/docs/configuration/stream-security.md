@@ -89,7 +89,7 @@ Out of the box, Opencast provides three different verification components, each 
 * Wowza streaming server
 * Opencast internal UrlSigningFilter
 
-The following section is dedicated to the installation and configuration of the Opencast internal UrlSigningFilter. You can find the installation and configuration of the [Apache HTTPd verification component here](https://bitbucket.org/entwinemedia/apache-httpd-stream-security-plugin) and the [Wowza verification component here](https://bitbucket.org/entwinemedia/wowza-stream-security-plugin). 
+The following section is dedicated to the installation and configuration of the Opencast internal UrlSigningFilter. You can find the installation and configuration of the [Apache HTTPd verification component here](https://bitbucket.org/opencast-community/apache-httpd-stream-security-plugin) and the [Wowza verification component here](https://bitbucket.org/opencast-community/wowza-stream-security-plugin). 
 
 ### Configuration of Opencast verification filter
 The Servlet Filter providing the verification of requests to Opencast internal resources is implemented in these two bundles:
@@ -129,7 +129,7 @@ The second step is to configure the filter defining the endpoints to be protecte
 
 The configuration defaults to a set of regular expressions which match all of the endpoints that serve files, and avoid protecting endpoints that only serve data. Therefore, the remaining step is enabling the filter by setting the property “enabled” to “true” and determining whether strict or non-strict verification of the resource is required.
 
-The latter is similar to the corresponding configuration option in the [Apache HTTPd verification component](https://bitbucket.org/entwinemedia/apache-httpd-stream-security-plugin), where strict verification of resources means the entire URL will be considered when comparing the incoming request for a resource against the policy, including the scheme (http, https etc.), hostname and port. If turned off, only the path to the resource will be considered. So if the request is for a resource at “http://httpdserver:8080/the/full/path/video.mp4”, only the “/the/full/path/video.mp4” part of the URL will be checked against the policy’s path. As mentioned before, this is useful when using a load balancer so that the requested host name doesn’t have to match the actual hostname or if a video player is rewriting requests, e. g. by inserting the port number.
+The latter is similar to the corresponding configuration option in the [Apache HTTPd verification component](https://bitbucket.org/opencast-community/apache-httpd-stream-security-plugin), where strict verification of resources means the entire URL will be considered when comparing the incoming request for a resource against the policy, including the scheme (http, https etc.), hostname and port. If turned off, only the path to the resource will be considered. So if the request is for a resource at “http://httpdserver:8080/the/full/path/video.mp4”, only the “/the/full/path/video.mp4” part of the URL will be checked against the policy’s path. As mentioned before, this is useful when using a load balancer so that the requested host name doesn’t have to match the actual hostname or if a video player is rewriting requests, e. g. by inserting the port number.
 
 Example:
 
@@ -205,8 +205,8 @@ For an overview of Stream Security:
 
 For installation instructions for external verification components:
 
-* [Apache HTTPd Verification Component](https://bitbucket.org/entwinemedia/apache-httpd-stream-security-plugin)
-* [Wowza Verification Component](https://bitbucket.org/entwinemedia/wowza-stream-security-plugin)
+* [Apache HTTPd Verification Component](https://bitbucket.org/opencast-community/apache-httpd-stream-security-plugin)
+* [Wowza Verification Component](https://bitbucket.org/opencast-community/wowza-stream-security-plugin)
 
 For further developer information including the [Opencast Signing Protocol](../../developer/stream-security-insights#Opencast Signing Protocol), please read the information here:
 
