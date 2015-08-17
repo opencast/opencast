@@ -165,7 +165,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var storage_focus_video = "focusvideo";
     var bootstrapPath = "lib/bootstrap/js/bootstrap";
     var jQueryUIPath = "lib/jqueryui/jquery-ui";
-    var storage_zoomLevel = "zoomLevel";
+    var storage_zoomLevel = "zoomLevels";
     var id_zoomLevelIndicator = "zoomLevelIndicator";
     var id_zoomReset = "resetZoom";
     var id_zoomLevel1 = "zoomLevel1";
@@ -628,15 +628,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function addZoomEvents() {
         var zoom = Basil.get(storage_zoomLevel);
-
-        if (!zoom) {
-            $("#" + id_zoomLevelIndicator).html(zoom);
-            Engage.trigger(plugin.events.setZoomLevel.getName(), [zoom, true]);
-        } else {
-            Basil.set(storage_zoomLevel, "1.0");
-            $("#" + id_zoomLevelIndicator).html("1.0");
-            Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
-        }
+        /* TODO: Set Zoomlevel in Navbar */
 
         /* Events for Button */
         $("#" + id_zoomLevel1).click(function(event) {

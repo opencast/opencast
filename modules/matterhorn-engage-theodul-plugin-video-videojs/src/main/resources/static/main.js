@@ -486,6 +486,32 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         var singleVideo = true;
         var zoomLevels = Array();
 
+        if (Basil.get("zoomData") == undefined) {
+            Basil.set("zoomData", {})
+        }
+
+        /* Current video id */
+        var id = Engage.model.get("urlParameters").id;
+
+        /* Lookup for id */
+        var zoomData = Basil.get("zoomData");
+
+        if (zoomData[id] == undefined) {
+            zoomData[id] = {}
+            Basil.set("zoomData", zoomData);
+        } else {
+            zoomLevels = zoomData[id];
+            console.log(zoomLevels);
+            Engage.on(plugin.events.play.getName(), applyStoredZoom());
+        }
+
+        function applyStoredZoom() {
+            for (var i = 0; i <= (zoomLevels.length/2); i+=2) {
+                $("#"+zoomLevels[i])[0].style.transform = "scale(" + zoomLevels[i+1] + ")";
+                Engage.trigger(plugin.events.zoomChange.getName(), zoomLevels[i+1]);
+            }
+        }
+
         Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function(number) {
             if (number > 1) {
                 selector = ".videoFocused video";
@@ -589,7 +615,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
 
         Engage.on(plugin.events.setZoomLevel.getName(), function(data) {
-            Engage.log("Video:setZoomLevel - data:" + data);
+            console.log("Video:setZoomLevel - data:" + data);
 
             var level = data[0];
             var fixed = data[1];
@@ -619,6 +645,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
             Engage.log("Video: ZoomLevels Array: " + zoomLevels);
             if (Number(level).toFixed(1) >= 1.0 && (videoFocused || singleVideo)) {
+                console.log("Zoom: " + level);
                 var topTrans = Number($(selector).css("top").replace("px", ""));
                 var leftTrans = Number($(selector).css("left").replace("px", ""));
 
@@ -651,6 +678,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     $(selector)[0].style.transform = "scale(" + zoomLevel + ")";
                     Engage.trigger(plugin.events.zoomChange.getName(), zoomLevel);
                     zoomLevels[(zoomLevels.indexOf($(selector)[0].id) + 1)] = parseFloat(Number(level).toFixed(1));
+                    updateZoomData(zoomLevels, id);
                 }
                 Engage.log("Video: Finished zoom of " + selector + " to level: " + zoomLevel);
             };
@@ -668,6 +696,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         Engage.on(plugin.events.zoomOut.getName(), function() {
             Engage.trigger(plugin.events.setZoomLevel.getName(), [-0.1]);
         });
+    }
+
+    function updateZoomData(data, id) {
+        var storedData = Basil.get("zoomData");
+        storedData[id] = data;
+        Basil.set("zoomData", storedData);
     }
 
     function changeQuality(q) {
