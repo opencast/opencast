@@ -53,9 +53,6 @@
             <Embed-Dependency>
               jmf;inline=true
             </Embed-Dependency>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Service-Component>
               OSGI-INF/helloworld.xml
             </Service-Component>
