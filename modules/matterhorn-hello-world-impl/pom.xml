@@ -50,9 +50,6 @@
               org.opencastproject.helloworld.impl;version=${project.version},
               org.opencastproject.helloworld.impl.endpoint;version=${project.version}
             </Export-Package>
-            <Embed-Dependency>
-              jmf;inline=true
-            </Embed-Dependency>
             <Service-Component>
               OSGI-INF/helloworld.xml
             </Service-Component>
