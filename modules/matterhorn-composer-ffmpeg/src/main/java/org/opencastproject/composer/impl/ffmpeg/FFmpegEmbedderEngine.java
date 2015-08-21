@@ -53,7 +53,7 @@ public class FFmpegEmbedderEngine extends AbstractCmdlineEmbedderEngine {
   private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpeg.path";
 
   /** Command line template for executing job */
-  private static final String CMD_TEMPLATE = "#{-i in.media.path} #<-i #{in.captions.path}> -c copy -map 0:0 #<-map #{param.map}:0 -metadata:s:s:#{param.index} language=#{param.lang}> -scodec mov_text #{out.media.path}";
+  private static final String CMD_TEMPLATE = "#{-i in.media.path} #<-i #{in.captions.path}> -c copy #<-map #{param.input}:0> #<-map #{param.map}:0 -metadata:s:s:#{param.index} language=#{param.lang}> -scodec mov_text #{out.media.path}";
 
   /** the logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(FFmpegEmbedderEngine.class);
@@ -111,6 +111,17 @@ public class FFmpegEmbedderEngine extends AbstractCmdlineEmbedderEngine {
             mediaSource.getAbsoluteFile().getParent() + File.separator + UUID.randomUUID() + "-caption."
                     + FilenameUtils.getExtension(mediaSource.getAbsolutePath()));
 
+    int inputStreamCount;
+    try {
+      inputStreamCount = Integer.valueOf(properties.get("param.input.stream.count"));
+    } catch (NumberFormatException e) {
+      logger.info("No stream count found, assuming input file is single-stream");
+      inputStreamCount = 1;
+    }
+    for (int i = 0; i < inputStreamCount; i++) {
+      embedderProperties.put("param.input." + i, String.valueOf(i));
+    }
+
     for (int i = 0; i < ((captionSources.length > captionLanguages.length) ? captionSources.length
             : captionLanguages.length); i++) {
       embedderProperties.put("in.captions.path." + i, captionSources[i].getAbsolutePath());
@@ -121,8 +132,8 @@ public class FFmpegEmbedderEngine extends AbstractCmdlineEmbedderEngine {
         throw new EmbedderException("Captions language has not been set.");
       }
       embedderProperties.put("param.lang." + i, language);
-      embedderProperties.put("param.index." + i, "" + i);
-      embedderProperties.put("param.map." + i, "" + (i + 1));
+      embedderProperties.put("param.index." + i, String.valueOf(i));
+      embedderProperties.put("param.map." + i, String.valueOf(i + inputStreamCount));
     }
 
     // execute command
