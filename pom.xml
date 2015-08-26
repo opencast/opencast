@@ -925,6 +925,18 @@
         <module>modules/matterhorn-webconsole</module>
       </modules>
     </profile>
+    
+     <profile>
+      <id>hello-world</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-hello-world-api</module>
+        <module>modules/matterhorn-hello-world-impl</module>
+      </modules>
+    </profile>   
 
     <profile>
       <id>sign</id>
