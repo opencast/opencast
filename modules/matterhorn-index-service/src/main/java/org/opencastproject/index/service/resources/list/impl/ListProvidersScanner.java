@@ -116,7 +116,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
     @Override
     public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
             throws ListProviderException {
-      logger.info("Getting list " + listName + " query " + query + " org " + organization);
+      logger.debug("Getting list " + listName + " query " + query + " org " + organization);
       if (this.listName.equals(listName) && "".equals(this.orgId)) {
         return Collections.unmodifiableMap(list);
       }
