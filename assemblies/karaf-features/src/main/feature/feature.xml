@@ -73,7 +73,6 @@
     <bundle>mvn:org.springframework/spring-web/3.1.0.RELEASE</bundle>
 
     <!-- EclipseLink -->
-    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.core/2.0.2</bundle>
     <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.antlr/2.0.2</bundle>
     <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.asm/2.0.2</bundle>
     <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.core/2.0.2</bundle>
@@ -193,8 +192,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-sox-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-sox-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-sox-workflowoperation/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-speech-recognition-service-api/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-speech-recognition-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-workflowoperation/${project.version}</bundle>
@@ -283,8 +280,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-sox-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-sox-remote/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-sox-workflowoperation/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-speech-recognition-service-api/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-speech-recognition-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-remote/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-workflowoperation/${project.version}</bundle>
@@ -330,7 +325,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-smil-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-sox-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-sox-impl/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-speech-recognition-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-textanalyzer-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-textextractor-tesseract/${project.version}</bundle>

@@ -83,7 +83,7 @@ Compile the source code:
 
 Create the Karaf distribution:
 
-    cd assemblies
+    cd assemblies/karaf-dist-allinone
     mvn clean install
 
 Extract the all-in-one distribution
