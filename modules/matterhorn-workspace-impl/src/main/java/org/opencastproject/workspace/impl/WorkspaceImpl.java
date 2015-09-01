@@ -129,7 +129,7 @@ public final class WorkspaceImpl implements Workspace {
   private String wfrRoot = null;
   private String wfrUrl = null;
 
-  private boolean waitForResource = false;
+  private boolean waitForResourceFlag = false;
 
   private WorkspaceCleaner workspaceCleaner;
 
@@ -148,7 +148,7 @@ public final class WorkspaceImpl implements Workspace {
    */
   public WorkspaceImpl(String rootDirectory, boolean waitForResource) {
     this.wsRoot = rootDirectory;
-    this.waitForResource = waitForResource;
+    this.waitForResourceFlag = waitForResourceFlag;
   }
 
   /**
@@ -759,7 +759,7 @@ public final class WorkspaceImpl implements Workspace {
   private static final long INTERVAL = 1000L;
 
   private void waitForResource(final URI uri, final int expectedStatus, final String errorMsg) throws IOException {
-    if (waitForResource) {
+    if (waitForResourceFlag) {
       HttpUtil.waitForResource(trustedHttpClient, uri, expectedStatus, TIMEOUT, INTERVAL).fold(
               Misc.<Exception, Void> chuck(), new Effect.X<Integer>() {
                 @Override
