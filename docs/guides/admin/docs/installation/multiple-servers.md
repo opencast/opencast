@@ -15,7 +15,18 @@ purposes. A common setup could look like this:
 * 1 or more **presentation** nodes
 
 For all of the three listed node profiles, there is a pre-defined Opencast distribution that is built as part of the 'assemblies' sub-project.
-The resulting archives just need to be extracted. Please refer to the Install from Source
+
+Compile the source code:
+
+    cd /tmp/matterhorn
+    mvn clean install -Dall
+
+Create the Karaf distribution:
+
+    cd assemblies
+    mvn clean install
+
+The resulting archives just need to be extracted from the karaf-dist-admin, karaf-dist-engage, karaf-dist-worker sub directories. Please refer to the Install from Source for more details about extracting the archives in the target directories.
 
 Please follow the next steps to ensure the different nodes are working in harmony.
 
