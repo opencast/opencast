@@ -1,0 +1,203 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// Logo
+// ----------------------------------------
+
+$logo-width:                  55px;
+$logo-height:                 16px;
+
+/*
+// $logo-file only supports a PNG image
+//
+// The retina-image mixin will take an argument to change the file extension if required see
+// _header.scss, and look for class .logo to change the mixin
+//
+// For more information see the Bourbon documentation (http://bourbon.io/docs/#retina-image)
+*/
+
+$logo-file:                   "pm-logo";
+
+
+
+// Colors
+// ----------------------------------------
+
+$l-blue:                       #378dd4;
+$bright-blue:                  #4da1f7;
+$d-blue:                       #24425c;
+$green:                        #37c180;
+$grey:                         #8c939b;
+$red:                          #fa1919;
+$alt-red:                      #e45253;
+$yellow:                       #e4d12e;
+
+$black:                        #000;
+$white:                        #fff;
+$off-white:                    #fafafa;
+
+// Primary color with light/medium/darker shades
+$prim-color:                   darken(#fff, 50%);
+$light-prim-color:             lighten($prim-color, 15%);
+$medium-prim-color:            darken($prim-color, 10%);
+$dark-prim-color:              darken($prim-color, 30%); 
+
+$global-text-color:            $medium-prim-color;
+
+// Alpha Channel
+$light-black-alpha:            rgba($black, 0.04);
+
+
+// Element Colors
+// ----------------------------------------
+
+$body-background:               $off-white;
+$header-link-color:             #5d7589;
+$color-link:                    $medium-prim-color;
+$color-link-hover:              $dark-prim-color;
+
+
+// Border
+// ----------------------------------------
+
+$main-border-color:            #c9d0d3;
+$light-border-color:           #cfd3d5;
+$main-border-radius:           4px;
+$thin-border-stroke:           1px solid;
+$mid-border-stroke:            2px solid;
+
+
+
+// Form
+// ----------------------------------------
+
+$login-input-width:            350px;
+$input-height:                 40px;
+$btn-height:                   39px;
+
+
+
+// Progress Bar
+// ----------------------------------------
+
+$progress-bar-color:            $l-blue;
+
+
+
+// Inputs
+// ----------------------------------------
+$small-input-width:             130px;
+
+
+
+// Modals
+// ----------------------------------------
+
+$modal-width:                   800px;
+$modal-col-width:               358px;
+$modal-full-col-width:          100%;
+
+// Nav Colors
+$modal-nav-bg-color:            #eeeff0;
+$modal-nav-border-color:        #d6d6d6;
+$modal-nav-link-color:          #92a0ab;
+$modal-nav-link-active-color:   $header-link-color;
+
+
+
+// Layout
+// ----------------------------------------
+
+// Bourbon Neat Settings
+$border-box-sizing: false;
+
+// Helpers
+$side-margin:                   20px;
+$z-10:                          100;
+$z-20:                          200;
+$z-30:                          300;
+$z-40:                          400;
+$z-50:                          500;
+$z-60:                          600;
+$z-70:                          700;
+$z-80:                          800;
+$z-90:                          900;
+$z-100:                         1000;
+$max-z:                         2147483647 - 100;
+
+// Global Values
+$modal-container-padding:       20px;
+$app-min-width:                 1100px;
+
+
+
+// Fonts
+// ----------------------------------------
+
+$font-stack:                    "Open Sans", Helvetica, sans-serif;
+$weight-light:                  200;
+$weight-regular:                400;
+$weight-semibold:               600;
+$weight-bold:                   800;
+
+
+
+
+// Paths
+// ----------------------------------------
+
+$img-path:                      "../img/";
+
+
+
+// Alerts
+// ----------------------------------------
+
+
+// Colors
+
+// Success (Green)
+$state-success-text:             #3c763d;
+$state-success-bg:               #dff0d8;
+$state-success-border:           darken(shade($state-success-bg, 1%), 3%);
+
+// Info (Blue)
+$state-info-text:                lighten(#31708f, 5%);
+$state-info-bg:                  #d9edf7;
+$state-info-border:              darken(shade($state-info-bg, 1%), 5%);
+
+// Warning (Yellow)
+$state-warning-text:             #8a6d3b;
+$state-warning-bg:               #fcf8e3;
+$state-warning-border:           darken(shade($state-warning-bg, 1%), 5%);
+
+// Danger (Red)
+$state-danger-text:              #a94442;
+$state-danger-bg:                #f2dede;
+$state-danger-border:            darken(shade($state-danger-bg, 1%), 3%);
+
+// Transition
+$alert-transition: color 300ms ease-in;
+
+// Modal Alerts (styles are inheirted from main alerts)
+$fa-icon-warning-sign: "\F071";
+$modal-alert-fa-size: 12px;
