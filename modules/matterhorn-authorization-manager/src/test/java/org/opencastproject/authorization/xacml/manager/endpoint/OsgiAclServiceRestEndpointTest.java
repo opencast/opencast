@@ -16,8 +16,9 @@
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForCustomConfig;
@@ -27,9 +28,9 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.UrlSupport;
 
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.hamcrest.Matchers;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
@@ -63,7 +64,17 @@ public class OsgiAclServiceRestEndpointTest {
   @Before
   public void setUpTest() throws Exception {
     String publicAcl = "{\"acl\": {\"ace\": {\"allow\":true, \"action\":\"read\", \"role\":\"SERIES_10_INSTRUCTOR\" }}}";
-    String privateAcl = "{\"acl\": {\"ace\": {\"allow\":false, \"action\":\"read\", \"role\":\"SERIES_10_INSTRUCTOR\" }}}";
+
+    // Fix to make tests pass after modifications of MH-10969.
+    // MH-10969 removes all entries from an ACL with an "allow = false" rule.
+    //
+    // The tests need a private ACL that denies the "read" action. Since MH-10969 filters out rules where
+    // "allow" is set to false a different ACL has to be created. An empty ACL would perfectly do
+    // the job but it breaks the (rather fragile) tests in many ways. Therefore I
+    // The following ACL does not contain a rule that allows to read which is equivalent to deny reads.
+    // Using an empty ACL would be much cleaner but it breaks the tests in many ways
+    // so I use this ACL with a dummy action instead.
+    String privateAcl = "{\"acl\": {\"ace\": {\"allow\":true, \"action\":\"dummy\", \"role\":\"SERIES_10_INSTRUCTOR\" }}}";
 
     publicAclId = extractAclId(given().formParam("name", "Public").formParam("acl", publicAcl).expect().statusCode(OK)
             .when().post(host("/acl")));
@@ -412,7 +423,7 @@ public class OsgiAclServiceRestEndpointTest {
   @Test
   public void testAclEditor() throws Exception {
     String publicAclWrite = "{\"acl\": {\"ace\": {\"allow\":true, \"action\":\"write\", \"role\":\"SERIES_10_INSTRUCTOR\" }}}";
-    String publicAclWrite2 = "{\"acl\": {\"ace\": {\"allow\":false, \"action\":\"write\", \"role\":\"SERIES_10_INSTRUCTOR\" }}}";
+    String publicAclWrite2 = "{\"acl\": {}}";
 
     // GET
     // Test with existing acl Id
@@ -426,7 +437,7 @@ public class OsgiAclServiceRestEndpointTest {
     given().log().all().expect().statusCode(OK).log().all().body("[0].name", equalTo("Public"))
             .body("[0].acl.ace[0].action", equalTo("read")).body("[0].acl.ace[0].allow", equalTo(true))
             .body("[0].acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR")).body("[1].name", equalTo("Private"))
-            .body("[1].acl.ace[0].action", equalTo("read")).body("[1].acl.ace[0].allow", equalTo(false))
+            .body("[1].acl.ace[0].action", not(equalTo("read")))
             .body("[1].acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR")).when().get(host("/acl/acls.json"));
 
     // POST
@@ -445,8 +456,8 @@ public class OsgiAclServiceRestEndpointTest {
 
     // PUT
     given().pathParam("aclId", publicAclWriteId).formParam("name", aclName).formParam("acl", publicAclWrite2).expect()
-            .body("name", equalTo(aclName)).body("acl.ace[0].action", equalTo("write"))
-            .body("acl.ace[0].allow", equalTo(false)).body("acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR"))
+            .log().all()
+            .body("name", equalTo(aclName)).body("acl.ace", Matchers.empty())
             .statusCode(OK).when().put(host("/acl/{aclId}"));
     given().pathParam("aclId", publicAclWriteId).formParam("name", aclName).formParam("acl", "test").expect()
             .statusCode(BAD_REQUEST).when().put(host("/acl/{aclId}"));

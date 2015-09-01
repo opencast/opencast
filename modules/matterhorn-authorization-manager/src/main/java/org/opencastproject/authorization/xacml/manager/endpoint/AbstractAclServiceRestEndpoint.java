@@ -15,6 +15,7 @@
  */
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
+import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
@@ -29,13 +30,13 @@ import static org.opencastproject.security.api.AccessControlUtil.acl;
 import static org.opencastproject.util.Jsons.arr;
 import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
-import static org.opencastproject.util.RestUtil.splitCommaSeparatedParam;
 import static org.opencastproject.util.RestUtil.R.badRequest;
 import static org.opencastproject.util.RestUtil.R.conflict;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
+import static org.opencastproject.util.RestUtil.splitCommaSeparatedParam;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Monadics.mlist;
@@ -64,6 +65,7 @@ import org.opencastproject.episode.api.EpisodeQuery;
 import org.opencastproject.episode.api.EpisodeService;
 import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
 import org.opencastproject.episode.api.SearchResultItem;
+import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
@@ -725,13 +727,27 @@ public abstract class AbstractAclServiceRestEndpoint {
 
   private static final Function<String, AccessControlList> parseAcl = new Function<String, AccessControlList>() {
     @Override
-    public AccessControlList apply(String acl) {
+    public AccessControlList apply(String serializedAcl) {
+      final AccessControlList acl;
       try {
-        return AccessControlParser.parseAcl(acl);
+        acl = AccessControlParser.parseAcl(serializedAcl);
       } catch (Exception e) {
         logger.warn("Unable to parse ACL");
         throw new WebApplicationException(Response.Status.BAD_REQUEST);
       }
+      // filter out denial rules
+      return new AccessControlList(mlist(acl.getEntries()).filter(onlyAllow).value());
+    }
+  };
+
+  private static final Function<AccessControlEntry, Boolean> onlyAllow = new Function<AccessControlEntry, Boolean>() {
+    @Override public Boolean apply(AccessControlEntry accessControlEntry) {
+      final boolean allow = accessControlEntry.isAllow();
+      if (!allow) {
+        logger.warn(format("Discarding ACL rule [%s] since denial is not supported by the workflow service",
+                           accessControlEntry));
+      }
+      return allow;
     }
   };
 
