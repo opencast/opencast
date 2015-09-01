@@ -1,5 +1,3 @@
-use matterhorn;
-
 CREATE TABLE mh_user_session (
   session_id VARCHAR(50) NOT NULL,
   user_ip VARCHAR(255),
