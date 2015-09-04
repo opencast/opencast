@@ -2327,28 +2327,6 @@
     <system>jira</system>
     <url>https://opencast.jira.com</url>
   </issueManagement>
-
-  <!-- These should be the right locations for opencast maven 2 distribution, make sure you have <scm> defined for your sub
-    project -->
-  <distributionManagement>
-    <snapshotRepository>
-      <id>matterhorn-maven2-snapshot</id>
-      <name>OC Snapshot repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/repositories/snapshots</url>
-      <uniqueVersion>false</uniqueVersion>
-    </snapshotRepository>
-    <repository>
-      <id>matterhorn-maven2-release</id>
-      <name>OC Release repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/repositories/releases</url>
-    </repository>
-    <site>
-      <id>matterhorn-site</id>
-      <url>file://tmp/matterhorn/site/</url>
-      <!-- <url>scp://www.mycompany.com/www/docs/project/</url> -->
-    </site>
-  </distributionManagement>
-
   <!-- Site Report generation settings -->
   <reporting>
     <plugins>
