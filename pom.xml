@@ -821,7 +821,7 @@
         <module>modules/matterhorn-speech-recognition-workflowoperation</module>
         <module>modules/matterhorn-execute-api</module>
         <module>modules/matterhorn-execute-impl</module>
-        <module>modules/matterhorn-execute-operations</module>
+        <module>modules/matterhorn-execute-workflowoperation</module>
         <module>modules/matterhorn-execute-remote</module>
       </modules>
     </profile>
@@ -1147,6 +1147,7 @@
                   <pluginExecutionFilter>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
+                    <versionRange>[0.0.23,)</versionRange>
                     <goals>
                       <goal>install-node-and-npm</goal>
                       <goal>npm</goal>
