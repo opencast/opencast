@@ -115,7 +115,7 @@ As specified in the guide, make sure you replace the default ActiveMQ configurat
 Running Opencast
 ----------------
 
-Make sure you have ActiveMQ running. Then you can run Opencast using the start-matterhorn script.
+Make sure you have ActiveMQ running (unless you're running it on a different machine). Then you can start Opencast using the start-matterhorn script.
 
     activemq start
     cd /opt/matterhorn
