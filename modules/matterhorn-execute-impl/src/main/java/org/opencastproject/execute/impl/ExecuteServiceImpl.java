@@ -693,6 +693,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         executeJobLoad = DEFAULT_EXECUTE_JOB_LOAD;
         logger.info("Set default execute job load to default of {}", executeJobLoad);
       }
+    } else {
+      logger.info("No job load configuration found, set default execute job load to default of {}", executeJobLoad);
     }
   }
 

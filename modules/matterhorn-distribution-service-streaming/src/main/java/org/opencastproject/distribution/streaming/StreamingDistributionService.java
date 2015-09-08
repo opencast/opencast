@@ -565,6 +565,8 @@ public class StreamingDistributionService extends AbstractJobProducer implements
         distributeJobLoad = DEFAULT_DISTRIBUTE_JOB_LOAD;
         logger.info("Set distribute job load to default of {}", distributeJobLoad);
       }
+    } else {
+      logger.info("No job load configuration found, set distribute job load to default of {}", distributeJobLoad);
     }
 
     String retractStringJobLoad = StringUtils.trimToNull((String) properties.get(RETRACT_JOB_LOAD_KEY));
@@ -582,6 +584,8 @@ public class StreamingDistributionService extends AbstractJobProducer implements
         retractJobLoad = DEFAULT_RETRACT_JOB_LOAD;
         logger.info("Set retract job load to default of {}", retractJobLoad);
       }
+    } else {
+      logger.info("No job load configuration found, set retract job load to default of {}", retractJobLoad);
     }
   }
 }
