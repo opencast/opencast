@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.1-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -91,7 +91,10 @@
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
             <Import-Package>
-              *;resolution:=optional
+              !junit.framework,
+              !org.apache.lucene.*,
+              !org.mortbay.*,
+              *
             </Import-Package>
             <Private-Package>
               org.tartarus.snowball;-split-package:=merge-first,

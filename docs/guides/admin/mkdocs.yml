@@ -74,6 +74,7 @@ pages:
 - ['workflowoperationhandlers/compose-woh.md', 'Workflow Operation Handlers', 'Compose WOH']
 - ['workflowoperationhandlers/composite-woh.md', 'Workflow Operation Handlers', 'Composite WOH']
 - ['workflowoperationhandlers/concat-woh.md', 'Workflow Operation Handlers', 'Concat WOH']
+- ['workflowoperationhandlers/coverimage-woh.md', 'Workflow Operation Handlers', 'Cover Image WOH']
 - ['workflowoperationhandlers/defaults-woh.md', 'Workflow Operation Handlers', 'Defaults WOH']
 - ['workflowoperationhandlers/editor-woh.md', 'Workflow Operation Handlers', 'Editor WOH']
 - ['workflowoperationhandlers/email-woh.md', 'Workflow Operation Handlers', 'Email WOH']
