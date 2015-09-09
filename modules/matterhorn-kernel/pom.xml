@@ -313,6 +313,7 @@
               org.opencastproject.kernel.security;version=${project.version},
               org.opencastproject.kernel.security.persistence;version=${project.version},
               org.opencastproject.kernel.userdirectory;version=${project.version},
+              org.opencastproject.kernel.bundleinfo;version=${project.version},
               org.springframework.security.oauth;version=1.0.0.M1,
               org.springframework.security.oauth.common;version=1.0.0.M1,
               org.springframework.security.oauth.config;version=1.0.0.M1,
