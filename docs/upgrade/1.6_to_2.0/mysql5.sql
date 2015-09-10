@@ -23,6 +23,8 @@ CREATE INDEX IX_mh_user_session_user_id ON mh_user_session (user_id);
 
 ALTER TABLE mh_organization_property MODIFY value TEXT(65535);
 
+ALTER TABLE mh_search ADD COLUMN series_id VARCHAR(128) AFTER id;
+
 -- Alter Existing Tables
 -- Adding default values for the columns that will be overwritten at startup
 ALTER TABLE mh_host_registration ADD COLUMN address VARCHAR(39) DEFAULT '127.0.0.1' NOT NULL;
@@ -134,8 +136,8 @@ CREATE TABLE mh_series_property (
   name VARCHAR(255) NOT NULL,
   value TEXT(65535),
   PRIMARY KEY (organization, series, name),
-  CONSTRAINT FK_mh_series_property_series FOREIGN KEY (series) REFERENCES mh_series (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8; 
+  CONSTRAINT FK_mh_series_property_organization_series FOREIGN KEY (organization, series) REFERENCES mh_series (organization, id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_series_property_pk ON mh_series_property (series);
 
@@ -146,8 +148,7 @@ CREATE TABLE mh_user_settings (
   username varchar(128) NOT NULL,
   organization varchar(128) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_mh_user_setting_username FOREIGN KEY (username) REFERENCES mh_user (username),
-  CONSTRAINT FK_mh_user_setting_organization FOREIGN KEY (organization) REFERENCES mh_user (organization)
+  CONSTRAINT UNQ_mh_user_settings UNIQUE (username, organization)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_email_configuration (

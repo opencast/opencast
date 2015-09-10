@@ -379,8 +379,10 @@
       <modules>
         <module>modules/matterhorn-annotation-api</module>
         <module>modules/matterhorn-annotation-impl</module>
+        <module>modules/matterhorn-archive-api</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-common</module>
+        <module>modules/matterhorn-composer-service-api</module>
         <module>modules/matterhorn-db</module>
         <module>modules/matterhorn-dublincore</module>
         <module>modules/matterhorn-engage-theodul-api</module>
@@ -396,6 +398,7 @@
         <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
         <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
         <module>modules/matterhorn-engage-ui</module>
+        <module>modules/matterhorn-inspection-service-api</module>
         <module>modules/matterhorn-json</module>
         <module>modules/matterhorn-kernel</module>
         <module>modules/matterhorn-lti</module>
@@ -406,6 +409,7 @@
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info-ui</module>
         <module>modules/matterhorn-runtime-info</module>
+        <module>modules/matterhorn-scheduler-api</module>
         <module>modules/matterhorn-search-service-api</module>
         <module>modules/matterhorn-search-service-feeds</module>
         <module>modules/matterhorn-search-service-impl</module>
@@ -520,6 +524,7 @@
         </property>
       </activation>
       <modules>
+        <module>modules/matterhorn-archive-api</module>
         <module>modules/matterhorn-authorization-xacml</module>
         <module>modules/matterhorn-caption-api</module>
         <module>modules/matterhorn-caption-impl</module>
@@ -541,6 +546,7 @@
         <module>modules/matterhorn-runtime-dependencies</module>
         <module>modules/matterhorn-runtime-info</module>
         <module>modules/matterhorn-runtime-info-ui</module>
+        <module>modules/matterhorn-scheduler-api</module>
         <module>modules/matterhorn-series-service-api</module>
         <module>modules/matterhorn-series-service-remote</module>
         <module>modules/matterhorn-silencedetection-api</module>
@@ -805,6 +811,10 @@
         <module>modules/matterhorn-dictionary-none</module>
         <module>modules/matterhorn-speech-recognition-service-api</module>
         <module>modules/matterhorn-speech-recognition-workflowoperation</module>
+        <module>modules/matterhorn-execute-api</module>
+        <module>modules/matterhorn-execute-impl</module>
+        <module>modules/matterhorn-execute-workflowoperation</module>
+        <module>modules/matterhorn-execute-remote</module>
       </modules>
     </profile>
 
@@ -1117,6 +1127,7 @@
                   <pluginExecutionFilter>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
+                    <versionRange>[0.0.23,)</versionRange>
                     <goals>
                       <goal>install-node-and-npm</goal>
                       <goal>npm</goal>
