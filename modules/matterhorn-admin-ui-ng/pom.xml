@@ -366,6 +366,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Build-Number>${buildNumber}</Build-Number>
                         <Private-Package>webapp.*</Private-Package>
                         <Include-Resource>{maven-resources}, target/grunt</Include-Resource>
                         <Http-Alias>/admin-ng</Http-Alias>

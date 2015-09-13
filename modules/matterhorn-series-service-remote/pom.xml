@@ -62,6 +62,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.series.remote;version=${project.version}
             </Export-Package>

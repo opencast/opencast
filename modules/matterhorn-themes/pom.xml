@@ -121,6 +121,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               org.opencastproject.message.broker.api.index;version=${project.version},
               *;resolution:=optional

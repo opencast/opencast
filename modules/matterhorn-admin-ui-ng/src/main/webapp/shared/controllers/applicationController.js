@@ -1,7 +1,7 @@
 // The main controller that all other scopes inherit from (except isolated scopes).
 angular.module('adminNg.controllers')
-.controller('ApplicationCtrl', ['$scope', '$rootScope', '$location', '$window', 'AuthService', 'Notifications', 'ResourceModal',
-    function ($scope, $rootScope, $location, $window, AuthService, Notifications, ResourceModal) {
+.controller('ApplicationCtrl', ['$scope', '$rootScope', '$location', '$window', 'AuthService', 'Notifications', 'ResourceModal', 'VersionResource',
+    function ($scope, $rootScope, $location, $window, AuthService, Notifications, ResourceModal, VersionResource) {
 
         $scope.bodyClicked = function () {
             angular.element('[old-admin-ng-dropdown]').removeClass('active');
@@ -40,6 +40,12 @@ angular.module('adminNg.controllers')
         var params = $location.search();
         if (params.modal && params.resourceId) {
             ResourceModal.show(params.modal, params.resourceId, params.tab, params.action);
+        }
+
+        if (angular.isUndefined($rootScope.version)) {
+            VersionResource.query(function(response) {
+                $rootScope.version = response.version ? response : (angular.isArray(response.versions)?response.versions[0]:{});
+            });
         }
     }
 ]);

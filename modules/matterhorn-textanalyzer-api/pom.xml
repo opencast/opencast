@@ -48,6 +48,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.textanalyzer.api;version=${project.version},
               org.opencastproject.textextractor.api;version=${project.version}

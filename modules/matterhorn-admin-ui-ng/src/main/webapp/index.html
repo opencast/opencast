@@ -63,8 +63,8 @@
 
         <footer id="main-footer" ng-controller="NavCtrl">
             <div class="default-footer">
-                <div class="meta">
-                    Opencast Video Capture Software
+                <div ng-if="version.version" class="meta">
+                    Opencast Video Capture Software (v.{{ version.version }} - build: {{ version.buildNumber }})
                 </div>
                 <div ng-if="feedbackUrl" class="feedback-btn" id="feedback-btn">
                     <a href="javascript:;">Feedback</a>
@@ -106,6 +106,7 @@
         <script src="shared/services/videoService.js"></script>
         <script src="shared/resources/resources.js"></script>
         <script src="shared/resources/identityResource.js"></script>
+        <script src="shared/resources/versionResource.js"></script>
         <script src="shared/resources/eventsResource.js"></script>
         <script src="shared/resources/optoutsResource.js"></script>
         <script src="shared/resources/seriesResource.js"></script>
