@@ -2149,27 +2149,6 @@
     <url>https://opencast.jira.com</url>
   </issueManagement>
 
-  <!-- These should be the right locations for opencast maven 2 distribution, make sure you have <scm> defined for your sub
-    project -->
-  <distributionManagement>
-    <snapshotRepository>
-      <id>matterhorn-maven2-snapshot</id>
-      <name>OC Snapshot repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/repositories/snapshots</url>
-      <uniqueVersion>false</uniqueVersion>
-    </snapshotRepository>
-    <repository>
-      <id>matterhorn-maven2-release</id>
-      <name>OC Release repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/repositories/releases</url>
-    </repository>
-    <site>
-      <id>matterhorn-site</id>
-      <url>file://tmp/matterhorn/site/</url>
-      <!-- <url>scp://www.mycompany.com/www/docs/project/</url> -->
-    </site>
-  </distributionManagement>
-
   <!-- Site Report generation settings -->
   <reporting>
     <plugins>
@@ -2303,7 +2282,7 @@
     <pluginRepository>
       <id>opencast</id>
       <name>Opencast Repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public</url>
+      <url>http://nexus.opencast.org/nexus/content/groups/public</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -2311,30 +2290,13 @@
         <enabled>true</enabled>
       </releases>
     </pluginRepository>
-    <pluginRepository>
-      <id>opencast.snapshots</id>
-      <name>Opencast SNAPSHOTS</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public-snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </pluginRepository>
-    <!-- these are here as a backup in case the matterhorn nexus is down -->
-    <!-- <pluginRepository> <id>ops4j.releases</id> <url>http://repository.ops4j.org/maven2</url> <snapshots> <enabled>false</enabled>
-      </snapshots> </pluginRepository> <pluginRepository> <id>apache Snapshots</id> <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-      <snapshots> <enabled>true</enabled> </snapshots> <releases> <enabled>false</enabled> </releases> </pluginRepository> <pluginRepository>
-      <id>sonatype-repository</id> <name>Sonatype Public Repo</name> <url>http://repository.sonatype.org/content/groups/public/</url>
-      </pluginRepository> -->
   </pluginRepositories>
 
   <repositories>
     <repository>
       <id>opencast</id>
       <name>Opencast Repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public</url>
+      <url>http://nexus.opencast.org/nexus/content/groups/public</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -2342,46 +2304,5 @@
         <enabled>true</enabled>
       </releases>
     </repository>
-    <repository>
-      <id>opencast.snapshots</id>
-      <name>Opencast SNAPSHOTS</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public-snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-    <repository>
-      <id>sakai</id>
-      <name>Sakai Repo</name>
-      <url>http://source.sakaiproject.org/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-    <repository>
-      <id>eclipselink</id>
-      <name>Eclipselink Repo</name>
-      <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
-    </repository>
-    <!-- these are here as a backup in case the matterhorn nexus repository is down -->
-    <!-- <repository> <id>com.springsource.repository.bundles.release</id> <name>SpringSource Enterprise Bundle Repository
-      - SpringSource Bundle Releases</name> <url>http://repository.springsource.com/maven/bundles/release</url> <releases> <enabled>true</enabled>
-      </releases> </repository> <repository> <id>com.springsource.repository.bundles.external</id> <name>SpringSource Enterprise
-      Bundle Repository - External Bundle Releases</name> <url>http://repository.springsource.com/maven/bundles/external</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>ops4j</id> <name>OPS4J Repository</name> <url>http://repository.ops4j.org/maven2</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>apache.incubating</id> <name>Apache Incubating
-      Repository</name> <url>http://people.apache.org/repo/m2-incubating-repository</url> <releases> <enabled>true</enabled> </releases>
-      </repository> <repository> <id>codehaus-release-repo</id> <name>Codehaus Release Repo</name> <url>http://repository.codehaus.org</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>modularity-releases</id> <name>Modularity Releases
-      Repository</name> <url>http://m2.modularity.net.au/releases</url> <releases> <enabled>true</enabled> </releases> </repository>
-      <repository> <id>sonatype-repository</id> <name>Sonatype Public Repo</name> <url>http://repository.sonatype.org/content/groups/public/</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>EclipseLink Repo</id> <url>http://mirrors.ibiblio.org/pub/mirrors/eclipse/rt/eclipselink/maven.repo</url>
-      <releases> <enabled>true</enabled> </releases> </repository> -->
   </repositories>
 </project>
