@@ -31,7 +31,7 @@ describe('Bulk Delete controller', function () {
             }
         };
         $provide.value('Modal', modal);
-        selection = [{id: 1}, {id: 2}];
+        selection = [{id: 1, selected: true}, {id: 2, selected: true}];
     }));
 
     beforeEach(inject(function ($rootScope, $controller, Notifications) {
@@ -47,15 +47,10 @@ describe('Bulk Delete controller', function () {
         expect($scope.toggleSelectAll).toBeDefined();
     });
 
-    it('toggles the table selection', function () {
-        spyOn(table, 'toggleAllSelectionFlags').and.callThrough();
-        $scope.toggleSelectAll();
-        expect(table.toggleAllSelectionFlags).toHaveBeenCalled();
-    });
-
     it('checks validity', function () {
         expect($scope.valid()).toBeTruthy();
-        selection = [];
+        $scope.all = false;
+        $scope.toggleSelectAll();
         expect($scope.valid()).toBeFalsy();
     });
 

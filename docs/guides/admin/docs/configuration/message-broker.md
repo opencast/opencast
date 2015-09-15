@@ -47,7 +47,7 @@ there are more details about using alternative authentication and authorization 
 
 #### Create ActiveMQ Admin User
 
-First, you need to create a new user that will have access to the queues. This is configured in the `user.properties`
+First, you need to create a new user that will have access to the queues. This is configured in the `users.properties`
 configuration file in the configuration directory for ActiveMQ. It is a list of the format `username = password` so, for
 example, we could create a new admin user with the following file contents:
 
@@ -67,8 +67,8 @@ To set-up our new user to be a part of the admins group:
 
 #### Configure Users and Groups Configuration Files
 
-Next, we need to make sure that ActiveMQ is using our `user.properties` and `group.properties` files to authenticate and
-authorize users. The `login.conf` file should be in the ActivemQ configuration directory and contain:
+Next, we need to make sure that ActiveMQ is using our `users.properties` and `groups.properties` files to authenticate
+and authorize users. The `login.config` file should be in the ActivemQ configuration directory and contain:
 
     activemq {
         org.apache.activemq.jaas.PropertiesLoginModule required
@@ -101,7 +101,7 @@ We will add the following plugin configuration:
         </authorizationPlugin>
     </plugins>
 
-The `jaasAuthenticationPlugin` configures the broker to use our `login.conf` file to do the authentication.
+The `jaasAuthenticationPlugin` configures the broker to use our `login.config` file to do the authentication.
 
     <jaasAuthenticationPlugin configuration="activemq" />
 
@@ -109,7 +109,7 @@ The `jaasAuthenticationPlugin` configures the broker to use our `login.conf` fil
 
     configuration=activemq
 
-needs to match the name given for surrounding object in `login.conf` i.e. activemq{};
+needs to match the name given for surrounding object in `login.config` i.e. activemq{};
 
 The `authorizationEntry` gives read, write and admin access to only those members in the group admins for queues and topics.
 

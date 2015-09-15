@@ -399,6 +399,11 @@ modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/test/resources/
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
+modules/matterhorn-engage-theodul-plugin-video-videojs/src/main/resources/static/lib/synchronize.js
+  Synchronize.js
+  Copyright (c) 2013-2015, Denis Meyer, calltopower88@googlemail.com
+  3-clause BSD License
+
 modules/matterhorn-engage-theodul-plugin-video-videojs/src/main/resources/static/lib/videojs/video.js
   Video.js v4.7.1
   Copyright 2014 Brightcove, Inc.
@@ -552,6 +557,11 @@ modules/matterhorn-videoeditor-workflowoperation/src/main/resources/ui/operation
   Author: Yusuke Kawasaki http://www.kawa.net/
   Copyright (c) 2005-2006 Yusuke Kawasaki. All rights reserved.
   Artistic license.
+
+modules/matterhorn-videoeditor-workflowoperation/src/main/resources/ui/operation/editor/js/synchronize-min.js
+  Synchronize.js
+  Copyright (c) 2013-2015, Denis Meyer, calltopower88@googlemail.com
+  3-clause BSD License
 
 shared-resources/css/jquery-ui/*
   jQuery UI CSS Framework
@@ -988,7 +998,7 @@ matterhorn-execute-impl
   org.slf4j                              slf4j-log4j12                                    MIT License
 
 
-matterhorn-execute-operations
+matterhorn-execute-workflowoperation
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
   org.slf4j                              slf4j-log4j12                                    MIT License

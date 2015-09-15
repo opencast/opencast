@@ -289,6 +289,12 @@ angular.module('adminNg.services')
                 me.rows = data.rows;
                 me.loading = false;
                 me.pagination.totalItems = data.total;
+
+                // If the current offset is not 0 and we have no result, we move to the first page
+                if (me.pagination.offset !== 0 && data.count === 0) {
+                    me.goToPage(0);
+                }
+
                 me.updatePagination();
             });
 
