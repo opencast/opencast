@@ -701,6 +701,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         addJobLoad = DEFAULT_ADD_JOB_LOAD;
         logger.info("Set add job load to default of {}", addJobLoad);
       }
+    } else {
+      logger.info("No job load configuration found, set add job load to default of {}", addJobLoad);
     }
 
     String deleteJobLoadString = StringUtils.trimToNull((String) properties.get(DELETE_JOB_LOAD_KEY));
@@ -718,6 +720,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         deleteJobLoad = DEFAULT_DELETE_JOB_LOAD;
         logger.info("Set delete job load to default of {}", deleteJobLoad);
       }
+    } else {
+      logger.info("No job load configuration found, set delete job load to default of {}", deleteJobLoad);
     }
   }
 }

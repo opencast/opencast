@@ -2047,6 +2047,8 @@ logger.info("Starting parallel encode with profile {} ", profileId);
         captionJobLoad = DEFAULT_CAPTION_JOB_LOAD;
         logger.info("Set caption job load to default of {}", captionJobLoad);
       }
+    } else {
+      logger.info("No job load configuration found, set caption job load to default of {}", captionJobLoad);
     }
   }
 

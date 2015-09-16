@@ -1446,6 +1446,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         ingestFileJobLoad = DEFAULT_INGEST_FILE_JOB_LOAD;
         logger.info("Set ingest file job load to default of {}", ingestFileJobLoad);
       }
+    } else {
+      logger.info("No job load configuration found, set ingest file job load to default of {}", ingestFileJobLoad);
     }
 
     String ingestStringZipJobLoad = StringUtils.trimToNull((String) properties.get(ZIP_JOB_LOAD_KEY));
@@ -1463,6 +1465,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         ingestZipJobLoad = DEFAULT_INGEST_ZIP_JOB_LOAD;
         logger.info("Set ingest zip job load to default of {}", ingestZipJobLoad);
       }
+    } else {
+      logger.info("No job load configuration found, set ingest zip job load to default of {}", ingestZipJobLoad);
     }
   }
 }
