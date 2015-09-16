@@ -119,7 +119,6 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
         $.ajax({
             url: jsonstr,
             dataType: "json",
-            async: false,
             success: function(data) {
                 if (data) {
                     data.value_locale = language;

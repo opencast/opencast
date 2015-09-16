@@ -114,6 +114,8 @@ import org.apache.commons.lang.time.DateUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.LoggerFactory;
 
@@ -124,6 +126,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -151,7 +154,7 @@ import javax.management.ObjectInstance;
  * WorkflowOperation.getName(), then the factory returns a WorkflowOperationRunner to handle that operation. This allows
  * for custom runners to be added or modified without affecting the workflow service itself.
  */
-public class WorkflowServiceImpl extends AbstractIndexProducer implements WorkflowService, JobProducer {
+public class WorkflowServiceImpl extends AbstractIndexProducer implements WorkflowService, JobProducer, ManagedService {
 
   /** The code to use for the incident service to report a failed capture. */
   private static final int FAILED_CAPTURE_CODE = 1;
@@ -190,6 +193,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /** The set of 'no' values */
   public static final Set<String> NO;
 
+  /** The configuration key for setting {@link #workflowStatsCollect} */
+  public static final String STATS_COLLECT_CONFIG_KEY = "workflowstats.collect";
+
+  /** The default value for {@link #workflowStatsCollect} */
+  public static final Boolean DEFAULT_STATS_COLLECT_CONFIG = false;
+
   /** Configuration value for the maximum number of parallel workflows based on the number of cores in the cluster */
   public static final String OPT_NUM_CORES = "cores";
 
@@ -216,7 +225,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /** Remove references to the component context once felix scr 1.2 becomes available */
   protected ComponentContext componentContext = null;
 
-    /** The collection of workflow definitions */
+  /** Flag whether to collect JMX statistics */
+  protected boolean workflowStatsCollect = DEFAULT_STATS_COLLECT_CONFIG;
+
+  /** The collection of workflow definitions */
   // protected Map<String, WorkflowDefinition> workflowDefinitions = new HashMap<String, WorkflowDefinition>();
 
   /** The metadata services */
@@ -1389,7 +1401,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throw new WorkflowException(e);
         }
 
-        workflowsStatistics.updateWorkflow(getBeanStatistics(), getHoldWorkflows());
+        if (workflowStatsCollect) {
+          workflowsStatistics.updateWorkflow(getBeanStatistics(), getHoldWorkflows());
+        }
 
         try {
           WorkflowInstance clone = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(workflowInstance));
@@ -2230,6 +2244,28 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public String getJobType() {
     return JOB_TYPE;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   */
+  @Override
+  @SuppressWarnings("rawtypes")
+  public void updated(Dictionary properties) throws ConfigurationException {
+    }
+    String workflowStatsConfiguration = StringUtils.trimToNull((String) properties.get(STATS_COLLECT_CONFIG_KEY));
+    if (StringUtils.isNotEmpty(workflowStatsConfiguration)) {
+      try {
+         workflowStatsCollect = Boolean.parseBoolean(workflowStatsConfiguration);
+        logger.info("Workflow statistics collection is set to %s", workflowStatsConfiguration);
+      } catch (Exception e) {
+        logger.warn("Workflow statistics collection flag '%s' is malformed, setting to %s",
+                workflowStatsConfiguration, DEFAULT_STATS_COLLECT_CONFIG.toString());
+        workflowStatsCollect = DEFAULT_STATS_COLLECT_CONFIG;
+      }
+    }
   }
 
   /**
