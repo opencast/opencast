@@ -17,7 +17,7 @@ tracked on a per-node basis, so a job running on one node imposes no load on ano
 
 As an example, say we have a worker with 8 cores.  With Opencast 1.x all jobs, even expensive jobs like encoding, had an
 effective load value of 1.0.  This meant that Opencast would schedule up to 8 encodes on worker 1! Obviously this is not 
-ideal, since most encoding jobs consume multiple cores.  With Opencast 2.x you can now specify on an encoding profile 
+ideal, since most encoding jobs consume multiple cores.  Since Opencast 2.1 you can now specify on an encoding profile 
 level how much load is imposed on a node.  Likewise, all other jobs (video segmentation, publishing, etc) also now have
 configurable loads.
 
