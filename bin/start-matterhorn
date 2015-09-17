@@ -11,7 +11,7 @@ echo '  *****************************************************************'
 echo
 
 # Load default configuration
-MATTERHORN=$(stat -f $(dirname $0)/..)
+MATTERHORN=$(readlink -f $(dirname $0)/..)
 LOGDIR=${MATTERHORN}/logs
 LOGLEVEL="WARN"
 ECLIPSE_LOGLEVEL="CONFIG"
