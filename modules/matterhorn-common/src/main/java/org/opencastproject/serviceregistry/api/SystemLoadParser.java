@@ -64,7 +64,9 @@ public final class SystemLoadParser {
    * @return The SystemLoad
    */
   public static SystemLoad parseXml(String xml) throws IOException {
-    return parse(IOUtils.toInputStream(xml, "UTF-8"));
+    try (InputStream in = IOUtils.toInputStream(xml, "UTF-8")) {
+      return parse(in);
+    }
   }
 
   /**
@@ -83,8 +85,6 @@ public final class SystemLoadParser {
       return unmarshaller.unmarshal(new StreamSource(in), SystemLoad.class).getValue();
     } catch (Exception e) {
       throw new IOException(e);
-    } finally {
-      IOUtils.closeQuietly(in);
     }
   }
 

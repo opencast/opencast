@@ -21,8 +21,6 @@
 
 package org.opencastproject.inspection.ffmpeg;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.tika.parser.Parser;
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -35,7 +33,11 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.tika.parser.Parser;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -129,39 +131,8 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       inspector = new MediaInspector(workspace, tikaParser, path);
     }
 
-    String inspectStringJobLoad = StringUtils.trimToNull((String) properties.get(INSPECT_JOB_LOAD_KEY));
-    if (inspectStringJobLoad != null) {
-      try {
-        inspectJobLoad = Float.parseFloat(inspectStringJobLoad);
-        if (inspectJobLoad < 0) {
-          logger.warn("Inspect job load set to less than 0, defaulting to 0");
-          inspectJobLoad = 0.0f;
-        }
-        logger.info("Set inspect job load to {}", inspectJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set inspect job loads to {}. {} must be a float", inspectStringJobLoad,
-                INSPECT_JOB_LOAD_KEY);
-        inspectJobLoad = DEFAULT_INSPECT_JOB_LOAD;
-        logger.info("Set inspect job load to default of {}", inspectJobLoad);
-      }
-    }
-
-    String enrichStringJobLoad = StringUtils.trimToNull((String) properties.get(ENRICH_JOB_LOAD_KEY));
-    if (enrichStringJobLoad != null) {
-      try {
-        enrichJobLoad = Float.parseFloat(enrichStringJobLoad);
-        if (enrichJobLoad < 0) {
-          logger.warn("Enrich job load set to less than 0, defaulting to 0");
-          enrichJobLoad = 0.0f;
-        }
-        logger.info("Set enrich job load to {}", enrichJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set enrich job loads to {}. {} must be a float", enrichStringJobLoad,
-                INSPECT_JOB_LOAD_KEY);
-        enrichJobLoad = DEFAULT_ENRICH_JOB_LOAD;
-        logger.info("Set enrich job load to default of {}", enrichJobLoad);
-      }
-    }
+    inspectJobLoad = LoadUtil.getConfiguredLoadValue(properties, INSPECT_JOB_LOAD_KEY, DEFAULT_INSPECT_JOB_LOAD);
+    enrichJobLoad = LoadUtil.getConfiguredLoadValue(properties, ENRICH_JOB_LOAD_KEY, DEFAULT_ENRICH_JOB_LOAD);
   }
 
   /**

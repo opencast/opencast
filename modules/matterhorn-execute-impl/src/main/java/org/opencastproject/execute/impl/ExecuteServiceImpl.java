@@ -42,6 +42,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -678,24 +679,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws org.osgi.service.cm.ConfigurationException {
-    String jobLoadString = StringUtils.trimToNull((String) properties.get(EXECUTE_JOB_LOAD_KEY));
-    if (jobLoadString != null) {
-      try {
-        executeJobLoad = Float.parseFloat(jobLoadString);
-        if (executeJobLoad < 0) {
-          logger.warn("Execute job load set to less than 0, defaulting to 0");
-          executeJobLoad = 0.0f;
-        }
-        logger.info("Set ingest file job load to {}", executeJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set default execute job loads to {}. {} must be a float", jobLoadString,
-                DEFAULT_EXECUTE_JOB_LOAD);
-        executeJobLoad = DEFAULT_EXECUTE_JOB_LOAD;
-        logger.info("Set default execute job load to default of {}", executeJobLoad);
-      }
-    } else {
-      logger.info("No job load configuration found, set default execute job load to default of {}", executeJobLoad);
-    }
+    executeJobLoad = LoadUtil.getConfiguredLoadValue(properties, EXECUTE_JOB_LOAD_KEY, DEFAULT_EXECUTE_JOB_LOAD);
   }
 
 }

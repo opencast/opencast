@@ -66,6 +66,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.JsonObj;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
@@ -2032,24 +2033,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
 
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    String jobLoad = StringUtils.trimToNull((String) properties.get(CAPTION_JOB_LOAD_KEY));
-    if (jobLoad != null) {
-      try {
-        captionJobLoad = Float.parseFloat(jobLoad);
-        if (captionJobLoad < 0) {
-          logger.warn("Caption embedding job load set to less than 0, defaulting to 0");
-          captionJobLoad = 0.0f;
-        }
-        logger.info("Set caption job load to {}", captionJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set caption job loads to {}. {} must be a float", jobLoad,
-                CAPTION_JOB_LOAD_KEY);
-        captionJobLoad = DEFAULT_CAPTION_JOB_LOAD;
-        logger.info("Set caption job load to default of {}", captionJobLoad);
-      }
-    } else {
-      logger.info("No job load configuration found, set caption job load to default of {}", captionJobLoad);
-    }
+    captionJobLoad = LoadUtil.getConfiguredLoadValue(properties, CAPTION_JOB_LOAD_KEY, DEFAULT_CAPTION_JOB_LOAD);
   }
 
 }

@@ -21,13 +21,6 @@
 
 package org.opencastproject.silencedetection.impl;
 
-import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-import org.apache.commons.lang.StringUtils;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -47,12 +40,22 @@ import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Implementation of SilenceDetectionService using FFmpeg.
@@ -254,8 +257,9 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
   }
 
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     this.properties = new Properties();
+    @SuppressWarnings("rawtypes")
     Enumeration keys = properties.keys();
     while (keys.hasMoreElements()) {
       Object key = keys.nextElement();
@@ -263,21 +267,7 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
     }
     logger.debug("Properties updated!");
 
-    try {
-      String loadString = StringUtils.trimToNull((String) properties.get(JOB_LOAD_KEY));
-      if (loadString != null) {
-        jobload = Float.parseFloat(loadString);
-        if (jobload < 0) {
-          logger.warn("Silence detection job load set to less than 0, defaulting to 0");
-          jobload = 0.0f;
-        }
-        logger.info("Job load set to {}", jobload);
-      } else {
-        logger.debug("No load value setting detected, defaulting to {}", jobload);
-      }
-    } catch (NumberFormatException e) {
-      logger.debug("Job load value malformed, defaulting to {}", jobload);
-    }
+    jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD);
   }
 
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {

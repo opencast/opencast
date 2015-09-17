@@ -304,6 +304,11 @@ public interface Job {
   void setBlockedJobIds(List<Long> list);
 
   /**
+   * Clears the list of jobs blocking this job from continuing
+   */
+  void removeBlockedJobsIds();
+
+  /**
    * Gets which job, if any, this job is blocking
    * 
    * @return the Job ID this job is blocking, or null
@@ -316,4 +321,9 @@ public interface Job {
    * @param jobId the ID of the job this job is blocking, or null if it is not blocking anything
    */
   void setBlockingJobId(Long jobId);
+
+  /**
+   * Clears the reference to the job which this job is blocking, if any
+   */
+  void removeBlockingJobId();
 }

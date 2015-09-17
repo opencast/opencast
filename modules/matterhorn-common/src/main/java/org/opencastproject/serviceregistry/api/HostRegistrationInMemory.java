@@ -23,24 +23,25 @@ package org.opencastproject.serviceregistry.api;
 
 public class HostRegistrationInMemory implements HostRegistration {
 
-  protected String baseUrl;
+  private String baseUrl;
 
-  protected float maxLoad;
+  private float maxLoad;
 
-  protected int cores;
+  private int cores;
 
-  protected long memory;
+  private long memory;
 
-  protected boolean online;
+  private boolean online;
 
-  protected boolean active;
+  private boolean active;
 
-  protected boolean maintenanceMode;
+  private boolean maintenanceMode;
 
-  protected String ipAddress;
+  private String address;
 
-  public HostRegistrationInMemory(String baseUrl, float maxLoad, int cores, long memory) {
+  public HostRegistrationInMemory(String baseUrl, String address, float maxLoad, int cores, long memory) {
     this.baseUrl = baseUrl;
+    this.address = address;
     this.maxLoad = maxLoad;
     this.online = true;
     this.active = true;
@@ -101,12 +102,12 @@ public class HostRegistrationInMemory implements HostRegistration {
 
   @Override
   public String getIpAddress() {
-    return ipAddress;
+    return address;
   }
 
   @Override
   public void setIpAddress(String address) {
-    this.ipAddress = address;
+    this.address = address;
   }
 
   @Override

@@ -114,8 +114,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.LoggerFactory;
 
@@ -126,7 +124,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -154,7 +151,7 @@ import javax.management.ObjectInstance;
  * WorkflowOperation.getName(), then the factory returns a WorkflowOperationRunner to handle that operation. This allows
  * for custom runners to be added or modified without affecting the workflow service itself.
  */
-public class WorkflowServiceImpl extends AbstractIndexProducer implements WorkflowService, JobProducer, ManagedService {
+public class WorkflowServiceImpl extends AbstractIndexProducer implements WorkflowService, JobProducer {
 
   /** The code to use for the incident service to report a failed capture. */
   private static final int FAILED_CAPTURE_CODE = 1;
@@ -193,12 +190,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /** The set of 'no' values */
   public static final Set<String> NO;
 
+<<<<<<< HEAD
+=======
+  /** The configuration key for setting {@link #maxConcurrentWorkflows} */
+  public static final String MAX_CONCURRENT_CONFIG_KEY = "max.concurrent";
+
   /** The configuration key for setting {@link #workflowStatsCollect} */
   public static final String STATS_COLLECT_CONFIG_KEY = "workflowstats.collect";
 
   /** The default value for {@link #workflowStatsCollect} */
   public static final Boolean DEFAULT_STATS_COLLECT_CONFIG = false;
 
+>>>>>>> origin/develop
   /** Configuration value for the maximum number of parallel workflows based on the number of cores in the cluster */
   public static final String OPT_NUM_CORES = "cores";
 
@@ -225,10 +228,17 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /** Remove references to the component context once felix scr 1.2 becomes available */
   protected ComponentContext componentContext = null;
 
+<<<<<<< HEAD
+    /** The collection of workflow definitions */
+=======
+  /** The maximum number of cluster-wide workflows that will cause this service to stop accepting new jobs */
+  protected int maxConcurrentWorkflows = -1;
+
   /** Flag whether to collect JMX statistics */
   protected boolean workflowStatsCollect = DEFAULT_STATS_COLLECT_CONFIG;
 
   /** The collection of workflow definitions */
+>>>>>>> origin/develop
   // protected Map<String, WorkflowDefinition> workflowDefinitions = new HashMap<String, WorkflowDefinition>();
 
   /** The metadata services */
@@ -2247,6 +2257,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
+<<<<<<< HEAD
+=======
    * {@inheritDoc}
    *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
@@ -2254,6 +2266,16 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
+    String maxConfiguration = StringUtils.trimToNull((String) properties.get(MAX_CONCURRENT_CONFIG_KEY));
+    if (StringUtils.isNotEmpty(maxConfiguration)) {
+      try {
+        maxConcurrentWorkflows = Integer.parseInt(maxConfiguration);
+        logger.info("Set maximum concurrent workflows to %d", maxConcurrentWorkflows);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set max concurrent workflows to %s. %s must be an integer", maxConfiguration,
+                MAX_CONCURRENT_CONFIG_KEY);
+      }
+    }
     String workflowStatsConfiguration = StringUtils.trimToNull((String) properties.get(STATS_COLLECT_CONFIG_KEY));
     if (StringUtils.isNotEmpty(workflowStatsConfiguration)) {
       try {
@@ -2268,6 +2290,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
+>>>>>>> origin/develop
    * A tuple of a workflow operation handler and the name of the operation it handles
    */
   public static class HandlerRegistration {

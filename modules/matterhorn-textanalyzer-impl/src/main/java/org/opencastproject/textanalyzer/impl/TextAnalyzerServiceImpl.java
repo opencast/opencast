@@ -56,10 +56,10 @@ import org.opencastproject.textextractor.api.TextExtractor;
 import org.opencastproject.textextractor.api.TextExtractorException;
 import org.opencastproject.textextractor.api.TextFrame;
 import org.opencastproject.textextractor.api.TextLine;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -481,21 +481,6 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
-    String jobLoad = StringUtils.trimToNull((String) properties.get(ANALYSIS_JOB_LOAD_KEY));
-    if (jobLoad != null) {
-      try {
-        analysisJobLoad = Float.parseFloat(jobLoad);
-        if (analysisJobLoad < 0) {
-          logger.warn("Text analyzer job load set to less than 0, defaulting to 0");
-          analysisJobLoad = 0.0f;
-        }
-        logger.info("Set analysis job load to {}", analysisJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set analysis job loads to {}. {} must be a float", jobLoad,
-                ANALYSIS_JOB_LOAD_KEY);
-        analysisJobLoad = DEFAULT_ANALYSIS_JOB_LOAD;
-        logger.info("Set analysis job load to default of {}", analysisJobLoad);
-      }
-    }
+    analysisJobLoad = LoadUtil.getConfiguredLoadValue(properties, ANALYSIS_JOB_LOAD_KEY, DEFAULT_ANALYSIS_JOB_LOAD);
   }
 }

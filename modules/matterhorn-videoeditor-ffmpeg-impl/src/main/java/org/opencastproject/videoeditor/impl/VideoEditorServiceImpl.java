@@ -46,6 +46,7 @@ import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 import org.opencastproject.videoeditor.api.VideoEditorService;
@@ -54,7 +55,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -453,9 +453,11 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     logger.debug("deactivating...");
   }
 
+
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     this.properties = new Properties();
+    @SuppressWarnings("rawtypes")
     Enumeration keys = properties.keys();
     while (keys.hasMoreElements()) {
       Object key = keys.nextElement();
@@ -463,21 +465,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     }
     logger.debug("Properties updated!");
 
-    try {
-      String loadString = StringUtils.trimToNull((String) properties.get(JOB_LOAD_KEY));
-      if (loadString != null) {
-        jobload = Float.parseFloat(loadString);
-        if (jobload < 0) {
-          logger.warn("Video editor job load set to less than 0, defaulting to 0");
-          jobload = 0.0f;
-        }
-        logger.info("Job load set to {}", jobload);
-      } else {
-        logger.debug("No load value setting detected, defaulting to {}", jobload);
-      }
-    } catch (NumberFormatException e) {
-      logger.debug("Job load value malformed, defaulting to {}", jobload);
-    }
+    jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD);
   }
 
   public void setMediaInspectionService(MediaInspectionService inspectionService) {
