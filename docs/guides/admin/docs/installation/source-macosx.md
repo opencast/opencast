@@ -93,12 +93,6 @@ Pre-built versions of most dependencies can be downloaded from the respective pr
 Building Opencast
 -----------------
 
-Configure environment
-
-    export MAVEN_OPTS="-Xms256m -Xmx960m -XX:PermSize=64m -XX:MaxPermSize=256m" >> ~/.bash_profile
-    echo "export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib" >> ~/.bash_profile
-    source ~/.bash_profile
-
 Compile the source code:
 
     cd /opt/matterhorn
