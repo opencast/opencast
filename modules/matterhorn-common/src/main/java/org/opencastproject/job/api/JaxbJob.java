@@ -38,8 +38,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * A long running, asynchronously executed job.
@@ -47,7 +45,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(name = "job", namespace = "http://job.opencastproject.org")
 @XmlRootElement(name = "job", namespace = "http://job.opencastproject.org")
-@XmlJavaTypeAdapter(JaxbJob.Adapter.class)
 public class JaxbJob implements Job {
 
   /** The job ID */
@@ -661,14 +658,14 @@ public class JaxbJob implements Job {
 
   @Override
   public void setBlockedJobIds(List<Long> list) {
-    if (null == list)
+    if (null != list)
       blockedJobIds = Immutables.mk(list);
     else
-      blockedJobIds = Immutables.nil();
+      blockedJobIds = null;
   }
 
   public void removeBlockedJobsIds() {
-    blockedJobIds = null;
+    setBlockedJobIds(null);
   }
 
   @Override
@@ -716,17 +713,5 @@ public class JaxbJob implements Job {
   @Override
   public String toString() {
     return "Job {id:" + this.id + ", version:" + version + "}";
-  }
-
-  static class Adapter extends XmlAdapter<JaxbJob, JaxbJob> {
-    @Override
-    public JaxbJob marshal(JaxbJob job) throws Exception {
-      return job;
-    }
-
-    @Override
-    public JaxbJob unmarshal(JaxbJob job) throws Exception {
-      return new JaxbJob(job);
-    }
   }
 }
