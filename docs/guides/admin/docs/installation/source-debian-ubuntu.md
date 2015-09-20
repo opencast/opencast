@@ -82,14 +82,9 @@ Switch to user `opencast`:
 
     sudo su - opencast
 
-Compile the source code:
+Compile the source code and create the Karaf distributions:
 
     cd /tmp/matterhorn
-    mvn clean install
-
-Create the Karaf distribution:
-
-    cd assemblies/karaf-dist-allinone
     mvn clean install
 
 Extract the all-in-one distribution
