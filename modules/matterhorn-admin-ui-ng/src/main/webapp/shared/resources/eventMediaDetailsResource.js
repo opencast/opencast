@@ -3,7 +3,11 @@ angular.module('adminNg.resources')
     var transform = function (data) {
         var media = {};
         try {
-            media = JSON.parse(data);
+            if (typeof data === 'string') {
+                media = JSON.parse(data);
+            } else {
+                media = data;
+            }
             media.url = media.url.split('?')[0];
         } catch (e) { }
         return media;
