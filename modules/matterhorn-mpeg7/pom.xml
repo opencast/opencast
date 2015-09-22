@@ -48,6 +48,11 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
+            <Import-Package>
+              org.opencastproject.metadata.api;version=${project.version},
+              *;resolution:=optional
+            </Import-Package>
             <Export-Package>
               org.opencastproject.metadata.mpeg7;version=${project.version}
             </Export-Package>

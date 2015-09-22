@@ -118,7 +118,8 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>org.opencastproject.caption.remote;version=${project.version}</Export-Package>
             <Service-Component>OSGI-INF/caption-service-remote.xml</Service-Component>
           </instructions>

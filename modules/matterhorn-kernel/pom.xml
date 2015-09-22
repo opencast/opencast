@@ -201,6 +201,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Embed-Dependency>
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true,
@@ -243,6 +244,7 @@
               org.opencastproject.kernel.security;version=${project.version},
               org.opencastproject.kernel.security.persistence;version=${project.version},
               org.opencastproject.kernel.userdirectory;version=${project.version},
+              org.opencastproject.kernel.bundleinfo;version=${project.version},
               org.springframework.security.oauth;version=1.0.0.M1,
               org.springframework.security.oauth.common;version=1.0.0.M1,
               org.springframework.security.oauth.config;version=1.0.0.M1,
@@ -251,6 +253,7 @@
               org.springframework.security.oauth.provider.token;version=1.0.0.M1,
             </Export-Package>
             <Service-Component>
+              OSGI-INF/bundle-info.xml,
               OSGI-INF/cleansessions.xml, 
               OSGI-INF/http-client-factory.xml,
               OSGI-INF/http-client.xml,

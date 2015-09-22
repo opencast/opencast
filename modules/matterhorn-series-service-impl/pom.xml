@@ -146,6 +146,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.series.impl.solr;version=${project.version},
               org.opencastproject.series.impl.persistence;version=${project.version},

@@ -100,6 +100,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Private-Package>
               org.opencastproject.staticfiles.impl;version=${project.version},
               org.opencastproject.staticfiles.jmx;version=${project.version}
