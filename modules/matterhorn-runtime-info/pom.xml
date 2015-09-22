@@ -81,22 +81,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Activator>org.opencastproject.runtimeinfo.Activator</Bundle-Activator>
-            <Import-Package>
-              org.opencastproject.rest,
-              javax.servlet,
-              javax.servlet.http,
-              javax.ws.rs,
-              org.apache.commons.lang,
-              org.opencastproject.security.api,
-              org.opencastproject.util,
-              org.opencastproject.util.doc.rest,
-              org.osgi.framework,
-              org.osgi.service.component,
-              org.slf4j,
-              org.json.simple,
-              org.json.simple.parser,
-              *;resolution:=optional
-            </Import-Package>
             <Private-Package>
               org.opencastproject.runtimeinfo.rest
             </Private-Package>

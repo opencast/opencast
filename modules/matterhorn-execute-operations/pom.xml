@@ -80,9 +80,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.execute.operation.handler;version=${project.version}
             </Export-Package>

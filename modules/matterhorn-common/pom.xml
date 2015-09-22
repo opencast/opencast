@@ -277,7 +277,22 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
-              *;resolution:=optional
+              !com.mchange.v2.c3p0.*,
+              !com.sun.*,
+              !javax.el.*,
+              !javax.servlet.jsp.*,
+              !org.apache.log.*,
+              !org.apache.tools.*,
+              !org.bouncycastle.crypto.*,
+              !org.dom4j.*,
+              !org.eclipse.persistence.jpa.*,
+              !org.hamcrest.*,
+              !org.jaxen.*,
+              !org.jdom.*,
+              !org.mozilla.javascript.*,
+              !org.python.*,
+              !org.zeroturnaround.javarebel.*,
+              *
             </Import-Package>
             <Embed-Dependency>
               truezip;inline=true,
@@ -296,7 +311,6 @@
               org.opencastproject.mediapackage.identifier;version=${project.version},
               org.opencastproject.mediapackage.elementbuilder;version=${project.version},
               org.opencastproject.mediapackage.selector;version=${project.version},
-              org.opencastproject.event;version=${project.version},
               org.opencastproject.fun;version=${project.version},
               org.opencastproject.fun.juc;version=${project.version},
               org.opencastproject.job.api;version=${project.version},

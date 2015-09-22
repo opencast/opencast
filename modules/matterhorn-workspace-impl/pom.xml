@@ -91,9 +91,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Private-Package>
               org.opencastproject.workspace.impl;version=${project.version},
               org.opencastproject.workspace.impl.jmx;version=${project.version}

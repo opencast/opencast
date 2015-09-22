@@ -38,7 +38,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
-            <Export-Package> org.opencastproject.capture.admin.api;version=${project.version} </Export-Package>
+            <Export-Package>
+              org.opencastproject.capture.admin.api;version=${project.version}
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>
