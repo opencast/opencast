@@ -28,7 +28,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.IoSupport.withFile;
 import static org.opencastproject.util.RestUtil.fileResponse;
 import static org.opencastproject.util.RestUtil.partialFileResponse;
-import static org.opencastproject.util.RestUtil.streamResponse;
+import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.FILE;
@@ -102,6 +102,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
    * @param cc
    *          OSGi component context
    */
+  @Override
   public void activate(ComponentContext cc) throws IOException {
     super.activate(cc);
   }
@@ -243,8 +244,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       return withFile(getFile(mediaPackageID, mediaPackageElementID), new Function2.X<InputStream, File, Response>() {
         @Override
         public Response xapply(InputStream in, File f) throws Exception {
-          return streamResponse(get(mediaPackageID, mediaPackageElementID), extractContentType(in), some(f.length()),
-                  none("")).build();
+          return ok(get(mediaPackageID, mediaPackageElementID), extractContentType(in), some(f.length()), none(""));
         }
       }).orError(new NotFoundException()).get();
     } catch (IllegalStateException e) {
