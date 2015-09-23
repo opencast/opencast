@@ -28,12 +28,29 @@ angular.module('adminNg.controllers')
         $scope.stats = Stats;
         $scope.stats.configure({
             stats: [
-            {filters: [{name: 'status', filter:'FILTERS.EVENTS.STATUS.LABEL', value: 'EVENTS.EVENTS.STATUS.PROCESSING'}], description: ''},
-            {filters: [{name: 'status', filter:'FILTERS.EVENTS.STATUS.LABEL', value: 'EVENTS.EVENTS.STATUS.PROCESSED'}], description: ''},
-            {filters: [{name: 'status', filter:'FILTERS.EVENTS.STATUS.LABEL', value: 'EVENTS.EVENTS.STATUS.PROCESSING_FAILURE'}], description: 'STATS.DESCRIPTION.PROCESSINGFAILED'},
-            {filters: [{name: 'comments', filter:'FILTERS.EVENTS.COMMENTS.LABEL', value: 'OPEN'},
-               {name: 'status', filter: 'FILTERS.EVENTS.STATUS.LABEL', value: 'EVENTS.EVENTS.STATUS.PROCESSED'}], description: 'STATS.DESCRIPTION.FINISHEDWITHCOMMENTS'},
-            {filters: [{name: 'status', filter: 'FILTERS.EVENTS.STATUS.LABEL', value: 'EVENTS.EVENTS.STATUS.SCHEDULED'}], description: ''}
+            {filters: [{name: 'status',
+                        filter:'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PROCESSING'}],
+             description: ''},
+            {filters: [{name: 'status',
+                        filter:'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PROCESSED'}],
+             description: ''},
+            {filters: [{name: 'status',
+                        filter:'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PROCESSING_FAILURE'}],
+             description: 'STATS.DESCRIPTION.PROCESSINGFAILED'},
+            {filters: [{name: 'comments',
+                        filter:'FILTERS.EVENTS.COMMENTS.LABEL',
+                        value: 'OPEN'},
+                       {name: 'status',
+                        filter: 'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PROCESSED'}],
+             description: 'STATS.DESCRIPTION.FINISHEDWITHCOMMENTS'},
+            {filters: [{name: 'status',
+                        filter: 'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.SCHEDULED'}],
+             description: ''}
             ],
             resource:   'events',
             apiService: EventsResource
