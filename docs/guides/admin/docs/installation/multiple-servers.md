@@ -135,9 +135,8 @@ To do this, you first have to install and enable the NFS server:
     chkconfig  --level 345 nfs on
     service nfs start
 
-Later on you want to have one common user on all your systems that has access to the share as you do not want everyone to
-have access. As preparation for this it makes sense to manually create a matterhorn user and group with a common UID and
-GID. In the following example we use 992 as group id and 995 as user id for matterhorn:
+You want to have one common user on all your systems, so that file permissions do not become an issue.. As preparation
+for this it makes sense to manually create a matterhorn user and group with a common UID and GID:
 
     groupadd -g 1234 matterhorn
     useradd -g 1234 -u 1234 matterhorn
