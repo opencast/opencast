@@ -12,7 +12,7 @@
 
   <artifactId>opencast-karaf-dist-allinone</artifactId>
   <packaging>karaf-assembly</packaging>
-  <name>Opencast // Assemblies // Apache Karaf 'all-in-one' Distribution</name>
+  <name>Opencast // Assemblies // Distribution All-In-One</name>
 
   <dependencies>
     <dependency>
