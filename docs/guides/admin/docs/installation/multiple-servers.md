@@ -26,7 +26,7 @@ Create the Karaf distribution:
     cd assemblies
     mvn clean install
 
-The resulting archives just need to be extracted from the karaf-dist-admin, karaf-dist-engage, karaf-dist-worker sub directories. Please refer to the Install from Source for more details about extracting the archives in the target directories.
+The resulting archives just need to be extracted from the karaf-dist-admin, karaf-dist-presentation, karaf-dist-worker sub directories. Please refer to the Install from Source for more details about extracting the archives in the target directories.
 
 Please follow the next steps to ensure the different nodes are working in harmony.
 
