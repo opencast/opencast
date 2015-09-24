@@ -482,6 +482,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
         var selector = "video"
         var lastEvent = null;
+        var wheelEvent = null;
         var videoFocused = true;
         var singleVideo = true;
         var zoomLevels = Array();
@@ -561,7 +562,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         })
 
         $(selector).on('mousewheel', function(event) {
-
+            if (wheelEvent != null) {
+                console.log(wheelEvent);
+                if (event.timeStamp - wheelEvent.timeStamp < 30) {
+                    event.preventDefault();
+                    return;
+                }
+            }
             // calculate mouse position
             var parentOffset = $(this).parent().offset();
             var relX = event.pageX - parentOffset.left;
@@ -589,6 +596,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             if (event.deltaY < 0) {
                 Engage.trigger(events.setZoomLevel.getName(), [-0.1]);
             };
+
+            wheelEvent = event;
         });
 
         $(selector).mousedown(function() {
@@ -657,7 +666,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 return;
             }
 
-            if (zoomLevels.indexOf($(selector)[0].id) == -1) {
+            if (zoomLevels.indexOf($(selector)[0].id) == undefined) {
                 if (1.0 + level >= 1.0) {
                     if (!fixed) {
                         level = (1.0 + level);
