@@ -1351,5 +1351,11 @@
          "CONSTRUCTION":     "Construction"
        }
      }
+   },
+   "STATS": {
+     "DESCRIPTION": {
+       "FINISHEDWITHCOMMENTS": "Finished with open comments",
+       "PROCESSINGFAILED": "Processing Failed"
+     }
    }
 }
