@@ -30,6 +30,8 @@
         <exclude>bin/**</exclude>
         <exclude>deploy/**</exclude>
         <exclude>**/README</exclude>
+        <exclude>etc/equinox-debug.properties</exclude>
+        <exclude>etc/keys.properties</exclude>
       </excludes>
     </fileSet>
 
