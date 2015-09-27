@@ -122,7 +122,7 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>../package.xml</descriptor>
+                <descriptor>${project.basedir}/../package.xml</descriptor>
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>gnu</tarLongFileMode>
