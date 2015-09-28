@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
-  <artifactId>matterhorn-execute-operations</artifactId>
+  <artifactId>matterhorn-execute-workflowoperation</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-execute-operations</name>
+  <name>matterhorn-execute-workflowoperation</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -80,6 +80,10 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
+            <Import-Package>
+              *;resolution:=optional
+            </Import-Package>
             <Export-Package>
               org.opencastproject.execute.operation.handler;version=${project.version}
             </Export-Package>
