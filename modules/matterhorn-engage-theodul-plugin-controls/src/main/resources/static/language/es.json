@@ -31,5 +31,6 @@
   "playbackRate":"Velocidad de reproducción",
   "remainingTime":"tiempo restante",
   "embedButton":"Botón \"incrustar reproductor\". Seleccione el tamaño en la lista desplegable.",
-  "checkingLoginStatus":"Comprobando el estado de la sesión..."
+  "checkingLoginStatus":"Comprobando el estado de la sesión...",
+  "besides": "junto a"
 }

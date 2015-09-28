@@ -62,7 +62,7 @@
              && (typeof str_pictureInPicture !== "undefined")
              && (typeof str_left !== "undefined")
              && (typeof str_right !== "undefined")
-             && (typeof str_off !== "undefined")
+             && (typeof str_besides !== "undefined")
 	     && (typeof str_quality !== "undefined")
 	     && (typeof qualities !== "undefined") 
              && (typeof translatedqualities !== "undefined")) { %>
@@ -102,7 +102,8 @@
              && (typeof str_pictureInPicture !== "undefined")
              && (typeof str_left !== "undefined")
              && (typeof str_right !== "undefined")
-             && (typeof str_off !== "undefined")) { %>            
+             && (typeof str_besides !== "undefined")
+             && (typeof str_besides !== "undefined")) { %>            
             <div class="btn-group">
                 <button id="dropdownMenuLayout" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_layoutButton %>">
                 <span class="glyphicon glyphicon-film"></span>
@@ -114,6 +115,7 @@
                     <li class="divider"></li>
                     <li role="presentation"><a id="pipLeft" role="menuitem" tabindex="-1" href="#"><%= str_left %></a></li>
                     <li role="presentation"><a id="pipRight" role="menuitem" tabindex="-1" href="#"><%= str_right %></a></li>
+                    <li role="presentation"><a id="pipBesides" role="menuitem" tabindex="-1" href="#"><%= str_besides %></a></li>
                     <li role="presentation"><a id="pipOff" role="menuitem" tabindex="-1" href="#"><%= str_off %></a></li>
                 </ul>
             </div>
