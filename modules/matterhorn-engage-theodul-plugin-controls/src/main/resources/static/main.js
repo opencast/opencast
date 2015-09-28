@@ -168,9 +168,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var storage_zoomLevel = "zoomLevels";
     var id_zoomLevelIndicator = "zoomLevelIndicator";
     var id_zoomReset = "resetZoom";
-    var id_zoomLevel1 = "zoomLevel1";
-    var id_zoomLevel15 = "zoomLevel15";
     var id_zoomLevel2 = "zoomLevel2";
+    var id_zoomLevel4 = "zoomLevel4";
+    var id_zoomLevel6 = "zoomLevel6";
     var id_engage_controls = "engage_controls";
     var id_engage_controls_topIfBottom = "engage_controls_second";
     var id_slider = "slider";
@@ -631,19 +631,19 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         /* TODO: Set Zoomlevel in Navbar */
 
         /* Events for Button */
-        $("#" + id_zoomLevel1).click(function(event) {
-            event.preventDefault();
-            Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
-        });
-
-        $("#" + id_zoomLevel15).click(function(event) {
-            event.preventDefault();
-            Engage.trigger(plugin.events.setZoomLevel.getName(), [1.5, true]);
-        });
-
         $("#" + id_zoomLevel2).click(function(event) {
             event.preventDefault();
             Engage.trigger(plugin.events.setZoomLevel.getName(), [2.0, true]);
+        });
+
+        $("#" + id_zoomLevel4).click(function(event) {
+            event.preventDefault();
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [4.0, true]);
+        });
+
+        $("#" + id_zoomLevel6).click(function(event) {
+            event.preventDefault();
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [6.0, true]);
         });
 
         $("#" + id_zoomReset).click(function(event) {
