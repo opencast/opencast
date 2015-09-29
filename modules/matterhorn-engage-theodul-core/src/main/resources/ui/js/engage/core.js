@@ -63,6 +63,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var browser_minVersion_opera = 20;
     var browser_minVersion_safari = 7;
     var browser_minVersion_msie = 9;
+    var zoom_wasd_step_size = 15;
     var path_language_de = "language/de.json";
     var path_language_en = "language/en.json";
 
@@ -389,25 +390,25 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 case shortcut_moveLeft:
                     Mousetrap.bind(val.key, function() {
                         //engageCore.trigger(events.moveLeft.getName(), true);
-                        engageCore.trigger(events.moveHorizontal.getName(), 10);
+                        engageCore.trigger(events.moveHorizontal.getName(), zoom_wasd_step_size);
                     });
                     break;
                 case shortcut_moveRight:
                     Mousetrap.bind(val.key, function() {
                         //engageCore.trigger(events.moveRight.getName(), true);
-                        engageCore.trigger(events.moveHorizontal.getName(), -10);
+                        engageCore.trigger(events.moveHorizontal.getName(), -zoom_wasd_step_size);
                     });
                     break;
                 case shortcut_moveUp:
                     Mousetrap.bind(val.key, function() {
                         //engageCore.trigger(events.moveUp.getName(), true);
-                        engageCore.trigger(events.moveVertical.getName(), 10);
+                        engageCore.trigger(events.moveVertical.getName(), zoom_wasd_step_size);
                     });
                     break;
                 case shortcut_moveDown:
                     Mousetrap.bind(val.key, function() {
                         //engageCore.trigger(events.moveDown.getName(), true);
-                        engageCore.trigger(events.moveVertical.getName(), -10);
+                        engageCore.trigger(events.moveVertical.getName(), -zoom_wasd_step_size);
                     });
                     break;
                 case shortcut_zoomIn:
@@ -802,13 +803,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     }, loadingDelay2);
                 }, loadingDelay1);
             });
-            
+
             this.dispatcher.on(events.movePiP.getName(), function(pos) {
                 pipPos = pos;
-            }); 
+            });
             this.dispatcher.on(events.togglePiP.getName(), function(status) {
                 pip = status;
-            }); 
+            });
         }
     });
 

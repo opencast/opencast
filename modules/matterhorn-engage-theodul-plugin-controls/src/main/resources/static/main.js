@@ -652,7 +652,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         });
 
         Engage.on(plugin.events.zoomChange.getName(), function(level) {
-            $("#" + id_zoomLevelIndicator).html(String(Number(level).toFixed(1)));
+            $("#" + id_zoomLevelIndicator).html(String(Number(level).toFixed(3)));
         });
         /* Events for Keys */
 
