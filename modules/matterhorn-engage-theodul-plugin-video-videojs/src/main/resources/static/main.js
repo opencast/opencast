@@ -597,8 +597,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             if (event.deltaY > 0) {
                 Engage.trigger(events.setZoomLevel.getName(), [zoom_step_size]);
                 // move towards mouse position
-                //moveHorizontal(-(xdiff/10));
-                //moveVertical(-(ydiff/10));
+                var z = zoomLevels[zoomLevels.indexOf($(selector)[0].id) + 1]
+                console.log(z);
+                moveHorizontal(-((xdiff/5)/z));
+                moveVertical(-((ydiff/5)/z));
             };
             // zoom out
             if (event.deltaY < 0) {
@@ -641,6 +643,22 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 offset = offset.replace("px", "");
                 offset = Number(offset);
 
+                (step > 0) ? console.log("Shift right: " + step) : console.log("Shift left: " + step);
+
+                if (step > 0 && Math.abs($(selector).position().left) < step ) {
+                    // Shift right, but too far
+                    step = Math.abs($(selector).position().left);
+                }
+
+                if (step < 0 && (offset + step < left)) {
+                    // Shift left but too far
+                    step = (left - offset);
+                }
+
+                console.log("Offset: " + offset);
+                console.log("Left: " + left);
+                console.log("$(selector).position().left " + $(selector).position().left);
+
                 if (!(($(selector).position().left + step) > 0) && !((offset + step) < left)) {
                     $(selector).css("left", (offset + step) + "px");
                 };
@@ -654,6 +672,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
                 offset = offset.replace("px", "");
                 offset = Number(offset);
+
+                (step > 0) ? console.log("Shift down: " + step) : console.log("Shift up: " + step);
+
+                if (step > 0 && (Math.abs($(selector).position().top) < step)) {
+                    step = Math.abs($(selector).position().top)
+                }
+
+                if (step < 0 && (offset + step < top)) {
+                    step = (top - offset);
+                }
+                console.log("top: " + top);
+                console.log("offset: " + offset);
 
                 if (!((offset + step) < top) && !(($(selector).position().top + step) > 0)) {
                     $(selector).css("top", (offset + step) + "px");
