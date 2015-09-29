@@ -98,7 +98,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         moveVertical: new Engage.Event("Video:moveVertical", "move video vertical", "handler"),
         zoomIn: new Engage.Event("Video:zoomIn", "zooms in video", "handler"),
         zoomOut: new Engage.Event("Video:zoomOut", "zooms out video", "handler"),
-        zoomChange: new Engage.Event("Video:zoomChange", "zoom level has changed", "trigger")
+        zoomChange: new Engage.Event("Video:zoomChange", "zoom level has changed", "trigger"),
+        switchVideo: new Engage.Event("Video:switch", "switch the video", "handler")
     };
 
     var isDesktopMode = false;
@@ -1046,33 +1047,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     // TODO: this is just a temporary solution until the mobile player has been designed and implemented
     function appendMobilePlayer_switchPlayers() {
-        $("#" + id_switchPlayers).html(
-            translate("switchPlayer", "Switch player") + ':' +
-            '<ul class="nav nav-pills">' +
-            '<li id="' + id_btn_video1 + '" role="presentation" class="active"><a href="#">' +
-            translate("video_short", "Vid.") + ' 1' +
-            '</a></li>' +
-            '<li id="' + id_btn_video2 + '" role="presentation"><a href="#">' +
-            translate("video_short", "Vid.") + ' 2' +
-            '</a></li>' +
-            '</ul>'
-        );
-
-        $("#" + id_btn_video1).click(function(e) {
-            if (!currentlySelectedVideodisplay == 0) {
-                $("#" + id_btn_video1).addClass("active");
-                $("#" + id_btn_video2).removeClass("active");
-                currentlySelectedVideodisplay = 0;
-                videojs(globalVideoSource[0].id).src(globalVideoSource[0].src);
-            }
+        $("#prevVideo").click(function(e) {
+            currentlySelectedVideodisplay = (currentlySelectedVideodisplay - 1) % globalVideoSource.length;
+            videojs(globalVideoSource[currentlySelectedVideodisplay].id).src(globalVideoSource[currentlySelectedVideodisplay].src);
         });
-        $("#" + id_btn_video2).click(function(e) {
-            if (!currentlySelectedVideodisplay == 1) {
-                $("#" + id_btn_video1).removeClass("active");
-                $("#" + id_btn_video2).addClass("active");
-                currentlySelectedVideodisplay = 1;
-                videojs(globalVideoSource[1].id).src(globalVideoSource[1].src);
-            }
+        $("#nextVideo").click(function(e) {
+            currentlySelectedVideodisplay = (currentlySelectedVideodisplay + 1) % globalVideoSource.length;
+            videojs(globalVideoSource[currentlySelectedVideodisplay].id).src(globalVideoSource[currentlySelectedVideodisplay].src);
         });
     }
 
@@ -1844,6 +1825,17 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             videodisplayMaster.on(event_html5player_fullscreenchange, function() {
                 Engage.trigger(plugin.events.fullscreenChange.getName());
             });
+
+            // event used to switch between videos in single player mode
+            Engage.on(plugin.events.switchVideo.getName(), function(event) {
+
+            });
+            
+            var numberDisplays = $("." + videoDisplayClass).length;
+            if (numberDisplays > 1) {
+                $("." + videoDisplayClass).on("click", function () {
+                    Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
+                });
 
             Engage.on(plugin.events.focusVideo.getName(), function(display) {
                 Engage.log("Video: received focusing video " + display);
