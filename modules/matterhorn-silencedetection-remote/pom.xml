@@ -27,7 +27,11 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
+            <Import-Package>
+              *;resolution:=optional
+            </Import-Package>
             <Export-Package>
               org.opencastproject.silencedetection.remote;version=${project.version}
             </Export-Package>

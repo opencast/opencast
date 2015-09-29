@@ -8,6 +8,30 @@
    "SAVE":         "Save",
    "LOGOUT":       "Logout",
    "RESET":        "Reset",
+   "LANGUAGES": {
+      "ARABIC":"Arabic",
+      "DANISH":"Danish",
+      "GERMAN":"German",
+      "GERMAN_CH":"Swiss German",
+      "FINNISH":"Finnish",
+      "HINDI":"Hindi",
+      "ITALIAN":"Italian",
+      "JAPANESE":"Japanese",
+      "DUTCH":"Dutch",
+      "NORWEGIAN":"Norwegian",
+      "FRENCH":"French",
+      "ENGLISH":"English",
+      "SPANISH":"Spanish",
+      "ROMANSH":"Romansh",
+      "POLISH":"Polish",
+      "PORTUGESE":"Portugese",
+      "SLOVENIAN":"Slovenian",
+      "SWEDISH":"Swedish",
+      "RUSSIAN":"Russian",
+      "TURKISH":"Turkish",
+      "UKRAINIAN":"Ukrainian",
+      "CHINESE":"Chinese"
+    },
    "PREFERENCES":  {
       "CAPTION": "Preferences",
       "PROFILE": "Profile",
@@ -571,7 +595,8 @@
             "URL": "URL"
           },
          "WORKFLOW_DETAILS": {
-           "TITLE": "Workflow details"
+           "TITLE": "Workflow details",
+           "CONFIGURATION": "Workflow configuration"
          },
          "WORKFLOW_OPERATIONS": {
            "TITLE": "Workflow operations"

@@ -136,7 +136,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         $.ajax({
             url: jsonstr,
             dataType: "json",
-            async: false,
             success: function(data) {
                 if (data) {
                     data.value_locale = language;
