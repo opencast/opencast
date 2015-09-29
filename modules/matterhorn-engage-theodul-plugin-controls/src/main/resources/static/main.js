@@ -176,7 +176,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_pipIndicator = "pipIndicator";
     var id_pipLeft = "pipLeft";
     var id_pipRight = "pipRight";
-    var id_pipBesides = "pipBesides";
+    var id_pipBeside = "pipBeside";
     var id_pipOff = "pipOff";
     var id_qualityLow = "qualityLow";
     var id_qualityMedium = "qualityMedium";
@@ -408,7 +408,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 
                 var pipPosition = pipPos;
 		if (!pipStatus) {
-                    pipPosition = "besides";
+                    pipPosition = "beside";
                 }
                 
                 segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
@@ -463,7 +463,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_pictureInPicture: translate("pictureInPicture", "Picture in Picture"),
                     str_left: translate("left", "left"),
                     str_right: translate("right", "right"),
-                    str_besides: translate("besides", "besides"),
+                    str_beside: translate("beside", "beside"),
                     str_off: translate("off", "off"),
                     pip_position: translate(pipPosition, pipPosition),
                     translatedqualities: translatedQualites,
@@ -612,10 +612,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.trigger(plugin.events.movePiP.getName(), "right");
             Engage.trigger(plugin.events.togglePiP.getName(), true);
         });
-        $("#" + id_pipBesides).click(function(e) {
+        $("#" + id_pipBeside).click(function(e) {
             e.preventDefault();
             $(".videoDisplay").trigger("click");
-            $("#" + id_pipIndicator).html(translate("besides", "besides"));
+            $("#" + id_pipIndicator).html(translate("beside", "beside"));
             Engage.trigger(plugin.events.togglePiP.getName(), false);
         });
         $("#" + id_pipOff).click(function(e) {
@@ -1080,7 +1080,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 if (pip !== undefined) {
                     Basil.set(storage_pip, pip);                    
                     if (! pip) {
-                        $("#" + id_pipIndicator).html(translate("besides", "besides"));
+                        $("#" + id_pipIndicator).html(translate("beside", "beside"));
                     } else {
                         if (pipPos === "left") {
                             $("#" + id_pipIndicator).html(translate("left", "left"));
