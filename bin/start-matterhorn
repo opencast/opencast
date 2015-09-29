@@ -20,7 +20,7 @@ ECLIPSE_LOGLEVEL="CONFIG"
 FELIX_CONFIG_DIR=$OPENCAST_HOME_DIR/etc
 FELIX_WORK_DIR=$OPENCAST_HOME_DIR/work
 FELIX_CACHE_DIR="${FELIX_WORK_DIR}/felix-cache"
-MATTERHORN_TEMP_DIR="${FELIX_WORK_DIR}/tmp"
+OPENCAST_TEMP_DIR="${FELIX_WORK_DIR}/tmp"
 
 # Check lib dir exists
 [ -d "$OPENCAST_HOME_DIR/lib/matterhorn" ] || \
@@ -60,7 +60,7 @@ DISABLE_PHONEHOME="-Dnet.sf.ehcache.skipUpdateCheck=true"
 DISABLE_PHONEHOME="${DISABLE_PHONEHOME} -Dorg.terracotta.quartz.skipUpdateCheck=true"
 
 # Configure temporary files
-JAVA="-Djava.io.tmpdir=$OPENCAST_TEMP_DIR"
+JAVA="-Djava.io.tmpdir=${DISABLE_PHONEHOME}"
 
 # Set memory allocation options
 # -XX:MaxPermSize has been removed in OpenJDK >= 8
