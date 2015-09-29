@@ -469,9 +469,8 @@ CREATE TABLE mh_user_settings (
   setting_value text NOT NULL,
   username varchar(128) NOT NULL,
   organization varchar(128) NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT FK_mh_user_setting_username FOREIGN KEY (username) REFERENCES mh_user (username),
-  CONSTRAINT FK_mh_user_setting_org FOREIGN KEY (organization) REFERENCES mh_user (organization)
+  CONSTRAINT UNQ_mh_user_settings UNIQUE (username, organization),
+  PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_email_configuration (
@@ -605,9 +604,9 @@ CREATE TABLE mh_series_property (
   series VARCHAR(128) NOT NULL,
   name VARCHAR(255) NOT NULL,
   value TEXT(65535),
-  PRIMARY KEY (`organization`, `series`, `name`),
-  CONSTRAINT FK_mh_series_property_series FOREIGN KEY (series) REFERENCES mh_series (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8; 
+  PRIMARY KEY (organization, series, name),
+  CONSTRAINT FK_mh_series_property_organization_series FOREIGN KEY (organization, series) REFERENCES mh_series (organization, id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_series_property_pk ON mh_series_property (series);
 

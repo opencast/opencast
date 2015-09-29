@@ -32,7 +32,8 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>*</Import-Package>
             <Export-Package> org.opencastproject.caption.api;version=${project.version} </Export-Package>
             <Private-Package/>

@@ -89,9 +89,13 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
-              *;resolution:=optional
+              !junit.framework,
+              !org.apache.lucene.*,
+              !org.mortbay.*,
+              *
             </Import-Package>
             <Private-Package>
               org.tartarus.snowball;-split-package:=merge-first,

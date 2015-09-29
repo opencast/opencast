@@ -25,7 +25,6 @@ import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter.SourceType;
 import org.opencastproject.index.service.resources.list.provider.ContributorsListProvider;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider;
-import org.opencastproject.index.service.resources.list.provider.LanguagesListProvider;
 import org.opencastproject.index.service.resources.list.provider.SeriesListProvider;
 import org.opencastproject.index.service.util.FiltersUtils;
 import org.opencastproject.util.data.Option;
@@ -295,7 +294,7 @@ public class EventListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createLanguageFilter(Option<String> language) {
     return FiltersUtils.generateFilter(language, FILTER_LANGUAGE_NAME, FILTER_LANGUAGE_LABEL, SourceType.SELECT,
-            Option.some(LanguagesListProvider.DEFAULT));
+            Option.some("LANGUAGES"));
   }
 
   /**

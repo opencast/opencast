@@ -73,6 +73,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>${package};version=${project.version}</Export-Package>
             <Import-Package>org.opencastproject.engage.theodul.api;version=${project.version},
               *;resolution:=optional</Import-Package>
