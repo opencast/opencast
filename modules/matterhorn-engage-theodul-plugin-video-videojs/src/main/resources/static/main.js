@@ -481,6 +481,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     function registerZoomLevelEvents() {
 
+        Engage.group("registerZoomLevelEvents");
+
         var selector = "video"
         var lastEvent = null;
         var wheelEvent = null;
@@ -508,12 +510,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             Basil.set("zoomData", zoomData);
         } else if(zoomData[id].length != 0){
             /* get zoomlevels for displays and apply them */
+            Engage.log("Found stored Zoom: " + zoomData[id]);
             zoomLevels = zoomData[id];
             Engage.on(plugin.events.play.getName(), applyStoredZoom());
         }
 
         function applyStoredZoom() {
             for (var i = 0; i <= (zoomLevels.length/2); i+=2) {
+                Engage.log("Apply zoom: " + $("#"+zoomLevels[i])[0].id + " / " + zoomLevels[i+1]);
                 $("#"+zoomLevels[i])[0].style.transform = "scale(" + zoomLevels[i+1] + ")";
                 Engage.trigger(plugin.events.zoomChange.getName(), zoomLevels[i+1]);
             }
@@ -598,7 +602,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 Engage.trigger(events.setZoomLevel.getName(), [zoom_step_size]);
                 // move towards mouse position
                 var z = zoomLevels[zoomLevels.indexOf($(selector)[0].id) + 1]
-                console.log(z);
+
                 moveHorizontal(-((xdiff/5)/z));
                 moveVertical(-((ydiff/5)/z));
             };
@@ -643,7 +647,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 offset = offset.replace("px", "");
                 offset = Number(offset);
 
-                (step > 0) ? console.log("Shift right: " + step) : console.log("Shift left: " + step);
+                //(step > 0) ? Engage.log("Shift right: " + step) : Engage.log("Shift left: " + step);
 
                 if (step > 0 && Math.abs($(selector).position().left) < step ) {
                     // Shift right, but too far
@@ -654,10 +658,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     // Shift left but too far
                     step = (left - offset);
                 }
-
-                console.log("Offset: " + offset);
-                console.log("Left: " + left);
-                console.log("$(selector).position().left " + $(selector).position().left);
 
                 if (!(($(selector).position().left + step) > 0) && !((offset + step) < left)) {
                     $(selector).css("left", (offset + step) + "px");
@@ -673,7 +673,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 offset = offset.replace("px", "");
                 offset = Number(offset);
 
-                (step > 0) ? console.log("Shift down: " + step) : console.log("Shift up: " + step);
+                //(step > 0) ? Engage.log("Shift down: " + step) : Engage.log("Shift up: " + step);
 
                 if (step > 0 && (Math.abs($(selector).position().top) < step)) {
                     step = Math.abs($(selector).position().top)
@@ -682,8 +682,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 if (step < 0 && (offset + step < top)) {
                     step = (top - offset);
                 }
-                console.log("top: " + top);
-                console.log("offset: " + offset);
 
                 if (!((offset + step) < top) && !(($(selector).position().top + step) > 0)) {
                     $(selector).css("top", (offset + step) + "px");
@@ -692,7 +690,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
 
         Engage.on(plugin.events.setZoomLevel.getName(), function(data) {
-
             var level = data[0];
             var fixed = data[1];
             var moveOnly = data[2];
@@ -719,9 +716,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     }
                 }
             }
-
-            Engage.log("Video: ZoomLevels Array: " + zoomLevels);
-            if (Number(level).toFixed(decimal_places) >= 1.0 && (videoFocused || singleVideo)) {
+            if (Number(level).toFixed(decimal_places) <= 1.0) {
+                $("#indicator").hide();
+            }
+            else if (Number(level).toFixed(decimal_places) >= 1.0 && (videoFocused || singleVideo)) {
                 var topTrans = Number($(selector).css("top").replace("px", ""));
                 var leftTrans = Number($(selector).css("left").replace("px", ""));
 
@@ -756,8 +754,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     Engage.trigger(plugin.events.zoomChange.getName(), zoomLevel);
                     zoomLevels[(zoomLevels.indexOf($(selector)[0].id) + 1)] = parseFloat(Number(level).toFixed(decimal_places));
                     updateZoomData(zoomLevels, id);
+
+                    if ($("#indicator").length == 0){
+                        console.log("insert");
+                        $(selector).after("<canvas id='indicator' height='200px' width='5px'></canvas>");
+                    } else {
+                        $("#indicator").show();
+                    }
                 }
-                Engage.log("Video: Finished zoom of " + $(selector)[0].id + " to level: " + zoomLevel);
             };
         });
 
@@ -773,6 +777,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         Engage.on(plugin.events.zoomOut.getName(), function() {
             Engage.trigger(plugin.events.setZoomLevel.getName(), [-zoom_step_size]);
         });
+
+        Engage.groupEnd();
     }
 
     function changeQuality(q) {

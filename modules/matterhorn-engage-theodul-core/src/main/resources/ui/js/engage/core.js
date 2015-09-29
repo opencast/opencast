@@ -580,6 +580,16 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 console.log(data);
             }
         },
+        group: function(block) {
+            if (this.model.get("isDebug") && window.console) {
+                console.group(block);
+            }
+        },
+        groupEnd: function() {
+            if (this.model.get("isDebug") && window.console) {
+                console.groupEnd();
+            }
+        },
         getPluginPath: function(pluginName) {
             var evaluated_plugin_path = "";
             var pluginsInfos = engageCore.model.get("pluginsInfo");
