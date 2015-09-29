@@ -506,7 +506,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         if (zoomData[id] == undefined) {
             zoomData[id] = [];
             Basil.set("zoomData", zoomData);
-        } else {
+        } else if(zoomData[id].length != 0){
             /* get zoomlevels for displays and apply them */
             zoomLevels = zoomData[id];
             Engage.on(plugin.events.play.getName(), applyStoredZoom());
