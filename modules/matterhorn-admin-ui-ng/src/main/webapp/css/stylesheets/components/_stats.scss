@@ -18,11 +18,7 @@
  * the License.
  *
  */
-// borrowed from less/views/_dashboard.less
 .stats-container {
-
-  margin-bottom: 20px;
-
   .col {
     $num-cols: 10;
     $padding: 1%;
@@ -50,9 +46,10 @@
       cursor: pointer;
       border-radius: $main-border-radius;
       border: $thin-border-stroke $main-border-color;
+      overflow: hidden;
 
       &:hover {
-        border: 1px solid darken($main-border-color, 20%);
+        border: $thin-border-stroke darken($main-border-color, 20%);
       }
 
       h1 {
@@ -61,7 +58,7 @@
         background: darken($body-background, .5%);
         margin: 0 0 15px 0;
         padding: 15px 0;
-        border-bottom: 1px solid darken($body-background, 8%);
+        border-bottom: $thin-border-stroke darken($body-background, 8%);
       }
 
       span {
