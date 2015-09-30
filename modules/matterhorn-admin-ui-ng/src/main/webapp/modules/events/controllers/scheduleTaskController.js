@@ -25,12 +25,30 @@ angular.module('adminNg.controllers')
 .controller('ScheduleTaskCtrl', ['$scope', 'Table', 'FormNavigatorService', 'NewEventProcessing', 'TaskResource', 'Notifications',
 function ($scope, Table, FormNavigatorService, NewEventProcessing, TaskResource, Notifications) {
     var onSuccess, onFailure;
-    $scope.rows = Table.getSelected();
+    // make a shallow copy of selected main Table rows for our own use
+    $scope.rows = [];
+    angular.forEach(Table.getSelected(), function (row) {
+        $scope.rows.push($.extend({}, row ));
+    });
     $scope.navigateTo = function (targetForm, currentForm, requiredForms) {
         $scope.currentForm = FormNavigatorService.navigateTo(targetForm, currentForm, requiredForms);
     };
     $scope.currentForm = 'generalForm';
     $scope.processing = NewEventProcessing.get('tasks');
+
+    var getSelectedIds = function () {
+        var result = [];
+        angular.forEach($scope.rows, function (row) {
+            if(row.selected) {
+                result.push(row.id);
+            }
+        });
+        return result;
+    };
+
+    $scope.valid = function () {
+        return getSelectedIds().length > 0;
+    };
     
     onSuccess = function () {
         $scope.close();
@@ -43,15 +61,30 @@ function ($scope, Table, FormNavigatorService, NewEventProcessing, TaskResource,
     };
 
     $scope.submit = function () {
-        var eventIds = [], payload;
-        angular.forEach($scope.rows, function (row) {
-            eventIds.push(row.id);
-        });
-        payload = {
-            workflows: $scope.processing.ud.workflow.id,
-            configuration: $scope.processing.ud.workflow.selection.configuration,
-            eventIds: eventIds
-        };
-        TaskResource.save(payload, onSuccess, onFailure);
+        if ($scope.valid()) {
+            var eventIds = getSelectedIds(), payload;
+            payload = {
+                workflows: $scope.processing.ud.workflow.id,
+                configuration: $scope.processing.ud.workflow.selection.configuration,
+                eventIds: eventIds
+            };
+            TaskResource.save(payload, onSuccess, onFailure);
+        }
+    };
+    
+    $scope.toggleSelectAll = function () {
+        if ($scope.all) {
+            angular.forEach($scope.rows, function (row) {
+                row.selected = true;
+            });
+        } else {
+            angular.forEach($scope.rows, function (row) {
+                row.selected = false;
+            });
+        }
+    };
+    
+    $scope.numSelected = function () {
+        return getSelectedIds().length;
     };
 }]);

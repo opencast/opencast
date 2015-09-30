@@ -133,6 +133,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               org.opencastproject.message.broker.api.index;version=${project.version},
               *;resolution:=optional
@@ -172,7 +173,6 @@
               OSGI-INF/list-providers/events.xml,
               OSGI-INF/list-providers/groups.xml,
               OSGI-INF/list-providers/jobs.xml,
-              OSGI-INF/list-providers/languages.xml,
               OSGI-INF/list-providers/participation.xml,
               OSGI-INF/list-providers/roles.xml,
               OSGI-INF/list-providers/series.xml,

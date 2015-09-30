@@ -606,7 +606,20 @@
                             </tr>
                         </table>
                     </div>
+                </div>                
+
+                <div class="obj tbl-details">
+                    <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION">Workflow configuration</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr ng-repeat="(key, value) in subNavData.configuration">
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
+
                 <div class="obj tbl-container more-info-actions">
                     <header>More Information &amp; Actions</header>
                     <div class="obj-container">
