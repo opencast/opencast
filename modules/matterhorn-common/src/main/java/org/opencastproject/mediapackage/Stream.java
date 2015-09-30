@@ -32,4 +32,6 @@ public interface Stream extends ManifestContributor {
    */
   String getIdentifier();
 
+  Long getFrameCount();
+
 }

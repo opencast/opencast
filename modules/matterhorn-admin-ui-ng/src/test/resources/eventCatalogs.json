@@ -1,23 +1,23 @@
 [
     {
-        "id": "publish-track-1",
-        "mimetype": "video/quicktime",
+        "id": "catalog-1",
+        "mimetype": "text/xml",
         "tags": ["archive", "engage"],
-        "type": "presenter/source",
+        "type": "episode/dublincore",
         "url": "http://episodes/10.0000/1/publish-track-1/1/track.mov"
     },
     {
-        "id": "publish-track-2",
-        "mimetype": "video/quicktime",
+        "id": "catalog-2",
+        "mimetype": "text/xml",
         "tags": ["archive", "engage"],
-        "type": "presenter/source",
+        "type": "episode/dublincore",
         "url": "http://episodes/10.0000/1/publish-track-2/1/track.mov"
     },
     {
-        "id": "publish-track-3",
-        "mimetype": "video/quicktime",
+        "id": "catalog-3",
+        "mimetype": "text/xml",
         "tags": ["archive", "engage"],
-        "type": "presenter/source",
+        "type": "episode/dublincore",
         "url": "http://episodes/10.0000/1/publish-track-3/1/track.mov"
     }
 ]
