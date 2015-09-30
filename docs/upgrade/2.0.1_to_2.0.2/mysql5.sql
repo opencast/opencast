@@ -1,4 +1,5 @@
--- Need to drop and add FK_mh_user_action_session_id separately
+-- Consistency updates MH-10588, MH-11067 --
+
 ALTER TABLE mh_user_action
 DROP FOREIGN KEY FK_mh_user_action_session_id;
 ALTER TABLE mh_user_action
@@ -97,6 +98,7 @@ DROP INDEX UNQ_mh_email_configuration_0,
 ADD CONSTRAINT UNQ_mh_email_configuration UNIQUE (organization);
 
 ALTER TABLE mh_comment_mh_comment_reply
+DROP INDEX FK_mh_comment_mh_comment_reply_replies_id,
 DROP FOREIGN KEY FK_mh_comment_mh_comment_reply_replies_id,
 DROP FOREIGN KEY FK_mh_comment_mh_comment_reply_Comment_id;
 ALTER TABLE mh_comment_mh_comment_reply
@@ -105,7 +107,6 @@ CHANGE Comment_id comment_id BIGINT(20) NOT NULL,
 ADD PRIMARY KEY (comment_id,replies_id),
 ADD CONSTRAINT FK_mh_comment_mh_comment_reply_comment_id FOREIGN KEY (comment_id) REFERENCES mh_comment (id),
 ADD CONSTRAINT FK_mh_comment_mh_comment_reply_replies_id FOREIGN KEY (replies_id) REFERENCES mh_comment_reply (id);
-
 
 CREATE INDEX IX_mh_comment_mh_comment_reply_replies on mh_comment_mh_comment_reply (replies_id);
 
@@ -152,4 +153,3 @@ ADD INDEX IX_mh_archive_episode_id (id);
 CREATE INDEX IX_mh_archive_episode_organization on mh_archive_episode (organization);
 CREATE INDEX IX_mh_event_mh_comment_comment on mh_event_mh_comment (comment);
 
- 
