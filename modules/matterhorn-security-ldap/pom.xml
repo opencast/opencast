@@ -23,6 +23,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               org.springframework.security.ldap;version=${spring-security.version},
               org.springframework.security.ldap.authentication;version=${spring-security.version},

@@ -85,6 +85,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               javax.xml.namespace;version=0,
               org.w3c.dom;version=0,

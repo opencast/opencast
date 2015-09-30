@@ -105,6 +105,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Embed-Dependency>
               org.springframework.ldap;inline=true,
               org.springframework.beans;inline=true,

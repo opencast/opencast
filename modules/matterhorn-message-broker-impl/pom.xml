@@ -107,6 +107,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               javax.jms,
               org.opencastproject.message.broker.api;version=${project.version},

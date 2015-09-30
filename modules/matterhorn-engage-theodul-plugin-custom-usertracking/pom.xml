@@ -71,6 +71,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Build-Number>${buildNumber}</Build-Number>
                         <Export-Package>org.opencast.engage.theodul.plugin.custom.usertracking;version=${project.version}</Export-Package>
                         <Import-Package>org.opencastproject.engage.theodul.api;version=${project.version},
                             *;resolution:=optional</Import-Package>

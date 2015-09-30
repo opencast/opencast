@@ -18,8 +18,8 @@
                         <div class="row">
                             <p>
                                 <span translate='LOGIN.WELCOME'></span><br />
-                                <span class="subtle-text">
-                                    Opencast Video Capture Software
+                                <span class="subtle-text" ng-if="version.version">
+                                    Opencast (v.{{ version.version }} - build: {{ version.buildNumber }})
                                 </span>
                             </p>
                         </div>
@@ -91,6 +91,7 @@
         <script src="shared/services/jsHelperService.js"></script>
         <script src="shared/resources/resources.js"></script>
         <script src="shared/resources/identityResource.js"></script>
+        <script src="shared/resources/versionResource.js"></script>
         <script src="shared/directives/oldDropdownDirective.js"></script>
     </body>
 </html>
