@@ -1407,6 +1407,8 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       properties.put("param.trackh", String.valueOf(subHeight));
       properties.put("param.offset", String.valueOf(subHeight / 2));
 
+      properties.put("param.input.stream.count", String.valueOf(mediaTrack.getStreams().length));
+
       File output;
       try {
         output = engine.embed(mediaFile, captionFiles, captionLanguages, properties);

@@ -23,7 +23,7 @@ package org.opencastproject.composer.impl;
 
 import org.opencastproject.composer.api.EmbedderEngine;
 import org.opencastproject.composer.api.EmbedderEngineFactory;
-import org.opencastproject.composer.impl.qtembedder.QTSbtlEmbedderEngine;
+import org.opencastproject.composer.impl.ffmpeg.FFmpegEmbedderEngine;
 
 import org.osgi.service.component.ComponentContext;
 
@@ -49,7 +49,7 @@ public class EmbedderEngineFactoryImpl implements EmbedderEngineFactory {
    */
   @Override
   public EmbedderEngine newEmbedderEngine() {
-    QTSbtlEmbedderEngine engine = new QTSbtlEmbedderEngine();
+    FFmpegEmbedderEngine engine = new FFmpegEmbedderEngine();
     engine.activate(context);
     return engine;
   }
