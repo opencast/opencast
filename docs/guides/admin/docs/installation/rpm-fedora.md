@@ -70,11 +70,11 @@ Opencast RPM repository as well and can be installed by running:
 
     dnf install activemq-dist
 
-A prepared configuration file for ActiveMQ can be found at `/usr/share/matterhorn/docs/scripts/activemq/settings.xml`
-*after Opencast itself has been installed* and should replace `/etc/activemq/settings.xml`. For an all-in-one
+A prepared configuration file for ActiveMQ can be found at `/usr/share/matterhorn/docs/scripts/activemq/activemq.xml`
+*after Opencast itself has been installed* and should replace `/etc/activemq/activemq.xml`. For an all-in-one
 installation the following command should suffice:
 
-    sudo cp /usr/share/matterhorn/docs/scripts/activemq/settings.xml /etc/activemq/settings.xml
+    sudo cp /usr/share/matterhorn/docs/scripts/activemq/activemq.xml /etc/activemq/activemq.xml
 
 ActiveMQ should be started before starting Opencast.
 

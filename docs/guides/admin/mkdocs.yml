@@ -68,6 +68,7 @@ pages:
 # workflow operation handlers
 - ['workflowoperationhandlers/index.md', 'Workflow Operation Handlers', 'Workflow Operation Handler Overview']
 - ['workflowoperationhandlers/analyzeaudio-woh.md', 'Workflow Operation Handlers', 'Analyze audio WOH']
+- ['workflowoperationhandlers/append-woh.md', 'Workflow Operation Handlers', 'Append WOH']
 - ['workflowoperationhandlers/applyacl-woh.md', 'Workflow Operation Handlers', 'Apply ACL WOH']
 - ['workflowoperationhandlers/archive-woh.md', 'Workflow Operation Handlers', 'Archive WOH']
 - ['workflowoperationhandlers/caption-woh.md', 'Workflow Operation Handlers', 'Caption WOH']
