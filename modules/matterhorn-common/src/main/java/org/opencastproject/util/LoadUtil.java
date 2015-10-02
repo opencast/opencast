@@ -21,11 +21,16 @@
 
 package org.opencastproject.util;
 
+import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
+import java.util.List;
 
 public final class LoadUtil {
 
@@ -35,7 +40,7 @@ public final class LoadUtil {
   /** The logging instance */
   private static final Logger logger = LoggerFactory.getLogger(LoadUtil.class);
 
-  public static float getConfiguredLoadValue(@SuppressWarnings("rawtypes") Dictionary bundleProperties, String configKey, Float defaultValue) {
+  public static float getConfiguredLoadValue(@SuppressWarnings("rawtypes") Dictionary bundleProperties, String configKey, Float defaultValue, ServiceRegistry registry) {
     String jobLoad = StringUtils.trimToNull((String) bundleProperties.get(configKey));
     float loadValue = defaultValue;
     if (jobLoad != null) {
@@ -55,6 +60,21 @@ public final class LoadUtil {
     } else {
       logger.info("No job load configuration found for key {}, load to default of {}", configKey, loadValue);
     }
+    try {
+      checkJobFitsCluster(loadValue, configKey, registry.getHostRegistrations());
+    } catch (ServiceRegistryException e) {
+      logger.warn("Unable to verify that {} will run on this cluster due to load of {}", configKey, loadValue);
+    }
     return loadValue;
+  }
+
+  public static void checkJobFitsCluster(float load, String loadType, List<HostRegistration> hosts) {
+    for (HostRegistration host : hosts) {
+      if (host.getMaxLoad() >= load) {
+        logger.trace("Host " + host.toString() + " can process jobs of type " + loadType + " with load " + load);
+        break;
+      }
+    }
+    logger.warn("No hosts found that can process jobs of type {} with load {}", loadType, load);
   }
 }

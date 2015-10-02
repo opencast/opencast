@@ -679,7 +679,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws org.osgi.service.cm.ConfigurationException {
-    executeJobLoad = LoadUtil.getConfiguredLoadValue(properties, EXECUTE_JOB_LOAD_KEY, DEFAULT_EXECUTE_JOB_LOAD);
+    executeJobLoad = LoadUtil.getConfiguredLoadValue(properties, EXECUTE_JOB_LOAD_KEY, DEFAULT_EXECUTE_JOB_LOAD, serviceRegistry);
   }
 
 }

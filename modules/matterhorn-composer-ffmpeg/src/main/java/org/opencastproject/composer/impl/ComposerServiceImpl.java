@@ -2033,7 +2033,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
 
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    captionJobLoad = LoadUtil.getConfiguredLoadValue(properties, CAPTION_JOB_LOAD_KEY, DEFAULT_CAPTION_JOB_LOAD);
+    captionJobLoad = LoadUtil.getConfiguredLoadValue(properties, CAPTION_JOB_LOAD_KEY, DEFAULT_CAPTION_JOB_LOAD, serviceRegistry);
   }
 
 }

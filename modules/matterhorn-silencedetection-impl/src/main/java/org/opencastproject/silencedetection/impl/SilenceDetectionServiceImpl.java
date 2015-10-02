@@ -267,7 +267,7 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
     }
     logger.debug("Properties updated!");
 
-    jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD);
+    jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
   }
 
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {

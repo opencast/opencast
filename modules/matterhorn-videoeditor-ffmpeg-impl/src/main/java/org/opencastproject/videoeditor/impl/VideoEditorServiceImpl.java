@@ -465,7 +465,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     }
     logger.debug("Properties updated!");
 
-    jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD);
+    jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
   }
 
   public void setMediaInspectionService(MediaInspectionService inspectionService) {

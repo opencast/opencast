@@ -190,8 +190,8 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
       throw new ConfigurationException("Failed to load YouTube v3 properties", dataStore, e);
     }
 
-    youtubePublishJobLoad = LoadUtil.getConfiguredLoadValue(properties, YOUTUBE_PUBLISH_LOAD_KEY, DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD);
-    youtubeRetractJobLoad = LoadUtil.getConfiguredLoadValue(properties, YOUTUBE_RETRACT_LOAD_KEY, DEFAULT_YOUTUBE_RETRACT_JOB_LOAD);
+    youtubePublishJobLoad = LoadUtil.getConfiguredLoadValue(properties, YOUTUBE_PUBLISH_LOAD_KEY, DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD, serviceRegistry);
+    youtubeRetractJobLoad = LoadUtil.getConfiguredLoadValue(properties, YOUTUBE_RETRACT_LOAD_KEY, DEFAULT_YOUTUBE_RETRACT_JOB_LOAD, serviceRegistry);
   }
 
   @Override
