@@ -15,16 +15,24 @@ directory. In most cases, that should be either `/etc/matterhorn/custom.properti
 Step 1: Setting the Server URL
 ------------------------------
 
-The first thing you should do is to set the server URL. To do that, find the property org.opencastproject.server.url in
-your custom.properties configuration file. This key is set to http://localhost:8080 by default.  That will only allow
-access from the local machine. You should change this if your server should be accessible within a network. Set it to
-your domain name or IP address like:
+By default, only connections from the local machine are accepted by Opencast.  You want to change this if the system
+should be accessible within a network.
+
+First, find the property `org.opencastproject.server.url` in your `custom.properties` configuration file and set it to
+your own domain name:
 
     org.opencastproject.server.url=http://example.com:8080
 
-*Note:* This value will be written to all generated mediapackages and thus cannot be changed for already generated media
-afterwards. At least not without an extra amount of work involving modifications to the database. So think about this
-setting for a minute.
+*Note:* This value will be written to all generated mediapackages and thus cannot be changed easily for already
+processed media. At least not without an extra amount of work involving modifications to the database. That is why you
+should think about this setting carefully.
+
+Second, adjust the binding address and port in `org.ops4j.pax.web.cfg`. The binding address can be set to `0.0.0.0` for
+general network access. The port should either fit the server URL or the settings of a proxy server, if one is used. The
+properties to modify are:
+
+    org.ops4j.pax.web.listening.addresses=127.0.0.1
+    org.osgi.service.http.port=8080
 
 
 Step 2: Setting the Login Details
