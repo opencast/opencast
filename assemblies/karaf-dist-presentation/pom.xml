@@ -79,12 +79,6 @@
           <!-- no startupFeatures -->
           <bootFeatures>
             <feature>standard</feature>
-            <feature>management</feature>
-            <feature>ssh</feature>
-            <feature>config</feature>
-            <feature>region</feature>
-            <feature>package</feature>
-            <feature>kar</feature>
             <feature>opencast-presentation</feature>
            </bootFeatures>
           <!-- no installedFeatures -->
