@@ -91,10 +91,29 @@
             <phase>prepare-package</phase>
             <configuration>
               <target>
+                <!-- Remove Karaf Spring bundle since it conflicts with the one used by Opencast -->
                 <replaceregexp
                   file="target/assembly/etc/startup.properties"
                   match="^.*org.apache.karaf.deployer/org.apache.karaf.deployer.spring.*$"
+                  replace="#\0"
+                  byline="true" />
+                <!-- Make sure to deactivate JMX by default -->
+                <replaceregexp
+                  file="target/assembly/bin/karaf"
+                  match="-Dcom.sun.management.jmxremote"
                   replace=""
+                  byline="true" />
+                <!-- Correct the start script name -->
+                <replaceregexp
+                  file="target/assembly/bin/karaf"
+                  match="^KARAF_SCRIPT=.*$"
+                  replace="KARAF_SCRIPT='start-opencast'"
+                  byline="true" />
+                <!-- Remove SSHd and JMX from default start -->
+                <replaceregexp
+                  file="target/assembly/etc/org.apache.karaf.features.cfg"
+                  match="^(featuresBoot = .*),ssh,management(.*)$"
+                  replace="#\0${line.separator}\1\2"
                   byline="true" />
               </target>
             </configuration>
