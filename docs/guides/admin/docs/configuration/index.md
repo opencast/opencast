@@ -17,6 +17,7 @@ General Configuration
  - [Security Configuration](security.md)
     - [CAS Security Configuration](security.cas.md)
  - [Workflow Configuration](workflow.md)
+    - [Workflow Operation Handler](../workflowoperationhandlers/index.md)
 
 Additional Documentation
 ------------------------

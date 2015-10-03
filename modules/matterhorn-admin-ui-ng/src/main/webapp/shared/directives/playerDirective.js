@@ -9,7 +9,8 @@ angular.module('adminNg.directives')
         scope: {
             player   : '=',
             video    : '=',
-            controls : '@'
+            controls : '@',
+            subControls: '@'
         },
         link: function (scope, element, attrs) {
             function loadPlayerAdapter(element) {
@@ -98,6 +99,8 @@ angular.module('adminNg.directives')
                     scope.player.adapter.play();
                 }
             };
+
+            scope.subControls = angular.isDefined(scope.subControls) ? scope.subControls : 'true';
 
             // Check for the player (10 times) before to load the adapter
             checkPlayerElement(10, loadPlayerAdapter);

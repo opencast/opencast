@@ -5,7 +5,7 @@
   immediate="true"
   activate="activate">
     <implementation class="org.opencastproject.composer.impl.EmbedderEngineFactoryImpl" />
-    <property name="service.description" value="QT SUbtitle Embedder Engine Factory" />
+    <property name="service.description" value="FFmpeg subtitle Embedder Engine Factory" />
     <service>
       <provide interface="org.opencastproject.composer.api.EmbedderEngineFactory" />
     </service>

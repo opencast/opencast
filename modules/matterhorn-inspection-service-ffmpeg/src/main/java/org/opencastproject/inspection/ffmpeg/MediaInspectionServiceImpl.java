@@ -21,8 +21,6 @@
 
 package org.opencastproject.inspection.ffmpeg;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.tika.parser.Parser;
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -36,6 +34,9 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.tika.parser.Parser;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -67,7 +68,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Sets the Apache Tika parser.
-   *
+   * 
    * @param tikaParser
    */
   public void setTikaParser(Parser tikaParser) {
@@ -84,8 +85,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
     final String path = cc.getBundleContext().getProperty(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG);
     final String ffprobeBinary;
     if (path == null) {
-      logger.debug("DEFAULT " + FFmpegAnalyzer.FFPROBE_BINARY_CONFIG + ": "
-          + FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT);
+      logger.debug("DEFAULT " + FFmpegAnalyzer.FFPROBE_BINARY_CONFIG + ": " + FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT);
       ffprobeBinary = FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT;
     } else {
       logger.debug("FFprobe config binary: {}", path);
@@ -96,11 +96,10 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
@@ -113,7 +112,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -149,7 +148,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.inspection.api.MediaInspectionService#inspect(java.net.URI)
    */
   @Override
@@ -163,19 +162,19 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(org.opencastproject.mediapackage.MediaPackageElement,
    *      boolean)
    */
   @Override
   public Job enrich(final MediaPackageElement element, final boolean override) throws MediaInspectionException,
-         MediaPackageException {
-           try {
-             return serviceRegistry.createJob(JOB_TYPE, Operation.Enrich.toString(),
-                 Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)));
-           } catch (ServiceRegistryException e) {
-             throw new MediaInspectionException(e);
-           }
+          MediaPackageException {
+    try {
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Enrich.toString(),
+              Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)));
+    } catch (ServiceRegistryException e) {
+      throw new MediaInspectionException(e);
+    }
   }
 
   protected void setWorkspace(Workspace workspace) {
@@ -189,7 +188,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -199,9 +198,9 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Callback for setting the security service.
-   *
+   * 
    * @param securityService
-   *         the securityService to set
+   *          the securityService to set
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
@@ -209,9 +208,9 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Callback for setting the user directory service.
-   *
+   * 
    * @param userDirectoryService
-   *         the userDirectoryService to set
+   *          the userDirectoryService to set
    */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
@@ -219,9 +218,9 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Sets a reference to the organization directory service.
-   *
+   * 
    * @param organizationDirectory
-   *         the organization directory
+   *          the organization directory
    */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
@@ -229,7 +228,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -239,7 +238,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -249,7 +248,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   *
+   * 
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override
