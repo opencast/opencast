@@ -2,14 +2,13 @@ Basic Configuration
 ===================
 
 This guide will help you to change the basic configuration settings which are required or at least strongly recommended
-for each Opencast installation. This is basically what you should do directly after you installed Opencast on your
-machine.
+for each Opencast installation. This is basically what you should do, right after installing Opencast on your machine.
 
-All these settings are made in the `custom.properties` file. It can be found directly in your Opencast configuration
-directory. In most cases, that should be either `/etc/matterhorn/custom.properties` or
-`/opt/matterhorn/etc/custom.properties`. Open this file using the editor of your choice, e.g.:
+All settings are made to files, residing in the Opencast configuration directory. In most cases, that should be either
+`/etc/opencast/custom.properties` or `/opt/opencast/etc/custom.properties`. Edit the files, using the editor of your
+choice, e.g.:
 
-    vim /etc/matterhorn/custom.properties
+    vim /etc/opencast/custom.properties
 
 
 Step 1: Setting the Server URL
@@ -41,17 +40,19 @@ Step 2: Setting the Login Details
 There are two authentication methods for Opencast. HTTP Digest authntication and form-based authentication. Both
 methods need a username and a password. Change the password for both! The important keys for this are:
 
- - `org.opencastproject.security.admin.user`: The user for the administrative account. This is set to “admin” by
-   default. You should definitely change the credentials if your server is reachable from the internet.
- - `org.opencastproject.security.admin.pass`: The password for the administrative account. This is set to “opencast” by
-   default. You should definitely change the credentials if your server is reachable from the internet.
- - `org.opencastproject.security.digest.user`: The user for the communication between Opencast nodes. This is set to
-   “matterhorn_system_account” by default.
- - `org.opencastproject.security.digest.pass`: The password for the communication between Opencast nodes. This is set
-   to “CHANGE_ME” by default.
+ - `org.opencastproject.security.admin.user`
+    - The user for the administrative account. This is set to `admin` by default.
+ - `org.opencastproject.security.admin.pass`
+    - The password for the administrative account. This is set to `opencast` by default.
+ - `org.opencastproject.security.digest.user`
+    - The user for the communication between Opencast nodes, as well as for capture agents. This is set to
+      `opencast_system_account` by default.
+ - `org.opencastproject.security.digest.pass`
+    - The password for the communication between Opencast nodes and capture agents. This is set to `CHANGE_ME` by
+      default.
 
-*Note:* The Digest credentials are also used for internal communication of Opencast servers. So these keys have to be
-set to the same value on each of you Matterhon nodes (Core, Worker, Capture Agent, …)
+*Note:* The digest credentials are also used for internal communication of Opencast servers. So these keys have to be
+set to the same value on each of you Opencast nodes (Core, Worker, Capture Agent, …)
 
 
 Step 3: Setting up Apache ActiveMQ Message Broker
@@ -62,6 +63,21 @@ broker is mostly run on the admin server of Opencast but can be run separately. 
 For more details about the setup, have a look at the [Apache ActiveMQ configuration guide](message-broker.md).
 
 
+Step 4: Database Configuration
+------------------------------
+
+Opencast uses an integrated HSQL database by default. While you will find it perfectly functional, it has certain
+drawvacks:
+
+ - It is rather slow
+ - It cannot be used for distributed set-ups
+ - Upgrading Opencast with this database is not possible
+
+For testing, it is totally fine to keep the internal database, but you are highly encouraged to switch to a stand-alone
+database for productional use. For more information about database configuration, have a look at the [Database
+Configuration](database.md) section.
+
+
 Step 4: Setting the Storage Directory (optional)
 ------------------------------------------------
 
@@ -70,11 +86,3 @@ the storage directory. This directory is used to store all media, metadata, … 
 can set the directory by changing org.opencastproject.storage.dir like:
 
     org.opencastproject.storage.dir=/media/mhdatamount
-
-
-Step 5: Database Configuration (optional)
------------------------------------------
-
-Opencast uses an integrated HSQL database by default. While you will find it perfectly functional, it is rather slow. So
-you are highly encouraged to switch to a stand-alone database for productional use. For more information about database
-configuration, have a look at the [Database Configuration section](database).
