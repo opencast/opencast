@@ -6,9 +6,9 @@ These instructions outline how to install an all in one Opencast system on Ubunt
 Preparation
 -----------
 
-Create a dedicated Opencast user.
+Create a dedicated Opencast user:
 
-    useradd -d /opt/matterhorn opencast
+    useradd -d /opt/opencast opencast
 
 Get Opencast source:
 
@@ -18,18 +18,18 @@ prior option, the tarball download, needs less tools and you do not have to down
 
 Using the tarball:
 
-Select the tarball for the version you want to install from
-https://bitbucket.org/opencast-community/matterhorn/downloads#tag-downloads
+Select the tarball for the version you want to install from the [BitBucket downloads
+section](https://bitbucket.org/opencast-community/matterhorn/downloads).
 
     # Download desired tarball
     curl -O https://bitbucket.org/opencast-community/matterhorn/...
-    tar xf develop.tar.gz
-    mv opencast-community-matterhorn-* /opt/matterhorn/
+    tar xf ....tar.gz
+    cd opencast-community-...
 
 Cloning the Git repository:
 
     git clone https://bitbucket.org/opencast-community/matterhorn.git
-    cd opencast
+    cd matterhorn
     git tag   <-  List all available versions
     git checkout TAG   <-  Switch to desired version
 
@@ -44,10 +44,6 @@ Required:
     openjdk-7-jdk or openjdk-8-jdk
     ffmpeg >= 2.5
     maven >= 3.1
-
-> *Note that by default Ubuntu and Debian ship Libav and installing the `ffmpeg` package from the default repository
-> will not get you FFmpeg. If you are unsure about where to get FFmpeg, please refer to the [FFmpeg
-> website](http://ffmpeg.org).*
 
 Required (not necessarily on the same machine):
 
@@ -71,30 +67,26 @@ Pre-built versions of most dependencies that are not in the repositories can be 
 website:
 
  - [Get FFmpeg](http://ffmpeg.org/download.html)
- - [(Get Apache Maven](https://maven.apache.org/download.cgi)
+ - [Get Apache Maven](https://maven.apache.org/download.cgi)
  - [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
 
 
 Building Opencast
 -----------------
 
-Switch to user `opencast`:
+Automatically build all Opencast modules and assemble distributions for different server types:
 
-    sudo su - opencast
-
-Compile the source code and create the Karaf distributions:
-
-    cd /tmp/matterhorn
+    cd opencast-dir
     mvn clean install
 
-Extract the all-in-one distribution
+Deploy all-in-one distribution:
 
-    tar xf karaf-dist-allinone/target/opencast-karaf-dist-allinone-${VERSION}.tar.gz
-    mv opencast-karaf-dist-allinone-${VERSION} /opt/matterhorn
+    ca assemblies/karaf-dist-allinone/target/opencast-karaf-dist-allinone-*
+    mv opencast-karaf-dist-allinone-* /opt/opencast
 
 Make sure everything belongs to the user `opencast`:
 
-    sudo chown -R opencast:opencast /opt/matterhorn
+    sudo chown -R opencast:opencast /opt/opencast
 
 
 Configure
@@ -105,30 +97,14 @@ hostname, login information, …
 
 
 Running Opencast
-----------------
-
-Install Opencast start script and man-page for installations in `/opt`:
-
-    cd /opt/matterhorn/docs/scripts/init/opt
-    sudo ./install.sh
-
-This will install the start script along with either a SysV-Init script or a
-systemd unit file.
-
-Now you can start Opencast by running
-
-    sudo matterhorn --interactive
-
-Browse to [http://localhost:8080] to get to the admin interface.
-
-
-Running Opencast
 ------------------
 
-Opencast is running on top of Apache Karaf. Please refer to the [Karaf documentation](http://karaf.apache.org/manual/latest-3.0.x/users-guide/start-stop.html)
-for further information about the different start modes.
+To start Opencast, run `.../bin/start-opencast` as user `opencast`:
 
-As soon as Opencast is completely started, browse to [http://localhost:8080](http://localhost:8080) to get to the administration interface.
+    sudo -u opencast /opt/opencast/bin/start-opencast
+
+As soon as Opencast is completely started, browse to [http://localhost:8080](http://localhost:8080) to get to the
+administration interface.
 
 
 Run Opencast as a service
@@ -137,17 +113,4 @@ Run Opencast as a service
 Usually, you do not want to run Opencast in interactive mode but as system service to make sure it is only running
 once on a system and is started automatically.
 
-Karaf comes with built-in support for wrapping an installation as a system service. Please take note of the further
-instructions which can be found in the [Karaf documentation](http://karaf.apache.org/manual/latest-3.0.x/users-guide/wrapper.html).
-
-
-Customizing the installation
-----------------------------
-
-The Opencast installation can easily be further customized. With Karaf as a management layer, it is very easy to install
-additional bundles via the [Karaf Console](http://karaf.apache.org/manual/latest-3.0.x/users-guide/console.html).
-
-    bundle:install -s mvn:<package>/<identifier>/<version>
-
-For more advanced scenarios, creating a customized distribution would be another option. The existing Opencast distributions
-found in the `assemblies` serve as a good starting point for doing this.
+*TODO: Add notes about Systemd and SysV-Init scripts once they are added.*

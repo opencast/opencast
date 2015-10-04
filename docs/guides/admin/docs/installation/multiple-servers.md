@@ -2,33 +2,55 @@ Install Across Multiple Servers
 ===============================
 
 *Note that this is not a comprehensive guide of all possible ways to install Opencast. It is more like a guide to good
-practice and presents what a lot of people are running.*
+practices and presents what a lot of people are running.*
 
-Step 1: Install Opencast
+
+Step 1: Install Matterhorn
 --------------------------
 
-Beside running Opencast on a single server as an 'all-in-one' installation, several nodes can be used to serve different
-purposes. A common setup could look like this:
+Opencast consists of a large set of modules which together build the whole system. In a distributed set-up, different
+kinds of nodes are basically only defined by the existence or absence of specific modules.
 
-* 1 **admin** node (it's currently not supported to have more than one admin node)
-* 1 or more **worker** nodes
-* 1 or more **presentation** nodes
+While it is possible to stick together a system module by module, opencast comes with a set of pre-defined distribution
+which can directly be built and installed. To build these distributions, you would compile Opencast just like it is outlined in the basic installation guides and will then find a set of different distributions, both as archive and in a separate directory.
 
-For all of the three listed node profiles, there is a pre-defined Opencast distribution that is built as part of the 'assemblies' sub-project.
+To list all distributions, run the following command after Opencast is built:
 
-Compile the source code:
+    % ls -d assemblies/karaf-dist-*/target/opencast*
+    assemblies/karaf-dist-admin/target/opencast-karaf-dist-admin-${version}
+    assemblies/karaf-dist-admin/target/opencast-karaf-dist-admin-${version}.tar.gz
+    assemblies/karaf-dist-admin/target/opencast-karaf-dist-admin-${version}.zip
+    assemblies/karaf-dist-allinone/target/opencast-karaf-dist-allinone-${version}
+    assemblies/karaf-dist-allinone/target/opencast-karaf-dist-allinone-${version}.tar.gz
+    ...
 
-    cd /tmp/matterhorn
-    mvn clean install -Dall
 
-Create the Karaf distribution:
+The same distributions can be found in the packages provided in the Opencast RPM repository.  These packages will
+automatically install all dependencies for a given node type. For example, to install an Opencast worker node, you would
+install the package `opencast21-distribution-worker`.
 
-    cd assemblies
-    mvn clean install
+The following list describes possible set-ups:
 
-The resulting archives just need to be extracted from the karaf-dist-admin, karaf-dist-presentation, karaf-dist-worker sub directories. Please refer to the Install from Source for more details about extracting the archives in the target directories.
+### All-In-One
 
-Please follow the next steps to ensure the different nodes are working in harmony.
+This is the default set-up described in the basic installation guides. It works fine for testing purposes. It should usually
+not be used in production. It is not distributed but is listed here to have a comprehensive list of predefined distributions.
+
+
+### Two-Server Set-up
+
+This set-up is the minimum set-up recommended for productive use. It will separate the presentation layer from the
+administrative and working layer. This means that even if one server is under heavy load while videos are processed, it
+will not effect the distribution and users should still be able to watch videos smoothly. However, it might happen that
+under heavy load the handling of the administrative user interface gets a bit rough.
+
+
+### Three (or more) Server Set-up
+
+While in the last example we have created one combined node for both the administrative tools and the workers, in this
+example we will split it into dedicated worker and admin nodes. Using this set-up it is easy to increase the systems
+performance simply by adding further worker nodes to the system.
+
 
 
 Step 2: Set-Up NFS Server

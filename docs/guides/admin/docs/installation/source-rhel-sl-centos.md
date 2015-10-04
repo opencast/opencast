@@ -6,7 +6,7 @@ Preparation
 
 Create a dedicated Opencast user:
 
-    useradd -d /opt/matterhorn opencast
+    useradd -d /opt/opencast opencast
 
 Get Opencast source:
 
@@ -16,16 +16,16 @@ prior option, the tarball download, needs less tools and you do not have to down
 
 Using the tarball:
 
-Select the tarball for the version you want to install from [https://bitbucket.org/opencast-community/matterhorn/downloads](https://bitbucket.org/opencast-community/matterhorn/downloads)
+Select the tarball for the version you want to install from the [BitBucket downloads
+section](https://bitbucket.org/opencast-community/matterhorn/downloads).
 
     # Download desired tarball
     curl -O https://bitbucket.org/opencast-community/matterhorn/...
-    tar xf develop.tar.gz
-    mv opencast-community-matterhorn-* /tmp/matterhorn/
+    tar xf ....tar.gz
+    cd opencast-community-...
 
 Cloning the Git repository:
 
-    cd /tmp
     git clone https://bitbucket.org/opencast-community/matterhorn.git
     cd matterhorn
     git tag   <-  List all available versions
@@ -57,7 +57,7 @@ Required for hunspell based text filtering (optional):
 
 Required for audio normalization (optional):
 
-    sox >= 14
+    sox >= 14.4
 
 ### Dependency Download
 
@@ -70,41 +70,39 @@ website:
 
 
 Building Opencast
--------------------
+-----------------
 
-Switch to user `opencast`:
+Automatically build all Opencast modules and assemble distributions for different server types:
 
-    sudo su - opencast
-
-Compile the source code and create the Karaf distributions:
-
-    cd /tmp/matterhorn
+    cd opencast-dir
     mvn clean install
 
-Extract the all-in-one distribution
+Deploy all-in-one distribution:
 
-    tar xf karaf-dist-allinone/target/opencast-karaf-dist-allinone-${VERSION}.tar.gz
-    mv opencast-karaf-dist-allinone-${VERSION} /opt/matterhorn
+    ca assemblies/karaf-dist-allinone/target/opencast-karaf-dist-allinone-*
+    mv opencast-karaf-dist-allinone-* /opt/opencast
 
 Make sure everything belongs to the user `opencast`:
 
-    sudo chown -R opencast:opencast /opt/matterhorn
+    sudo chown -R opencast:opencast /opt/opencast
 
 
 Configure
 ---------
 
-Please follow the steps of the [Basic Configuration guide](../configuration/basic.md).
-It will help you to set your hostname, login information, …
+Please follow the steps of the [Basic Configuration guide](../configuration/basic.md). It will help you to set your
+hostname, login information, …
 
 
 Running Opencast
 ------------------
 
-Opencast is running on top of Apache Karaf. Please refer to the [Karaf documentation](http://karaf.apache.org/manual/latest-3.0.x/users-guide/start-stop.html)
-for further information about the different start modes.
+To start Opencast, run `.../bin/start-opencast` as user `opencast`:
 
-As soon as Opencast is completely started, browse to [http://localhost:8080](http://localhost:8080) to get to the administration interface.
+    sudo -u opencast /opt/opencast/bin/start-opencast
+
+As soon as Opencast is completely started, browse to [http://localhost:8080](http://localhost:8080) to get to the
+administration interface.
 
 
 Run Opencast as a service
@@ -113,18 +111,4 @@ Run Opencast as a service
 Usually, you do not want to run Opencast in interactive mode but as system service to make sure it is only running
 once on a system and is started automatically.
 
-Karaf comes with built-in support for wrapping an installation as a system service. Please take note of the further
-instructions which can be found in the [Karaf documentation](http://karaf.apache.org/manual/latest-3.0.x/users-guide/wrapper.html).
-
-
-Customizing the installation
-----------------------------
-
-The Opencast installation can easily be further customized. With Karaf as a management layer, it is very easy to install
-additional bundles via the [Karaf Console](http://karaf.apache.org/manual/latest-3.0.x/users-guide/console.html).
-
-    bundle:install -s mvn:<package>/<identifier>/<version>
-
-For more advanced scenarios, creating a customized distribution would be another option. The existing Opencast distributions
-found in the `assemblies` serve as a good starting point for doing this.
-
+*TODO: Add notes about Systemd and SysV-Init scripts once they are added.*
