@@ -26,6 +26,7 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -42,6 +43,7 @@ import org.opencastproject.serviceregistry.api.JaxbServiceStatisticsList;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
@@ -281,6 +283,50 @@ public class ServiceRegistryEndpoint {
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "No service type specified, bad request.") })
   public Response getAvailableServicesAsJson(@QueryParam("serviceType") String serviceType) {
     return getAvailableServicesAsXml(serviceType);
+  }
+
+  @GET
+  @Path("health")
+  @RestQuery(name = "health", description = "Checks the status of the registered services", returnDescription = "Returns NO_CONTENT if services are in a proper state", restParameters = {
+          @RestParameter(name = "serviceType", isRequired = false, type = Type.STRING, description = "The service type identifier"),
+          @RestParameter(name = "host", isRequired = false, type = Type.STRING, description = "The host, including the http(s) protocol") }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Every service is in a proper state."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No service of that type on that host is registered."),
+          @RestResponse(responseCode = SC_SERVICE_UNAVAILABLE, description = "At least one service is in error state.") })
+  public Response getHealthStatus(@QueryParam("serviceType") String serviceType, @QueryParam("host") String host)
+          throws NotFoundException {
+    try {
+      if (isNotBlank(serviceType) && isNotBlank(host)) {
+        // This is a request for one specific service. Return it, or SC_NOT_FOUND if not found
+        ServiceRegistration reg = serviceRegistry.getServiceRegistration(serviceType, host);
+        if (reg == null)
+          throw new NotFoundException();
+
+        if (ServiceState.ERROR.equals(reg.getServiceState()))
+          throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+      } else if (isBlank(serviceType) && isBlank(host)) {
+        // This is a request for all service registrations
+        for (ServiceRegistration reg : serviceRegistry.getServiceRegistrations()) {
+          if (ServiceState.ERROR.equals(reg.getServiceState()))
+            throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+        }
+      } else if (isNotBlank(serviceType)) {
+        // This is a request for all service registrations of a particular type
+        for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByType(serviceType)) {
+          if (ServiceState.ERROR.equals(reg.getServiceState()))
+            throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+        }
+      } else if (isNotBlank(host)) {
+        // This is a request for all service registrations of a particular host
+        for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByHost(host)) {
+          if (ServiceState.ERROR.equals(reg.getServiceState()))
+            throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+        }
+      }
+      return Response.noContent().build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
   }
 
   @GET

@@ -83,7 +83,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "handler"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler"),
-        videoFormatsFound: new Engage.Event("Video:videoFormatsFound", "", "handler")
+        videoFormatsFound: new Engage.Event("Video:videoFormatsFound", "", "handler"),
+        numberOfVideodisplaysSet: new Engage.Event("Video:numberOfVideodisplaysSet", "the number of videodisplays has been set", "trigger"),
+        focusVideo: new Engage.Event("Video:focusVideo", "increases the size of one video", "handler"),
+        resetLayout: new Engage.Event("Video:resetLayout", "resets the layout of the videodisplays", "handler"),
+        movePiP: new Engage.Event("Video:movePiP", "moves the smaller picture over the larger to the different corners", "handler"),
+        togglePiP: new Engage.Event("Video:togglePiP", "switches between PiP and next to each other layout", "handler")
     };
 
     var isDesktopMode = false;
@@ -152,6 +157,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var storage_volume = "volume";
     var storage_lastvolume = "lastvolume";
     var storage_muted = "muted";
+    var storage_pip = "pictureinpicture";
+    var storage_pip_pos = "pictureinpictureposition";
+    var storage_focus_video = "focusvideo";
     var bootstrapPath = "lib/bootstrap/js/bootstrap";
     var jQueryUIPath = "lib/jqueryui/jquery-ui";
     var id_engage_controls = "engage_controls";
@@ -165,6 +173,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_playbackRate100 = "playback100";
     var id_playbackRate125 = "playback125";
     var id_playbackRate150 = "playback150";
+    var id_pipIndicator = "pipIndicator";
+    var id_pipLeft = "pipLeft";
+    var id_pipRight = "pipRight";
+    var id_pipBeside = "pipBeside";
+    var id_pipOff = "pipOff";
     var id_qualityLow = "qualityLow";
     var id_qualityMedium = "qualityMedium";
     var id_qualityHigh = "qualityHigh";
@@ -234,6 +247,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var controlsViewTopIfBottom = undefined;
     var controlsView = undefined;
     var resolutions = undefined;
+    var pipPos = "left";
+    var pipStatus = true;
+    var numberVideos = 1;
+    var currentFocusFlavor = "focus.none";
+    var videosInitialReadyness = true;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -245,7 +263,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         $.ajax({
             url: jsonstr,
             dataType: "json",
-            async: false,
             success: function(data) {
                 if (data) {
                     data.value_locale = language;
@@ -389,6 +406,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 duration = parseInt(this.model.get("duration"));
                 segments = Engage.model.get("mediaPackage").get("segments");
                 
+                var pipPosition = pipPos;
+		if (!pipStatus) {
+                    pipPosition = "beside";
+                }
+                
                 segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
                 
                 if (Engage.model.get("meInfo")) {
@@ -437,9 +459,16 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_fullscreen: translate("fullscreen", "Fullscreen"),
                     str_qualityButton: translate("quality", "Quality"),
                     str_quality: translate("quality", "Quality"),
-                    qualities: resolutions,
+                    str_layoutButton: translate("layout", "Layout"),
+                    str_pictureInPicture: translate("pictureInPicture", "Picture in Picture"),
+                    str_left: translate("left", "left"),
+                    str_right: translate("right", "right"),
+                    str_beside: translate("beside", "beside"),
+                    str_off: translate("off", "off"),
+                    pip_position: translate(pipPosition, pipPosition),
                     translatedqualities: translatedQualites,
                     hasqualities: resolutions !== undefined,
+                    hasmultiplevideos: numberVideos > 1,
                     controlsTop: Engage.controls_top,
                     logo: logo,
                     show_embed: showEmbed
@@ -455,6 +484,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     }
                     if (tempVars.hasqualities) {
                         addQualityChangeEvents();
+                    }
+                    if (tempVars.hasmultiplevideos) {
+                        addLayoutEvents();
                     }
                     ready();
                     playPause();
@@ -556,12 +588,41 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             $("#" + id_qualityIndicator).html(q.charAt(0).toUpperCase() + q.substring(1));
         }
     }
-    
+
     function addQualityListener(quality) {
         $("#quality" + quality).click(function(element) {
                     element.preventDefault();
                     $("#" + id_qualityIndicator).html(translate(quality, quality));
                     Engage.trigger(plugin.events.qualitySet.getName(), quality);
+        });
+    }
+    
+    function addLayoutEvents() {
+        $("#" + id_pipLeft).click(function(e) {
+            e.preventDefault();
+            $(".videoDisplay").trigger("click");
+            $("#" + id_pipIndicator).html(translate("left", "left"));
+            Engage.trigger(plugin.events.movePiP.getName(), "left");
+            Engage.trigger(plugin.events.togglePiP.getName(), true);
+        });
+        $("#" + id_pipRight).click(function(e) {
+            e.preventDefault();
+            $(".videoDisplay").trigger("click");
+            $("#" + id_pipIndicator).html(translate("right", "right"));
+            Engage.trigger(plugin.events.movePiP.getName(), "right");
+            Engage.trigger(plugin.events.togglePiP.getName(), true);
+        });
+        $("#" + id_pipBeside).click(function(e) {
+            e.preventDefault();
+            $(".videoDisplay").trigger("click");
+            $("#" + id_pipIndicator).html(translate("beside", "beside"));
+            Engage.trigger(plugin.events.togglePiP.getName(), false);
+        });
+        $("#" + id_pipOff).click(function(e) {
+            e.preventDefault();
+            $(".videoDisplay").trigger("click");
+            $("#" + id_pipIndicator).html(translate("off", "off"));
+            Engage.trigger(plugin.events.resetLayout.getName());
         });
     }
 
@@ -616,6 +677,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         } else {
             Engage.trigger(plugin.events.unmute.getName());
         }
+        
+        var pipPos = Basil.get(storage_pip_pos);
+        if (pipPos !== undefined) {
+            Engage.trigger(plugin.events.movePiP.getName(), pipPos);
+        }
+        var pip = Basil.get(storage_pip);
+        if (pip !== undefined && pip === false) {
+            Engage.trigger(plugin.events.togglePiP.getName(), pip);
+        }
+        var focusVideo = Basil.get(storage_focus_video);
+        if (focusVideo !== undefined ) {
+//            Engage.trigger(plugin.events.focusVideo.getName(), focusVideo);
+            currentFocusFlavor = focusVideo;
+        }        
     }
 
     function initControlsEvents() {
@@ -781,6 +856,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             if (!isAudioOnly) {
                 enableFullscreenButton = true;
                 $("#" + id_fullscreen_button).removeClass("disabled");
+            }   
+            Engage.trigger(plugin.events.movePiP.getName(), pipPos);
+            Engage.trigger(plugin.events.togglePiP.getName(), pipStatus);
+            if (videosInitialReadyness) {
+                Engage.trigger(plugin.events.focusVideo.getName(), currentFocusFlavor);
+                videosInitialReadyness = false;
             }
         }
     }
@@ -857,6 +938,19 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     if (controlsView) {
                         controlsView.render();
                     }
+                    addQualityChangeEvents();
+                }
+            });
+            Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function(number) {
+                numberVideos = number;
+                if (number > 1) {
+                    if (controlsViewTopIfBottom) {
+                        controlsViewTopIfBottom.render();
+                    }
+                    if (controlsView) {
+                        controlsView.render();
+                    }
+                    addLayoutEvents();
                 }
             });
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
@@ -982,6 +1076,44 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     $("#" + id_segmentNo + no).removeClass("segmentHover");
                 }
             });
+            Engage.on(plugin.events.togglePiP.getName(), function(pip) {
+                if (pip !== undefined) {
+                    Basil.set(storage_pip, pip);                    
+                    if (! pip) {
+                        $("#" + id_pipIndicator).html(translate("beside", "beside"));
+                    } else {
+                        if (pipPos === "left") {
+                            $("#" + id_pipIndicator).html(translate("left", "left"));
+                        } else {
+                            $("#" + id_pipIndicator).html(translate("right", "right"));
+                        }
+                    }
+                    pipStatus = pip;
+                }
+            });   
+            Engage.on(plugin.events.focusVideo.getName(), function(flavor) {
+                if (flavor !== undefined && flavor !== null && flavor.indexOf("focus.") < 1) {
+                    Basil.set(storage_focus_video, flavor);
+                    currentFocusFlavor = flavor;
+                }
+            });
+            Engage.on(plugin.events.resetLayout.getName(), function() {
+                Basil.set(storage_focus_video, "focus.none");
+                currentFocusFlavor = "focus.none";
+            });          
+
+            Engage.on(plugin.events.movePiP.getName(), function(pos) {
+                if (pos !== undefined) {
+                    Basil.set(storage_pip_pos, pos);
+                    if (pos === "left") {
+                        $("#" + id_pipIndicator).html(translate("left", "left"));
+                    } else {
+                        $("#" + id_pipIndicator).html(translate("right", "right"));
+                    }
+                    pipPos = pos;
+                }
+            });
+            
             loadStoredInitialValues();
         }
     }

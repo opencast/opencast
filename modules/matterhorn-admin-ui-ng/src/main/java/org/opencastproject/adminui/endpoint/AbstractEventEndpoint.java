@@ -21,12 +21,14 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.json.Jsons.a;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.jsonArrayFromList;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
+import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -102,6 +104,7 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
@@ -169,7 +172,6 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JObjectWrite;
 import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons;
 
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -1193,107 +1195,179 @@ public abstract class AbstractEventEndpoint {
   }
 
   @GET
-  @Path("{eventId}/media.json")
+  @Path("{eventId}/asset/assets.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventmedia", description = "Returns all the data related to the media tab in the event details modal as JSON", returnDescription = "All the data related to the event media tab as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "Returns all the data related to the event media tab as JSON", responseCode = HttpServletResponse.SC_OK),
+  @RestQuery(name = "getAssetList", description = "Returns the number of assets from each types as JSON", returnDescription = "The number of assets from each types as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestResponse(description = "Returns the number of assets from each types as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getEventMedia(@PathParam("eventId") String id) throws Exception {
+  public Response getAssetList(@PathParam("eventId") String id) throws Exception {
     Opt<Event> optEvent = getEvent(id);
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);
-
-    Opt<MediaPackage> mpOpt = getIndexService().getEventMediapackage(optEvent.get());
-
-    List<JValue> tracksJSON = new ArrayList<JValue>();
-    if (mpOpt.isSome()) {
-      for (Track track : mpOpt.get().getTracks()) {
-        tracksJSON.add(j(f("id", vN(track.getIdentifier())), f("type", vN(track.getFlavor().toString())),
-                f("mimetype", vN(track.getMimeType())), f("url", vN(signUrl(track.getURI())))));
-      }
-    }
-
-    return okJson(a(tracksJSON));
-  }
-
-  @GET
-  @Path("{eventId}/media/{trackId}.json")
-  @RestQuery(name = "geteventtrack", description = "Returns all the data related to the media/track tab in the event details modal as JSON", returnDescription = "All the data related to the given track for the media tab as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "trackId", description = "The track id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "Returns all the data related to the given track for the media tab as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getEventTrack(@PathParam("eventId") String eventId, @PathParam("trackId") String trackId)
-          throws Exception {
-    Opt<Event> optEvent = getEvent(eventId);
-    if (optEvent.isNone())
-      return notFound("Cannot find an event with id '%s'.", eventId);
-
-    JValue result = Jsons.jz;
-    Opt<MediaPackage> mpOpt = getIndexService().getEventMediapackage(optEvent.get());
-    if (mpOpt.isSome()) {
-
-      Track track = mpOpt.get().getTrack(trackId);
-      if (track == null)
-        return notFound("Cannot find a track with id '%s' on event with id '%s'.", trackId, eventId);
-
-      org.opencastproject.mediapackage.Stream[] streams = track.getStreams();
-      List<JValue> audioStreamsJSON = new ArrayList<JValue>();
-      List<JValue> videoStreamsJSON = new ArrayList<JValue>();
-      for (org.opencastproject.mediapackage.Stream stream : streams) {
-
-        if (stream instanceof AudioStreamImpl) {
-          AudioStream audioStream = (AudioStream) stream;
-          // TODO There is a bug with the stream ids, see MH-10325, so ignoring for now
-          JField id = f("id", vN(audioStream.getIdentifier()));
-
-          audioStreamsJSON.add(j(f("type", vN(audioStream.getFormat())), f("channels", vN(audioStream.getChannels())),
-                  f("bitrate", vN(audioStream.getBitRate()))));
-        } else if (stream instanceof VideoStreamImpl) {
-          VideoStream videoStream = (VideoStream) stream;
-          // TODO There is a bug with the stream ids, see MH-10325, so ignoring for now
-          JField id = f("id", vN(videoStream.getIdentifier()));
-
-          videoStreamsJSON.add(j(f("type", vN(videoStream.getFormat())), f("bitrate", v(videoStream.getBitRate())),
-                  f("framerate", vN(videoStream.getFrameRate())),
-                  f("resolution", vN(videoStream.getFrameWidth() + "x" + videoStream.getFrameHeight()))));
-        } else {
-          throw new IllegalArgumentException("stream must be either audio or video");
-        }
-      }
-      result = j(f("id", vN(track.getIdentifier())), f("type", vN(track.getElementType())),
-              f("duration", vN(track.getDuration())), f("mimetype", vN(track.getMimeType())),
-              f("flavor", vN(track.getFlavor())), f("url", vN(signUrl(track.getURI()))),
-              f("description", vN(track.getDescription())), f("tags", vN(StringUtils.join(track.getTags(), ","))),
-              f("streams", j(f("audio", a(audioStreamsJSON)), f("video", a(videoStreamsJSON)))));
-    }
-    return okJson(result);
-  }
-
-  @GET
-  @Path("{eventId}/attachments.json")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventattachements", description = "Returns all the data related to the attachements tab in the event details modal as JSON", returnDescription = "All the data related to the event attachements tab as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "Returns all the data related to the event attachements tab as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getEventAttachements(@PathParam("eventId") String id) throws Exception {
-    Opt<Event> optEvent = getEvent(id);
-    if (optEvent.isNone())
-      return notFound("Cannot find an event with id '%s'.", id);
-
     Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
-
-    List<JValue> attachementsJSON = new ArrayList<JValue>();
+    int attachments = 0;
+    int catalogs = 0;
+    int media = 0;
+    int publications = 0;
     if (mp.isSome()) {
-      for (Attachment attachement : mp.get().getAttachments()) {
-        attachement.getMediaPackage();
-        attachementsJSON.add(j(f("id", vN(attachement.getIdentifier())),
-                f("type", vN(attachement.getFlavor().toString())), f("mimetype", vN(attachement.getMimeType())),
-                f("tags", vN(StringUtils.join(attachement.getTags(), ","))), f("url", vN(signUrl(attachement.getURI())))));
+      attachments = mp.get().getAttachments().length;
+      catalogs = mp.get().getCatalogs().length;
+      media = mp.get().getTracks().length;
+      publications = mp.get().getPublications().length;
+    }
+    return okJson(j(f("attachments", v(attachments)), f("catalogs", v(catalogs)), f("media", v(media)),
+            f("publications", v(publications))));
+  }
+
+  @GET
+  @Path("{eventId}/asset/attachment/attachments.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getAttachmentsList", description = "Returns a list of attachments from the given event as JSON", returnDescription = "The list of attachments from the given event as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestResponse(description = "Returns a list of attachments from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getAttachmentsList(@PathParam("eventId") String id) throws Exception {
+    Opt<Event> optEvent = getEvent(id);
+    if (optEvent.isNone())
+      return notFound("Cannot find an event with id '%s'.", id);
+    Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
+    List<JValue> attachments = new ArrayList<JValue>();
+    if (mp.isSome()) {
+      attachments = getEventMediaPackageElements(mp.get().getAttachments());
+    }
+    return okJson(a(attachments));
+  }
+
+  @GET
+  @Path("{eventId}/asset/attachment/{id}.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getAttachment", description = "Returns the details of an attachment from the given event and attachment id as JSON", returnDescription = "The details of an attachment from the given event and attachment id as JSON", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
+          @RestParameter(name = "id", description = "The attachment id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestResponse(description = "Returns the details of an attachment from the given event and attachment id as JSON", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event or attachment with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getAttachment(@PathParam("eventId") String eventId, @PathParam("id") String id)
+          throws NotFoundException, SearchIndexException, InternalServerErrorException {
+    MediaPackage mp = getMediaPackageByEventId(eventId);
+
+    Attachment attachment = mp.getAttachment(id);
+    if (attachment == null)
+      return notFound("Cannot find an attachment with id '%s'.", id);
+    return okJson(attachmentToJSON(attachment));
+  }
+
+  @GET
+  @Path("{eventId}/asset/catalog/catalogs.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getCatalogList", description = "Returns a list of catalogs from the given event as JSON", returnDescription = "The list of catalogs from the given event as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestResponse(description = "Returns a list of catalogs from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getCatalogList(@PathParam("eventId") String id) throws Exception {
+    Opt<Event> optEvent = getEvent(id);
+    if (optEvent.isNone())
+      return notFound("Cannot find an event with id '%s'.", id);
+    Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
+    List<JValue> catalogs = new ArrayList<JValue>();
+    if (mp.isSome()) {
+      catalogs = getEventMediaPackageElements(mp.get().getCatalogs());
+    }
+    return okJson(a(catalogs));
+  }
+
+  @GET
+  @Path("{eventId}/asset/catalog/{id}.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getCatalog", description = "Returns the details of a catalog from the given event and catalog id as JSON", returnDescription = "The details of a catalog from the given event and catalog id as JSON", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
+          @RestParameter(name = "id", description = "The catalog id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestResponse(description = "Returns the details of a catalog from the given event and catalog id as JSON", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event or catalog with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getCatalog(@PathParam("eventId") String eventId, @PathParam("id") String id)
+          throws NotFoundException, SearchIndexException, InternalServerErrorException {
+    MediaPackage mp = getMediaPackageByEventId(eventId);
+
+    Catalog catalog = mp.getCatalog(id);
+    if (catalog == null)
+      return notFound("Cannot find a catalog with id '%s'.", id);
+    return okJson(catalogToJSON(catalog));
+  }
+
+  @GET
+  @Path("{eventId}/asset/media/media.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getMediaList", description = "Returns a list of media from the given event as JSON", returnDescription = "The list of media from the given event as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestResponse(description = "Returns a list of media from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getMediaList(@PathParam("eventId") String id) throws Exception {
+    Opt<Event> optEvent = getEvent(id);
+    if (optEvent.isNone())
+      return notFound("Cannot find an event with id '%s'.", id);
+    Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
+    List<JValue> media = new ArrayList<JValue>();
+    if (mp.isSome()) {
+      media = getEventMediaPackageElements(mp.get().getTracks());
+    }
+    return okJson(a(media));
+  }
+
+  @GET
+  @Path("{eventId}/asset/media/{id}.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getMedia", description = "Returns the details of a media from the given event and media id as JSON", returnDescription = "The details of a media from the given event and media id as JSON", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
+          @RestParameter(name = "id", description = "The media id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestResponse(description = "Returns the media of a catalog from the given event and media id as JSON", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event or media with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getMedia(@PathParam("eventId") String eventId, @PathParam("id") String id) throws NotFoundException,
+          SearchIndexException, InternalServerErrorException {
+    MediaPackage mp = getMediaPackageByEventId(eventId);
+
+    Track track = mp.getTrack(id);
+    if (track == null)
+      return notFound("Cannot find media with id '%s'.", id);
+    return okJson(trackToJSON(track));
+  }
+
+  @GET
+  @Path("{eventId}/asset/publication/publications.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getPublicationList", description = "Returns a list of publications from the given event as JSON", returnDescription = "The list of publications from the given event as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestResponse(description = "Returns a list of publications from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getPublicationList(@PathParam("eventId") String id) throws Exception {
+    Opt<Event> optEvent = getEvent(id);
+    if (optEvent.isNone())
+      return notFound("Cannot find an event with id '%s'.", id);
+    Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
+    List<JValue> publications = new ArrayList<JValue>();
+    if (mp.isSome()) {
+      publications = getEventPublications(mp.get().getPublications());
+    }
+    return okJson(a(publications));
+  }
+
+  @GET
+  @Path("{eventId}/asset/publication/{id}.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getPublication", description = "Returns the details of a publication from the given event and publication id as JSON", returnDescription = "The details of a publication from the given event and publication id as JSON", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
+          @RestParameter(name = "id", description = "The publication id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestResponse(description = "Returns the publication of a catalog from the given event and publication id as JSON", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event or publication with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getPublication(@PathParam("eventId") String eventId, @PathParam("id") String id)
+          throws NotFoundException, SearchIndexException, InternalServerErrorException {
+    MediaPackage mp = getMediaPackageByEventId(eventId);
+
+    Publication publication = null;
+    for (Publication p : mp.getPublications()) {
+      if (id.equals(p.getIdentifier())) {
+        publication = p;
+        break;
       }
     }
 
-    return okJson(a(attachementsJSON));
+    if (publication == null)
+      return notFound("Cannot find publication with id '%s'.", id);
+    return okJson(publicationToJSON(publication));
   }
 
   @GET
@@ -2117,6 +2191,17 @@ public abstract class AbstractEventEndpoint {
     });
   }
 
+  private MediaPackage getMediaPackageByEventId(String eventId) throws SearchIndexException,
+          InternalServerErrorException, NotFoundException {
+    Opt<Event> optEvent = getEvent(eventId);
+    if (optEvent.isNone())
+      throw new NotFoundException(format("Cannot find an event with id '%s'.", eventId));
+    Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
+    if (mp.isNone())
+      throw new NotFoundException(format("No mediapackage availalbe on event with id '%s'.", eventId));
+    return mp.get();
+  }
+
   private URI getCommentUrl(String eventId, long commentId) {
     return UrlSupport.uri(serverUrl, eventId, "comment", Long.toString(commentId));
   }
@@ -2161,6 +2246,141 @@ public abstract class AbstractEventEndpoint {
 
     return j(fields);
   }
+
+  private JValue attachmentToJSON(Attachment attachment) {
+    List<JField> fields = new ArrayList<JField>();
+    fields.addAll(getEventMediaPackageElementFields(attachment));
+    fields.addAll(getCommonElementFields(attachment));
+    return j(fields);
+  }
+
+  private JValue catalogToJSON(Catalog catalog) {
+    List<JField> fields = new ArrayList<JField>();
+    fields.addAll(getEventMediaPackageElementFields(catalog));
+    fields.addAll(getCommonElementFields(catalog));
+    return j(fields);
+  }
+
+  private JValue trackToJSON(Track track) {
+    List<JField> fields = new ArrayList<JField>();
+    fields.addAll(getEventMediaPackageElementFields(track));
+    fields.addAll(getCommonElementFields(track));
+    fields.add(f("duration", vN(track.getDuration())));
+    fields.add(f("has_audio", v(track.hasAudio())));
+    fields.add(f("has_video", v(track.hasVideo())));
+    fields.add(f("streams", j(streamsToJSON(track.getStreams()))));
+    return j(fields);
+  }
+
+  private List<JField> streamsToJSON(org.opencastproject.mediapackage.Stream[] streams) {
+    List<JField> fields = new ArrayList<JField>();
+    List<JValue> audioList = new ArrayList<JValue>();
+    List<JValue> videoList = new ArrayList<JValue>();
+    for (org.opencastproject.mediapackage.Stream stream : streams) {
+      // TODO There is a bug with the stream ids, see MH-10325
+      if (stream instanceof AudioStreamImpl) {
+        List<JField> audio = new ArrayList<JField>();
+        AudioStream audioStream = (AudioStream) stream;
+        audio.add(f("id", vN(audioStream.getIdentifier())));
+        audio.add(f("type", vN(audioStream.getFormat())));
+        audio.add(f("channels", vN(audioStream.getChannels())));
+        audio.add(f("bitrate", vN(audioStream.getBitRate())));
+        audio.add(f("bitdepth", vN(audioStream.getBitDepth())));
+        audio.add(f("samplingrate", vN(audioStream.getSamplingRate())));
+        audio.add(f("framecount", vN(audioStream.getFrameCount())));
+        audio.add(f("peakleveldb", vN(audioStream.getPkLevDb())));
+        audio.add(f("rmsleveldb", vN(audioStream.getRmsLevDb())));
+        audio.add(f("rmspeakdb", vN(audioStream.getRmsPkDb())));
+        audioList.add(j(audio));
+      } else if (stream instanceof VideoStreamImpl) {
+        List<JField> video = new ArrayList<JField>();
+        VideoStream videoStream = (VideoStream) stream;
+        video.add(f("id", vN(videoStream.getIdentifier())));
+        video.add(f("type", vN(videoStream.getFormat())));
+        video.add(f("bitrate", v(videoStream.getBitRate())));
+        video.add(f("framerate", vN(videoStream.getFrameRate())));
+        video.add(f("resolution", vN(videoStream.getFrameWidth() + "x" + videoStream.getFrameHeight())));
+        video.add(f("framecount", vN(videoStream.getFrameCount())));
+        video.add(f("scantype", vN(videoStream.getScanType())));
+        video.add(f("scanorder", vN(videoStream.getScanOrder())));
+        videoList.add(j(video));
+      } else {
+        throw new IllegalArgumentException("Stream must be either audio or video");
+      }
+    }
+    fields.add(f("audio", a(audioList)));
+    fields.add(f("video", a(videoList)));
+    return fields;
+  }
+
+  private JValue publicationToJSON(Publication publication) {
+    List<JField> fields = new ArrayList<JField>();
+    fields.add(f("id", vN(publication.getIdentifier())));
+    fields.add(f("channel", vN(publication.getChannel())));
+    fields.add(f("mimetype", vN(publication.getMimeType())));
+    fields.add(f("tags", a($(publication.getTags()).map(toStringJValue))));
+    fields.add(f("url", vN(signUrl(publication.getURI()))));
+    fields.addAll(getCommonElementFields(publication));
+    return j(fields);
+  }
+
+  private List<JField> getCommonElementFields(MediaPackageElement element) {
+    List<JField> fields = new ArrayList<JField>();
+    fields.add(f("size", vN(element.getSize())));
+    fields.add(f("checksum", vN(element.getChecksum() != null ? element.getChecksum().getValue() : null)));
+    fields.add(f("reference", vN(element.getReference() != null ? element.getReference().getIdentifier() : null)));
+    return fields;
+  }
+
+  /**
+   * Render an array of {@link Publication}s into a list of JSON values.
+   *
+   * @param publications
+   *          The elements to pull the data from to create the list of {@link JValue}s
+   * @return {@link List} of {@link JValue}s that represent the {@link Publication}
+   */
+  private List<JValue> getEventPublications(Publication[] publications) {
+    List<JValue> publicationJSON = new ArrayList<JValue>();
+    for (Publication publication : publications) {
+      publicationJSON.add(j(f("id", vN(publication.getIdentifier())), f("channel", vN(publication.getChannel())),
+              f("mimetype", vN(publication.getMimeType())), f("tags", a($(publication.getTags()).map(toStringJValue))),
+              f("url", vN(signUrl(publication.getURI())))));
+    }
+    return publicationJSON;
+  }
+
+  /**
+   * Render an array of {@link MediaPackageElement}s into a list of JSON values.
+   *
+   * @param elements
+   *          The elements to pull the data from to create the list of {@link JValue}s
+   * @return {@link List} of {@link JValue}s that represent the {@link MediaPackageElement}
+   */
+  private List<JValue> getEventMediaPackageElements(MediaPackageElement[] elements) {
+    List<JValue> elementJSON = new ArrayList<JValue>();
+    for (MediaPackageElement element : elements) {
+      elementJSON.add(j(getEventMediaPackageElementFields(element)));
+    }
+    return elementJSON;
+  }
+
+  private List<JField> getEventMediaPackageElementFields(MediaPackageElement element) {
+    List<JField> fields = new ArrayList<JField>();
+    fields.add(f("id", vN(element.getIdentifier())));
+    fields.add(f("type", vN(element.getFlavor().toString())));
+    fields.add(f("mimetype", vN(element.getMimeType())));
+    List<JValue> tags = Stream.$(element.getTags()).map(toStringJValue).toList();
+    fields.add(f("tags", a(tags)));
+    fields.add(f("url", vN(signUrl(element.getURI()))));
+    return fields;
+  }
+
+  private static final Fn<String, JValue> toStringJValue = new Fn<String, JValue>() {
+    @Override
+    public JValue ap(String stringValue) {
+      return vN(stringValue);
+    }
+  };
 
   private final Fn<Publication, JObjectWrite> publicationToJson = new Fn<Publication, JObjectWrite>() {
     @Override

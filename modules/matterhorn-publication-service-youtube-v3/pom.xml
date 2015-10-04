@@ -177,20 +177,21 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Private-Package>
               com.google.*;-split-package:=merge-first,
               org.jdom.*,
             </Private-Package>
-            <Import-Bundle>
-              javax.activation-mail
-            </Import-Bundle>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.publication.youtube.*;version=${project.version}
             </Export-Package>
+            <Import-Package>
+              !oracle.xml.parser.*,
+              !org.jaxen.*,
+              !sun.security.util,
+              *
+            </Import-Package>
             <Embed-Dependency>
               javax.activation-mail;inline=true,
               org.apache.felix.http.bundle;inline=true

@@ -18,9 +18,11 @@
                 ng-if="!column.deactivated"
                 ng-class="{ 'col-sort': table.predicate === column.name, 'no-sort': column.dontSort }"
                 ng-click="table.sortBy(column)">
-                <span translate="{{ column.label }}"></span>
+                <span>
+                {{ column.label | translate }}
                 <i ng-if="!column.dontSort" class="sort"
                    ng-class="{ asc: table.predicate === column.name && !table.reverse, desc: table.predicate === column.name && table.reverse }"></i>
+                </span>
             </th>
         </tr>
     </thead>
