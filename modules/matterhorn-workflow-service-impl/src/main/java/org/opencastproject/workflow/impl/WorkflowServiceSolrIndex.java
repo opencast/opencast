@@ -415,6 +415,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       }
     } else {
       indexingExecutor.submit(new Runnable() {
+        @Override
         public void run() {
           try {
             SolrInputDocument doc = createDocument(instance);
@@ -1000,11 +1001,11 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   public WorkflowSet getWorkflowInstances(WorkflowQuery query, String action, boolean applyPermissions)
           throws WorkflowDatabaseException {
     int count = query.getCount() > 0 ? (int) query.getCount() : 20; // default to 20 items if not specified
-    int startPage = query.getStartPage() > 0 ? (int) query.getStartPage() : 0; // default to page zero
+    int startIndex = query.getStartPage() > 0 ? (int) query.getStartPage() * count : (int) query.getStartIndex();
 
     SolrQuery solrQuery = new SolrQuery();
     solrQuery.setRows(count);
-    solrQuery.setStart(startPage * count);
+    solrQuery.setStart(startIndex);
 
     String solrQueryString = createQuery(query, action, applyPermissions);
     solrQuery.setQuery(solrQueryString);
