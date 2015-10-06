@@ -34,7 +34,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
     var PLUGIN_STYLES_DESKTOP = [
         Engage.controls_top ? "styles/desktop_top.css" : "styles/desktop_bottom.css",
-        "lib/bootstrap/css/bootstrap.css",
         "lib/jqueryui/themes/base/jquery-ui.css"
     ];
     var PLUGIN_STYLES_EMBED = [
@@ -163,7 +162,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var storage_pip = "pictureinpicture";
     var storage_pip_pos = "pictureinpictureposition";
     var storage_focus_video = "focusvideo";
-    var bootstrapPath = "lib/bootstrap/js/bootstrap";
     var jQueryUIPath = "lib/jqueryui/jquery-ui";
     var storage_zoomLevel = "zoomLevels";
     var id_zoomLevelIndicator = "zoomLevelIndicator";
@@ -231,7 +229,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var event_slidestop = "slidestop";
     var plugin_path = "";
     var plugin_path_topIfBottom = "";
-    var initCount = 7;
+    var initCount = 6;
     var isPlaying = false;
     var isSliding = false;
     var duration;
@@ -418,7 +416,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 segments = Engage.model.get("mediaPackage").get("segments");
 
                 var pipPosition = pipPos;
-		if (!pipStatus) {
+                if (!pipStatus) {
                     pipPosition = "beside";
                 }
 
@@ -1215,15 +1213,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         // load jquery-ui lib
         require([relative_plugin_path + jQueryUIPath], function() {
             Engage.log("Controls: Lib jQuery UI loaded");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        });
-
-        // load bootstrap lib
-        require([relative_plugin_path + bootstrapPath], function() {
-            Engage.log("Controls: Lib bootstrap loaded");
             initCount -= 1;
             if (initCount <= 0) {
                 initPlugin();
