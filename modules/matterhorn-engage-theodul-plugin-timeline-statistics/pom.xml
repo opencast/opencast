@@ -31,6 +31,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.4</version>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
@@ -71,7 +76,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Build-Number>${buildNumber}</Build-Number>
                         <Export-Package> org.opencastproject.engage.theodul.plugin.timeline.statistics;version=${project.version} </Export-Package>
                         <Service-Component>
                             OSGI-INF/engage-plugin.xml

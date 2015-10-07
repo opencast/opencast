@@ -12,6 +12,9 @@
     <div data-admin-ng-notifications=""></div>
 
     <div class="controls-container">
+        <div ng-if="table.resource == 'events'" class="stats-container">
+            <div admin-ng-stats="" stats="stats"></div>
+        </div>
         <div class="filters-container">
             <div old-admin-ng-dropdown="" class="drop-down-container">
                 <span translate="BULK_ACTIONS.CAPTION">Actions</span>

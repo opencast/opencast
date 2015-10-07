@@ -22,7 +22,6 @@
 
 package org.opencastproject.inspection.ffmpeg.api;
 
-
 /**
  * Common metadata for all kind of embedded media streams.
  */
@@ -31,6 +30,8 @@ public class StreamMetadata extends TemporalMetadata {
   protected String alignment;
 
   protected Long delay;
+
+  protected Long frames;
 
   protected Float compressionRatio;
 
@@ -57,6 +58,14 @@ public class StreamMetadata extends TemporalMetadata {
 
   public void setDelay(Long delay) {
     this.delay = delay;
+  }
+
+  public Long getFrames() {
+    return frames;
+  }
+
+  public void setFrames(Long frames) {
+    this.frames = frames;
   }
 
   public Float getCompressionRatio() {

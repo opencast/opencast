@@ -1,7 +1,7 @@
 # ZipWorkflowOperation
 
 ## Description
-The ZipWorkflowOperationHandler creates a zip archive including all elements from the current mediapackage that are specified in the operation configuration. It then adds the archive to the as an attachment with the given flavor and tags to the mediapackage.
+The ZipWorkflowOperationHandler creates a zip archive including all elements of the current mediapackage that are specified in the operation configuration. It then adds the archive to the mediapackage as an attachment with the given flavor and tags and by default stores the zip file in the working file repository's "zip" collection.
 
 ## Parameter Table
 

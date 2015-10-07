@@ -62,7 +62,7 @@ You can use the admin screen to monitor the server or make ad-hoc queries:
 Just like with a relational database server, it is critical that you limit access to the solr server. Matterhorn's communication with solr servers is unauthenticated, so you must secure a firewall on the solr servers that accepts HTTP requests only from Matterhorn servers. If these servers were publicly accessible, anyone could make changes to Matterhorn data from outside Matterhorn itself.
 
 ## Configure Matterhorn
-Set the URL to this solr server in Matterhorn's config.properties file:
+Set the URL to this solr server in Matterhorn's custom.properties file:
 
     org.opencastproject.search.solr.url=http://your.solr.server.edu:8080/solr/
 

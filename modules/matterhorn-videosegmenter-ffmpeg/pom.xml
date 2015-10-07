@@ -81,6 +81,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.videosegmenter.ffmpeg;version=${project.version},
               org.opencastproject.videosegmenter.ffmpeg.endpoint;version=${project.version}

@@ -25,9 +25,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-json</artifactId>
-      <version>${project.version}</version>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+      <version>${json-simple.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -77,7 +77,8 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package> org.opencastproject.workingfilerepository.remote;version=${project.version} </Export-Package>
             <Service-Component>
               OSGI-INF/working-file-repo-remote.xml
