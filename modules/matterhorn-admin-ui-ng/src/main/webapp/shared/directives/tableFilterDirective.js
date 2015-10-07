@@ -102,13 +102,13 @@ angular.module('adminNg.directives')
             };
 
             scope.loadFilterProfile = function (index) {
-                var i, filter;
-                for (i in scope.filters.filters) {
-                    if (FilterProfiles.get(scope.namespace)[index]) {
-                        filter = scope.filters.filters[i];
-                        filter.value = FilterProfiles.get(scope.namespace)[index].filter[i];
-                        Storage.put('filter', scope.namespace, i, filter.value);
-                    }
+                if (FilterProfiles.get(scope.namespace)[index]) {
+                  var newFilters = [];
+                  var filtersFromProfile = FilterProfiles.get(scope.namespace)[index].filter;
+                  angular.forEach(filtersFromProfile, function (fvalue, fkey) {
+                    newFilters.push({namespace: scope.namespace, key: fkey, value: fvalue});
+                  });
+                  Storage.replace(newFilters, 'filter');
                 }
                 scope.mode = 0;
                 scope.activeProfile = index;
