@@ -70,14 +70,22 @@ public class FFmpegSilenceDetector {
   public FFmpegSilenceDetector(Properties properties, Track track, Workspace workspace)
     throws SilenceDetectionFailedException, MediaPackageException, IOException {
 
-    long minSilenceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.SILENCE_MIN_LENGTH,
-          DEFAULT_SILENCE_MIN_LENGTH));
-    long minVoiceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.VOICE_MIN_LENGTH,
-          DEFAULT_VOICE_MIN_LENGTH));
-    long preSilenceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.SILENCE_PRE_LENGTH,
-          DEFAULT_SILENCE_PRE_LENGTH));
-    String thresholdDB = properties.getProperty(SilenceDetectionProperties.SILENCE_THRESHOLD_DB, DEFAULT_THRESHOLD_DB);
+    long minSilenceLength;
+    long minVoiceLength;
+    long preSilenceLength;
+    String thresholdDB;
 
+    try {
+      minSilenceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.SILENCE_MIN_LENGTH,
+            DEFAULT_SILENCE_MIN_LENGTH));
+      minVoiceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.VOICE_MIN_LENGTH,
+            DEFAULT_VOICE_MIN_LENGTH));
+      preSilenceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.SILENCE_PRE_LENGTH,
+            DEFAULT_SILENCE_PRE_LENGTH));
+      thresholdDB = properties.getProperty(SilenceDetectionProperties.SILENCE_THRESHOLD_DB, DEFAULT_THRESHOLD_DB);
+    } catch (NullPointerException e) {
+      throw new SilenceDetectionFailedException("Could not find silence detection configuration parameters");
+    }
     String binary = properties.getProperty(FFMPEG_BINARY_CONFIG, FFMPEG_BINARY_DEFAULT);
 
     trackId = track.getIdentifier();

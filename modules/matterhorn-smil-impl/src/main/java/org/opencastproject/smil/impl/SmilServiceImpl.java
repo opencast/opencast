@@ -141,7 +141,7 @@ public class SmilServiceImpl implements SmilService {
     SmilMediaParamGroup trackParamGroup = null;
     for (SmilMediaParamGroup paramGroup : smil.getHead().getParamGroups()) {
       // support for adding multiple tracks to the same param group
-      if (pgId != null && paramGroup.getId().equals(pgId)) {
+      if (pgId != null && paramGroup.getId().equals(pgId.trim())) {
         trackParamGroup = paramGroup;
         break;
       }

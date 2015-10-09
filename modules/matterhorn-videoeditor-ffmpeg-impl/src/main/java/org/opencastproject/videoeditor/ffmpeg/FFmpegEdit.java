@@ -61,7 +61,7 @@ public class FFmpegEdit {
   protected String audioCodec = null;
 
   public static void init(BundleContext bundleContext) {
-    String path = bundleContext.getProperty(CONFIG_FFMPEG_PATH);
+    String path = bundleContext.getProperty(CONFIG_FFMPEG_PATH).trim();
 
     if (path != null) {
       binary = path;
@@ -127,8 +127,8 @@ public class FFmpegEdit {
       String line;
       int n = 5;
       while ((line = in.readLine()) != null) {
-    if (n-- > 0)
-      logger.info(line);
+        if (n-- > 0)
+          logger.info(line);
       }
 
       // wait until the task is finished
