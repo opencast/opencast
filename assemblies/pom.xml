@@ -119,6 +119,12 @@
                     match="^(featuresBoot = .*),ssh,management(.*)$"
                     replace="#\0${line.separator}\1\2"
                     byline="true" />
+                  <!-- Make sure bundle cache gets cleared by default -->
+                  <replaceregexp
+                    file="target/assembly/etc/system.properties"
+                    match="^karaf.clean.cache .*=.*$"
+                    replace="karaf.clean.cache = true"
+                    byline="true" />
                   <!-- Special configuration for development -->
                   <replaceregexp
                     file="target/classes/package.xml"
