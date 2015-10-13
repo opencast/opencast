@@ -1758,7 +1758,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             });
             Engage.on(plugin.events.timeupdate.getName(), function(time) {
                 currentTime = time;
-                Engage.log("Current time set to " + time);
             });
             Engage.on(plugin.events.seek.getName(), function(time) {
                 Engage.log("Video: Seek to " + time);
@@ -1821,9 +1820,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 videojs(globalVideoSource[currentlySelectedVideodisplay].id).src(globalVideoSource[currentlySelectedVideodisplay].src);
 
                 // synchronize videos
-                Engage.trigger(plugin.events.seek.getName(), currentTime);
-                if (! isPaused && pressedPlayOnce) {
-                    Engage.trigger(plugin.events.play.getName());
+                if (pressedPlayOnce) {
+                    Engage.trigger(plugin.events.seek.getName(), currentTime);
+                    if (!isPaused) {
+                        Engage.trigger(plugin.events.play.getName());
+                    }
                 }
             });
             
