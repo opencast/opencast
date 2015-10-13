@@ -1246,10 +1246,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           jobHost = job.processorServiceRegistration.getHost();
         }
         if (!jobHost.equals(hostName)) {
-          logger.info("Not marking undispatchable job {} as canceled as it is being processed by a different host", job);
+          logger.debug("Will not cancel undispatchable job {}, it is running on a different host", job);
 
         } else {
-          logger.info("Marking undispatchable job {} as canceled", job);
+          logger.info("Cancelling the running undispatchable job {}, it was orphaned on this host", job);
           job.setStatus(Status.CANCELED);
           em.merge(job);
         }
