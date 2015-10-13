@@ -37,7 +37,7 @@ define(['jquery', 'backbone', "engage/core", "engage/models/engage"], function($
     }
 
     /*
-     * Logic to insert a plugin with name and type to the player in embed mode
+     * Logic to insert a plugin with name and type to the player in mobile mode
      */
     var insertPluginToDOM = function(plugin) {
 

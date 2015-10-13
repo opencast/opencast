@@ -7,6 +7,7 @@ body {
 
 #engage_content {
     width: 100%;
+    position: relative;
 }
 
 .container {
