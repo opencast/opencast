@@ -1763,6 +1763,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             });
             Engage.on(plugin.events.timeupdate.getName(), function(time) {
                 currentTime = time;
+                Engage.log("Current time set to " + time);
             });
             Engage.on(plugin.events.seek.getName(), function(time) {
                 Engage.log("Video: Seek to " + time);
@@ -1816,12 +1817,19 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
             // event used to switch between videos in single player (e.g. mobile) mode
             Engage.on(plugin.events.switchVideo.getName(), function(direction) {
+                var isPaused = videodisplayMaster.paused();     // check if current video is paused
                 var n = globalVideoSource.length;
                 var x = currentlySelectedVideodisplay + direction;
                 // use different style of modulo, see
                 // http://stackoverflow.com/questions/4467539/javascript-modulo-not-behaving
                 currentlySelectedVideodisplay = ((x % n) + n) % n;
                 videojs(globalVideoSource[currentlySelectedVideodisplay].id).src(globalVideoSource[currentlySelectedVideodisplay].src);
+
+                // synchronize videos
+                Engage.trigger(plugin.events.seek.getName(), currentTime);
+                if (! isPaused && pressedPlayOnce) {
+                    Engage.trigger(plugin.events.play.getName());
+                }
             });
             
             var numberDisplays = $("." + videoDisplayClass).length;
