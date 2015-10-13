@@ -1045,18 +1045,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
     }
 
-    // TODO: this is just a temporary solution until the mobile player has been designed and implemented
-    function appendMobilePlayer_switchPlayers() {
-        $("#prevVideo").click(function(e) {
-            currentlySelectedVideodisplay = (currentlySelectedVideodisplay - 1) % globalVideoSource.length;
-            videojs(globalVideoSource[currentlySelectedVideodisplay].id).src(globalVideoSource[currentlySelectedVideodisplay].src);
-        });
-        $("#nextVideo").click(function(e) {
-            currentlySelectedVideodisplay = (currentlySelectedVideodisplay + 1) % globalVideoSource.length;
-            videojs(globalVideoSource[currentlySelectedVideodisplay].id).src(globalVideoSource[currentlySelectedVideodisplay].src);
-        });
-    }
-
     // TODO: this is just a temporary solution until the embed player has been designed and implemented
     function appendEmbedPlayer_openInPlayer() {
         $("." + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">" + translate("openInPlayer", "Open in player") + "</span></div></div>");
@@ -1150,9 +1138,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             });
         }
 
-        if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
-            appendMobilePlayer_switchPlayers();
-        }
+        // if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
+        //     appendMobilePlayer_switchPlayers();
+        // }
         // appendEmbedPlayer_openInPlayer();
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
@@ -1826,9 +1814,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 Engage.trigger(plugin.events.fullscreenChange.getName());
             });
 
-            // event used to switch between videos in single player mode
-            Engage.on(plugin.events.switchVideo.getName(), function(event) {
-
+            // event used to switch between videos in single player (e.g. mobile) mode
+            Engage.on(plugin.events.switchVideo.getName(), function(direction) {
+                var n = globalVideoSource.length;
+                var x = currentlySelectedVideodisplay + direction;
+                // use different style of modulo, see
+                // http://stackoverflow.com/questions/4467539/javascript-modulo-not-behaving
+                currentlySelectedVideodisplay = ((x % n) + n) % n;
+                videojs(globalVideoSource[currentlySelectedVideodisplay].id).src(globalVideoSource[currentlySelectedVideodisplay].src);
             });
             
             var numberDisplays = $("." + videoDisplayClass).length;
