@@ -1,13 +1,14 @@
 describe('New Event API Resource', function () {
     var NewEventResource, $httpBackend, JsHelper,
-        singleTestData, multiTestData, uploadTestData,
+        singleTestData, multiTestData, multiTestDSTData, uploadTestData,
         expectedSingle, expectedSourceSingle, expectedSourceMultiple,
-        startDate, endDate, date;
+        startDate, startDateDST, endDateDST, endDate, date, dateDST, expectedSourceDSTMultiple;
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/test/unit/fixtures';
         singleTestData = getJSONFixture('newEventSingleFixture.json');
         multiTestData = getJSONFixture('newEventMultipleFixture.json');
+        multiTestDSTData = getJSONFixture('newEventMultipleDSTFixture.json');
         uploadTestData = getJSONFixture('newEventUploadFixture.json');
     });
 
@@ -25,10 +26,23 @@ describe('New Event API Resource', function () {
         JsHelper = _JsHelper_;
 
         date = new Date ('2014', '7', '17', '10', '0');
+
         startDate = JsHelper.toZuluTimeString({
             date: '2014-07-17',
             hour:  '10',
             minute: '0'
+        });           
+
+        startDateDST = JsHelper.toZuluTimeString({
+            date   : '2016-03-25',
+            hour   : '8',
+            minute : '0'
+        });         
+
+        endDateDST = JsHelper.toZuluTimeString({
+            date   : '2016-03-28',
+            hour   : '8',
+            minute : '10'
         });   
 
         endDate = JsHelper.toZuluTimeString({
@@ -38,7 +52,7 @@ describe('New Event API Resource', function () {
         }, {
             hour: '1',
             minute: '45'
-        });
+        });        
 
         expectedSourceMultiple = {
             'type': 'SCHEDULE_MULTIPLE',
@@ -47,6 +61,21 @@ describe('New Event API Resource', function () {
                 'end'     : endDate,
                 'duration': '6300000',
                 'rrule'   : 'FREQ=WEEKLY;BYDAY=MO,TU,WE;BYHOUR=' + date.getUTCHours() + ';BYMINUTE=0',
+                'device'  : '•mock• agent3',
+                'inputs'  : 'TRANSLATION.PATH.VIDEO'
+            }
+        };        
+
+        dateDST = moment(startDateDST);
+        dateDST.utc();
+
+        expectedSourceDSTMultiple = {
+            'type': 'SCHEDULE_MULTIPLE',
+            'metadata': {
+                'start'   : startDateDST,
+                'end'     : endDateDST,
+                'duration': '600000',
+                'rrule'   : 'FREQ=WEEKLY;BYDAY=MO,TU,WE;BYHOUR=' + dateDST.hours() + ';BYMINUTE=0',
                 'device'  : '•mock• agent3',
                 'inputs'  : 'TRANSLATION.PATH.VIDEO'
             }
@@ -172,6 +201,18 @@ describe('New Event API Resource', function () {
         args = JSON.parse(FormData.prototype.append.calls.allArgs()[0][1]);
 
         expect(args.source).toEqual(expectedSourceMultiple);
+    });
+
+    it('assembles the metadata for SCHEDULE_MULTIPLE with DST change', function () {
+        var args;
+        $httpBackend.expectPOST('/admin-ng/event/new').respond(200);
+
+        spyOn(FormData.prototype, 'append').and.callThrough();
+        NewEventResource.save(multiTestDSTData);
+        $httpBackend.flush();
+        args = JSON.parse(FormData.prototype.append.calls.allArgs()[0][1]);
+
+        expect(args.source).toEqual(expectedSourceDSTMultiple);
     });
 
     describe('UPLOAD', function () {

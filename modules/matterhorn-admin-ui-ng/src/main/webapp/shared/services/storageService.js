@@ -59,6 +59,24 @@ angular.module('adminNg.services')
             me.scope.$broadcast('change', type, namespace, key);
         };
 
+        this.replace = function (entries, type) {
+            delete me.storage[type];
+            // put for each entry
+            angular.forEach(entries, function (entry) {
+                if (angular.isUndefined(me.storage[type])) {
+                    me.storage[type] = {};
+                }
+                if (angular.isUndefined(me.storage[type][entry.namespace])) {
+                    me.storage[type][entry.namespace] = {};
+                }
+                me.storage[type][entry.namespace][entry.key] = entry.value;
+            });
+
+            // save and broadcast change
+            me.save();
+            me.scope.$broadcast('change', type);
+        };
+
         this.getFromStorage();
     };
     return new Storage();

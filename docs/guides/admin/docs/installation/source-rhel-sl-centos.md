@@ -4,9 +4,9 @@ Install from Source (RedHat Enterprise Linux, CentOS, Scientific Linux, Fedora)
 Preparation
 -----------
 
-Create a dedicated Opencast user.
+Create a dedicated Opencast user:
 
-    useradd -d /opt/matterhorn opencast
+    useradd -d /opt/opencast opencast
 
 Get Opencast source:
 
@@ -16,13 +16,13 @@ prior option, the tarball download, needs less tools and you do not have to down
 
 Using the tarball:
 
-Select the tarball for the version you want to install from
-https://bitbucket.org/opencast-community/matterhorn/downloads#tag-downloads
+Select the tarball for the version you want to install from the [BitBucket downloads
+section](https://bitbucket.org/opencast-community/matterhorn/downloads).
 
     # Download desired tarball
     curl -O https://bitbucket.org/opencast-community/matterhorn/...
-    tar xf develop.tar.gz
-    mv opencast-community-matterhorn-* /opt/matterhorn/
+    tar xf ....tar.gz
+    cd opencast-community-...
 
 Cloning the Git repository:
 
@@ -57,7 +57,7 @@ Required for hunspell based text filtering (optional):
 
 Required for audio normalization (optional):
 
-    sox >= 14
+    sox >= 14.4
 
 ### Dependency Download
 
@@ -65,67 +65,50 @@ Pre-built versions of most dependencies that are not in the repositories can be 
 website:
 
  - [Get FFmpeg](http://ffmpeg.org/download.html)
- - [(Get Apache Maven](https://maven.apache.org/download.cgi)
+ - [Get Apache Maven](https://maven.apache.org/download.cgi)
  - [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
 
 
 Building Opencast
--------------------
+-----------------
 
-Make sure everything belongs to the user `matterhorn`:
+Automatically build all Opencast modules and assemble distributions for different server types:
 
-    sudo chown -R opencast:opencast /opt/matterhorn
+    cd opencast-dir
+    mvn clean install
 
-Switch to user `opencast`:
+Deploy all-in-one distribution:
 
-    sudo su - opencast
+    ca assemblies/karaf-dist-allinone/target/opencast-karaf-dist-allinone-*
+    mv opencast-karaf-dist-allinone-* /opt/opencast
 
-Compile the source code:
+Make sure everything belongs to the user `opencast`:
 
-    cd /opt/matterhorn
-    mvn clean install -DdeployTo=/opt/matterhorn
+    sudo chown -R opencast:opencast /opt/opencast
 
 
 Configure
 ---------
 
-Please follow the steps of the Basic Configuration guide. It will help you to set your hostname, login information, …
+Please follow the steps of the [Basic Configuration guide](../configuration/basic.md). It will help you to set your
+hostname, login information, …
 
 
 Running Opencast
 ------------------
 
-Install Opencast start script and man-page for installations in `/opt`:
+To start Opencast, run `.../bin/start-opencast` as user `opencast`:
 
-    cd /opt/matterhorn/docs/scripts/init/opt
-    sudo ./install.sh
+    sudo -u opencast /opt/opencast/bin/start-opencast
 
-This will install the start script along with either a SysV-Init script or a
-systemd unit file.
-
-Now you can start Opencast by running
-
-    sudo matterhorn --interactive
-
-Browse to [http://localhost:8080] to get to the admin interface.
+As soon as Opencast is completely started, browse to [http://localhost:8080](http://localhost:8080) to get to the
+administration interface.
 
 
-Run Opencast as Service
+Run Opencast as a service
 -------------------------
 
-Usually, you do not want to run Opencast in interactive mode but as system service to make sure matterhorn is run only
+Usually, you do not want to run Opencast in interactive mode but as system service to make sure it is only running
 once on a system and is started automatically.
 
-SysV-Init:
-
-    # Start Opencast
-    sudo service matterhorn start
-    # Autostart after reboot
-    sudo chkconfig --level 345 matterhorn on
-
-Systemd:
-
-    # Start Opencast
-    sudo systemctl start matterhorn
-    # Autostart after reboot
-    sudo systemctl enable matterhorn
+*TODO: Add notes about Systemd and SysV-Init scripts once they are added.*

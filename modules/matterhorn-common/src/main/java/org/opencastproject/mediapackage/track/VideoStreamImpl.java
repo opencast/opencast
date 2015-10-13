@@ -85,19 +85,6 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
   }
 
   /**
-   * @param s
-   */
-  public VideoStreamImpl(VideoStreamImpl s) {
-    this.bitRate = s.bitRate;
-    this.device = s.device;
-    this.encoder = s.encoder;
-    this.frameRate = s.frameRate;
-    this.identifier = s.identifier;
-    this.resolution = s.resolution;
-    this.scanType = s.scanType;
-  }
-
-  /**
    * Create a video stream from the XML manifest.
    *
    * @param streamIdHint
@@ -111,6 +98,15 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     if (StringUtils.isEmpty(sid))
       sid = streamIdHint;
     VideoStreamImpl vs = new VideoStreamImpl(sid);
+
+    // Frame count
+    try {
+      String frameCount = (String) xpath.evaluate("framecount/text()", node, XPathConstants.STRING);
+      if (!StringUtils.isBlank(frameCount))
+        vs.frameCount = new Long(frameCount.trim());
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("Frame count was malformatted: " + e.getMessage());
+    }
 
     // bit rate
     try {
@@ -206,6 +202,13 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     Element node = document.createElement("video");
     // Stream ID
     node.setAttribute("id", getIdentifier());
+
+    // Frame count
+    if (frameCount != null) {
+      Element frameCountNode = document.createElement("framecount");
+      frameCountNode.appendChild(document.createTextNode(Long.toString(frameCount)));
+      node.appendChild(frameCountNode);
+    }
 
     // device
     Element deviceNode = document.createElement("device");
@@ -310,12 +313,12 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
 
   @Override
   public ScanType getScanType() {
-    return scanType.type;
+    return scanType != null ? scanType.type : null;
   }
 
   @Override
   public ScanOrder getScanOrder() {
-    return scanType.order;
+    return scanType != null ? scanType.order : null;
   }
 
   // Setter

@@ -78,6 +78,11 @@ angular.module('adminNg.services')
             };
         };
 
+        this.reload = function () {
+            me.acls  = ResourcesListResource.get({ resource: 'ACL' });
+            me.roles = ResourcesListResource.get({ resource: 'ROLES' }); 
+        };
+
         this.reset();
     };
 

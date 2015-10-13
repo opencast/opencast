@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.1-SNAPSHOT</version>
+    <version>2.2-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -201,6 +201,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Embed-Dependency>
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true,
@@ -218,8 +219,14 @@
               !org.w3c.dom.*,
               !sun.net.www.protocol.*,
               !sun.security.util.*,
+              javax.xml.datatype;version=0,
+              javax.xml.namespace;version=0,
+              javax.xml.parsers;version=0,
+              javax.xml.validation;version=0,
+              org.opencastproject.fsresources,
               org.springframework.security.core.userdetails.cache,
               org.springframework.security.core.userdetails.memory,
+              org.xml.sax;version=0,
               META-INF.cxf,
               META-INF.cxf.osgi,
               *
@@ -237,6 +244,7 @@
               org.opencastproject.kernel.security;version=${project.version},
               org.opencastproject.kernel.security.persistence;version=${project.version},
               org.opencastproject.kernel.userdirectory;version=${project.version},
+              org.opencastproject.kernel.bundleinfo;version=${project.version},
               org.springframework.security.oauth;version=1.0.0.M1,
               org.springframework.security.oauth.common;version=1.0.0.M1,
               org.springframework.security.oauth.config;version=1.0.0.M1,
@@ -245,6 +253,7 @@
               org.springframework.security.oauth.provider.token;version=1.0.0.M1,
             </Export-Package>
             <Service-Component>
+              OSGI-INF/bundle-info.xml,
               OSGI-INF/cleansessions.xml, 
               OSGI-INF/http-client-factory.xml,
               OSGI-INF/http-client.xml,
@@ -260,6 +269,7 @@
               OSGI-INF/rest.xml,
               OSGI-INF/security-service.xml,
               OSGI-INF/smtp-service.xml,
+              OSGI-INF/static.xml,
               OSGI-INF/remote-user-and-role-filter.xml,
               OSGI-INF/security-config-scanner.xml,
               OSGI-INF/transparentproxy-filter.xml, 

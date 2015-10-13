@@ -8,7 +8,7 @@ describe('Schedule Task Controller', function () {
     FormNavigatorServiceMock = jasmine.createSpyObj('FormNavigatorService', ['navigateTo']);
     TaskResourceMock = jasmine.createSpyObj('TaskResource', ['save']);
     NotificationsMock = jasmine.createSpyObj('Notifications', ['add']);
-    TableServiceMock.getSelected.and.returnValue([{id: 'row1'}, {id: 'row2'}]);
+    TableServiceMock.getSelected.and.returnValue([{id: 'row1', selected: true}, {id: 'row2', selected: true}]);
     
     beforeEach(module(function ($provide) {
         $provide.value('FormNavigatorService', FormNavigatorServiceMock);

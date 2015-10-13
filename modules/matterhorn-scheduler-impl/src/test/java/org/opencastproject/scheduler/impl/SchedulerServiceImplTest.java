@@ -498,6 +498,30 @@ public class SchedulerServiceImplTest {
     assertEquals(1, events.size());
   }
 
+  /**
+   * Make sure only current event is retrieved and excludes the one that has ended, MH-10991
+   *
+   * @throws Exception
+   */
+  public void testCalendarEndFrom() throws Exception {
+    long currentTime = System.currentTimeMillis();
+    Date startDate = new Date(currentTime - 10 * 1000);
+    Date endDate = new Date(currentTime + (60 * 60 * 1000));
+    DublinCoreCatalog eventCurrent = generateEvent("Device A", startDate, endDate);
+
+    startDate = new Date(currentTime - (60 * 60 * 1000));
+    endDate = new Date(currentTime - (60 * 1000));
+    DublinCoreCatalog eventPast = generateEvent("Device A", startDate, endDate);
+
+    schedSvc.addEvent(eventCurrent, wfProperties);
+    schedSvc.addEvent(eventPast, wfProperties);
+
+    Date now = new Date(currentTime);
+    SchedulerQuery filter = new SchedulerQuery().setEndsFrom(now);
+    List<DublinCoreCatalog> events = schedSvc.search(filter).getCatalogList();
+    assertEquals(1, events.size());
+  }
+
   @Test
   public void testSpatial() throws Exception {
     long currentTime = System.currentTimeMillis();

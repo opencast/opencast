@@ -23,12 +23,11 @@
 // Controller for all event screens.
 angular.module('adminNg.controllers')
 .controller('EventCtrl', [
-    '$scope', 'Notifications', 'EventMetadataResource', 'EventAttachmentsResource',
-    'EventMediaResource', 'CommentResource', 'EventWorkflowsResource',
+    '$scope', 'Notifications', 'EventMetadataResource', 'EventAssetsResource',
+    'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource',
     'ResourcesListResource', 'EventAccessResource', 'EventGeneralResource',
     'OptoutsResource',
-    function ($scope, Notifications, EventMetadataResource,
-        EventAttachmentsResource, EventMediaResource, CommentResource,
+    function ($scope, Notifications, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
         EventWorkflowsResource, ResourcesListResource, EventAccessResource, EventGeneralResource,
         OptoutsResource) {
 
@@ -91,8 +90,7 @@ angular.module('adminNg.controllers')
                 $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
                 $scope.roles = ResourcesListResource.get({ resource: 'ROLES' });
 
-                $scope.media       = EventMediaResource.get({ id: id });
-                $scope.attachments = EventAttachmentsResource.get({ id: id });
+                $scope.assets      = EventAssetsResource.get({ id: id });
                 $scope.workflows   = EventWorkflowsResource.get({ id: id });
                 $scope.access      = EventAccessResource.get({ id: id }, function (data) {
                     if (angular.isDefined(data.episode_access)) {
@@ -134,6 +132,12 @@ angular.module('adminNg.controllers')
             }
 
             $scope.accessSave();
+        };
+
+        $scope.getPreview = function (url) {
+            return [{ 
+                uri: url
+            }];
         };
 
         $scope.updateOptout = function (newBoolean) {

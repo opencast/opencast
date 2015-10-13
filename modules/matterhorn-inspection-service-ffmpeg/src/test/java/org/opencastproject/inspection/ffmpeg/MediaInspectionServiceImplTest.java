@@ -21,26 +21,6 @@
 
 package org.opencastproject.inspection.ffmpeg;
 
-import org.apache.tika.parser.audio.AudioParser;
-import org.easymock.EasyMock;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.opencastproject.mediapackage.Track;
-import org.opencastproject.util.Checksum;
-import org.opencastproject.util.ChecksumType;
-import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.MimeType;
-import org.opencastproject.util.StreamHelper;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.workspace.api.Workspace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
@@ -50,6 +30,30 @@ import static org.opencastproject.util.MimeType.mimeType;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
+
+import org.opencastproject.mediapackage.AudioStream;
+import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.TrackSupport;
+import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.util.Checksum;
+import org.opencastproject.util.ChecksumType;
+import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.MimeType;
+import org.opencastproject.util.StreamHelper;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.tika.parser.audio.AudioParser;
+import org.easymock.EasyMock;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class MediaInspectionServiceImplTest {
   private static final Logger logger = LoggerFactory.getLogger(MediaInspectionServiceImplTest.class);
@@ -147,6 +151,11 @@ public class MediaInspectionServiceImplTest {
       track.setMimeType(mt);
       // test the enrich scenario
       Track newTrack = (Track) mi.enrich(track, false);
+
+      VideoStream[] videoStreams = TrackSupport.byType(newTrack.getStreams(), VideoStream.class);
+      assertEquals(1L, videoStreams[0].getFrameCount().longValue());
+      AudioStream[] audioStreams = TrackSupport.byType(newTrack.getStreams(), AudioStream.class);
+      assertEquals(46L, audioStreams[0].getFrameCount().longValue());
       assertEquals(newTrack.getChecksum(), cs);
       assertEquals(newTrack.getMimeType(), mt);
       assertNotNull(newTrack.getDuration());

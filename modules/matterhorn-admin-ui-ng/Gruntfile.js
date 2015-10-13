@@ -1,7 +1,10 @@
 module.exports = function (grunt) {
 
+    require('load-grunt-tasks')(grunt);
+    
     // Project configuration.
     grunt.initConfig({
+        
 
         /**===================================
          * Configuration variables
@@ -28,7 +31,7 @@ module.exports = function (grunt) {
         /** Paths for the different types of ressource */
         srcPath: {
             js   : "<%= baseDir %>/**/*.js",
-            less : "<%= baseDir %>/css/**/*.less",
+            sass : "<%= baseDir %>/css/**/*.scss",
             html : "<%= baseDir %>/**/*.html",
             mocks: "<%= testDirBase %>/**/*",
             unit : "<%= unitTestDir %>/**/*.js",
@@ -95,10 +98,10 @@ module.exports = function (grunt) {
                 files: ["<%= srcPath.mocks %>"],
                 tasks: ["copy:oneTest"]
             },
-            // Watch less file
-            less: {
-                files: ["<%= srcPath.less %>"],
-                tasks: ["less:dev"]
+            // Watch sass file
+            sass: {
+                files: ["<%= srcPath.sass %>"],
+                tasks: ["sass:dev"]
             },
             i18n: {
                 files: ["<%= srcPath.i18n %>"],
@@ -116,30 +119,39 @@ module.exports = function (grunt) {
             }
         },
 
-        /** Compile the less files into a CSS file */
-        less: {
+        /** Compile the sass files into a CSS file */
+        sass: {
             dev: {
                 options: {
-                    concat: false,
-                    compress: false,
-                    paths: ["<%= baseDir %>/css/"]
+                    style: 'expanded',
+                    trace: true
                 },
-                files: {
-                    "<%= serverDir %>/css/main.css": "<%= baseDir %>/css/less/override.less"
-                }
+                  files: {                         
+                    "<%= serverDir %>/css/main.css": "<%= baseDir %>/css/stylesheets/override.scss"
+                  }
             },
             production: {
                 options: {
-                    syncImport    : true,
-                    strictImports : true,
-                    concat        : true,
-                    compress      : true,
-                    paths         : [ "<%= baseDir %>/css/" ]
+                    style: 'compact',
                 },
-                files: {
-                    "<%= serverDir %>/css/main.css": "<%= baseDir %>/css/less/override.less"
+                files: {                         
+                    "<%= serverDir %>/css/main.css": "<%= baseDir %>/css/stylesheets/override.scss"
                 }
+            }                              
+        },
+
+        /** Combine CSS files */
+        cssmin: {
+          options: {
+            shorthandCompacting: true,
+            roundingPrecision: -1,
+            processImport: true
+          },
+          target: {
+            files: {
+              '<%= serverDir %>/css/main.css': ['<%= baseDir %>/css/vendor/chosen.css', '<%= baseDir %>/css/vendor/animate/animate.css', '<%= serverDir %>/css/main.css']
             }
+          }
         },
 
         /** Copy .. */
@@ -233,7 +245,7 @@ module.exports = function (grunt) {
         /** Task to run tasks in parrallel */
         concurrent: {
             dev: {
-                tasks: ["watch:js", "watch:i18n", "watch:less", "watch:html", "watch:mocks", "watch:www", "watch:grunt", "connect:server", "karma:devCoverage"],
+                tasks: ["watch:js", "watch:i18n", "watch:sass", "watch:html", "watch:mocks", "watch:www", "watch:grunt", "connect:server", "karma:devCoverage"],
                 options: {
                     logConcurrentOutput: true,
                     limit: 9
@@ -356,30 +368,30 @@ module.exports = function (grunt) {
     });
 
     // Load the plugin that provides the "uglify" task.
-    grunt.loadNpmTasks("assemble-less");
     grunt.loadNpmTasks("grunt-concurrent");
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-connect");
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks("grunt-docular");
     grunt.loadNpmTasks("grunt-karma");
     grunt.loadNpmTasks("grunt-protractor-runner");
 
     // Base task for the development
-    grunt.registerTask("dev", ["clean", "less:dev", "jshint:all", "copy:all", "concurrent:dev"]);
+    grunt.registerTask("dev", ["clean", "sass:dev", "cssmin", "jshint:all", "copy:all", "concurrent:dev"]);
 
     // Base task for production
-    var buildWithoutTests = ["clean", "less:production", "copy:prod" ] ;
-    var buildWithTests = ["jshint:all", "karma:continuous", "clean", "less:production", "copy:prod" ];
+    var buildWithoutTests = ["clean", "sass:production", "cssmin", "copy:prod" ] ;
+    var buildWithTests = ["jshint:all", "karma:continuous", "clean", "sass:production", "cssmin", "copy:prod" ];
     grunt.registerTask("build", grunt.option('skipTests') ? buildWithoutTests : buildWithTests);
 
     // Deployment task
     grunt.registerTask("deploy", ["jshint:all", "karma:continuous", "build:prod"]);
 
     // Provide protractor with an independent web server
-    grunt.registerTask("e2e:prepare", ["clean", "less:production", "copy:all", "connect:test"]);
+    grunt.registerTask("e2e:prepare", ["clean", "sass:production", "copy:all", "connect:test"]);
     grunt.registerTask("e2e:continuous", ["e2e:prepare", "protractor:continuous"]);
     grunt.registerTask("e2e:dev", ["e2e:prepare", "protractor:dev"]);
     grunt.registerTask("e2e:debug", ["e2e:prepare", "protractor:debug"]);
