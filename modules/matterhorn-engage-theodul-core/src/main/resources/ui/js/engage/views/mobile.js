@@ -52,8 +52,12 @@ define(['jquery', 'backbone', "engage/core", "engage/models/engage"], function($
                 plugin.inserted = true;
                 plugin.container = "#" + id_engage_controls;
                 break;
-            case id_engage_tab:
             case id_engage_description:
+                $("#" + id_engage_description).html(plugin.templateProcessed);
+                plugin.inserted = true;
+                plugin.container = "#" + id_engage_description;
+                break;
+            case id_engage_tab:
             case id_engage_timeline:
             default:
                 plugin.inserted = false;
