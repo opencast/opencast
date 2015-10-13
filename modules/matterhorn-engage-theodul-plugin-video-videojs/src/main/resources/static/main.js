@@ -1138,11 +1138,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             });
         }
 
-        // if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
-        //     appendMobilePlayer_switchPlayers();
-        // }
-        // appendEmbedPlayer_openInPlayer();
-
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
             aspectRatio[1] = parseInt(aspectRatio[1]);
             aspectRatio[2] = parseInt(aspectRatio[2]);
@@ -1169,7 +1164,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
             if (videoDataView.model.get("type") != "audio") {
                 $(window).resize(function() {
-                    checkVideoDisplaySize();
+                    checkVideoDisplaySize();          
                 });
             }
         }
