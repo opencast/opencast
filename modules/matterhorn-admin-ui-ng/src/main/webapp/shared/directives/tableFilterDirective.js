@@ -45,6 +45,10 @@ angular.module('adminNg.directives')
                 Storage.put('filter', scope.namespace, filterName, filter.value);
             };
 
+            scope.toggleFilterSettings = function () {
+                scope.mode = scope.mode ? 0:1;
+            };
+
             scope.selectFilterPeriodValue = function (filterName, filter) {
                 // Merge from-to values of period filter)
                 if (filter.period.to && filter.period.from) {
@@ -87,6 +91,12 @@ angular.module('adminNg.directives')
                 scope.profiles = FilterProfiles.get(scope.namespace);
                 scope.profile = {};
                 scope.mode = 1;
+                delete scope.currentlyEditing;
+            };
+
+            scope.closeProfile = function () {
+                scope.mode = 0;
+                scope.profile = {};
                 delete scope.currentlyEditing;
             };
 

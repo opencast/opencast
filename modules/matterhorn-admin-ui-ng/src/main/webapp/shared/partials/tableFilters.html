@@ -58,11 +58,12 @@
             title="{{ 'TABLE_FILTERS.CLEAR' | translate }}"
             class="clear fa fa-times"></i>
 
-        <div class="btn-dd filter-settings-dd">
-            <i ng-click="mode = mode ? 0:1"></i>
+        <i ng-click="toggleFilterSettings()" class="settings fa fa-cog fa-times"></i>
 
+        <div class="btn-dd filter-settings-dd df-profile-filters">
             <div ng-show="mode == 1" class="filters-list">
                 <header>
+                    <a class="icon close" ng-click="closeProfile()"></a>
                     <h4 translate="TABLE_FILTERS.PROFILES.FILTERS_HEADER"><!--Saved Filter Sets--></h4>
                 </header>
                 <ul>
@@ -90,6 +91,7 @@
 
             <div ng-show="mode == 2" class="filter-details">
                 <header>
+                    <a class="icon close" ng-click="cancelProfileEditing()"></a>
                     <h4 translate="TABLE_FILTERS.PROFILES.FILTER_HEADER"><!--Save Filter Set--></h4>
                 </header>
                 <div ng-form="profileForm" ng-model="profile" class="input-container">
@@ -102,7 +104,8 @@
                     <label translate="TABLE_FILTERS.PROFILES.DESCRIPTION"><!--Description--></label>
                     <textarea ng-model="profile.description"
                         placeholder="{{ 'TABLE_FILTERS.PROFILES.DESCRIPTION_PLACEHOLDER' | translate }}"></textarea>
-
+                </div>
+                <div class="input-container">
                     <div class="btn-container">
                         <a ng-click="cancelProfileEditing()" class="cancel"
                             translate="CANCEL"><!--Cancel--></a>
