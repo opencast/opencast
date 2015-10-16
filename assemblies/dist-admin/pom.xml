@@ -14,9 +14,9 @@
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
   </properties>
 
-  <artifactId>opencast-karaf-dist-allinone</artifactId>
+  <artifactId>opencast-dist-admin</artifactId>
   <packaging>karaf-assembly</packaging>
-  <name>Opencast // Assemblies // Distribution All-In-One</name>
+  <name>Opencast // Assemblies // Distribution Admin</name>
 
   <dependencies>
     <dependency>
@@ -59,13 +59,6 @@
           <include>**/*</include>
         </includes>
       </resource>
-      <resource>
-        <directory>..</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>package.xml</include>
-        </includes>
-      </resource>
     </resources>
 
     <plugins>
@@ -83,8 +76,8 @@
         <configuration>
           <bootFeatures>
             <feature>standard</feature>
-            <feature>opencast-allinone</feature>
-          </bootFeatures>
+            <feature>opencast-admin</feature>
+           </bootFeatures>
         </configuration>
       </plugin>
       <plugin>
@@ -94,27 +87,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>develop</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>${project.basedir}/target/classes/package.xml</descriptor>
-              </descriptors>
-              <outputDirectory>${opencast.basedir}/build/</outputDirectory>
-              <appendAssemblyId>false</appendAssemblyId>
-              <tarLongFileMode>gnu</tarLongFileMode>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

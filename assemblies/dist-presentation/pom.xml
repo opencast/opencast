@@ -14,9 +14,9 @@
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
   </properties>
 
-  <artifactId>opencast-karaf-dist-admin</artifactId>
+  <artifactId>opencast-dist-presentation</artifactId>
   <packaging>karaf-assembly</packaging>
-  <name>Opencast // Assemblies // Distribution Admin</name>
+  <name>Opencast // Assemblies // Distribution Presentation</name>
 
   <dependencies>
     <dependency>
@@ -76,7 +76,7 @@
         <configuration>
           <bootFeatures>
             <feature>standard</feature>
-            <feature>opencast-admin</feature>
+            <feature>opencast-presentation</feature>
            </bootFeatures>
         </configuration>
       </plugin>
