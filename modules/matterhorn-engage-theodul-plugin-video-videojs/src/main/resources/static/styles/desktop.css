@@ -79,3 +79,10 @@
 .vjs-fullscreen-control {
     visibility: hidden;
 }
+
+#indicator {
+    top: 2px;
+    position: absolute;
+    background: red;
+    left: 2px
+}
