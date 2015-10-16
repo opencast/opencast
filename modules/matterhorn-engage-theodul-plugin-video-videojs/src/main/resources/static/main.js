@@ -481,6 +481,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     function registerZoomLevelEvents() {
 
+        if (isUsingFlash) {
+            Engage.log("Video: Zoom for Flash is not supported");
+            return;
+        }
+        
         Engage.group("registerZoomLevelEvents");
 
         var selector = "video"

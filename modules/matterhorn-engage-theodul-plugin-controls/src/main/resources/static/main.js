@@ -439,7 +439,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         translatedQualites[resolutions[i]] = translate(resolutions[i], resolutions[i]);
                     }
                 }
-
+                console.log("!!!! " + usingFlash);
                 var tempVars = {
                     plugin_path: this.pluginPath,
                     startTime: Utils.formatSeconds(0),
@@ -480,7 +480,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     controlsTop: Engage.controls_top,
                     logo: logo,
                     show_embed: showEmbed,
-                    str_zoomlevel: "1.0"
+                    str_zoomlevel: "1.0",
+                    flash: usingFlash
                 };
 
                 // compile template and load it
@@ -627,35 +628,35 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     }
 
     function addZoomEvents() {
-        var zoom = Basil.get(storage_zoomLevel);
-        /* TODO: Set Zoomlevel in Navbar */
+        if(!usingFlash) {
+            var zoom = Basil.get(storage_zoomLevel);
+            /* TODO: Set Zoomlevel in Navbar */
 
-        /* Events for Button */
-        $("#" + id_zoomLevel2).click(function(event) {
-            event.preventDefault();
-            Engage.trigger(plugin.events.setZoomLevel.getName(), [2.0, true]);
-        });
+            /* Events for Button */
+            $("#" + id_zoomLevel2).click(function(event) {
+                event.preventDefault();
+                Engage.trigger(plugin.events.setZoomLevel.getName(), [2.0, true]);
+            });
 
-        $("#" + id_zoomLevel4).click(function(event) {
-            event.preventDefault();
-            Engage.trigger(plugin.events.setZoomLevel.getName(), [4.0, true]);
-        });
+            $("#" + id_zoomLevel4).click(function(event) {
+                event.preventDefault();
+                Engage.trigger(plugin.events.setZoomLevel.getName(), [4.0, true]);
+            });
 
-        $("#" + id_zoomLevel6).click(function(event) {
-            event.preventDefault();
-            Engage.trigger(plugin.events.setZoomLevel.getName(), [6.0, true]);
-        });
+            $("#" + id_zoomLevel6).click(function(event) {
+                event.preventDefault();
+                Engage.trigger(plugin.events.setZoomLevel.getName(), [6.0, true]);
+            });
 
-        $("#" + id_zoomReset).click(function(event) {
-            event.preventDefault();
-            Engage.trigger(plugin.events.zoomReset.getName(), true);
-        });
+            $("#" + id_zoomReset).click(function(event) {
+                event.preventDefault();
+                Engage.trigger(plugin.events.zoomReset.getName(), true);
+            });
 
-        Engage.on(plugin.events.zoomChange.getName(), function(level) {
-            $("#" + id_zoomLevelIndicator).html(String(Number(level).toFixed(3)));
-        });
-        /* Events for Keys */
-
+            Engage.on(plugin.events.zoomChange.getName(), function(level) {
+                $("#" + id_zoomLevelIndicator).html(String(Number(level).toFixed(3)));
+            });
+        }
     }
 
     function triggerEmbedMessage(ratioWidth, ratioHeight) {
