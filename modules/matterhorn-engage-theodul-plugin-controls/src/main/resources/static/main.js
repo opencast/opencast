@@ -439,7 +439,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         translatedQualites[resolutions[i]] = translate(resolutions[i], resolutions[i]);
                     }
                 }
-                console.log("!!!! " + usingFlash);
+
                 var tempVars = {
                     plugin_path: this.pluginPath,
                     startTime: Utils.formatSeconds(0),
@@ -629,8 +629,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function addZoomEvents() {
         if(!usingFlash) {
-            var zoom = Basil.get(storage_zoomLevel);
-            /* TODO: Set Zoomlevel in Navbar */
+            /* TODO: Set Zoomlevel in Navbar on Page loaded */
 
             /* Events for Button */
             $("#" + id_zoomLevel2).click(function(event) {

@@ -485,7 +485,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             Engage.log("Video: Zoom for Flash is not supported");
             return;
         }
-        
+
         Engage.group("registerZoomLevelEvents");
 
         var selector = "video"
@@ -721,10 +721,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     }
                 }
             }
-            if (Number(level).toFixed(decimal_places) <= 1.0) {
-                $("#indicator").hide();
-            }
-            else if (Number(level).toFixed(decimal_places) >= 1.0 && (videoFocused || singleVideo)) {
+
+            if (Number(level).toFixed(decimal_places) >= 1.0 && (videoFocused || singleVideo)) {
                 var topTrans = Number($(selector).css("top").replace("px", ""));
                 var leftTrans = Number($(selector).css("left").replace("px", ""));
 
