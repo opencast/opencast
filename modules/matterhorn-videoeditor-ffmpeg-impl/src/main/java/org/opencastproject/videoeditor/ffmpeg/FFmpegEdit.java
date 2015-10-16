@@ -67,10 +67,10 @@ public class FFmpegEdit {
   protected String audioCodec = null;
 
   public static void init(BundleContext bundleContext) {
-    String path = bundleContext.getProperty(CONFIG_FFMPEG_PATH).trim();
+    String path = bundleContext.getProperty(CONFIG_FFMPEG_PATH);
 
     if (path != null) {
-      binary = path;
+      binary = path.trim();
     }
   }
 
