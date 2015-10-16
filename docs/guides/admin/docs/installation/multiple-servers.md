@@ -16,12 +16,11 @@ which can directly be built and installed. To build these distributions, you wou
 
 To list all distributions, run the following command after Opencast is built:
 
-    % ls -d assemblies/karaf-dist-*/target/opencast*
-    assemblies/karaf-dist-admin/target/opencast-karaf-dist-admin-${version}
-    assemblies/karaf-dist-admin/target/opencast-karaf-dist-admin-${version}.tar.gz
-    assemblies/karaf-dist-admin/target/opencast-karaf-dist-admin-${version}.zip
-    assemblies/karaf-dist-allinone/target/opencast-karaf-dist-allinone-${version}
-    assemblies/karaf-dist-allinone/target/opencast-karaf-dist-allinone-${version}.tar.gz
+    % ls -1 build/*.tar.gz
+    build/opencast-dist-admin-${version}.tar.gz
+    build/opencast-dist-allinone-${version}.tar.gz
+    build/opencast-dist-presentation-${version}.tar.gz
+    build/opencast-dist-worker-${version}.tar.g
     ...
 
 

@@ -79,8 +79,8 @@ Automatically build all Opencast modules and assemble distributions for differen
 
 Deploy all-in-one distribution:
 
-    ca assemblies/karaf-dist-allinone/target/opencast-karaf-dist-allinone-*
-    mv opencast-karaf-dist-allinone-* /opt/opencast
+    cd build/
+    mv opencast-dist-allinone-*/ /opt/opencast
 
 Make sure everything belongs to the user `opencast`:
 
