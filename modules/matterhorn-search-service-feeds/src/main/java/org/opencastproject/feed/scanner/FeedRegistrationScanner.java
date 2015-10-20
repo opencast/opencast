@@ -115,7 +115,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
    */
   @Override
   public void install(File artifact) throws Exception {
-    logger.info("Installing a feed from {}", artifact.getAbsolutePath());
+    logger.info("Installing a feed from '{}'", artifact.getName());
     Properties props = new Properties();
     FileInputStream in = null;
     try {
