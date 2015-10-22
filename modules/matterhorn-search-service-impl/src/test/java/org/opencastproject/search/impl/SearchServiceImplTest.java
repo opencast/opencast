@@ -401,6 +401,7 @@ public class SearchServiceImplTest {
     assertEquals(1, service.getByQuery(new SearchQuery().withText("nstitute")).size());
     assertEquals(1, service.getByQuery(new SearchQuery().withText("nstitut")).size());
     assertEquals(1, service.getByQuery(new SearchQuery().withText("Institut")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("2008-03-05")).size());
   }
 
   @Ignore("This test randomly fails. See MH-10573.")
