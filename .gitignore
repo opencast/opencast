@@ -6,6 +6,7 @@ target/
 target-grunt/
 node_modules/
 node/
+/build/
 
 # ignore Eclipse project data
 .project

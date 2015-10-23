@@ -10,6 +10,10 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
+  <properties>
+    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
+  </properties>
+
   <artifactId>opencast-karaf-dist-admin</artifactId>
   <packaging>karaf-assembly</packaging>
   <name>Opencast // Assemblies // Distribution Admin</name>
@@ -60,88 +64,29 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>process-resources</id>
-            <goals>
-              <goal>resources</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
-        <version>${karaf.version}</version>
-        <extensions>true</extensions>
         <configuration>
-          <!-- no startupFeatures -->
           <bootFeatures>
             <feature>standard</feature>
             <feature>opencast-admin</feature>
            </bootFeatures>
-          <!-- no installedFeatures -->
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>prepare-package</phase>
-            <configuration>
-              <target>
-                <!-- Remove Karaf Spring bundle since it conflicts with the one used by Opencast -->
-                <replaceregexp
-                  file="target/assembly/etc/startup.properties"
-                  match="^.*org.apache.karaf.deployer/org.apache.karaf.deployer.spring.*$"
-                  replace="#\0"
-                  byline="true" />
-                <!-- Make sure to deactivate JMX by default -->
-                <replaceregexp
-                  file="target/assembly/bin/karaf"
-                  match="-Dcom.sun.management.jmxremote"
-                  replace=""
-                  byline="true" />
-                <!-- Correct the start script name -->
-                <replaceregexp
-                  file="target/assembly/bin/karaf"
-                  match="^KARAF_SCRIPT=.*$"
-                  replace="KARAF_SCRIPT='start-opencast'"
-                  byline="true" />
-                <!-- Remove SSHd and JMX from default start -->
-                <replaceregexp
-                  file="target/assembly/etc/org.apache.karaf.features.cfg"
-                  match="^(featuresBoot = .*),ssh,management(.*)$"
-                  replace="#\0${line.separator}\1\2"
-                  byline="true" />
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>bin</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>${project.basedir}/../package.xml</descriptor>
-              </descriptors>
-              <appendAssemblyId>false</appendAssemblyId>
-              <tarLongFileMode>gnu</tarLongFileMode>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

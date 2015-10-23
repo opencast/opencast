@@ -3,10 +3,16 @@
   <id>bin</id>
 
   <formats>
+    <!-- This will be changed to dir to build the development distribution from
+         dist-allinone. If you change the archive format, make sure to change
+         the rule in the main assemblies pom.xml -->
     <format>tar.gz</format>
-    <format>zip</format>
-    <format>dir</format>
   </formats>
+
+  <!-- This will be changed to exclude the inner directory for the development
+       distribution built from dist-allinone. If you change or remove this option,
+       make sure to change the rule in the main assemblies pom.xml -->
+  <baseDirectory>${project.artifactId}</baseDirectory>
 
   <fileSets>
 
@@ -28,7 +34,6 @@
       <outputDirectory></outputDirectory>
       <excludes>
         <exclude>bin/**</exclude>
-        <exclude>deploy/**</exclude>
         <exclude>**/README</exclude>
         <exclude>etc/equinox-debug.properties</exclude>
         <exclude>etc/keys.properties</exclude>
