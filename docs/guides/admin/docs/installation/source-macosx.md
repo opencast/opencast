@@ -46,7 +46,7 @@ Required:
     
     Xcode
     jdk 7 or jdk 8
-    ffmpeg >= 2.5
+    ffmpeg >= 2.8
     maven >= 3.1
 
 Required (not necessarily on the same machine):
