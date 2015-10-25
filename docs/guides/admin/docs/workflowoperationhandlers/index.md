@@ -1,7 +1,9 @@
 # Workflow Operation Handler
 
 ## Introduction
-Workflows are the central element to define how a media package is being processed by the Matterhorn services. Their definitions consist of a list of workflow operations, which basically map a piece of configuration to Matterhorn code:
+
+Workflows are the central element to define how a media package is being processed by the Opencast services. Their
+definitions consist of a list of workflow operations, which basically map a piece of configuration to Opencast code:
 
     <definition xmlns="http://workflow.opencastproject.org">
         ....
@@ -16,7 +18,8 @@ Workflows are the central element to define how a media package is being process
     </definition>
 
 ##Default Workflow Operations
-The following table contains the workflow operations that are available in an out-of-the-box Matterhorn installation:
+
+The following table contains the workflow operations that are available in an out-of-the-box Opencast installation:
 
 |Operation Handler |Description                              |Details|
 |------------------|---------------------------------------------------------------|------------------------------------|

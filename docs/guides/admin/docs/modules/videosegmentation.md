@@ -8,14 +8,13 @@ Video segmentation is a way of dividing a movie into meaningful segments. In the
 segmentation is best applied to captured screen presentation, that the presenter goes through slide after slide.
 
 As a result, video segmentation returns the exact timepoints of slide changes on the timeline, which allows for
-sophisticated ways for the learner to browse the lecture content, as shown in the slides section of the Matterhorn Media
-Player.
+sophisticated ways for the learner to browse the lecture content, as shown in the slides section of the Opencast Player.
 
 
 How the video segmentation process works
 ----------------------------------------
 
-For detecting new scenes, Matterhorn uses the scene detection build into the FFmpeg select filter. The basic idea behind
+For detecting new scenes, Opencast uses the scene detection build into the FFmpeg select filter. The basic idea behind
 this filter is to compare to consecutive frames and decide if the second frame belongs to a new scene based on the
 difference.
 

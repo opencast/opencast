@@ -1,6 +1,6 @@
 # Module Documentation
 
-This is a documentation for modules included in Matterhorn that do not to be configured by default, but that allow some
+This is a documentation for modules included in Opencast that do not to be configured by default, but that allow some
 tweaking. For some modules some more in depth documentation is available too.
 
  - [Atom and RSS Feed](atomrss.md)

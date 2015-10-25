@@ -35,14 +35,15 @@ First you have to install the necessary repositories so that your package manage
 
  - Add Opencast repository:
 
-    ```
-    cd /etc/yum.repos.d
-    curl -O http://repo.virtuos.uos.de/matterhorn.repo \
-       -d os=el -d version=6 \
-       -u [YOUR_USERNAME]:[YOUR_PASSWORD]
-    ```
+        cd /etc/yum.repos.d
+        curl -O http://repo.virtuos.uos.de/opencast.repo \
+           -d os=el -d version=6 \
+           -u [YOUR_USERNAME]:[YOUR_PASSWORD]
 
     *Note: For RHEL/CentOS/SL 7.x use `version=7`*
+
+    It might take one or two weeks after the final version is released before the RPMs are moved to the stable
+    repository. Before that, you can use `.../opencast-testing.repo` instead to get the latest version.
 
 2. Add EPEL repository:
 
