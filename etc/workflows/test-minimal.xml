@@ -23,8 +23,8 @@
         <li class="ui-helper-clearfix">
           <label class="scheduler-label"><span class="color-red">* </span><span id="i18n_dist_label">Distribution Channel(s)</span>:</label>
           <span id="dist">
-            <input id="distribution" name="distribution" type="checkbox" checked="checked" disabled="disabled" class="configField" value="Matterhorn Media Module" />
-            <span id="i18n_dist_mmm">&nbsp;Matterhorn Media Module</span>
+            <input id="distribution" name="distribution" type="checkbox" checked="checked" disabled="disabled" class="configField" value="Opencast Media Module" />
+            <span id="i18n_dist_mmm">&nbsp;Opencast Media Module</span>
           </span>
         </li>
       </ul>
