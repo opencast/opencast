@@ -4,7 +4,7 @@
   <tools>
     <tool>
       <name>ffmpeg</name>
-      <minversion>2.5</minversion>
+      <minversion>2.8</minversion>
     </tool>
     <tool>
       <name>hunspell</name>

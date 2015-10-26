@@ -40,7 +40,7 @@ Please make sure to install the following dependencies. Note that not all depend
 Required:
 
     java-devel >= 1:1.7.0
-    ffmpeg >= 2.5
+    ffmpeg >= 2.8
     maven >= 3.1
 
 Required (not necessarily on the same machine):

@@ -42,7 +42,7 @@ Please make sure to install the following dependencies. Note that not all depend
 Required:
 
     openjdk-7-jdk or openjdk-8-jdk
-    ffmpeg >= 2.5
+    ffmpeg >= 2.8
     maven >= 3.1
 
 Required (not necessarily on the same machine):
