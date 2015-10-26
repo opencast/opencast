@@ -737,9 +737,11 @@ public class WorkspaceImpl implements Workspace {
                 || file.getAbsolutePath().startsWith(collectionDirectory.getAbsolutePath()))
           return false;
 
-        boolean maxAgeReached = true;
-        if (maxAge.isSome())
-          maxAgeReached = FileUtils.isFileOlder(file, new Date().getTime() + maxAge.get());
+        boolean maxAgeReached = false;
+        if (maxAge.isSome()) {
+          long fileAgeInSeconds = (new Date().getTime() - file.lastModified()) / 1000;
+          maxAgeReached = fileAgeInSeconds > maxAgeInSeconds.get();
+        }
 
         return maxAgeReached;
       }
