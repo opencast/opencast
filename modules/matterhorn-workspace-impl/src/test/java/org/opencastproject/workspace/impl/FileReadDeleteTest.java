@@ -33,6 +33,9 @@ import org.opencastproject.util.data.Function;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -45,6 +48,8 @@ import java.util.UUID;
 
 public class FileReadDeleteTest {
   private static final String FILE = "/opencast_header.gif";
+
+  private static final Logger logger = LoggerFactory.getLogger(FileReadDeleteTest.class);
 
   private final Object start = new Object();
   private volatile long totalRead = 0;
@@ -81,7 +86,7 @@ public class FileReadDeleteTest {
       assertEquals("Reader already finished", 0, totalRead);
       assertTrue("File could not be deleted", work.delete());
       assertFalse("File still exists", work.exists());
-      System.out.println("Work file deleted");
+      logger.debug("Work file deleted");
       // wait for reader to complete
       readerThread.join();
       assertEquals("File not completely read", expectedSize, totalRead);
@@ -112,14 +117,14 @@ public class FileReadDeleteTest {
   private Effect<FileInputStream> mkReaderFrom(final Function<FileInputStream, Function<Long, Long>> readerMaker) {
     return new Effect<FileInputStream>() {
       @Override public void run(final FileInputStream in) {
-        System.out.println("Start reading");
+        logger.debug("Start reading");
         long total = 0L;
         long read;
         final Function<Long, Long> readFile = readerMaker.apply(in);
         try {
           while ((read = readFile.apply(total)) > 0) {
             total = total + read;
-            System.out.println("Read " + total);
+            logger.debug("Read " + total);
             if (total > 3000) {
               synchronized (start) {
                 start.notifyAll();
@@ -128,7 +133,7 @@ public class FileReadDeleteTest {
             Thread.sleep(100);
           }
           totalRead = total;
-          System.out.println("File completely read " + total);
+          logger.debug("File completely read " + total);
         } catch (Throwable e) {
           e.printStackTrace();
         }
