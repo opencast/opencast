@@ -168,11 +168,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_volume = "volume";
     var id_volumeIcon = "volumeIcon";
     var id_dropdownMenuPlaybackRate = "dropdownMenuPlaybackRate";
-    var id_playbackRate050 = "playback050";
     var id_playbackRate075 = "playback075";
     var id_playbackRate100 = "playback100";
     var id_playbackRate125 = "playback125";
     var id_playbackRate150 = "playback150";
+    var id_playbackRate200 = "playback200";
+    var id_playbackRate300 = "playback300";
     var id_pipIndicator = "pipIndicator";
     var id_pipLeft = "pipLeft";
     var id_pipRight = "pipRight";
@@ -200,11 +201,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_embed3 = "embed3";
     var id_embed4 = "embed4";
     var id_playbackRateIndicator = "playbackRateIndicator";
-    var id_playbackRemTime050 = "playbackRemTime050";
     var id_playbackRemTime075 = "playbackRemTime075";
     var id_playbackRemTime100 = "playbackRemTime100";
     var id_playbackRemTime125 = "playbackRemTime125";
     var id_playbackRemTime150 = "playbackRemTime150";
+    var id_playbackRemTime200 = "playbackRemTime200";
+    var id_playbackRemTime300 = "playbackRemTime300";
     var id_loggedInNotLoggedIn = "loggedInNotLoggedIn";
     var id_loginlogout = "loginlogout";
     var id_str_loginlogout = "str_loginlogout";
@@ -551,11 +553,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     function addNonFlashEvents() {
         if (!mediapackageError && !usingFlash && !isAudioOnly) {
             // setup listeners for the playback rate
-            $("#" + id_playbackRate050).click(function(e) {
-                e.preventDefault();
-                $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(0.5));
-                Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5);
-            });
             $("#" + id_playbackRate075).click(function(e) {
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(0.75));
@@ -575,6 +572,16 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 e.preventDefault();
                 $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(1.5));
                 Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5);
+            });
+            $("#" + id_playbackRate200).click(function(e) {
+                e.preventDefault();
+                $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(2.0));
+                Engage.trigger(plugin.events.playbackRateChanged.getName(), 2.0);
+            });
+            $("#" + id_playbackRate300).click(function(e) {
+                e.preventDefault();
+                $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(3.0));
+                Engage.trigger(plugin.events.playbackRateChanged.getName(), 3.0);
             });
         }
     }
@@ -911,11 +918,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             }
             var val = Math.round((duration / 1000) - currentTime);
             val = ((val >= 0) && (val <= (duration / 1000))) ? val : "-";
-            $("#" + id_playbackRemTime050).html(Utils.formatSeconds(!isNaN(val) ? (val / 0.5) : val));
             $("#" + id_playbackRemTime075).html(Utils.formatSeconds(!isNaN(val) ? (val / 0.75) : val));
             $("#" + id_playbackRemTime100).html(Utils.formatSeconds(!isNaN(val) ? (val) : val));
             $("#" + id_playbackRemTime125).html(Utils.formatSeconds(!isNaN(val) ? (val / 1.25) : val));
             $("#" + id_playbackRemTime150).html(Utils.formatSeconds(!isNaN(val) ? (val / 1.5) : val));
+            $("#" + id_playbackRemTime200).html(Utils.formatSeconds(!isNaN(val) ? (val / 2.0) : val));
+            $("#" + id_playbackRemTime300).html(Utils.formatSeconds(!isNaN(val) ? (val / 3.0) : val));
         } else {
             $("#" + id_slider).slider("option", "value", 0);
         }
@@ -978,9 +986,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 isAudioOnly = audio;
             });
             Engage.on(plugin.events.playbackRateChanged.getName(), function(pbr) {
-                if ((pbr > 0) && (pbr < 2)) {
-                    $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(pbr));
-                }
+                $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(pbr));
             });
             Engage.on(plugin.events.volumeSet.getName(), function(volume) {
                 $("#" + id_volume).slider("value", volume * 100);
