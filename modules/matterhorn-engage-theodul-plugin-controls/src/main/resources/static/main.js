@@ -679,19 +679,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.trigger(plugin.events.unmute.getName());
         }
         
-        var pipPos = Basil.get(storage_pip_pos);
-        if (pipPos !== undefined) {
+        if (Basil.get(storage_pip_pos) !== undefined) {
+            var pipPos = Basil.get(storage_pip_pos);
             Engage.trigger(plugin.events.movePiP.getName(), pipPos);
         }
-        var pip = Basil.get(storage_pip);
-        if (pip !== undefined && pip === false) {
-            Engage.trigger(plugin.events.togglePiP.getName(), pip);
+        if (Basil.get(storage_pip) !== undefined) {
+            var pip = Basil.get(storage_pip);
+            if (pip === false) {
+                Engage.trigger(plugin.events.togglePiP.getName(), pip);
+            }
         }
-        var focusVideo = Basil.get(storage_focus_video);
-        if (focusVideo !== undefined ) {
-//            Engage.trigger(plugin.events.focusVideo.getName(), focusVideo);
+        if (Basil.get(storage_focus_video) !== undefined) {
+            var focusVideo = Basil.get(storage_focus_video);
             currentFocusFlavor = focusVideo;
-        }        
+        }
     }
 
     function initControlsEvents() {

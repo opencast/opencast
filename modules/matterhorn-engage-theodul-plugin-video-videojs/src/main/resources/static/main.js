@@ -952,9 +952,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     function isElementVisible(elementToBeChecked) {
         var TopView = $(window).scrollTop();
         var BotView = TopView + $(window).height();
-        var TopElement = $(elementToBeChecked).offset().top;
-        var BotElement = TopElement + $(elementToBeChecked).height();
-        return ((BotElement <= BotView) && (TopElement >= TopView));
+        if (elementToBeChecked !== undefined && $(elementToBeChecked).offset() !== undefined && $(elementToBeChecked).offset().top !== undefined) {
+            var TopElement = $(elementToBeChecked).offset().top;
+            var BotElement = TopElement + $(elementToBeChecked).height();
+            return ((BotElement <= BotView) && (TopElement >= TopView));
+        } else {
+            return false;
+        }
     }
 
     function clearAutoplay() {
@@ -1531,12 +1535,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 Engage.trigger(plugin.events.fullscreenChange.getName());
             });
             
-            $("." + videoDisplayClass).on("click", function () {
-                Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
-            });
+            var numberDisplays = $("." + videoDisplayClass).length;
+            if (numberDisplays > 1) {
+                $("." + videoDisplayClass).on("click", function () {
+                    Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
+                });
+            }
 
             Engage.on(plugin.events.focusVideo.getName(), function(display) {
                 Engage.log("Video: received focusing video " + display);
+
+                var numberDisplays = $("." + videoDisplayClass).length;
+                if (numberDisplays <= 1) return;
 
                 var videoDiv;
                 
@@ -1643,6 +1653,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }); 
             
             Engage.on(plugin.events.movePiP.getName(), function(pos) {
+                var numberDisplays = $("." + videoDisplayClass).length;
+                if (numberDisplays <= 1) return;
                 if (pos !== undefined) {
                     pipPos = pos;
                 } 
@@ -1662,6 +1674,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             });  
 
             Engage.on(plugin.events.togglePiP.getName(), function(pip) {
+                var numberDisplays = $("." + videoDisplayClass).length;
+                if (numberDisplays <= 1) return;
+                
                 Engage.log("Video: setting PiP to " + pip);
                 if ((pip && isPiP) || (! pip && ! isPiP)) {
                     return;
