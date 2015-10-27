@@ -233,12 +233,12 @@ public class SchedulerServiceImplTest {
     EasyMock.expect(
             messageReceiver.receiveSerializable(EasyMock.anyString(),
                     EasyMock.anyObject(MessageSender.DestinationType.class))).andStubReturn(
-                            new FutureTask<Serializable>(new Callable<Serializable>() {
-                              @Override
-                              public Serializable call() throws Exception {
-                                return baseMessageMock;
-                              }
-                            }));
+            new FutureTask<Serializable>(new Callable<Serializable>() {
+              @Override
+              public Serializable call() throws Exception {
+                return baseMessageMock;
+              }
+            }));
 
     EasyMock.replay(workflowService, seriesService, workspace, messageSender, baseMessageMock, messageReceiver);
 
@@ -1058,6 +1058,11 @@ public class SchedulerServiceImplTest {
     service.setMessageSender(messageSender);
     service.setMessageReceiver(messageReceiver);
     service.removeScheduledRecordingsBeforeBuffer(0);
+  }
+
+  @Test
+  public void calculatePeriods() {
+
   }
 
   private void checkEvent(long eventId, Properties initialCaProps, String title) throws Exception {

@@ -136,7 +136,7 @@
       },
       "repetitionOption": "WEEKLY",
       "start": {
-        "date"   : "2016-03-25T00:00:00Z",
+        "date"   : "2016-03-25T00:00:00Z", 
         "hour"   : "8",
         "minute" : "0"
       },
