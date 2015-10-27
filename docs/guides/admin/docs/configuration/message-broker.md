@@ -1,9 +1,9 @@
 Message Broker Configuration
 ============================
 
-Since version 2, Opencast Matterhorn requires an Apache ActiveMQ message broker as message relay for the administrative
-user interface. ActiveMQ can either be set up to run on its own machine or on one of the existing Matterhorn nodes
-(usually the admin node).
+Since version 2, Opencast requires an Apache ActiveMQ message broker as message relay for the administrative user
+interface. ActiveMQ can either be set up to run on its own machine or on one of the existing Opencast nodes (usually the
+admin node).
 
 ### Required Version
 
@@ -14,7 +14,7 @@ user interface. ActiveMQ can either be set up to run on its own machine or on on
 
 ### Installation
 
- - If you use the Matterhorn RPM repository, simply install the `activemq-dist` package.
+ - If you use the Opencast RPM repository, simply install the `activemq-dist` package.
  - If you are running RHEL, CentOS or Fedora you can use the [ActiveMQ-dist Copr RPM repository
    ](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
  - You can download binary distributions from the [Apache ActiveMQ website](http://activemq.apache.org/download.html)
@@ -22,19 +22,19 @@ user interface. ActiveMQ can either be set up to run on its own machine or on on
 
 ### Configuration
 
-What you basically need to do:
+What you need to do:
 
- - Set-up required message queues for Matterhorn
- - Point all your Matterhorn nodes to your message broker.
+ - Set-up required message queues for Opencast
+ - Point all your Opencast nodes to your message broker.
 
-The first task is easy. Matterhorn comes with a ActiveMQ configuration file, located at
-`docs/scripts/activemq/activemq.xml` (RPM repo: `/usr/share/matterhorn/docs/scripts/activemq/activemq.xml`). This file
+The first task is easy. Opencast comes with a ActiveMQ configuration file, located at
+`docs/scripts/activemq/activemq.xml` (RPM repo: `/usr/share/opencast/docs/scripts/activemq/activemq.xml`). This file
 will give you a basic configuration with all queues set-up and accepting connections from all hosts over TCP port
-61616.`Simply replace the default ActiveMQ configuration, usually located at `/etc/activemq/activemq.xml`, with this
-file.
+`61616`. Simply replacing the default ActiveMQ configuration, usually located at `/etc/activemq/activemq.xml`, with this
+file will already give you a fully functional ActiveMQ set-up.
 
-Then configure the ActiveMQ connectvion in the `config.properties`. The default configuration points to a local
-installation of ActiveMQ, but that can be changed with:
+Then configure the ActiveMQ connection in the `custom.properties`. The default configuration points to a local
+installation of ActiveMQ:
 
     activemq.broker.url = failover://tcp://example.opencast.org:61616
 
@@ -113,10 +113,10 @@ needs to match the name given for surrounding object in `login.config` i.e. acti
 
 The `authorizationEntry` gives read, write and admin access to only those members in the group admins for queues and topics.
 
-##### Configure Matterhorn to Connect with Username and Password to Message Broker
+##### Configure Opencast to Connect with Username and Password to Message Broker
 
 Now that we have secured the queues, Opencast will complain that it is unable to connect, using the current username and
-password. The username and password used above need to be added to the `config.properties` file of Opencast.  There are
+password. The username and password used above need to be added to the `custom.properties` file of Opencast.  There are
 two properties to set:
 
     activemq.broker.username=admin

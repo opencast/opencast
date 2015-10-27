@@ -103,6 +103,13 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     // Stream ID
     node.setAttribute("id", getIdentifier());
 
+    // Frame count
+    if (frameCount != null) {
+      Element frameCountNode = document.createElement("framecount");
+      frameCountNode.appendChild(document.createTextNode(Long.toString(frameCount)));
+      node.appendChild(frameCountNode);
+    }
+
     // Device
     Element deviceNode = document.createElement("device");
     boolean hasAttr = false;
@@ -202,6 +209,15 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     if (StringUtils.isEmpty(sid))
       sid = streamIdHint;
     AudioStreamImpl as = new AudioStreamImpl(sid);
+
+    // Frame count
+    try {
+      String frameCount = (String) xpath.evaluate("framecount/text()", node, XPathConstants.STRING);
+      if (!StringUtils.isBlank(frameCount))
+        as.frameCount = new Long(frameCount.trim());
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("Frame count was malformatted: " + e.getMessage());
+    }
 
     // bit depth
     try {

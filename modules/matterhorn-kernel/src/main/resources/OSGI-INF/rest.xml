@@ -3,6 +3,9 @@
 
   <scr:component name="org.opencastproject.kernel.rest.RestPublisher" activate="activate" deactivate="deactivate" immediate="true">
     <implementation class="org.opencastproject.kernel.rest.RestPublisher" />
+    <service>
+      <provide interface="org.opencastproject.kernel.rest.RestPublisher" />
+    </service>
     <property name="service.description" value="Opencast REST Endpoint Publisher" />
   </scr:component>
 

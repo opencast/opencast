@@ -13,6 +13,7 @@ work on all Unix-like systems.
  - [Fedora](source-rhel-sl-centos.md)
  - [Debian](source-debian-ubuntu.md)
  - [Ubuntu](source-debian-ubuntu.md)
+ - [Mac OS X](source-macosx.md)
 
 Building on most other Unix-like operating systems should be very much alike.
 

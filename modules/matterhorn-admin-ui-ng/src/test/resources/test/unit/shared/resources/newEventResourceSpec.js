@@ -2,7 +2,8 @@ describe('New Event API Resource', function () {
     var NewEventResource, $httpBackend, JsHelper,
         singleTestData, multiTestData, multiTestDSTData, uploadTestData,
         expectedSingle, expectedSourceSingle, expectedSourceMultiple,
-        startDate, startDateDST, endDate, date, dateDST, expectedSourceDSTMultiple;
+        startDate, startDateDST, endDateDST, endDate, date, dateDST, expectedSourceDSTMultiple;
+
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/test/unit/fixtures';
@@ -37,6 +38,13 @@ describe('New Event API Resource', function () {
             date   : '2016-03-25',
             hour   : '8',
             minute : '0'
+
+        });         
+
+        endDateDST = JsHelper.toZuluTimeString({
+            date   : '2016-03-28',
+            hour   : '8',
+            minute : '10'
         });   
 
         endDate = JsHelper.toZuluTimeString({
@@ -60,14 +68,17 @@ describe('New Event API Resource', function () {
             }
         };        
 
-        dateDST = new Date ('2016-03-25T07:00:00Z');
+
+        dateDST = moment(startDateDST);
+        dateDST.utc();
+
         expectedSourceDSTMultiple = {
             'type': 'SCHEDULE_MULTIPLE',
             'metadata': {
                 'start'   : startDateDST,
-                'end'     : '2016-03-28T06:10:00Z',
+                'end'     : endDateDST,
                 'duration': '600000',
-                'rrule'   : 'FREQ=WEEKLY;BYDAY=MO,TU,WE;BYHOUR=' + dateDST.getUTCHours() + ';BYMINUTE=0',
+                'rrule'   : 'FREQ=WEEKLY;BYDAY=MO,TU,WE;BYHOUR=' + dateDST.hours() + ';BYMINUTE=0',
                 'device'  : '•mock• agent3',
                 'inputs'  : 'TRANSLATION.PATH.VIDEO'
             }
