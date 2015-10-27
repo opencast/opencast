@@ -26,7 +26,7 @@ import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.util.EqualsUtil;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Business object for an capture agent

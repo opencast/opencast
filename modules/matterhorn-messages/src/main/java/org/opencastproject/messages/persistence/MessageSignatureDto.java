@@ -47,7 +47,8 @@ import javax.persistence.UniqueConstraint;
 
 /** Entity object for message signatures. */
 @Entity(name = "MessageSignature")
-@Table(name = "mh_message_signature", uniqueConstraints = { @UniqueConstraint(columnNames = { "name", "organization" }) })
+@Table(name = "mh_message_signature", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "name", "organization" }) })
 @NamedQueries({
         @NamedQuery(name = "MessageSignature.countByCreator", query = "SELECT COUNT(m) FROM MessageSignature m WHERE m.creator = :username AND m.organization = :org"),
         @NamedQuery(name = "MessageSignature.findAll", query = "SELECT m FROM MessageSignature m WHERE m.organization = :org"),

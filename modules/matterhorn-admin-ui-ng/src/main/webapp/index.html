@@ -6,7 +6,6 @@
         <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
         <link type="text/css" href="css/main.css" rel="stylesheet">
         <link type="text/css" href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-        <link rel="shortcut icon" href="img/favicon.ico">
         <script>
             window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>')
         </script>
@@ -16,17 +15,18 @@
         <script type="text/javascript" src="lib/backbone-1.1.0.js"></script>
         <script type="text/javascript" src="lib/visualsearch.js"></script>
         <script type="text/javascript" src="lib/chosen.jquery.min.js"></script>
-        <script type="text/javascript" src="lib/amazon/html2canvas-v2.js"></script>
+        <script type="text/javascript" src="lib/moment-with-locales.js"></script>
         <script type="text/javascript" src="lib/moment.min.js"></script>
     </head>
 
     <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
         <header ng-controller="NavCtrl" class="primary-header">
             <div class="header-branding">
-                <img src="img/opencast_logo_white.png" width="100px" height="20px" alt="Opencast logo" />
+                <div class="text-logo">Opencast</div>
+                <div class="logo-tag">Beta</div>
             </div>
-            <nav id="nav-dd-container" class="nav-dd-container">
-                <div class="nav-dd" id="lang-dd" old-admin-ng-dropdown="">
+            <nav class="header-nav nav-dd-container" id="nav-dd-container">
+                <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown="">
                     <div class="lang" ng-class="currentLanguageCode"></div>
                     <ul class="dropdown-ul">
                         <li><a href="#" ng-repeat="language in availableLanguages | orderBy:'displayLanguage'" ng-click="changeLanguage(language.code)">
@@ -35,22 +35,33 @@
                     </ul>
                 </div>
 
-                <div ng-if="documentationUrl" class="nav-dd help" id="help-dd" ng-click="toDoc()"></div>
+                <div ng-if="documentationUrl || restdocsUrl" class="nav-dd" id="help-dd" old-admin-ng-dropdown="">
+                    <div class="help"></div>
+                    <ul class="dropdown-ul">
+                        <li ng-if="restdocsUrl" with-role="ROLE_ADMIN">
+                        <a ng-click="toRestDoc()">
+                            <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
+                        </a>
+                        </li>
+                        <li ng-if="documentationUrl">
+                        <a ng-click="toDoc()">
+                          <span translate="HELP.USERS_GUIDE"><!-- User's Guide --></span>
+                        </a>
+                        </li>
+                    </ul>
+                </div>
 
-                <div class="nav-dd" id="user-dd" old-admin-ng-dropdown="">
-                    <div class="user">{{ currentUser.user.name }}</div>
-                    <i class="fa fa-chevron-down"></i>
+                <div class="nav-dd user-dd" id="user-dd" old-admin-ng-dropdown="">
+                    <div class="h-nav dropdown-icon">{{ currentUser.user.name || currentUser.user.username }}</div>
                     <ul class="dropdown-ul">
                         <li>
                         <a data-open-modal="user-preferences">
-                            <i class="fa fa-cogs"></i>
-                            <span translate="PREFERENCES.CAPTION">Preferences</span>
+                            <span class="cogs-icon" translate="PREFERENCES.CAPTION">Preferences</span>
                         </a>
                         </li>
                         <li>
                         <a ng-click="logout()">
-                                <i class="fa fa-power-off"></i>
-                                <span translate="LOGOUT">Logout</span>
+                                <span class="logout-icon" translate="LOGOUT">Logout</span>
                         </a>
                         </li>
                     </ul>
@@ -63,8 +74,8 @@
 
         <footer id="main-footer" ng-controller="NavCtrl">
             <div class="default-footer">
-                <div class="meta">
-                    Opencast Video Capture Software
+                <div ng-if="version.version" class="meta">
+                    Opencast Video Capture Software (v.{{ version.version }} - build: {{ version.buildNumber }})
                 </div>
                 <div ng-if="feedbackUrl" class="feedback-btn" id="feedback-btn">
                     <a href="javascript:;">Feedback</a>
@@ -101,11 +112,13 @@
         <script src="shared/services/filterProfilesService.js"></script>
         <script src="shared/services/notificationsService.js"></script>
         <script src="shared/services/tableService.js"></script>
+        <script src="shared/services/statsService.js"></script>
         <script src="shared/services/underscoreService.js"></script>
         <script src="shared/services/formNavigatorService.js"></script>
         <script src="shared/services/videoService.js"></script>
         <script src="shared/resources/resources.js"></script>
         <script src="shared/resources/identityResource.js"></script>
+        <script src="shared/resources/versionResource.js"></script>
         <script src="shared/resources/eventsResource.js"></script>
         <script src="shared/resources/optoutsResource.js"></script>
         <script src="shared/resources/seriesResource.js"></script>
@@ -122,7 +135,11 @@
         <script src="shared/resources/conflictCheckResource.js"></script>
         <script src="shared/resources/bulkDeleteResource.js"></script>
         <script src="shared/resources/eventMediaResource.js"></script>
+        <script src="shared/resources/eventAttachmentDetailsResource.js"></script>
         <script src="shared/resources/eventMediaDetailsResource.js"></script>
+        <script src="shared/resources/eventCatalogDetailsResource.js"></script>
+        <script src="shared/resources/eventPublicationDetailsResource.js"></script>
+        <script src="shared/resources/eventPublicationsResource.js"></script>
         <script src="shared/resources/eventWorkflowsResource.js"></script>
         <script src="shared/resources/eventErrorsResource.js"></script>
         <script src="shared/resources/eventErrorDetailsResource.js"></script>
@@ -130,6 +147,8 @@
         <script src="shared/resources/eventWorkflowOperationsResource.js"></script>
         <script src="shared/resources/eventWorkflowOperationDetailsResource.js"></script>
         <script src="shared/resources/eventAttachmentsResource.js"></script>
+        <script src="shared/resources/eventCatalogsResource.js"></script>
+        <script src="shared/resources/eventAssetsResource.js"></script>
         <script src="shared/resources/eventAccessResource.js"></script>
         <script src="shared/resources/eventGeneralResource.js"></script>
         <script src="shared/resources/toolsResource.js"></script>
@@ -213,6 +232,7 @@
         <script src="shared/directives/selectBoxDirective.js"></script>
         <script src="shared/directives/navDirective.js"></script>
         <script src="shared/directives/tableDirective.js"></script>
+        <script src="shared/directives/statsDirective.js"></script>
         <script src="shared/directives/confirmationModalDirective.js"></script>
         <script src="shared/directives/resourceModalDirective.js"></script>
         <script src="shared/directives/editableDirective.js"></script>

@@ -29,7 +29,7 @@ import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.impl.jpa.JpaRole;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;

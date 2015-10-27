@@ -80,7 +80,8 @@ public final class JpaGroup implements Group {
   private String role;
 
   @ElementCollection
-  @CollectionTable(name = "mh_group_member")
+  @CollectionTable(name = "mh_group_member", joinColumns = { @JoinColumn(name = "group_id") })
+  @Column(name = "member")
   private Set<String> members;
 
   @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)

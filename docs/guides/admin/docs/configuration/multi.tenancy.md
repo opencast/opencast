@@ -48,9 +48,9 @@ installation:
     admin_role=ROLE_ADMIN
     anonymous_role=ROLE_ANONYMOUS
 
-    # Admin and Engage Server Urls
+    # Admin and Presentation Server Urls
     prop.org.opencastproject.admin.ui.url=https://tenant1_admin.myuniversity.edu
-    prop.org.opencastproject.engage.ui.url=https://tenant1_engage.myuniversity.edu
+    prop.org.opencastproject.engage.ui.url=https://tenant1_presentation.myuniversity.edu
 
     # Default properties for the user interface
     prop.logo_mediamodule=/img/MatterhornLogo_large.png

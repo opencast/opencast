@@ -21,7 +21,7 @@
 
 package org.opencastproject.workflow.impl;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Collections.mkString;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.FAILED;
@@ -107,10 +107,10 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.FnX;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceException;
 import org.osgi.framework.ServiceReference;
@@ -196,6 +196,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /** The configuration key for setting {@link #maxConcurrentWorkflows} */
   public static final String MAX_CONCURRENT_CONFIG_KEY = "max.concurrent";
 
+  /** The configuration key for setting {@link #workflowStatsCollect} */
+  public static final String STATS_COLLECT_CONFIG_KEY = "workflowstats.collect";
+
+  /** The default value for {@link #workflowStatsCollect} */
+  public static final Boolean DEFAULT_STATS_COLLECT_CONFIG = false;
+
   /** Configuration value for the maximum number of parallel workflows based on the number of cores in the cluster */
   public static final String OPT_NUM_CORES = "cores";
 
@@ -218,6 +224,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   /** The maximum number of cluster-wide workflows that will cause this service to stop accepting new jobs */
   protected int maxConcurrentWorkflows = -1;
+
+  /** Flag whether to collect JMX statistics */
+  protected boolean workflowStatsCollect = DEFAULT_STATS_COLLECT_CONFIG;
 
   /** The collection of workflow definitions */
   // protected Map<String, WorkflowDefinition> workflowDefinitions = new HashMap<String, WorkflowDefinition>();
@@ -1392,7 +1401,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throw new WorkflowException(e);
         }
 
-        workflowsStatistics.updateWorkflow(getBeanStatistics(), getHoldWorkflows());
+        if (workflowStatsCollect) {
+          workflowsStatistics.updateWorkflow(getBeanStatistics(), getHoldWorkflows());
+        }
 
         try {
           WorkflowInstance clone = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(workflowInstance));
@@ -2270,13 +2281,24 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     String maxConfiguration = StringUtils.trimToNull((String) properties.get(MAX_CONCURRENT_CONFIG_KEY));
-    if (maxConfiguration != null) {
+    if (StringUtils.isNotEmpty(maxConfiguration)) {
       try {
         maxConcurrentWorkflows = Integer.parseInt(maxConfiguration);
         logger.info("Set maximum concurrent workflows to %d", maxConcurrentWorkflows);
       } catch (NumberFormatException e) {
         logger.warn("Can not set max concurrent workflows to %s. %s must be an integer", maxConfiguration,
                 MAX_CONCURRENT_CONFIG_KEY);
+      }
+    }
+    String workflowStatsConfiguration = StringUtils.trimToNull((String) properties.get(STATS_COLLECT_CONFIG_KEY));
+    if (StringUtils.isNotEmpty(workflowStatsConfiguration)) {
+      try {
+         workflowStatsCollect = Boolean.parseBoolean(workflowStatsConfiguration);
+        logger.info("Workflow statistics collection is set to %s", workflowStatsConfiguration);
+      } catch (Exception e) {
+        logger.warn("Workflow statistics collection flag '%s' is malformed, setting to %s",
+                workflowStatsConfiguration, DEFAULT_STATS_COLLECT_CONFIG.toString());
+        workflowStatsCollect = DEFAULT_STATS_COLLECT_CONFIG;
       }
     }
   }

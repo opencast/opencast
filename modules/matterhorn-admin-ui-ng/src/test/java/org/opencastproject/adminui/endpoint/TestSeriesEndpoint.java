@@ -42,8 +42,9 @@ import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
 import org.opencastproject.index.service.impl.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
+import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
+import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
-import org.opencastproject.index.service.resources.list.provider.LanguagesListProvider;
 import org.opencastproject.index.service.resources.list.provider.UsersListProvider;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchQuery.Order;
@@ -62,6 +63,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -110,13 +112,23 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     EasyMock.expect(userDirectoryService.findUsers("%", 0, 0)).andReturn(users.iterator()).anyTimes();
     EasyMock.replay(userDirectoryService);
 
-    LanguagesListProvider languages = new LanguagesListProvider();
     UsersListProvider userListProvider = new UsersListProvider();
     userListProvider.setUserDirectoryService(userDirectoryService);
 
     ListProvidersServiceImpl listProvidersServiceImpl = new ListProvidersServiceImpl();
     listProvidersServiceImpl.addProvider(userListProvider);
-    listProvidersServiceImpl.addProvider(languages);
+    listProvidersServiceImpl.addProvider(new ResourceListProvider() {
+
+      @Override
+      public String[] getListNames() {
+        return new String[] { "LANGUAGES" };
+      }
+
+      @Override
+      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
+        return new HashMap<String, Object>();
+      }
+    });
     listProvidersServiceImpl.activate(null);
     return listProvidersServiceImpl;
   }

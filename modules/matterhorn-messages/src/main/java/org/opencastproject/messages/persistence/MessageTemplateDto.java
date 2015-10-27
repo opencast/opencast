@@ -45,7 +45,8 @@ import javax.persistence.UniqueConstraint;
 
 /** Entity object for message templates. */
 @Entity(name = "MessageTemplate")
-@Table(name = "mh_message_template", uniqueConstraints = { @UniqueConstraint(columnNames = { "name", "organization" }) })
+@Table(name = "mh_message_template", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "name", "organization" }) })
 @NamedQueries({
         @NamedQuery(name = "MessageTemplate.findAll", query = "SELECT m FROM MessageTemplate m WHERE m.organization = :org"),
         @NamedQuery(name = "MessageTemplate.findById", query = "SELECT m FROM MessageTemplate m WHERE m.id = :id AND m.organization = :org"),
@@ -74,6 +75,7 @@ public class MessageTemplateDto {
   @Column(name = "hidden", nullable = false)
   private boolean hidden = false;
 
+  @Column(name = "template_type")
   @Enumerated(EnumType.STRING)
   private TemplateType.Type type;
 

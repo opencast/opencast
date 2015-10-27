@@ -25,9 +25,14 @@ import static com.entwinemedia.fn.data.json.Jsons.a;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
+
+import com.entwinemedia.fn.data.json.JValue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,10 +63,6 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.entwinemedia.fn.data.json.JValue;
 
 @Path("/")
 @RestService(name = "captureAgents", title = "Capture agents façade service", notes = "This service offers the default capture agents CRUD Operations for the admin UI.", abstractText = "Provides operations for the capture agents")

@@ -54,9 +54,9 @@ import org.opencastproject.util.doc.rest.RestService;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -938,9 +938,10 @@ public class SchedulerRestService {
       if (StringUtils.isNotBlank(ifNoneMatch) && ifNoneMatch.equals(lastModified)) {
         return Response.notModified(lastModified).expires(null).build();
       }
-      SchedulerQuery filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId);
+      SchedulerQuery filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId)
+              .setEndsFrom(DateTime.now().minusHours(1).toDate());
       if (endDate != null)
-        filter.setEndsFrom(DateTime.now().minusHours(1).toDate()).setStartsTo(endDate);
+        filter.setStartsTo(endDate);
 
       String result = service.getCalendar(filter);
       if (!result.isEmpty()) {

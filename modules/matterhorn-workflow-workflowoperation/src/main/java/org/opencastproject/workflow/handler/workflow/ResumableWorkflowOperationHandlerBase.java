@@ -132,7 +132,7 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
     String welcomeFile = FilenameUtils.getName(resourcePath);
     staticResource = new StaticResource(getClass().getClassLoader(), path, alias, welcomeFile);
     Dictionary<String, String> props = new Hashtable<String, String>();
-    props.put("contextId", RestConstants.HTTP_CONTEXT_ID);
+    props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
     props.put("alias", alias);
     staticResourceRegistration = componentContext.getBundleContext().registerService(Servlet.class.getName(),
             staticResource, props);

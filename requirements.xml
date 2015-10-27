@@ -15,10 +15,6 @@
       <minversion>3.1</minversion>
     </tool>
     <tool>
-      <name>qt_sbtl_embedder</name>
-      <minversion>0.4</minversion>
-    </tool>
-    <tool>
       <name>sox</name>
       <minversion>14</minversion>
     </tool>
@@ -41,7 +37,6 @@
       <module>composer-ffmpeg</module>
       <build>ffmpeg</build>
       <runtime>ffmpeg</runtime>
-      <runtime>qt_sbtl_embedder</runtime>
     </requirement>
     <requirement>
       <module>dictionary-hunspell</module>

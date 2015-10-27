@@ -35,7 +35,7 @@ import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import junit.framework.Assert;
 
 import org.apache.commons.fileupload.MockHttpServletRequest;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Before;

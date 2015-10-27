@@ -6,6 +6,18 @@ CREATE TABLE SEQUENCE (
 
 INSERT INTO SEQUENCE(SEQ_NAME, SEQ_COUNT) values ('SEQ_GEN', 0);
 
+CREATE TABLE mh_bundleinfo (
+  id BIGINT(20) NOT NULL,
+  bundle_name VARCHAR(128) NOT NULL,
+  build_number VARCHAR(128) DEFAULT NULL,
+  host VARCHAR(128) NOT NULL,
+  bundle_id BIGINT(20) NOT NULL,
+  bundle_version VARCHAR(128) NOT NULL,
+  db_schema_version VARCHAR(128) DEFAULT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT UNQ_mh_bundleinfo UNIQUE (host, bundle_name, bundle_version)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE mh_organization (
   id VARCHAR(128) NOT NULL,
   anonymous_role VARCHAR(255),
@@ -92,7 +104,7 @@ CREATE TABLE mh_host_registration (
   active TINYINT(1) DEFAULT 1 NOT NULL,
   max_jobs INTEGER NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_host_registration_0 UNIQUE (host)
+  CONSTRAINT UNQ_mh_host_registration UNIQUE (host)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_host_registration_online ON mh_host_registration (online);
@@ -112,8 +124,8 @@ CREATE TABLE mh_service_registration (
   error_state_trigger BIGINT,
   host_registration BIGINT,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_service_registration_0 UNIQUE (host_registration, service_type),
-  CONSTRAINT FK_service_registration_host_registration FOREIGN KEY (host_registration) REFERENCES mh_host_registration (id) ON DELETE CASCADE
+  CONSTRAINT UNQ_mh_service_registration UNIQUE (host_registration, service_type),
+  CONSTRAINT FK_mh_service_registration_host_registration FOREIGN KEY (host_registration) REFERENCES mh_host_registration (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_service_registration_service_type ON mh_service_registration (service_type);
@@ -162,7 +174,7 @@ CREATE TABLE mh_job_argument (
   id BIGINT NOT NULL,
   argument TEXT(2147483647),
   argument_index INTEGER,
-  CONSTRAINT FK_job_argument_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE
+  CONSTRAINT FK_mh_job_argument_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_job_argument_id ON mh_job_argument (id);
@@ -171,8 +183,8 @@ CREATE TABLE mh_job_context (
   id BIGINT NOT NULL,
   name VARCHAR(255) NOT NULL,
   value TEXT(65535),
-  CONSTRAINT UNQ_job_context_0 UNIQUE (id, name),
-  CONSTRAINT FK_job_context_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE
+  CONSTRAINT UNQ_mh_job_context UNIQUE (id, name),
+  CONSTRAINT FK_mh_job_context_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_job_context_id ON mh_job_context (id);
@@ -182,10 +194,10 @@ CREATE TABLE mh_job_mh_service_registration (
   servicesRegistration_id BIGINT NOT NULL,
   PRIMARY KEY (Job_id, servicesRegistration_id),
   CONSTRAINT FK_mh_job_mh_service_registration_Job_id FOREIGN KEY (Job_id) REFERENCES mh_job (id) ON DELETE CASCADE,
-  CONSTRAINT mhjobmhservice_registrationservicesRegistration_id FOREIGN KEY (servicesRegistration_id) REFERENCES mh_service_registration (id) ON DELETE CASCADE
+  CONSTRAINT FK_mh_job_mh_service_registration_servicesRegistration_id FOREIGN KEY (servicesRegistration_id) REFERENCES mh_service_registration (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE INDEX IX_mh_job_mh_service_registration_service_registration_id ON mh_job_mh_service_registration (servicesRegistration_id);
+CREATE INDEX IX_mh_job_mh_service_registration_servicesRegistration_id ON mh_job_mh_service_registration (servicesRegistration_id);
 
 CREATE TABLE mh_incident (
   id BIGINT NOT NULL,
@@ -196,7 +208,7 @@ CREATE TABLE mh_incident (
   parameters TEXT(65535),
   details TEXT(65535),
   PRIMARY KEY (id),
-  CONSTRAINT FK_job_incident_jobid FOREIGN KEY (jobid) REFERENCES mh_job (id) ON DELETE CASCADE
+  CONSTRAINT FK_mh_incident_jobid FOREIGN KEY (jobid) REFERENCES mh_job (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_incident_jobid ON mh_incident (jobid);
@@ -261,6 +273,8 @@ CREATE TABLE mh_user_session (
   PRIMARY KEY (session_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE INDEX IX_mh_user_session_user_id ON mh_user_session (user_id);
+
 CREATE TABLE mh_user_action (
   id BIGINT NOT NULL,
   inpoint INTEGER,
@@ -271,10 +285,9 @@ CREATE TABLE mh_user_action (
   length INTEGER,
   type VARCHAR(128),
   playing TINYINT(1) DEFAULT 0,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT FK_mh_user_action_session_id FOREIGN KEY (session_id) REFERENCES mh_user_session (session_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-ALTER TABLE mh_user_action ADD CONSTRAINT FK_mh_user_action_session_id FOREIGN KEY (session_id) REFERENCES mh_user_session (session_id);
 
 CREATE INDEX IX_mh_user_action_created ON mh_user_action (created);
 CREATE INDEX IX_mh_user_action_inpoint ON mh_user_action (inpoint);
@@ -282,18 +295,11 @@ CREATE INDEX IX_mh_user_action_outpoint ON mh_user_action (outpoint);
 CREATE INDEX IX_mh_user_action_mediapackage_id ON mh_user_action (mediapackage);
 CREATE INDEX IX_mh_user_action_type ON mh_user_action (type);
 
-CREATE INDEX IX_mh_user_session_user_id ON mh_user_session (user_id);
-
 CREATE TABLE mh_oaipmh_harvesting (
   url VARCHAR(255) NOT NULL,
   last_harvested datetime,
   PRIMARY KEY (url)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
---
--- Archive
---
 
 CREATE TABLE mh_archive_asset (
   id bigint(20) NOT NULL,
@@ -304,12 +310,13 @@ CREATE TABLE mh_archive_asset (
   uri varchar(255) NOT NULL,
   version bigint(20) NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY UNQ_mh_archive_asset_0 (organization,mediapackage,mediapackageelement,version),
-  KEY IX_mh_archive_asset_mediapackage (mediapackage),
-  KEY IX_mh_archive_asset_checksum (checksum),
-  KEY IX_mh_archive_asset_uri (uri),
-  CONSTRAINT mh_archive_asset_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+  CONSTRAINT UNQ_mh_archive_asset UNIQUE (organization,mediapackage,mediapackageelement,version),
+  CONSTRAINT FK_mh_archive_asset_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_archive_asset_mediapackage on mh_archive_asset (mediapackage);
+CREATE INDEX IX_mh_archive_asset_checksum on mh_archive_asset (checksum);
+CREATE INDEX IX_mh_archive_asset_uri on mh_archive_asset (uri);
 
 CREATE TABLE mh_archive_episode (
   id varchar(128) NOT NULL,
@@ -320,20 +327,22 @@ CREATE TABLE mh_archive_episode (
   mediapackage_xml mediumtext,
   modification_date datetime DEFAULT NULL,
   PRIMARY KEY (id,version,organization),
-  KEY FK_mh_archive_episode_organization (organization),
-  KEY IX_mh_archive_episode_mediapackage (id),
-  KEY IX_mh_archive_episode_version (version),
-  KEY IX_mh_archive_episode_deleted (deleted),
   CONSTRAINT FK_mh_archive_episode_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_archive_episode_id on mh_archive_episode (id);
+CREATE INDEX IX_mh_archive_episode_organization on mh_archive_episode (organization);
+CREATE INDEX IX_mh_archive_episode_version on mh_archive_episode (version);
+CREATE INDEX IX_mh_archive_episode_deleted on mh_archive_episode (deleted);
 
 CREATE TABLE mh_archive_version_claim (
   mediapackage varchar(128) NOT NULL,
   last_claimed bigint(20) NOT NULL,
-  PRIMARY KEY (mediapackage),
-  KEY IX_mh_archive_version_claim_mediapackage (mediapackage),
-  KEY IX_mh_archive_version_claim_last_claimed (last_claimed)
+  PRIMARY KEY (mediapackage)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_archive_version_claim_mediapackage on mh_archive_version_claim (mediapackage);
+CREATE INDEX IX_mh_archive_version_claim_last_claimed on mh_archive_version_claim (last_claimed);
 
 --
 -- ACL manager
@@ -341,25 +350,23 @@ CREATE TABLE mh_archive_version_claim (
 CREATE TABLE mh_acl_managed_acl (
   pk BIGINT(20) NOT NULL,
   acl TEXT NOT NULL,
-  -- @changelog UNI-216
   name VARCHAR(128) NOT NULL,
   organization_id VARCHAR(128) NOT NULL,
   PRIMARY KEY (pk),
-  CONSTRAINT UNQ_mh_acl_managed_acl_0 UNIQUE (name, organization_id)
+  CONSTRAINT UNQ_mh_acl_managed_acl UNIQUE (name, organization_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_acl_episode_transition (
   pk BIGINT(20) NOT NULL,
   workflow_params VARCHAR(255) DEFAULT NULL,
   application_date DATETIME DEFAULT NULL,
-  -- @changelog UNI-216
   workflow_id VARCHAR(128) DEFAULT NULL,
   done TINYINT(1) DEFAULT 0,
   episode_id VARCHAR(128) DEFAULT NULL,
   organization_id VARCHAR(128) DEFAULT NULL,
   managed_acl_fk BIGINT(20) DEFAULT NULL,
   PRIMARY KEY (pk),
-  CONSTRAINT UNQ_mh_acl_episode_transition_0 UNIQUE (episode_id, organization_id, application_date),
+  CONSTRAINT UNQ_mh_acl_episode_transition UNIQUE (episode_id, organization_id, application_date),
   CONSTRAINT FK_mh_acl_episode_transition_managed_acl_fk FOREIGN KEY (managed_acl_fk) REFERENCES mh_acl_managed_acl (pk)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -367,7 +374,6 @@ CREATE TABLE mh_acl_series_transition (
   pk BIGINT(20) NOT NULL,
   workflow_params VARCHAR(255) DEFAULT NULL,
   application_date DATETIME DEFAULT NULL,
-  -- @changelog UNI-216
   workflow_id VARCHAR(128) DEFAULT NULL,
   override TINYINT(1) DEFAULT 0,
   done TINYINT(1) DEFAULT 0,
@@ -375,20 +381,17 @@ CREATE TABLE mh_acl_series_transition (
   series_id VARCHAR(128) DEFAULT NULL,
   managed_acl_fk BIGINT(20) DEFAULT NULL,
   PRIMARY KEY (pk),
-  CONSTRAINT UNQ_mh_acl_series_transition_0 UNIQUE (series_id, organization_id, application_date),
+  CONSTRAINT UNQ_mh_acl_series_transition UNIQUE (series_id, organization_id, application_date),
   CONSTRAINT FK_mh_acl_series_transition_managed_acl_fk FOREIGN KEY (managed_acl_fk) REFERENCES mh_acl_managed_acl (pk)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- groups, roles and users
---
 CREATE TABLE mh_role (
   id bigint(20) NOT NULL,
   description varchar(255) DEFAULT NULL,
   name varchar(128) DEFAULT NULL,
   organization varchar(128) DEFAULT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_role_0 UNIQUE (name, organization),
+  CONSTRAINT UNQ_mh_role UNIQUE (name, organization),
   CONSTRAINT FK_mh_role_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -400,20 +403,20 @@ CREATE TABLE mh_group (
   role varchar(255) DEFAULT NULL,
   organization varchar(128) DEFAULT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_group_0 UNIQUE (group_id, organization),
+  CONSTRAINT UNQ_mh_group UNIQUE (group_id, organization),
   CONSTRAINT FK_mh_group_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_group_member (
-  JpaGroup_id bigint(20) NOT NULL,
-  MEMBERS varchar(255) DEFAULT NULL
+  group_id bigint(20) NOT NULL,
+  member varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_group_role (
   group_id bigint(20) NOT NULL,
   role_id bigint(20) NOT NULL,
   PRIMARY KEY (group_id,role_id),
-  CONSTRAINT UNQ_mh_group_role_0 UNIQUE (group_id, role_id),
+  CONSTRAINT UNQ_mh_group_role UNIQUE (group_id, role_id),
   CONSTRAINT FK_mh_group_role_group_id FOREIGN KEY (group_id) REFERENCES mh_group (id),
   CONSTRAINT FK_mh_group_role_role_id FOREIGN KEY (role_id) REFERENCES mh_role (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -426,7 +429,7 @@ CREATE TABLE mh_user (
   email varchar(256) DEFAULT NULL,
   organization varchar(128) DEFAULT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_user_0 UNIQUE (username, organization),
+  CONSTRAINT UNQ_mh_user UNIQUE (username, organization),
   CONSTRAINT FK_mh_user_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -436,7 +439,7 @@ CREATE TABLE mh_user_role (
   user_id bigint(20) NOT NULL,
   role_id bigint(20) NOT NULL,
   PRIMARY KEY (user_id,role_id),
-  CONSTRAINT UNQ_mh_user_role_0 UNIQUE (user_id, role_id),
+  CONSTRAINT UNQ_mh_user_role UNIQUE (user_id, role_id),
   CONSTRAINT FK_mh_user_role_role_id FOREIGN KEY (role_id) REFERENCES mh_role (id),
   CONSTRAINT FK_mh_user_role_user_id FOREIGN KEY (user_id) REFERENCES mh_user (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -450,7 +453,7 @@ CREATE TABLE mh_user_ref (
   login_mechanism varchar(255) DEFAULT NULL,
   organization varchar(128) DEFAULT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_user_ref_0 UNIQUE (username, organization),
+  CONSTRAINT UNQ_mh_user_ref UNIQUE (username, organization),
   CONSTRAINT FK_mh_user_ref_organization FOREIGN KEY (organization) REFERENCES mh_organization (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -458,7 +461,7 @@ CREATE TABLE mh_user_ref_role (
   user_id bigint(20) NOT NULL,
   role_id bigint(20) NOT NULL,
   PRIMARY KEY (user_id, role_id),
-  CONSTRAINT UNQ_mh_user_ref_role_0 UNIQUE (user_id, role_id),
+  CONSTRAINT UNQ_mh_user_ref_role UNIQUE (user_id, role_id),
   CONSTRAINT FK_mh_user_ref_role_role_id FOREIGN KEY (role_id) REFERENCES mh_role (id),
   CONSTRAINT FK_mh_user_ref_role_user_id FOREIGN KEY (user_id) REFERENCES mh_user_ref (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -470,8 +473,7 @@ CREATE TABLE mh_user_settings (
   username varchar(128) NOT NULL,
   organization varchar(128) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_mh_user_setting_username FOREIGN KEY (username) REFERENCES mh_user (username),
-  CONSTRAINT FK_mh_user_setting_org FOREIGN KEY (organization) REFERENCES mh_user (organization)
+  CONSTRAINT UNQ_mh_user_settings UNIQUE (username, organization)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_email_configuration (
@@ -484,11 +486,46 @@ CREATE TABLE mh_email_configuration (
   ssl_enabled TINYINT(1) NOT NULL DEFAULT '0',
   password VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_email_configuration_0 UNIQUE (organization),
+  CONSTRAINT UNQ_mh_email_configuration UNIQUE (organization),
   CONSTRAINT FK_mh_email_configuration_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_email_configuration_organization ON mh_email_configuration (organization);
+
+CREATE TABLE mh_comment (
+  id BIGINT(20) NOT NULL,
+  creation_date DATETIME NOT NULL,
+  author VARCHAR(255) NOT NULL,
+  text VARCHAR(255) NOT NULL,
+  reason VARCHAR(255) DEFAULT NULL,
+  modification_date DATETIME NOT NULL,
+  resolved_status TINYINT(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_comment_author ON mh_comment (author);
+CREATE INDEX IX_mh_comment_resolved_status ON mh_comment (resolved_status);
+
+CREATE TABLE mh_comment_reply (
+  id BIGINT(20) NOT NULL,
+  creation_date DATETIME NOT NULL,
+  author VARCHAR(255) NOT NULL,
+  text VARCHAR(255) NOT NULL,
+  modification_date DATETIME NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_comment_reply_author ON mh_comment_reply (author);
+
+CREATE TABLE mh_comment_mh_comment_reply (
+  comment_id BIGINT(20) NOT NULL,
+  replies_id BIGINT(20) NOT NULL,
+  PRIMARY KEY (comment_id,replies_id),
+  CONSTRAINT FK_mh_comment_mh_comment_reply_comment_id FOREIGN KEY (comment_id) REFERENCES mh_comment (id),
+  CONSTRAINT FK_mh_comment_mh_comment_reply_replies_id FOREIGN KEY (replies_id) REFERENCES mh_comment_reply (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_comment_mh_comment_reply_replies on mh_comment_mh_comment_reply (replies_id);
 
 CREATE TABLE mh_message_signature (
   id BIGINT(20) NOT NULL,
@@ -502,12 +539,20 @@ CREATE TABLE mh_message_signature (
   signature VARCHAR(255) NOT NULL,
   creator_username VARCHAR(255) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_message_signature_0 UNIQUE (organization, name),
+  CONSTRAINT UNQ_mh_message_signature UNIQUE (organization, name),
   CONSTRAINT FK_mh_message_signature_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_message_signature_organization ON mh_message_signature (organization);
 CREATE INDEX IX_mh_message_signature_name ON mh_message_signature (name);
+
+CREATE TABLE mh_message_signature_mh_comment (
+  message_signature_id BIGINT(20) NOT NULL,
+  comments_id BIGINT(20) NOT NULL,
+  PRIMARY KEY (message_signature_id, comments_id),
+  CONSTRAINT FK_mh_message_signature_mh_comment_comments_id FOREIGN KEY (comments_id) REFERENCES mh_comment (id) ON DELETE CASCADE,
+  CONSTRAINT FK_mh_message_signature_mh_comment_message_signature_id FOREIGN KEY (message_signature_id) REFERENCES mh_message_signature (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_message_template (
   id BIGINT(20) NOT NULL,
@@ -516,16 +561,35 @@ CREATE TABLE mh_message_template (
   creation_date DATETIME NOT NULL,
   subject VARCHAR(255) NOT NULL,
   name VARCHAR(255) NOT NULL,
-  TYPE VARCHAR(255) DEFAULT NULL,
+  template_type VARCHAR(255) DEFAULT NULL,
   creator_username VARCHAR(255) NOT NULL,
   hidden TINYINT(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_message_template_0 UNIQUE (organization, name),
+  CONSTRAINT UNQ_mh_message_template UNIQUE (organization, name),
   CONSTRAINT FK_mh_message_template_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_message_template_organization ON mh_message_template (organization);
 CREATE INDEX IX_mh_message_template_name ON mh_message_template (name);
+
+CREATE TABLE mh_message_template_mh_comment (
+  message_template_id BIGINT(20) NOT NULL,
+  comments_id BIGINT(20) NOT NULL,
+  PRIMARY KEY (message_template_id, comments_id),
+  CONSTRAINT FK_mh_message_template_mh_comment_message_template_id FOREIGN KEY (message_template_id) REFERENCES mh_message_template (id) ON DELETE CASCADE,
+  CONSTRAINT FK_mh_message_template_mh_comment_comments_id FOREIGN KEY (comments_id) REFERENCES mh_comment (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE mh_event_mh_comment (
+  id BIGINT(20) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  event VARCHAR(128) NOT NULL,
+  comment BIGINT(20) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT FK_mh_event_mh_comment_comment FOREIGN KEY (comment) REFERENCES mh_comment (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_event_mh_comment_comment on mh_event_mh_comment (comment);
 
 CREATE TABLE mh_series_elements (
   series VARCHAR(128) NOT NULL,
@@ -540,9 +604,9 @@ CREATE TABLE mh_series_property (
   series VARCHAR(128) NOT NULL,
   name VARCHAR(255) NOT NULL,
   value TEXT(65535),
-  PRIMARY KEY (`organization`, `series`, `name`),
-  CONSTRAINT FK_mh_series_property_series FOREIGN KEY (series) REFERENCES mh_series (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8; 
+  PRIMARY KEY (organization, series, name),
+  CONSTRAINT FK_mh_series_property_organization_series FOREIGN KEY (organization, series) REFERENCES mh_series (organization, id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_series_property_pk ON mh_series_property (series);
 
