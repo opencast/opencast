@@ -26,18 +26,6 @@ angular.module('adminNg.services')
 .factory('JsHelper', [
     function () {
         return {
-            getWeekDays: function () {
-                return [
-                    { key: 'MO', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.MO' },
-                    { key: 'TU', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.TU' },
-                    { key: 'WE', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.WE' },
-                    { key: 'TH', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.TH' },
-                    { key: 'FR', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.FR' },
-                    { key: 'SA', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.SA' },
-                    { key: 'SU', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.SU' }
-                ];
-            },
-
             map: function (array, key) {
                 var i, result = [];
                 for (i = 0; i < array.length; i++) {
@@ -198,46 +186,23 @@ angular.module('adminNg.services')
              * given user input.
              */
             assembleRrule: function (data) {
-                var date, 
-                    weekdays = '',
-                    weekdaysOffset = 0,
-                    indexWeekdays = {},
-                    weekdaysList = this.getWeekDays(),
-                    dateParts = this.getDateParts(data.start);
+                var weekdays = '';
+                angular.forEach(data.weekdays, function (active, weekday) {
+                    if (active) {
+                        if (weekdays.length !== 0) {
+                            weekdays += ',';
+                        }
+                        weekdays += weekday.substr(-2);
+                    }
+                });
 
+                var date, dateParts;
+                dateParts = this.getDateParts(data.start);
                 // Create a date object to translate it to UTC
                 date = new Date(dateParts.year, dateParts.month, dateParts.day, data.start.hour, data.start.minute);
-
-                if (data.weekdays) {
-                    angular.forEach(weekdaysList, function(day, index) {
-                        indexWeekdays[day.key] = index;
-                    });
-
-                    // Check if the weekdays need to be shifted because of timezone change
-                    if (date.getUTCDate() > dateParts.day) {
-                        weekdaysOffset = +1; 
-                    } else if (date.getUTCDate() < dateParts.day) {
-                        weekdaysOffset = -1;
-                    }
-
-                    angular.forEach(data.weekdays, function (active, weekday) {
-                        if (active) {
-                            if (weekdays.length !== 0) {
-                                weekdays += ',';
-                            }
-                            var idx = indexWeekdays[weekday.length > 2 ? weekday.substr(-2) : weekday] + weekdaysOffset;
-
-                            // Check Sunday to Monday, Monday to Sunday 
-                            idx = (idx > 6 ? 0 : (idx < 0 ? 6 : idx));
-
-                            weekdays += weekdaysList[idx].key.substr(-2);
-                        }
-                    });
-                }
-
                 return 'FREQ=WEEKLY;BYDAY=' + weekdays +
-                        ';BYHOUR=' + date.getUTCHours() +
-                        ';BYMINUTE=' + date.getUTCMinutes();
+                    ';BYHOUR=' + date.getUTCHours() +
+                    ';BYMINUTE=' + date.getUTCMinutes();
             },
 
             replaceBooleanStrings: function (metadata) {

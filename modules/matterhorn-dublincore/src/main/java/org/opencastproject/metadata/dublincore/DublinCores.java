@@ -73,21 +73,22 @@ public final class DublinCores {
   public static final EName OC_PROPERTY_ANNOTATION = new EName(OC_PROPERTY_NS_URI, "annotation");
   public static final EName OC_PROPERTY_ADVERTISED = new EName(OC_PROPERTY_NS_URI, "advertised");
   public static final EName OC_PROPERTY_PROMOTED = new EName(OC_PROPERTY_NS_URI, "promoted");
-  public static final EName OC_PROPERTY_DURATION = new EName(OC_PROPERTY_NS_URI, "duration");
 
   private DublinCores() {
   }
 
   /**
    * Create a new empty Opencast DublinCore metadata catalog with
-   * {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE} flavor. Register all necessary namespaces and
-   * set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
+   * {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE} flavor.
+   * Register all necessary namespaces and set the root tag to
+   * {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
    */
   @Nonnull
   public static DublinCoreCatalog mkOpencast() {
     final DublinCoreCatalog dc = new DublinCoreCatalog();
     dc.setFlavor(MediaPackageElements.EPISODE);
-    dc.addBindings(XmlNamespaceContext.mk(XmlNamespaceBinding.mk(ELEMENTS_1_1_NS_PREFIX, ELEMENTS_1_1_NS_URI),
+    dc.addBindings(XmlNamespaceContext.mk(
+            XmlNamespaceBinding.mk(ELEMENTS_1_1_NS_PREFIX, ELEMENTS_1_1_NS_URI),
             XmlNamespaceBinding.mk(TERMS_NS_PREFIX, TERMS_NS_URI),
             // Opencast property namespace
             XmlNamespaceBinding.mk(OC_PROPERTY_NS_PREFIX, OC_PROPERTY_NS_URI),
@@ -98,15 +99,16 @@ public final class DublinCores {
   }
 
   /**
-   * Create a new empty catalog suitable to take properties from the standard DublinCore namespaces
-   * {@link DublinCore#ELEMENTS_1_1_NS_URI} and {@link DublinCore#TERMS_NS_URI}.
+   * Create a new empty catalog suitable to take properties from the standard DublinCore
+   * namespaces {@link DublinCore#ELEMENTS_1_1_NS_URI} and {@link DublinCore#TERMS_NS_URI}.
    * <p/>
    * Please note that neither a flavor nor a root tag is set.
    */
   @Nonnull
   public static DublinCoreCatalog mkStandard() {
     final DublinCoreCatalog dc = new DublinCoreCatalog();
-    dc.addBindings(XmlNamespaceContext.mk(XmlNamespaceBinding.mk(ELEMENTS_1_1_NS_PREFIX, ELEMENTS_1_1_NS_URI),
+    dc.addBindings(XmlNamespaceContext.mk(
+            XmlNamespaceBinding.mk(ELEMENTS_1_1_NS_PREFIX, ELEMENTS_1_1_NS_URI),
             XmlNamespaceBinding.mk(TERMS_NS_PREFIX, TERMS_NS_URI)));
     return dc;
   }
@@ -118,13 +120,12 @@ public final class DublinCores {
   }
 
   /**
-   * Read a DublinCore catalog from a stream containing either JSON or XML. The method is capable of detecting the used
-   * format.
+   * Read a DublinCore catalog from a stream containing either JSON or XML. The method is
+   * capable of detecting the used format.
    * <p/>
-   * <strong>Implementation note:</strong> In order to detect the format the whole stream is read into memory first. If
-   * you know upfront whether JSON or XML is used you may want to choose
-   * {@link DublinCoreJsonFormat#read(java.io.InputStream)} or {@link DublinCoreXmlFormat#read(java.io.InputStream)} for
-   * performance reasons.
+   * <strong>Implementation note:</strong> In order to detect the format the whole stream is read into memory first. If you
+   * know upfront whether JSON or XML is used you may want to choose {@link DublinCoreJsonFormat#read(java.io.InputStream)}
+   * or {@link DublinCoreXmlFormat#read(java.io.InputStream)} for performance reasons.
    */
   @Nonnull
   public static DublinCoreCatalog read(InputStream in) {

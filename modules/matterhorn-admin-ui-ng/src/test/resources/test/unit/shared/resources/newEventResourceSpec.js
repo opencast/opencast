@@ -4,7 +4,6 @@ describe('New Event API Resource', function () {
         expectedSingle, expectedSourceSingle, expectedSourceMultiple,
         startDate, startDateDST, endDateDST, endDate, date, dateDST, expectedSourceDSTMultiple;
 
-
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/test/unit/fixtures';
         singleTestData = getJSONFixture('newEventSingleFixture.json');
@@ -38,7 +37,6 @@ describe('New Event API Resource', function () {
             date   : '2016-03-25',
             hour   : '8',
             minute : '0'
-
         });         
 
         endDateDST = JsHelper.toZuluTimeString({
@@ -67,7 +65,6 @@ describe('New Event API Resource', function () {
                 'inputs'  : 'TRANSLATION.PATH.VIDEO'
             }
         };        
-
 
         dateDST = moment(startDateDST);
         dateDST.utc();

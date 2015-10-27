@@ -82,8 +82,11 @@ import com.google.common.cache.Cache;
 
 import com.google.common.cache.CacheBuilder;
 
-import net.fortuna.ical4j.model.Period;
+import net.fortuna.ical4j.model.DateList;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
@@ -657,7 +660,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.opencastproject.scheduler.api.SchedulerService#addEvent(org.opencastproject.metadata.dublincore.DublinCoreCatalog
    * , java.lang.String)
@@ -735,7 +738,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#addReccuringEvent(org.opencastproject.metadata.dublincore.
    * DublinCoreCatalog, java.lang.String, java.util.Date, java.util.Date, long)
    */
@@ -759,7 +762,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#updateCaptureAgentMetadata(java.lang.Long[],
    * java.util.Properties)
    */
@@ -799,7 +802,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#updateEvent(org.opencastproject.metadata.dublincore.
    * DublinCoreCatalog)
    */
@@ -926,14 +929,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       throw new IllegalArgumentException("Event has no recurrence pattern.");
     }
 
-    TimeZone tz = null; // Create timezone based on CA's reported TZ.
-    if (template.hasValue(DublinCores.OC_PROPERTY_AGENT_TIMEZONE)) {
-      tz = TimeZone.getTimeZone(template.getFirst(DublinCores.OC_PROPERTY_AGENT_TIMEZONE));
-    } else { // No timezone was present, assume the serve's local timezone.
-      tz = TimeZone.getDefault();
-      logger.warn("The field 'agentTimezone' has not been set in the dubline core catalog. The default server timezone will be used.");
-    }
-
     DCMIPeriod temporal = EncodingSchemeUtils.decodeMandatoryPeriod(template.getFirst(DublinCore.PROPERTY_TEMPORAL));
     if (!temporal.hasEnd() || !temporal.hasStart()) {
       throw new IllegalArgumentException(
@@ -944,21 +939,47 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     Date end = temporal.getEnd();
     Long duration = 0L;
 
-    String durationProperty = template.getFirst(DublinCores.OC_PROPERTY_DURATION);
-    if (StringUtils.isNotBlank(durationProperty))
-      duration = Long.parseLong(durationProperty);
-    else
-      throw new IllegalArgumentException("Dublin core field dc:duration has not been set or is empty");
+    TimeZone tz = null; // Create timezone based on CA's reported TZ.
+    if (template.hasValue(DublinCores.OC_PROPERTY_AGENT_TIMEZONE)) {
+      tz = TimeZone.getTimeZone(template.getFirst(DublinCores.OC_PROPERTY_AGENT_TIMEZONE));
+    } else { // No timezone was present, assume the serve's local timezone.
+      tz = TimeZone.getDefault();
+    }
 
-    RRule rrule = new RRule(template.getFirst(DublinCores.OC_PROPERTY_RECURRENCE));
-
-    List<Period> periods = Util.calculatePeriods(start, end, duration, rrule, tz);
+    Recur recur = new RRule(template.getFirst(DublinCores.OC_PROPERTY_RECURRENCE)).getRecur();
+    DateTime seed = new DateTime(true);
+    DateTime period = new DateTime(true);
+    if (tz.inDaylightTime(start) && !tz.inDaylightTime(end)) {
+      seed.setTime(start.getTime() + 3600000);
+      period.setTime(end.getTime());
+      duration = (end.getTime() - (start.getTime() + 3600000)) % (24 * 60 * 60 * 1000);
+    } else if (!tz.inDaylightTime(start) && tz.inDaylightTime(end)) {
+      seed.setTime(start.getTime());
+      period.setTime(end.getTime() + 3600000);
+      duration = ((end.getTime() + 3600000) - start.getTime()) % (24 * 60 * 60 * 1000);
+    } else {
+      seed.setTime(start.getTime());
+      period.setTime(end.getTime());
+      duration = (end.getTime() - start.getTime()) % (24 * 60 * 60 * 1000);
+    }
+    DateList dates = recur.getDates(seed, period, Value.DATE_TIME);
+    logger.debug("DateList: {}", dates);
 
     List<DublinCoreCatalog> events = new LinkedList<DublinCoreCatalog>();
     int i = 1;
-    int length = Integer.toString(periods.size()).length();
-    for (Period p : periods) {
-
+    int length = Integer.toString(dates.size()).length();
+    for (Object date : dates) {
+      Date d = (Date) date;
+      // Adjust for DST, if start of event
+      if (tz.inDaylightTime(seed)) { // Event starts in DST
+        if (!tz.inDaylightTime(d)) { // Date not in DST?
+          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
+        }
+      } else { // Event doesn't start in DST
+        if (tz.inDaylightTime(d)) {
+          d.setTime(d.getTime() - tz.getDSTSavings()); // Adjust for Spring forward one hour
+        }
+      }
       DublinCoreCatalog event = (DublinCoreCatalog) template.clone();
       int numZeros = length - Integer.toString(i).length();
       StringBuilder sb = new StringBuilder();
@@ -968,7 +989,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       sb.append(i);
       event.set(DublinCore.PROPERTY_TITLE, template.getFirst(DublinCore.PROPERTY_TITLE) + " " + sb.toString());
 
-      DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(p.getStart(), p.getEnd()),
+      DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(d, new Date(d.getTime() + duration)),
               Precision.Second);
       event.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
       events.add(event);
@@ -979,7 +1000,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#removeEvent(long)
    */
   @Override
@@ -1067,7 +1088,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#getEventDublinCore(long)
    */
   @Override
@@ -1082,7 +1103,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#getEventCaptureAgentConfiguration(long)
    */
   @Override
@@ -1097,7 +1118,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#search(org.opencastproject.scheduler.api.SchedulerQuery)
    */
   @Override
@@ -1112,7 +1133,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#findConflictingEvents(java.lang.String, java.util.Date,
    * java.util.Date)
    */
@@ -1131,7 +1152,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#findConflictingEvents(java.lang.String, java.lang.String,
    * java.util.Date, java.util.Date, long)
    */
@@ -1146,14 +1167,38 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       logger.error("Could not create rule for finding conflicting events: {}", e.getMessage());
       throw new SchedulerException(e);
     }
-
+    Recur recur = rule.getRecur();
     TimeZone tz = TimeZone.getTimeZone(timezone);
-
-    List<Period> periods = Util.calculatePeriods(startDate, endDate, duration, rule, tz);
+    DateTime seed = new DateTime(true);
+    DateTime period = new DateTime(true);
+    if (tz.inDaylightTime(startDate) && !tz.inDaylightTime(endDate)) {
+      seed.setTime(startDate.getTime() + 3600000);
+      period.setTime(endDate.getTime());
+    } else if (!tz.inDaylightTime(startDate) && tz.inDaylightTime(endDate)) {
+      seed.setTime(startDate.getTime());
+      period.setTime(endDate.getTime() + 3600000);
+    } else {
+      seed.setTime(startDate.getTime());
+      period.setTime(endDate.getTime());
+    }
+    DateList dates = recur.getDates(seed, period, Value.DATE_TIME);
     List<DublinCoreCatalog> events = new ArrayList<DublinCoreCatalog>();
 
-    for (Period p : periods) {
-      List<DublinCoreCatalog> filterEvents = findConflictingEvents(captureDeviceID, p.getStart(), p.getEnd())
+    for (Object date : dates) {
+      // Date filterStart = (Date) d;
+      Date d = (Date) date;
+      // Adjust for DST, if start of event
+      if (tz.inDaylightTime(seed)) { // Event starts in DST
+        if (!tz.inDaylightTime(d)) { // Date not in DST?
+          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
+        }
+      } else { // Event doesn't start in DST
+        if (tz.inDaylightTime(d)) {
+          d.setTime(d.getTime() - tz.getDSTSavings()); // Adjust for Spring forward one hour
+        }
+      }
+      // TODO optimize: create only one query and execute it
+      List<DublinCoreCatalog> filterEvents = findConflictingEvents(captureDeviceID, d, new Date(d.getTime() + duration))
               .getCatalogList();
       events.addAll(filterEvents);
     }
@@ -1163,7 +1208,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#getCalendarForCaptureAgent(java.lang.String)
    */
   @Override
@@ -1277,7 +1322,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencastproject.scheduler.api.SchedulerService#removeScheduledRecordingsBeforeBuffer(long)
    */
   @Override
