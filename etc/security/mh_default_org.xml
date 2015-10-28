@@ -28,6 +28,7 @@
 
     <!-- Allow anonymous access to the login form -->
     <sec:intercept-url pattern="/admin-ng/login.html" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/sysinfo/bundles/version" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Protect admin UI facade -->
     <sec:intercept-url pattern="/email/templates.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EMAILTEMPLATES_VIEW" />
