@@ -186,7 +186,7 @@ define(["jquery"], function($) {
                             segments[i-1].duration = parseInt(segments[i].duration) + parseInt(segments[i-1].duration);
                             segments.splice(i,1);
                         } else {
-                            if (segments.length > 1 && segments[i+1].duration) {
+                            if (segments.length > 1 && segments [i+1] !== undefined && segments[i+1].duration) {
                                 segments[i+1].duration = parseInt(segments[i].duration) + parseInt(segments[i+1].duration);
                                 segments.splice(i,1);
                             }

@@ -17,6 +17,9 @@ site_dir: 'site'
 
 pages:
 - ['index.md', 'Home']
+- ['development.md', 'Development Process']
+- ['reviewing-and-merging.md', 'Reviewing, Merging and Declining Pull Requests']
+- ['release-manager.md', 'Release Manager']
 - ['license.md', 'Licenses and Legal Matters']
 - ['proposal-log.md', 'Proposal Log']
 - ['packaging.md', 'Packaging']

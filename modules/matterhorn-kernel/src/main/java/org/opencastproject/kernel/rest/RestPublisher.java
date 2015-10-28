@@ -181,7 +181,7 @@ public class RestPublisher implements RestConstants {
     boolean jobProducer = Boolean.parseBoolean((String) ref.getProperty(SERVICE_JOBPRODUCER_PROPERTY));
     try {
       Dictionary<String, Object> props = new Hashtable<String, Object>();
-      props.put("contextId", RestConstants.HTTP_CONTEXT_ID);
+      props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
       props.put("alias", servicePath);
       props.put(SERVICE_TYPE_PROPERTY, serviceType);
       props.put(SERVICE_PATH_PROPERTY, servicePath);
@@ -387,7 +387,7 @@ public class RestPublisher implements RestConstants {
       if (classpath != null && alias != null) {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put("alias", alias);
-        props.put("contextId", RestConstants.HTTP_CONTEXT_ID);
+        props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
 
         StaticResource servlet = new StaticResource(new StaticResourceClassLoader(bundle), classpath, alias,
                 welcomeFile);
@@ -395,7 +395,7 @@ public class RestPublisher implements RestConstants {
         // We use the newly added bundle's context to register this service, so when that bundle shuts down, it brings
         // down this servlet with it
         logger.debug("Registering servlet with alias {}", alias);
-        bundle.getBundleContext().registerService(Servlet.class.getName(), servlet, props);
+        componentContext.getBundleContext().registerService(Servlet.class.getName(), servlet, props);
       }
 
       return super.addingBundle(bundle, event);

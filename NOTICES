@@ -636,6 +636,13 @@ shared-resources/js/jquery/plugins/jquery.xslt.new.js
 
 List of Third-Party Dependencies Included with Maven
 ----------------------------------------------------
+assemblies
+  GroupId                                ArtifactId                                       License
+  org.apache.karaf.features              framework                                        Apache License, Version 2.0
+  org.apache.karaf.features              standard                                         Apache License, Version 2.0
+  org.apache.karaf.tooling               karaf-maven-plugin                               Apache License, Version 2.0
+  org.apache.maven.plugins               maven-resources-plugin                           Apache License, Version 2.0
+  org.codehaus.mojo                      build-helper-maven-plugin                        MIT License
 
 matterhorn-admin-ui
   GroupId                                ArtifactId                                       License
@@ -780,9 +787,9 @@ matterhorn-common
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   joda-time                              joda-time                                        Apache 2
-  org.apache.commons                     com.springsource.org.apache.commons.beanutils    -
+  org.apache.commons                     com.springsource.org.apache.commons.beanutils    The Apache Software License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
-  org.codehaus.jettison                  jettison                                         -
+  org.codehaus.jettison                  jettison                                         Apache License, Version 2.0
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
   org.eclipse.persistence                org.eclipse.persistence.jpa                      Eclipse Public License - v 1.0
   org.freemarker                         freemarker                                       BSD-style license
@@ -1031,7 +1038,7 @@ matterhorn-inspection-service-ffmpeg
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.commons                     com.springsource.org.apache.commons.beanutils    -
+  org.apache.commons                     com.springsource.org.apache.commons.beanutils    The Apache Software License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
   org.apache.tika                        tika-bundle                                      The Apache Software License, Version 2.0
   org.apache.tika                        tika-core                                        The Apache Software License, Version 2.0
@@ -1059,7 +1066,7 @@ matterhorn-kernel
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  net.sourceforge.nekohtml               com.springsource.org.cyberneko.html              -
+  net.sourceforge.nekohtml               com.springsource.org.cyberneko.html              The Apache Software License, Version 2.0
   org.apache.cxf                         cxf-bundle-jaxrs                                 The Apache Software License, Version 2.0
   org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
@@ -1220,9 +1227,9 @@ matterhorn-runtime-dependencies
   commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
   commons-pool                           commons-pool                                     The Apache Software License, Version 2.0
   joda-time                              joda-time                                        Apache 2
-  net.sourceforge.nekohtml               com.springsource.org.cyberneko.html              -
+  net.sourceforge.nekohtml               com.springsource.org.cyberneko.html              The Apache Software License, Version 2.0
   org.aopalliance                        com.springsource.org.aopalliance                 -
-  org.apache.commons                     com.springsource.org.apache.commons.beanutils    -
+  org.apache.commons                     com.springsource.org.apache.commons.beanutils    The Apache Software License, Version 2.0
   org.apache.commons                     commons-compress                                 The Apache Software License, Version 2.0
   org.apache.commons                     commons-csv                                      The Apache Software License, Version 2.0
   org.apache.cxf                         cxf-bundle-jaxrs                                 The Apache Software License, Version 2.0
@@ -1260,11 +1267,11 @@ matterhorn-runtime-dependencies
   org.apache.servicemix.specs            org.apache.servicemix.specs.stax-api-1.0         The Apache Software License, Version 2.0
   org.apache.tika                        tika-bundle                                      The Apache Software License, Version 2.0
   org.apache.tika                        tika-core                                        The Apache Software License, Version 2.0
-  org.apache.xml                         com.springsource.org.apache.xml.security         -
+  org.apache.xml                         com.springsource.org.apache.xml.security         The Apache Software License, Version 2.0
   org.codehaus.jackson                   jackson-core-lgpl                                GNU Lesser General Public License (LGPL), Version 2.1
   org.codehaus.jackson                   jackson-mapper-lgpl                              GNU Lesser General Public License (LGPL), Version 2.1
   org.codehaus.jackson                   jackson-xc                                       The Apache Software License, Version 2.0-GNU Lesser General Public License (LGPL), Version 2.1
-  org.codehaus.jettison                  jettison                                         -
+  org.codehaus.jettison                  jettison                                         Apache License, Version 2.0
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
   org.eclipse.persistence                org.eclipse.persistence.antlr                    Eclipse Public License - v 1.0
   org.eclipse.persistence                org.eclipse.persistence.asm                      Eclipse Public License - v 1.0
@@ -1274,22 +1281,23 @@ matterhorn-runtime-dependencies
   org.jdom                               com.springsource.org.jdom                        -
   org.jolokia                            jolokia-osgi                                     Apache 2
   org.opencastproject                    org.springframework.ldap                         -
-  org.openid4java                        com.springsource.org.openid4java                 -
-  org.opensaml                           com.springsource.org.opensaml                    -
+  org.openid4java                        com.springsource.org.openid4java                 The Apache Software License, Version 2.0
+  org.opensaml                           com.springsource.org.opensaml                    The Apache Software License, Version 2.0
   org.ops4j.pax.confman                  pax-confman-propsloader                          ALv2
   org.ops4j.pax.logging                  pax-logging-api                                  ALv2
   org.ops4j.pax.logging                  pax-logging-service                              ALv2
+  org.osgi                               org.osgi.compendium                              -
   org.osgi                               org.osgi.enterprise                              -
   org.sakaiproject.nakamura              javax.activation-mail                            -
-  org.springframework                    spring-aop                                       -
-  org.springframework                    spring-asm                                       -
-  org.springframework                    spring-beans                                     -
-  org.springframework                    spring-context                                   -
-  org.springframework                    spring-context-support                           -
-  org.springframework                    spring-core                                      -
-  org.springframework                    spring-expression                                -
-  org.springframework                    spring-tx                                        -
-  org.springframework                    spring-web                                       -
+  org.springframework                    spring-aop                                       The Apache Software License, Version 2.0
+  org.springframework                    spring-asm                                       The Apache Software License, Version 2.0
+  org.springframework                    spring-beans                                     The Apache Software License, Version 2.0
+  org.springframework                    spring-context                                   The Apache Software License, Version 2.0
+  org.springframework                    spring-context-support                           The Apache Software License, Version 2.0
+  org.springframework                    spring-core                                      The Apache Software License, Version 2.0
+  org.springframework                    spring-expression                                The Apache Software License, Version 2.0
+  org.springframework                    spring-tx                                        The Apache Software License, Version 2.0
+  org.springframework                    spring-web                                       The Apache Software License, Version 2.0
   org.springframework.osgi               spring-osgi-core                                 Apache License, Version 2.0
   org.springframework.osgi               spring-osgi-extender                             Apache License, Version 2.0
   org.springframework.osgi               spring-osgi-io                                   Apache License, Version 2.0
