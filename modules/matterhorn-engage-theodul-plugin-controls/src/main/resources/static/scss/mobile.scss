@@ -1,0 +1,46 @@
+/*********************************************************
+ * Add theodul controls plugin (mobile mode) scss here.
+ * This file is compiled with compass,
+ * see http://compass-style.org/
+ *********************************************************/
+
+
+@import "compass/css3/images";
+@import "compass/css3/text-shadow";
+
+#switchPlayers {
+  .switchButton {
+  	position: absolute;
+	  top: 0;
+	  bottom: 35px;
+		width: 20%;
+		
+		display: block;
+		background-repeat: no-repeat;
+		border: 0;
+		font-size: 40px;
+		text-decoration: none;
+		span.glyphicon {
+			// vertical center with absolute positioning
+			position: absolute;
+			top: 0; bottom: 0; left: 0; right: 0;
+			height: 40px;
+			margin: auto;
+			padding: 0 10px;
+		}
+		&:focus, &:hover {
+			@include single-text-shadow(-2px, 2px, 2px, 1px, #333);
+		}
+  }
+
+  #prevVideo {
+		@include background-image(linear-gradient(to left, rgba(#000, 0), rgba(#000, 0.5)));
+		left: 0;
+		text-align: left;
+  }
+  #nextVideo {
+		@include background-image(linear-gradient(to right, rgba(#000, 0), rgba(#000, 0.5)));
+		right: 0;
+		text-align: right;
+  }
+}

@@ -41,4 +41,7 @@
   "medium":"Mittel",
   "high":"Hoch",
   "beside":"nebeneinander"
+  "switchPlayer":"Video wechseln",
+  "prevVideo":"Vorheriges Video",
+  "nextVideo":"Nächstes Video"
 }

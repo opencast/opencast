@@ -41,4 +41,7 @@
     "medium": "Medium",
     "high": "High",
     "beside": "beside"
+    "switchPlayer": "Switch player",
+    "prevVideo": "Previous Video",
+    "nextVideo": "Next Video"
 }

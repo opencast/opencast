@@ -1,1 +1,21 @@
 <!-- theodul controls plugin mobile mode -->
+<% if((typeof multipleVideos !== "undefined")
+   && (typeof str_prevVideo !== "undefined")
+   && (typeof str_nextVideo !== "undefined")
+   && (typeof str_switchPlayer !== "undefined")) { %>
+
+<% if(multipleVideos) { %>
+<div id="switchPlayers" class="switchPlayers_mobile">
+	<a class="switchButton" id="prevVideo">
+		<span class="sr-only"><%= str_prevVideo %></span>
+		<span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
+	</a>
+	<span class="sr-only"><%= str_switchPlayer %></span>
+	<a class="switchButton" id="nextVideo">
+		<span class="sr-only"><%= str_nextVideo %></span>
+		<span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
+	</a>
+</div>
+<% } %>
+
+<% } %>

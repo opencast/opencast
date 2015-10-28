@@ -30,8 +30,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var PLUGIN_TEMPLATE_DESKTOP = Engage.controls_top ? "templates/desktop_top.html" : "templates/desktop_bottom.html";
     // provide this additional template if the controls are below the video to have content above the video
     var PLUGIN_TEMPLATE_DESKTOP_TOP_IFBOTTOM = Engage.controls_top ? "none" : "templates/desktop_top_ifbottom.html";
-    var PLUGIN_TEMPLATE_EMBED = "templates/embed.html";
     var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
+    var PLUGIN_TEMPLATE_EMBED = "templates/mobile.html";
     var PLUGIN_STYLES_DESKTOP = [
         Engage.controls_top ? "styles/desktop_top.css" : "styles/desktop_bottom.css",
         "lib/jqueryui/themes/base/jquery-ui.css"
@@ -90,7 +90,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         togglePiP: new Engage.Event("Video:togglePiP", "switches between PiP and next to each other layout", "handler"),
         setZoomLevel: new Engage.Event("Video:setZoomLevel", "sets the zoom level", "trigger"),
         zoomReset: new Engage.Event("Video:resetZoom", "resets position and zoom level", "trigger"),
-        zoomChange: new Engage.Event("Video:zoomChange", "zoom level has changed", "handler")
+        zoomChange: new Engage.Event("Video:zoomChange", "zoom level has changed", "handler"),
+        // events for mobile view
+        switchVideo: new Engage.Event("Video:switch", "switch the video", "trigger"),
+        toggleControls: new Engage.Event("Controls:toggle", "toggle the controls", "both")
     };
 
     var isDesktopMode = false;
@@ -152,6 +155,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var logoLink = false;
     var logo = plugin_path + "images/logo.png";
     var showEmbed = true;
+    var hideTimeout = 3;            // time after controls are hidden again in seconds
+
 
     /* don't change these variables */
     var Utils;
@@ -261,6 +266,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var numberVideos = 1;
     var currentFocusFlavor = "focus.none";
     var videosInitialReadyness = true;
+    // for mobile view
+    var id_videoWrapper = "video_wrapper";
+    var id_prevVideo = "prevVideo";
+    var id_nextVideo = "nextVideo";
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -483,13 +492,19 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     logo: logo,
                     show_embed: showEmbed,
                     str_zoomlevel: "100%",
-                    flash: usingFlash
+                    flash: usingFlash,
+                    // for mobile view
+                    multipleVideos: (Engage.model.get("videoDataModel").get("ids").length > 1),     // check if stream includes multiple videos
+                    str_prevVideo: translate("prevVideo", "Previous Video"),
+                    str_nextVideo: translate("nextVideo", "Next Video"),
+                    str_switchPlayer: translate("switchPlayer", "Switch player")
                 };
 
                 // compile template and load it
                 this.$el.html(_.template(this.template, tempVars));
+                initControlsEvents();
+
                 if (isDesktopMode) {
-                    initControlsEvents();
                     if (aspectRatioTriggered) {
                         calculateEmbedAspectRatios();
                         addEmbedRatioEvents();
@@ -503,11 +518,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     ready();
                     playPause();
                     timeUpdate();
+
                     // init dropdown menus
                     $("." + class_dropdown).dropdown();
-                    addNonFlashEvents();
-                    checkLoginStatus();
                 }
+                ready();
+                playPause();
+                timeUpdate();
+                addNonFlashEvents();
+                checkLoginStatus();
             }
         }
     });
@@ -860,6 +879,21 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     });
                 });
             }
+
+            // register special events for mobile template
+            if (isMobileMode) {
+                $("#" + id_videoWrapper).click(function(e) {
+                  Engage.trigger(plugin.events.toggleControls.getName());
+                });
+                $("#" + id_prevVideo).click(function(e) {
+                  e.preventDefault();
+                  Engage.trigger(plugin.events.switchVideo.getName(), -1);
+                });
+                $("#" + id_nextVideo).click(function(e) {
+                  e.preventDefault();
+                  Engage.trigger(plugin.events.switchVideo.getName(), 1);
+                });
+            }
         }
     }
 
@@ -976,7 +1010,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
      */
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
-        if (isDesktopMode && plugin.inserted) {
+        if (plugin.inserted) {
             if (!Engage.controls_top && plugin.template_topIfBottom && (plugin.template_topIfBottom != "none")) {
                 controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get("videoDataModel"), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
             }
@@ -1074,6 +1108,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     isPlaying = true;
                     playPause();
                     loadStoredInitialValues();
+
+                    if (isMobileMode) {
+                        Engage.trigger(plugin.events.toggleControls.getName());
+                    }
                 }
             });
             Engage.on(plugin.events.pause.getName(), function() {
@@ -1170,74 +1208,81 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
             loadStoredInitialValues();
         }
-    }
 
-    if (isDesktopMode) {
-        // init event
-        Engage.log("Controls: Init");
-        var relative_plugin_path = Engage.getPluginPath("EngagePluginControls");
-
-        // listen on a change/set of the video data model
-        Engage.model.on(videoDataModelChange, function() {
-            initCount -= 1;
-            if (initCount == 0) {
-                initPlugin();
-            }
-        });
-
-        // listen on a change/set of the InfoMe model
-        Engage.model.on(infoMeChange, function() {
-            initCount -= 1;
-            if (initCount == 0) {
-                initPlugin();
-            }
-        });
-
-        // listen on a change/set of the mediaPackage model
-        Engage.model.on(mediapackageChange, function() {
-            initCount -= 1;
-            if (initCount == 0) {
-                initPlugin();
-            }
-        });
-
-        // all plugins loaded
-        Engage.on(plugin.events.plugin_load_done.getName(), function() {
-            Engage.log("Controls: Plugin load done");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        });
-
-        // load jquery-ui lib
-        require([relative_plugin_path + jQueryUIPath], function() {
-            Engage.log("Controls: Lib jQuery UI loaded");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        });
-
-        // load utils class
-        require([relative_plugin_path + "utils"], function(utils) {
-            Engage.log("Controls: Utils class loaded");
-            Utils = new utils();
-            initTranslate(Utils.detectLanguage(), function() {
-                Engage.log("Controls: Successfully translated.");
-                initCount -= 1;
-                if (initCount <= 0) {
-                    initPlugin();
-                }
-            }, function() {
-                Engage.log("Controls: Error translating...");
-                initCount -= 1;
-                if (initCount <= 0) {
-                    initPlugin();
+        if (isMobileMode && plugin.inserted) {
+            Engage.on(plugin.events.toggleControls.getName(), function(e) {
+                $("#" + id_engage_controls).fadeIn();
+                if (isPlaying) {
+                    $("#" + id_engage_controls).delay(hideTimeout*1000).fadeOut();
                 }
             });
-        });
+        }
     }
+
+    // init event
+    Engage.log("Controls: Init");
+    var relative_plugin_path = Engage.getPluginPath("EngagePluginControls");
+
+    // listen on a change/set of the video data model
+    Engage.model.on(videoDataModelChange, function() {
+        initCount -= 1;
+        if (initCount == 0) {
+            initPlugin();
+        }
+    });
+
+    // listen on a change/set of the InfoMe model
+    Engage.model.on(infoMeChange, function() {
+        initCount -= 1;
+        if (initCount == 0) {
+            initPlugin();
+        }
+    });
+
+    // listen on a change/set of the mediaPackage model
+    Engage.model.on(mediapackageChange, function() {
+        initCount -= 1;
+        if (initCount == 0) {
+            initPlugin();
+        }
+    });
+
+    // all plugins loaded
+    Engage.on(plugin.events.plugin_load_done.getName(), function() {
+        Engage.log("Controls: Plugin load done");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
+
+    // load jquery-ui lib
+    require([relative_plugin_path + jQueryUIPath], function() {
+        Engage.log("Controls: Lib jQuery UI loaded");
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+    });
+
+    // load utils class
+    require([relative_plugin_path + "utils"], function(utils) {
+        Engage.log("Controls: Utils class loaded");
+        Utils = new utils();
+        initTranslate(Utils.detectLanguage(), function() {
+            Engage.log("Controls: Successfully translated.");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        }, function() {
+            Engage.log("Controls: Error translating...");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });
+    });
 
     return plugin;
 });
