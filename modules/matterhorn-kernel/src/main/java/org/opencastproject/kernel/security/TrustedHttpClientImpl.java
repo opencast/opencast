@@ -46,7 +46,7 @@ import org.opencastproject.util.data.Function;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpResponse;

@@ -21,7 +21,7 @@
 
 package org.opencastproject.workflow.handler.distribution;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.systems.MatterhornConstants.SERVER_URL_PROPERTY;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.functions.Strings.toBool;
@@ -60,7 +60,7 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;

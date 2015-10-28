@@ -142,7 +142,7 @@ index.number_of_replicas: 0
 
 # Path to directory containing configuration (this file and logging.yml):
 #
-path.conf: ${bundles.configuration.location}/index/adminui
+path.conf: ${karaf.etc}/index/adminui
 
 # Path to directory where to store index data allocated for this node.
 #
@@ -152,15 +152,15 @@ path.conf: ${bundles.configuration.location}/index/adminui
 # the locations (a la RAID 0) on a file level, favouring locations with most free
 # space on creation. For example:
 #
-path.data: ${felix.work}/adminui/data
+path.data: ${karaf.data}/adminui/data
 
 # Path to temporary files:
 #
-path.work: ${felix.work}/index/adminui
+path.work: ${karaf.data}/index/adminui
 
 # Path to log files:
 #
-path.logs: ${opencast.logdir}/elasticsearch.log
+path.logs: ${karaf.data}/log/elasticsearch.log
 
 # Path to where plugins are installed:
 #

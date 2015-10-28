@@ -27,8 +27,8 @@ import org.opencastproject.urlsigning.common.ResourceRequest;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;

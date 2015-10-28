@@ -4,10 +4,10 @@
   <scr:component name="org.opencastproject.kernel.filter.proxy.TransparentProxyFilter" immediate="true">
     <implementation class="org.opencastproject.kernel.filter.proxy.TransparentProxyFilter" />
     <property name="service.description" value="Transparent Proxy Filter" />
-    <property name="contextId" value="opencast.httpcontext" />
+    <property name="httpContext.id" value="opencast.httpcontext" />
     <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
     <property name="service.ranking" value="9" />
-    <property name="pattern" value=".*" />
+    <property name="urlPatterns" value="*" />
     <service>
       <provide interface="javax.servlet.Filter" />
     </service>

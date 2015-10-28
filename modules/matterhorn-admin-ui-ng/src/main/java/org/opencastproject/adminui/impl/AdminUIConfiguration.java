@@ -22,7 +22,7 @@ package org.opencastproject.adminui.impl;
 
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;

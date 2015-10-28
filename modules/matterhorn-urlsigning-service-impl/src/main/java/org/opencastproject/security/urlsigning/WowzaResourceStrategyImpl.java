@@ -22,7 +22,7 @@ package org.opencastproject.security.urlsigning;
 
 import org.opencastproject.urlsigning.common.ResourceStrategy;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;

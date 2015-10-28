@@ -22,7 +22,7 @@ package org.opencastproject.mediapackage;
 
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.Stream.$;
-import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import com.entwinemedia.fn.Fn2;
 

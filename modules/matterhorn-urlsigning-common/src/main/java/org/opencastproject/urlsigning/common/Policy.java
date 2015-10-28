@@ -25,7 +25,7 @@ import com.google.common.net.InetAddresses;
 
 import static java.util.Objects.requireNonNull;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import java.net.InetAddress;

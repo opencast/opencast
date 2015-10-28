@@ -35,7 +35,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.parser.Parser;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -68,7 +68,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Sets the Apache Tika parser.
-   * 
+   *
    * @param tikaParser
    */
   public void setTikaParser(Parser tikaParser) {
@@ -96,7 +96,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
   @Override
@@ -112,7 +112,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -148,7 +148,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.api.MediaInspectionService#inspect(java.net.URI)
    */
   @Override
@@ -162,7 +162,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(org.opencastproject.mediapackage.MediaPackageElement,
    *      boolean)
    */
@@ -188,7 +188,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -198,7 +198,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -208,7 +208,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -218,7 +218,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -228,7 +228,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -238,7 +238,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -248,7 +248,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

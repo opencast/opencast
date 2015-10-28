@@ -21,7 +21,7 @@
 package org.opencastproject.security.urlsigning.service.impl;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;

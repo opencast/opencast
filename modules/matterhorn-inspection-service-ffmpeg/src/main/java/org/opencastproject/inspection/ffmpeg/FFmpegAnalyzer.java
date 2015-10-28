@@ -31,8 +31,8 @@ import org.opencastproject.util.ProcessRunner.ProcessInfo;
 
 import com.entwinemedia.fn.Pred;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -68,7 +68,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
 
   /**
    * Returns the binary used to provide media inspection functionality.
-   * 
+   *
    * @return the binary
    */
   protected String getBinary() {
@@ -303,7 +303,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
 
   /**
    * Allows configuration {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.ffmpeg.api.MediaAnalyzer#setConfig(java.util.Map)
    */
   @Override

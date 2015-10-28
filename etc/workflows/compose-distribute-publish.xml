@@ -420,7 +420,7 @@
       exception-handler-workflow="error"
       description="Create a cover image">
       <configurations>
-        <configuration key="stylesheet">file://${bundles.configuration.location}/branding/coverimage.xsl</configuration>
+        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
         <configuration key="width">1920</configuration>
         <configuration key="height">1080</configuration>
         <configuration key="posterimage-flavor">presenter/player+preview</configuration>
