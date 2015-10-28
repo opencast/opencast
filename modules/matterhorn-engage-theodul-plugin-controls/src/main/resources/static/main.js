@@ -37,10 +37,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         "lib/jqueryui/themes/base/jquery-ui.css"
     ];
     var PLUGIN_STYLES_EMBED = [
-        "styles/embed.css"
+        "styles/embed.css",
+        "lib/jqueryui/themes/base/jquery-ui.css"
     ];
     var PLUGIN_STYLES_MOBILE = [
-        "styles/mobile.css"
+        "styles/mobile.css",
+        "lib/jqueryui/themes/base/jquery-ui.css"
     ];
 
     var basilOptions = {
@@ -178,6 +180,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_engage_controls_topIfBottom = "engage_controls_second";
     var id_slider = "slider";
     var id_volume = "volume";
+    var id_volumeSlider = "volumeSlider";
+    var id_volumeSliderWrapper = "volumeSliderWrapper";
     var id_volumeIcon = "volumeIcon";
     var id_dropdownMenuPlaybackRate = "dropdownMenuPlaybackRate";
     var id_playbackRate075 = "playback075";
@@ -796,23 +800,40 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 value: 0
             });
 
-            $("#" + id_volume).slider({
-                range: "min",
-                min: 0,
-                max: 100,
-                value: 100,
-                change: function(event, ui) {}
-            });
+            if (isDesktopMode) {
+                $("#" + id_volumeSlider).slider({
+                    range: "min",
+                    min: 1,
+                    max: 100,
+                    value: 100,
+                    change: function(event, ui) {}
+                });
+            } else {
+                $("#" + id_volumeSlider).slider({
+                    range: "max",
+                    min: 1,
+                    max: 100,
+                    value: 100,
+                    orientation: "vertical"      // use vertical orientation in mobile/embed mode
+                });   
+            }
 
             $("#" + id_volumeIcon).click(function() {
-                var isMute = Basil.get(storage_muted);
-                if (isMute == "true") {
-                    Engage.trigger(plugin.events.unmute.getName());
-                    Basil.set(storage_muted, "false");
+                // use as mute button in desktop mode
+                if (isDesktopMode) {
+                    var isMute = Basil.get(storage_muted);
+                    if (isMute == "true") {
+                        Engage.trigger(plugin.events.unmute.getName());
+                        Basil.set(storage_muted, "false");
+                    } else {
+                        Engage.trigger(plugin.events.mute.getName());
+                        Basil.set(storage_muted, "true");
+                    }
+                // toggle volume slider in mobile/embed mode
                 } else {
-                    Engage.trigger(plugin.events.mute.getName());
-                    Basil.set(storage_muted, "true");
+                    $("#" + id_volumeSliderWrapper).fadeToggle(150);
                 }
+
             });
 
             $("#" + id_playpause_controls).click(function() {
@@ -856,7 +877,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 Engage.trigger(plugin.events.sliderMousemove.getName(), currPos * dur);
             });
             // volume event
-            $("#" + id_volume).on(event_slidestop, function(event, ui) {
+            $("#" + id_volumeSlider).on(event_slidestop, function(event, ui) {
                 Engage.trigger(plugin.events.volumeSet.getName(), ui.value / 100);
             });
             // check segments
@@ -902,7 +923,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         if (isMute == "true") {
             return 0;
         } else {
-            var vol = $("#" + id_volume).slider("option", "value");
+            var vol = $("#" + id_volumeSlider).slider("option", "value");
             return vol;
         }
     }
@@ -989,7 +1010,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 var normTime = (currentTime / (duration / 1000)) * 1000;
                 $("#" + id_slider).slider("option", "value", normTime);
                 if (!$("#" + id_navigation_time_current).is(":focus")) {
-                    $("#" + id_navigation_time_current).val(Utils.formatSeconds(currentTime));
+                    // distinguish between desktop and mobile, because in desktop mode
+                    // a input field is used
+                    if (isDesktopMode)
+                        $("#" + id_navigation_time_current).val(Utils.formatSeconds(currentTime));
+                    else
+                        $("#" + id_navigation_time_current).text(Utils.formatSeconds(currentTime));
                 }
             }
             var val = Math.round((duration / 1000) - currentTime);
@@ -1067,7 +1093,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 $("#" + id_playbackRateIndicator).html(Utils.getFormattedPlaybackRate(pbr));
             });
             Engage.on(plugin.events.volumeSet.getName(), function(volume) {
-                $("#" + id_volume).slider("value", volume * 100);
+                $("#" + id_volumeSlider).slider("value", volume * 100);
                 if ((volume * 100) > 1) {
                     Basil.set(storage_lastvolume, volume * 100);
                 }

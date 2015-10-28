@@ -3,20 +3,22 @@
  * This file is compiled with compass,
  * see http://compass-style.org/
  *********************************************************/
-/* line 12, ../scss/mobile.scss */
-#switchPlayers .switchButton {
+/* line 14, ../scss/mobile.scss */
+#engage_controls #switchPlayers .switchButton {
   position: absolute;
+  z-index: 1;
   top: 0;
-  bottom: 35px;
+  bottom: 0;
   width: 20%;
+  height: 100%;
   display: block;
   background-repeat: no-repeat;
   border: 0;
   font-size: 40px;
   text-decoration: none;
 }
-/* line 23, ../scss/mobile.scss */
-#switchPlayers .switchButton span.glyphicon {
+/* line 27, ../scss/mobile.scss */
+#engage_controls #switchPlayers .switchButton span.glyphicon {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -26,13 +28,13 @@
   margin: auto;
   padding: 0 10px;
 }
-/* line 31, ../scss/mobile.scss */
-#switchPlayers .switchButton:focus, #switchPlayers .switchButton:hover {
+/* line 35, ../scss/mobile.scss */
+#engage_controls #switchPlayers .switchButton:focus, #engage_controls #switchPlayers .switchButton:hover {
   text-shadow: -2px 2px 2px #333;
   text-shadow: -2px 2px 2px 1px #333;
 }
-/* line 36, ../scss/mobile.scss */
-#switchPlayers #prevVideo {
+/* line 40, ../scss/mobile.scss */
+#engage_controls #switchPlayers #prevVideo {
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjEuMCIgeTE9IjAuNSIgeDI9IjAuMCIgeTI9IjAuNSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmFkKSIgLz48L3N2Zz4g');
   background-size: 100%;
   background-image: -webkit-gradient(linear, 100% 50%, 0% 50%, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.5)));
@@ -42,8 +44,8 @@
   left: 0;
   text-align: left;
 }
-/* line 41, ../scss/mobile.scss */
-#switchPlayers #nextVideo {
+/* line 45, ../scss/mobile.scss */
+#engage_controls #switchPlayers #nextVideo {
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuMCIgeTE9IjAuNSIgeDI9IjEuMCIgeTI9IjAuNSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmFkKSIgLz48L3N2Zz4g');
   background-size: 100%;
   background-image: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.5)));
@@ -52,4 +54,137 @@
   background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
   right: 0;
   text-align: right;
+}
+/* line 54, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper {
+  position: absolute;
+  z-index: 10;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 5px;
+  background: rgba(255, 255, 255, 0.8);
+  border-top: 1px solid #2a6496;
+  display: -webkit-flex;
+  display: flex;
+}
+/* line 67, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper .ui-slider-handle {
+  position: absolute;
+  z-index: 2;
+  width: 25px !important;
+  height: 25px !important;
+  cursor: pointer !important;
+  background: url("../images/handle.png") no-repeat 50% 50% !important;
+  font-weight: bold;
+  color: #1C94C4;
+  outline: none;
+  border: none !important;
+  top: -10px !important;
+  margin-left: -12px;
+}
+/* line 82, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #navigation_control {
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+}
+/* line 84, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #navigation_control img {
+  width: 30px;
+  height: auto;
+}
+/* line 90, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #navigation_time {
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+  margin-right: 12px;
+  font-size: 12px;
+}
+/* line 94, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #navigation_time #navigation_time_current {
+  color: #666;
+}
+/* line 97, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #navigation_time p {
+  margin: 0;
+  line-height: 1.2;
+}
+/* line 103, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #slider {
+  -webkit-flex: 1 0 30px;
+  flex: 1 0 30px;
+  margin: 13px 17px 0px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #333 #333 #777 #333;
+  border-radius: 25px;
+  height: 4px;
+  background-color: #8e8d8d;
+  background: url("../images/bg-track.png") repeat top left;
+  box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
+}
+/* line 118, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #volume {
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+  position: relative;
+}
+/* line 122, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #volume #volumeSliderWrapper {
+  position: absolute;
+  bottom: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 5px 5px 0 0;
+  border: 1px solid #2a6496;
+  border-bottom: none;
+  padding: 13px 2px 8px;
+  width: 100%;
+  height: 95px;
+  margin-bottom: 5px;
+}
+/* line 135, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #volume #volumeSlider {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #333 #777 #333 #333;
+  border-radius: 25px;
+  height: 100%;
+  width: 4px;
+  margin: 0 auto;
+  background-color: #8e8d8d;
+  background: url("../images/bg-track.png") repeat top left;
+  box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
+}
+/* line 148, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #volume #volumeSlider .ui-slider-handle {
+  top: auto !important;
+  margin-left: -7px !important;
+}
+/* line 154, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #volume .volume_icon {
+  margin-top: 6px;
+}
+/* line 159, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper .ui-slider-range {
+  background: #ffffff;
+  /* Old browsers */
+  background: -moz-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+  /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(100%, #eaeaea));
+  /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+  /* IE10+ */
+  background: linear-gradient(to bottom, #ffffff 0%, #eaeaea 100%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient(  startColorstr='#ffffff', endColorstr='#eaeaea', GradientType=0);
+  /* IE6-9 */
+  position: absolute;
+  border: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 25px;
 }

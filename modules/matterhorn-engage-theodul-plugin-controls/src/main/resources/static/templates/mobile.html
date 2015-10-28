@@ -2,7 +2,14 @@
 <% if((typeof multipleVideos !== "undefined")
    && (typeof str_prevVideo !== "undefined")
    && (typeof str_nextVideo !== "undefined")
-   && (typeof str_switchPlayer !== "undefined")) { %>
+   && (typeof str_switchPlayer !== "undefined")
+   && (typeof plugin_path !== "undefined")
+   && (typeof str_playPauseVideo !== "undefined")
+   && (typeof str_playVideo !== "undefined")
+   && (typeof str_pauseVideo !== "undefined")
+   && (typeof str_volumeSlider !== "undefined")
+   && (typeof str_muteVolume !== "undefined")
+   && (typeof str_unmuteVolume !== "undefined")) { %>
 
 <% if(multipleVideos) { %>
 <div id="switchPlayers" class="switchPlayers_mobile">
@@ -17,5 +24,37 @@
 	</a>
 </div>
 <% } %>
+
+<div id="navigation_wrapper">
+
+	<div id="navigation_control">
+	    <div id="playpause_controls" class="controlbutton" role="button" aria-label="<%= str_playPauseVideo %>">
+	        <img id="play_button" class="playpause_btn" src="<%= plugin_path %>images/play.png" aria-label="<%= str_playVideo %>" title="<%= str_playVideo %>" alt="<%= str_playVideo %>" /> 
+	        <img id="pause_button" class="playpause_btn" style="display: none;" src="<%= plugin_path %>images/pause.png" aria-label="<%= str_pauseVideo %>" title="<%= str_pauseVideo %>" alt="<%= str_pauseVideo %>"  />
+	    </div>
+	</div>
+
+	<div id="slider" role="progressbar"></div>
+
+	<div id="navigation_time">
+	    <% if(typeof startTime !== "undefined") { %>
+	    <p id="navigation_time_current" role="timer"><%= startTime %></p>
+	    <p id="navigation_time_duration" aria-label="<%= str_totalVideoLength %> <%= duration %>"><%= duration %></p>
+	    <% } else { %>
+	    <p id="navigation_time_current" role="timer">00:00:00</p>
+	    <% } %>
+	</div>
+
+	<div id="volume">
+		<div class="volume_icon" id="volumeIcon">
+		    <img id="unmute_button" class="mute_btn" src="<%= plugin_path %>images/volume.png" role="button" aria-label="<%= str_muteVolume %>" title="<%= str_muteVolume %>" alt="<%= str_muteVolume %>" />
+		    <img id="mute_button" class="mute_btn" style="display: none;" src="<%= plugin_path %>images/volumeMuted.png" role="button" aria-label="<%= str_unmuteVolume %>" title="<%= str_unmuteVolume %>" alt="<%= str_unmuteVolume %>" /> 
+		</div>
+		<div id="volumeSliderWrapper" style="display:none;">
+			<div id="volumeSlider" role="slider" aria-label="<%= str_volumeSlider %>"></div>
+		</div>
+	</div>
+
+</div> <!-- end #navigation_wrapper -->
 
 <% } %>
