@@ -424,10 +424,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         showEmbed = false;
                     }               
                 }
-                var translatedQualites = new Array();
+                var translatedQualities = new Array();
                 if (resolutions) {
                     for (var i = 0; i < resolutions.length; i++) {
-                        translatedQualites[resolutions[i]] = translate(resolutions[i], resolutions[i]);
+                        translatedQualities[resolutions[i]] = translate(resolutions[i], resolutions[i]);
                     }
                 }
 
@@ -465,8 +465,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_right: translate("right", "right"),
                     str_beside: translate("beside", "beside"),
                     str_off: translate("off", "off"),
+                    qualities: resolutions,
                     pip_position: translate(pipPosition, pipPosition),
-                    translatedqualities: translatedQualites,
+                    translatedqualities: translatedQualities,
                     hasqualities: resolutions !== undefined,
                     hasmultiplevideos: numberVideos > 1,
                     controlsTop: Engage.controls_top,

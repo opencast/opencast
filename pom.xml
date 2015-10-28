@@ -30,7 +30,7 @@
     <osgi.compendium.version>4.2.0</osgi.compendium.version>
     <osgi.core.version>4.2.0</osgi.core.version>
     <osgi.enterprise.version>4.2.0</osgi.enterprise.version>
-    <karaf.version>3.0.4</karaf.version>
+    <karaf.version>3.0.5</karaf.version>
   </properties>
 
   <modules>
@@ -551,6 +551,10 @@
               </goals>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.6.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
