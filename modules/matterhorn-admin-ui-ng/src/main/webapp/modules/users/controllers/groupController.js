@@ -78,17 +78,5 @@ angular.module('adminNg.controllers')
 
         reloadRoles();
         reloadUsers();
-
-        // Reload tab resource on tab changes
-        $scope.$parent.$watch('tab', function (value) {
-          switch (value) {
-            case 'users':
-              reloadUsers();
-              break;
-            case 'roles':
-              reloadRoles();
-              break;
-          }
-        });
     }
 ]);
