@@ -1,0 +1,57 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// Triangle Point
+
+$point-top-margin: 9px;
+$point-width: 10px;
+$point-height: 7px;
+$parent-border-stroke: 1px;
+
+
+.right-triangle-point-common {
+    content: "";
+    position: absolute;
+    top: $point-top-margin;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: $point-height 0 $point-height $point-width;
+}
+
+.popover-header {
+
+    &::after {
+        $point-background-color: $main-border-color; // this is creating a faux border by using a background color
+        @extend .right-triangle-point-common;
+        right: $point-width - (($point-width*2) - $parent-border-stroke);
+        border-color: transparent transparent transparent $point-background-color;
+    }
+
+    &::before {
+        $point-background-color: #fbfbfb; // mid point color from vertical gradient
+        @extend .right-triangle-point-common;
+        z-index: $z-100;
+        right: $point-width - (($point-width*2) - ($parent-border-stroke+2));
+        border-color: transparent transparent transparent $point-background-color;
+    }
+}

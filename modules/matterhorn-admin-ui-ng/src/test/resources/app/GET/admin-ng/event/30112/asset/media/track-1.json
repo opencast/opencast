@@ -1,0 +1,35 @@
+{
+    "id": "370597b6-35ec-45de-9101-ccb87b873ee7",
+    "type": "presenter/source",
+    "mimetype": "video/mp4",
+    "tags ": ["archive", "engage"],
+    "url": "http://localhost:9001/videos/test.mp4",
+    "duration": 123,
+    "size": "415 MB",
+    "has_video": true,
+    "has_audio": false,
+    "streams": {
+        "audio": [{
+            "id": "audio-1",
+            "bitrate": "126694.0",
+            "bitdepth": "3432",
+            "channels": "2",
+            "samplingrate": "33000",
+            "framecount": "33000",
+            "peakleveldb": "32.4",
+            "rmsleveldb": "23.1",
+            "rmspeakdb": "3.9 ",
+            "type": "AAC"
+        }],
+        "video": [{
+            "id": "video - 1 ",
+            "bitrate": 2108424.0,
+            "resolution": "1920x1080",
+            "framecount": "33000 ",
+            "type":"AVC",
+            "framerate": "24.0",
+            "scantype": "Progressive",
+            "scanorder": "TopFieldFirst"
+        }]
+    }
+}

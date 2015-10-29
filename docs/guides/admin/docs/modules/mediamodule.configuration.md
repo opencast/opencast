@@ -3,7 +3,7 @@
 The Media Module is the default overview of the distributed media files.
 
 The configurations for the Media Module are done for each tenant. So the configuration keys are located in
-`<felix_home>/etc/load/org.opencastproject.organization-mh_default_org.cfg`:
+`<opencast_home>/etc/load/org.opencastproject.organization-mh_default_org.cfg`:
 
  - `prop.logo_large`
     - This logo file will be displayed in the upper left of the Media Module page

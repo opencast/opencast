@@ -112,5 +112,14 @@ angular.module('adminNg.controllers')
         });
     };
 
+    // Reload tab resource on tab changes
+    $scope.$parent.$watch('tab', function (value) {
+        angular.forEach($scope.states, function (state) {
+            if (value === state.name && !angular.isUndefined(state.stateController.reload)) {
+                state.stateController.reload();            
+            }
+        });
+    });
+
     $scope.components = ResourcesListResource.get({ resource: 'components' });
 }]);

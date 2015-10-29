@@ -21,7 +21,7 @@
 
 package org.opencastproject.workflow.handler.composer;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -83,7 +83,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   /**
    * Callback for the OSGi declarative services configuration.
-   * 
+   *
    * @param composerService
    *          the local composer service
    */
@@ -94,7 +94,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
-   * 
+   *
    * @param workspace
    *          an instance of the workspace
    */
@@ -104,7 +104,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -114,7 +114,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -131,7 +131,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   /**
    * Encode tracks from MediaPackage using profiles stored in properties and updates current MediaPackage.
-   * 
+   *
    * @param src
    *          The source media package
    * @param operation
@@ -328,7 +328,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     /**
      * Returns the track.
-     * 
+     *
      * @return the track
      */
     public Track getTrack() {
@@ -337,7 +337,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     /**
      * Returns the profile.
-     * 
+     *
      * @return the profile
      */
     public EncodingProfile getProfile() {

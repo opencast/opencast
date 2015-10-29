@@ -25,7 +25,7 @@ package org.opencastproject.mediapackage.track;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.mediapackage.VideoStream;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -70,6 +70,7 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     @XmlAttribute(name = "order")
     protected ScanOrder order;
 
+    @Override
     public String toString() {
       return type.toString();
     }
@@ -81,19 +82,6 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
 
   public VideoStreamImpl(String identifier) {
     super(identifier);
-  }
-
-  /**
-   * @param s
-   */
-  public VideoStreamImpl(VideoStreamImpl s) {
-    this.bitRate = s.bitRate;
-    this.device = s.device;
-    this.encoder = s.encoder;
-    this.frameRate = s.frameRate;
-    this.identifier = s.identifier;
-    this.resolution = s.resolution;
-    this.scanType = s.scanType;
   }
 
   /**
@@ -110,6 +98,15 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     if (StringUtils.isEmpty(sid))
       sid = streamIdHint;
     VideoStreamImpl vs = new VideoStreamImpl(sid);
+
+    // Frame count
+    try {
+      String frameCount = (String) xpath.evaluate("framecount/text()", node, XPathConstants.STRING);
+      if (!StringUtils.isBlank(frameCount))
+        vs.frameCount = new Long(frameCount.trim());
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("Frame count was malformatted: " + e.getMessage());
+    }
 
     // bit rate
     try {
@@ -200,10 +197,18 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
    * @see org.opencastproject.mediapackage.ManifestContributor#toManifest(org.w3c.dom.Document,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
+  @Override
   public Node toManifest(Document document, MediaPackageSerializer serializer) {
     Element node = document.createElement("video");
     // Stream ID
     node.setAttribute("id", getIdentifier());
+
+    // Frame count
+    if (frameCount != null) {
+      Element frameCountNode = document.createElement("framecount");
+      frameCountNode.appendChild(document.createTextNode(Long.toString(frameCount)));
+      node.appendChild(frameCountNode);
+    }
 
     // device
     Element deviceNode = document.createElement("device");
@@ -272,14 +277,17 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     return node;
   }
 
+  @Override
   public Float getBitRate() {
     return bitRate;
   }
 
+  @Override
   public Float getFrameRate() {
     return frameRate;
   }
 
+  @Override
   public Integer getFrameWidth() {
     try {
       String[] s = resolution.trim().split("x");
@@ -291,6 +299,7 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     }
   }
 
+  @Override
   public Integer getFrameHeight() {
     try {
       String[] s = resolution.trim().split("x");
@@ -302,12 +311,14 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     }
   }
 
+  @Override
   public ScanType getScanType() {
-    return scanType.type;
+    return scanType != null ? scanType.type : null;
   }
 
+  @Override
   public ScanOrder getScanOrder() {
-    return scanType.order;
+    return scanType != null ? scanType.order : null;
   }
 
   // Setter

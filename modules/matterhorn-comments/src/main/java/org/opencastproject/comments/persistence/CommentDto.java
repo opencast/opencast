@@ -40,6 +40,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -82,6 +84,9 @@ public class CommentDto {
   private boolean resolvedStatus = false;
 
   @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.REMOVE })
+  @JoinTable(name = "mh_comment_mh_comment_reply", joinColumns = {
+          @JoinColumn(name = "comment_id", referencedColumnName = "id") }, inverseJoinColumns = {
+                  @JoinColumn(name = "replies_id", referencedColumnName = "id", unique = true) })
   private List<CommentReplyDto> replies = new ArrayList<CommentReplyDto>();
 
   /**
@@ -92,7 +97,7 @@ public class CommentDto {
 
   /**
    * Creates a comment
-   * 
+   *
    * @param text
    *          the text
    */
@@ -102,7 +107,7 @@ public class CommentDto {
 
   /**
    * Returns the id of this entity
-   * 
+   *
    * @return the id as long
    */
   public long getId() {
@@ -111,7 +116,7 @@ public class CommentDto {
 
   /**
    * Sets the text
-   * 
+   *
    * @param text
    *          the text
    */
@@ -121,7 +126,7 @@ public class CommentDto {
 
   /**
    * Returns the text
-   * 
+   *
    * @return the text
    */
   public String getText() {
@@ -130,7 +135,7 @@ public class CommentDto {
 
   /**
    * Sets the creation date
-   * 
+   *
    * @param creationDate
    *          the creation date
    */
@@ -140,7 +145,7 @@ public class CommentDto {
 
   /**
    * Returns the creation date
-   * 
+   *
    * @return the creation date
    */
   public Date getCreationDate() {
@@ -149,7 +154,7 @@ public class CommentDto {
 
   /**
    * Sets the modification date
-   * 
+   *
    * @param modificationDate
    *          the modification date
    */
@@ -159,7 +164,7 @@ public class CommentDto {
 
   /**
    * Returns the modification date
-   * 
+   *
    * @return the modification date
    */
   public Date getModificationDate() {
@@ -168,7 +173,7 @@ public class CommentDto {
 
   /**
    * Sets the author
-   * 
+   *
    * @param author
    *          the author
    */
@@ -178,7 +183,7 @@ public class CommentDto {
 
   /**
    * Returns the author
-   * 
+   *
    * @return the author
    */
   public String getAuthor() {
@@ -187,7 +192,7 @@ public class CommentDto {
 
   /**
    * Sets the reason
-   * 
+   *
    * @param reason
    *          the reason
    */
@@ -197,7 +202,7 @@ public class CommentDto {
 
   /**
    * Returns the reason
-   * 
+   *
    * @return the reason
    */
   public String getReason() {
@@ -206,7 +211,7 @@ public class CommentDto {
 
   /**
    * Sets whether the status is resolved
-   * 
+   *
    * @param resolvedStatus
    *          whether the status is resolved
    */
@@ -216,7 +221,7 @@ public class CommentDto {
 
   /**
    * Returns whether the status is resolved
-   * 
+   *
    * @return whether the status is resolved
    */
   public boolean isResolvedStatus() {
@@ -225,7 +230,7 @@ public class CommentDto {
 
   /**
    * Sets a comment replies list.
-   * 
+   *
    * @param replies
    *          the replies list
    */
@@ -235,7 +240,7 @@ public class CommentDto {
 
   /**
    * Returns the replies list
-   * 
+   *
    * @return the replies list
    */
   public List<CommentReplyDto> getReplies() {
@@ -244,10 +249,10 @@ public class CommentDto {
 
   /**
    * Add a reply to the comment
-   * 
+   *
    * @param reply
    *          the reply to add to this comment
-   * 
+   *
    * @return true if this collection changed as a result of the call
    */
   public boolean addReply(CommentReplyDto reply) {
@@ -256,10 +261,10 @@ public class CommentDto {
 
   /**
    * Remove a reply from the comment
-   * 
+   *
    * @param reply
    *          the reply to remove from this comment
-   * 
+   *
    * @return true if this collection changed as a result of the call
    */
   public boolean removeReply(CommentReplyDto reply) {
@@ -268,7 +273,7 @@ public class CommentDto {
 
   /**
    * Returns the business object of this comment
-   * 
+   *
    * @return the business object model of this comment
    */
   public Comment toComment(UserDirectoryService userDirectoryService) {

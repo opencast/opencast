@@ -36,7 +36,7 @@ angular.module('adminNg.services')
                         result.push(effectiveMapper(data.results));
                     }
                 } catch (e) {
-                    console.warn(e);
+                    //console.warn(e);
                 }
 
                 // guard against empty dataset

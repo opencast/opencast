@@ -1,22 +1,32 @@
 /**
- * Licensed to The Apereo Foundation under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
+ * Synchronize.js
  *
+ * Copyright (c) 2013-2015, Denis Meyer, calltopower88@googlemail.com
+ * All rights reserved.
  *
- * The Apereo Foundation licenses this file to you under the Educational
- * Community License, Version 2.0 (the "License"); you may not use this file
- * except in compliance with the License. You may obtain a copy of the License
- * at:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *   http://opensource.org/licenses/ecl2.txt
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 (function($) {
     var checkBuffer = true; // flag whether to check for the video buffers
@@ -182,6 +192,38 @@
             }
         } else {
             log("SJS: [mute] Undefined video element id '" + id + "'");
+            return undefined;
+        }
+    }
+    
+    /**
+     * Mute the video
+     *
+     * @param id video id
+     * @param volume 0.0 - 1.0
+     * @return true if id is not undefined
+     */
+    function unmute(id, volume) {
+        if (id && volume) {
+            log("SJS: [unmute] un-muting video element id '" + id + "'");
+            if (!useVideoJs()) {
+                getVideo(id).muted = false;
+                getVideo(id).volume(volume);
+            } else {
+                getVideo(id).volume(volume);
+            }
+        } else {
+            log("SJS: [unmute] Undefined video element id '" + id + "'");
+            return undefined;
+        }
+    } 
+    
+    function getVolume(id) {
+        if (id) {
+            log("SJS: [volume] getting volume from video element id '" + id + "': " + getVideo(id).volume());
+            return getVideo(id).volume();
+        } else {
+            log("SJS: [volume] Undefined video element id '" + id + "'");
             return undefined;
         }
     }
@@ -672,7 +714,6 @@
      * Initial play
      */
     function initialPlay() {
-        var myPlayer = this;
         for (var i = 0; i < videoIds.length; ++i) {
             pause(videoIds[i]);
         }
@@ -683,7 +724,6 @@
      * Initial pause
      */
     function initialPause() {
-        var myPlayer = this;
         for (var i = 0; i < videoIds.length; ++i) {
             pause(videoIds[i]);
         }
@@ -698,6 +738,66 @@
             window.clearInterval(tryToPlayWhenBufferingTimer);
             tryToPlayWhenBufferingTimer = null;
         }
+    }
+    
+    /**
+     * Remove a video-display from the list of videos that are currently synchronized.
+     * This maybe needed if only one video should be displ
+     * @param {type} videoId
+     */
+    function unsyncVideo(videoId) {
+        if (videoId === masterVideoId) {
+            if (! selectNewMasterVideo()) {
+                return; // if only the master video is left no video can be removed
+            };
+        }
+        for (var i = 0; i < videoIds.length; ++i) {
+            if (videoIds[i] === videoId) {
+                videoIds.splice(i, 1);
+                pause(videoId);
+                $(document).trigger("sjs:idUnregistered", [videoId]);
+                break;
+            }
+        }
+        
+    }
+    
+    /**
+     * Select a new master video from the videos left 
+     * @returns {Boolean} true if a new master video could be selected
+     */
+    function selectNewMasterVideo() {
+        if (videoIds.length <= 1) {
+            return false;
+        }
+        var volume = getVolume(masterVideoId);
+        for (var i = 0; i < videoIds.length; ++i) {
+            if (videoIds[i] !== masterVideoId) {
+                getVideoObj(masterVideoId).off();
+                setMasterVideoId(i);
+                break;
+            }
+        }
+        registerEvents();
+        unmute(masterVideoId, volume);
+        
+        return true;
+    }
+    
+    /**
+     * Add a new video to the group of synced videos
+     * @param {type} videoId
+     * @returns {undefined}
+     */
+    function addVideoForSync(videoId) {
+        for (var i = 0; i < videoIds.length; ++i) {
+            if (videoIds[i] === videoId) {
+                return; // Video is already synced
+            }
+        }
+        videoIds.push(videoId);
+        $(document).trigger("sjs:idRegistered", [videoId]);
+        synchronize();
     }
 
     /**

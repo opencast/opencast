@@ -26,7 +26,7 @@ e = { $exception printStackTrace }
 #.Format.Pipe = false
 
 # set prompt
-prompt = 'matterhorn> '
+prompt = 'opencast> '
 
 # print welcome message
 try {

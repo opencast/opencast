@@ -1,0 +1,146 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// Roll Up Menu
+// ----------------------------------------
+
+#roll-up-menu {
+    float: left;
+    width: 80px;
+    background: #fff;
+    border: $thin-border-stroke #c3cbd0;
+    border-top: none;
+    @include border-bottom-radius(4px);
+    position: absolute;
+    top: 1px;
+    left: -1px;
+
+    // Hide menu
+    opacity: 0;
+
+    #nav-container {
+        display: none;
+    }
+
+    // Nav icons.
+    a {
+        $height: 60px;
+
+        width: 80px;
+        height: $height;
+        line-height: $height;
+        margin: 0 auto;
+        text-align: center;
+        vertical-align: middle;
+        display: block;
+
+        > i {
+            display: inline-block;
+            margin: 0 auto;
+            vertical-align: middle;
+            position: relative;
+            line-height: $height;
+            @include transition(all .2s);
+
+            &[data-title]:hover:after {
+                position: absolute;
+                content: attr(data-title);
+                z-index: $max-z;
+                border: $thin-border-stroke #c3cbd0;
+                opacity: 0.9;
+                @include transition(all .2s);
+                @include linear-gradient(top, #fff, #f3f4f4);
+                padding: 0 10px;
+                line-height: 25px;
+                left: 40px;
+                border-radius: 4px;
+                color: $dark-prim-color;
+                font-size: 10px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+        }
+
+        .dashboard {
+            @include build-icon(auto, auto, dashboard, 30px, 20px);
+
+            &:hover,
+            &.active {
+                @include build-icon(auto, auto, dashboard-on, 30px, 20px);
+            }
+        }
+
+        .events {
+            @include build-icon(auto, auto, events, 27px, 27px);
+
+            &:hover,
+            &.active {
+                @include build-icon(auto, auto, events-on, 27px, 27px);
+            }
+        }
+
+        .systems {
+            @include build-icon(auto, auto, servers, 29px, 20px);
+
+            &:hover,
+            &.active {
+                @include build-icon(auto, auto, servers-on, 29px, 20px);
+            }
+        }
+
+        .recordings {
+            @include build-icon(auto, auto, recordings, 29px, 18px);
+
+            &:hover,
+            &.active {
+                @include build-icon(auto, auto, recordings-on, 29px, 18px);
+            }
+        }
+
+        .users {
+            @include build-icon(auto, auto, user-group, 27px, 24px);
+
+            &:hover,
+            &.active {
+                @include build-icon(auto, auto, user-group-on, 27px, 24px);
+            }
+        }
+
+        .integrations {
+            @include build-icon(auto, auto, integrations, 33px, 20px);
+
+            &:hover,
+            &.active {
+                @include build-icon(auto, auto, integrations-on, 33px, 20px);
+            }
+        }
+
+        .configuration {
+            @include build-icon(auto, auto, configuration, 27px, 27px);
+
+            &:hover,
+            &.active {
+                @include build-icon(auto, auto, configuration-on, 27px, 27px);
+            }
+        }
+    }
+}
