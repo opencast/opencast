@@ -98,6 +98,7 @@
   "BULK_ACTIONS":{
     "CAPTION":"Acciones",
     "SEND_MESSAGE":"Enviar mensaje",
+    "WARNING":"Warning",
     "EDIT_STATUS":{
       "CAPTION":"Modificar estado",
       "READY_FOR_RECORDING":"Preparado para grabar",
@@ -105,10 +106,12 @@
     },
     "DELETE":{
       "SERIES":{
-        "CAPTION":"Eliminar"
+        "CAPTION":"Eliminar",
+        "BUTTON": "Eliminar"
       },
       "EVENTS":{
-        "CAPTION":"Eliminar"
+        "CAPTION":"Eliminar",
+        "BUTTON": "Eliminar"
       }
     },
     "DELETE_EVENTS_WARNING_LINE1":"Al eliminar un evento, todos sus metadatos y sus archivos de audio y vídeo se eliminarán y serán irrecuperables.",

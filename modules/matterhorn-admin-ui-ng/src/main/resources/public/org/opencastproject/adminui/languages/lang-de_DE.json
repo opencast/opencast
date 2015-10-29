@@ -98,6 +98,7 @@
   "BULK_ACTIONS":{
     "CAPTION":"Aktionen",
     "SEND_MESSAGE":"Nachricht senden",
+    "WARNING":"Warnung",
     "EDIT_STATUS":{
       "CAPTION":"Status bearbeiten",
       "READY_FOR_RECORDING":"Bereit für die Aufnahme",
@@ -105,10 +106,12 @@
     },
     "DELETE":{
       "SERIES":{
-        "CAPTION":"Löschen"
+        "CAPTION": "Löschen",
+        "BUTTON": "Löschen"
       },
       "EVENTS":{
-        "CAPTION":"Löschen"
+        "CAPTION":"Löschen",
+        "BUTTON": "Löschen"
       }
     },
     "DELETE_EVENTS_WARNING_LINE1":"Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",

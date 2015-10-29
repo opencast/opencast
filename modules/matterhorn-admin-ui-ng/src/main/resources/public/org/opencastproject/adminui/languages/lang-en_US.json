@@ -122,6 +122,7 @@
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
       "SEND_MESSAGE": "Send message",
+      "WARNING":"Warning",
       "EDIT_STATUS": {
           "CAPTION": "Edit Status",
           "READY_FOR_RECORDING": "Ready for recording",
@@ -129,10 +130,12 @@
       },
       "DELETE": {
           "SERIES": {
-            "CAPTION": "Delete"
+            "CAPTION": "Delete",
+            "BUTTON": "Delete"
           },
           "EVENTS": {
-            "CAPTION": "Delete"
+            "CAPTION": "Delete",
+            "BUTTON": "Delete"
           }
       },
 
