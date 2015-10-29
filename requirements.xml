@@ -4,7 +4,7 @@
   <tools>
     <tool>
       <name>ffmpeg</name>
-      <minversion>2.5</minversion>
+      <minversion>2.8</minversion>
     </tool>
     <tool>
       <name>hunspell</name>
@@ -13,10 +13,6 @@
     <tool>
       <name>maven</name>
       <minversion>3.1</minversion>
-    </tool>
-    <tool>
-      <name>qt_sbtl_embedder</name>
-      <minversion>0.4</minversion>
     </tool>
     <tool>
       <name>sox</name>
@@ -41,7 +37,6 @@
       <module>composer-ffmpeg</module>
       <build>ffmpeg</build>
       <runtime>ffmpeg</runtime>
-      <runtime>qt_sbtl_embedder</runtime>
     </requirement>
     <requirement>
       <module>dictionary-hunspell</module>

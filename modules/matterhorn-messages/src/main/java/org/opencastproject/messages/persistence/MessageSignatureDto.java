@@ -45,6 +45,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -55,7 +57,8 @@ import javax.persistence.UniqueConstraint;
 
 /** Entity object for message signatures. */
 @Entity(name = "MessageSignature")
-@Table(name = "mh_message_signature", uniqueConstraints = { @UniqueConstraint(columnNames = { "name", "organization" }) })
+@Table(name = "mh_message_signature", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "name", "organization" }) })
 @NamedQueries({
         @NamedQuery(name = "MessageSignature.countByCreator", query = "SELECT COUNT(m) FROM MessageSignature m WHERE m.creator = :username AND m.organization = :org"),
         @NamedQuery(name = "MessageSignature.findAll", query = "SELECT m FROM MessageSignature m WHERE m.organization = :org"),
@@ -103,6 +106,9 @@ public class MessageSignatureDto {
   private Date creationDate;
 
   @OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.REMOVE })
+  @JoinTable(name = "mh_message_signature_mh_comment", joinColumns = {
+          @JoinColumn(name = "message_signature_id", referencedColumnName = "id") }, inverseJoinColumns = {
+                  @JoinColumn(name = "comments_id", referencedColumnName = "id", unique = true) })
   private List<CommentDto> comments = new ArrayList<CommentDto>();
 
   /** Default constructor */

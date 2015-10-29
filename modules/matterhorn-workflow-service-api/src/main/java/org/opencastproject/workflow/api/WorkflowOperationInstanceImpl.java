@@ -219,6 +219,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    * @param jobId
    *          the job identifier
    */
+  @Override
   public void setId(Long jobId) {
     this.jobId = jobId;
   }
@@ -243,6 +244,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
     this.template = template;
   }
 
+  @Override
   public String getDescription() {
     return description;
   }
@@ -255,6 +257,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
     this.executeCondition = condition;
   }
 
+  @Override
   public String getExecutionCondition() {
     return executeCondition;
   }
@@ -263,15 +266,18 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
     this.skipCondition = condition;
   }
 
+  @Override
   public String getSkipCondition() {
     return skipCondition;
   }
 
   static class Adapter extends XmlAdapter<WorkflowOperationInstanceImpl, WorkflowOperationInstance> {
+    @Override
     public WorkflowOperationInstanceImpl marshal(WorkflowOperationInstance op) throws Exception {
       return (WorkflowOperationInstanceImpl) op;
     }
 
+    @Override
     public WorkflowOperationInstance unmarshal(WorkflowOperationInstanceImpl op) throws Exception {
       return op;
     }
@@ -287,6 +293,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
     return state;
   }
 
+  @Override
   public void setState(OperationState state) {
     Date now = new Date();
     if (OperationState.RUNNING.equals(state)) {
@@ -312,6 +319,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getConfiguration(java.lang.String)
    */
+  @Override
   public String getConfiguration(String key) {
     if (key == null || configurations == null)
       return null;
@@ -327,6 +335,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @see org.opencastproject.workflow.api.WorkflowInstance#removeConfiguration(java.lang.String)
    */
+  @Override
   public void removeConfiguration(String key) {
     if (key == null || configurations == null)
       return;
@@ -344,6 +353,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @see org.opencastproject.workflow.api.WorkflowInstance#setConfiguration(java.lang.String, java.lang.String)
    */
+  @Override
   public void setConfiguration(String key, String value) {
     if (key == null)
       return;
@@ -379,6 +389,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
   /**
    * @return the holdStateUserInterfaceUrl
    */
+  @Override
   public String getHoldStateUserInterfaceUrl() {
     return holdStateUserInterfaceUrl;
   }
@@ -403,6 +414,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @return title to be displayed
    */
+  @Override
   public String getHoldActionTitle() {
     return holdActionTitle;
   }
@@ -446,6 +458,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
   /**
    * @return the dateStarted
    */
+  @Override
   public Date getDateStarted() {
     return dateStarted;
   }
@@ -461,6 +474,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
   /**
    * @return the dateCompleted
    */
+  @Override
   public Date getDateCompleted() {
     return dateCompleted;
   }
@@ -553,6 +567,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#isAbortable()
    */
+  @Override
   public Boolean isAbortable() {
     return abortable;
   }
@@ -572,6 +587,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#isContinuable()
    */
+  @Override
   public Boolean isContinuable() {
     return continuable;
   }

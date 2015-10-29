@@ -2,7 +2,7 @@
 
 The Opencast 2.0 Player (aka Theodul Pass Player) is the new default player in 2.0. The old engage player from 1.x is still available too.
 
-The configurations for the player are done for each tenant. So the configuration keys are located in `<felix_home>/etc/load/org.opencastproject.organization-mh_default_org.cfg`.
+The configurations for the player are done for each tenant. So the configuration keys are located in `<opencast_home>/etc/load/org.opencastproject.organization-mh_default_org.cfg`.
 
 ## Select the Opencast 2.0 Player
 To activate the player set:

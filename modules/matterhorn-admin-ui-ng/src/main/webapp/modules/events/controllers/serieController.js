@@ -272,6 +272,16 @@ angular.module('adminNg.controllers')
             }
     };
 
+    // Reload tab resource on tab changes
+    $scope.$parent.$watch('tab', function (value) {
+      switch (value) {
+        case 'permissions':
+            $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
+            $scope.roles = ResourcesListResource.get({ resource: 'ROLES' });
+          break;
+      }
+    });
+
     $scope.themeSave = function () {
         var theme = $scope.theme.current;
 

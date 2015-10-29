@@ -22,7 +22,7 @@
 
 package org.opencastproject.util;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility functions for handling common requirements.
@@ -125,7 +125,7 @@ public final class RequireUtil {
   /**
    * The given string value must not be blank, empty nor {@code null}. Otherwise, an {@link IllegalArgumentException} is
    * thrown.
-   * 
+   *
    * @param value
    *          the value to check for not being empty
    * @param valueName

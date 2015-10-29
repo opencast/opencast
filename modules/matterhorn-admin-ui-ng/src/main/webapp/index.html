@@ -6,7 +6,6 @@
         <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
         <link type="text/css" href="css/main.css" rel="stylesheet">
         <link type="text/css" href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-        <link rel="shortcut icon" href="img/favicon.ico">
         <script>
             window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>')
         </script>
@@ -23,7 +22,8 @@
     <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
         <header ng-controller="NavCtrl" class="primary-header">
             <div class="header-branding">
-                <img src="img/opencast_logo_white.png" width="100px" height="20px" alt="Opencast logo" />
+                <div class="text-logo">Opencast</div>
+                <div class="logo-tag">Beta</div>
             </div>
             <nav class="header-nav nav-dd-container" id="nav-dd-container">
                 <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown="">
@@ -112,6 +112,7 @@
         <script src="shared/services/filterProfilesService.js"></script>
         <script src="shared/services/notificationsService.js"></script>
         <script src="shared/services/tableService.js"></script>
+        <script src="shared/services/statsService.js"></script>
         <script src="shared/services/underscoreService.js"></script>
         <script src="shared/services/formNavigatorService.js"></script>
         <script src="shared/services/videoService.js"></script>
@@ -232,6 +233,7 @@
         <script src="shared/directives/selectBoxDirective.js"></script>
         <script src="shared/directives/navDirective.js"></script>
         <script src="shared/directives/tableDirective.js"></script>
+        <script src="shared/directives/statsDirective.js"></script>
         <script src="shared/directives/confirmationModalDirective.js"></script>
         <script src="shared/directives/resourceModalDirective.js"></script>
         <script src="shared/directives/editableDirective.js"></script>

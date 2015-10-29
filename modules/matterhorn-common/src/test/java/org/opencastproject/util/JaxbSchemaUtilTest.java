@@ -21,7 +21,7 @@
 
 package org.opencastproject.util;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.opencastproject.job.api.JaxbJob;
 

@@ -35,7 +35,7 @@ Some examples:
 Matterhorn specifies an AuthenticationProvider by default, using a UserDetailService that is obtained from the OSGI service registry.
 
 You can use this simple provider as is, loading users into the mh_user and mh_role database tables, and specifying an
-administrative username and password in config.properties:
+administrative username and password in custom.properties:
 
     org.opencastproject.security.digest.user=matterhorn_system_account
     org.opencastproject.security.digest.pass=CHANGE_ME

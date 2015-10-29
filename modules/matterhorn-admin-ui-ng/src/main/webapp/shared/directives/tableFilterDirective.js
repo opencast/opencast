@@ -125,6 +125,19 @@ angular.module('adminNg.directives')
                 scope.mode = 0;
                 scope.activeProfile = index;
             };
+
+            // Deregister change handler
+            scope.$on('$destroy', function () {
+                scope.deregisterChange();
+            });
+
+            // React on filter changes
+            scope.deregisterChange = Storage.scope.$on('change', function (event, type) {
+                if (type === 'filter') {
+                    scope.restoreFilters();
+                }
+            });
+
         }
     };
 }]);

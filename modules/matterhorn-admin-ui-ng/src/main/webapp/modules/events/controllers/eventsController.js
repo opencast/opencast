@@ -22,9 +22,39 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('EventsCtrl', ['$scope', 'Table', 'EventsResource', 'ResourcesFilterResource',
-    function ($scope, Table, EventsResource, ResourcesFilterResource) {
+.controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource',
+    function ($scope, Stats, Table, EventsResource, ResourcesFilterResource) {
         // Configure the table service
+        $scope.stats = Stats;
+        $scope.stats.configure({
+            stats: [
+            {filters: [{name: 'status',
+                        filter:'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PROCESSING'}],
+             description: 'Running'},
+            {filters: [{name: 'status',
+                        filter:'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PROCESSED'}],
+             description: 'Finished'},
+            {filters: [{name: 'status',
+                        filter:'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PROCESSING_FAILURE'}],
+             description: 'Failed'},
+            {filters: [{name: 'comments',
+                        filter:'FILTERS.EVENTS.COMMENTS.LABEL',
+                        value: 'OPEN'},
+                       {name: 'status',
+                        filter: 'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PROCESSED'}],
+             description: 'Finished with open comments'},
+            {filters: [{name: 'status',
+                        filter: 'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.SCHEDULED'}],
+             description: 'Scheduled'}
+            ],
+            resource:   'events',
+            apiService: EventsResource
+        });
         $scope.table = Table;
         $scope.table.configure({
             columns: [{

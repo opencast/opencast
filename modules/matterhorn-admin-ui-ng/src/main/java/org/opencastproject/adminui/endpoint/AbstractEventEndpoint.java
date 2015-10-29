@@ -35,7 +35,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.conflictJson;
 import static org.opencastproject.index.service.util.RestUtils.notFound;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
@@ -153,9 +153,9 @@ import com.entwinemedia.fn.data.json.JValue;
 
 import net.fortuna.ical4j.model.property.RRule;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -1878,6 +1878,7 @@ public abstract class AbstractEventEndpoint {
         audio.add(f("bitrate", vN(audioStream.getBitRate())));
         audio.add(f("bitdepth", vN(audioStream.getBitDepth())));
         audio.add(f("samplingrate", vN(audioStream.getSamplingRate())));
+        audio.add(f("framecount", vN(audioStream.getFrameCount())));
         audio.add(f("peakleveldb", vN(audioStream.getPkLevDb())));
         audio.add(f("rmsleveldb", vN(audioStream.getRmsLevDb())));
         audio.add(f("rmspeakdb", vN(audioStream.getRmsPkDb())));
@@ -1890,6 +1891,7 @@ public abstract class AbstractEventEndpoint {
         video.add(f("bitrate", v(videoStream.getBitRate())));
         video.add(f("framerate", vN(videoStream.getFrameRate())));
         video.add(f("resolution", vN(videoStream.getFrameWidth() + "x" + videoStream.getFrameHeight())));
+        video.add(f("framecount", vN(videoStream.getFrameCount())));
         video.add(f("scantype", vN(videoStream.getScanType())));
         video.add(f("scanorder", vN(videoStream.getScanOrder())));
         videoList.add(j(video));

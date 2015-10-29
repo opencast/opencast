@@ -94,3 +94,4 @@
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
             cardinality="1..1" policy="static" bind="setWorkspace"/>
   </scr:component>
+</scr:components>

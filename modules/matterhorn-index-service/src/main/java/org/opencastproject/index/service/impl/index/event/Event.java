@@ -28,8 +28,8 @@ import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.mapped.Configuration;

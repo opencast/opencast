@@ -21,7 +21,7 @@
 
 package org.opencastproject.serviceregistry.impl;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.job.api.Job.FailureReason.DATA;
 import static org.opencastproject.job.api.Job.Status.FAILED;
 import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
@@ -61,8 +61,8 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.jmx.JmxUtil;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -250,15 +250,15 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     // Set up persistence
     emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.serviceregistry", persistenceProperties);
 
-    // Clean all undispatchable jobs
-    cleanUndispatchableJobs();
-
     // Find this host's url
     if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY))) {
       hostName = UrlSupport.DEFAULT_BASE_URL;
     } else {
       hostName = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
     }
+
+    // Clean all undispatchable jobs that were orphaned when this host was last deactivated
+    cleanUndispatchableJobs(hostName);
 
     // Register JMX beans with statistics
     try {
@@ -1224,8 +1224,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     cleanRunningJobs(serviceType, baseUrl);
   }
 
-  /** Find all undispatchable jobs and set them to CANCELED. */
-  private void cleanUndispatchableJobs() {
+  /** Find all undispatchable jobs that were orphaned when this host was last deactivated and set them to CANCELED. */
+  private void cleanUndispatchableJobs(String hostName) {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -1240,9 +1240,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       @SuppressWarnings("unchecked")
       List<JobJpaImpl> undispatchableJobs = query.getResultList();
       for (JobJpaImpl job : undispatchableJobs) {
-        logger.info("Marking undispatchable job {} as canceled", job);
-        job.setStatus(Status.CANCELED);
-        em.merge(job);
+        // Make sure the job was processed on this host
+        String jobHost = "";
+        if (job.processorServiceRegistration != null) {
+          jobHost = job.processorServiceRegistration.getHost();
+        }
+        if (!jobHost.equals(hostName)) {
+          logger.debug("Will not cancel undispatchable job {}, it is running on a different host", job);
+
+        } else {
+          logger.info("Cancelling the running undispatchable job {}, it was orphaned on this host", job);
+          job.setStatus(Status.CANCELED);
+          em.merge(job);
+        }
       }
       tx.commit();
     } catch (Exception e) {

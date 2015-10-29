@@ -31,7 +31,7 @@ import org.opencastproject.util.NotFoundException;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

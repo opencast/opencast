@@ -32,7 +32,8 @@
     "load-grunt-tasks": "^3.1.0",
     "phantomjs": "^1.9.7-15",
     "protractor": "~1.1.1",
-    "requirejs": "~2.1.14"
+    "requirejs": "~2.1.14",
+    "sass": "^0.5.0"
   },
   "main": "Gruntfile.js",
   "repository": {
