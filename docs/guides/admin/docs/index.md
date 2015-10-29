@@ -31,7 +31,7 @@ for each release. It contains:
     - [Database Configuration](configuration/database.md)
     - [Workflow Configuration](configuration/workflow.md)
     - [Encoding Configuration](configuration/encoding.md)
-    - [more...](configuration)
+    - [more...](configuration/index.md)
  - [Module Documentation](modules/index.md)
     - [Atom and RSS Feed](modules/atomrss.md)
     - [Media Module](modules/mediamodule.configuration.md)

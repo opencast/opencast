@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.inspection.ffmpeg;
 
 import org.opencastproject.inspection.ffmpeg.api.AudioStreamMetadata;
@@ -31,8 +30,8 @@ import org.opencastproject.util.ProcessRunner;
 import org.opencastproject.util.ProcessRunner.ProcessInfo;
 
 import com.entwinemedia.fn.Pred;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

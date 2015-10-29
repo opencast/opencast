@@ -4,10 +4,10 @@
   <scr:component name="org.opencastproject.kernel.security.OrganizationFilter" immediate="true">
     <implementation class="org.opencastproject.kernel.security.OrganizationFilter" />
     <property name="service.description" value="Organization Filter" />
-    <property name="contextId" value="opencast.httpcontext" />
+    <property name="httpContext.id" value="opencast.httpcontext" />
     <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
     <property name="service.ranking" value="5" />
-    <property name="pattern" value=".*" />
+    <property name="urlPatterns" value="*" />
     <service>
       <provide interface="javax.servlet.Filter" />
     </service>

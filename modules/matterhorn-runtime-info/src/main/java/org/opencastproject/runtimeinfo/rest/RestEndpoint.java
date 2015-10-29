@@ -23,7 +23,7 @@ package org.opencastproject.runtimeinfo.rest;
 
 import org.opencastproject.util.doc.DocData;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -321,7 +321,7 @@ public class RestEndpoint {
          * try { qs = URLEncoder.encode(sb.toString(),"UTF-8"); } catch (UnsupportedEncodingException e) { qs =
          * sb.toString(); }
          */
-        qs = StringEscapeUtils.escapeHtml(sb.toString());
+        qs = StringEscapeUtils.escapeHtml4(sb.toString());
       }
     }
     return qs;

@@ -85,8 +85,9 @@ angular.module('adminNg.services.modal')
          * @param {string} apiServiceName (optional) Service name of the $resource wrapper to use.
          * @param {Array} subIds (optional) resource sub-IDs of the current sub tab.
          * @param {boolean} sibling (optional) Indicates if this sub tab is a sibling to its parent.
+         * @param {string} noSchedule Defines that no schedule should be create to refresh the subtab data if true.
          */
-        this.openSubTab = function (subTabId, apiServiceName, subId, sibling) {
+        this.openSubTab = function (subTabId, apiServiceName, subId, sibling, noSchedule) {
             var params = $location.search(), previous;
 
             // Determine if any sub tabs need to be restored
@@ -102,6 +103,8 @@ angular.module('adminNg.services.modal')
             me.$scope.tab = Modal.modal.find('[data-modal-tab-content="' + subTabId + '"]')
                 .addClass('active').data('parent');
 
+            me.$scope.subTab = subTabId;
+
             if (me.$scope.breadcrumbs.length > 0) {
                 me.loadSubNavData();
             }
@@ -111,7 +114,9 @@ angular.module('adminNg.services.modal')
 
             if (me.refreshScheduler.on) {
                 me.refreshScheduler.cancel();
-                me.refreshScheduler.newSchedule();
+                if (!angular.isDefined(noSchedule) || noSchedule === false) {
+                    me.refreshScheduler.newSchedule();
+                }
             }
         };
 
@@ -250,7 +255,6 @@ angular.module('adminNg.services.modal')
                 me.$scope.$broadcast('change', adjacentId);
             }
         };
-
 
         /**
          * @ngdoc function

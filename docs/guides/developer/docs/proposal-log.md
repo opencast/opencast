@@ -15,7 +15,6 @@ response signals agreement. Apart from that committers may vote with:
 Passed Proposals
 ----------------
 
-
 ### How to release a new Opencast version…
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Fri, 14 Aug 2015 12:54:51 UTC
 
@@ -336,7 +335,7 @@ Proposed by Lars Kiesow <lkiesow@uos.de>, Passed on Fri, 8 May 2015 11:52:16 UTC
 ### Opencast Documentation
 Proposed by Rüdiger Rolf <rrolf@uni-osnabrueck.de>, Passed on Sat, 02 May 2015 14:43:28 UTC
 
-Hi all,
+    Hi all,
 
     Tobias, Basil, Lars and I discussed status of the current migration of
     the Opencast (Matterhorn) documentation to GIT. We still see some open

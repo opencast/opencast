@@ -92,7 +92,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -128,7 +128,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.api.MediaInspectionService#inspect(java.net.URI)
    */
   @Override
@@ -142,7 +142,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(org.opencastproject.mediapackage.MediaPackageElement,
    *      boolean)
    */

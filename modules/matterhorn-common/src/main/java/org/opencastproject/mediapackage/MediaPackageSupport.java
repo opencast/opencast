@@ -21,7 +21,7 @@
 
 package org.opencastproject.mediapackage;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Option.option;
