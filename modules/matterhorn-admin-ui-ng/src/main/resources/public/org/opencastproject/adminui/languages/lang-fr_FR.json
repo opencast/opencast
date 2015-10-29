@@ -98,6 +98,7 @@
   "BULK_ACTIONS":{
     "CAPTION":"Actions",
     "SEND_MESSAGE":"Envoyer un message",
+    "WARNING":"Warning",
     "EDIT_STATUS":{
       "CAPTION":"Modifier statut",
       "READY_FOR_RECORDING":"Prêt pour l'enregistrement",
