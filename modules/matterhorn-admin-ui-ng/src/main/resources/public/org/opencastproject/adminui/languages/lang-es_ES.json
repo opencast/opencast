@@ -22,6 +22,12 @@
       "FOOTER_TEXT":"El orden y la selección se guardarán automáticamente. Pulse \"{{resetTranslation}}\" para restaurar la vista por defecto."
     }
   },
+  "CONFIRMATIONS": {
+    "CONTINUE_ACTION" : "Are you sure you want to continue?",
+    "ACTIONS": { 
+      "CONFIRMATION" : "Confirmation required"
+    }
+  },
   "NOTIFICATIONS":{
     "ACL_ADDED":"Se ha creado la política de acceso",
     "ACL_NOT_SAVED":"No se ha podido guardar la política de acceso",

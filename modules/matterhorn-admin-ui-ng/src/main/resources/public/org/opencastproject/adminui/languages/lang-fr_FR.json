@@ -5,6 +5,7 @@
   "SUBMIT":"Envoyer",
   "UPDATE":"Appliquer",
   "CANCEL":"Annuler",
+  "CONFIRM":"Confirm",
   "SAVE":"Enregistrer",
   "LOGOUT":"Déconnexion",
   "RESET":"Remise à zéro",
@@ -20,6 +21,12 @@
       "AVAILABLE_COLUMNS":"Colonnes disponibles",
       "SELECTED_COLUMNS":"Colonnes choisies",
       "FOOTER_TEXT":"L'ordre et la sélection seront enregistrés automatiquement. Appuyez sur «{{resetTranslation}} » pour restaurer l'affichage par défaut."
+    }
+  },
+  "CONFIRMATIONS": {
+    "CONTINUE_ACTION" : "Are you sure you want to continue?",
+    "ACTIONS": { 
+      "CONFIRMATION" : "Confirmation required"
     }
   },
   "NOTIFICATIONS":{

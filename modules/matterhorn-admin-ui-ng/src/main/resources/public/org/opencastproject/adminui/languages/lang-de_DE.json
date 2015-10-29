@@ -5,6 +5,7 @@
   "SUBMIT":"Speichern",
   "UPDATE":"Aktualisieren",
   "CANCEL":"Abbrechen",
+  "CONFIRM":"Bestätigen",
   "SAVE":"Speichern",
   "LOGOUT":"Ausloggen",
   "RESET":"Zurücksetzen",
@@ -20,6 +21,12 @@
       "AVAILABLE_COLUMNS":"Verfügbare Spalten",
       "SELECTED_COLUMNS":"Ausgewählte Spalten",
       "FOOTER_TEXT":"Die Reihenfolge und Auswahl werden automatisch gespeichert. Drücken Sie \"{{resetTranslation}}\", um die Standardansicht wiederherzustellen."
+    }
+  },
+  "CONFIRMATIONS": {
+      "CONTINUE_ACTION" : "Sind Sie sicher, dass sie fortsetzen möchten?",
+      "ACTIONS": { 
+         "CONFIRMATION" : "Bestätigung"
     }
   },
   "NOTIFICATIONS":{
