@@ -30,13 +30,7 @@ import org.opencastproject.archive.api.UriRewriter;
 import org.opencastproject.archive.api.Version;
 import org.opencastproject.archive.opencast.OpencastResultItem;
 import org.opencastproject.archive.opencast.OpencastResultSet;
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
-import org.opencastproject.oaipmh.persistence.SearchResult;
-import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbUser;
@@ -45,9 +39,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.FileSupport;
-import org.opencastproject.util.data.Option;
 
-import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +51,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class DistributionMigrationServiceTest {
@@ -74,9 +65,6 @@ public class DistributionMigrationServiceTest {
    */
   @Before
   public void setUp() throws Exception {
-    final MediaPackage mediaPackage = MediaPackageParser
-            .getFromXml(IOUtils.toString(getClass().getResourceAsStream("/mediapackage.xml"), "UTF-8"));
-
     List<Organization> orgs = new ArrayList<>();
     orgs.add(new DefaultOrganization());
     orgs.add(new JaxbOrganization("test_org"));
@@ -127,95 +115,6 @@ public class DistributionMigrationServiceTest {
       }
     };
 
-    SearchResult searchResult = new SearchResult() {
-      @Override
-      public long size() {
-        return 1;
-      }
-
-      @Override
-      public long getOffset() {
-        return 0;
-      }
-
-      @Override
-      public long getLimit() {
-        return 0;
-      }
-
-      @Override
-      public List<SearchResultItem> getItems() {
-        List<SearchResultItem> items = new ArrayList<>();
-        items.add(new SearchResultItem() {
-          @Override
-          public boolean isDeleted() {
-            return false;
-          }
-
-          @Override
-          public Option<String> getSeriesDublinCoreXml() {
-            return null;
-          }
-
-          @Override
-          public Option<DublinCoreCatalog> getSeriesDublinCore() {
-            return null;
-          }
-
-          @Override
-          public Option<String> getSeriesAclXml() {
-            return null;
-          }
-
-          @Override
-          public String getRepository() {
-            return null;
-          }
-
-          @Override
-          public String getOrganization() {
-            return null;
-          }
-
-          @Override
-          public Date getModificationDate() {
-            return null;
-          }
-
-          @Override
-          public String getMediaPackageXml() {
-            return null;
-          }
-
-          @Override
-          public MediaPackage getMediaPackage() {
-            return mediaPackage;
-          }
-
-          @Override
-          public String getId() {
-            return null;
-          }
-
-          @Override
-          public Option<String> getEpisodeDublinCoreXml() {
-            return null;
-          }
-
-          @Override
-          public Option<DublinCoreCatalog> getEpisodeDublinCore() {
-            return null;
-          }
-        });
-        return items;
-      }
-    };
-
-    OaiPmhDatabase oaiPmhDatabase = EasyMock.createNiceMock(OaiPmhDatabase.class);
-    EasyMock.expect(oaiPmhDatabase.search(EasyMock.anyObject(org.opencastproject.oaipmh.persistence.Query.class)))
-            .andReturn(searchResult).anyTimes();
-    EasyMock.replay(oaiPmhDatabase);
-
     Archive<ResultSet> archive = EasyMock.createNiceMock(Archive.class);
     EasyMock.expect(
             archive.findForAdministrativeRead(EasyMock.anyObject(Query.class), EasyMock.anyObject(UriRewriter.class)))
@@ -236,7 +135,6 @@ public class DistributionMigrationServiceTest {
     distributionMigrationService.setSecurityService(securityService);
     distributionMigrationService.setArchive(archive);
     distributionMigrationService.setHttpMediaPackageElementProvider(httpMediaPackageElementProvider);
-    distributionMigrationService.setOaiPmhDatabase(oaiPmhDatabase);
   }
 
   @Test

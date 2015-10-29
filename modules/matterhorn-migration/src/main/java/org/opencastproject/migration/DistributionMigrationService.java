@@ -20,7 +20,7 @@
  */
 package org.opencastproject.migration;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.Option.none;
@@ -31,8 +31,6 @@ import org.opencastproject.archive.api.Query;
 import org.opencastproject.archive.api.ResultSet;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
-import org.opencastproject.oaipmh.persistence.QueryBuilder;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultItem;
@@ -53,7 +51,7 @@ import org.opencastproject.util.data.Option;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,9 +100,6 @@ public class DistributionMigrationService {
   /** HttpMediaPackagheElementProvider */
   private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
 
-  /** The OAI-PMH database */
-  private OaiPmhDatabase oaiPmhDatabase;
-
   /** The component context */
   private ComponentContext cc;
 
@@ -141,11 +136,6 @@ public class DistributionMigrationService {
   /** OSGi DI callback. */
   public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
     this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
-  }
-
-  /** OSGi DI callback. */
-  public void setOaiPmhDatabase(OaiPmhDatabase oaiPmhDatabase) {
-    this.oaiPmhDatabase = oaiPmhDatabase;
   }
 
   public void activate(final ComponentContext cc) {
@@ -198,10 +188,6 @@ public class DistributionMigrationService {
       // move files
       Map<Organization, Set<String>> mediapackages = moveFiles(serviceName, distributionDirectory, tenantPaths,
               organizations);
-
-      // make dynamic reference
-      if (oaiPmhDatabase != null)
-        adjustDistributedOaiPmhURL(serviceName, mediapackages, distributionUrl, isStreaming);
 
       adjustDistributedSearchURL(serviceName, mediapackages, distributionUrl, isStreaming);
     } catch (Exception e) {
@@ -427,77 +413,6 @@ public class DistributionMigrationService {
           }
           logger.info(
                   "Finished adjusting {} distribution URL's on search service for tenant {}. {} entries migrated. {} entries couldn't be migrated. Check logs for errror",
-                  new Object[] { serviceName, org, sucess, errors });
-        }
-      });
-    }
-  }
-
-  private void adjustDistributedOaiPmhURL(final String serviceName, final Map<Organization, Set<String>> mps,
-          final String distributionUrl, final boolean isStreaming) {
-    // Adjust distribution URLs in OAI-PMH mediapackage
-    for (final Organization org : mps.keySet()) {
-      SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), new Effect0() {
-        @Override
-        protected void run() {
-          int sucess = 0;
-          int errors = 0;
-          int total = mps.get(org).size();
-          logger.info("Start adjusting {} distribution URL's on OAI-PMH for tenant {}", serviceName, org);
-          logger.info("{} mediapackages to adjust...", total);
-          int i = 0;
-          for (String mpId : mps.get(org)) {
-            try {
-              org.opencastproject.oaipmh.persistence.SearchResult result = oaiPmhDatabase
-                      .search(QueryBuilder.query().mediaPackageId(mpId).build());
-              for (org.opencastproject.oaipmh.persistence.SearchResultItem item : result.getItems()) {
-                MediaPackage mediaPackage = item.getMediaPackage();
-                boolean mediapackageChanged = false;
-
-                // migration distribution URL's!
-                for (MediaPackageElement e : mediaPackage.getElements()) {
-                  String uri = e.getURI().toString();
-
-                  logger.debug("Looking to migrate '{}'", uri);
-
-                  if (uri.indexOf(org.getId()) > 0) {
-                    logger.debug("Mediapackage element {} has already been migrated", uri);
-                    continue;
-                  }
-
-                  if (uri.startsWith(distributionUrl)) {
-                    String path = uri.substring(distributionUrl.length());
-                    URI newUri = URI.create(UrlSupport.concat(distributionUrl, org.getId(), path));
-                    if (isStreaming) {
-                      String[] tag = StringUtils.split(path, ":");
-                      if (tag.length > 1) {
-                        newUri = URI.create(UrlSupport.concat(distributionUrl, tag[0] + ":" + org.getId(),
-                                path.substring(tag[0].length() + 1)));
-                      }
-                    }
-                    e.setURI(newUri);
-                    mediapackageChanged = true;
-                  }
-                }
-
-                if (!mediapackageChanged) {
-                  sucess++;
-                  logger.info("Mediapackage {} ({}/{}) has already been migrated", new Object[] { mpId, i++, total });
-                  continue;
-                }
-
-                // Write mediapackage to DB
-                oaiPmhDatabase.store(mediaPackage, item.getRepository());
-                sucess++;
-                logger.info("Successfully migrated {} ({}/{})", new Object[] { mpId, i++, total });
-              }
-            } catch (Exception e) {
-              errors++;
-              logger.info("Unable to migrate {} ({}/{}): {}", new Object[] { mpId, i++, total, getMessage(e) });
-            }
-          }
-          logger.info(
-                  "Finished adjusting {} distribution URL's on OAI-PMH for tenant {}. {} entries migrated. {} entries couldn't be migrated. Check logs for errror",
                   new Object[] { serviceName, org, sucess, errors });
         }
       });

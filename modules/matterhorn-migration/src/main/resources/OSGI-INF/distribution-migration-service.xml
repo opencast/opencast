@@ -17,6 +17,4 @@
     cardinality="1..1" policy="static" bind="setHttpMediaPackageElementProvider" />
   <reference name="authorization" interface="org.opencastproject.security.api.AuthorizationService"
     cardinality="1..1" policy="static" bind="setAuthorizationService"/>
-  <reference name="oaiPmh" interface="org.opencastproject.oaipmh.persistence.OaiPmhDatabase"
-    cardinality="1..1" policy="static" bind="setOaiPmhDatabase"/>
 </scr:component>
