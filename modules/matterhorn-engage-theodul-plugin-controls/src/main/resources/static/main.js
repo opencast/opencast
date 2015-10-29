@@ -1285,11 +1285,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     // load jquery-ui lib
     require([relative_plugin_path + jQueryUIPath], function() {
         Engage.log("Controls: Lib jQuery UI loaded");
+
+        // load jquery-ui touch-punch lib in mobile mode
+        if (isMobileMode) {
+            require([relative_plugin_path + "lib/jqueryui/jquery.ui.touch-punch.min"], function() {
+                Engage.log("Controls: Lib jQuery UI Touch Punch loaded");
+            });
+        }
+
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
         }
     });
+
 
     // load utils class
     require([relative_plugin_path + "utils"], function(utils) {
