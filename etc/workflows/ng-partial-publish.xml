@@ -45,7 +45,7 @@
     <!-- From the edited recording, take preview images for the player,    -->
     <!-- search results etc.                                               -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-  
+
     <!-- Encode to engage search result thumbnails -->
 
     <operation
@@ -78,6 +78,23 @@
       </configurations>
     </operation>
 
+    <!-- Create a cover image with the default template -->
+
+    <operation
+      id="cover-image"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Create a cover image">
+      <configurations>
+        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
+        <configuration key="width">1920</configuration>
+        <configuration key="height">1080</configuration>
+        <configuration key="posterimage-flavor">presenter/player+preview</configuration>
+        <configuration key="target-flavor">image/cover</configuration>
+        <configuration key="target-tags">archive</configuration>
+     </configurations>
+    </operation>
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Apply the branding artifacts                                      -->
     <!--                                                                   -->
@@ -86,7 +103,7 @@
 
     <!-- Apply the theme to the mediapackage -->
 
-    <operation 
+    <operation
       id="theme"
       exception-handler-workflow="ng-partial-error"
       description="Apply the theme">
@@ -111,7 +128,7 @@
     </operation>
 
     <!-- Add bumper and trailer part to the presenter track -->
-    
+
       <operation
         id="concat"
         exception-handler-workflow="ng-partial-error"
@@ -126,9 +143,9 @@
           <configuration key="output-resolution">part-1</configuration>
         </configurations>
       </operation>
-    
+
     <!-- Add bumper and trailer part to the presentation track -->
-    
+
       <operation
         id="concat"
         exception-handler-workflow="ng-partial-error"
@@ -202,7 +219,7 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <!-- Run the videosegmentation -->
-    
+
     <operation
       id="segment-video"
       fail-on-error="false"
@@ -214,7 +231,7 @@
     </operation>
 
     <!-- Generate segment preview images -->
-    
+
     <operation
       id="segmentpreviews"
       fail-on-error="false"

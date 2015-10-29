@@ -9,8 +9,8 @@
         <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="EVENTS.EVENTS.DETAILS.TABS.GENERAL" with-role="ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW">General</a>
         <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">Metadata</a>
         <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT">Ext-Metadata</a>
-        <a ng-click="openTab('media')" data-modal-tab="media" ng-class="{ active: tab == 'media' }" translate="EVENTS.EVENTS.DETAILS.TABS.MEDIA" with-role="ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW">Media</a>
-        <a ng-click="openTab('attachments')" data-modal-tab="attachments" ng-class="{ active: tab == 'attachments' }" translate="EVENTS.EVENTS.DETAILS.TABS.ATTACHMENTS" with-role="ROLE_UI_EVENTS_DETAILS_ATTACHMENTS_VIEW">Attachments</a>
+<!--         <a ng-click="openTab('media')" data-modal-tab="media" ng-class="{ active: tab == 'media' }" translate="EVENTS.EVENTS.DETAILS.TABS.MEDIA" with-role="ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW">Media</a> -->
+        <a ng-click="openTab('assets')" data-modal-tab="assets" ng-class="{ active: tab == 'assets' }" translate="EVENTS.EVENTS.DETAILS.TABS.ASSETS" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW">Assets</a>
         <a ng-click="openTab('workflows')" data-modal-tab="workflows" ng-class="{ active: tab == 'workflows' }" translate="EVENTS.EVENTS.DETAILS.TABS.WORKFLOWS" with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW">Workflows</a>
         <a ng-click="openTab('access')" data-modal-tab="access" ng-class="{ active: tab == 'access' }" translate="EVENTS.EVENTS.DETAILS.TABS.ACCESS" with-role="ROLE_UI_EVENTS_DETAILS_ACL_VIEW">Access</a>
         <a ng-click="openTab('comments')" data-modal-tab="comments" ng-class="{ active: tab == 'comments' }" translate="EVENTS.EVENTS.DETAILS.TABS.COMMENTS" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW">Comments</a>
@@ -85,20 +85,10 @@
         </div>
     </div>
 
-    <div class="modal-content" data-modal-tab-content="media">
+<!--     <div class="modal-content" data-modal-tab-content="media">
         <div class="modal-body">
             <div class="full-col">
 
-                <!--
-                <div class="obj stub trim-btn-container">
-                    <header>Trim Media</header>
-                    <div class="obj-container padded">
-                        <p>This allows you to trim or edit the clip to remove any unwanted sections, images or audio </p>
-                        <a href="javascript:;" class="trim-btn">Trim Media</a>
-                        <p>Note: Button will open a new window, once it's implemented.</p>
-                    </div>
-                </div>
-                -->
 
                 <div class="obj tbl-container">
                     <header translate="EVENTS.EVENTS.DETAILS.MEDIA.MEDIA">Media</header>
@@ -127,31 +117,42 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
-    <div class="modal-content" data-modal-tab-content="attachments">
+    <div class="modal-content" data-modal-tab-content="assets">
         <div class="modal-body">
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
-                    <header translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.CAPTION">Attachments</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CAPTION">Assets</header>
                     <div class="obj-container">
                         <table cellpadding="0" cellspacing="0" class="main-tbl">
                             <thead>
                                 <tr>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.ID">ID</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.TYPE">Type</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.MIMETYPE">Mimetype</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.TAGS">Tags</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ATTACHMENTS.LINK">Link</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.TYPE">Type</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.SIZE">Size</th>
+                                    <th class="medium"></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="item in attachments track by $index">
-                                    <td>{{ item.id }}</td>
-                                    <td>{{ item.type }}</td>
-                                    <td>{{ item.mimetype }}</td>
-                                    <td>{{ item.tags }}</td>
-                                    <td><a href="{{ item.url }}" class="fa fa-external-link"></a></td>
+                                <tr>
+                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.CAPTION">Attachments</td>
+                                    <td>{{ assets.attachments }}</td>
+                                    <td><a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.attachments > 0" ng-click="openSubTab('attachments', 'EventAttachmentsResource', 'attachment')">Details</a></td>
+                                </tr>                                
+                                <tr>
+                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.CAPTION">Catalogs</td>
+                                    <td>{{ assets.catalogs }}</td>
+                                    <td><a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.catalogs > 0" ng-click="openSubTab('catalogs', 'EventCatalogsResource', 'catalog')">Details</a></td>
+                                </tr>                                
+                                <tr>
+                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION">Media</td>
+                                    <td>{{ assets.media }}</td>
+                                    <td><a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.media > 0" ng-click="openSubTab('media', 'EventMediaResource', 'media')">Details</a></td>
+                                </tr>                                
+                                <tr>
+                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.CAPTION">Publications</td>
+                                    <td>{{ assets.publications }}</td>
+                                    <td><a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.publications > 0" ng-click="openSubTab('publications', 'EventPublicationsResource', 'publication')">Details</a></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -396,100 +397,7 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="modal-content" data-modal-tab-content="media-details" data-parent="media" data-level="2" data-label="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TITLE">
-        <div class="modal-body">
-            <div class="full-col">
-                <div class="obj tbl-details">
-                    <header translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TITLE">Media Details</header>
-                    <div class="obj-container">
-                        <table class="main-tbl">
-                            <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.ID">ID</td>
-                                <td>{{ subNavData.id }}</td>
-                            </tr>
-                            <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TYPE">Type</td>
-                                <td>{{ subNavData.type }}</td>
-                            </tr>
-                            <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.MIMETYPE">Mimetype</td>
-                                <td>{{ subNavData.mimetype }}</td>
-                            </tr>
-                            <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.FLAVOR">Flavor</td>
-                                <td>{{ subNavData.flavor }}</td>
-                            </tr>
-                            <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TAGS">Tags</td>
-                                <td>{{ subNavData.tags }}</td>
-                            </tr>
-                            <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.URL">URL</td>
-                                <td>{{ subNavData.url }}</td>
-                            </tr>
-                            <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.DURATION">Duration</td>
-                                <td>{{ subNavData.duration }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="obj tbl-container media-stream-details">
-                    <header>Streams</header>
-                    <div class="obj-container">
-                        <div class="table-series">
-                            <div class="wrapper">
-                                <header>{{ EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.STREAM_AUDIO | translate }}</header>
-                                <table class="main-tbl">
-                                    <thead>
-                                        <tr>
-                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.ID">ID</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TYPE">Type</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.CHANNELS">Channels</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.BITRATE">Bitrate</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr ng-repeat="stream in subNavData.streams.audio track by $index">
-                                            <td>{{ $index }}</td>
-                                            <td>{{ stream.type }}</td>
-                                            <td>{{ stream.channels }}</td>
-                                            <td>{{ stream.bitrate }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="wrapper">
-                                <header>{{ EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.STREAM_VIDEO | translate }}</header>
-                                <table class="main-tbl">
-                                    <thead>
-                                        <tr>
-                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.ID">ID</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.TYPE">Type</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.FRAMERATE">Framerate</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.MEDIA_DETAILS.RESOLUTION">Resolution</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr ng-repeat="stream in subNavData.streams.video track by $index">
-                                            <td>{{ $index }}</td>
-                                            <td>{{ stream.type }}<i></i></td>
-                                            <td>{{ stream.framerate }}<i></i></td>
-                                            <td>{{ stream.resolution }}<i></i></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
-    </div>
+    </div>    
 
     <div class="modal-content" data-modal-tab-content="errors-and-warnings" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">
         <div class="modal-body">
@@ -577,6 +485,398 @@
         </div>
     </div>
 
+    <div class="modal-content" data-modal-tab-content="attachments" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-container operations-tbl">
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.CAPTION">Attachments</header>
+                    <div class="obj-container">
+                        <table cellpadding="0" cellspacing="0" class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.ID">ID</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TYPE">Type</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.MIMETYPE">Mimetype</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TAGS">Tags</th>
+                                    <th class="medium"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in subNavData">
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.type }}</td>
+                                    <td>{{ item.mimetype }}</td>
+                                    <td>{{ item.tags|joinBy:', ' }}</td>
+                                    <td><a ng-click="openSubTab('attachment-details', 'EventAttachmentDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <div class="modal-content" data-modal-tab-content="catalogs" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-container operations-tbl">
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.CAPTION">Catalogs</header>
+                    <div class="obj-container">
+                        <table cellpadding="0" cellspacing="0" class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.ID">ID</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.TYPE">Type</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.MIMETYPE">Mimetype</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.TAGS">Tags</th>
+                                    <th class="medium"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in subNavData">
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.type }}</td>
+                                    <td>{{ item.mimetype }}</td>
+                                    <td>{{ item.tags|joinBy:', ' }}</td>
+                                    <td><a ng-click="openSubTab('catalog-details', 'EventCatalogDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <div class="modal-content" data-modal-tab-content="media" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-container operations-tbl">
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION">Media</header>
+                    <div class="obj-container">
+                        <table cellpadding="0" cellspacing="0" class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.ID">ID</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.TYPE">Type</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.MIMETYPE">Mimetype</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.TAGS">Tags</th>
+                                    <th class="medium"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in subNavData">
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.type }}</td>
+                                    <td>{{ item.mimetype }}</td>
+                                    <td>{{ item.tags|joinBy:', ' }}</td>
+                                    <td><a ng-click="openSubTab('media-details', 'EventMediaDetailsResource', item.id, false, true)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <div class="modal-content" data-modal-tab-content="publications" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-container operations-tbl">
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.CAPTION">Publications</header>
+                    <div class="obj-container">
+                        <table cellpadding="0" cellspacing="0" class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.ID">ID</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.CHANNEL">Channel</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.TAGS">Tags</th>
+                                    <th class="medium"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in subNavData">
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.channel }}</td>
+                                    <td>{{ item.tags|joinBy:', ' }}</td>
+                                    <td><a ng-click="openSubTab('publications-details', 'EventPublicationDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <div class="modal-content" data-modal-tab-content="attachment-details" data-parent="attachments" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-container operations-tbl">
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.CAPTION">Attachment</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.ID">Id</td>
+                                <td>{{ subNavData.id }}</td>
+                            </tr>                            
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.TYPE">Type</td>
+                                <td>{{ subNavData.type }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.MIMETYPE">Mimetype</td>
+                                <td>{{ subNavData.mimetype }}</td>
+                            </tr>                            
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.SIZE">Size</td>
+                                <td>{{ subNavData.size }}</td>
+                            </tr>                            
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.CHECKSUM">Checksum</td>
+                                <td>{{ subNavData.checksum }}</td>
+                            </tr>                            
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.REFERENCE">Reference</td>
+                                <td>{{ subNavData.reference }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.TAGS">Tags</td>
+                                <td>{{ subNavData.tags|joinBy:', ' }}</td>
+                            </tr>                        
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.URL">Link</td>
+                                <td><a href="{{ subNavData.url }}" class="fa fa-external-link"></a></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>      
+
+    <div class="modal-content" data-modal-tab-content="catalog-details" data-parent="catalogs" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-container operations-tbl">
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.CAPTION">Catalogs</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.ID">Id</td>
+                                <td>{{ subNavData.id }}</td>
+                            </tr>                            
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.TYPE">Type</td>
+                                <td>{{ subNavData.type }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.MIMETYPE">Mimetype</td>
+                                <td>{{ subNavData.mimetype }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.SIZE">Size</td>
+                                <td>{{ subNavData.size }}</td>
+                            </tr>   
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.CHECKSUM">Checksum</td>
+                                <td>{{ subNavData.checksum }}</td>
+                            </tr>                              
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.REFERENCE">Reference</td>
+                                <td>{{ subNavData.reference }}</td>
+                            </tr>                               
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.TAGS">Tags</td>
+                                <td>{{ subNavData.tags|joinBy:', ' }}</td>
+                            </tr>                        
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.URL">Link</td>
+                                <td><a href="{{ subNavData.url }}" class="fa fa-external-link"></a></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="media-details" data-parent="media" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-details">
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TITLE">Media Details</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.ID">ID</td>
+                                <td>{{ subNavData.id }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TYPE">Type</td>
+                                <td>{{ subNavData.type }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.MIMETYPE">Mimetype</td>
+                                <td>{{ subNavData.mimetype }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.FLAVOR">Flavor</td>
+                                <td>{{ subNavData.flavor }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TAGS">Tags</td>
+                                <td>{{ subNavData.tags|joinBy:', ' }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.DURATION">Duration</td>
+                                <td>{{ subNavData.duration }}</td>
+                            </tr>                            
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SIZE">Size</td>
+                                <td>{{ subNavData.size }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.URL">URL</td>
+                                <td>{{ subNavData.url }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="obj tbl-container media-stream-details">
+                    <header>Streams</header>
+                    <div class="obj-container">
+                        <div class="table-series">
+                            <div class="wrapper">
+                                <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.STREAM_AUDIO">Audio streams</header>
+                                <table class="main-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.ID">ID</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TYPE">Type</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.CHANNELS">Channels</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.BITRATE">Bitrate</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.BITDEPTH">Bitdepth</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SAMPLINGRATE">Samplingrate</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.FRAMECOUNT">Framecount</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.PEAKLEVELDB">Peak level DB</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.RMSLEVELDB">RMS level DB</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.RMSPEAKDB">RMS speak DB</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="stream in subNavData.streams.audio track by $index">
+                                            <td>{{ $index }}</td>
+                                            <td>{{ stream.type }}</td>
+                                            <td>{{ stream.channels }}</td>
+                                            <td>{{ stream.bitrate }}</td>
+                                            <td>{{ stream.bitdepth }}</td>
+                                            <td>{{ stream.samplingrate }}</td>
+                                            <td>{{ stream.framecount }}</td>
+                                            <td>{{ stream.peakleveldb }}</td>
+                                            <td>{{ stream.rmsleveldb }}</td>
+                                            <td>{{ stream.rmspeakdb }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="wrapper">
+                                <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.STREAM_VIDEO">Video streams</header>
+                                <table class="main-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.ID">ID</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TYPE">Type</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.FRAMERATE">Framerate</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.BITRATE">Bitrate</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.RESOLUTION">Resolution</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.FRAMECOUNT">Framecount</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SCANTYPE">Scantype</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SCANORDER">Scanorder</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="stream in subNavData.streams.video track by $index">
+                                            <td>{{ $index }}</td>
+                                            <td>{{ stream.type }}<i></i></td>
+                                            <td>{{ stream.framerate }}<i></i></td>
+                                            <td>{{ stream.bitrate }}<i></i></td>
+                                            <td>{{ stream.resolution }}<i></i></td>
+                                            <td>{{ stream.framecount }}<i></i></td>
+                                            <td>{{ stream.scantype }}<i></i></td>
+                                            <td>{{ stream.scanorder }}<i></i></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="obj tbl-container media-stream-details">
+                    <header>Preview</header>
+                         <div class="obj-container">
+                            
+                            <div ng-if="subTab == 'media-details'" data-video-player data-player="{}" data-video="subNavData.video" data-adapter="html5" data-player-ref="player" data-controls="true" data-sub-controls="false"/>
+
+                        </div>
+                    </header>
+                </div>
+            </div>
+
+
+        </div>
+    </div> 
+
+    <div class="modal-content" data-modal-tab-content="publications-details" data-parent="publications" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TITLE">
+        <div class="modal-body">
+            <div class="full-col">
+                <div class="obj tbl-container operations-tbl">
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CAPTION">Publications</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.ID">Id</td>
+                                <td>{{ subNavData.id }}</td>
+                            </tr>                            
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TYPE">Type</td>
+                                <td>{{ subNavData.type }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.MIMETYPE">Mimetype</td>
+                                <td>{{ subNavData.mimetype }}</td>
+                            </tr>                       
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.SIZE">Size</td>
+                                <td>{{ subNavData.size }}</td>
+                            </tr>                          
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CHANNEL">Channel</td>
+                                <td>{{ subNavData.channel }}</td>
+                            </tr>                          
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.REFERENCE">Reference</td>
+                                <td>{{ subNavData.reference }}</td>
+                            </tr>
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TAGS">Tags</td>
+                                <td>{{ subNavData.tags|joinBy:', ' }}</td>
+                            </tr>                        
+                            <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.URL">Link</td>
+                                <td><a href="{{ subNavData.url }}" class="fa fa-external-link"></a></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="modal-content" data-modal-tab-content="workflow-details" data-parent="workflows" data-level="2" data-label="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE">
         <div class="modal-body">
             <div class="full-col">
@@ -606,7 +906,20 @@
                             </tr>
                         </table>
                     </div>
+                </div>                
+
+                <div class="obj tbl-details">
+                    <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION">Workflow configuration</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <tr ng-repeat="(key, value) in subNavData.configuration">
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
+
                 <div class="obj tbl-container more-info-actions">
                     <header>More Information &amp; Actions</header>
                     <div class="obj-container">

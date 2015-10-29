@@ -4,11 +4,11 @@
   <scr:component name="org.opencastproject.kernel.security.RemoteUserAndOrganizationFilter" immediate="true">
     <implementation class="org.opencastproject.kernel.security.RemoteUserAndOrganizationFilter" />
     <property name="service.description" value="Remote User and Organization Filter" />
-    <property name="contextId" value="opencast.httpcontext" />
+    <property name="httpContext.id" value="opencast.httpcontext" />
     <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
     <!-- This filter must be called after the organization filter -->
     <property name="service.ranking" value="1" />
-    <property name="pattern" value=".*" />
+    <property name="urlPatterns" value="*" />
     <service>
       <provide interface="javax.servlet.Filter" />
     </service>

@@ -32,8 +32,8 @@
  * page but add a `error` search parameter (without a value).
  */
 angular.module('adminNg.controllers')
-.controller('LoginCtrl', ['$scope', '$location', 'Language', '$rootScope',
-        function ($scope, $location, Language, $rootScope) {
+.controller('LoginCtrl', ['$scope', '$location', 'VersionResource', 'Language', '$rootScope',
+        function ($scope, $location, VersionResource, Language, $rootScope) {
 
             $scope.isError = false;
 
@@ -50,6 +50,10 @@ angular.module('adminNg.controllers')
             // set.
             if ($location.absUrl().match(/\?error$/)) {
                 $scope.isError = true;
+            } else {
+                VersionResource.query(function(response){
+                    $scope.version = response.version ? response : (angular.isArray(response.versions) ? response.versions[0]:{});
+                });
             }
 
             $rootScope.$on('language-changed', function () {

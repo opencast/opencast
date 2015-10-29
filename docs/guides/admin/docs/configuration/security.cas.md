@@ -5,16 +5,11 @@
 Many campuses use some kind of single sign on, such as JASIG's Central Authentication Service, or CAS. This guide describes how to integrate Matterhorn into such a system.
  
 ### Step 1
-At first uncomment Lines for OpenId and CAS in system.properties as described in the same file:
 
-    file:${felix.home}/lib/ext/cas-client-core-3.1.12.jar \
-    file:${felix.home}/lib/ext/com.springsource.org.apache.xml.security-1.4.2.jar \
-    file:${felix.home}/lib/ext/com.springsource.org.opensaml-1.1.0.jar \
-    file:${felix.home}/lib/ext/spring-security-cas-3.1.0.RELEASE.jar \
-    file:${felix.home}/lib/ext/com.springsource.org.jasig.cas.client-3.1.12.jar \
-    file:${felix.home}/lib/ext/com.springsource.org.openid4java-0.9.5.jar \
-    file:${felix.home}/lib/ext/spring-security-openid-3.1.0.RELEASE.jar
- 
+First, install the optional CAS feature. Via the Karaf console, this can be done like this:
+
+    feature:install opencast-contrib-cas
+
 ### Step 2
 To configure matterhorn to use CAS, simply replace the default mh_default_org.xml with the contents of security_sample_cas.xml, available in the Matterhorn source. You must modify several settings in the sample to point to your CAS server:
 
