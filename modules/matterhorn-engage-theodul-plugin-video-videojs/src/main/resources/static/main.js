@@ -531,13 +531,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             Basil.set("zoomData", zoomData);
         } else if(zoomData[id].length != 0){
             /* get zoomlevels for displays and apply them */
-            Engage.log("Found stored Zoom: " + zoomData[id]);
+            console.log("Found stored Zoom: " + zoomData[id]);
             zoomLevels = zoomData[id];
+            // TODO: Ohne Timeout vllt. ...
+            setTimeout(applyStoredZoom, 200);
             Engage.on(plugin.events.play.getName(), applyStoredZoom());
         }
 
         function applyStoredZoom() {
-            //console.log("Apply stored zoom");
+            console.log("Apply stored zoom");
             //console.log(zoomLevels);
             for (var i = 0; i <= (zoomLevels.length/2); i+=2) {
                 Engage.log("Apply zoom: " + $("#"+zoomLevels[i])[0].id + " / " + zoomLevels[i+1]);
@@ -605,6 +607,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         })
 
         Engage.on(plugin.events.zoomChange.getName(), function(data){
+            console.log("Zoom has changed" + data);
             currentZoom = data;
         })
 

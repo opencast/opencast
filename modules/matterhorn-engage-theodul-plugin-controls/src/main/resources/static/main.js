@@ -653,7 +653,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
 
             Engage.on(plugin.events.zoomChange.getName(), function(level) {
-                $("#" + id_zoomLevelIndicator).html(String(Number(level).toFixed(3)));
+                console.log("Yes, indeed ... " + level);
+                level = Number(level).toFixed(2);
+                level = (level * 100).toFixed(0);
+                $("#" + id_zoomLevelIndicator).html(String(level) + "%");
             });
         }
     }
