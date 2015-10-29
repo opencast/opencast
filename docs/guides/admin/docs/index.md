@@ -24,13 +24,14 @@ Release Documentation
 The Matterhorn Release Documentation is the official Matterhorn documentation
 for each release. It contains:
 
+ - [Release Notes](release.notes.md)
  - [Installation Guides](installation/index.md)
  - [Configuration Guides](configuration/index.md)
     - [Basic Configuration](configuration/basic.md)
     - [Database Configuration](configuration/database.md)
     - [Workflow Configuration](configuration/workflow.md)
     - [Encoding Configuration](configuration/encoding.md)
-    - [more...](configuration)
+    - [more...](configuration/index.md)
  - [Module Documentation](modules/index.md)
     - [Atom and RSS Feed](modules/atomrss.md)
     - [Media Module](modules/mediamodule.configuration.md)

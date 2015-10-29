@@ -58,7 +58,7 @@ For example, for OCR on slides with German language, you want to run something l
   argument could simply be omitted. If you know more about this input videos, you might want to use different options
   here (not likely).
 
-In Matterhorn you can modify this options in the config.properties file setting the following option:
+In Matterhorn you can modify this options in the custom.properties file setting the following option:
 ```
    org.opencastproject.textanalyzer.tesseract.options=-l deu -psm 3
 ```
@@ -155,13 +155,13 @@ arguments to use for filtering.
 
 By default Matterhorn will just call `hunspell` without an absolute path. This will work as long as hunspell is in the
 systems path which should be the case unless you have built and installed it manually. In that case, the binary can be
-configured using the following option in the `config.properties` file:
+configured using the following option in the `custom.properties` file:
 ```
    org.opencastproject.dictionary.hunspell.binary=/usr/bin/hunspell
 ```
 
 While most people wont need the binary path configuration, most people will need the filtering option which can be used
-for setting the languages.  Configuration for this can be done using the following key in the `config.properties` file:
+for setting the languages.  Configuration for this can be done using the following key in the `custom.properties` file:
 ```
    org.opencastproject.dictionary.hunspell.command=-d de_DE,en_GB,en_US -G
 ```

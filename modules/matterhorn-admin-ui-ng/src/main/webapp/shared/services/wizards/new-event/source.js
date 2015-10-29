@@ -160,10 +160,12 @@ angular.module('adminNg.services')
         };
 
         this.checkConflicts = function () {
+            me.checkingConflicts = true;
             if (me.readyToPollConflicts()) {
                 ConflictCheckResource.check(me.ud[me.ud.type], me.noConflictsDetected, me.conflictsDetected);
                 me.updateWeekdays();
             }
+            me.checkingConflicts = false;
         };
 
         /**

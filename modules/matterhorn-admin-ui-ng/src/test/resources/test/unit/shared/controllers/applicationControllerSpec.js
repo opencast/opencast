@@ -21,6 +21,9 @@ describe('Application controller', function () {
         $httpBackend.whenGET('/info/me.json').respond(
             JSON.stringify(getJSONFixture('info/me.json'))
         );
+        $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
+            {'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}
+        );
         $scope = $rootScope.$new();
 
         $controller('ApplicationCtrl', {$scope: $scope});
@@ -34,6 +37,28 @@ describe('Application controller', function () {
         $httpBackend.flush();
 
         expect($scope.currentUser.user.name).toEqual('Oliver Queen');
+    });
+
+    describe('version', function () {
+
+        it('sets the version out of object', function () {
+            $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
+                {'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}
+            );
+
+            $httpBackend.flush();
+            expect($scope.version.version).toEqual('1.6.0.SNAPSHOT');
+        });
+
+        it('sets the version out of array', function () {
+            $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
+                {versions: [{'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}]}
+            );
+
+            $httpBackend.flush();
+            expect($scope.version.version).toEqual('1.6.0.SNAPSHOT');
+        });
+
     });
 
     describe('with a modal specified in the URL', function () {
