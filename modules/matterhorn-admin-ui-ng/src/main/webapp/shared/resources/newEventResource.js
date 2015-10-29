@@ -56,20 +56,18 @@ angular.module('adminNg.resources')
                 if (sourceType === 'SCHEDULE_MULTIPLE') {
                     // We need to set it to the end time and day so the last day will be used in the recurrance and the correct end time is used
                     // for the rest of the recordings.
-                    var endParts = JsHelper.getDateParts(data.source.SCHEDULE_MULTIPLE.end);
-                    var end = {
-                        date : data.source.SCHEDULE_MULTIPLE.end,
-                        hour : parseInt(data.source.SCHEDULE_MULTIPLE.start.hour) + parseInt(data.source.SCHEDULE_MULTIPLE.duration.hour),
-                        minute : parseInt(data.source.SCHEDULE_MULTIPLE.start.minute) + parseInt(data.source.SCHEDULE_MULTIPLE.duration.minute)
-                    };
-                    var endDate = new Date(endParts.year, endParts.month, endParts.day, end.hour , end.minute);
-                    end.hour = endDate.getHours();
-                    end.minute = endDate.getMinutes();
-                    source.metadata.end = JsHelper.toZuluTimeString(end);
-                    source.metadata.duration = (
-                        parseInt(data.source.SCHEDULE_MULTIPLE.duration.hour, 10) * 60 * 60 * 1000 +
-                        parseInt(data.source.SCHEDULE_MULTIPLE.duration.minute, 10) * 60 * 1000
-                    ).toString();
+
+                    source.metadata.duration = moment.duration(parseInt(data.source.SCHEDULE_MULTIPLE.duration.hour, 10), 'h')
+                                                    .add(parseInt(data.source.SCHEDULE_MULTIPLE.duration.minute, 10), 'm')
+                                                    .as('ms') + '';
+
+                    var endMomentDate = moment(data.source.SCHEDULE_MULTIPLE.end)
+                                        .hour(data.source.SCHEDULE_MULTIPLE.start.hour)
+                                        .minute(data.source.SCHEDULE_MULTIPLE.start.minute)
+                                        .add(source.metadata.duration, 'ms');
+
+                    source.metadata.end = endMomentDate.toISOString().replace('.000', '');
+
                     source.metadata.rrule = (function (src) {
                         return JsHelper.assembleRrule(src.SCHEDULE_MULTIPLE);
                     })(data.source);
