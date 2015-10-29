@@ -35,6 +35,7 @@ import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
+import org.opencastproject.kernel.security.SecurityServiceSpringImpl;
 import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.AccessControlList;
@@ -107,6 +108,7 @@ public class AclScannerTest {
     aclScanner = new AclScanner();
     aclScanner.setAclServiceFactory(aclServiceFactory);
     aclScanner.setOrganizationDirectoryService(orgService);
+    aclScanner.setSecurityService(new SecurityServiceSpringImpl());
   }
 
   @Test

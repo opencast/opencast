@@ -29,12 +29,13 @@ import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -64,6 +65,8 @@ public class AclScanner implements ArtifactInstaller {
   /** The Access Control service */
   private AclServiceFactory aclServiceFactory;
 
+  private SecurityService securityService;
+
   /**
    * A map linking the Acl file name concatenate with the organization id {@code filename_organizationId} to the related
    * managed Acl Id
@@ -85,13 +88,18 @@ public class AclScanner implements ArtifactInstaller {
   }
 
   /** OSGi DI. */
-  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+  void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /** OSGi callback for setting persistence. */
-  public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
+  void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
+  }
+
+  /** OSGi DI */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**
@@ -123,7 +131,7 @@ public class AclScanner implements ArtifactInstaller {
 
     // Add the Acl to all the organizations
     for (Organization org : organizations) {
-
+      securityService.setOrganization(org);
       // If there are already (not-default) Acl defined for this organization, we skip this one.
       for (ManagedAcl a : getAclService(org).getAcls()) {
         if (managedAcls.get(generateAclId(a.getName(), org)) == null) {
@@ -162,6 +170,7 @@ public class AclScanner implements ArtifactInstaller {
 
     // Update the Acl on all the organizations
     for (Organization org : organizations) {
+      securityService.setOrganization(org);
       Long id = managedAcls.get(generateAclId(fileName, org));
       if (id != null) {
         // If the Acl Id is in the managedAcls map, we update the Acl
@@ -194,6 +203,7 @@ public class AclScanner implements ArtifactInstaller {
 
     // Remove the Acl on all the organizations
     for (Organization org : organizations) {
+      securityService.setOrganization(org);
       Long id = managedAcls.get(generateAclId(fileName, org));
       if (id != null) {
         try {

@@ -116,10 +116,10 @@ phpMyAdmin or MySQL-Workbench…
 
 ### Step 3: Configure Matterhorn
 
-The following settings are made in the `<MH_CONFIG_DIR>/config.properties` file (often
-`/etc/matterhorn/config.properties`). Use the editor of your choice to open it, e.g.:
+The following settings are made in the `<MH_CONFIG_DIR>/custom.properties` file (often
+`/etc/matterhorn/custom.properties`). Use the editor of your choice to open it, e.g.:
 
-    vim /etc/matterhorn/config.properties
+    vim /etc/matterhorn/custom.properties
 
 Now change the following configuration keys:
 

@@ -25,24 +25,30 @@ angular.module('adminNg.controllers')
 .controller('BulkDeleteCtrl', ['$scope', 'Modal', 'Table', 'Notifications', 'BulkDeleteResource',
         function ($scope, Modal, Table, Notifications, BulkDeleteResource) {
     Notifications;
-    $scope.rows = Table.getSelected();
+    // make a shallow copy of selected main Table rows for our own use
+    $scope.rows = [];
+    angular.forEach(Table.getSelected(), function (row) {
+        $scope.rows.push($.extend({}, row ));
+    });
     $scope.all = true; // by default, all records are selected
 
-    var getSelectedEventIds = function () {
+    var getSelectedIds = function () {
         var result = [];
-        angular.forEach(Table.getSelected(), function (selected) {
-            result.push(selected.id);
+        angular.forEach($scope.rows, function (row) {
+            if(row.selected) {
+                result.push(row.id);
+            }
         });
         return result;
     };
 
     $scope.valid = function () {
-        return Table.getSelected().length > 0;
+        return getSelectedIds().length > 0;
     };
 
     $scope.submit = function () {
         if ($scope.valid()) {
-            var selecteds = getSelectedEventIds(),
+            var selecteds = getSelectedIds(),
             resource = Table.resource.indexOf('series') >= 0 ? 'series' : 'event',
             endpoint = Table.resource.indexOf('series') >= 0 ? 'deleteSeries' : 'deleteEvents';
             BulkDeleteResource.delete({}, {
@@ -60,8 +66,15 @@ angular.module('adminNg.controllers')
     };
 
     $scope.toggleSelectAll = function () {
-        Table.all = !Table.all;
-        Table.toggleAllSelectionFlags();
+        if ($scope.all) {
+            angular.forEach($scope.rows, function (row) {
+                row.selected = true;
+            });
+        } else {
+            angular.forEach($scope.rows, function (row) {
+                row.selected = false;
+            });
+        }
     };
 
 }]);
