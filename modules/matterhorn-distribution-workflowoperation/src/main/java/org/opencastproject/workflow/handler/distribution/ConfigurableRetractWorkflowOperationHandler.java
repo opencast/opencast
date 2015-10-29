@@ -20,7 +20,7 @@
  */
 package org.opencastproject.workflow.handler.distribution;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.distribution.api.DistributionException;
@@ -42,7 +42,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
