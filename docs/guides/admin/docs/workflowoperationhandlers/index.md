@@ -45,7 +45,7 @@ The following table contains the workflow operations that are available in an ou
 |republish         |Republishes elements to search                                 |[Documentation](republish-woh.md)|
 |segment-video     |Extracting segments from presentation                          |[Documentation](segmentvideo-woh.md)|
 |segmentpreviews   |Extract segment images from a video using FFmpeg               |[Documentation](segmentpreviews-woh.md)|
-|series            |AApply series to the mediapackage                              |[Documentation](series-woh.md)|
+|series            |Apply series to the mediapackage                               |[Documentation](series-woh.md)|
 |silence           |Silence detection on audio of the mediapackage                 |[Documentation](silence-woh.md)|
 |tag               |Modify the tag sets of media package elements                  |[Documentation](tag-woh.md)|
 |trim              |Waiting for user to review, then trim the recording            |[Documentation](trim-woh.md)|
