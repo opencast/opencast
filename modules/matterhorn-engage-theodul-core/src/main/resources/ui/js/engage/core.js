@@ -84,7 +84,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var id_loading2 = "loading2";
     var id_loadingProgressbar2 = "loadingProgressbar2";
     var id_browserWarning = "browserWarning";
-    var id_volume = "volume";
+    var id_volumeSlider = "volumeSlider";
     var id_btn_reloadPage = "btn_reloadPage";
     var id_btn_login = "btn_login";
     var id_btn_tryAnyway = "btn_tryAnyway";
@@ -774,7 +774,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                             translateCoreHTML();
                             if (engageCore.model.desktop) {
                                 window.setTimeout(function() {
-                                    if ($("#" + id_volume).html() === undefined) {
+                                    if ($("#" + id_volumeSlider).html() === undefined) {
                                         $("#" + id_btn_reloadPage).click(function(e) {
                                             e.preventDefault();
                                             location.reload();

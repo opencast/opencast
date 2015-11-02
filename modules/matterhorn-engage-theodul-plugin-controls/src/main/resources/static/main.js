@@ -179,9 +179,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_engage_controls = "engage_controls";
     var id_engage_controls_topIfBottom = "engage_controls_second";
     var id_slider = "slider";
-    var id_volume = "volume";
     var id_volumeSlider = "volumeSlider";
-    var id_volumeSliderWrapper = "volumeSliderWrapper";
+    var id_volumeSliderWrapper = "volumeSliderWrapper";             // for mobile template
     var id_volumeIcon = "volumeIcon";
     var id_dropdownMenuPlaybackRate = "dropdownMenuPlaybackRate";
     var id_playbackRate075 = "playback075";
@@ -805,8 +804,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     range: "min",
                     min: 1,
                     max: 100,
-                    value: 100,
-                    change: function(event, ui) {}
+                    value: 100
                 });
             } else {
                 $("#" + id_volumeSlider).slider({
@@ -829,8 +827,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         Engage.trigger(plugin.events.mute.getName());
                         Basil.set(storage_muted, "true");
                     }
-                // toggle volume slider in mobile/embed mode
                 } else {
+                    // toggle volume slider in mobile/embed mode
                     $("#" + id_volumeSliderWrapper).fadeToggle(150);
                 }
 
