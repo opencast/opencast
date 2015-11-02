@@ -81,8 +81,7 @@
 }
 
 #indicator {
-    top: 2px;
     position: absolute;
-    background: red;
+    border: 2px solid white;
     left: 2px
 }
