@@ -32,15 +32,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
     var PLUGIN_STYLES_DESKTOP = [
         "styles/desktop.css",
-        "lib/videojs/video-js.css"
+        "lib/videojs/video-js.min.css"
     ];
     var PLUGIN_STYLES_EMBED = [
         "styles/embed.css",
-        "lib/videojs/video-js.css"
+        "lib/videojs/video-js.min.css"
     ];
     var PLUGIN_STYLES_MOBILE = [
         "styles/mobile.css",
-        "lib/videojs/video-js.css"
+        "lib/videojs/video-js.min.css"
     ];
 
     var plugin;
@@ -975,84 +975,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             Engage.trigger(plugin.events.playbackRateChanged.getName(), (rate + value));
         }        
         
-    }
-
-    function registerEvents(videoDisplay) {
-        var videodisplay = videojs(videoDisplay);
-
-        $(window).resize(function() {
-            checkVideoDisplaySize();
-        });
-        
-        Engage.on(plugin.events.play.getName(), function() {
-            if (videosReady) {
-                clearAutoplay();
-                videodisplay.play();
-                pressedPlayOnce = true;
-            }
-        });
-        Engage.on(plugin.events.autoplay.getName(), function() {
-            interval_autoplay = window.setInterval(function() {
-                if (pressedPlayOnce) {
-                    clearAutoplay();
-                } else if (videosReady) {
-                    videodisplay.play();
-                    clearAutoplay();
-                }
-            }, interval_autoplay_ms);
-        });
-        Engage.on(plugin.events.initialSeek.getName(), function(e) {
-            parsedSeconds = Utils.parseSeconds(e);
-            interval_initialSeek = window.setInterval(function() {
-                if (pressedPlayOnce) {
-                    clearInitialSeek();
-                } else if (videosReady) {
-                    videodisplay.play();
-                    window.setTimeout(function() {
-                        Engage.trigger(plugin.events.seek.getName(), parsedSeconds);
-                    }, timeout_initialSeek_ms);
-                    clearInitialSeek();
-                }
-            }, interval_initialSeek_ms);
-        });
-        Engage.on(plugin.events.pause.getName(), function() {
-            clearAutoplay();
-            videodisplay.pause();
-        });
-        Engage.on(plugin.events.playPause.getName(), function() {
-            if (videodisplay.paused()) {
-                Engage.trigger(plugin.events.play.getName());
-            } else {
-                Engage.trigger(plugin.events.pause.getName());
-            }
-        });
-        Engage.on(plugin.events.seekLeft.getName(), function() {
-            if (pressedPlayOnce) {
-                var currTime = videodisplay.currentTime();
-                if ((currTime - seekSeconds) >= 0) {
-                    Engage.trigger(plugin.events.seek.getName(), currTime - seekSeconds);
-                } else {
-                    Engage.trigger(plugin.events.seek.getName(), 0);
-                }
-            }
-        });
-        Engage.on(plugin.events.seekRight.getName(), function() {
-            if (pressedPlayOnce) {
-                var currTime = videodisplay.currentTime();
-                var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
-                if (duration && ((currTime + seekSeconds) < duration)) {
-                    Engage.trigger(plugin.events.seek.getName(), currTime + seekSeconds);
-                } else {
-                    Engage.trigger(plugin.events.seek.getName(), duration);
-                }
-            }
-        });
-        Engage.on(plugin.events.playbackRateIncrease.getName(), function() {
-            changePlaybackRate(0.125, videodisplayMaster);
-        });
-        Engage.on(plugin.events.playbackRateDecrease.getName(), function() {
-            changePlaybackRate(-0.125, videodisplayMaster);
-        });
     }
 
     function registerEvents(videoDisplay, numberOfVideodisplays) {
