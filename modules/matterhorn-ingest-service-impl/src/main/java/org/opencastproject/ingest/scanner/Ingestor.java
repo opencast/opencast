@@ -23,15 +23,26 @@ package org.opencastproject.ingest.scanner;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -39,9 +50,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.IoSupport.fileInputStream;
-import static org.opencastproject.util.IoSupport.withStream;
-import static org.opencastproject.util.data.Arrays.append;
 
 /** Used by the {@link InboxScannerService} to do the actual ingest. */
 public class Ingestor {
@@ -62,6 +70,8 @@ public class Ingestor {
 
   private Map<String, String> workflowConfig;
 
+  private final MediaPackageElementFlavor mediaFlavor;
+
   private final File inbox;
 
   /** Thread pool to run the ingest worker. */
@@ -81,18 +91,21 @@ public class Ingestor {
    *          workflow to apply to ingested media packages
    * @param workflowConfig
    *          the workflow definition configuration
+   * @param mediaFlavor
+   *          media flavor to use by default
    * @param inbox
    *          inbox directory to watch
    * @param maxThreads
    *          maximum worker threads doing the actual ingest
    */
   public Ingestor(IngestService ingestService, WorkingFileRepository workingFileRepository, SecurityContext secCtx,
-          String workflowDefinition, Map<String, String> workflowConfig, File inbox, int maxThreads) {
+      String workflowDefinition, Map<String, String> workflowConfig, String mediaFlavor, File inbox, int maxThreads) {
     this.workingFileRepository = workingFileRepository;
     this.ingestService = ingestService;
     this.secCtx = secCtx;
     this.workflowDefinition = workflowDefinition;
     this.workflowConfig = workflowConfig;
+    this.mediaFlavor = MediaPackageElementFlavor.parseFlavor(mediaFlavor);
     this.inbox = inbox;
     this.executorService = Executors.newFixedThreadPool(maxThreads);
   }
@@ -110,31 +123,43 @@ public class Ingestor {
         secCtx.runInContext(new Effect0() {
           @Override
           protected void run() {
-            boolean ignore = "zip".equalsIgnoreCase(FilenameUtils.getExtension(artifact.getName()))
-                    && withStream(fileInputStream(artifact),
-                            logWarn("Unable to ingest mediapackage '{}', {}", artifact.getAbsolutePath()),
-                            new Function.X<InputStream, Boolean>() {
-                              @Override
-                              public Boolean xapply(InputStream in) throws Exception {
-                                ingestService.addZippedMediaPackage(in, workflowDefinition, workflowConfig);
-                                logger.info("Ingested {} as a mediapackage", artifact.getAbsolutePath());
-                                return true;
-                              }
-                            }).isRight()
-                    || withStream(fileInputStream(artifact),
-                            logWarn("Unable to process inbox file '{}', {}", artifact.getAbsolutePath()),
-                            new Function.X<InputStream, Boolean>() {
-                              @Override
-                              public Boolean xapply(InputStream in) throws Exception {
-                                workingFileRepository.putInCollection(WFR_COLLECTION, artifact.getName(), in);
-                                logger.info("Ingested {} as an inbox file", artifact.getAbsolutePath());
-                                return true;
-                              }
-                            }).isRight();
+            InputStream in = null;
+            try {
+              in = new FileInputStream(artifact);
+              if ("zip".equalsIgnoreCase(FilenameUtils.getExtension(artifact.getName()))) {
+                ingestService.addZippedMediaPackage(in, workflowDefinition, workflowConfig);
+                logger.info("Ingested {} as a mediapackage from inbox", artifact.getName());
+              } else {
+                /* Create MediaPackage and add Track */
+                MediaPackage mp = ingestService.createMediaPackage();
+                ingestService.addTrack(in, artifact.getName(), mediaFlavor, mp);
+                logger.info("Added track to mediapackage for ingest from inbox");
+
+                /* Add title */
+                DublinCoreCatalog dcc = DublinCores.mkOpencast();
+                dcc.add(DublinCore.PROPERTY_TITLE, artifact.getName());
+                ByteArrayOutputStream dcout = new ByteArrayOutputStream();
+                dcc.toXml(dcout, true);
+                InputStream dcin = new ByteArrayInputStream(dcout.toByteArray());
+                ingestService.addCatalog(dcin, "dublincore.xml", MediaPackageElements.EPISODE, mp);
+                logger.info("Added DC catalog to mediapackage for ingest from inbox");
+
+                /* Ingest media */
+                ingestService.ingest(mp, workflowDefinition, workflowConfig);
+                logger.info("Ingested {} from inbox", artifact.getName());
+              }
+              in.close();
+            } catch (IOException e) {
+              logger.error("Error accessing inbox file '{}', {}", artifact.getName());
+            } catch (Exception e) {
+              logger.error("Error ingesting inbox file '{}', {}", artifact.getName());
+            } finally {
+              IOUtils.closeQuietly(in);
+            }
             try {
               FileUtils.forceDelete(artifact);
             } catch (IOException e) {
-              logger.warn("Unable to delete file {}, {}", artifact.getAbsolutePath(), e);
+              logger.error("Unable to delete file {}, {}", artifact.getAbsolutePath(), e);
             }
           }
         });
@@ -142,12 +167,15 @@ public class Ingestor {
     };
   }
 
-  /** Return true if the passed artifact can be handled by this ingestor, i.e. it lies in its inbox and its name does not start with a ".". */
+  /** Return true if the passed artifact can be handled by this ingestor, i.e. it lies in its inbox and its name does
+   * not start with a ".". */
   public boolean canHandle(final File artifact) {
     logger.debug("CanHandle {}, {}", myInfo(), artifact.getAbsolutePath());
     File dir = artifact.getParentFile();
     try {
-      return dir != null && inbox.getCanonicalPath().equals(dir.getCanonicalPath()) && !artifact.getName().startsWith(".");
+      return dir != null
+        && inbox.getCanonicalPath().equals(dir.getCanonicalPath())
+        && !artifact.getName().startsWith(".");
     } catch (IOException e) {
       logger.warn("Unable to determine canonical path of {} ", artifact.getAbsolutePath());
       return false;
@@ -156,23 +184,5 @@ public class Ingestor {
 
   public String myInfo() {
     return format("[%x thread=%x]", hashCode(), Thread.currentThread().getId());
-  }
-
-  /**
-   * Create a function that logs a warning.
-   *
-   * @param msg
-   *          a message string to be used with {@link org.slf4j.Logger}
-   * @param args
-   *          args for the Logger. The function argument (the exception) will be the last arg.
-   */
-  public static Function<Exception, Exception> logWarn(final String msg, final Object... args) {
-    return new Function<Exception, Exception>() {
-      @Override
-      public Exception apply(Exception e) {
-        logger.warn(msg, append(Object.class, args, e.getMessage()));
-        return e;
-      }
-    };
   }
 }

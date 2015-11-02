@@ -67,7 +67,7 @@ import java.util.Map;
  * The inbox scanner monitors a directory for incoming media packages.
  * <p/>
  * There is one InboxScanner instance per inbox. Each instance is configured by a config file in
- * <code>$FELIX_HOME/load</code> named <code>&lt;inbox-scanned-pid&gt;-&lt;name&gt;.cfg</code> where <code>name</code>
+ * <code>.../etc/load</code> named <code>&lt;inbox-scanned-pid&gt;-&lt;name&gt;.cfg</code> where <code>name</code>
  * can be arbitrarily chosen and has no further meaning. <code>inbox-scanned-pid</code> must confirm to the PID given to
  * the InboxScanner in the declarative service (DS) configuration <code>OSGI-INF/inbox-scanner-service.xml</code>.
  *
@@ -89,6 +89,10 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   /** The configuration key to use for determining the workflow definition to use for ingest */
   public static final String WORKFLOW_DEFINITION = "workflow.definition";
+
+  /** The configuration key to use for determining the default media flavor */
+  public static final String MEDIA_FLAVOR = "media.flavor";
+
 
   /** The configuration key to use for determining the workflow configuration to use for ingest */
   public static final String WORKFLOW_CONFIG = "workflow.config";
@@ -127,6 +131,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     // build scanner configuration
     final String orgId = getCfg(properties, USER_ORG);
     final String userId = getCfg(properties, USER_NAME);
+    final String mediaFlavor = getCfg(properties, MEDIA_FLAVOR);
     final String workflowDefinition = getCfg(properties, WORKFLOW_DEFINITION);
     final Map<String, String> workflowConfig = getCfgAsMap(properties, WORKFLOW_CONFIG);
     final int interval = getCfgAsInt(properties, INBOX_POLL);
@@ -139,8 +144,13 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
             "%s does not exists and could not be created".format(inbox.getAbsolutePath()));
       }
     }
+    /* We need to be able to read from the inbox to get files from there */
     if (!inbox.canRead()) {
       throw new ConfigurationException(INBOX_PATH, "Cannot read from %s".format(inbox.getAbsolutePath()));
+    }
+    /* We need to be able to write to the inbox to remove files after they have been ingested */
+    if (!inbox.canWrite()) {
+      throw new ConfigurationException(INBOX_PATH, "Cannot write to %s".format(inbox.getAbsolutePath()));
     }
     final int maxthreads = option(cc.getBundleContext().getProperty("org.opencastproject.inbox.threads")).bind(
             Strings.toInt).getOrElse(1);
@@ -159,7 +169,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
       fileInstallCfg = some(configureFileInstall(cc.getBundleContext(), inbox, interval));
       // create new scanner
       ingestor = some(new Ingestor(ingestService, workingFileRepository, secCtx.get(), workflowDefinition,
-              workflowConfig, inbox, maxthreads));
+            workflowConfig, mediaFlavor, inbox, maxthreads));
       logger.info("Now watching inbox {}", inbox.getAbsolutePath());
     } else {
       logger.warn("Cannot create security context for user {}, organization {}. "
