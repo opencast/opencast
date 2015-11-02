@@ -1684,15 +1684,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
     }
 
-    /* usage:
-            var tuples = getSortedVideosourcesArray(videoSources);
-        for (var i = 0; i < tuples.length; ++i) {
-            var key = tuples[i][0];
-            var value = tuples[i][1];
-
-            // do something with key and value
-        }
-    */
     function getSortedVideosourcesArray(videoSources) {
         var tuples = [];
 
