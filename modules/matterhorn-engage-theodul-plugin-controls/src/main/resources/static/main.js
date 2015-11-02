@@ -238,6 +238,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var plugin_path = "";
     var plugin_path_topIfBottom = "";
     var initCount = 6;
+    if (isMobileMode) {
+        initCount += 1;          // increase initCount, because mobile version loads 1 more lib
+    }
     var isPlaying = false;
     var isSliding = false;
     var duration;
@@ -1284,16 +1287,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     require([relative_plugin_path + jQueryUIPath], function() {
         Engage.log("Controls: Lib jQuery UI loaded");
 
+        initCount -= 1;
+        if (initCount <= 0) {
+            initPlugin();
+        }
+
         // load jquery-ui touch-punch lib in mobile mode
         if (isMobileMode) {
             require([relative_plugin_path + "lib/jqueryui/jquery.ui.touch-punch.min"], function() {
                 Engage.log("Controls: Lib jQuery UI Touch Punch loaded");
+                initCount -= 1;
+                if (initCount <= 0) {
+                    initPlugin();
+                }
             });
-        }
-
-        initCount -= 1;
-        if (initCount <= 0) {
-            initPlugin();
         }
     });
 
