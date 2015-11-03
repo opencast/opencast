@@ -256,6 +256,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     var zoomTimeout = 500;
     var zoomMiniMapWidth = 300;
+    var minimapStrokeColor = "black";
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginVideoVideoJS").replace(/(\.\.\/)/g, "");
@@ -495,84 +496,29 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         var wheelEvent = null;
         var videoFocused = true;
         var singleVideo = true;
-        var currentZoom = 1.0;
-        var resetted = false;
-
         var mapSelector = "videoDisplay";
-
-        /* TODO: Experimental, get shiftings onload */
-        var vertShifting = 0;
-        var horShifting = 0;
         var minimapVisible = false;
-
         var zoomLevels = [];
-
-        /* Set Basil LocalStorage Data if not defined */
-        if (Basil.get("zoomData") == undefined) {
-            Basil.set("zoomData", {})
-        }
-
-        var info = Engage.model.get("mediaPackage");
-
-        ////console.log(aspectRatio);
         var ratio = aspectRatio[2] / aspectRatio[1];
-
-        ////console.log(ratio);
-
-        /* Current video id */
         var id = Engage.model.get("urlParameters").id;
 
-        /* Lookup for id */
-        var zoomData = Basil.get("zoomData");
-
-        /* Set zoomLevels in LocalStorage if not already defined.
-         * otherwise apply stored zoom
-         */
-        if (zoomData[id] == undefined) {
-            zoomData[id] = [];
-            Basil.set("zoomData", zoomData);
-        } else if(zoomData[id].length != 0){
-            /* get zoomlevels for displays and apply them */
-            //console.log("Found stored Zoom: " + zoomData[id]);
-            zoomLevels = zoomData[id];
-            // TODO: Ohne Timeout vllt. ...
-            setTimeout(applyStoredZoom, 200);
-            Engage.on(plugin.events.play.getName(), applyStoredZoom());
-        }
-
-        function applyStoredZoom() {
-            //console.log("Apply stored zoom");
-            //console.log(zoomLevels);
-            for (var i = 0; i <= (zoomLevels.length/2); i+=2) {
-                Engage.log("Apply zoom: " + $("#"+zoomLevels[i])[0].id + " / " + zoomLevels[i+1]);
-                $("#"+zoomLevels[i])[0].style.transform = "scale(" + zoomLevels[i+1] + ")";
-                Engage.trigger(plugin.events.zoomChange.getName(), zoomLevels[i+1]);
-            }
-        }
-
-        function updateZoomData(data, id) {
-            var storedData = Basil.get("zoomData");
-            storedData[id] = data;
-            Basil.set("zoomData", storedData);
-        }
 
         /* Hides Minimap, e.g. when zoom < 1 */
         function hideMinimap() {
-            //console.log("hideMinimap");
+            console.log("hideMinimap");
             $("#indicator").remove();
             minimapVisible = false;
-
         }
 
         /* Shows Minimap when its not already displayed */
         function showMinimap() {
-            //console.log("showMinimap");
-            //console.log("Selector: " + mapSelector);
-            //console.log($(selector));
+            console.log("showMinimap");
+            console.log("Selector: " + mapSelector);
+            console.log($(selector));
 
             // TODO: Maybe not only zoom, better ...
             var zoom = $(selector)[0].style.transform.replace(/[a-z]*/, "");
-            //console.log(zoom);
+            console.log(zoom);
             zoom = zoom.replace("(", "");
             zoom = zoom.replace(")", "");
 
@@ -585,7 +531,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 var w = $(mapSelector).width();
 
 
-                //console.log("h: " + h + " w: " + w);
+                console.log("h: " + h + " w: " + w);
 
                 $(mapSelector).after("<canvas id='indicator'></canvas>");
                 var c = document.getElementById("indicator");
@@ -594,7 +540,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 var mapWidth = zoomMiniMapWidth/zoom;
                 var mapHeight = (zoomMiniMapWidth * ratio)/zoom;
 
-                //console.log(mapWidth + " / " + mapHeight);
+                console.log(mapWidth + " / " + mapHeight);
                 ctx.rect(zoomMiniMapWidth/2 - mapWidth/2, (zoomMiniMapWidth * ratio)/2 - mapHeight/2, mapWidth, mapHeight);
                 //(zoomMiniMapWidth * ratio)/2 - mapHeight
                 ctx.strokeStyle="red";
@@ -612,7 +558,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
         /* Redraws Minimap, e.g. when other display is focused */
         function redrawMinimap() {
-            //console.log("redrawMinimap");
+            console.log("redrawMinimap");
             hideMinimap();
             showMinimap();
         }
@@ -620,8 +566,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         /* Updates Minimap, e.g. when moving video */
         function updateMinimap() {
             // Must also ensure proper drawing on right display > 2
-            //console.log("updateMinimap");
-            //console.log("Selector: " + selector);
+            console.log("updateMinimap");
+            console.log("Selector: " + selector);
             var zoom = $(selector)[0].style.transform.replace(/[a-z]*/, "");
             zoom = zoom.replace("(", "");
             zoom = zoom.replace(")", "");
@@ -631,35 +577,35 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
             var h = $(mapSelector).height();
             var w = $(mapSelector).width();
-            //console.log("h: " + h + " w: " + w);
+            console.log("h: " + h + " w: " + w);
 
             var left = $(selector).css("left").replace("px", "");
             var top = $(selector).css("top").replace("px", "");
 
-            //console.log("top: " + Number(top));
-            //console.log("left: " + Number(left));
+            console.log("top: " + Number(top));
+            console.log("left: " + Number(left));
 
             var hDiff = (h*zoom - h)/2;
             var wDiff= (w*zoom - w)/2;
-            //console.log("Diff: " + hDiff + " / " + wDiff);
+            console.log("Diff: " + hDiff + " / " + wDiff);
 
             // Rel. Verschiebung berechnen
 
             var relHDiff = top / hDiff;
-            //console.log("rel hdiff" + relHDiff);
+            console.log("rel hdiff" + relHDiff);
 
             var relWDiff = left / wDiff;
-            //console.log("rel wdiff" + relWDiff);
+            console.log("rel wdiff" + relWDiff);
 
 
-            //console.log(zoom);
+            console.log(zoom);
 
 
             var mapWidth = zoomMiniMapWidth/zoom;
             var mapHeight = (zoomMiniMapWidth * ratio)/zoom;
 
-            //console.log(mapWidth);
-            //console.log(mapHeight);
+            console.log(mapWidth);
+            console.log(mapHeight);
 
             var c = document.getElementById("indicator");
             if (c == undefined) {
@@ -692,45 +638,39 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
         })
 
-        Engage.on(plugin.events.zoomChange.getName(), function(data){
-            //console.log("Zoom has changed" + data);
-            currentZoom = data;
-        })
-
         Engage.on(plugin.events.togglePiP.getName(), function(pip) {
 
             if (pip && videoFocused) {
-                //console.log("togglePiP 1");
+                console.log("togglePiP 1");
                 selector = ".videoFocusedPiP video";
                 mapSelector = ".videoFocusedPiP"
                 setTimeout(redrawMinimap, zoomTimeout);
             } else if (!pip && videoFocused) {
-                //console.log("togglePiP 2");
+                console.log("togglePiP 2");
                 selector = ".videoFocused video";
                 mapSelector =".videoFocused";
                 setTimeout(redrawMinimap, zoomTimeout);
             } else {
-                //console.log("togglePiP 3");
+                console.log("togglePiP 3");
                 selector = "video";
             }
         })
 
         Engage.on(plugin.events.resetLayout.getName(), function(v) {
-            //console.log("resetLayout");
+            console.log("resetLayout");
             videoFocused = false;
             selector = "video";
-            resetted = true;
             if (!singleVideo) {
                 hideMinimap();
             }
         })
 
         Engage.on(plugin.events.focusVideo.getName(), function(v) {
-            //console.log("What: " + v);
-            //console.log(Utils.getFlavorForVideoDisplay(String(v)));
+            console.log("What: " + v);
+            console.log(Utils.getFlavorForVideoDisplay(String(v)));
 
             if (isPiP && !videoFocused) {
-                //console.log("focusVideo:1");
+                console.log("focusVideo:1");
                 videoFocused = true;
                 selector = ".videoFocusedPiP video";
                 mapSelector = ".videoFocusedPiP";
@@ -738,7 +678,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     setTimeout(showMinimap, zoomTimeout);
                 }
             } else if (!isPiP && !videoFocused) {
-                //console.log("focusVideo:2");
+                console.log("focusVideo:2");
                 selector = ".videoFocused video";
                 videoFocused = true;
                 mapSelector =".videoFocused";
@@ -748,10 +688,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             } else if (!isPiP && videoFocused) {
                 // Toggle nonPiP Displays or leave focused mode while nonPiP
-                //console.log("focusVideo:3");
+                console.log("focusVideo:3");
                 if (singleVideo) {
                     // While Video with one Display loaded this could occur
-                    ////console.log("Single Display");
+                    console.log("Single Display");
                     videoFocused = false;
                     selector = "video"
                     mapSelector = ".videoDisplay"
@@ -762,10 +702,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             } else if (isPiP && videoFocused) {
                 // Toggle PiP Displays or leave focused mode while PiP
-                //console.log("focusVideo:4");
+                console.log("focusVideo:4");
                 if (singleVideo) {
                     // While Video with one Display loaded this could occur
-                    ////console.log("Single Display");
+                    console.log("Single Display");
                     videoFocused = false;
                     selector = "video"
                     mapSelector = ".videoDisplay"
@@ -775,7 +715,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     setTimeout(redrawMinimap, zoomTimeout);
                 }
             } else {
-                //console.log("focusVideo:5");
+                console.log("focusVideo:5");
                 selector = "video"
                 hideMinimap();
             }
@@ -875,7 +815,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 if (!(($(selector).position().left + step) > 0) && !((offset + step) < left)) {
                     $(selector).css("left", (offset + step) + "px");
                 };
-                //console.log("move hor");
+                console.log("move hor");
                 updateMinimap();
             }
         }
@@ -900,10 +840,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
                 if (!((offset + step) < top) && !(($(selector).position().top + step) > 0)) {
                     $(selector).css("top", (offset + step) + "px");
-                    /* TODO: Only saves after first call of moveVertical() */
-                    vertShifting = (offset + step);
                 };
-                //console.log("move vert");
+                console.log("move vert");
                 updateMinimap();
             }
         }
@@ -937,7 +875,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
 
             if (Number(level).toFixed(decimal_places) == Number(1).toFixed(decimal_places) && minimapVisible) {
-                //console.log("hide in set level");
+                console.log("hide in set level");
                 hideMinimap();
             }
 
@@ -976,13 +914,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 if(!moveOnly) {
                     $(selector)[0].style.transform = "scale(" + zoomLevel + ")";
                     zoomLevels[(zoomLevels.indexOf($(selector)[0].id) + 1)] = parseFloat(Number(level).toFixed(decimal_places));
-                    updateZoomData(zoomLevels, id);
                     Engage.trigger(plugin.events.zoomChange.getName(), zoomLevel);
 
                     if (!minimapVisible && biggerThenOne) {
                         showMinimap();
                     } else if (minimapVisible && biggerThenOne) {
-                        //console.log("update last time? " + zoomLevel);
+                        console.log("update last time? " + zoomLevel);
                         updateMinimap();
                     }
                 }
