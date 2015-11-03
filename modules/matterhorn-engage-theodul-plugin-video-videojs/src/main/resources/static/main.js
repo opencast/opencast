@@ -255,7 +255,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var foundQualities = undefined;
 
     var zoomTimeout = 500;
-    var zoomMiniMapWidth = 300;
+    var zoomMiniMapWidth = 0.2;
     var minimapStrokeColor = "black";
 
     function initTranslate(language, funcSuccess, funcError) {
@@ -530,6 +530,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 var h = $(mapSelector).height();
                 var w = $(mapSelector).width();
 
+                var minimapWidth = w * zoomMiniMapWidth;
 
                 console.log("h: " + h + " w: " + w);
 
@@ -537,20 +538,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 var c = document.getElementById("indicator");
                 var ctx = c.getContext("2d");
 
-                var mapWidth = zoomMiniMapWidth/zoom;
-                var mapHeight = (zoomMiniMapWidth * ratio)/zoom;
+                var mapWidth = minimapWidth/zoom;
+                var mapHeight = (minimapWidth * ratio)/zoom;
 
                 console.log(mapWidth + " / " + mapHeight);
-                ctx.rect(zoomMiniMapWidth/2 - mapWidth/2, (zoomMiniMapWidth * ratio)/2 - mapHeight/2, mapWidth, mapHeight);
-                //(zoomMiniMapWidth * ratio)/2 - mapHeight
+                ctx.rect(minimapWidth/2 - mapWidth/2, (minimapWidth * ratio)/2 - mapHeight/2, mapWidth, mapHeight);
+                //(minimapWidth * ratio)/2 - mapHeight
                 ctx.strokeStyle="red";
                 ctx.stroke();
 
-                $("#indicator").width(zoomMiniMapWidth);
-                $("#indicator").height(zoomMiniMapWidth * ratio);
+                $("#indicator").width(minimapWidth);
+                $("#indicator").height(minimapWidth * ratio);
 
-                $("#indicator").css("top", h - ((zoomMiniMapWidth * ratio) + 5));
-                $("#indicator").css("left", w - zoomMiniMapWidth - 5);
+                $("#indicator").css("top", h - ((minimapWidth * ratio) + 5));
+                $("#indicator").css("left", w - minimapWidth - 5);
 
                 minimapVisible = true;
             }
@@ -579,6 +580,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             var w = $(mapSelector).width();
             console.log("h: " + h + " w: " + w);
 
+            var minimapWidth = w * zoomMiniMapWidth;
+
             var left = $(selector).css("left").replace("px", "");
             var top = $(selector).css("top").replace("px", "");
 
@@ -601,8 +604,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             console.log(zoom);
 
 
-            var mapWidth = zoomMiniMapWidth/zoom;
-            var mapHeight = (zoomMiniMapWidth * ratio)/zoom;
+            var mapWidth = minimapWidth/zoom;
+            var mapHeight = (minimapWidth * ratio)/zoom;
 
             console.log(mapWidth);
             console.log(mapHeight);
@@ -617,8 +620,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
             //ctx.rect(0,0, mapWidth, mapHeight);
             // TODO: Auf vertikaler Verschiebung nicht 100% korrekt
-            ctx.rect((zoomMiniMapWidth/2 - mapWidth/2) - ((zoomMiniMapWidth/2 - mapWidth/2) * relWDiff),
-                ((zoomMiniMapWidth * ratio)/2 - mapHeight/2) - ( ((zoomMiniMapWidth * ratio)/2 - mapHeight/2)*relHDiff ),
+            ctx.rect((minimapWidth/2 - mapWidth/2) - ((minimapWidth/2 - mapWidth/2) * relWDiff),
+                ((minimapWidth * ratio)/2 - mapHeight/2) - ( ((minimapWidth * ratio)/2 - mapHeight/2)*relHDiff ),
                 mapWidth, mapHeight);
 
             ctx.strokeStyle="red";
