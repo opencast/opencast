@@ -740,7 +740,7 @@ public class WorkspaceImpl implements Workspace {
         boolean maxAgeReached = false;
         if (maxAge.isSome()) {
           long fileAgeInSeconds = (new Date().getTime() - file.lastModified()) / 1000;
-          maxAgeReached = fileAgeInSeconds > maxAgeInSeconds.get();
+          maxAgeReached = fileAgeInSeconds > maxAgeInSeconds;
         }
 
         return maxAgeReached;
