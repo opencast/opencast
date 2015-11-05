@@ -5,6 +5,7 @@
    "SUBMIT":       "Submit",
    "UPDATE":       "Update",
    "CANCEL":       "Cancel",
+   "CONFIRM":      "Confirm",
    "SAVE":         "Save",
    "LOGOUT":       "Logout",
    "RESET":        "Reset",
@@ -45,6 +46,12 @@
         "SELECTED_COLUMNS": "Selected columns",
         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
+   },
+   "CONFIRMATIONS": {
+      "CONTINUE_ACTION" : "Are you sure you want to continue?",
+      "ACTIONS": { 
+        "CONFIRMATION" : "Confirmation required"
+     }
    },
    "NOTIFICATIONS": {
      "ACL_ADDED":           "The access policy has been created",
@@ -122,6 +129,7 @@
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
       "SEND_MESSAGE": "Send message",
+      "WARNING":"Warning",
       "EDIT_STATUS": {
           "CAPTION": "Edit Status",
           "READY_FOR_RECORDING": "Ready for recording",
@@ -129,10 +137,12 @@
       },
       "DELETE": {
           "SERIES": {
-            "CAPTION": "Delete"
+            "CAPTION": "Delete",
+            "BUTTON": "Delete"
           },
           "EVENTS": {
-            "CAPTION": "Delete"
+            "CAPTION": "Delete",
+            "BUTTON": "Delete"
           }
       },
 

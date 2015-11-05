@@ -5,6 +5,7 @@
   "SUBMIT":"Speichern",
   "UPDATE":"Aktualisieren",
   "CANCEL":"Abbrechen",
+  "CONFIRM":"Bestätigen",
   "SAVE":"Speichern",
   "LOGOUT":"Ausloggen",
   "RESET":"Zurücksetzen",
@@ -20,6 +21,12 @@
       "AVAILABLE_COLUMNS":"Verfügbare Spalten",
       "SELECTED_COLUMNS":"Ausgewählte Spalten",
       "FOOTER_TEXT":"Die Reihenfolge und Auswahl werden automatisch gespeichert. Drücken Sie \"{{resetTranslation}}\", um die Standardansicht wiederherzustellen."
+    }
+  },
+  "CONFIRMATIONS": {
+      "CONTINUE_ACTION" : "Sind Sie sicher, dass sie fortsetzen möchten?",
+      "ACTIONS": { 
+         "CONFIRMATION" : "Bestätigung"
     }
   },
   "NOTIFICATIONS":{
@@ -98,6 +105,7 @@
   "BULK_ACTIONS":{
     "CAPTION":"Aktionen",
     "SEND_MESSAGE":"Nachricht senden",
+    "WARNING":"Warnung",
     "EDIT_STATUS":{
       "CAPTION":"Status bearbeiten",
       "READY_FOR_RECORDING":"Bereit für die Aufnahme",
@@ -105,10 +113,12 @@
     },
     "DELETE":{
       "SERIES":{
-        "CAPTION":"Löschen"
+        "CAPTION": "Löschen",
+        "BUTTON": "Löschen"
       },
       "EVENTS":{
-        "CAPTION":"Löschen"
+        "CAPTION":"Löschen",
+        "BUTTON": "Löschen"
       }
     },
     "DELETE_EVENTS_WARNING_LINE1":"Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",
