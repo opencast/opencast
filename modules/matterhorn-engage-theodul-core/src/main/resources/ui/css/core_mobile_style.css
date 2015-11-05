@@ -12,6 +12,7 @@ body {
 
 #video_wrapper {
 	position: relative;
+	overflow: hidden;
 }
 
 #engage_content {
@@ -20,5 +21,6 @@ body {
 }
 
 #information_wrapper {
+	margin-top: 1em;
 	padding: 5px 8px;
 }
