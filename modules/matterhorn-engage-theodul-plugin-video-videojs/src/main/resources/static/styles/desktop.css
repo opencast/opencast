@@ -84,4 +84,7 @@
     position: absolute;
     background-color: black;
     opacity: 0.4;
+    width: 20%;
+    margin-left: 75%;
+    left: 0px;
 }
