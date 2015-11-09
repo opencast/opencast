@@ -1,13 +1,13 @@
 Encoding Profile Configuration
 ==============================
 
-A workflow defines which operations are applied to media ingested into Matterhorn and the order of these operations. An
+A workflow defines which operations are applied to media ingested into Opencast and the order of these operations. An
 operation can be something general like “encode this video”. The encoding profiles then specify exactly how a media is
 ancoded, which filters are applied, which codecs are used and in which container these will be stored, …
 
-Matterhorn comes with a set of such profiles generating files for both online playback and download. These profiles are
+Opencast comes with a set of such profiles generating files for both online playback and download. These profiles are
 build to work for everyone, meaning that in most cases optimization can be done according to local needs. So modifying
-these profiles or building new ones often makes sense. This document will help you modify or augment Matterhorn's
+these profiles or building new ones often makes sense. This document will help you modify or augment Opencast's
 default encoding profiles for audio, video and still images.
 
 Default Profiles and Possible Settings
@@ -18,7 +18,7 @@ at things you might want to change depending on your local set-up.
 
 ### A/V-Muxing: From lossless to safe
 
-The audio/video muxing (profile.mux-av.work) is applied if audio and video are send to Matterhorn separately. The basic
+The audio/video muxing (profile.mux-av.work) is applied if audio and video are send to Opencast separately. The basic
 idea behind this is, to combine these separate files into one file which can later be converted in one step.
 
 Possible settings:
@@ -29,7 +29,7 @@ Possible settings:
  - You can try to use the video container the input video came in and just add the audio. This means that you will never
    have an unexpected video container you don't know of. I.e. if you put an .mp4 video in, it still uses and .mp4
    container after musing, etc. This might, however, lead to problems if you throw in an audio file that cannot be muxen
-   in the specific container format (i.e. you have a FLAC audio file and an FLV container). This is, what Matterhorn
+   in the specific container format (i.e. you have a FLAC audio file and an FLV container). This is, what Opencast
    does at the moment.
  - To circumvent the container problem, we could also use a container format which can hold almost everything (i.e. mkv)
    regardless of the input. This would mean that MH can handle more combinations of a/v streams but you will always end
@@ -49,7 +49,7 @@ have basically two choices:
    cut a stream at an I-frame (a frame holding the full image). Doing this, FFmpeg will cut the video at the nearest
    I-frame before the selected position meaning that you might end up with a bit more video than you thought you would
    get. You can minimize this by making sure that the input video has a high I-frame frequency (probably a good idea
-   anyway). This is what Matterhorn does at the moment.
+   anyway). This is what Opencast does at the moment.
  - The alternative is to cut between two I-frames. This is possible, but requires the video to be re-encoded completely.
    This means that you will spend a lot of time on this process and will always loose quality.
 
@@ -64,7 +64,7 @@ watch folder.
 
 ### Encoding Profile Folder
 
-The `<config_dir>/encoding` folder allows you to quickly augment Matterhorn's existing behavior, simply by modifying or
+The `<config_dir>/encoding` folder allows you to quickly augment Opencast's existing behavior, simply by modifying or
 adding new configuration files. The file names should follow the pattern `*.properties`.
 
 
@@ -95,7 +95,7 @@ For example:
     profile.my-av-profile.http.output         = visual
     profile.my-av-profile.http.suffix         = -encoded.enc
     profile.my-av-profile.http.mimetype       = video/x-enc
-    profile.my-av-profile.http.ffmpeg.command = -i #{in.video.path} -c:v videoencoder -c:a audioencoder #{out.dir}/#{out.name}#{out.suffix}
+    profile.my-av-profile.http.ffmpeg.command = -i #{in.video.path} -c:v venc -c:a aenc #{out.dir}/#{out.name}#{out.suffix}
 
 The most important part of this profile is the `ffmpeg.command`. This line specifies FFmpeg command line options using
 `#{expression}` for string replacement.

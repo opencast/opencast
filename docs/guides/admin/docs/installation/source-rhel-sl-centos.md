@@ -16,8 +16,8 @@ prior option, the tarball download, needs less tools and you do not have to down
 
 Using the tarball:
 
-Select the tarball for the version you want to install from the [BitBucket downloads
-section](https://bitbucket.org/opencast-community/matterhorn/downloads).
+Select the tarball for the version you want to install from the [BitBucket downloads section
+](https://bitbucket.org/opencast-community/matterhorn/downloads).
 
     # Download desired tarball
     curl -O https://bitbucket.org/opencast-community/matterhorn/...
