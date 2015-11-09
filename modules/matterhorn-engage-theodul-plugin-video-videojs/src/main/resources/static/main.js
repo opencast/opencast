@@ -532,10 +532,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 var mapWidth = minimapWidth/zoom;
                 var mapHeight = (minimapWidth * ratio)/zoom;
 
-                ctx.rect(minimapWidth/2 - mapWidth/2, (minimapWidth * ratio)/2 - mapHeight/2, mapWidth, mapHeight);
+                ctx.fillStyle="#FFFFFF";
 
-                ctx.strokeStyle="red";
-                ctx.stroke();
+                ctx.fillRect(minimapWidth/2 - mapWidth/2, (minimapWidth * ratio)/2 - mapHeight/2, mapWidth, mapHeight);
+
+                //ctx.strokeStyle="red";
+                //ctx.stroke();
 
                 minimapVisible = true;
                 updateMinimap();
@@ -584,13 +586,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             c.width = c.width;
 
             var ctx = c.getContext("2d");
-
+            ctx.fillStyle="#FFFFFF";
             // calculate Position and draw it onto indicator
             var x =(minimapWidth/2 - mapWidth/2) - ((minimapWidth/2 - mapWidth/2) * relWDiff);
             var y = (minimapWidth*ratio)/2 - mapHeight/2 - (((minimapWidth*ratio)/2 - mapHeight/2)*relHDiff);
-            ctx.rect(x, y, mapWidth, mapHeight);
-            ctx.strokeStyle="red";
-            ctx.stroke();
+            ctx.fillRect(x, y, mapWidth, mapHeight);
+            //ctx.strokeStyle="red";
+            //ctx.stroke();
         }
 
         function isFocused() {
