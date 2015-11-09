@@ -441,6 +441,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     function registerSynchronizeEvents() {
         // throw some important synchronize.js-events for other plugins
         $(document).on(event_sjs_allPlayersReady, function(event) {
+            Engage.model.get("videoDataModel").set("ready", true);
             videosReady = true;
             Engage.trigger(plugin.events.ready.getName());
         });
@@ -999,6 +1000,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 initSynchronize();
             } else {
                 videosReady = true;
+                Engage.model.get("videoDataModel").set("ready", true);
                 if (!isAudioOnly) {
                     Engage.trigger(plugin.events.ready.getName());
                 }
@@ -1108,6 +1110,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             // set first videoDisplay as master
             registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], 1);
 
+            Engage.model.get("videoDataModel").set("ready", true);
             videosReady = true;
             Engage.trigger(plugin.events.ready.getName());
 
@@ -1159,6 +1162,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             // set first videoDisplay as master
             registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], 1);
 
+            Engage.model.get("videoDataModel").set("ready", true);
             videosReady = true;
             Engage.trigger(plugin.events.ready.getName());
 
