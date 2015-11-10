@@ -48,10 +48,14 @@
       }
    },
    "CONFIRMATIONS": {
-      "CONTINUE_ACTION" : "Are you sure you want to continue?",
-      "ACTIONS": { 
-        "CONFIRMATION" : "Confirmation required"
+     "CONTINUE_ACTION" : "Are you sure you want to continue?",
+     "ACTIONS": { 
+       "CONFIRMATION" : "Confirmation required"
      }
+   },
+   "HELP":{
+     "DOCUMENTATION": "Documentation",
+     "REST_DOC": "REST API Docs"
    },
    "NOTIFICATIONS": {
      "ACL_ADDED":           "The access policy has been created",
