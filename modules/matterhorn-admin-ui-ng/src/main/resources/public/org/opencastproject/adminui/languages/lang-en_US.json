@@ -1455,6 +1455,12 @@
       }
      },
      "USERS": {
+       "PROVIDER": {
+         "LABEL": "Provider"
+       },
+       "ROLE": {
+         "LABEL": "Role"
+       },
        "USERNAME": {
          "LABEL": "Username"
        },
