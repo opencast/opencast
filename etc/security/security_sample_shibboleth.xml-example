@@ -74,7 +74,7 @@
     <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
 
     <!-- Everything else is for the admin users -->
-    <sec:intercept-url pattern="/**" access="ROLE_ADMIN, ROLE_COURSE_ADMIN, ROLE_INSTRUCTOR" />
+    <sec:intercept-url pattern="/**" access="ROLE_ADMIN, ROLE_COURSE_ADMIN" />
 
     <!-- ############################# -->
     <!-- # LOGIN / LOGOUT MECHANISMS # -->
