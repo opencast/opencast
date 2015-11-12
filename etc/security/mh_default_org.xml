@@ -19,7 +19,7 @@
   <sec:http pattern="/style.css" security="none" />
   <sec:http pattern="/css/**" security="none" />
 
-  <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast Matterhorn"
+  <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast"
     entry-point-ref="matterhornEntryPoint">
 
     <!-- ################ -->
@@ -28,6 +28,7 @@
 
     <!-- Allow anonymous access to the login form -->
     <sec:intercept-url pattern="/admin-ng/login.html" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/sysinfo/bundles/version" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Protect admin UI facade -->
     <sec:intercept-url pattern="/email/templates.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EMAILTEMPLATES_VIEW" />
@@ -218,7 +219,7 @@
 
     <sec:custom-filter ref="asyncTimeoutRedirectFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
 
-    <!-- Matterhorn is shipping its own implementation of the anonymous filter -->
+    <!-- Opencast is shipping its own implementation of the anonymous filter -->
     <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
 
     <!--
@@ -228,7 +229,7 @@
     -->
 
     <!-- Enables "remember me" functionality -->
-    <sec:remember-me key="matterhorn" user-service-ref="userDetailsService" />
+    <sec:remember-me key="opencast" user-service-ref="userDetailsService" />
 
     <!-- Set the request cache -->
     <sec:request-cache ref="requestCache" />
@@ -243,7 +244,7 @@
 
   <!-- ########################################### -->
   <!-- # Custom ajax timeout Filter Definition   # -->
-  <!-- ########################################### --> 
+  <!-- ########################################### -->
 
   <bean id="asyncTimeoutRedirectFilter" class="org.opencastproject.kernel.security.AsyncTimeoutRedirectFilter" />
 
@@ -278,8 +279,8 @@
 
   <!-- Returns a 401 request for authentication via digest auth -->
   <bean id="digestEntryPoint" class="org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint">
-    <property name="realmName" value="Opencast Matterhorn" />
-    <property name="key" value="matterhorn" />
+    <property name="realmName" value="Opencast" />
+    <property name="key" value="opencast" />
     <property name="nonceValiditySeconds" value="300" />
   </bean>
 

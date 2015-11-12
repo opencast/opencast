@@ -30,7 +30,7 @@ https://bitbucket.org/opencast-community/matterhorn/downloads#tag-downloads
     mv opencast-community-matterhorn-* /opt/matterhorn/
 
 Cloning the Git repository:
-    
+
     cd /opt
     git clone https://bitbucket.org/opencast-community/matterhorn.git
     cd opencast
@@ -43,7 +43,7 @@ Install Dependencies
 Please make sure to install the following dependencies.
 
 Required:
-    
+
     Xcode
     jdk 7 or jdk 8
     ffmpeg >= 2.8

@@ -1,14 +1,15 @@
-# Create a Custom Workflow
+Create a Custom Workflow
+========================
 
-This document will help you get started with creating your own Matterhorn workflows.
+This document will help you get started with creating your own Opencast workflows.
  - For a list of available workflow operations, see:
-  [Workflow Operation Handler](../workflowoperationhandlers/index.md)
+   [Workflow Operation Handler](../workflowoperationhandlers/index.md)
  - For a more detailed discussion on how to create your own workflow operations, see:
-  [Create a Custom Workflow Operation Handler](https://opencast.jira.com/wiki/display/MHDOC/Create+a+Custom+Workflow+Operation+Handler)
+   [Create a Custom Workflow Operation Handler](https://opencast.jira.com/wiki/display/MHDOC/Create+a+Custom+Workflow+Operation+Handler)
 
 ## Overview
 
-A Matterhorn workflow is an ordered list of operations. There is no limit to the number of operations or their
+A Opencast workflow is an ordered list of operations. There is no limit to the number of operations or their
 repetition in a given workflow.
 
 Workflow operations can be configured using configuration elements. The use of string replacement in configuration
@@ -18,17 +19,17 @@ A workflow operation can run autonomously or pause itself to allow for external,
 
 ### Watch Folder
 
-The Matterhorn workflow service will automatically register any workflow documents placed in the Felix workflow
+The Opencast workflow service will automatically register any workflow documents placed in the Felix workflow
 configuration directory:
 
     <mh_config_dir>/workflows
 
 ### Document
 
-Matterhorn workflows are defined in xml documents. The name of the document should follow the pattern
-<workflow_name>-workflow.xml, e.g. compose-distribute-publish-workflow.xml.
+Opencast workflows are defined in xml documents. The name of the document should follow the pattern
+`<workflow_name>-workflow.xml`, e.g. `compose-distribute-publish-workflow.xml`.
 
-The structure of a Matterhorn workflow document:
+The structure of a Opencast workflow document:
 
     <definition xmlns="http://workflow.opencastproject.org">
 
@@ -57,7 +58,7 @@ topic on the page “Encoding Profiles”. For this quide we assume that we have
 creates a distribution format definition for mpeg4 quicktime presenter/presentation download and a “feed-cover.http”
 encoding profile to create thumbnail images for the videos.
 
-###Describe the Workflow
+### Describe the Workflow
 
 Start by naming the workflow and giving it a meaningful description:
 
@@ -222,7 +223,7 @@ The next operations will create thumbnails from the media:
 
 ### Distribute the Media
 
-The next operation copies the encoded media to the Matterhorn distribution channel:
+The next operation copies the encoded media to the Opencast distribution channel:
 
     <definition xmlns="http://workflow.opencastproject.org">
 
@@ -265,7 +266,7 @@ The next operation copies the encoded media to the Matterhorn distribution chann
 
 Workflow definitions may optionally include variables to be replaced by user input. For instance, the "review" operation
 can put a workflow "on hold" and wait for an administrative user to review the media before allowing processing to
-continue. To enable user control of individual workflow instances, the workflow definition must 1) use the ${variable}
+continue. To enable user control of individual workflow instances, the workflow definition must 1) use the `${variable}`
 notation in the workflow definition and 2) contain a custom configuration panel. Here is an example of a configurable
 "review" operation:
 
@@ -285,12 +286,12 @@ A simple configuration panel for the "review" operation might look like this:
       ]]>
     </configuration_panel>
 
-The checkbox in this <configuration_panel> will now be displayed in the administrative tools, and the user's selection
-will be used to replace the ${review.hold} variable in the workflow.
+The checkbox in this `<configuration_panel>` will now be displayed in the administrative tools, and the user's selection
+will be used to replace the `${review.hold}` variable in the workflow.
 
 ## Test the Workflow
 
-The easiest way to test a workflow is to just put it into the workflow folder where it will be picked up by Matterhorn
+The easiest way to test a workflow is to just put it into the workflow folder where it will be picked up by Opencast
 automatically. This needs, however, administrative privileges. If you don't have those you can also use the workflow
 service REST endpoint.
 
@@ -299,13 +300,13 @@ service REST endpoint.
 (user:admin / passwd:opencast)**
 
 1. Scroll down to "POST /start" and click on the "Testing form" link.
-![workflow start](workflow1.png)
+   ![workflow start](workflow1.png)
 
 2. Copy and paste the complete workflow definition into the "definition" field and click "submit."
-![testing form](workflow2.png)
+   ![testing form](workflow2.png)
 
 3. Open the Admin Tools and navigate the recordings dashboard to view the status of the workflow instance.
-![dashboard](workflow3.png)
+   ![dashboard](workflow3.png)
 
-4. Open the Matterhorn Media Module to see the published media.
-![media module](workflow4.png)
+4. Open the Opencast Media Module to see the published media.
+   ![media module](workflow4.png)

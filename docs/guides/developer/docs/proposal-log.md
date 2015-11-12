@@ -1,9 +1,9 @@
 Opencast Proposals
 ==================
 
-All important decisions for Opencast Matterhorn have to be made on list. To do that committers may send proposals
-(marked with #proposal) to list on which other committers may then vote. Opencast uses lazy consensus meaning that no
-response signals agreement. Apart from that committers may vote with:
+All important decisions for Opencast have to be made on list. To do that committers may send proposals (marked with
+#proposal) to list on which other committers may then vote. Opencast uses lazy consensus meaning that no response
+signals agreement. Apart from that committers may vote with:
 
  - `+1` yes, agree - also willing to help bring about the proposed action
  - `+0` yes, agree - not willing or able to help bring about the proposed action

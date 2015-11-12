@@ -1,7 +1,7 @@
 Packaging Guidelines
 ====================
 
-This page is intended as a guideline for packagers. It may help to figure out where to place parts of Matterhorn.  The
+This page is intended as a guideline for packagers. It may help to figure out where to place parts of Opencast.  The
 locations, etc. proposed here should never overrule the official packaging guides for a specific operating system or
 distribution.  If in doubt follow the guides for your distribution like for example the [Fedora Packaging
 Guidelines](http://fedoraproject.org/wiki/Packaging:Guidelines)
@@ -19,7 +19,7 @@ Especially software which is installed automatically–for example software from
 these rules so conflicts are minimized and the user will have one place to look for one kind of data. For example if you
 are searching for a system-wide configuration file for any software on Linux every user will always look in `/etc`.
 
-If you want to package Matterhorn use the following documentations to decide where to place Matterhorn:
+If you want to package Opencast use the following documentations to decide where to place files:
 
  - Distribution guidelines like the [Fedora Packaging Guidelines](http://fedoraproject.org/wiki/Packaging:Guidelines)
  - [Filesystem Hierarchy Standard](http://www.pathname.com/fhs/pub/fhs-2.3.html)
@@ -29,47 +29,47 @@ If you want to package Matterhorn use the following documentations to decide whe
 Locations To Use
 ----------------
 
-The following locations should be used for Matterhorn and its related data:
+The following locations should be used for Opencast and its related data:
 
- - `/usr/share/matterhorn`:
-   Software and data not modified by Matterhorn. This includes felix, the matterhorn modules and external libraries.
- - `/etc/matterhorn`:
-   Matterhorn related configuration files (Felix and service configuration, workflows, encoding profiles, etc.)
- - `/var/log/matterhorn`:
-   The Matterhorn logfiles. Consider to enable logrotate for this directory.
- - `/srv/matterhorn` or `/var/lib/matterhorn`:
-   Matterhorn storage, including the recordings, the archive, the Solr indexes, etc. You may use one of these
+ - `/usr/share/opencast`:
+   Software and data not modified by Opencast. This includes felix, the Opencast modules and external libraries.
+ - `/etc/opencast`:
+   Opencast related configuration files (Felix and service configuration, workflows, encoding profiles, etc.)
+ - `/var/log/opencast`:
+   The Opencast logfiles. Consider to enable logrotate for this directory.
+ - `/srv/opencast` or `/var/lib/opencast`:
+   Opencast storage, including the recordings, the archive, the Solr indexes, etc. You may use one of these
    directories or both. For more details have a look at the explanation below and the discussion in the comments.
- - `/tmp/matterhorn`:
+ - `/tmp/opencast`:
    Temporary data which are not necessarily preserved between reboots. This includes the felix-cache and other temporary
    data.
- - `/usr/sbin/matterhorn`:
-   Matterhorn startscript
- - `/etc/init.d/matterhorn`
+ - `/usr/sbin/opencast`:
+   Opencast startscript
+ - `/etc/init.d/opencast`
    SysV-Initscript (if necessary)
 
 
 Reasoning for these Locations
 -----------------------------
 
-### /usr/share/matterhorn – Matterhorn Software Components
+### /usr/share/opencast – Opencast Software Components
 
 The Filesystem Hierarchy Standard states that “*The /usr/share hierarchy is for all read-only architecture independent
 data files.*” and that “*Any program or package which contains or requires data that does not need to be modified should
 store that data in /usr/share*”.  It is also used for this purpose by cups, emacs, cmake, pulseaudio, gimp, … It sould
 be used for felix.jar and all the modules (lib directory)
 
-### /etc/matterhorn – Matterhorn Configuration
+### /etc/opencast – Opencast Configuration
 
 The Filesystem Hierarchy Standard states that “*The /etc hierarchy contains configuration files. A "configuration file"
 is a local file used to control the operation of a program; it must be static and cannot be an executable binary.*”
 
-### /var/log/matterhorn/ – Matterhorn Logs
+### /var/log/opencast/ – Opencast Logs
 
 The Filesystem Hierarchy Standard states that “*This directory contains miscellaneous log files. Most logs must be
 written to this directory or an appropriate subdirectory.*”
 
-### /srv/matterhorn and/or /var/lib/matterhorn/ – Data modified by Matterhorn
+### /srv/opencast and/or /var/lib/opencast/ – Data modified by Opencast
 
 About this the Filesystem Hierarchy Standard says that “*This hierarchy holds state information pertaining to an
 application or the system. State information is data that programs modify while they run, …*” also “*/var/lib/<name> is
@@ -98,11 +98,11 @@ further problems.
 Notice For System Operators
 ---------------------------
 
-This guide is supposed to defines default locations for a matterhorn system. It does not restrict your own system
+This guide is supposed to defines default locations for an Opencast system. It does not restrict your own system
 configuration.
 
-For a Matterhorn system it is for example quite common to mount an external storage (NFS, …) and use it as storage for
-Matterhorn. You do not have to mount it to `/var/lib/matterhorn` if you do not want to. Instead, mount it in /media or
-wherever you want–it is your system afterall–and either change the Matterhorn configuration to use the directory of your
-directly, or put appropriate symlinks in `/var/lib/matterhorn`. This is, however, system specific and should not be done
+For a Opencast system it is for example quite common to mount an external storage (NFS, …) and use it as storage for
+Opencast. You do not have to mount it to `/var/lib/opencast` if you do not want to. Instead, mount it in /media or
+wherever you want–it is your system afterall–and either change the Opencast configuration to use the directory of your
+directly, or put appropriate symlinks in `/var/lib/opencast`. This is, however, system specific and should not be done
 for packages.

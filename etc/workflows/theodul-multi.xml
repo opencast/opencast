@@ -44,7 +44,7 @@
       </span>
     </li>
       </ul>
-    </fieldset>  
+    </fieldset>
     <fieldset>
       <legend>Distribution</legend>
       <ul class="oc-ui-form-list">
@@ -52,8 +52,8 @@
         <li class="ui-helper-clearfix">
           <label class="scheduler-label"><span class="color-red">* </span><span id="i18n_dist_label">Distribution Channel(s)</span>:</label>
           <span id="dist">
-            <input id="distribution" name="distribution" type="checkbox" checked="checked" disabled="disabled" class="configField" value="Matterhorn Media Module" />
-            <span id="i18n_dist_mmm">&nbsp;Matterhorn Media Module</span>
+            <input id="distribution" name="distribution" type="checkbox" checked="checked" disabled="disabled" class="configField" value="Opencast Media Module" />
+            <span id="i18n_dist_mmm">&nbsp;Opencast Media Module</span>
             <input id="youtube" name="youtube" type="checkbox" disabled="disabled" class="configField" value="Youtube" />
             <span id="i18n_dist_mmm">&nbsp;Youtube</span>
           </span>
@@ -66,7 +66,7 @@
       var trimHold = $('input#trimHold');
       var captionHold = $('input#captionHold');
       var videoPreview = $('input#videoPreview');
-      
+
       // Make sure video preview are created if one of caption hold, trim hold, is selected
       var checkVideoPreview = function() {
         var checkValue = trimHold.is(':checked') || captionHold.is(':checked');
@@ -74,7 +74,7 @@
       }
       trimHold.click(checkVideoPreview);
       captionHold.click(checkVideoPreview);
-      
+
       ocWorkflowPanel.registerComponents = function(components){
         /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
          * into the workflow. The component's nodeKey must match the components array key.
@@ -86,30 +86,30 @@
           {key: 'org.opencastproject.workflow.config.trimHold'},
           {getValue: function(){ return this.fields.trimHold.is(":checked"); }
           });
-          
+
         components['org.opencastproject.workflow.config.archiveOp'] = new ocAdmin.Component(
           ['archiveOp'],
           {key: 'org.opencastproject.workflow.config.archiveOp'},
           {getValue: function(){ return this.fields.archiveOp.is(":checked");}
           });
-          
+
         components['org.opencastproject.workflow.config.captionHold'] = new ocAdmin.Component(
           ['captionHold'],
           {key: 'org.opencastproject.workflow.config.captionHold'},
           {getValue: function(){ return this.fields.captionHold.is(":checked");}
           });
-          
+
         components['org.opencastproject.workflow.config.videoPreview'] = new ocAdmin.Component(
           ['videoPreview'],
           {key: 'org.opencastproject.workflow.config.videoPreview'},
           {getValue: function(){ return this.fields.videoPreview.is(":checked");}
           });
-          
+
         ocScheduler.dublinCore.components['license'] = new ocAdmin.Component(
           ['license'],
           {label: 'licenseLabel', key: 'license'}
           );
-          
+
           //etc...
       }
       ocWorkflowPanel.setComponentValues = function(values, components){
@@ -131,7 +131,7 @@
     <!-- Download from external ingest nodes, tag, inspect and and prepare -->
     <!-- source recording and metadata catalogs.                           -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-  
+
     <!-- Ingest elements from external working file repositories and file servers -->
 
     <operation
@@ -141,7 +141,7 @@
         <configuration key="delete-external">true</configuration>
       </configurations>
     </operation>
-  
+
     <!-- Apply ACL from series to the mediapackage -->
 
     <operation
@@ -150,7 +150,7 @@
       exception-handler-workflow="error"
       description="Applying access control entries">
     </operation>
-    
+
     <!-- Tag the incoming source material for archival -->
 
     <operation
@@ -174,7 +174,7 @@
     </operation>
 
     <!-- Inspect the media -->
-    
+
     <operation
       id="inspect"
       fail-on-error="true"
@@ -265,7 +265,7 @@
       </configurations>
     </operation>
 
-    <!-- hold for review and trimming --> 
+    <!-- hold for review and trimming -->
 
     <operation
       id="trim"
@@ -424,8 +424,8 @@
         <configuration key="target-tags">engage-download,engage-streaming,rss,atom</configuration>
         <configuration key="encoding-profile">mp3.http</configuration>
       </configurations>
-    </operation>   
-    
+    </operation>
+
     <!-- encode to feed preview images -->
 
     <operation
@@ -450,7 +450,7 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <!-- run the videosegmentation -->
-    
+
     <operation
       id="segment-video"
       fail-on-error="false"
@@ -462,7 +462,7 @@
     </operation>
 
     <!-- Generate segment preview images -->
-    
+
     <operation
       id="segmentpreviews"
       fail-on-error="false"
@@ -531,7 +531,7 @@
         <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
- 
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Cleanup                                                           -->
     <!--                                                                   -->
