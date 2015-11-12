@@ -49,7 +49,7 @@
    },
    "CONFIRMATIONS": {
      "CONTINUE_ACTION" : "Are you sure you want to continue?",
-     "ACTIONS": { 
+     "ACTIONS": {
        "CONFIRMATION" : "Confirmation required"
      }
    },
@@ -475,7 +475,7 @@
                     "CHECKSUM" : "Checksum",
                     "REFERENCE": "Reference"
                   }
-              },              
+              },
               "MEDIA": {
                   "TITLE": "Media",
                   "CAPTION": "Media",
@@ -510,7 +510,7 @@
                       "SCANTYPE": "Scantype",
                       "SCANORDER": "Scanorder"
                   }
-               },            
+               },
               "PUBLICATIONS": {
                   "TITLE"    : "Publications",
                   "CAPTION"  : "Publications",
@@ -1327,6 +1327,14 @@
      }
    },
    "FILTERS": {
+     "AGENTS": {
+       "NAME": {
+         "LABEL": "Name"
+       },
+       "STATUS": {
+         "LABEL": "Status"
+       }
+     },
      "EVENTS": {
        "STATUS": {
          "LABEL":      "Status",
