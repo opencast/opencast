@@ -1117,9 +1117,9 @@
     <developer>
       <id>twunden</id>
       <name>Tobias Wunden</name>
-      <email>tobias@entwinemedia.com</email>
-      <organization>Entwine</organization>
-      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <email>twunden@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1128,9 +1128,9 @@
     <developer>
       <id>akm220</id>
       <name>Adam McKenzie</name>
-      <email>akm220@mail.usask.ca</email>
-      <organization>University of Saskatchewan</organization>
-      <organizationUrl>http://www.usask.ca</organizationUrl>
+      <email>amckenzie@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1139,9 +1139,9 @@
     <developer>
       <id>cedriessen</id>
       <name>Christoph Driessen</name>
-      <email>christoph@entwinemedia.com</email>
-      <organization>Entwine</organization>
-      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <email>cdriessen@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1161,9 +1161,9 @@
     <developer>
       <id>lrohner</id>
       <name>Lukas Rohner</name>
-      <email>lukas@entwinemedia.com</email>
-      <organization>Entwine</organization>
-      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <email>lrohner@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1172,9 +1172,9 @@
     <developer>
       <id>xavier.butty</id>
       <name>Xavier Butty</name>
-      <email>xavier@entwinemedia.com</email>
-      <organization>Entwine</organization>
-      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <email></email>
+      <organization></organization>
+      <organizationUrl></organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1243,9 +1243,9 @@
     <developer>
       <id>basil.brunner</id>
       <name>Basil Brunner</name>
-      <email>basil@entwinemedia.com</email>
-      <organization>Entwine</organization>
-      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <email>bbrunner@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
