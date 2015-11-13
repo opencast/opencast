@@ -42,6 +42,7 @@
     "USER_NOT_DELETED":"Der Nutzer konnte nicht gelöscht werden",
     "USER_NOT_MANAGEABLE":"Dieser Nutzer kann nicht geändert werden",
     "GROUP_ADDED":"Die Gruppe wurde angelegt",
+    "GROUP_CONFLICT":"Der erzeugte Gruppenname existiert bereits",
     "GROUP_UPDATED":"Die Gruppe wurde aktualisiert",
     "GROUP_NOT_SAVED":"Die Gruppe konnte nicht gespeichert werden",
     "GROUP_DELETED":"Die Gruppe wurde gelöscht",
