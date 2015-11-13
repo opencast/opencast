@@ -131,7 +131,7 @@ public final class WorkspaceImpl implements Workspace {
 
   private boolean waitForResourceFlag = false;
 
-  private WorkspaceCleaner workspaceCleaner;
+  private WorkspaceCleaner workspaceCleaner = null;
 
   public WorkspaceImpl() {
   }
@@ -152,6 +152,17 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   /**
+   * Check is a property exists in a given bundle context.
+   * @param cc
+   *          the OSGi component context
+   * @param prop
+   *          property to check for.
+   */
+  private boolean ensureContextProp(ComponentContext cc, String prop) {
+    return cc != null && cc.getBundleContext().getProperty(prop) != null;
+  }
+
+  /**
    * OSGi service activation callback.
    *
    * @param cc
@@ -159,11 +170,11 @@ public final class WorkspaceImpl implements Workspace {
    */
   public void activate(ComponentContext cc) {
     if (this.wsRoot == null) {
-      if (cc != null && cc.getBundleContext().getProperty(WORKSPACE_DIR_KEY) != null) {
+      if (ensureContextProp(cc, WORKSPACE_DIR_KEY)) {
         // use rootDir from CONFIG
         this.wsRoot = cc.getBundleContext().getProperty(WORKSPACE_DIR_KEY);
         logger.info("CONFIG " + WORKSPACE_DIR_KEY + ": " + this.wsRoot);
-      } else if (cc != null && cc.getBundleContext().getProperty(STORAGE_DIR_KEY) != null) {
+      } else if (ensureContextProp(cc,STORAGE_DIR_KEY)) {
         // create rootDir by adding "workspace" to the default data directory
         this.wsRoot = PathSupport.concat(cc.getBundleContext().getProperty(STORAGE_DIR_KEY), "workspace");
         logger.warn("CONFIG " + WORKSPACE_DIR_KEY + " is missing: falling back to " + this.wsRoot);
@@ -178,20 +189,7 @@ public final class WorkspaceImpl implements Workspace {
       try {
         FileUtils.forceMkdir(f);
       } catch (Exception e) {
-        throw new IllegalStateException(e);
-      }
-    }
-
-    // Set up the garbage file collection timer
-    if (cc != null && cc.getBundleContext().getProperty(WORKSPACE_CLEANUP_PERIOD_KEY) != null) {
-      String period = cc.getBundleContext().getProperty(WORKSPACE_CLEANUP_PERIOD_KEY);
-      if (period != null) {
-        try {
-          garbageCollectionPeriodInSeconds = Integer.parseInt(period);
-        } catch (NumberFormatException e) {
-          logger.warn("Workspace garbage collection period can not be set to {}."
-                  + " Please choose a valid number for the '{}' config", period, WORKSPACE_CLEANUP_PERIOD_KEY);
-        }
+        throw new IllegalStateException("Could not create workspace directory.", e);
       }
     }
 
@@ -213,29 +211,43 @@ public final class WorkspaceImpl implements Workspace {
       }
     }
 
+    // Set up the garbage collection timer
+    if (ensureContextProp(cc,  WORKSPACE_CLEANUP_PERIOD_KEY)) {
+      String period = cc.getBundleContext().getProperty(WORKSPACE_CLEANUP_PERIOD_KEY);
+      try {
+        garbageCollectionPeriodInSeconds = Integer.parseInt(period);
+      } catch (NumberFormatException e) {
+        logger.warn("Invalid configuration for workspace garbage collection period ({}={})",
+            WORKSPACE_CLEANUP_PERIOD_KEY, period);
+      }
+    }
+
     // Activate garbage collection
-    if (cc != null && cc.getBundleContext().getProperty(WORKSPACE_CLEANUP_MAX_AGE_KEY) != null) {
+    if (ensureContextProp(cc, WORKSPACE_CLEANUP_MAX_AGE_KEY)) {
       String age = cc.getBundleContext().getProperty(WORKSPACE_CLEANUP_MAX_AGE_KEY);
-      if (age != null) {
-        try {
-          maxAgeInSeconds = Integer.parseInt(age);
-        } catch (NumberFormatException e) {
-          logger.warn("Workspace garbage collection max age can not be set to {}."
-                  + " Please choose a valid number for the '{}' setting", age, WORKSPACE_CLEANUP_MAX_AGE_KEY);
-        }
+      try {
+        maxAgeInSeconds = Integer.parseInt(age);
+      } catch (NumberFormatException e) {
+        logger.warn("Invalid configuration for workspace garbage collection max age ({}={})",
+            WORKSPACE_CLEANUP_MAX_AGE_KEY, age);
       }
     }
 
     registeredMXBean = JmxUtil.registerMXBean(workspaceBean, JMX_WORKSPACE_TYPE);
 
-    workspaceCleaner = new WorkspaceCleaner(this, garbageCollectionPeriodInSeconds, maxAgeInSeconds);
-    workspaceCleaner.schedule();
+    // Start cleanup scheduler if we have sensible cleanup values:
+    if (garbageCollectionPeriodInSeconds > 0) {
+      workspaceCleaner = new WorkspaceCleaner(this, garbageCollectionPeriodInSeconds, maxAgeInSeconds);
+      workspaceCleaner.schedule();
+    }
   }
 
   /** Callback from OSGi on service deactivation. */
   public void deactivate() {
     JmxUtil.unregisterMXBean(registeredMXBean);
-    workspaceCleaner.shutdown();
+    if (workspaceCleaner != null) {
+      workspaceCleaner.shutdown();
+    }
   }
 
   @Override
@@ -387,7 +399,7 @@ public final class WorkspaceImpl implements Workspace {
 
   /**
    * {@link #downloadIfNecessary(java.net.URI, java.io.File)} as a function.
-   * <code>src_uri -> dst_file -> dst_file</code>
+   * <code>src_uri -&gt; dst_file -&gt; dst_file</code>
    */
   private Function<File, File> downloadIfNecessary(final URI src) {
     return new Function.X<File, File>() {
@@ -775,31 +787,38 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   @Override
-  public void cleanup(final Option<Integer> maxAgeInSeconds) {
+  public void cleanup(final int maxAgeInSeconds) {
+    // Cancel cleanup if we do not have a valid setting for the maximum file age
+    if (maxAgeInSeconds < 0) {
+      logger.debug("Canceling cleanup of workspace due to maxAge ({}) <= 0", maxAgeInSeconds);
+      return;
+    }
+
+    // Get root directly
     final File rootDirecotry = new File(wsRoot);
+
+    // Get path for mediapackage and collection directly
+    final String mediapackageDirectory = new File(rootDirecotry,
+        WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX).getAbsolutePath();
+    final String collectionDirectory = new File(rootDirecotry,
+        WorkingFileRepository.COLLECTION_PATH_PREFIX).getAbsolutePath();
 
     logger.info("Starting cleanup of workspace at {}", rootDirecotry);
     Collection<File> files = FileUtils.listFiles(rootDirecotry, null, true);
     List<File> filesToDelete = Monadics.mlist(files).filter(new Function<File, Boolean>() {
       @Override
       public Boolean apply(File file) {
-        if (file.isDirectory())
+        if (file.isDirectory()) {
           return false;
-
-        File mediapackageDirectory = new File(rootDirecotry, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX);
-        File collectionDirectory = new File(rootDirecotry, WorkingFileRepository.COLLECTION_PATH_PREFIX);
-
-        if (file.getAbsolutePath().startsWith(mediapackageDirectory.getAbsolutePath())
-                || file.getAbsolutePath().startsWith(collectionDirectory.getAbsolutePath()))
-          return false;
-
-        boolean maxAgeReached = true;
-        if (maxAgeInSeconds.isSome()) {
-          long fileAgeInSeconds = (new Date().getTime() - file.lastModified()) / 1000;
-          maxAgeReached = fileAgeInSeconds > maxAgeInSeconds.get();
         }
 
-        return maxAgeReached;
+        String filePath = file.getAbsolutePath();
+        if (filePath.startsWith(mediapackageDirectory) || filePath.startsWith(collectionDirectory)) {
+          return false;
+        }
+
+        long fileAgeInSeconds = (new Date().getTime() - file.lastModified()) / 1000;
+        return fileAgeInSeconds >= maxAgeInSeconds;
       }
     }).value();
 
@@ -808,6 +827,6 @@ public final class WorkspaceImpl implements Workspace {
       FileSupport.delete(file);
       FileSupport.deleteHierarchyIfEmpty(rootDirecotry, file.getParentFile());
     }
-    logger.info("Finished cleanup of workspace!");
+    logger.debug("Finished cleanup of workspace!");
   }
 }
