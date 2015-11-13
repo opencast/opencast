@@ -5,7 +5,7 @@ tweaking. For some modules some more in depth documentation is available too.
 
  - [Atom and RSS Feed](atomrss.md)
  - [Media Module](mediamodule.configuration.md)
- - Player 2.0
+ - Player 2.0+
     - [Configuration](player.configuration.md)
     - [URL Parameter](player.url.parameter.md)
     - [Optional Plugins](player.plugins.md)
