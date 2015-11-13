@@ -64,6 +64,14 @@ angular.module('adminNg.directives')
                     }
                 }
             }
+            
+            function getTimeInSeconds(time) {
+            	var millis = time.milliseconds;
+            	millis += time.seconds * 1000;
+            	millis += time.minutes * 60 * 1000;
+            	millis += time.hours * 60 * 60 * 1000;
+            	return millis / 1000;
+            }
 
             scope.$on('$destroy', function () {
                 $timeout.cancel(scope.checkTimeout);
@@ -99,7 +107,11 @@ angular.module('adminNg.directives')
                     scope.player.adapter.play();
                 }
             };
-
+            
+            scope.changeTime = function (time) {
+            	scope.player.adapter.setCurrentTime(getTimeInSeconds(time));
+            };
+            
             scope.subControls = angular.isDefined(scope.subControls) ? scope.subControls : 'true';
 
             // Check for the player (10 times) before to load the adapter
