@@ -1255,7 +1255,15 @@
       <name>Michael Stypa</name>
     </developer>
     <developer>
+      <id>rsantos</id>
       <name>Rute Santos</name>
+      <email>rute_santos@harvard.edu</email>
+      <organization>Harvard University, Division of Continuing Education</organization>
+      <organizationUrl>http://www.dce.harvard.edu</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-5</timezone>
     </developer>
   </developers>
 
