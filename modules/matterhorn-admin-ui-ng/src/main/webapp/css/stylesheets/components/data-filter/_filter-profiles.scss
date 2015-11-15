@@ -96,24 +96,26 @@
 
         // Content styles
         ul {
-            padding: 5px 15px 0;
             line-height: 35px;
             cursor: default;
         } // ul
 
         li {
+            border-top: 1px solid #e2e2e2;
+            border-bottom: 1px solid #e2e2e2;
+            padding: 0px 10px 0px 10px;
+
             .remove {
                 @include fa-icon($fa-close, before, inline-block, 0, 0, $medium-prim-color, 17px);
-                float: right;
-            } // remove
+            }
 
             .edit {
                 @include fa-icon($fa-cog, before, inline-block, 0, 0, $medium-prim-color, 17px);
-                float: right;
-                margin-right: 8px;
+                padding-left: 5px;
+                padding-right: 5px;
             }
 
-            > a { &.active { color: $l-blue; } }
+            > a { word-wrap: break-word; &.active { color: $l-blue; }  }
 
         } // li
     }

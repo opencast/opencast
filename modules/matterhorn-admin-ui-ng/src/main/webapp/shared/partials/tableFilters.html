@@ -73,8 +73,8 @@
                             ng-class="{ active: $index === activeProfile }">
                             {{ profile.name }}
                         </a>
-                        <a ng-click="removeFilterProfile($index)" class="icon remove"></a>
                         <a ng-click="editFilterProfile($index)" class="icon edit"></a>
+                        <a ng-click="removeFilterProfile($index)" class="icon remove"></a>
                     </li>
                     <li ng-show="profiles.length == 0"
                     translate="TABLE_FILTERS.PROFILES.EMPTY"><!--No saved filters yet--></li>
