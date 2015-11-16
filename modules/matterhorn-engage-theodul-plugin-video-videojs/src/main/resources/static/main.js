@@ -501,7 +501,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         var zoomLevels = [];
         var ratio = aspectRatio[2] / aspectRatio[1];
         var id = Engage.model.get("urlParameters").id;
-
+        var flag = 0;
 
         /* Hides Minimap, e.g. when zoom < 1 */
         function hideMinimap() {
@@ -604,6 +604,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 selector = ".videoFocused video";
                 videoFocused = false;
                 singleVideo = false;
+                $("." + videoDisplayClass).on("click", function() {
+                    if (flag == 0) {
+                        Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
+                    }
+                });
             }
         })
 
@@ -689,12 +694,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     return;
                 }
             }
-
             // scrolling stays avaiable
             if (selector == "video" && !singleVideo) {
                 return;
             }
-
             // calculate mouse position
             var parentOffset = $(this).parent().offset();
             var relX = event.pageX - parentOffset.left;
@@ -725,8 +728,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
 
         $(selector).mousedown(function() {
+            flag = 0;
             $(selector).mousemove(function(event) {
-                if (lastEvent != null && singleVideo) {
+                if (lastEvent != null) {
+                    flag = 1;
                     // Movement
                     var x_move = lastEvent.pageX - event.pageX;
                     var y_move = lastEvent.pageY - event.pageY;
@@ -805,7 +810,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             var level = data[0];
             var fixed = data[1];
             var moveOnly = data[2];
-            console.log("setZoom: " + selector);
+
             fixed = typeof fixed !== 'undefined' ? fixed : false;
             moveOnly = typeof moveOnly !== 'undefined' ? moveOnly : false;
 
@@ -1978,9 +1983,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             });
 
             if (numberOfVideodisplays > 1) {
-                $("." + videoDisplayClass).on("click", function() {
-                    Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
-                });
+                //$("." + videoDisplayClass).on("click", function() {
+                //    Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
+                //});
             }
 
             Engage.on(plugin.events.focusVideo.getName(), function(display) {
