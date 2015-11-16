@@ -12,31 +12,6 @@ angular.module('adminNg.directives')
             requiredRole: '@'
         },
         link: function (scope, element) {
-
-            /**
-             * Format the value to a presentable string. 
-             * The arrays are presented the as comma separated list of items.
-             * 
-             * @param  {Object} value The source value
-             * @return {String}       The formated value
-             */
-            var present = function (value) {
-                if (value instanceof Array) {
-                    var presentableValue = '';
-
-                    angular.forEach(value, function (item, index) {
-                        presentableValue += item;
-                        if ((index + 1) < value.length) {
-                            presentableValue += ', ';
-                        }
-                    });
-
-                    return presentableValue;
-                } else {
-                    return value;
-                }
-            };
-            
             scope.mixed = false;
 
             if (scope.params.readOnly) {
@@ -82,8 +57,6 @@ angular.module('adminNg.directives')
             
             if (scope.mode !== 'readOnly') {
                 element.addClass('editable');
-            } else {
-                scope.presentableValue = present(scope.params.value);
             }
         }
     };

@@ -1,4 +1,4 @@
-<span ng-if="mode === 'readOnly'">{{ presentableValue }}</span>
+<span ng-if="mode === 'readOnly'">{{ params.value | presentValue }}</span>
 
 <div ng-if="mode === 'singleValue'"
     admin-ng-editable-single-value
