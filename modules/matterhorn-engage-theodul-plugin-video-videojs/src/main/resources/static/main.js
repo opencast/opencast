@@ -656,6 +656,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     mapSelector = ".videoDisplay"
                     setTimeout(showMinimap, zoomTimeout);
                 } else {
+                    Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
                     selector = ".videoFocused video";
                     setTimeout(redrawMinimap, zoomTimeout);
                 }
@@ -668,6 +669,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     mapSelector = ".videoDisplay"
                     setTimeout(showMinimap, zoomTimeout);
                 } else {
+                    // Reset before unfocus
+                    Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
                     selector = ".videoFocusedPiP video";
                     setTimeout(redrawMinimap, zoomTimeout);
                 }
