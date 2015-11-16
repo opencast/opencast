@@ -802,7 +802,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             var level = data[0];
             var fixed = data[1];
             var moveOnly = data[2];
-
+            console.log("setZoom: " + selector);
             fixed = typeof fixed !== 'undefined' ? fixed : false;
             moveOnly = typeof moveOnly !== 'undefined' ? moveOnly : false;
 
@@ -877,7 +877,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
 
         Engage.on(plugin.events.zoomReset.getName(), function() {
-            Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
+            var tmpSelector = selector;
+            for (var i = 0; i < zoomLevels.length; i++) {
+                selector = $("#"+zoomLevels[i])[0];
+                Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
+                i++;
+            }
+            selector = tmpSelector;
         });
 
         Engage.on(plugin.events.zoomIn.getName(), function() {
