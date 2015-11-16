@@ -54,7 +54,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -168,6 +167,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     solrServer = new Object() {
       SolrServer create() {
         if (solrServerUrlConfig != null) {
+          /* Use external SOLR server */
           try {
             logger.info("Setting up solr server at {}", solrServerUrlConfig);
             URL solrServerUrl = new URL(solrServerUrlConfig);
@@ -175,21 +175,10 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           } catch (MalformedURLException e) {
             throw connectError(solrServerUrlConfig, e);
           }
-        } else if (cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT) != null) {
-          String solrRoot = cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT);
-          try {
-            logger.debug("Setting up solr server at {}", solrRoot);
-            return setupSolr(new File(solrRoot));
-          } catch (IOException e) {
-            throw connectError(solrServerUrlConfig, e);
-          } catch (SolrServerException e) {
-            throw connectError(solrServerUrlConfig, e);
-          }
         } else {
-          String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
-          if (storageDir == null)
-            throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
-          String solrRoot = PathSupport.concat(storageDir, "searchindex");
+          /* Set-up embedded SOLR */
+          String solrRoot = SolrServerFactory.getEmbeddedDir(cc, CONFIG_SOLR_ROOT, "search");
+
           try {
             logger.debug("Setting up solr server at {}", solrRoot);
             return setupSolr(new File(solrRoot));
