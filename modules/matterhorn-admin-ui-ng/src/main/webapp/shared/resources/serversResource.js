@@ -1,11 +1,11 @@
 angular.module('adminNg.resources')
 .factory('ServersResource', ['$resource', 'JsHelper', function ($resource, JsHelper) {
     return $resource('/admin-ng/server/servers.json', {}, {
-        query: { method: 'GET', isArray: false, transformResponse: function (data) {
-            var results = JSON.parse(data).results;
+        query: { method: 'GET', isArray: false, transformResponse: function (rawData) {
+            var data = JSON.parse(rawData);
             var result = [];
-            for (var i = 0; i < results.length; i++) {
-                var row = results[i];
+            for (var i = 0; i < data.results.length; i++) {
+                var row = data.results[i];
                 row.id = row.name;
 
                 row.meanRunTime = JsHelper.secondsToTime(row.meanRunTime);
