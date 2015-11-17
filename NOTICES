@@ -916,20 +916,6 @@ matterhorn-engage-theodul-api
 
 matterhorn-engage-theodul-core
   GroupId                                ArtifactId                                       License
-  com.sun.jersey                         jersey-atom                                      CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey                         jersey-client                                    CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey                         jersey-core                                      CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey                         jersey-json                                      CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey                         jersey-server                                    CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey.contribs                jersey-apache-client                             CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey.contribs                jersey-atom-abdera                               CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey.contribs                jersey-guice                                     CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey.contribs                jersey-multipart                                 CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey.contribs                jersey-simple-server                             CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey.contribs                jersey-spring                                    CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey.contribs.jersey-oauth   oauth-client                                     CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey.contribs.jersey-oauth   oauth-server                                     CDDL 1.1-GPL2 w/ CPE
-  com.sun.jersey.contribs.jersey-oauth   oauth-signature                                  CDDL 1.1-GPL2 w/ CPE
   javax.ws.rs                            jsr311-api                                       -
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
 
