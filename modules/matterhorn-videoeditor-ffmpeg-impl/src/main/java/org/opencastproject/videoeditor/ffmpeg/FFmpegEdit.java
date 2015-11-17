@@ -52,7 +52,7 @@ public class FFmpegEdit {
 
   private static final Logger logger = LoggerFactory.getLogger(FFmpegEdit.class);
   private static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
-  private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpegpath";
+  private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpeg.path";
 
   private static final String DEFAULT_FFMPEG_PROPERTIES = "-strict -2 -preset faster -crf 18";
   public static final String DEFAULT_OUTPUT_FILE_EXTENSION = ".mp4";
