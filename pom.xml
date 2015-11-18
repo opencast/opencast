@@ -1252,7 +1252,20 @@
       <timezone>+1</timezone>
     </developer>
     <developer>
+      <id>mstypa</id>
       <name>Michael Stypa</name>
+      <email>michael@stypa.info</email>
+      <url>http://michael.stypa.info</url>
+      <organization>ELAN e.V., University of Osnabrück</organization>
+      <organizationUrl>http://www.virtuos.uos.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+      <properties>
+        <irc.nick>mstypa</irc.nick>
+        <bitbucket.nick>doofy</bitbucket.nick>
+      </properties>
     </developer>
     <developer>
       <id>rsantos</id>
