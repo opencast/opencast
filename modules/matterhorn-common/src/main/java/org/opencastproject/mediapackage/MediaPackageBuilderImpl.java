@@ -31,6 +31,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -167,7 +168,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
    * Rewrite the url elements using the serializer. Attention: This method modifies the given DOM!
    */
   private static void rewriteUrls(Node xml, MediaPackageSerializer serializer) throws XPathExpressionException,
-          URISyntaxException {
+  URISyntaxException {
     XPath xPath = XPathFactory.newInstance().newXPath();
     NodeList nodes = (NodeList) xPath.evaluate("//*[local-name() = 'url']", xml, XPathConstants.NODESET);
     for (int i = 0; i < nodes.getLength(); i++) {
@@ -182,7 +183,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
           logger.warn("Detected invalid URI. Trying to fix it by "
               + "removing spaces from beginning/end.");
         }
-        uri.setNodeValue(serializer.resolvePath(trimmedUriStr).toString());
+        uri.setNodeValue(serializer.decodeURI(new URI(trimmedUriStr)).toString());
       }
     }
   }

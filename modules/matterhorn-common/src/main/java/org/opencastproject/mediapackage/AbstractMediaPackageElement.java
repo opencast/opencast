@@ -33,6 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -479,7 +480,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
   @Override
-  public Node toManifest(Document document, MediaPackageSerializer serializer) {
+  public Node toManifest(Document document, MediaPackageSerializer serializer) throws MediaPackageException {
     Element node = document.createElement(elementType.toString().toLowerCase());
     if (id != null)
       node.setAttribute("id", id);
@@ -514,7 +515,11 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
     // Url
     Element urlNode = document.createElement("url");
     String urlValue;
-    urlValue = (serializer != null) ? serializer.encodeURI(uri).toString() : uri.toString();
+    try {
+      urlValue = (serializer != null) ? serializer.encodeURI(uri).toString() : uri.toString();
+    } catch (URISyntaxException e) {
+      throw new MediaPackageException(e);
+    }
     urlNode.appendChild(document.createTextNode(urlValue));
     node.appendChild(urlNode);
 

@@ -340,7 +340,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    * @return The file to copy the content to
    */
   protected File getDistributionFile(String channelId, MediaPackage mp, MediaPackageElement element) {
-    String uriString = element.getURI().toString();
+    String uriString = element.getURI().toString().split("\\?")[0];
     final String directoryName = distributionDirectory.getAbsolutePath();
     if (uriString.startsWith(streamingUrl)) {
       if (uriString.lastIndexOf(".") < (uriString.length() - 4)) {
