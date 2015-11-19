@@ -101,7 +101,7 @@
                             <options>
                                 <undef>true</undef>
                                 <predef>videojs, _V_, define</predef>
-                                <indent>2</indent>
+                                <indent>4</indent>
                                 <eqeq>true</eqeq>
                                 <sloppy>false</sloppy>
                                 <white>false</white>
@@ -109,6 +109,7 @@
                             <excludes>
                                 <exclude>**/lib/*.js</exclude>
                                 <exclude>**/lib/videojs/*.js</exclude>
+                                <exclude>**/lib/videojs/lang/*.js</exclude>
                             </excludes>
                             <sourceFolders>
                                 <folder>${project.basedir}/src/main/resources/static</folder>
