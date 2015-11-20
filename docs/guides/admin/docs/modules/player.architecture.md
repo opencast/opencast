@@ -1,12 +1,13 @@
 # Architecture
 
 ## Overview
+
 The architecture of the theodul player has a plugin based structure based around a core. The core and the plugins have
 been realized as OSGi modules. Each plugin can be separately build.
 
 The following figure shows the OSGi architecture of the player.
 
-![Architecture](modules/player.architecture1.png)
+![Architecture](player.architecture1.png)
 
 All Theodul OSGi modules are stored under:
 
@@ -72,18 +73,20 @@ structure of core in the **matterhorn-engage-theodul-core OSGi** module.
     |---------js
     |-----------spec
 
-All Theodul JavaScript components are defined as a RequireJS module. The file engage_init.js is loaded firstly and
+All Theodul JavaScript components are defined as a RequireJS module. The file `engage_init.js` is loaded firstly and
 contains the configuration of RequireJS. This init script additionally loads the core module, which is defined in the
-engage_core.js.
+`engage_core.js`.
 
 The core module initializes the main HTML view. This view is realized as a BackboneJS view and is linked to a global
-Backbone model, which is stored in the model module in engage_model.js. The view is returned by the core module, so
-every other module, which has a dependency to the core module, has a reference to the view (simply called "Engage" in
-the plugins) and it's functions. See the Core Reference for more information about the functions of the core view.
+Backbone model, which is stored in the model module in `engage_model.js`. The view is returned by the core module, so
+every other module, which has a dependency to the core module, has a reference to the view (simply called *Engage* in
+the plugins) and its functions. See the Core Reference for more information about the functions of the core view.
 
 ## Plugins
 
-Plugins in the Theodul player are developed and distributed in own OSGi modules. Every plugin has a special UI type. In dependency of this type the core injects the plugin to the right position of the player. The following plugin types are possible:
+Plugins in the Theodul player are developed and distributed in own OSGi modules. Every plugin has a special UI type. In
+dependency of this type the core injects the plugin to the right position of the player. The following plugin types are
+possible:
 
 |Plugin Type|Description|Characteristics|Module Name|JS Plugin Type Name|Maven Plugin Type Name|
 |-----------|-----------|---------------|-----------|-------------------|----------------------|

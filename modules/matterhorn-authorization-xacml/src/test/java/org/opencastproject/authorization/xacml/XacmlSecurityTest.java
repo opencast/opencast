@@ -291,7 +291,7 @@ public class XacmlSecurityTest {
     }
 
     @Override
-    public void cleanup(Option<Integer> maxAge) {
+    public void cleanup(int maxAge) {
       // TODO Auto-generated method stub
     }
 
