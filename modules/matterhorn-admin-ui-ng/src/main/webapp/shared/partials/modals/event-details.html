@@ -357,7 +357,9 @@
                                   ng-model="myComment.reason"
                                   ng-options="value | translate for (id, value) in components.eventCommentReasons"
                                   data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER' | translate }}"
-                              />
+                                  >
+                                <option value=""></option>
+                              </select>
                           </div>
                           <button ng-class="{ disabled: !myComment.text.length || !myComment.reason.length || myComment.saving }" class="save green" ng-click="comment()" translate="SUBMIT">Submit</button>
                         </form>
