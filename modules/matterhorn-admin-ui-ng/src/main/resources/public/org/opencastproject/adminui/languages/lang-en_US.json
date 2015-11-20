@@ -70,6 +70,7 @@
      "USER_NOT_DELETED":    "The user could not be deleted",
      "USER_NOT_MANAGEABLE": "The user is not manageable",
      "GROUP_ADDED":          "The group has been created",
+     "GROUP_CONFLICT":       "The generated group name already exists",
      "GROUP_UPDATED":        "The group has been updated",
      "GROUP_NOT_SAVED":      "The group could not be saved",
      "GROUP_DELETED":        "The group has been deleted",

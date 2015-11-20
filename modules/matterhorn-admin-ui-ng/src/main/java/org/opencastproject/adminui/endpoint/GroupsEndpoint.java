@@ -26,6 +26,7 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static com.entwinemedia.fn.data.json.Jsons.a;
@@ -224,8 +225,9 @@ public class GroupsEndpoint {
           @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
           @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, reponses = {
-          @RestResponse(responseCode = SC_CREATED, description = "Group created"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long") })
+                  @RestResponse(responseCode = SC_CREATED, description = "Group created"),
+                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long"),
+                  @RestResponse(responseCode = SC_CONFLICT, description = "An group with this name already exists.") })
   public Response createGroup(@FormParam("name") String name, @FormParam("description") String description,
           @FormParam("roles") String roles, @FormParam("users") String users) {
 

@@ -70,8 +70,12 @@ angular.module('adminNg.controllers')
             GroupsResources.create($scope.group, function () {
                 Notifications.add('success', 'GROUP_ADDED');
                 Modal.$scope.close();
-            }, function () {
-                Notifications.add('error', 'GROUP_NOT_SAVED', 'group-form');
+            }, function (response) {
+                if(response.status === 409) {
+                    Notifications.add('error', 'GROUP_CONFLICT', 'group-form');
+                } else {
+                    Notifications.add('error', 'GROUP_NOT_SAVED', 'group-form');
+                }
             });
           }
         };
