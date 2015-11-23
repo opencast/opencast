@@ -48,7 +48,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         play: new Engage.Event("Video:play", "plays the video", "both"),
         pause: new Engage.Event("Video:pause", "pauses the video", "both"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "both"),
-        ready: new Engage.Event("Video:ready", "all videos loaded successfully", "trigger"),
+        ready: new Engage.Event("Video:ready", "all videos loaded successfully", "both"),
         ended: new Engage.Event("Video:ended", "end of the video", "trigger"),
         playerLoaded: new Engage.Event("Video:playerLoaded", "player loaded successfully", "trigger"),
         synchronizing: new Engage.Event("Video:synchronizing", "synchronizing videos with the master video", "trigger"),
@@ -441,7 +441,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     function registerSynchronizeEvents() {
         // throw some important synchronize.js-events for other plugins
         $(document).on(event_sjs_allPlayersReady, function(event) {
-            Engage.model.get("videoDataModel").set("ready", true);
             videosReady = true;
             Engage.trigger(plugin.events.ready.getName());
         });
@@ -1000,7 +999,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 initSynchronize();
             } else {
                 videosReady = true;
-                Engage.model.get("videoDataModel").set("ready", true);
+                
                 if (!isAudioOnly) {
                     Engage.trigger(plugin.events.ready.getName());
                 }
@@ -1110,7 +1109,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             // set first videoDisplay as master
             registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], 1);
 
-            Engage.model.get("videoDataModel").set("ready", true);
+            
             videosReady = true;
             Engage.trigger(plugin.events.ready.getName());
 
@@ -1162,7 +1161,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             // set first videoDisplay as master
             registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], 1);
 
-            Engage.model.get("videoDataModel").set("ready", true);
             videosReady = true;
             Engage.trigger(plugin.events.ready.getName());
 
@@ -1810,31 +1808,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 Engage.trigger(plugin.events.fullscreenChange.getName());
             });
 
-            // event used to switch between videos in single player (e.g. mobile) mode
-            Engage.on(plugin.events.switchVideo.getName(), function(direction) {
-                var isPaused = videodisplayMaster.paused();     // check if current video is paused
-                var n = globalVideoSource.length;
-                var x = currentlySelectedVideodisplay + direction;
-                // use different style of modulo, see
-                // http://stackoverflow.com/questions/4467539/javascript-modulo-not-behaving
-                currentlySelectedVideodisplay = ((x % n) + n) % n;
-                videojs(globalVideoSource[currentlySelectedVideodisplay].id).src(globalVideoSource[currentlySelectedVideodisplay].src);
-
-                // synchronize videos
-                if (pressedPlayOnce) {
-                    Engage.trigger(plugin.events.seek.getName(), currentTime);
-                    if (!isPaused) {
-                        Engage.trigger(plugin.events.play.getName());
-                    }
-                }
-            });
-            
-            var numberDisplays = $("." + videoDisplayClass).length;
-            if (numberDisplays > 1) {
-                $("." + videoDisplayClass).on("click", function () {
-                    Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
-                });
-
             Engage.on(plugin.events.focusVideo.getName(), function(display) {
                 Engage.log("Video: received focusing video " + display);
                 var videoDiv;
@@ -2015,6 +1988,32 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     }
                 }
                 delayedCalculateVideoAreaAspectRatio();
+            });
+
+            // event used to switch between videos in single player (e.g. mobile) mode
+            Engage.on(plugin.events.switchVideo.getName(), function(direction) {
+                var isPaused = videodisplayMaster.paused();     // check if current video is paused
+                var n = globalVideoSource.length;
+                var x = currentlySelectedVideodisplay + direction;
+                // use different style of modulo, see
+                // http://stackoverflow.com/questions/4467539/javascript-modulo-not-behaving
+                currentlySelectedVideodisplay = ((x % n) + n) % n;
+                videojs(globalVideoSource[currentlySelectedVideodisplay].id).src(globalVideoSource[currentlySelectedVideodisplay].src);
+
+                // synchronize videos
+                if (pressedPlayOnce) {
+                    Engage.trigger(plugin.events.seek.getName(), currentTime);
+                    if (!isPaused) {
+                        Engage.trigger(plugin.events.play.getName());
+                    }
+                }
+            });
+
+            // listen on ready event with query argument
+            Engage.on(plugin.events.ready.getName(), function(query) {
+                if (query) {
+                    Engage.trigger(plugin.events.ready.getName());
+                }
             });
         }
     }

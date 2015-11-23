@@ -77,7 +77,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         volumeDown: new Engage.Event("Video:volumeDown", "", "handler"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "notices a fullscreen change", "handler"),
-        ready: new Engage.Event("Video:ready", "all videos loaded successfully", "handler"),
+        ready: new Engage.Event("Video:ready", "all videos loaded successfully", "both"),
         timeupdate: new Engage.Event("Video:timeupdate", "notices a timeupdate", "handler"),
         ended: new Engage.Event("Video:ended", "end of the video", "handler"),
         usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "handler"),
@@ -528,8 +528,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     // init dropdown menus
                     $("." + class_dropdown).dropdown();
                 }
+
+                // query ready state of video, in case the ready event from
+                // the video plugin was fired before the controls plugin was initialized
+                Engage.trigger(plugin.events.ready.getName(), true);
+
                 ready();
-                playPause();
                 timeUpdate();
                 addNonFlashEvents();
                 checkLoginStatus();
@@ -1042,6 +1046,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get("videoDataModel"), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
             }
             controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
+            
             Engage.on(plugin.events.videoFormatsFound.getName(), function(formatarr) {
                 if (formatarr) {
                     resolutions = formatarr;
