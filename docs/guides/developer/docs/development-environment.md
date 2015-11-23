@@ -11,3 +11,5 @@ This can be done through the [bundle:watch](https://karaf.apache.org/manual/late
  - Use `bundle:watch IDs` to watch the desired modules, e.g. `bundle:watch 190 199`
  - Make your changes and rebuild the module (e.g. execute `mvn clean install` in the module folder).
  - Watch how karaf automatically redeploys the changed jars from your local maven repository. You can verify that everything went smoothly by checking the log with `log:tail`.
+
+The latest version of the bundle is available after a restart of opencast as well.
