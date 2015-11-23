@@ -6,20 +6,20 @@
     <artifactId>matterhorn-engage-theodul-core</artifactId>
     <packaging>bundle</packaging>
     <name>matterhorn-engage-theodul-core</name>
-  
+
     <parent>
         <groupId>org.opencastproject</groupId>
         <artifactId>base</artifactId>
-        <version>2.1-SNAPSHOT</version>
+        <version>2.2-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-  
+
     <properties>
         <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
         <checkstyle.skip>false</checkstyle.skip>
         <skipJasmineTests>true</skipJasmineTests>
     </properties>
-  
+
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-        </dependency>  
+        </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
@@ -71,78 +71,8 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-atom</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-atom-abdera</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-apache-client</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-spring</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-multipart</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-guice</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-simple-server</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-            <artifactId>oauth-client</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-            <artifactId>oauth-server</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-            <artifactId>oauth-signature</artifactId>
-            <version>1.8</version>
-        </dependency>
     </dependencies>
-  
+
     <build>
         <plugins>
             <plugin>
@@ -151,10 +81,15 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Build-Number>${buildNumber}</Build-Number>
                         <Export-Package>org.opencastproject.engage.theodul.manager.impl</Export-Package>
                         <Private-Package>ui.*</Private-Package>
-                        <Bundle-Activator>org.opencastproject.engage.theodul.manager.impl.Activator</Bundle-Activator>
+                        <Service-Component>
+                            OSGI-INF/theodul-core-static-resources.xml,
+                            OSGI-INF/theodul-pluginmanager-service.xml,
+                            OSGI-INF/theodul-pluginmanager-service-rest.xml
+                        </Service-Component>
                     </instructions>
                 </configuration>
             </plugin>

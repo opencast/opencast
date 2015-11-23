@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.1-SNAPSHOT</version>
+    <version>2.2-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -59,6 +59,12 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
+            <Import-Package>
+              org.opencastproject.archive.api;version=${project.version},
+              org.opencastproject.archive.base.*;version=${project.version},
+              *;resolution:=optional
+            </Import-Package>
             <Export-Package>
             </Export-Package>
             <Service-Component>

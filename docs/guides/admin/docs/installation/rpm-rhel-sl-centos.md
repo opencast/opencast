@@ -33,20 +33,22 @@ Activate Repository
 
 First you have to install the necessary repositories so that your package manager can access them:
 
-1. Add matterhorn repository:
+ - Add Opencast repository:
 
-    ```
-    cd /etc/yum.repos.d
-    curl -O http://repo.virtuos.uos.de/matterhorn.repo \
-       -d os=el -d version=6 \
-       -u [YOUR_USERNAME]:[YOUR_PASSWORD]
-    ```
+        cd /etc/yum.repos.d
+        curl -O http://repo.virtuos.uos.de/opencast.repo \
+           -d os=el -d version=6 \
+           -u [YOUR_USERNAME]:[YOUR_PASSWORD]
 
     *Note: For RHEL/CentOS/SL 7.x use `version=7`*
 
+    It might take one or two weeks after the final version is released before the RPMs are moved to the stable
+    repository. Before that, you can use `.../opencast-testing.repo` instead to get the latest version.
+
 2. Add EPEL repository:
 
-    sudo yum install epel-release
+    yum install epel-release
+
 
 Install 3rd-party-tools
 -----------------------
@@ -54,13 +56,13 @@ Install 3rd-party-tools
 This step is optional and only recommended for those who want to build Opencast from source. If you install Opencast
 from the repository, all necessary dependencies will be installed automatically.
 
-You can install all necessary 3rd-Party-Tools for matterhorn like this:
+You can install all necessary 3rd-Party-Tools for Opencast like this:
 
-    sudo yum install opencast20-third-party-tools
+    yum install opencast21-third-party-tools
 
 Or manually:
 
-    sudo yum install ffmpeg qt_sbtl_embedder tesseract mediainfo
+    yum install ffmpeg tesseract hunspell sox
 
 
 Install Apache ActiveMQ
@@ -72,11 +74,11 @@ Opencast RPM repository as well and can be installed by running:
 
     yum install activemq-dist
 
-A prepared configuration file for ActiveMQ can be found at `/usr/share/matterhorn/docs/scripts/activemq/settings.xml`
-*after Opencast itself has been installed* and should replace `/etc/activemq/settings.xml`. For an all-in-one
+A prepared configuration file for ActiveMQ can be found at `/usr/share/opencast/docs/scripts/activemq/activemq.xml`
+*after Opencast itself has been installed* and should replace `/etc/activemq/activemq.xml`. For an all-in-one
 installation the following command should suffice:
 
-    sudo cp /usr/share/matterhorn/docs/scripts/activemq/settings.xml /etc/activemq/settings.xml
+    cp /usr/share/opencast/docs/scripts/activemq/activemq.xml /etc/activemq/activemq.xml
 
 ActiveMQ should be started before starting Opencast.
 
@@ -90,27 +92,24 @@ Install Opencast
 For this guide, `opencast20` is used as placeholder for the package name. It will install the latest version of the
 Opencast 2.0.x branch. If you want to install another version, please change the name accordingly.
 
-> *Notice: Since the name `matterhorn` was dropped between version 1.6 and 2.0, old packages were named
-> `opencast-matterhornXX`.*
-
 
 ### Basic Installation
 
 For a basic installation (All-In-One) just run:
 
-    sudo yum install opencast20
+    yum install opencast21
 
-This will install the default distribution of matterhorn and all its dependencies, including the 3rd-Party-Tools.
+This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.
 
 Now you can start Opencast.
 
  - On a SysV-init based system
 
-    sudo service matterhorn start
+    service opencast start
 
  - On a Systemd based system
 
-    sudo systemctl start matterhorn.service
+    systemctl start opencast.service
 
 While Opencast is preconfigured, it is strongly recommended to follow at least the [Basic Configuration
 guide](../configuration/basic.md). It will help you to set your hostname, login information, …
@@ -125,16 +124,13 @@ want to install. You can list all Opencast packages with:
 
     yum search opencast
 
-This will list four kinds of packages:
+This will list three kinds of packages:
 
 `opencastXX` is the package that was used for the basic installation. It represents a default Opencast
 distribution.  This is what you would get if you built Opencast from source and do not change any options.
 
 The `opencastXX-distribution-...` packages will install preconfigured Opencast distributions. Have a look at
 the Opencast Distribution section below for more information about the different distributions.
-
-`opencastXX-profile-...` are the Opencast profiles from the main pom.xml. Each profile keeps track of a
-couple of modules.  You should only install these if you know what you are doing.
 
 `opencastXX-module-...` are the Opencast modules itself. It should only be necessary to install these
 directly in special cases.  And you should only do that if you know what you are doing.
@@ -160,7 +156,7 @@ select this package for one node if you are running Opencast across three or mor
 `opencastXX-distribution-admin-worker`
 
 Combined Admin/Worker Opencast distribution. This will install both the modules and profiles for the Administrative
-Tools and the Worker. This package is targeted at medium-sized installations, where you want to seperate the "backend"
+Tools and the Worker. This package is targeted at medium-sized installations, where you want to separate the "backend"
 server that the admin accesses from the "frontend" server that the viewers use.
 
 ### Default Opencast distribution
@@ -182,7 +178,7 @@ highly recommended to keep these separated from the rest of your system.
 
 `opencastXX-distribution-worker`
 
-This is the worker package that contains the modules that create the most CPU load (encoding, OCR, etc). So it is
+This is the worker package that contains the modules that create the most CPU load (encoding, OCR, etc.). So it is
 recommended to deploy this on a more powerful machine.
 
 
@@ -191,16 +187,16 @@ Uninstall Opencast
 
 Sometimes you want to uninstall Opencast. For example to do a clean reinstall. You can do that by executing:
 
-    sudo yum remove 'opencast*'
+    yum remove 'opencast*'
 
 This will not touch your created media files or modified configuration files.  If you want to remove them as well, you
 have to to that by yourself.
 
     # Remove media files
-    sudo rm -rf /srv/matterhorn
- 
+    sudo rm -rf /srv/opencast
+
     # Remove configuration files
-    sudo rm -rf /etc/matterhorn
+    sudo rm -rf /etc/opencast
 
     # Remove system logfiles
-    sudo rm -rf /var/log/matterhorn
+    sudo rm -rf /var/log/opencast

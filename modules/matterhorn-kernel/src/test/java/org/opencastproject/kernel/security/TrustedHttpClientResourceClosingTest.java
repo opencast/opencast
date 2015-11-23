@@ -26,6 +26,8 @@ import static org.junit.Assert.assertEquals;
 import org.opencastproject.kernel.http.api.HttpClient;
 import org.opencastproject.kernel.http.impl.HttpClientFactory;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.urlsigning.exception.UrlSigningException;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -45,10 +47,19 @@ public class TrustedHttpClientResourceClosingTest {
   private static final int PORT = 8952;
 
   private static final class TestHttpClient extends TrustedHttpClientImpl {
-    TestHttpClient() {
+    TestHttpClient() throws UrlSigningException {
       super("user", "pass");
       setHttpClientFactory(new HttpClientFactory());
       setSecurityService(EasyMock.createNiceMock(SecurityService.class));
+      // Setup signing service
+      UrlSigningService urlSigningService = EasyMock.createMock(UrlSigningService.class);
+      EasyMock.expect(urlSigningService.accepts(EasyMock.anyString())).andReturn(true).anyTimes();
+      EasyMock.expect(
+              urlSigningService.sign(EasyMock.anyString(), EasyMock.anyLong(), EasyMock.anyLong(), EasyMock.anyString()))
+              .andReturn("http://ok.com");
+      EasyMock.replay(urlSigningService);
+
+      setUrlSigningService(urlSigningService);
     }
 
     Map<HttpResponse, HttpClient> getResponseMap() {

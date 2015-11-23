@@ -2,19 +2,22 @@ angular.module('adminNg.controllers')
 .controller('GroupCtrl', ['$scope', 'UserRolesResource', 'ResourcesListResource', 'GroupResource', 'GroupsResource', 'Notifications', 'Modal',
     function ($scope, UserRolesResource, ResourcesListResource, GroupResource, GroupsResources, Notifications, Modal) {
 
-        $scope.role = {
-            available: ResourcesListResource.query({ resource: 'ROLES'}),
-            selected:  [],
-            i18n: 'USERS.GROUPS.DETAILS.ROLES',
-            searchable: true
-        };
-
-        $scope.user = {
-            available: ResourcesListResource.query({ resource: 'USERS.INVERSE'}),
-            selected:  [],
-            i18n: 'USERS.GROUPS.DETAILS.USERS',
-            searchable: true
-        };
+        var reloadRoles = function () {
+              $scope.role = {
+                  available: ResourcesListResource.query({ resource: 'ROLES'}),
+                  selected:  [],
+                  i18n: 'USERS.GROUPS.DETAILS.ROLES',
+                  searchable: true
+              };
+            },
+            reloadUsers = function () {
+              $scope.user = {
+                  available: ResourcesListResource.query({ resource: 'USERS.INVERSE'}),
+                  selected:  [],
+                  i18n: 'USERS.GROUPS.DETAILS.USERS',
+                  searchable: true
+              };
+            };
 
         if ($scope.action === 'edit') {
             $scope.caption = 'USERS.GROUPS.DETAILS.EDITCAPTION';
@@ -67,10 +70,17 @@ angular.module('adminNg.controllers')
             GroupsResources.create($scope.group, function () {
                 Notifications.add('success', 'GROUP_ADDED');
                 Modal.$scope.close();
-            }, function () {
-                Notifications.add('error', 'GROUP_NOT_SAVED', 'group-form');
+            }, function (response) {
+                if(response.status === 409) {
+                    Notifications.add('error', 'GROUP_CONFLICT', 'group-form');
+                } else {
+                    Notifications.add('error', 'GROUP_NOT_SAVED', 'group-form');
+                }
             });
           }
         };
+
+        reloadRoles();
+        reloadUsers();
     }
 ]);

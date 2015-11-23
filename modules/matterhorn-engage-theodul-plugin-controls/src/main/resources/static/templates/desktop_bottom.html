@@ -158,11 +158,12 @@
                 <ul class="dropdown-menu pull-right" role="menu">
                     <li class="disabled" role="presentation"><a id="playbackDescription" role="menuitem" tabindex="-1" href="#"><b><%= str_playbackRate %></b> (<%= str_remainingTime %>)</a></li>
                     <li class="divider"></li>
-                    <li role="presentation"><a id="playback050" role="menuitem" tabindex="-1" href="#"><b>50%</b> (<span id="playbackRemTime050"></span>)</a></li>
                     <li role="presentation"><a id="playback075" role="menuitem" tabindex="-1" href="#"><b>75%</b> (<span id="playbackRemTime075"></span>)</a></li>
                     <li role="presentation"><a id="playback100" role="menuitem" tabindex="-1" href="#"><b>100%</b> (<span id="playbackRemTime100"></span>)</a></li>
                     <li role="presentation"><a id="playback125" role="menuitem" tabindex="-1" href="#"><b>125%</b> (<span id="playbackRemTime125"></span>)</a></li>
                     <li role="presentation"><a id="playback150" role="menuitem" tabindex="-1" href="#"><b>150%</b> (<span id="playbackRemTime150"></span>)</a></li>
+                    <li role="presentation"><a id="playback200" role="menuitem" tabindex="-1" href="#"><b>200%</b> (<span id="playbackRemTime200"></span>)</a></li>
+                    <li role="presentation"><a id="playback300" role="menuitem" tabindex="-1" href="#"><b>300%</b> (<span id="playbackRemTime300"></span>)</a></li>
                 </ul>
             </div>
             <% if(hasmultiplevideos && (typeof pip_position !== "undefined")
@@ -170,11 +171,12 @@
              && (typeof str_pictureInPicture !== "undefined")
              && (typeof str_left !== "undefined")
              && (typeof str_right !== "undefined")
+             && (typeof str_beside !== "undefined")
              && (typeof str_off !== "undefined")) { %>
             <div class="btn-group">
                 <button id="dropdownMenuLayout" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_layoutButton %>">
                 <span class="glyphicon glyphicon-film"></span>
-                <span id="pipIndicator"><%= str_left %></span>
+                <span id="pipIndicator"><%= pip_position %></span>
                 <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu multi-level" role="menu">
@@ -182,6 +184,7 @@
                     <li class="divider"></li>
                     <li role="presentation"><a id="pipLeft" role="menuitem" tabindex="-1" href="#"><%= str_left %></a></li>
                     <li role="presentation"><a id="pipRight" role="menuitem" tabindex="-1" href="#"><%= str_right %></a></li>
+                    <li role="presentation"><a id="pipBeside" role="menuitem" tabindex="-1" href="#"><%= str_beside %></a></li>
                     <li role="presentation"><a id="pipOff" role="menuitem" tabindex="-1" href="#"><%= str_off %></a></li>
                 </ul>
             </div>

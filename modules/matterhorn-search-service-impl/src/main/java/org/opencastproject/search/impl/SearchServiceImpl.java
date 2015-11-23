@@ -29,6 +29,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.search.api.SearchException;
@@ -61,7 +62,7 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceException;
@@ -137,6 +138,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectory = null;
 
+  /** The optional Mediapackage serializer */
+  protected MediaPackageSerializer serializer = null;
+
   /**
    * Creates a new instance of the search service.
    */
@@ -209,7 +213,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }.create();
     // CHECKSTYLE:ON
 
-    solrRequester = new SolrRequester(solrServer, securityService);
+    solrRequester = new SolrRequester(solrServer, securityService, serializer);
     indexManager = new SolrIndexManager(solrServer, workspace, mdServices, seriesService, mpeg7CatalogService,
             securityService);
 
@@ -661,6 +665,18 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   @Override
   protected UserDirectoryService getUserDirectoryService() {
     return userDirectoryService;
+  }
+
+  /**
+   * Sets the optional MediaPackage serializer.
+   *
+   * @param serializer
+   *          the serializer
+   */
+  protected void setMediaPackageSerializer(MediaPackageSerializer serializer) {
+    this.serializer = serializer;
+    if (solrRequester != null)
+      solrRequester.setMediaPackageSerializer(serializer);
   }
 
 }

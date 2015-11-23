@@ -1,9 +1,13 @@
 # IngestDownloadWorkflowOperationHandler
 
 ## Description
-With the IngestDownloadWorkflowOperationHandler it's possible to initially download external URI's from mediapackage elements and store them to the working file repository. The external element URI's are then rewritten to the stored working file repository URI.
 
-In case of having external element URI's showing to a different Matterhorn working file repository, it's also possible to delete them after downloading it by activating the "delete-external" option.
+With the IngestDownloadWorkflowOperationHandler it's possible to initially download external URI's from mediapackage
+elements and store them to the working file repository. The external element URI's are then rewritten to the stored
+working file repository URI.
+
+In case of having external element URI's showing to a different Opencast working file repository, it's also possible to
+delete them after downloading it by activating the "delete-external" option.
 
 This operation is originally implemented to get rid of remaining files on ingest working file repositories.
 

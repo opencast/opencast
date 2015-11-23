@@ -45,7 +45,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -340,7 +340,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    * @return The file to copy the content to
    */
   protected File getDistributionFile(String channelId, MediaPackage mp, MediaPackageElement element) {
-    String uriString = element.getURI().toString();
+    String uriString = element.getURI().toString().split("\\?")[0];
     final String directoryName = distributionDirectory.getAbsolutePath();
     if (uriString.startsWith(streamingUrl)) {
       if (uriString.lastIndexOf(".") < (uriString.length() - 4)) {

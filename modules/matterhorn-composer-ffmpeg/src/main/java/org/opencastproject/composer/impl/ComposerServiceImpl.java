@@ -75,7 +75,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -246,12 +246,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           videoFile = workspace.get(videoTrack.getURI());
         } catch (NotFoundException e) {
           incident().recordFailure(job, WORKSPACE_GET_NOT_FOUND, e,
-                  getWorkspaceMediapackageParams("video", Type.Track, audioTrack.getURI()), NO_DETAILS);
-          throw new EncoderException("Requested video track " + audioTrack + " is not found");
+                  getWorkspaceMediapackageParams("video", Type.Track, videoTrack.getURI()), NO_DETAILS);
+          throw new EncoderException("Requested video track " + videoTrack + " is not found");
         } catch (IOException e) {
           incident().recordFailure(job, WORKSPACE_GET_IO_EXCEPTION, e,
-                  getWorkspaceMediapackageParams("video", Type.Track, audioTrack.getURI()), NO_DETAILS);
-          throw new EncoderException("Unable to access video track " + audioTrack);
+                  getWorkspaceMediapackageParams("video", Type.Track, videoTrack.getURI()), NO_DETAILS);
+          throw new EncoderException("Unable to access video track " + videoTrack);
         }
       }
 
@@ -1406,6 +1406,8 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       Map<String, String> properties = new HashMap<String, String>();
       properties.put("param.trackh", String.valueOf(subHeight));
       properties.put("param.offset", String.valueOf(subHeight / 2));
+
+      properties.put("param.input.stream.count", String.valueOf(mediaTrack.getStreams().length));
 
       File output;
       try {

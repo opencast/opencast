@@ -24,7 +24,7 @@ package org.opencastproject.kernel.rest;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +108,7 @@ public class CurrentJobFilter implements Filter {
         serviceRegistry.setCurrentJob(currentJob);
       }
     } catch (Exception e) {
-      logger.error("Was not able to set the current job id {} to the service registry", currentJobId);
+      logger.error("Unable to set the current job {}: {}", currentJobId, e);
       httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
               "Was not able to set the current job id {} to the service registry" + currentJobId);
     }

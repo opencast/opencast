@@ -36,8 +36,9 @@
     "pictureInPicture": "Picture in Picture",
     "left": "left",
     "right": "right",
-    "off": "off"
+    "off": "off",
     "low": "Low",
     "medium": "Medium",
-    "high": "High"
+    "high": "High",
+    "beside": "beside"
 }

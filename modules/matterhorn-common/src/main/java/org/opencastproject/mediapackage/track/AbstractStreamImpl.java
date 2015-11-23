@@ -50,6 +50,9 @@ public abstract class AbstractStreamImpl implements Stream {
   @XmlElement(name = "encoder")
   protected Encoder encoder = new Encoder();
 
+  @XmlElement(name = "framecount")
+  protected Long frameCount;
+
   @XmlType(name = "device")
   static class Device {
     @XmlAttribute(name = "type")
@@ -97,6 +100,10 @@ public abstract class AbstractStreamImpl implements Stream {
     return device.vendor;
   }
 
+  public Long getFrameCount() {
+    return frameCount;
+  }
+
   public String getFormat() {
     return encoder.type;
   }
@@ -119,6 +126,10 @@ public abstract class AbstractStreamImpl implements Stream {
 
   public void setCaptureDeviceVendor(String captureDeviceVendor) {
     this.device.vendor = captureDeviceVendor;
+  }
+
+  public void setFrameCount(Long frameCount) {
+    this.frameCount = frameCount;
   }
 
   public void setFormat(String format) {

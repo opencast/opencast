@@ -31,6 +31,7 @@ import static org.opencastproject.util.data.Option.option;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.search.api.MediaSegment;
 import org.opencastproject.search.api.MediaSegmentImpl;
 import org.opencastproject.search.api.SearchQuery;
@@ -48,7 +49,7 @@ import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
@@ -90,16 +91,38 @@ public class SolrRequester {
   private SecurityService securityService;
 
   /**
+   * The optional serializer
+   */
+  private MediaPackageSerializer serializer = null;
+
+  /**
    * Creates a new requester for solr that will be using the given connection object to query the search index.
    *
    * @param connection
    *          the solr connection
+   * @param securityService
+   *          the security service
    */
   public SolrRequester(SolrServer connection, SecurityService securityService) {
+    this(connection, securityService, null);
+  }
+
+  /**
+   * Creates a new requester for solr that will be using the given connection object to query the search index.
+   *
+   * @param connection
+   *          the solr connection
+   * @param securityService
+   *          the security service
+   * @param serializer
+   *          the optional mediapackage serializer
+   */
+  public SolrRequester(SolrServer connection, SecurityService securityService, MediaPackageSerializer serializer) {
     if (connection == null)
       throw new IllegalStateException("Unable to run queries on null connection");
     this.solrServer = connection;
     this.securityService = securityService;
+    this.serializer = serializer;
   }
 
   /**
@@ -169,6 +192,8 @@ public class SolrRequester {
         @Override
         public MediaPackage getMediaPackage() {
           MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
+          if (serializer != null)
+            builder.setSerializer(serializer);
           String mediaPackageFieldValue = Schema.getOcMediapackage(doc);
           if (mediaPackageFieldValue != null) {
             try {
@@ -788,6 +813,16 @@ public class SolrRequester {
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Sets the optional Mediapackage Serializer.
+   *
+   * @param serializer
+   *          the serializer
+   */
+  public void setMediaPackageSerializer(MediaPackageSerializer serializer) {
+    this.serializer = serializer;
   }
 
   /**

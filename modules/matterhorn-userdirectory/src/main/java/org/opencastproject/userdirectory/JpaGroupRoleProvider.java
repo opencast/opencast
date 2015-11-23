@@ -26,6 +26,7 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.apache.http.HttpStatus.SC_CONFLICT;
 
 import org.opencastproject.index.IndexProducer;
 import org.opencastproject.kernel.security.persistence.JpaOrganization;
@@ -56,8 +57,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -411,8 +412,9 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
           @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
           @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = false, type = Type.TEXT) }, reponses = {
-          @RestResponse(responseCode = SC_CREATED, description = "Group created"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long") })
+                  @RestResponse(responseCode = SC_CREATED, description = "Group created"),
+                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long"),
+                  @RestResponse(responseCode = SC_CONFLICT, description = "An group with this name already exists.") })
   public Response createGroup(@FormParam("name") String name, @FormParam("description") String description,
           @FormParam("roles") String roles, @FormParam("users") String users) {
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
@@ -431,9 +433,14 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
       }
     }
 
+    final String groupId = name.toLowerCase().replaceAll("\\W", "_");
+
+    JpaGroup existingGroup = UserDirectoryPersistenceUtil.findGroup(groupId, organization.getId(), emf);
+    if (existingGroup != null)
+      return Response.status(SC_CONFLICT).build();
+
     try {
-      addGroup(new JpaGroup(name.toLowerCase().replaceAll("\\W", "_"), organization, name, description, roleSet,
-              members));
+      addGroup(new JpaGroup(groupId, organization, name, description, roleSet, members));
     } catch (IllegalArgumentException e) {
       logger.warn(e.getMessage());
       return Response.status(Status.BAD_REQUEST).build();

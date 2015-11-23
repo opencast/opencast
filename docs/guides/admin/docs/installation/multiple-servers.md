@@ -1,133 +1,68 @@
 Install Across Multiple Servers
 ===============================
 
-*Note that this is not a comprehensive guide of all possible ways to install Matterhorn. It is more like a guide to good
-practice and presents what a lot of people are running.*
+*Note that this is not a comprehensive guide of all possible ways to install Opencast. It is more like a guide to good
+practices and presents what a lot of people are running.*
 
-Step 1: Install Matterhorn
+
+Step 1: Install Opencast
 --------------------------
 
-For a distributed set-up you basically only need to put the right modules onto the right node in the Matterhorn system.
-To make things less complicated, these modules are grouped together as profiles which you can directly build and
-install.
+Opencast consists of a large set of modules which together build the whole system. In a distributed set-up, different
+kinds of nodes are basically only defined by the existence or absence of specific modules.
 
-If you want to build Matterhorn yourself, you can invoke the build process for certain modules by using mavens `-P`
-option. For example the following command will build the three profiles called worker-standalone, serviceregistry and
-workspace (These are the profiles needed for a worker node):
+While it is possible to stick together a system module by module, opencast comes with a set of pre-defined distribution
+which can directly be built and installed. To build these distributions, you would compile Opencast just like it is
+outlined in the basic installation guides and will then find a set of different distributions, both as archive and in a
+separate directory.
 
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Pworker-standalone,serviceregistry,workspace
+To list all distributions, run the following command after Opencast is built:
 
-If you are using the Matterhorn RPM repository instead, you can do the same by installing the profile packages like
-this:
+    % ls -1 build/*.tar.gz
+    build/opencast-dist-admin-${version}.tar.gz
+    build/opencast-dist-allinone-${version}.tar.gz
+    build/opencast-dist-presentation-${version}.tar.gz
+    build/opencast-dist-worker-${version}.tar.g
+    ...
 
-    yum install opencast-matterhorn14-profile-worker-standalone \
-      opencast-matterhorn14-profile-serviceregistry \
-      opencast-matterhorn14-profile-workspace
 
-To make things easier, the repository also contains a set of predefined distribution packages which will automatically
-install all dependencies for a given node type. For example, to install a Matterhorn worker node:
+The same distributions can be found in the packages provided in the Opencast RPM repository.  These packages will
+automatically install all dependencies for a given node type. For example, to install an Opencast worker node, you would
+install the package `opencast21-distribution-worker`.
 
-    yum install opencast-matterhorn14-distribution-worker
-
-This is the general idea behind a distributed set-up of Matterhorn. The following list will now give a list of examples
-about how you could distribute Matterhorn over a given set of machines and what you need to install for that.  You
-should be aware that these examples are not the only possible ways of setting up Matterhorn. They are, however, a good
-way to start.
-
-   *What is not specified in this list is the location of the database and the storage server. You can place them either
-   on one of the Matterhorn nodes or create a dedicated machine for them. The latter will obviously give you more
-   performance.*
-
+The following list describes possible set-ups:
 
 ### All-In-One
 
-This is the default set-up described in the basic installation guides. It works fine for testing purposes should,
-however, not be used in production. It is not distributed but is listed here to have a comprehensive list of necessary
-profiles. For an All-In-One system the following profiles need to be installed:
-
-    admin, dist, engage, worker, workspace, serviceregistry, directory-db
-
-Maven build command:
-
-    mvn clean install -DdeployTo=/path/to/matterhorn/
-
-RPM Repository installation:
-
-    yum install opencast-matterhorn14-distribution-default
+This is the default set-up described in the basic installation guides. It works fine for testing purposes. It should
+usually not be used in production. It is not distributed but is listed here to have a comprehensive list of predefined
+distributions.
 
 
 ### Two-Server Set-up
 
-This set-up is the minimum set-up recommended for productive use. It will separate the distribution layer from the
-administrative and working layer. This means that even if one server is under heavy load as videos are processed, etc.
-it will not effect the distribution and users should still be able to watch videos smoothly. However, it might happen
-that under heavy load the handling of the administrative ui gets a bit rough.
-
-Necessary profiles to build:
-
-    admin-worker: admin,workspace,dist-stub,engage-stub,worker,serviceregistry
-    engage: engage-standalone,serviceregistry,dist-standalone,workspace
-
-Maven build commands:
-
-    # admin-worker
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Padmin,workspace,dist-stub,engage-stub,worker,serviceregistry
-    # engage
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Pengage-standalone,serviceregistry,dist-standalone,workspace
-
-RPM Repository installation:
-
-    # admin-worker
-    yum install opencast-matterhorn14-distribution-admin-worker
-    # engage
-    yum install opencast-matterhorn14-distribution-engage
+This set-up is the minimum set-up recommended for productive use. It will separate the presentation layer from the
+administrative and working layer. This means that even if one server is under heavy load while videos are processed, it
+will not effect the distribution and users should still be able to watch videos smoothly. However, it might happen that
+under heavy load the handling of the administrative user interface gets a bit rough.
 
 
 ### Three (or more) Server Set-up
 
 While in the last example we have created one combined node for both the administrative tools and the workers, in this
-example we will split this node into dedicated worker and admin nodes. Using this set-up it is easy to increase the
-systems performance simply by adding further worker nodes to the system.
+example we will split it into dedicated worker and admin nodes. Using this set-up it is easy to increase the systems
+performance simply by adding further worker nodes to the system.
 
-Necessary profiles to build:
-
-    admin: admin,workspace,dist-stub,engage-stub,worker-stub,serviceregistry
-    worker: serviceregistry,workspace,worker-standalone
-    engage: engage-standalone,serviceregistry,dist-standalone,workspace
-
-Maven build commands:
-
-    # admin
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Padmin,workspace,dist-stub,engage-stub,worker-stub,serviceregistry
-    # worker
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Pserviceregistry,workspace,worker-standalone
-    # engage
-    mvn clean install -DdeployTo=/path/to/matterhorn/ \
-      -Pengage-standalone,serviceregistry,dist-standalone,workspace
-
-RPM Repository installation:
-
-    # admin
-    yum install opencast-matterhorn14-distribution-admin
-    # worker
-    yum install opencast-matterhorn14-distribution-worker
-    # engage
-    yum install opencast-matterhorn14-distribution-engage
 
 
 Step 2: Set-Up NFS Server
 -------------------------
 
-Though it is possible to have Matterhorn run without shared storage, it is still a good idea to do so, as hard links can
+Though it is possible to have Opencast run without shared storage, it is still a good idea to do so, as hard links can
 be used to link files instead of copying them and not everything has to be tunneled over HTTP.
 
 Thus you should first set-up your NFS server. The best solution is certainly to have a dedicated storage server. For
-smaller set-ups, however, it can also be put on one of the Matterhorn nodes, i.e. on the admin node.
+smaller set-ups, however, it can also be put on one of the Opencast nodes, i.e. on the admin node.
 
 To do this, you first have to install and enable the NFS server:
 
@@ -135,24 +70,23 @@ To do this, you first have to install and enable the NFS server:
     chkconfig  --level 345 nfs on
     service nfs start
 
-Later on you want to have one common user on all your systems that has access to the share as you do not want everyone to
-have access. As preparation for this it makes sense to manually create a matterhorn user and group with a common UID and
-GID. In the following example we use 992 as group id and 995 as user id for matterhorn:
+You want to have one common user on all your systems, so that file permissions do not become an issue.. As preparation
+for this it makes sense to manually create an *opencast* user and group with a common UID and GID:
 
-    groupadd -g 1234 matterhorn
-    useradd -g 1234 -u 1234 matterhorn
+    groupadd -g 1234 opencast
+    useradd -g 1234 -u 1234 opencast
 
 If the user and group id `1234` is already used, just pick another one but make sure to pick the same one on all your
-Matterhorn nodes.
+Opencast nodes.
 
 Then create the directory to be shared and set its ownership to the newly created users:
 
-    mkdir -p /srv/matterhorn
-    chown matterhorn:matterhorn /srv/matterhorn
+    mkdir -p /srv/opencast
+    chown opencast:opencast /srv/opencast
 
 Next we actually share the storage dir. For this we need to edit the file `/etc/exports` and set:
 
-    /srv/matterhorn  131.173.172.190(rw,sync,no_subtree_check)
+    /srv/opencast  131.173.172.190(rw,sync,no_subtree_check)
 
 with 131.173.172.190 being the IP address of the other machine that should get access. Finally we enable the share with:
 
@@ -167,12 +101,12 @@ for example:
 You can set them by editing `/etc/sysconfig/iptables` and restarting the service afterwards.
 
 Now you have set-up your storage server. What is still left to do is to mount the network storage on all other servers
-of the matterhorn clusters except the capture agents. To do that you need to edit the `/etc/fstab` on each server and
-add the command to mount the network storage on startup:
+of the Opencast clusters except the capture agents. To do that you need to edit the `/etc/fstab` on each server and add
+the command to mount the network storage on startup:
 
-    storageserver.example.com:/srv/matterhorn /srv/matterhorn   nfs rw,hard,intr,rsize=32768,wsize=32768 0 0
+    storageserver.example.com:/srv/opencast /srv/opencast   nfs rw,hard,intr,rsize=32768,wsize=32768 0 0
 
-*Important:* Do not use multiple NFS shares for different parts of the Matterhorn storage dir. Matterhorn will check if
+*Important:* Do not use multiple NFS shares for different parts of the Opencast storage dir. Opencast will check if
 hard links are possible across in a distributed set-up, but the detection may fail if hard links are only possible
 between certain parts of the storage. This may lead to failures.
 
@@ -193,16 +127,16 @@ configure your firewall:
 Step 4: Set-Up ActiveMQ
 -----------------------
 
-Since version 2, Opencast Matterhorn requires an Apache ActiveMQ message broker as message relay for the administrative
-user interface. ActiveMQ can either be set up to run on its own machine or on one of the existing Matterhorn nodes
-(usually the admin node).
+Since version 2, Opencast requires an Apache ActiveMQ message broker as message relay for the administrative user
+interface. ActiveMQ can either be set up to run on its own machine or on one of the existing Opencast nodes (usually the
+admin node).
 
 ActiveMQ 5.10 or above should work. ActiveMQ 5.6 will not work. Versions in between are untested.
 
 
 ### Installation
 
- - If you use the Matterhorn RPM repository, simply install the `activemq-dist` package.
+ - If you use the Opencast RPM repository, simply install the `activemq-dist` package.
  - If you are running RHEL, CentOS or Fedora you can use the [ActiveMQ-dist Copr RPM repository
    ](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
  - You can download binary distributions from the [Apache ActiveMQ website](http://activemq.apache.org/download.html)
@@ -210,20 +144,21 @@ ActiveMQ 5.10 or above should work. ActiveMQ 5.6 will not work. Versions in betw
 
 ### Configuration
 
-What you basically need to do is to point all your Matterhorn nodes to your message broker. For more information about
+What you basically need to do is to point all your Opencast nodes to your message broker. For more information about
 the configuration, have a look at the [Message Broker Set-Up Guide](../configuration/message-broker.md).
 
-Do not forget that ActiveMQ uses TCP port 61616 (default configuration) for communication which you might have to allow in your firewall.
+Do not forget that ActiveMQ uses TCP port 61616 (default configuration) for communication which you might have to allow
+in your firewall.
 
 
-Step 5: Configure Matterhorn
+Step 5: Configure Opencast
 ----------------------------
 
 You did already set-up and configured your database and message broker in the last steps, but there is some more
 configuration you have to do. First of all you should follow the Basic Configuration guide which will tell you how to
 set the login credentials etc. After that continue with the following steps:
 
-### config.properties
+### custom.properties
 
 Set the server URL to the public url of each server (admin URL on admin, worker URL on worker, engage URL on engage, …).
 This may either be this nodes IP address or preferable its domain name:
@@ -232,7 +167,7 @@ This may either be this nodes IP address or preferable its domain name:
 
 Set the location of the shared storage directory:
 
-    org.opencastproject.storage.dir=/srv/matterhorn
+    org.opencastproject.storage.dir=/srv/opencast
 
 Define that the file repository shall access all files locally:
 
