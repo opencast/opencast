@@ -53,10 +53,11 @@
                         <table class="main-tbl">
                             <tr ng-repeat="row in episodeCatalog.fields track by $index">
                                 <td translate="{{ row.label }}"></td>
-                                <td admin-ng-editable
+                                <td ng-if="row.id === 'created' ">{{ row.value  | localizeDate : 'dateTime' : 'medium' }}</td>                            
+                                <td ng-if="row.id !== 'created' "  admin-ng-editable
                                     required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                                    params="row" save="getSaveFunction(episodeCatalog.flavor)"></td>
-                            </tr>
+                                    params="row" save="getSaveFunction(episodeCatalog.flavor)"></td>                            
+                             </tr>
                         </table>
                     </div>
                 </div>
@@ -316,25 +317,25 @@
                             <div class="comment" ng-class="{ active : $parent.replyToId === comment.id }"
                                 ng-repeat="comment in comments track by $index">
                                 <hr>
-                                <div class="date"><i class="fa fa-clock-o"></i>{{ comment.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
+                                <div class="date">{{ comment.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
                                 <h4>{{ comment.author.name }}</h4>
                                 <span class="category">
                                   <strong translate="EVENTS.EVENTS.DETAILS.COMMENTS.REASON">Reason: </strong>: {{ comment.reason | translate }}
                                 </span>
                                 <p>{{ comment.text }}</p>
                                 <a ng-click="deleteComment(comment.id)" class="delete">
-                                  <i class="fa fa-times-circle"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
+                                   {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
                                 </a>
                                 <a ng-click="replyTo(comment)" class="reply" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY">
-                                  <i class="fa fa-share"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY' | translate }}
+                                   {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY' | translate }}
                                 </a>
                                 <span class="resolve" ng-class="{ resolved : comment.resolvedStatus }">
-                                    <i class="fa fa-check"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED' | translate }}
+                                    {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED' | translate }}
                                 </span>
 
                                 <div class="comment is-reply" ng-repeat="reply in comment.replies track by $index">
                                     <hr>
-                                    <div class="date"><i class="fa fa-clock-o"></i>{{ reply.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
+                                    <div class="date">{{ reply.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
                                     <h4>{{ reply.author.name }}</h4>
                                     <span class="category">
                                       <strong translate="EVENTS.EVENTS.DETAILS.COMMENTS.REASON">Reason: </strong>: {{ comment.reason | translate }}
