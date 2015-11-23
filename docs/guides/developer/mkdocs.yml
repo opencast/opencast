@@ -17,7 +17,8 @@ site_dir: 'site'
 
 pages:
 - ['index.md', 'Home']
-- ['development.md', 'Development Process']
+- ['development-process.md', 'Development Process']
+- ['development-environment.md', 'Development Environment']
 - ['reviewing-and-merging.md', 'Reviewing, Merging and Declining Pull Requests']
 - ['release-manager.md', 'Release Manager']
 - ['license.md', 'Licenses and Legal Matters']
