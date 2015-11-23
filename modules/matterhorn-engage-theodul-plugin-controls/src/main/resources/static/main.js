@@ -276,6 +276,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_videoWrapper = "video_wrapper";
     var id_prevVideo = "prevVideo";
     var id_nextVideo = "nextVideo";
+    var controlsVisible = true;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -1141,9 +1142,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     playPause();
                     loadStoredInitialValues();
 
-                    if (isMobileMode) {
-                        Engage.trigger(plugin.events.toggleControls.getName());
-                    }
+                    // if (isMobileMode) {
+                    //     Engage.trigger(plugin.events.toggleControls.getName());
+                    // }
                 }
             });
             Engage.on(plugin.events.pause.getName(), function() {
@@ -1187,6 +1188,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.on(plugin.events.ended.getName(), function() {
                 if (!mediapackageError && videosReady) {
                     Engage.trigger(plugin.events.pause);
+                    Engage.trigger(plugin.events.toggleControls.getName());
                 }
             });
             Engage.on(plugin.events.segmentMouseover.getName(), function(no) {
@@ -1238,16 +1240,28 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 }
             });
 
-            loadStoredInitialValues();
-        }
+            // register toggleControls event in mobile mode
+            if (isMobileMode) {
+                Engage.on(plugin.events.toggleControls.getName(), function(e) {
+                    if (! controlsVisible) {
+                        controlsVisible = true;
+                        $("#" + id_engage_controls).fadeIn();
+                        if (isPlaying) {
+                            window.setTimeout(function() {
+                                $("#" + id_engage_controls).fadeOut();
+                                controlsVisible = false;
+                            }, hideTimeout*1000);
+                        }
+                    } else {
+                        if (isPlaying) {
+                            $("#" + id_engage_controls).fadeOut();
+                            controlsVisible = false;
+                        }
+                    }
+                });
+            }
 
-        if (isMobileMode && plugin.inserted) {
-            Engage.on(plugin.events.toggleControls.getName(), function(e) {
-                $("#" + id_engage_controls).fadeIn();
-                if (isPlaying) {
-                    $("#" + id_engage_controls).delay(hideTimeout*1000).fadeOut();
-                }
-            });
+            loadStoredInitialValues();
         }
     }
 
