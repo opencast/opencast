@@ -45,7 +45,6 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.solr.SolrServerFactory;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.VCell;
@@ -86,10 +85,10 @@ public class OpencastArchivePublisher extends SimpleServicePublisher {
   private static final Logger logger = LoggerFactory.getLogger(OpencastArchivePublisher.class);
 
   /** Configuration key for a remote solr server */
-  public static final String CONFIG_SOLR_URL = "org.opencastproject.episode.solr.url";
+  public static final String CONFIG_SOLR_URL = "org.opencastproject.archive.solr.url";
 
   /** Configuration key for an embedded solr configuration and data directory */
-  public static final String CONFIG_SOLR_ROOT = "org.opencastproject.episode.solr.dir";
+  public static final String CONFIG_SOLR_ROOT = "org.opencastproject.archive.solr.dir";
 
   /** File system element store JMX type */
   private static final String JMX_ELEMENT_STORE_TYPE = "ElementStore";
@@ -198,18 +197,8 @@ public class OpencastArchivePublisher extends SimpleServicePublisher {
           } catch (Exception e) {
             throw connectError(solrServerUrlConfig, e);
           }
-        } else if (cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT) != null) {
-          String solrRoot = cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT);
-          try {
-            return setupSolr(new File(solrRoot));
-          } catch (Exception e) {
-            throw connectError(solrServerUrlConfig, e);
-          }
         } else {
-          String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
-          if (storageDir == null)
-            throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
-          String solrRoot = PathSupport.concat(storageDir, "archiveindex");
+          String solrRoot =  SolrServerFactory.getEmbeddedDir(cc, CONFIG_SOLR_ROOT, "archive");
           try {
             return setupSolr(new File(solrRoot));
           } catch (Exception e) {
