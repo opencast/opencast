@@ -22,7 +22,9 @@
 package org.opencastproject.solr;
 
 import org.opencastproject.solr.internal.EmbeddedSolrServerWrapper;
+import org.opencastproject.util.PathSupport;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
@@ -32,6 +34,9 @@ import org.apache.solr.core.OpencastSolrConfig;
 import org.apache.solr.core.SolrConfig;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.schema.IndexSchema;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -41,6 +46,15 @@ import java.net.URL;
  * machine or remotely.
  */
 public final class SolrServerFactory {
+
+  /** Log facility */
+  private static final Logger logger = LoggerFactory.getLogger(SolrServerFactory.class);
+
+  /** Configuration key for default embedded solr location */
+  public static final String PROP_GLOBAL_SOLR_DIR = "org.opencastproject.solr.dir";
+
+  /** Default embedded solr location (relative to KARAF_DATA) */
+  public static final String DEFAULT_GLOBAL_SOLR_DIR = "solr-indexes";
 
   /** Disallow construction of this utility class */
   private SolrServerFactory() {
@@ -102,6 +116,43 @@ public final class SolrServerFactory {
     } else {
       // TODO: there doesn't appear to be any mechanism to close a remote connection to a solr server.
     }
+  }
+
+  /**
+   * Get location for embedded SOLR from configuration.
+   *
+   * @param cc
+   *          ComponentContext to get configuration from
+   * @param indexKey
+   *          Configuration key for specific index
+   * @param defaultDir
+   *          Default directory for specific index
+   */
+  public static String getEmbeddedDir(ComponentContext cc, String indexKey, String defaultDir)
+    throws IllegalStateException {
+    /* Check if we have a specific key for this SOLR index */
+    String solrDir = cc.getBundleContext().getProperty(indexKey);
+    if (StringUtils.isNotEmpty(solrDir)) {
+      return solrDir;
+    }
+    logger.debug("No explicit location configuration for embedded solr. Trying $\\{{}\\}/{}",
+        PROP_GLOBAL_SOLR_DIR, defaultDir);
+
+    /* Check if we have a globas SOLR directory configuration */
+    solrDir = cc.getBundleContext().getProperty(PROP_GLOBAL_SOLR_DIR);
+    if (StringUtils.isNotEmpty(solrDir)) {
+      return PathSupport.concat(solrDir, defaultDir);
+    }
+    logger.debug("No general location configuration for embedded solr. Trying $\\{karaf.data\\}/{}/{}",
+        DEFAULT_GLOBAL_SOLR_DIR, defaultDir);
+    solrDir = cc.getBundleContext().getProperty("karaf.data");
+    if (StringUtils.isNotEmpty(solrDir)) {
+      solrDir = PathSupport.concat(solrDir, SolrServerFactory.DEFAULT_GLOBAL_SOLR_DIR);
+      return PathSupport.concat(solrDir, defaultDir);
+    }
+
+    /* No config found. No fallback possible */
+    throw new IllegalStateException("Could not set SOLR root dir. All properties are empty.");
   }
 
 }

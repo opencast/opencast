@@ -42,7 +42,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowException;
@@ -215,13 +214,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       } catch (MalformedURLException e) {
         throw new IllegalStateException("Unable to connect to solr at " + solrServerUrlConfig, e);
       }
-    } else if (cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT) != null) {
-      solrRoot = cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT);
     } else {
-      String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
-      if (storageDir == null)
-        throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
-      solrRoot = PathSupport.concat(storageDir, "workflowindex");
+      solrRoot = SolrServerFactory.getEmbeddedDir(cc, CONFIG_SOLR_ROOT, "workflow");
     }
     Object syncIndexingConfig = cc.getProperties().get("synchronousIndexing");
     if (syncIndexingConfig != null && (syncIndexingConfig instanceof Boolean)) {
