@@ -1324,5 +1324,12 @@
         "CONSTRUCTION":"Umbau"
       }
     }
+  },
+  "DASHBOARD":{
+       "RUNNING":   "Aktiv",
+       "FINISHED":  "Abgeschlossen",
+       "FAILED" :   "Fehlgeschlagen",
+       "FINISHED_WITH_COMMENTS": "Abgeschlossen mit Kommentaren",
+       "SCHEDULED" : "Geplant"
   }
 }

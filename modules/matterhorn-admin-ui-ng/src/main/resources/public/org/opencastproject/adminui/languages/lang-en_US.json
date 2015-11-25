@@ -1471,5 +1471,12 @@
          "CONSTRUCTION":     "Construction"
        }
      }
+   },
+   "DASHBOARD":{
+       "RUNNING":   "Running",
+       "FINISHED":  "Finished",
+       "FAILED" :   "Failed",
+       "FINISHED_WITH_COMMENTS": "Finished with open comments",
+       "SCHEDULED" : "Scheduled"
    }
 }
