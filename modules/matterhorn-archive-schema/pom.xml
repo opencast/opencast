@@ -211,6 +211,11 @@
             <Export-Package>
               org.opencastproject.archive.opencast;version=${project.version}
             </Export-Package>
+            <Import-Package>
+              javax.xml.transform;version=0,
+              javax.xml.transform.stream;version=0,
+              *
+            </Import-Package>
             <Service-Component>
               OSGI-INF/archive.xml,
               OSGI-INF/archive-rest.xml

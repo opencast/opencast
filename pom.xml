@@ -1,10 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XML-instance"
   xsi:Location="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <packaging>pom</packaging>
   <version>2.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
   <name>matterhorn</name>
   <description>The Opencast Project's Matterhorn software is a media capture, processing, and distribution system</description>
   <url>http://opencastproject.org</url>
@@ -13,983 +16,190 @@
   <prerequisites>
     <maven>3.0.4</maven>
   </prerequisites>
+
   <properties>
+    <checkstyle.skip>false</checkstyle.skip>
+    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <checkstyle.skip>false</checkstyle.skip>
+
+    <commons-compress.version>1.9</commons-compress.version>
     <jmeter.version>2.4</jmeter.version>
-    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
+    <json-simple.version>1.1</json-simple.version>
+    <osgi.compendium.version>4.2.0</osgi.compendium.version>
+    <osgi.core.version>4.2.0</osgi.core.version>
+    <osgi.enterprise.version>4.2.0</osgi.enterprise.version>
+    <karaf.version>3.0.5</karaf.version>
   </properties>
 
-  <profiles>
-
-    <!-- Mix and match profiles used to build common deployments -->
-
-    <profile>
-      <id>admin</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-archive-api</module>
-        <module>modules/matterhorn-admin-ui-ng</module>
-        <module>modules/matterhorn-admin-ui</module>
-        <module>modules/matterhorn-archive-workflowoperation</module>
-        <module>modules/matterhorn-archive-base</module>
-        <module>modules/matterhorn-archive-schema</module>
-        <module>modules/matterhorn-archive-storage-fs</module>
-        <module>modules/matterhorn-authorization-manager</module>
-        <module>modules/matterhorn-authorization-xacml</module>
-        <module>modules/matterhorn-caption-api</module>
-        <module>modules/matterhorn-capture-admin-service-api</module>
-        <module>modules/matterhorn-capture-admin-service-impl</module>
-        <module>modules/matterhorn-capture-workflowoperation</module>
-        <module>modules/matterhorn-comments</module>
-        <module>modules/matterhorn-comments-workflowoperation</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-composer-service-api</module>
-        <module>modules/matterhorn-composer-workflowoperation</module>
-        <module>modules/matterhorn-conductor</module>
-        <module>modules/matterhorn-cover-image-api</module>
-        <module>modules/matterhorn-cover-image-workflowoperation</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-deprecated-workflowoperation</module>
-        <module>modules/matterhorn-distribution-service-api</module>
-        <module>modules/matterhorn-distribution-workflowoperation</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-fileupload</module>
-        <module>modules/matterhorn-holdstate-workflowoperation</module>
-        <module>modules/matterhorn-incident-workflowoperation</module>
-        <module>modules/matterhorn-index-service</module>
-        <module>modules/matterhorn-ingest-service-api</module>
-        <module>modules/matterhorn-ingest-service-impl</module>
-        <module>modules/matterhorn-ingest-workflowoperation</module>
-        <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-workflowoperation</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-lti</module>
-        <module>modules/matterhorn-mediapackage-manipulator</module>
-        <module>modules/matterhorn-mediapackage-ui</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-messages</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-metadata</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-notification-workflowoperation</module>
-        <module>modules/matterhorn-participation-api</module>
-        <module>modules/matterhorn-presets</module>
-        <module>modules/matterhorn-publication-service-api</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info</module>
-        <module>modules/matterhorn-runtime-info-ui-ng</module>
-        <module>modules/matterhorn-scheduler-api</module>
-        <module>modules/matterhorn-scheduler-impl</module>
-        <module>modules/matterhorn-scheduler-workflowoperation</module>
-        <module>modules/matterhorn-schema</module>
-        <module>modules/matterhorn-search-api</module>
-        <module>modules/matterhorn-search-service-api</module>
-        <module>modules/matterhorn-search-workflowoperation</module>
-        <module>modules/matterhorn-search</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-impl</module>
-        <module>modules/matterhorn-silencedetection-api</module>
-        <module>modules/matterhorn-smil-api</module>
-        <module>modules/matterhorn-smil-impl</module>
-        <module>modules/matterhorn-solr</module>
-        <module>modules/matterhorn-sox-api</module>
-        <module>modules/matterhorn-sox-workflowoperation</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-textanalyzer-api</module>
-        <module>modules/matterhorn-textanalyzer-workflowoperation</module>
-        <module>modules/matterhorn-themes-workflowoperation</module>
-        <module>modules/matterhorn-themes</module>
-        <module>modules/matterhorn-userdirectory</module>
-        <module>modules/matterhorn-videoeditor-api</module>
-        <module>modules/matterhorn-videoeditor-workflowoperation</module>
-        <module>modules/matterhorn-videosegmenter-api</module>
-        <module>modules/matterhorn-videosegmenter-workflowoperation</module>
-        <module>modules/matterhorn-webconsole</module>
-        <module>modules/matterhorn-workflow-service-api</module>
-        <module>modules/matterhorn-workflow-service-impl</module>
-        <module>modules/matterhorn-workflow-workflowoperation</module>
-        <module>modules/matterhorn-working-file-repository-service-api</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>ingest</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-ingest-service-api</module>
-        <module>modules/matterhorn-ingest-service-impl</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info</module>
-        <module>modules/matterhorn-scheduler-api</module>
-        <module>modules/matterhorn-scheduler-impl</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-impl</module>
-        <module>modules/matterhorn-serviceregistry</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-userdirectory</module>
-        <module>modules/matterhorn-workflow-service-api</module>
-        <module>modules/matterhorn-working-file-repository-service-api</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>ingest-standalone</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-authorization-xacml</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-ingest-service-api</module>
-        <module>modules/matterhorn-ingest-service-impl</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info</module>
-        <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-scheduler-api</module>
-        <module>modules/matterhorn-scheduler-remote</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-remote</module>
-        <module>modules/matterhorn-serviceregistry</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-userdirectory</module>
-        <module>modules/matterhorn-webconsole</module>
-        <module>modules/matterhorn-workflow-service-api</module>
-        <module>modules/matterhorn-workflow-service-remote</module>
-        <module>modules/matterhorn-working-file-repository-service-api</module>
-        <module>modules/matterhorn-working-file-repository-service-impl</module>
-        <module>modules/matterhorn-workspace-api</module>
-        <module>modules/matterhorn-workspace-impl</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>dist-standalone</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-authorization-xacml</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-distribution-service-acl</module>
-        <module>modules/matterhorn-distribution-service-api</module>
-        <module>modules/matterhorn-distribution-service-download</module>
-        <module>modules/matterhorn-distribution-service-streaming</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-publication-service-api</module>
-        <module>modules/matterhorn-publication-service-youtube-v3</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info</module>
-        <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-remote</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-userdirectory</module>
-        <module>modules/matterhorn-webconsole</module>
-        <module>modules/matterhorn-workflow-service-api</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>dist</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-authorization-xacml</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-distribution-service-acl</module>
-        <module>modules/matterhorn-distribution-service-api</module>
-        <module>modules/matterhorn-distribution-service-download</module>
-        <module>modules/matterhorn-distribution-service-streaming</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-publication-service-api</module>
-        <module>modules/matterhorn-publication-service-youtube-v3</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-impl</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-userdirectory</module>
-        <module>modules/matterhorn-webconsole</module>
-        <module>modules/matterhorn-workflow-service-api</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>dist-stub</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-authorization-xacml</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-distribution-service-acl-remote</module>
-        <module>modules/matterhorn-distribution-service-api</module>
-        <module>modules/matterhorn-distribution-service-download-remote</module>
-        <module>modules/matterhorn-distribution-service-streaming-remote</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-publication-service-api</module>
-        <module>modules/matterhorn-publication-service-youtube-remote</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-webconsole</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>engage</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-annotation-api</module>
-        <module>modules/matterhorn-annotation-impl</module>
-        <module>modules/matterhorn-authorization-xacml</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-engage-theodul-api</module>
-        <module>modules/matterhorn-engage-theodul-core</module>
-        <module>modules/matterhorn-engage-theodul-plugin-controls</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-mhConnection</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-notifications</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-usertracking</module>
-        <module>modules/matterhorn-engage-theodul-plugin-description</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-description</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-shortcuts</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-slidetext</module>
-        <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
-        <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
-        <module>modules/matterhorn-engage-ui</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-lti</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info</module>
-        <module>modules/matterhorn-search-service-api</module>
-        <module>modules/matterhorn-search-service-feeds</module>
-        <module>modules/matterhorn-search-service-impl</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-impl</module>
-        <module>modules/matterhorn-solr</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-userdirectory</module>
-        <module>modules/matterhorn-usertracking-api</module>
-        <module>modules/matterhorn-usertracking-impl</module>
-        <module>modules/matterhorn-webconsole</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>engage-standalone</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-annotation-api</module>
-        <module>modules/matterhorn-annotation-impl</module>
-        <module>modules/matterhorn-archive-api</module>
-        <module>modules/matterhorn-authorization-xacml</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-composer-service-api</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-engage-theodul-api</module>
-        <module>modules/matterhorn-engage-theodul-core</module>
-        <module>modules/matterhorn-engage-theodul-plugin-controls</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-mhConnection</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-notifications</module>
-        <module>modules/matterhorn-engage-theodul-plugin-custom-usertracking</module>
-        <module>modules/matterhorn-engage-theodul-plugin-description</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-description</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-shortcuts</module>
-        <module>modules/matterhorn-engage-theodul-plugin-tab-slidetext</module>
-        <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
-        <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
-        <module>modules/matterhorn-engage-ui</module>
-        <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-lti</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-runtime-info</module>
-        <module>modules/matterhorn-scheduler-api</module>
-        <module>modules/matterhorn-search-service-api</module>
-        <module>modules/matterhorn-search-service-feeds</module>
-        <module>modules/matterhorn-search-service-impl</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-remote</module>
-        <module>modules/matterhorn-solr</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-userdirectory</module>
-        <module>modules/matterhorn-usertracking-api</module>
-        <module>modules/matterhorn-usertracking-impl</module>
-        <module>modules/matterhorn-webconsole</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>engage-stub</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-authorization-xacml</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-distribution-service-api</module>
-        <module>modules/matterhorn-distribution-service-download-remote</module>
-        <module>modules/matterhorn-distribution-service-streaming-remote</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-lti</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-publication-service-api</module>
-        <module>modules/matterhorn-publication-service-youtube-remote</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-search-service-api</module>
-        <module>modules/matterhorn-search-service-remote</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-webconsole</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>worker</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-authorization-xacml</module>
-        <module>modules/matterhorn-caption-api</module>
-        <module>modules/matterhorn-caption-impl</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-composer-ffmpeg</module>
-        <module>modules/matterhorn-composer-service-api</module>
-        <module>modules/matterhorn-cover-image-api</module>
-        <module>modules/matterhorn-cover-image-impl</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-dictionary-api</module>
-        <module>modules/matterhorn-dictionary-regexp</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-impl</module>
-        <module>modules/matterhorn-silencedetection-api</module>
-        <module>modules/matterhorn-silencedetection-impl</module>
-        <module>modules/matterhorn-smil-api</module>
-        <module>modules/matterhorn-smil-impl</module>
-        <module>modules/matterhorn-sox-api</module>
-        <module>modules/matterhorn-sox-impl</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-textanalyzer-api</module>
-        <module>modules/matterhorn-textanalyzer-impl</module>
-        <module>modules/matterhorn-textextractor-tesseract</module>
-        <module>modules/matterhorn-userdirectory</module>
-        <module>modules/matterhorn-videoeditor-api</module>
-        <module>modules/matterhorn-videoeditor-ffmpeg-impl</module>
-        <module>modules/matterhorn-videosegmenter-api</module>
-        <module>modules/matterhorn-videosegmenter-ffmpeg</module>
-        <module>modules/matterhorn-webconsole</module>
-        <module>modules/matterhorn-workspace-api</module>
-        <module>modules/matterhorn-solr</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>worker-standalone</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-archive-api</module>
-        <module>modules/matterhorn-authorization-xacml</module>
-        <module>modules/matterhorn-caption-api</module>
-        <module>modules/matterhorn-caption-impl</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-composer-ffmpeg</module>
-        <module>modules/matterhorn-composer-service-api</module>
-        <module>modules/matterhorn-cover-image-api</module>
-        <module>modules/matterhorn-cover-image-impl</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-dictionary-api</module>
-        <module>modules/matterhorn-dictionary-regexp</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-service-ffmpeg</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-runtime-info</module>
-        <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-scheduler-api</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-remote</module>
-        <module>modules/matterhorn-silencedetection-api</module>
-        <module>modules/matterhorn-silencedetection-impl</module>
-        <module>modules/matterhorn-smil-api</module>
-        <module>modules/matterhorn-smil-impl</module>
-        <module>modules/matterhorn-sox-api</module>
-        <module>modules/matterhorn-sox-impl</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-textanalyzer-api</module>
-        <module>modules/matterhorn-textanalyzer-impl</module>
-        <module>modules/matterhorn-textextractor-tesseract</module>
-        <module>modules/matterhorn-userdirectory</module>
-        <module>modules/matterhorn-videoeditor-api</module>
-        <module>modules/matterhorn-videoeditor-ffmpeg-impl</module>
-        <module>modules/matterhorn-videosegmenter-api</module>
-        <module>modules/matterhorn-videosegmenter-ffmpeg</module>
-        <module>modules/matterhorn-webconsole</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>worker-stub</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-authorization-xacml</module>
-        <module>modules/matterhorn-caption-api</module>
-        <module>modules/matterhorn-caption-remote</module>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-composer-service-api</module>
-        <module>modules/matterhorn-composer-service-remote</module>
-        <module>modules/matterhorn-cover-image-api</module>
-        <module>modules/matterhorn-cover-image-remote</module>
-        <module>modules/matterhorn-inspection-service-api</module>
-        <module>modules/matterhorn-inspection-service-remote</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-message-broker-api</module>
-        <module>modules/matterhorn-message-broker-impl</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-runtime-dependencies</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-silencedetection-api</module>
-        <module>modules/matterhorn-silencedetection-remote</module>
-        <module>modules/matterhorn-smil-api</module>
-        <module>modules/matterhorn-smil-impl</module>
-        <module>modules/matterhorn-sox-api</module>
-        <module>modules/matterhorn-sox-remote</module>
-        <module>modules/matterhorn-static-file-service-api</module>
-        <module>modules/matterhorn-static-file-service-impl</module>
-        <module>modules/matterhorn-textanalyzer-api</module>
-        <module>modules/matterhorn-textanalyzer-remote</module>
-        <module>modules/matterhorn-videoeditor-api</module>
-        <module>modules/matterhorn-videoeditor-remote</module>
-        <module>modules/matterhorn-videosegmenter-api</module>
-        <module>modules/matterhorn-videosegmenter-remote</module>
-        <module>modules/matterhorn-webconsole</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>workspace</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-working-file-repository-service-api</module>
-        <module>modules/matterhorn-working-file-repository-service-impl</module>
-        <module>modules/matterhorn-workspace-api</module>
-        <module>modules/matterhorn-workspace-impl</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>workspace-stub</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-working-file-repository-service-api</module>
-        <module>modules/matterhorn-working-file-repository-service-remote</module>
-        <module>modules/matterhorn-workspace-api</module>
-        <module>modules/matterhorn-workspace-impl</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>serviceregistry</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-workflow-service-api</module>
-        <module>modules/matterhorn-serviceregistry</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>serviceregistry-stub</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-serviceregistry-remote</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>oaipmh</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-search-service-api</module>
-        <module>modules/matterhorn-search-service-impl</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-series-service-impl</module>
-        <module>modules/matterhorn-solr</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-workspace-api</module>
-        <module>modules/matterhorn-mpeg7</module>
-        <module>modules/matterhorn-oaipmh</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>directory-db</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-dataloader</module>
-        <module>modules/matterhorn-db</module>
-        <module>modules/matterhorn-dublincore</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-metadata-api</module>
-        <module>modules/matterhorn-series-service-api</module>
-        <module>modules/matterhorn-userdirectory</module>
-        <module>modules/matterhorn-workspace-api</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>directory-ldap</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-security-ldap</module>
-        <module>modules/matterhorn-userdirectory-ldap</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>directory-cas</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-security-cas</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>directory-openid</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-security-openid</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>directory-shibboleth</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-security-shibboleth</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>server-management</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-manager-api</module>
-        <module>modules/matterhorn-manager-impl</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>extra</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-dictionary-hunspell</module>
-        <module>modules/matterhorn-dictionary-none</module>
-        <module>modules/matterhorn-speech-recognition-service-api</module>
-        <module>modules/matterhorn-speech-recognition-workflowoperation</module>
-        <module>modules/matterhorn-execute-api</module>
-        <module>modules/matterhorn-execute-impl</module>
-        <module>modules/matterhorn-execute-workflowoperation</module>
-        <module>modules/matterhorn-execute-remote</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>migration</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>all</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-migration</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>test</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>tests</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-test-harness</module>
-      </modules>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>integration-tests</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target if="harness">
-                    <java classname="org.opencastproject.remotetest.Main" fork="true" failOnError="true">
-                      <classpath>
-                        <pathelement path="modules/matterhorn-test-harness/target/matterhorn-test-harness-${project.version}-jar-with-dependencies.jar"/>
-                      </classpath>
-                      <arg value="--with${harness}" />
-                    </java>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>test-performance</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <!-- They don't work at all
-        <property>
-          <name>tests</name>
-        </property>
-        -->
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>unpack-jmeter</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.apache.jmeter</groupId>
-                      <artifactId>jmeter</artifactId>
-                      <version>${jmeter.version}</version>
-                      <type>zip</type>
-                    </artifactItem>
-                  </artifactItems>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>chronos-maven-plugin</artifactId>
-            <configuration>
-              <input>${matterhorn.basedir}/docs/jmeter/general.jmx</input>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>test-load</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>tests</name>
-        </property>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-json</module>
-        <module>modules/matterhorn-kernel</module>
-        <module>modules/matterhorn-load-test</module>
-        <module>modules/matterhorn-runtime-info</module>
-        <module>modules/matterhorn-runtime-info-ui</module>
-        <module>modules/matterhorn-static</module>
-        <module>modules/matterhorn-webconsole</module>
-      </modules>
-    </profile>
-    
-     <profile>
-      <id>hello-world</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>modules/matterhorn-common</module>
-        <module>modules/matterhorn-hello-world-api</module>
-        <module>modules/matterhorn-hello-world-impl</module>
-      </modules>
-    </profile>   
-
-    <profile>
-      <id>sign</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>sign</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.4</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <configuration>
-                  <useAgent>true</useAgent>
-                </configuration>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+  <modules>
+    <module>modules/matterhorn-admin-ui</module>
+    <module>modules/matterhorn-admin-ui-ng</module>
+    <module>modules/matterhorn-annotation-api</module>
+    <module>modules/matterhorn-annotation-impl</module>
+    <module>modules/matterhorn-archive-api</module>
+    <module>modules/matterhorn-archive-base</module>
+    <module>modules/matterhorn-archive-schema</module>
+    <module>modules/matterhorn-archive-storage-fs</module>
+    <module>modules/matterhorn-archive-workflowoperation</module>
+    <module>modules/matterhorn-authorization-manager</module>
+    <module>modules/matterhorn-authorization-xacml</module>
+    <module>modules/matterhorn-caption-api</module>
+    <module>modules/matterhorn-caption-impl</module>
+    <module>modules/matterhorn-caption-remote</module>
+    <module>modules/matterhorn-capture-admin-service-api</module>
+    <module>modules/matterhorn-capture-admin-service-impl</module>
+    <module>modules/matterhorn-capture-workflowoperation</module>
+    <module>modules/matterhorn-comments</module>
+    <module>modules/matterhorn-comments-workflowoperation</module>
+    <module>modules/matterhorn-common</module>
+    <module>modules/matterhorn-composer-ffmpeg</module>
+    <module>modules/matterhorn-composer-service-api</module>
+    <module>modules/matterhorn-composer-service-remote</module>
+    <module>modules/matterhorn-composer-workflowoperation</module>
+    <module>modules/matterhorn-conductor</module>
+    <module>modules/matterhorn-cover-image-api</module>
+    <module>modules/matterhorn-cover-image-impl</module>
+    <module>modules/matterhorn-cover-image-remote</module>
+    <module>modules/matterhorn-cover-image-workflowoperation</module>
+    <module>modules/matterhorn-dataloader</module>
+    <module>modules/matterhorn-db</module>
+    <module>modules/matterhorn-deprecated-workflowoperation</module>
+    <module>modules/matterhorn-dictionary-api</module>
+    <module>modules/matterhorn-dictionary-hunspell</module>
+    <module>modules/matterhorn-dictionary-none</module>
+    <module>modules/matterhorn-dictionary-regexp</module>
+    <module>modules/matterhorn-distribution-service-acl</module>
+    <module>modules/matterhorn-distribution-service-acl-remote</module>
+    <module>modules/matterhorn-distribution-service-api</module>
+    <module>modules/matterhorn-distribution-service-download</module>
+    <module>modules/matterhorn-distribution-service-download-remote</module>
+    <module>modules/matterhorn-distribution-service-streaming</module>
+    <module>modules/matterhorn-distribution-service-streaming-remote</module>
+    <module>modules/matterhorn-distribution-workflowoperation</module>
+    <module>modules/matterhorn-dublincore</module>
+    <module>modules/matterhorn-engage-theodul-api</module>
+    <module>modules/matterhorn-engage-theodul-core</module>
+    <module>modules/matterhorn-engage-theodul-plugin-archetype</module>
+    <module>modules/matterhorn-engage-theodul-plugin-controls</module>
+    <module>modules/matterhorn-engage-theodul-plugin-custom-mhConnection</module>
+    <module>modules/matterhorn-engage-theodul-plugin-custom-notifications</module>
+    <module>modules/matterhorn-engage-theodul-plugin-custom-usertracking</module>
+    <module>modules/matterhorn-engage-theodul-plugin-description</module>
+    <module>modules/matterhorn-engage-theodul-plugin-tab-description</module>
+    <module>modules/matterhorn-engage-theodul-plugin-tab-shortcuts</module>
+    <module>modules/matterhorn-engage-theodul-plugin-tab-slidetext</module>
+    <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
+    <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
+    <module>modules/matterhorn-engage-ui</module>
+    <module>modules/matterhorn-execute-api</module>
+    <module>modules/matterhorn-execute-impl</module>
+    <module>modules/matterhorn-execute-remote</module>
+    <module>modules/matterhorn-fileupload</module>
+    <module>modules/matterhorn-holdstate-workflowoperation</module>
+    <module>modules/matterhorn-incident-workflowoperation</module>
+    <module>modules/matterhorn-index-service</module>
+    <module>modules/matterhorn-ingest-service-api</module>
+    <module>modules/matterhorn-ingest-service-impl</module>
+    <module>modules/matterhorn-ingest-workflowoperation</module>
+    <module>modules/matterhorn-inspection-service-api</module>
+    <module>modules/matterhorn-inspection-service-ffmpeg</module>
+    <module>modules/matterhorn-inspection-service-remote</module>
+    <module>modules/matterhorn-inspection-workflowoperation</module>
+    <module>modules/matterhorn-kernel</module>
+    <module>modules/matterhorn-load-test</module>
+    <module>modules/matterhorn-load-test-engage</module>
+    <module>modules/matterhorn-lti</module>
+    <module>modules/matterhorn-manager-api</module>
+    <module>modules/matterhorn-manager-impl</module>
+    <module>modules/matterhorn-mediapackage-manipulator</module>
+    <module>modules/matterhorn-mediapackage-ui</module>
+    <module>modules/matterhorn-message-broker-api</module>
+    <module>modules/matterhorn-message-broker-impl</module>
+    <module>modules/matterhorn-messages</module>
+    <module>modules/matterhorn-metadata</module>
+    <module>modules/matterhorn-metadata-api</module>
+    <module>modules/matterhorn-migration</module>
+    <module>modules/matterhorn-mpeg7</module>
+    <module>modules/matterhorn-notification-workflowoperation</module>
+    <module>modules/matterhorn-oaipmh</module>
+    <module>modules/matterhorn-participation-api</module>
+    <module>modules/matterhorn-presets</module>
+    <module>modules/matterhorn-publication-service-api</module>
+    <module>modules/matterhorn-publication-service-youtube-remote</module>
+    <module>modules/matterhorn-publication-service-youtube-v3</module>
+    <module>modules/matterhorn-runtime-info</module>
+    <module>modules/matterhorn-runtime-info-ui</module>
+    <module>modules/matterhorn-runtime-info-ui-ng</module>
+    <module>modules/matterhorn-scheduler-api</module>
+    <module>modules/matterhorn-scheduler-impl</module>
+    <module>modules/matterhorn-scheduler-remote</module>
+    <module>modules/matterhorn-scheduler-workflowoperation</module>
+    <module>modules/matterhorn-schema</module>
+    <module>modules/matterhorn-search</module>
+    <module>modules/matterhorn-search-api</module>
+    <module>modules/matterhorn-search-service-api</module>
+    <module>modules/matterhorn-search-service-feeds</module>
+    <module>modules/matterhorn-search-service-impl</module>
+    <module>modules/matterhorn-search-service-remote</module>
+    <module>modules/matterhorn-search-workflowoperation</module>
+    <module>modules/matterhorn-security-cas</module>
+    <module>modules/matterhorn-security-ldap</module>
+    <module>modules/matterhorn-security-openid</module>
+    <module>modules/matterhorn-security-shibboleth</module>
+    <module>modules/matterhorn-series-service-api</module>
+    <module>modules/matterhorn-series-service-impl</module>
+    <module>modules/matterhorn-series-service-remote</module>
+    <module>modules/matterhorn-serviceregistry</module>
+    <module>modules/matterhorn-serviceregistry-remote</module>
+    <module>modules/matterhorn-silencedetection-api</module>
+    <module>modules/matterhorn-silencedetection-impl</module>
+    <module>modules/matterhorn-silencedetection-remote</module>
+    <module>modules/matterhorn-smil-api</module>
+    <module>modules/matterhorn-smil-impl</module>
+    <module>modules/matterhorn-solr</module>
+    <module>modules/matterhorn-sox-api</module>
+    <module>modules/matterhorn-sox-impl</module>
+    <module>modules/matterhorn-sox-remote</module>
+    <module>modules/matterhorn-sox-workflowoperation</module>
+    <module>modules/matterhorn-speech-recognition-service-api</module>
+    <module>modules/matterhorn-speech-recognition-workflowoperation</module>
+    <module>modules/matterhorn-static</module>
+    <module>modules/matterhorn-static-file-service-api</module>
+    <module>modules/matterhorn-static-file-service-impl</module>
+    <module>modules/matterhorn-test-harness</module>
+    <module>modules/matterhorn-textanalyzer-api</module>
+    <module>modules/matterhorn-textanalyzer-impl</module>
+    <module>modules/matterhorn-textanalyzer-remote</module>
+    <module>modules/matterhorn-textanalyzer-workflowoperation</module>
+    <module>modules/matterhorn-textextractor-tesseract</module>
+    <module>modules/matterhorn-themes</module>
+    <module>modules/matterhorn-themes-workflowoperation</module>
+    <module>modules/matterhorn-userdirectory</module>
+    <module>modules/matterhorn-userdirectory-ldap</module>
+    <module>modules/matterhorn-usertracking-api</module>
+    <module>modules/matterhorn-usertracking-impl</module>
+    <module>modules/matterhorn-videoeditor-api</module>
+    <module>modules/matterhorn-videoeditor-ffmpeg-impl</module>
+    <module>modules/matterhorn-videoeditor-remote</module>
+    <module>modules/matterhorn-videoeditor-workflowoperation</module>
+    <module>modules/matterhorn-videosegmenter-api</module>
+    <module>modules/matterhorn-videosegmenter-ffmpeg</module>
+    <module>modules/matterhorn-videosegmenter-remote</module>
+    <module>modules/matterhorn-videosegmenter-workflowoperation</module>
+    <module>modules/matterhorn-webconsole</module>
+    <module>modules/matterhorn-workflow-service-api</module>
+    <module>modules/matterhorn-workflow-service-impl</module>
+    <module>modules/matterhorn-workflow-service-remote</module>
+    <module>modules/matterhorn-workflow-workflowoperation</module>
+    <module>modules/matterhorn-working-file-repository-service-api</module>
+    <module>modules/matterhorn-working-file-repository-service-impl</module>
+    <module>modules/matterhorn-working-file-repository-service-remote</module>
+    <module>modules/matterhorn-workspace-api</module>
+    <module>modules/matterhorn-workspace-impl</module>
+    <module>assemblies</module>
+  </modules>
 
   <build>
     <defaultGoal>install</defaultGoal>
@@ -1036,44 +246,6 @@
           <doUpdate>false</doUpdate>
           <shortRevisionLength>7</shortRevisionLength>
         </configuration>
-      </plugin>
-      <!-- Deploy OSGi bundles to a container -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-to-felix</id>
-            <phase>install</phase>
-            <configuration>
-              <target if="deployTo">
-                <delete dir="${deployTo}/lib/matterhorn/${project.build.finalName}" />
-                <copy file="${project.build.directory}/${project.build.finalName}.jar" todir="${deployTo}/lib/matterhorn"
-                  failonerror="false" />
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>extract-to-felix</id>
-            <phase>install</phase>
-            <configuration>
-              <target if="unpackTo">
-                <delete file="${unpackTo}/lib/matterhorn/${project.build.finalName}.jar" />
-                <unzip dest="${unpackTo}/lib/matterhorn/${project.build.finalName}" overwrite="true">
-                  <fileset dir="${project.build.directory}">
-                    <include name="${project.build.finalName}.jar" />
-                  </fileset>
-                </unzip>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <!-- Attach sources for all builds -->
       <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-source-plugin</artifactId> <executions>
@@ -1272,7 +444,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.7</version>
+          <version>1.8</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1297,7 +469,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.5.2</version>
+          <version>2.5.5</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1379,6 +551,10 @@
               </goals>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.6.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1487,14 +663,14 @@
       <dependency>
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.core</artifactId>
-        <version>4.2.0</version>
+        <version>${osgi.core.version}</version>
         <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.compendium</artifactId>
-        <version>4.2.0</version>
+        <version>${osgi.compendium.version}</version>
         <scope>provided</scope>
       </dependency>
 
@@ -1787,7 +963,7 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.9</version>
+        <version>${commons-compress.version}</version>
       </dependency>
 
       <dependency>
@@ -2365,28 +1541,6 @@
     <system>jira</system>
     <url>https://opencast.jira.com</url>
   </issueManagement>
-
-  <!-- These should be the right locations for opencast maven 2 distribution, make sure you have <scm> defined for your sub
-    project -->
-  <distributionManagement>
-    <snapshotRepository>
-      <id>matterhorn-maven2-snapshot</id>
-      <name>OC Snapshot repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/repositories/snapshots</url>
-      <uniqueVersion>false</uniqueVersion>
-    </snapshotRepository>
-    <repository>
-      <id>matterhorn-maven2-release</id>
-      <name>OC Release repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/repositories/releases</url>
-    </repository>
-    <site>
-      <id>matterhorn-site</id>
-      <url>file://tmp/matterhorn/site/</url>
-      <!-- <url>scp://www.mycompany.com/www/docs/project/</url> -->
-    </site>
-  </distributionManagement>
-
   <!-- Site Report generation settings -->
   <reporting>
     <plugins>
@@ -2520,7 +1674,7 @@
     <pluginRepository>
       <id>opencast</id>
       <name>Opencast Repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public</url>
+      <url>http://nexus.opencast.org/nexus/content/groups/public</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -2528,30 +1682,13 @@
         <enabled>true</enabled>
       </releases>
     </pluginRepository>
-    <pluginRepository>
-      <id>opencast.snapshots</id>
-      <name>Opencast SNAPSHOTS</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public-snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </pluginRepository>
-    <!-- these are here as a backup in case the matterhorn nexus is down -->
-    <!-- <pluginRepository> <id>ops4j.releases</id> <url>http://repository.ops4j.org/maven2</url> <snapshots> <enabled>false</enabled>
-      </snapshots> </pluginRepository> <pluginRepository> <id>apache Snapshots</id> <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-      <snapshots> <enabled>true</enabled> </snapshots> <releases> <enabled>false</enabled> </releases> </pluginRepository> <pluginRepository>
-      <id>sonatype-repository</id> <name>Sonatype Public Repo</name> <url>http://repository.sonatype.org/content/groups/public/</url>
-      </pluginRepository> -->
   </pluginRepositories>
 
   <repositories>
     <repository>
       <id>opencast</id>
       <name>Opencast Repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public</url>
+      <url>http://nexus.opencast.org/nexus/content/groups/public</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -2559,57 +1696,5 @@
         <enabled>true</enabled>
       </releases>
     </repository>
-      <repository>
-        <id>entwine</id>
-        <name>Entwine Repo</name>
-        <url>http://maven.entwinemedia.com/content/repositories/releases</url>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>
-        <releases>
-          <enabled>true</enabled>
-        </releases>
-      </repository>
-    <repository>
-      <id>opencast.snapshots</id>
-      <name>Opencast SNAPSHOTS</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public-snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-    <repository>
-      <id>sakai</id>
-      <name>Sakai Repo</name>
-      <url>http://source.sakaiproject.org/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-    <repository>
-      <id>eclipselink</id>
-      <name>Eclipselink Repo</name>
-      <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
-    </repository>
-    <!-- these are here as a backup in case the matterhorn nexus repository is down -->
-    <!-- <repository> <id>com.springsource.repository.bundles.release</id> <name>SpringSource Enterprise Bundle Repository
-      - SpringSource Bundle Releases</name> <url>http://repository.springsource.com/maven/bundles/release</url> <releases> <enabled>true</enabled>
-      </releases> </repository> <repository> <id>com.springsource.repository.bundles.external</id> <name>SpringSource Enterprise
-      Bundle Repository - External Bundle Releases</name> <url>http://repository.springsource.com/maven/bundles/external</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>ops4j</id> <name>OPS4J Repository</name> <url>http://repository.ops4j.org/maven2</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>apache.incubating</id> <name>Apache Incubating
-      Repository</name> <url>http://people.apache.org/repo/m2-incubating-repository</url> <releases> <enabled>true</enabled> </releases>
-      </repository> <repository> <id>codehaus-release-repo</id> <name>Codehaus Release Repo</name> <url>http://repository.codehaus.org</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>modularity-releases</id> <name>Modularity Releases
-      Repository</name> <url>http://m2.modularity.net.au/releases</url> <releases> <enabled>true</enabled> </releases> </repository>
-      <repository> <id>sonatype-repository</id> <name>Sonatype Public Repo</name> <url>http://repository.sonatype.org/content/groups/public/</url>
-      <releases> <enabled>true</enabled> </releases> </repository> <repository> <id>EclipseLink Repo</id> <url>http://mirrors.ibiblio.org/pub/mirrors/eclipse/rt/eclipselink/maven.repo</url>
-      <releases> <enabled>true</enabled> </releases> </repository> -->
   </repositories>
 </project>

@@ -26,6 +26,7 @@ pages:
 - ['installation/rpm-rhel-sl-centos.md', 'Installation', 'RPM RHEL/CentOS']
 - ['installation/source-debian-ubuntu.md', 'Installation', 'Source Debian/Ubuntu']
 - ['installation/source-rhel-sl-centos.md', 'Installation', 'Source RHEL/CentOS']
+- ['installation/source-macosx.md', 'Installation', 'Source Mac OS X']
 
 # configuration
 - ['configuration/index.md', 'Configuration', 'Configuration Home']
@@ -68,6 +69,7 @@ pages:
 # workflow operation handlers
 - ['workflowoperationhandlers/index.md', 'Workflow Operation Handlers', 'Workflow Operation Handler Overview']
 - ['workflowoperationhandlers/analyzeaudio-woh.md', 'Workflow Operation Handlers', 'Analyze audio WOH']
+- ['workflowoperationhandlers/append-woh.md', 'Workflow Operation Handlers', 'Append WOH']
 - ['workflowoperationhandlers/applyacl-woh.md', 'Workflow Operation Handlers', 'Apply ACL WOH']
 - ['workflowoperationhandlers/archive-woh.md', 'Workflow Operation Handlers', 'Archive WOH']
 - ['workflowoperationhandlers/caption-woh.md', 'Workflow Operation Handlers', 'Caption WOH']

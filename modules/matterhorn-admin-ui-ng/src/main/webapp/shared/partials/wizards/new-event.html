@@ -132,6 +132,7 @@
                             <td>
                                 <input datepicker
                                     type="text"
+                                    ng-disabled="wizard.step.checkingConflicts"
                                     placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.date"
                                     ng-change="wizard.step.checkConflicts()" />
@@ -142,6 +143,7 @@
                             <td>
                                 <select chosen
                                     data-width="'100px'"
+                                    ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.hour" ng-change="wizard.step.checkConflicts()"
                                     data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
@@ -149,6 +151,7 @@
                                 />
                                 <select chosen
                                     data-width="'100px'"
+                                    ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.minute" ng-change="wizard.step.checkConflicts()"
                                     data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
@@ -161,6 +164,7 @@
                             <td>
                                 <select chosen
                                     data-width="'100px'"
+                                    ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.hour" ng-change="wizard.step.checkConflicts()"
                                     data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
@@ -169,6 +173,7 @@
 
                                 <select chosen
                                     data-width="'100px'"
+                                    ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.minute" ng-change="wizard.step.checkConflicts()"
                                     data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
@@ -181,6 +186,7 @@
                             <td>
                             <select chosen
                                 data-width="'200px'"
+                                ng-disabled="wizard.step.checkingConflicts"
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
                                 ng-model="wizard.step.ud.SCHEDULE_SINGLE.device"
@@ -239,6 +245,7 @@
                             <td>
                                 <select chosen
                                     data-width="'100px'"
+                                    ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.hour"
                                     ng-change="wizard.step.checkConflicts()"
@@ -247,6 +254,7 @@
                                 />
                                 <select chosen
                                     data-width="'100px'"
+                                    ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.minute"
                                     ng-change="wizard.step.checkConflicts()"
@@ -259,6 +267,7 @@
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION' | translate }} <i class="required">*</i></td>
                             <td>
                                 <select chosen
+                                    ng-disabled="wizard.step.checkingConflicts"
                                     data-width="'100px'"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.hour"
@@ -267,6 +276,7 @@
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 />
                                 <select chosen
+                                    ng-disabled="wizard.step.checkingConflicts"
                                     data-width="'100px'"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.minute"
@@ -280,6 +290,7 @@
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.ROOM' | translate }} <i class="required">*</i></td>
                             <td>
                             <select chosen
+                                ng-disabled="wizard.step.checkingConflicts"
                                 data-width="'100%'"
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
@@ -313,6 +324,7 @@
                 <header class="no-expand" translate="EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW"><!--Select Workflow--></header>
                 <div class="obj-container padded">
                     <select chosen
+                        ng-disabled="wizard.step.changingWorkflow"
                         data-width="'100%'"
                         ng-change="wizard.step.changeWorkflow()"
                         data-disable-search-threshold="8"

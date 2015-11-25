@@ -80,8 +80,7 @@ public interface WorkflowService {
   void unregisterWorkflowDefinition(String workflowDefinitionId) throws NotFoundException, WorkflowDatabaseException;
 
   /**
-   * Returns the {@link WorkflowDefinition} identified by <code>name</code> or <code>null</code> if no such definition
-   * was found.
+   * Returns the {@link WorkflowDefinition} identified by <code>name</code>.
    *
    * @param id
    *          the workflow definition id
