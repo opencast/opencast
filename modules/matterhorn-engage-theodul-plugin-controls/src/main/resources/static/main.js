@@ -95,7 +95,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         zoomChange: new Engage.Event("Video:zoomChange", "zoom level has changed", "handler"),
         // events for mobile view
         switchVideo: new Engage.Event("Video:switch", "switch the video", "trigger"),
-        toggleControls: new Engage.Event("Controls:toggle", "toggle the controls", "both")
+        showControls: new Engage.Event("Controls:show", "show the controls", "both"),
+        hideControls: new Engage.Event("Controls:hide", "hide the controls", "both")
     };
 
     var isDesktopMode = false;
@@ -910,7 +911,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             // register special events for mobile template
             if (isMobileMode) {
                 $("#" + id_videoWrapper).click(function(e) {
-                  Engage.trigger(plugin.events.toggleControls.getName());
+                  Engage.trigger(plugin.events.showControls.getName());
                 });
                 $("#" + id_prevVideo).click(function(e) {
                   e.preventDefault();
@@ -1142,9 +1143,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     playPause();
                     loadStoredInitialValues();
 
-                    // if (isMobileMode) {
-                    //     Engage.trigger(plugin.events.toggleControls.getName());
-                    // }
+                    if (isMobileMode) {
+                        Engage.trigger(plugin.events.hideControls.getName());
+                    }
                 }
             });
             Engage.on(plugin.events.pause.getName(), function() {
@@ -1189,7 +1190,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 if (!mediapackageError && videosReady) {
                     Engage.trigger(plugin.events.pause);
                     if (isMobileMode) {
-                        Engage.trigger(plugin.events.toggleControls.getName());
+                        Engage.trigger(plugin.events.showControls.getName());
                     }
                 }
             });
@@ -1242,9 +1243,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 }
             });
 
-            // register toggleControls event in mobile mode
+            // register showControls event in mobile mode
             if (isMobileMode) {
-                Engage.on(plugin.events.toggleControls.getName(), function(e) {
+                Engage.on(plugin.events.showControls.getName(), function() {
+                    console.log("Show Controls with controlsVisible=" + controlsVisible);
                     if (! controlsVisible) {
                         controlsVisible = true;
                         $("#" + id_engage_controls).fadeIn();
@@ -1254,11 +1256,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                                 controlsVisible = false;
                             }, hideTimeout*1000);
                         }
-                    } else {
-                        if (isPlaying) {
-                            $("#" + id_engage_controls).fadeOut();
-                            controlsVisible = false;
-                        }
+                    }
+                });
+                Engage.on(plugin.events.hideControls.getName(), function() {
+                    console.log("Hide Controls with controlsVisible=" + controlsVisible);
+                    if (isPlaying) {
+                        $("#" + id_engage_controls).fadeOut();
+                        controlsVisible = false;
                     }
                 });
             }
