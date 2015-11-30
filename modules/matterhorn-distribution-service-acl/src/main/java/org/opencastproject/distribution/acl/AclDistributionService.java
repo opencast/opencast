@@ -22,6 +22,8 @@
 
 package org.opencastproject.distribution.acl;
 
+import static org.opencastproject.util.RequireUtil.notNull;
+
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -39,6 +41,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
@@ -46,7 +49,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -60,8 +62,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
-
-import static org.opencastproject.util.RequireUtil.notNull;
 
 /**
  * Distributes an access control list to control media to the local media delivery directory.
@@ -436,43 +436,8 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
 
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
-    String distributeStringJobLoad = StringUtils.trimToNull((String) properties.get(DISTRIBUTE_JOB_LOAD_KEY));
-    if (distributeStringJobLoad != null) {
-      try {
-        distributeJobLoad = Float.parseFloat(distributeStringJobLoad);
-        if (distributeJobLoad < 0) {
-          logger.warn("Distribute job load set to less than 0, defaulting to 0");
-          distributeJobLoad = 0.0f;
-        }
-        logger.info("Set distribute job load to {}", distributeJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set distribute job loads to {}. {} must be a float", distributeStringJobLoad,
-                DISTRIBUTE_JOB_LOAD_KEY);
-        distributeJobLoad = DEFAULT_DISTRIBUTE_JOB_LOAD;
-        logger.info("Set distribute job load to default of {}", distributeJobLoad);
-      }
-    } else {
-      logger.info("No job load configuration found, set distribute job load to default of {}", distributeJobLoad);
-    }
-
-    String retractStringJobLoad = StringUtils.trimToNull((String) properties.get(RETRACT_JOB_LOAD_KEY));
-    if (retractStringJobLoad != null) {
-      try {
-        retractJobLoad = Float.parseFloat(retractStringJobLoad);
-        if (retractJobLoad < 0) {
-          logger.warn("Retract job load set to less than 0, defaulting to 0");
-          retractJobLoad = 0.0f;
-        }
-        logger.info("Set retract job load to {}", retractJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set retract job loads to {}. {} must be a float", retractStringJobLoad,
-                RETRACT_JOB_LOAD_KEY);
-        retractJobLoad = DEFAULT_RETRACT_JOB_LOAD;
-        logger.info("Set retract job load to default of {}", retractJobLoad);
-      }
-    } else {
-      logger.info("No job load configuration found, set retract job load to default of {}", retractJobLoad);
-    }
+    distributeJobLoad = LoadUtil.getConfiguredLoadValue(properties, DISTRIBUTE_JOB_LOAD_KEY, DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
+    retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD, serviceRegistry);
   }
 
 }

@@ -23,7 +23,7 @@ package org.opencastproject.archive.storage;
 
 import static org.apache.commons.io.FilenameUtils.EXTENSION_SEPARATOR;
 import static org.apache.commons.io.FilenameUtils.getExtension;
-import static org.apache.commons.lang.exception.ExceptionUtils.getMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.opencastproject.util.FileSupport.link;
 import static org.opencastproject.util.IoSupport.file;
 import static org.opencastproject.util.PathSupport.path;
@@ -46,7 +46,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

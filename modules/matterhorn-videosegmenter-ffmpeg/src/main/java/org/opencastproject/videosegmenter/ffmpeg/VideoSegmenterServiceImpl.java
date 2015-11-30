@@ -21,20 +21,6 @@
 
 package org.opencastproject.videosegmenter.ffmpeg;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Catalog;
@@ -56,17 +42,33 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.common.io.LineReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.io.LineReader;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Media analysis plugin that takes a video stream and extracts video segments
@@ -195,23 +197,7 @@ VideoSegmenterService, ManagedService {
       }
     }
 
-    String jobLoad = StringUtils.trimToNull((String) properties.get(SEGMENTER_JOB_LOAD_KEY));
-    if (jobLoad != null) {
-      try {
-        segmenterJobLoad = Float.parseFloat(jobLoad);
-        if (segmenterJobLoad < 0) {
-          logger.warn("Video segmenter job load set to less than 0, defaulting to 0");
-          segmenterJobLoad = 0.0f;
-        }
-        logger.info("Set video segmenter job load to {}", segmenterJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set caption job loads to {}. {} must be a float", jobLoad,
-                SEGMENTER_JOB_LOAD_KEY);
-        segmenterJobLoad = DEFAULT_SEGMENTER_JOB_LOAD;
-        logger.info("Set caption job load to default of {}", segmenterJobLoad);
-      }
-    }
-
+    segmenterJobLoad = LoadUtil.getConfiguredLoadValue(properties, SEGMENTER_JOB_LOAD_KEY, DEFAULT_SEGMENTER_JOB_LOAD, serviceRegistry);
   }
 
   /**

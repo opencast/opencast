@@ -53,6 +53,7 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Tuple;
@@ -61,7 +62,7 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceException;
@@ -686,42 +687,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
-    String addJobLoadString = StringUtils.trimToNull((String) properties.get(ADD_JOB_LOAD_KEY));
-    if (addJobLoadString != null) {
-      try {
-        addJobLoad = Float.parseFloat(addJobLoadString);
-        if (addJobLoad < 0) {
-          logger.warn("Add job load set to less than 0, defaulting to 0");
-          addJobLoad = 0.0f;
-        }
-        logger.info("Set add job load to {}", addJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set add job loads to {}. {} must be a float", addJobLoadString,
-                ADD_JOB_LOAD_KEY);
-        addJobLoad = DEFAULT_ADD_JOB_LOAD;
-        logger.info("Set add job load to default of {}", addJobLoad);
-      }
-    } else {
-      logger.info("No job load configuration found, set add job load to default of {}", addJobLoad);
-    }
-
-    String deleteJobLoadString = StringUtils.trimToNull((String) properties.get(DELETE_JOB_LOAD_KEY));
-    if (deleteJobLoadString != null) {
-      try {
-        deleteJobLoad = Float.parseFloat(deleteJobLoadString);
-        if (deleteJobLoad < 0) {
-          logger.warn("Delete job load set to less than 0, defaulting to 0");
-          deleteJobLoad = 0.0f;
-        }
-        logger.info("Set delete job load to {}", deleteJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set delete job loads to {}. {} must be a float", deleteJobLoadString,
-                DELETE_JOB_LOAD_KEY);
-        deleteJobLoad = DEFAULT_DELETE_JOB_LOAD;
-        logger.info("Set delete job load to default of {}", deleteJobLoad);
-      }
-    } else {
-      logger.info("No job load configuration found, set delete job load to default of {}", deleteJobLoad);
-    }
+    addJobLoad = LoadUtil.getConfiguredLoadValue(properties, ADD_JOB_LOAD_KEY, DEFAULT_ADD_JOB_LOAD, serviceRegistry);
+    deleteJobLoad = LoadUtil.getConfiguredLoadValue(properties, DELETE_JOB_LOAD_KEY, DEFAULT_DELETE_JOB_LOAD, serviceRegistry);
   }
 }

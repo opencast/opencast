@@ -169,6 +169,8 @@ public class JaxbJob implements Job {
     this.creator = job.getCreator();
     this.organization = job.getOrganization();
     this.jobLoad = job.getJobLoad();
+    setBlockedJobIds(job.getBlockedJobIds());
+    setBlockingJobId(job.getBlockingJobId());
   }
 
   /**
@@ -654,7 +656,15 @@ public class JaxbJob implements Job {
 
   @Override
   public void setBlockedJobIds(List<Long> list) {
-    blockedJobIds = list;
+    //FIXME: This should be using Immutable to create a safe copy of the list that can't be changed easily
+    if (null != list)
+      blockedJobIds = list;
+    else
+      blockedJobIds = new LinkedList<Long>();
+  }
+
+  public void removeBlockedJobsIds() {
+    setBlockedJobIds(null);
   }
 
   @Override
@@ -665,6 +675,10 @@ public class JaxbJob implements Job {
 
   public void setBlockingJobId(Long jobId) {
     this.blockingJobId = jobId;
+  }
+
+  public void removeBlockingJobId() {
+    this.blockingJobId = null;
   }
 
   /**
@@ -699,5 +713,4 @@ public class JaxbJob implements Job {
   public String toString() {
     return "Job {id:" + this.id + ", version:" + version + "}";
   }
-
 }

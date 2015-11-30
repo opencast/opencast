@@ -169,10 +169,10 @@ public final class JobBarrier {
         this.waiter.setStatus(Job.Status.RUNNING);
         for (Job j : jobs) {
           Job updatedJob = this.serviceRegistry.getJob(j.getId());
-          updatedJob.setBlockingJobId(null);
+          updatedJob.removeBlockingJobId();
           this.serviceRegistry.updateJob(updatedJob);
         }
-        this.waiter.setBlockedJobIds(null);
+        this.waiter.removeBlockedJobsIds();
         this.serviceRegistry.updateJob(this.waiter);
       } catch (ServiceRegistryException e) {
         logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}", this.waiter, e.getMessage());

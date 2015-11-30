@@ -6,27 +6,24 @@ This document will help you get an overview of the existing Matterhorn configura
 Watch folders allow you to quickly augment Matterhorn's existing behavior, simply by adding new configuration files. Below is a list of default watch folders.
 
 ### Encoding Profiles
-Default and custom encoding profiles should be placed in <felix_home>/etc/encoding. The file names should follow the pattern *.properties.
+Default and custom encoding profiles should be placed in <opencast_home>/etc/encoding. The file names should follow the pattern *.properties.
 
 ### Atom and RSS Feeds
-Default and custom feed definitions should be placed in <felix_home>/etc/feeds. The file names should follow the pattern *.xml.
+Default and custom feed definitions should be placed in <opencast_home>/etc/feeds. The file names should follow the pattern *.xml.
 
 ### Workflow Definitions
-Custom workflow definitions should be placed in <felix_home>/etc/workflows. The file names should follow the pattern *.xml.
-
-### OSGi Bundles
-Additional OSGi bundles should be placed in <felix_home>/lib/matterhorn. <felix_home>/etc/load should be reserved for the default configuration.
+Custom workflow definitions should be placed in <opencast_home>/etc/workflows. The file names should follow the pattern *.xml.
 
 ### Inbox
-Media files placed in <felix_home>/inbox will be copied to the Matterhorn working file repository and made available in the Admin Tools > Uploading Recording user interface, via the File Location menu.
+Media files placed in <opencast_home>/inbox will be copied to the Matterhorn working file repository and made available in the Admin Tools > Uploading Recording user interface, via the File Location menu.
 
 *Queued media files are write-protected, copied to the working file repository and then deleted from the inbox.*
 
 ## Configuration Files
 Configuration files use key-value pairs to determine Matterhorn's runtime behavior.
 
-### <felix_home>/etc/config.properties
-*config.properties* is the primary Matterhorn configuration file.
+### <opencast_home>/etc/custom.properties
+*custom.properties* is the primary Matterhorn configuration file.
 
 #### Bundle Configuration Properties
 |Name|Description|Default|
@@ -40,7 +37,7 @@ Alternatively, edit Apache's httpd.conf to reroute Matterhorn to port 80:
     ProxyPass / http://localhost:8080/
     ProxyPassReverse / http://localhost:8080/
 
-#### Opencast Matterhorn Configuration
+#### Opencast Configuration
 
 #####General
 
@@ -115,7 +112,7 @@ Alternatively, edit Apache's httpd.conf to reroute Matterhorn to port 80:
 |org.opencastproject.inbox.threads|The number of mediapackages to ingest concurrently from the watch folder|1|
 
 
-### <felix_home>/etc/load/org.opencastproject.organization-mh_default_org.cfg
+### <opencast_home>/etc/load/org.opencastproject.organization-mh_default_org.cfg
 
 **org.opencastproject.organization-mh_default_org.cfg** defines the default tennant in a multi tennant setup. If you don't have a multi-tennant setup this is the file for you to edit.
 
@@ -129,6 +126,6 @@ Alternatively, edit Apache's httpd.conf to reroute Matterhorn to port 80:
 
 ## Security
 
-### <felix_home>/etc/security/mh_default_org.xml
+### <opencast_home>/etc/security/mh_default_org.xml
 
 *mh_default_org.xml* defines the Matterhorn access policy using the [Spring Security](http://static.springsource.org/spring-security/site/) framework XML schema.

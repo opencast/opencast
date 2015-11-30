@@ -37,7 +37,7 @@ import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,11 +138,11 @@ public abstract class AbstractJobProducer implements JobProducer {
     float currentLoad = systemLoad.get(getServiceRegistry().getRegistryHostname()).getLoadFactor();
     if (currentLoad > maxload.getLoadFactor()) {
       logger.debug("Declining job {} of type {} because load of {} would exceed this node's limit of {}.",
-                    new Object[] {job.getId(), job.getJobType(), currentLoad, maxload});
+                    new Object[] {job.getId(), job.getJobType(), currentLoad, maxload.getLoadFactor()});
       return false;
     }
     logger.debug("Accepting job {} of type {} because load of {} is within this node's limit of {}.",
-                  new Object[] {job.getId(), job.getJobType(), currentLoad, maxload});
+                  new Object[] {job.getId(), job.getJobType(), currentLoad, maxload.getLoadFactor()});
     return true;
   }
 

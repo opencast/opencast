@@ -21,7 +21,7 @@
 
 package org.opencastproject.serviceregistry.remote;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.opencastproject.job.api.JaxbJobList;
 import org.opencastproject.job.api.Job;
@@ -49,7 +49,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.QueryStringBuilder;
 import org.opencastproject.util.UrlSupport;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -63,6 +63,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -779,8 +780,10 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
       response = getHttpClient().execute(get);
       responseStatusCode = response.getStatusLine().getStatusCode();
       if (responseStatusCode == HttpStatus.SC_OK) {
-        SystemLoad systemLoad = SystemLoadParser.parse(response.getEntity().getContent());
-        return systemLoad;
+        try (InputStream in = response.getEntity().getContent()) {
+          SystemLoad systemLoad = SystemLoadParser.parse(in);
+          return systemLoad;
+        }
       }
     } catch (IOException e) {
       throw new ServiceRegistryException("Unable to get node loads", e);

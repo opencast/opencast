@@ -1,8 +1,9 @@
 angular.module('adminNg.services')
-.factory('NewSeriesAccess', ['ResourcesListResource', 'SeriesAccessResource', function (ResourcesListResource, SeriesAccessResource) {
+.factory('NewSeriesAccess', ['ResourcesListResource', 'SeriesAccessResource', 'Notifications', function (ResourcesListResource, SeriesAccessResource, Notifications) {
     var Access = function () {
 
         var me = this,
+            aclNotification,
             createPolicy = function (role) {
                 return {
                     role  : role,
@@ -64,6 +65,14 @@ angular.module('adminNg.services')
                     hasRights = true;
                 }
              });
+
+            if (hasRights && angular.isDefined(aclNotification)) {
+                Notifications.remove(aclNotification, 'series-acl');
+            }
+
+            if (!hasRights && !angular.isDefined(aclNotification)) {
+                aclNotification = Notifications.add('warning', 'SERIES_ACL_MISSING_READWRITE_ROLE', 'series-acl', -1);
+            }
             
             return hasRights;
         };
@@ -76,6 +85,11 @@ angular.module('adminNg.services')
                 id: {},
                 policies: []
             };
+        };
+
+        this.reload = function () {
+            me.acls  = ResourcesListResource.get({ resource: 'ACL' });
+            me.roles = ResourcesListResource.get({ resource: 'ROLES' }); 
         };
 
         this.reset();

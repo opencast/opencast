@@ -23,7 +23,7 @@ package org.opencastproject.workflow.api;
 
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +36,7 @@ public class WorkflowQuery {
   protected String id;
   protected long count;
   protected long startPage;
+  protected long startIndex;
   protected String text;
   protected String seriesTitle;
   protected String seriesId;
@@ -80,9 +81,17 @@ public class WorkflowQuery {
     return this;
   }
 
-  /** Include a paging offset for the items returned */
+  /** Include a paging offset for the items returned. Will delete any {@link #withStartIndex(long)} settings. */
   public WorkflowQuery withStartPage(long startPage) {
     this.startPage = startPage;
+    this.startIndex = 0;
+    return this;
+  }
+
+  /** Include a start index for the items returned. Will delete any {@link #withStartPage(long)} settings. */
+  public WorkflowQuery withStartIndex(long index) {
+    this.startIndex = index;
+    this.startPage = 0;
     return this;
   }
 
@@ -353,6 +362,11 @@ public class WorkflowQuery {
    */
   public long getStartPage() {
     return startPage;
+  }
+
+  /** Returns the start index within the full result set. */
+  public long getStartIndex() {
+    return startIndex;
   }
 
   /**

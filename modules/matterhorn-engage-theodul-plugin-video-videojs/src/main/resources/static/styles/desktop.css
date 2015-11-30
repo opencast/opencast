@@ -5,9 +5,12 @@
 }
 
 .videoDisplay {
-    float: left;
-    width: 49%;
     margin: 1px;
+}
+
+.videoDefaultLayout {
+    float: left;
+    width: 49.5%;
 }
 
 .audioDisplayError {
@@ -18,6 +21,35 @@
     width: 100%;
     height: 100%;
 }
+
+.videoFocusedPiP {
+    width: 100%;
+    float: left;
+    z-index: 10;
+}
+.videoUnfocusedPiP {
+    width: 19.5%;
+    position: absolute;
+    margin-left: 12%;
+    margin-top: 10%;
+    box-shadow: 3px 3px 3px black;
+    opacity: 0.6;
+    z-index: 20;
+}
+
+.videoFocused {
+    width: 80%;
+    float: left;
+    position: absolute;
+}
+
+.videoUnfocused {
+    width: 19.5%;
+    float: right;
+    margin-left: 70%;
+   }
+
+
 
 .clearfix:before,
 .clearfix:after {

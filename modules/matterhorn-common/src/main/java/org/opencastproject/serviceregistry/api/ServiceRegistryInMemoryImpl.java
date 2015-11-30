@@ -118,6 +118,8 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   public ServiceRegistryInMemoryImpl(JobProducer service, float maxLoad, SecurityService securityService,
           UserDirectoryService userDirectoryService, OrganizationDirectoryService organizationDirectoryService,
           IncidentService incidentService) throws ServiceRegistryException {
+    //Note: total memory here isn't really the correct value, but we just need something (preferably non-zero)
+    registerHost(LOCALHOST, LOCALHOST, Runtime.getRuntime().totalMemory(), Runtime.getRuntime().availableProcessors(), maxLoad);
     if (service != null)
       registerService(service, maxLoad);
     this.securityService = securityService;
@@ -152,7 +154,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     if (hosts.containsKey(host)) {
       hosts.get(host).setActive(true);
     } else {
-      throw new NotFoundException();
+      throw new NotFoundException("The host named " + host + " was not found");
     }
   }
 
@@ -166,7 +168,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     if (hosts.containsKey(host)) {
       hosts.get(host).setActive(false);
     } else {
-      throw new NotFoundException();
+      throw new NotFoundException("The host named " + host + " was not found");
     }
   }
 
@@ -178,7 +180,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   @Override
   public void registerHost(String host, String address, long memory, int cores, float maxLoad)
           throws ServiceRegistryException {
-    HostRegistrationInMemory hrim = new HostRegistrationInMemory(address, maxLoad, cores, memory);
+    HostRegistrationInMemory hrim = new HostRegistrationInMemory(address, address, maxLoad, cores, memory);
     hosts.put(host, hrim);
   }
 
@@ -217,11 +219,6 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    */
   public ServiceRegistration registerService(JobProducer localService, float maxLoad) throws ServiceRegistryException {
     HostRegistrationInMemory hrim = hosts.get(LOCALHOST);
-    if (hrim == null) {
-      //Note: total memory here isn't really the correct value, but we just need something (preferably non-zero)
-      registerHost(LOCALHOST, LOCALHOST, Runtime.getRuntime().totalMemory(), Runtime.getRuntime().availableProcessors(), maxLoad);
-      hrim = hosts.get(LOCALHOST);
-    }
 
     List<ServiceRegistrationInMemoryImpl> servicesOnHost = services.get(LOCALHOST);
     if (servicesOnHost == null) {
@@ -275,10 +272,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
     HostRegistrationInMemory hostRegistration = hosts.get(host);
     if (hostRegistration == null) {
-      //Note: total memory here isn't really the correct value, but we just need something (preferably non-zero)
-      int processors = Runtime.getRuntime().availableProcessors();
-      registerHost(host, host, processors, processors, Runtime.getRuntime().totalMemory());
-      hosts.put(host,  hostRegistration);
+      throw new ServiceRegistryException(new NotFoundException("Host " + host + " was not found"));
     }
 
     List<ServiceRegistrationInMemoryImpl> servicesOnHost = services.get(host);
@@ -319,6 +313,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   @Override
   public void setMaintenanceStatus(String host, boolean maintenance) throws NotFoundException {
     List<ServiceRegistrationInMemoryImpl> servicesOnHost = services.get(host);
+    if (!hosts.containsKey(host)) {
+      throw new NotFoundException("Host " + host + " was not found");
+    }
     hosts.get(host).setMaintenanceMode(maintenance);
     if (servicesOnHost != null) {
       for (ServiceRegistrationInMemoryImpl r : servicesOnHost) {
@@ -544,8 +541,8 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
       } else if (!registration.isJobProducer()) {
         logger.warn("This implementation of the service registry doesn't support dispatching to remote services");
         // TODO: Add remote dispatching
-      } else { //if (registration.isInMaintenanceMode()) {
-        logger.warn("This service is in maintenance mode");
+      } else {
+        logger.warn("Service " + registration + " is in maintenance mode");
       }
     }
     return false;
@@ -953,7 +950,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     if (hosts.containsKey(host)) {
       return new NodeLoad(host, hosts.get(host).getMaxLoad());
     }
-    throw new ServiceRegistryException("Unable to find host in service registry");
+    throw new ServiceRegistryException("Unable to find host " + host + " in service registry");
   }
 
   /**

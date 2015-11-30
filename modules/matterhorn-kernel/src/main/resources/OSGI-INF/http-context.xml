@@ -3,7 +3,8 @@
  name="org.opencastproject.kernel.http.SharedHttpContext" immediate="true" activate="activate" deactivate="deactivate">
   <implementation class="org.opencastproject.kernel.http.SharedHttpContext" />
   <property name="service.description" value="Opencast HttpContent" />
-  <property name="contextId" value="opencast.httpcontent" />
+  <property name="httpContext.id" value="opencast.httpcontext" />
+  <property name="httpContext.shared" value="true" />
   <service>
     <provide interface="org.osgi.service.http.HttpContext" />
   </service>

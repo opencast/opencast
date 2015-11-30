@@ -21,8 +21,6 @@
 
 package org.opencastproject.ingest.impl;
 
-import static java.util.Map.Entry;
-
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
@@ -59,6 +57,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ProgressInputStream;
 import org.opencastproject.util.jmx.JmxUtil;
@@ -77,8 +76,8 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.jdom.Document;
@@ -111,6 +110,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -1431,42 +1431,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @SuppressWarnings("rawtypes")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    String fileStringJobLoad = StringUtils.trimToNull((String) properties.get(FILE_JOB_LOAD_KEY));
-    if (fileStringJobLoad != null) {
-      try {
-        ingestFileJobLoad = Float.parseFloat(fileStringJobLoad);
-        if (ingestFileJobLoad < 0) {
-          logger.warn("File ingest job load set to less than 0, defaulting to 0");
-          ingestFileJobLoad = 0.0f;
-        }
-        logger.info("Set ingest file job load to {}", ingestFileJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set ingest file job loads to {}. {} must be a float", fileStringJobLoad,
-                DEFAULT_INGEST_FILE_JOB_LOAD);
-        ingestFileJobLoad = DEFAULT_INGEST_FILE_JOB_LOAD;
-        logger.info("Set ingest file job load to default of {}", ingestFileJobLoad);
-      }
-    } else {
-      logger.info("No job load configuration found, set ingest file job load to default of {}", ingestFileJobLoad);
-    }
-
-    String ingestStringZipJobLoad = StringUtils.trimToNull((String) properties.get(ZIP_JOB_LOAD_KEY));
-    if (ingestStringZipJobLoad != null) {
-      try {
-        ingestZipJobLoad = Float.parseFloat(ingestStringZipJobLoad);
-        if (ingestZipJobLoad < 0) {
-          logger.warn("Zip ingest job load set to less than 0, defaulting to 0");
-          ingestZipJobLoad = 0.0f;
-        }
-        logger.info("Set ingest zip job load to {}", ingestZipJobLoad);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set ingest zip job loads to {}. {} must be a float", ingestZipJobLoad,
-                DEFAULT_INGEST_ZIP_JOB_LOAD);
-        ingestZipJobLoad = DEFAULT_INGEST_ZIP_JOB_LOAD;
-        logger.info("Set ingest zip job load to default of {}", ingestZipJobLoad);
-      }
-    } else {
-      logger.info("No job load configuration found, set ingest zip job load to default of {}", ingestZipJobLoad);
-    }
+    ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD, serviceRegistry);
+    ingestZipJobLoad = LoadUtil.getConfiguredLoadValue(properties, ZIP_JOB_LOAD_KEY, DEFAULT_INGEST_ZIP_JOB_LOAD, serviceRegistry);
   }
 }

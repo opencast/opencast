@@ -29,7 +29,7 @@ Save Client ID in JSON Format
 --------------------------------------
 - Download the client information in JSON format by clicking **Download JSON**
 - Save the JSON file to
-`${bundles.configuration.location}/youtube-v3/client-secrets-youtube-v3.json`
+`${karaf.etc}/youtube-v3/client-secrets-youtube-v3.json`
 (Usually this is `etc/youtube-v3/client-secrets-youtube-v3.json`)
 
 Generate OAuth Tokens
