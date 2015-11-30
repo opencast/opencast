@@ -50,7 +50,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.io.LineReader;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;

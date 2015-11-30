@@ -25,7 +25,7 @@ import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +52,7 @@ public final class LoadUtil {
         }
         logger.info("Set load for key {} to {}", configKey, loadValue);
       } catch (NumberFormatException e) {
-        logger.warn("Can not set caption job loads to {}. {} must be a float", jobLoad,
-                configKey);
+        logger.warn("Can not set job loads to {}. {} must be a float", jobLoad, configKey);
         loadValue = defaultValue;
         logger.info("Set load for key {} to default of {}", configKey, loadValue);
       }
@@ -69,10 +68,12 @@ public final class LoadUtil {
   }
 
   public static void checkJobFitsCluster(float load, String loadType, List<HostRegistration> hosts) {
-    for (HostRegistration host : hosts) {
-      if (host.getMaxLoad() >= load) {
-        logger.trace("Host " + host.toString() + " can process jobs of type " + loadType + " with load " + load);
-        break;
+    if (hosts != null) {
+      for (HostRegistration host : hosts) {
+        if (host.getMaxLoad() >= load) {
+          logger.trace("Host " + host.toString() + " can process jobs of type " + loadType + " with load " + load);
+          break;
+        }
       }
     }
     logger.warn("No hosts found that can process jobs of type {} with load {}", loadType, load);

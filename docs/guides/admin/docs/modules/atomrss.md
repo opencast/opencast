@@ -30,7 +30,7 @@ Need an example? Visit http://demo.opencastproject.org/feeds/atom/1.0/latest
 The feed allows administrators to pre-configure feeds for specific sets of series. Given the following configuration, http://<matterhorn_root>/feeds/aggregated/myseries would return the latest episodes from series series_1 and series_2.
 The Matterhorn feed specifications are located in:
 
-    <felix_home>/conf/feeds
+    <opencast_home>/conf/feeds
 
 Update aggregation.properties, the specification for an example feed aggregation:
 
@@ -40,7 +40,7 @@ Update aggregation.properties, the specification for an example feed aggregation
 ## Custom
 The Matterhorn feed specifications are located in:
 
-    <felix_home>/conf/feeds
+    <opencast_home>/conf/feeds
 
 Below is custom.properties, the default specification for an example custom feed of published episodes:
 

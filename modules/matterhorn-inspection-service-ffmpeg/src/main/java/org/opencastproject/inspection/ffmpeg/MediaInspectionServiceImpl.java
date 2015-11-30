@@ -36,7 +36,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.parser.Parser;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -193,13 +193,13 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    */
   @Override
   public Job enrich(final MediaPackageElement element, final boolean override) throws MediaInspectionException,
-         MediaPackageException {
-           try {
-             return serviceRegistry.createJob(JOB_TYPE, Operation.Enrich.toString(),
-                 Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)), enrichJobLoad);
-           } catch (ServiceRegistryException e) {
-             throw new MediaInspectionException(e);
-           }
+          MediaPackageException {
+    try {
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Enrich.toString(),
+          Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)), enrichJobLoad);
+    } catch (ServiceRegistryException e) {
+      throw new MediaInspectionException(e);
+    }
   }
 
   protected void setWorkspace(Workspace workspace) {
@@ -225,7 +225,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    * Callback for setting the security service.
    *
    * @param securityService
-   *         the securityService to set
+   *          the securityService to set
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
@@ -235,7 +235,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    * Callback for setting the user directory service.
    *
    * @param userDirectoryService
-   *         the userDirectoryService to set
+   *          the userDirectoryService to set
    */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
@@ -245,7 +245,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    * Sets a reference to the organization directory service.
    *
    * @param organizationDirectory
-   *         the organization directory
+   *          the organization directory
    */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
