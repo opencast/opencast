@@ -23,8 +23,6 @@ package org.opencastproject.job.api;
 
 import static org.opencastproject.job.api.Job.FailureReason.NONE;
 
-import org.opencastproject.fun.juc.Immutables;
-
 import java.net.URI;
 import java.util.Date;
 import java.util.LinkedList;
@@ -658,10 +656,11 @@ public class JaxbJob implements Job {
 
   @Override
   public void setBlockedJobIds(List<Long> list) {
+    //FIXME: This should be using Immutable to create a safe copy of the list that can't be changed easily
     if (null != list)
-      blockedJobIds = Immutables.mk(list);
+      blockedJobIds = list;
     else
-      blockedJobIds = null;
+      blockedJobIds = new LinkedList<Long>();
   }
 
   public void removeBlockedJobsIds() {
