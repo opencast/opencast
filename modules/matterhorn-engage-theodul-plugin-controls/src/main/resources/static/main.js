@@ -157,7 +157,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var logoLink = false;
     var logo = plugin_path + "images/logo.png";
     var showEmbed = true;
-    var hideTimeout = 3;            // time after controls are hidden again in seconds
+    var hideTimeout = 5;            // time after controls are hidden again in seconds
 
 
     /* don't change these variables */
@@ -1188,7 +1188,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.on(plugin.events.ended.getName(), function() {
                 if (!mediapackageError && videosReady) {
                     Engage.trigger(plugin.events.pause);
-                    Engage.trigger(plugin.events.toggleControls.getName());
+                    if (isMobileMode) {
+                        Engage.trigger(plugin.events.toggleControls.getName());
+                    }
                 }
             });
             Engage.on(plugin.events.segmentMouseover.getName(), function(no) {
