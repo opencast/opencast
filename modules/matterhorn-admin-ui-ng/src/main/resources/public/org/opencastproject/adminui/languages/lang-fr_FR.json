@@ -5,6 +5,7 @@
   "SUBMIT":"Envoyer",
   "UPDATE":"Appliquer",
   "CANCEL":"Annuler",
+  "CONFIRM":"Confirm",
   "SAVE":"Enregistrer",
   "LOGOUT":"Déconnexion",
   "RESET":"Remise à zéro",
@@ -20,6 +21,12 @@
       "AVAILABLE_COLUMNS":"Colonnes disponibles",
       "SELECTED_COLUMNS":"Colonnes choisies",
       "FOOTER_TEXT":"L'ordre et la sélection seront enregistrés automatiquement. Appuyez sur «{{resetTranslation}} » pour restaurer l'affichage par défaut."
+    }
+  },
+  "CONFIRMATIONS": {
+    "CONTINUE_ACTION" : "Are you sure you want to continue?",
+    "ACTIONS": { 
+      "CONFIRMATION" : "Confirmation required"
     }
   },
   "NOTIFICATIONS":{
@@ -98,6 +105,7 @@
   "BULK_ACTIONS":{
     "CAPTION":"Actions",
     "SEND_MESSAGE":"Envoyer un message",
+    "WARNING":"Warning",
     "EDIT_STATUS":{
       "CAPTION":"Modifier statut",
       "READY_FOR_RECORDING":"Prêt pour l'enregistrement",
@@ -105,10 +113,12 @@
     },
     "DELETE":{
       "SERIES":{
-        "CAPTION":"Supprimer"
+        "CAPTION":"Supprimer",  
+        "BUTTON":"Supprimer"
       },
       "EVENTS":{
-        "CAPTION":"Supprimer"
+        "CAPTION":"Supprimer",  
+        "BUTTON":"Supprimer"
       }
     },
     "DELETE_EVENTS_WARNING_LINE1":"Une fois supprimés, toutes les métadonnées, les fichiers audio et vidéo seront supprimés et rendus irrécupérable.",

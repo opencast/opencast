@@ -155,7 +155,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
    * @throws ProcessFailedException
    *           if an error occured
    */
-  protected synchronized Track processSmil(Job job, Smil smil, String trackParamGroupId) throws ProcessFailedException {
+  protected Track processSmil(Job job, Smil smil, String trackParamGroupId) throws ProcessFailedException {
 
     SmilMediaParamGroup trackParamGroup;
     ArrayList<String> inputfile = new ArrayList<String>();

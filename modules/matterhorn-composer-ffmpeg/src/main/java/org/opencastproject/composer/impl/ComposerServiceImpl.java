@@ -259,12 +259,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           videoFile = workspace.get(videoTrack.getURI());
         } catch (NotFoundException e) {
           incident().recordFailure(job, WORKSPACE_GET_NOT_FOUND, e,
-                  getWorkspaceMediapackageParams("video", Type.Track, audioTrack.getURI()), NO_DETAILS);
-          throw new EncoderException("Requested video track " + audioTrack + " is not found");
+                  getWorkspaceMediapackageParams("video", Type.Track, videoTrack.getURI()), NO_DETAILS);
+          throw new EncoderException("Requested video track " + videoTrack + " is not found");
         } catch (IOException e) {
           incident().recordFailure(job, WORKSPACE_GET_IO_EXCEPTION, e,
-                  getWorkspaceMediapackageParams("video", Type.Track, audioTrack.getURI()), NO_DETAILS);
-          throw new EncoderException("Unable to access video track " + audioTrack);
+                  getWorkspaceMediapackageParams("video", Type.Track, videoTrack.getURI()), NO_DETAILS);
+          throw new EncoderException("Unable to access video track " + videoTrack);
         }
       }
 

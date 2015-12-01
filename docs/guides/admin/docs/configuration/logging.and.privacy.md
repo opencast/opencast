@@ -1,7 +1,7 @@
 Logging and Privacy
 ===================
 
-The Matterhorn User-Tracking service stores actions of the users in the engage player within the database. This data is
+The Opencast User-Tracking service stores actions of the users in the engage player within the database. This data is
 used for the footprint feature below the player and for the optional Analytics component.
 
 The settings for logging can be changed in the file:

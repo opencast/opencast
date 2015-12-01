@@ -45,6 +45,7 @@ import org.opencastproject.rest.RestServiceTestEnv;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
@@ -528,6 +529,7 @@ public class AbstractEventEndpointTest {
     private SchedulerService schedulerService;
     private CaptureAgentStateService captureAgentStateService;
     private AdminUISearchIndex index;
+    private UrlSigningService urlSigningService;
     private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
     private CommonEventCatalogUIAdapter episodeCatalogUIAdapter;
 
@@ -697,6 +699,14 @@ public class AbstractEventEndpointTest {
 
     public void setCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
       catalogUIAdapters.add(catalogUIAdapter);
+    }
+
+    public void setUrlSigningService(UrlSigningService urlSigningService) {
+      this.urlSigningService = urlSigningService;
+    }
+
+    public UrlSigningService getUrlSigningService() {
+      return urlSigningService;
     }
 
     public void unsetCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {

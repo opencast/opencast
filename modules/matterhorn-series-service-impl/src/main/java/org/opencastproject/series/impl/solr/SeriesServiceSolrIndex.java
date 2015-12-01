@@ -46,7 +46,6 @@ import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.series.impl.SeriesServiceIndex;
 import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -91,9 +90,6 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /** Configuration key for an embedded solr configuration and data directory */
   public static final String CONFIG_SOLR_ROOT = "org.opencastproject.series.solr.dir";
-
-  /** the default series index suffix */
-  public static final String SOLR_ROOT_SUFFIX = "/seriesindex";
 
   /** Delimeter used for concatenating multivalued fields for sorting fields in solr */
   public static final String SOLR_MULTIVALUED_DELIMETER = "; ";
@@ -179,13 +175,8 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
         } catch (MalformedURLException e) {
           throw new IllegalStateException("Unable to connect to solr at " + solrServerUrlConfig, e);
         }
-      } else if (cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT) != null) {
-        solrRoot = cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT);
       } else {
-        String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
-        if (storageDir == null)
-          throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
-        solrRoot = PathSupport.concat(storageDir + SOLR_ROOT_SUFFIX, "series");
+        solrRoot = SolrServerFactory.getEmbeddedDir(cc, CONFIG_SOLR_ROOT, "series");
       }
 
       Object syncIndexingConfig = cc.getProperties().get("synchronousIndexing");

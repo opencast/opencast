@@ -29,8 +29,9 @@
                 <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown="">
                     <div class="lang" ng-class="currentLanguageCode"></div>
                     <ul class="dropdown-ul">
-                        <li><a href="#" ng-repeat="language in availableLanguages | orderBy:'displayLanguage'" ng-click="changeLanguage(language.code)">
-                            <i class="lang {{ toLanguageClass(language) }}"></i>{{ language.displayLanguage }}</a>
+                        <li><a href="#" ng-repeat="language in availableLanguages | orderBy:'displayLanguage'"
+                            ng-click="changeLanguage(language.code)">
+                        <i class="lang {{ toLanguageClass(language) }}"></i>{{ language.displayLanguage }}</a>
                         </li>
                     </ul>
                 </div>
@@ -38,14 +39,14 @@
                 <div ng-if="documentationUrl || restdocsUrl" class="nav-dd" id="help-dd" old-admin-ng-dropdown="">
                     <div class="help"></div>
                     <ul class="dropdown-ul">
-                        <li ng-if="restdocsUrl" with-role="ROLE_ADMIN">
-                        <a ng-click="toRestDoc()">
-                            <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
+                        <li ng-if="documentationUrl">
+                        <a ng-click="toURL(documentationUrl)" href="{{documentationUrl}}">
+                          <span translate="HELP.DOCUMENTATION"><!-- Documentation Server --></span>
                         </a>
                         </li>
-                        <li ng-if="documentationUrl">
-                        <a ng-click="toDoc()">
-                          <span translate="HELP.USERS_GUIDE"><!-- User's Guide --></span>
+                        <li ng-if="restdocsUrl" with-role="ROLE_ADMIN">
+                        <a ng-click="toURL(restdocsUrl)" href="{{restdocsUrl}}">
+                            <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
                         </a>
                         </li>
                     </ul>
@@ -224,6 +225,7 @@
         <script src="shared/filters/filters.js"></script>
         <script src="shared/filters/localizeDateFilter.js"></script>
         <script src="shared/filters/arrayFilter.js"></script>
+        <script src="shared/filters/presentValue.js"></script>
         <script src="shared/filters/trustedResourceUrlFilter.js"></script>
         <script src="shared/directives/directives.js"></script>
         <script src="shared/directives/datepickerDirective.js"></script>

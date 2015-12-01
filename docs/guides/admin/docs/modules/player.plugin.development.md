@@ -2,13 +2,18 @@
 
 ## Plugin Archetype
 
-The [Maven Archetype Plugin](http://maven.apache.org/archetype/maven-archetype-plugin/) provides a convenient mechanism for automatically generating projects. Project templates are called Archetypes and they are basically maven artifacts of a special kind of packaging, ‘maven-archetype’.
+The [Maven Archetype Plugin](http://maven.apache.org/archetype/maven-archetype-plugin/) provides a convenient mechanism
+for automatically generating projects. Project templates are called Archetypes and they are basically maven artifacts of
+a special kind of packaging, ‘maven-archetype’.
 
-With the Theodul Plugin Archetype you can create a new plugin project in no time and start writing the plugin’s business logic right away, without caring about the POM or SCR component declarations.
+With the Theodul Plugin Archetype you can create a new plugin project in no time and start writing the plugin’s business
+logic right away, without caring about the POM or SCR component declarations.
 
 ### Installation
 
-The Theodul Plugin Archetype is included in the Matterhorn source code (Theodul Player branch) in the modules directory. To make the artifact available on your system you need to install it like any other atrifacts. In the Matterhorn source directory type:
+The Theodul Plugin Archetype is included in the Opencast source code (Theodul Player branch) in the modules directory.
+To make the artifact available on your system you need to install it like any other atrifacts. In the Opencast source
+directory type:
 
     > cd modules/matterhorn-engage-theodul-plugin-archetype
     > mvn install
@@ -17,7 +22,7 @@ After successful build and installation the archetype is available in your syste
 
 ### Generating a new plugin
 
-To generate a new plugin project simply go to the modules directory inside the Matterhorn source directory and type:
+To generate a new plugin project simply go to the modules directory inside the Opencast source directory and type:
 
     > mvn archetype:generate -DarchetypeGroupId=org.opencastproject -DarchetypeArtifactId=matterhorn-theodul-plugin
 
@@ -67,37 +72,44 @@ Provided the archetype is installed maven will now ask you for the properties co
     [INFO] Final Memory: 15M/308M
     [INFO] ------------------------------------------------------------------------
 
-There you go, the newly created plugin project is waiting to be filled with life in the directory that is named after the atrifactId you entered before.
+There you go, the newly created plugin project is waiting to be filled with life in the directory that is named after
+the atrifactId you entered before.
 
 ### Project Properties
 
-In addition to the above explanation, here is a description of the properties you have to specify when generating a new project with the Theodul Plugin Archetype:
+In addition to the above explanation, here is a description of the properties you have to specify when generating a new
+project with the Theodul Plugin Archetype:
 
 #### groupId
 
-Maven group ID. For the Matterhorn developers this is
+Maven group ID. For the Opencast developers this is
 
     org.opencastproject
 
 #### artifactId
 
-Maven artifact ID. Name by which your project is identified as an artifact by maven. Think of it as the project name. It will also be used as the name for your projects root directory. During the course of the Theodul project the following naming scheme came up:
+Maven artifact ID. Name by which your project is identified as an artifact by maven. Think of it as the project name. It
+will also be used as the name for your projects root directory. During the course of the Theodul project the following
+naming scheme came up:
 
     matterhorn-engage-theodul-plugin-<plugin type>-<plugin name>
 
 #### version
 
-The project version. For Matterhorn developers: simply put in the version of the Matterhorn source tree your are working on.
+The project version. For Opencast developers: simply put in the version of the Opencast source tree your are working
+on.
 
 #### package
 
-The Java package in which the source for the back end part of your plugin will live. The following scheme is used by the Theodul developers:
+The Java package in which the source for the back end part of your plugin will live. The following scheme is used by the
+Theodul developers:
 
     org.opencastproject.engage.theodul.plugin.<plugin type>.<plugin name>
 
 #### plugin_version
 
-The version of the plugin itself. This is not to be confused with the maven project version which will, for instance, be updated when the Matterhorn version changes.
+The version of the plugin itself. This is not to be confused with the maven project version which will, for instance, be
+updated when the Opencast version changes.
 
 #### plugin_type
 
@@ -110,11 +122,14 @@ The name by which your plugin will be registered by the plugin manager when runn
 
 #### plugin_description
 
-(optional) A short description of the plugin. The description will be provided by the [plugin list endpoint](https://engagedevcamp.wordpress.com/2013/04/15/plugin-infrastructure/) together with the other plugin data.
+(optional) A short description of the plugin. The description will be provided by the [plugin list endpoint
+](https://engagedevcamp.wordpress.com/2013/04/15/plugin-infrastructure/) together with the other plugin data.
 
 #### plugin_rest
 
-(boolean) Whether or not the plugin should provide a Matterhorn Rest endpoint. If set to true, the Java class that makes up the back end part of your plugin will be augmented with the annotations necessary to work as a Rest endpoint provider in Matterhorn. Also an example endpoint (GET:sayHello) will be generated.
+(boolean) Whether or not the plugin should provide a Opencast Rest endpoint. If set to true, the Java class that makes
+up the back end part of your plugin will be augmented with the annotations necessary to work as a Rest endpoint provider
+in Opencast. Also an example endpoint (GET:sayHello) will be generated.
 
 
 ## Example Plugin

@@ -29,6 +29,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.search.api.SearchException;
@@ -55,7 +56,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -159,6 +159,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectory = null;
 
+  /** The optional Mediapackage serializer */
+  protected MediaPackageSerializer serializer = null;
+
   /**
    * Creates a new instance of the search service.
    */
@@ -190,6 +193,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     solrServer = new Object() {
       SolrServer create() {
         if (solrServerUrlConfig != null) {
+          /* Use external SOLR server */
           try {
             logger.info("Setting up solr server at {}", solrServerUrlConfig);
             URL solrServerUrl = new URL(solrServerUrlConfig);
@@ -197,21 +201,10 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           } catch (MalformedURLException e) {
             throw connectError(solrServerUrlConfig, e);
           }
-        } else if (cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT) != null) {
-          String solrRoot = cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT);
-          try {
-            logger.debug("Setting up solr server at {}", solrRoot);
-            return setupSolr(new File(solrRoot));
-          } catch (IOException e) {
-            throw connectError(solrServerUrlConfig, e);
-          } catch (SolrServerException e) {
-            throw connectError(solrServerUrlConfig, e);
-          }
         } else {
-          String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
-          if (storageDir == null)
-            throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
-          String solrRoot = PathSupport.concat(storageDir, "searchindex");
+          /* Set-up embedded SOLR */
+          String solrRoot = SolrServerFactory.getEmbeddedDir(cc, CONFIG_SOLR_ROOT, "search");
+
           try {
             logger.debug("Setting up solr server at {}", solrRoot);
             return setupSolr(new File(solrRoot));
@@ -231,7 +224,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }.create();
     // CHECKSTYLE:ON
 
-    solrRequester = new SolrRequester(solrServer, securityService);
+    solrRequester = new SolrRequester(solrServer, securityService, serializer);
     indexManager = new SolrIndexManager(solrServer, workspace, mdServices, seriesService, mpeg7CatalogService,
             securityService);
 
@@ -683,6 +676,18 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   @Override
   protected UserDirectoryService getUserDirectoryService() {
     return userDirectoryService;
+  }
+
+  /**
+   * Sets the optional MediaPackage serializer.
+   *
+   * @param serializer
+   *          the serializer
+   */
+  protected void setMediaPackageSerializer(MediaPackageSerializer serializer) {
+    this.serializer = serializer;
+    if (solrRequester != null)
+      solrRequester.setMediaPackageSerializer(serializer);
   }
 
   @Override

@@ -33,6 +33,7 @@ import org.opencastproject.security.api.SecurityService;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.apache.http.HttpStatus;
 import org.easymock.EasyMock;
 import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
@@ -46,6 +47,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.ws.rs.core.Response;
 
 public class JpaGroupRoleProviderTest {
 
@@ -78,7 +81,8 @@ public class JpaGroupRoleProviderTest {
 
     // Create the message sender service
     MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    messageSender.sendObjectMessage(EasyMock.anyObject(String.class), EasyMock.anyObject(MessageSender.DestinationType.class), EasyMock.anyObject(Serializable.class));
+    messageSender.sendObjectMessage(EasyMock.anyObject(String.class),
+            EasyMock.anyObject(MessageSender.DestinationType.class), EasyMock.anyObject(Serializable.class));
     EasyMock.expectLastCall();
     EasyMock.replay(messageSender);
 
@@ -116,8 +120,17 @@ public class JpaGroupRoleProviderTest {
     Assert.assertEquals(loadGroup.getRoles(), loadGroup.getRoles());
     Assert.assertEquals(loadGroup.getMembers(), loadGroup.getMembers());
 
-    Assert.assertNull("Loading 'does not exist' should return null", provider.loadGroup("does not exist", org1.getId()));
+    Assert.assertNull("Loading 'does not exist' should return null",
+            provider.loadGroup("does not exist", org1.getId()));
     Assert.assertNull("Loading 'does not exist' should return null", provider.loadGroup("user1", org2.getId()));
+  }
+
+  @Test
+  public void testDuplicateGroupCreation() {
+    Response response = provider.createGroup("Test 1", "Test group", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
+    assertEquals(HttpStatus.SC_CREATED, response.getStatus());
+    response = provider.createGroup("Test 1", "Test group 2", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
+    assertEquals(HttpStatus.SC_CONFLICT, response.getStatus());
   }
 
   @Test

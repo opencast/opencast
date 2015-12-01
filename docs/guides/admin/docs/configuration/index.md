@@ -1,8 +1,8 @@
-Matterhorn Configuration Guides
-===============================
+Opencast Configuration Guides
+=============================
 
-These guides will help you to configure Matterhorn. If you are a first-time user, please make sure to at lease have a
-look at the [basic configuration guide](basic.md).
+These guides will help you to configure Opencast. If you are a first-time user, please make sure to at lease have a look
+at the [basic configuration guide](basic.md).
 
 
 General Configuration

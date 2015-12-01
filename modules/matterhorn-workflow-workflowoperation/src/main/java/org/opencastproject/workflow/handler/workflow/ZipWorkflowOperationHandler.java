@@ -320,7 +320,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
       File workspaceFile = workspace.get(element.getURI());
       File linkedFile = FileSupport.link(workspaceFile, new File(elementDir, workspaceFile.getName()), true);
       try {
-        element.setURI(new URI(serializer.encodeURI(linkedFile.toURI())));
+        element.setURI(serializer.encodeURI(linkedFile.toURI()));
       } catch (URISyntaxException e) {
         throw new MediaPackageException("unable to serialize a mediapackage element", e);
       }
