@@ -49,7 +49,7 @@
    },
    "CONFIRMATIONS": {
      "CONTINUE_ACTION" : "Are you sure you want to continue?",
-     "ACTIONS": { 
+     "ACTIONS": {
        "CONFIRMATION" : "Confirmation required"
      }
    },
@@ -479,7 +479,7 @@
                     "CHECKSUM" : "Checksum",
                     "REFERENCE": "Reference"
                   }
-              },              
+              },
               "MEDIA": {
                   "TITLE": "Media",
                   "CAPTION": "Media",
@@ -514,7 +514,7 @@
                       "SCANTYPE": "Scantype",
                       "SCANORDER": "Scanorder"
                   }
-               },            
+               },
               "PUBLICATIONS": {
                   "TITLE"    : "Publications",
                   "CAPTION"  : "Publications",
@@ -974,7 +974,8 @@
              "READ"        : "Read",
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
-             "DETAILS"     : "Details"
+             "DETAILS"     : "Details",
+             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies bellow"
            },
            "ROLES": {
               "LABEL": "Select a role",
@@ -1010,7 +1011,8 @@
              "READ"        : "Read",
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
-             "DETAILS"     : "Details"
+             "DETAILS"     : "Details",
+             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies bellow"
            },
            "ROLES": {
               "LABEL": "Select a role",
@@ -1331,6 +1333,14 @@
      }
    },
    "FILTERS": {
+     "AGENTS": {
+       "NAME": {
+         "LABEL": "Name"
+       },
+       "STATUS": {
+         "LABEL": "Status"
+       }
+     },
      "EVENTS": {
        "STATUS": {
          "LABEL":      "Status",
@@ -1451,6 +1461,12 @@
       }
      },
      "USERS": {
+       "PROVIDER": {
+         "LABEL": "Provider"
+       },
+       "ROLE": {
+         "LABEL": "Role"
+       },
        "USERNAME": {
          "LABEL": "Username"
        },
