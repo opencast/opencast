@@ -43,6 +43,7 @@ import org.opencastproject.silencedetection.api.SilenceDetectionFailedException;
 import org.opencastproject.silencedetection.impl.SilenceDetectionProperties;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,10 +62,33 @@ public class FFmpegSilenceDetector {
   private static final String DEFAULT_THRESHOLD_DB = "-40dB";
   private static final String DEFAULT_VOICE_MIN_LENGTH = "60000";
 
+  private static String binary = FFMPEG_BINARY_DEFAULT;
   private String filePath;
   private String trackId;
 
   private List<MediaSegment> segments = null;
+
+  /**
+   * Update FFMPEG binary path if set in configuration.
+   *
+   * @param bundleContext
+   */
+  public static void init(BundleContext bundleContext) {
+    String binaryPath = bundleContext.getProperty(FFMPEG_BINARY_CONFIG);
+    try {
+      if (binaryPath != null) {
+        File binaryFile = new File(binaryPath);
+        if (binaryFile.exists()) {
+          binary = binaryFile.getAbsolutePath();
+        } else {
+          logger.warn("FFMPEG binary file {} does not exist", binaryPath);
+        }
+      }
+    } catch (Exception ex) {
+      logger.error("Failed to set ffmpeg binary path", ex);
+    }
+  }
+
 
   /**
    * Create nonsilent sequences detection pipeline.
@@ -83,8 +107,6 @@ public class FFmpegSilenceDetector {
     long preSilenceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.SILENCE_PRE_LENGTH,
           DEFAULT_SILENCE_PRE_LENGTH));
     String thresholdDB = properties.getProperty(SilenceDetectionProperties.SILENCE_THRESHOLD_DB, DEFAULT_THRESHOLD_DB);
-
-    String binary = properties.getProperty(FFMPEG_BINARY_CONFIG, FFMPEG_BINARY_DEFAULT);
 
     trackId = track.getIdentifier();
 
