@@ -234,6 +234,7 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
 
   protected void activate(ComponentContext context) {
     logger.debug("activating...");
+    FFmpegSilenceDetector.init(context.getBundleContext());
   }
 
   protected void deactivate(ComponentContext context) {
