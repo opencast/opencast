@@ -27,7 +27,7 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.videoeditor.impl.VideoClip;
 import org.opencastproject.videoeditor.impl.VideoEditorProperties;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +69,7 @@ public class FFmpegEdit {
   public static void init(BundleContext bundleContext) {
     String path = bundleContext.getProperty(CONFIG_FFMPEG_PATH);
 
-    if (path != null) {
+    if (!StringUtils.isBlank(path)) {
       binary = path.trim();
     }
   }
