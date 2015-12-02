@@ -632,7 +632,6 @@
            "MIMETYPE": "Mimetype",
            "URL": "URL",
            "RECORDING_DATE": "Recording date",
-           "FLAVOR": "Flavor",
            "TAGS": "Tags",
            "DURATION": "Duration",
            "STREAM_AUDIO": "Audio streams",
