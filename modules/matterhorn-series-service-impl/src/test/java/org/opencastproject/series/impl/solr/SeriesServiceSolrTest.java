@@ -28,6 +28,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Permissions;
@@ -68,9 +69,10 @@ public class SeriesServiceSolrTest {
   public void setUp() throws Exception {
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
-            SecurityConstants.GLOBAL_ADMIN_ROLE, new DefaultOrganization()));
-    EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+    JaxbOrganization org = new JaxbOrganization("mh-default-org");
+
+    User user = new JaxbUser("admin", "test", org, new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org));
+    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
 
@@ -175,6 +177,29 @@ public class SeriesServiceSolrTest {
   }
 
   @Test
+  public void testSpecialOrgId() throws Exception {
+    String seriesId = "09157c61-d886-4b4a-a7b1-48da8618e780";
+
+    DublinCoreCatalog firstCatalog = dcService.newInstance();
+    firstCatalog.add(DublinCore.PROPERTY_IDENTIFIER, seriesId);
+    firstCatalog.add(DublinCore.PROPERTY_TITLE, "Cats and Dogs");
+    firstCatalog.add(DublinCore.PROPERTY_CREATED, "2007-05-03");
+
+    index.updateIndex(firstCatalog);
+
+    SeriesQuery q = new SeriesQuery().setSeriesId(seriesId);
+    DublinCoreCatalogList result = index.search(q);
+    Assert.assertTrue("One series satisfy id", result.size() == 1);
+    Assert.assertEquals(1, index.count());
+
+    index.delete(seriesId);
+
+    result = index.search(q);
+    Assert.assertTrue("No series satisfy id", result.size() == 0);
+    Assert.assertEquals(0, index.count());
+  }
+
+  @Test
   public void testAccessControlManagment() throws Exception {
     // sample access control list
     AccessControlList accessControlList = new AccessControlList();
@@ -203,8 +228,8 @@ public class SeriesServiceSolrTest {
   public void testAccessControlManagmentRewrite() throws Exception {
     // sample access control list
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new JaxbUser("anonymous", "test", new DefaultOrganization(), new JaxbRole("ROLE_ANONYMOUS",
-            new DefaultOrganization()));
+    User user = new JaxbUser("anonymous", "test", new DefaultOrganization(),
+            new JaxbRole("ROLE_ANONYMOUS", new DefaultOrganization()));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
