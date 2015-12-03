@@ -66,11 +66,11 @@ angular.module('adminNg.directives')
             }
             
             function getTimeInSeconds(time) {
-            	var millis = time.milliseconds;
-            	millis += time.seconds * 1000;
-            	millis += time.minutes * 60 * 1000;
-            	millis += time.hours * 60 * 60 * 1000;
-            	return millis / 1000;
+                var millis = time.milliseconds;
+                millis += time.seconds * 1000;
+                millis += time.minutes * 60 * 1000;
+                millis += time.hours * 60 * 60 * 1000;
+                return millis / 1000;
             }
 
             scope.$on('$destroy', function () {
