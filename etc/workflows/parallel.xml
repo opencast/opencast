@@ -428,6 +428,7 @@
       exception-handler-workflow="error"
       description="Publishing to Engage">
       <configurations>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">true</configuration>

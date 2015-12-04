@@ -17,7 +17,7 @@
       exception-handler-workflow="error"
       description="Download and Publish to Engage">
       <configurations>
-        <configuration key="download-source-flavors">dublincore/*</configuration>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="merge-only">true</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>
