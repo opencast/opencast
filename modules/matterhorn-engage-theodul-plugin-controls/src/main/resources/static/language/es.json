@@ -32,5 +32,13 @@
   "remainingTime":"tiempo restante",
   "embedButton":"Botón \"incrustar reproductor\". Seleccione el tamaño en la lista desplegable.",
   "checkingLoginStatus":"Comprobando el estado de la sesión...",
-  "beside": "junto a"
+  "quality":"Quality",
+  "pictureInPicture":"Picture in Picture",
+  "left":"left",
+  "right":"right",
+  "off":"off",
+  "low":"Low",
+  "medium":"Medium",
+  "high":"High",
+  "beside":"junto a"
 }

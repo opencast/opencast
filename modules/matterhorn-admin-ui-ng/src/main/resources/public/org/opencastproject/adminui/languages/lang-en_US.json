@@ -236,7 +236,10 @@
         "CCBYNC": "CC BY-NC",
         "CCBYNCSA": "CC BY-NC-SA",
         "CCBYNCND": "CC BY-NC-ND",
-        "CC0": "CC0"
+        "CC0": "CC0",
+        "BSD":"BSD",
+        "CCND":"CCND",
+        "GPL":"GPL"
       },
      "SEND_MESSAGE": {
        "CAPTION": "Send message",
@@ -706,7 +709,6 @@
            "CAPTION": "Theme",
            "DESCRIPTION": "",
            "TITLE": "Theme",
-           "DESCRIPTION": "",
            "LABEL": "No theme",
            "EMPTY": "No theme found"
          },
