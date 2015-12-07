@@ -68,14 +68,18 @@ public final class LoadUtil {
   }
 
   public static void checkJobFitsCluster(float load, String loadType, List<HostRegistration> hosts) {
+    boolean processable = false;
     if (hosts != null) {
       for (HostRegistration host : hosts) {
         if (host.getMaxLoad() >= load) {
           logger.trace("Host " + host.toString() + " can process jobs of type " + loadType + " with load " + load);
+          processable = true;
           break;
         }
       }
     }
-    logger.warn("No hosts found that can process jobs of type {} with load {}", loadType, load);
+    if (!processable) {
+      logger.warn("No hosts found that can process jobs of type {} with load {}", loadType, load);
+    }
   }
 }
