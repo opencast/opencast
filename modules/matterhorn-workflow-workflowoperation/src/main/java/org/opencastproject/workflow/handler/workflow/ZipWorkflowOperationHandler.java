@@ -94,10 +94,10 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /** The default location to use when building an zip archive relative to the
    * storage directory */
-  public static final String DEFAULT_ARCHIVE_TEMP_DIR = "archive-tmp";
+  public static final String DEFAULT_ZIP_ARCHIVE_TEMP_DIR = "tmp/zip";
 
   /** Key for configuring the location of the archive-temp folder */
-  public static final String ARCHIVE_TEMP_DIR_CFG_KEY =
+  public static final String ZIP_ARCHIVE_TEMP_DIR_CFG_KEY =
     "org.opencastproject.workflow.handler.workflow.ZipWorkflowOperationHandler.tmpdir";
 
   /** The default flavor to use for a mediapackage archive */
@@ -150,13 +150,14 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
    */
   protected void activate(ComponentContext cc) {
-    tempStorageDir = cc.getBundleContext().getProperty(ARCHIVE_TEMP_DIR_CFG_KEY) != null
-      ? new File(cc.getBundleContext().getProperty(ARCHIVE_TEMP_DIR_CFG_KEY))
-      : new File(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_ARCHIVE_TEMP_DIR);
+    tempStorageDir = StringUtils.isNotBlank(cc.getBundleContext().getProperty(ZIP_ARCHIVE_TEMP_DIR_CFG_KEY))
+      ? new File(cc.getBundleContext().getProperty(ZIP_ARCHIVE_TEMP_DIR_CFG_KEY))
+      : new File(cc.getBundleContext().getProperty("karaf.data"), DEFAULT_ZIP_ARCHIVE_TEMP_DIR);
     if (!tempStorageDir.isDirectory()) {
       try {
         FileUtils.forceMkdir(tempStorageDir);
       } catch (IOException e) {
+        logger.error("Could not create temporary directory for ZIP archives: `{}`", tempStorageDir.getAbsolutePath());
         throw new IllegalStateException(e);
       }
     }
