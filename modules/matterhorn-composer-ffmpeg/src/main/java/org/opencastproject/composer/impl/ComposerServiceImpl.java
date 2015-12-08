@@ -66,6 +66,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.JsonObj;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
@@ -77,6 +78,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +93,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -98,7 +102,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 /** FFMPEG based implementation of the composer service api. */
-public class ComposerServiceImpl extends AbstractJobProducer implements ComposerService {
+public class ComposerServiceImpl extends AbstractJobProducer implements ComposerService, ManagedService {
   /**
    * The indexes the composite job uses to create a Job
    */
@@ -146,6 +150,15 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /** Used to mark a track unavailable to composite. */
   private static final String NOT_AVAILABLE = "n/a";
+
+  /** The load introduced on the system by creating a caption job */
+  public static final float DEFAULT_CAPTION_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_CAPTION_JOB_LOAD} */
+  public static final String CAPTION_JOB_LOAD_KEY = "job.load.caption.embed";
+
+  /** The load introduced on the system by creating a caption job */
+  private float captionJobLoad = DEFAULT_CAPTION_JOB_LOAD;
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -418,7 +431,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         Job inspectionJob = null;
         try {
           inspectionJob = inspectionService.inspect(returnURL);
-          JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
+          JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
           if (!barrier.waitForJobs().isSuccess()) {
             throw new EncoderException("Media inspection of " + returnURL + " failed");
           }
@@ -1396,7 +1409,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
     }
 
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Caption.toString(), args);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Caption.toString(), args, captionJobLoad);
     } catch (ServiceRegistryException e) {
       throw new EmbedderException("Unable to create a job", e);
     }
@@ -1762,7 +1775,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       throw new EncoderException("Media inspection of " + workspaceURI + " failed", e);
     }
 
-    JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
+    JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
     if (!barrier.waitForJobs().isSuccess()) {
       throw new EncoderException("Media inspection of " + workspaceURI + " failed");
     }
@@ -2200,6 +2213,11 @@ logger.info("Starting parallel encode with profile {} ", profileId);
   @Override
   protected OrganizationDirectoryService getOrganizationDirectoryService() {
     return organizationDirectoryService;
+  }
+
+  @Override
+  public void updated(Dictionary properties) throws ConfigurationException {
+    captionJobLoad = LoadUtil.getConfiguredLoadValue(properties, CAPTION_JOB_LOAD_KEY, DEFAULT_CAPTION_JOB_LOAD, serviceRegistry);
   }
 
 }

@@ -172,4 +172,11 @@ public interface EncodingProfile {
    */
   Map<String, String> getExtensions();
 
+  /**
+   * Returns an estimate of the load a single job with this profile causes.
+   * This should be roughly equal to the number of processor cores used at runtime.
+   *
+   * @return the load a single job with this profile causes
+   */
+  float getJobLoad();
 }

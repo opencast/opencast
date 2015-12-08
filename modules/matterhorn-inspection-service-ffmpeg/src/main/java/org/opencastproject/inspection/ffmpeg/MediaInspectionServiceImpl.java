@@ -33,19 +33,42 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.tika.parser.Parser;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.List;
 
 /** Inspects media via ffprobe. */
-public class MediaInspectionServiceImpl extends AbstractJobProducer implements MediaInspectionService {
+public class MediaInspectionServiceImpl extends AbstractJobProducer implements MediaInspectionService, ManagedService {
+
+  /** The load introduced on the system by creating an inspect job */
+  public static final float DEFAULT_INSPECT_JOB_LOAD = 1.0f;
+
+  /** The load introduced on the system by creating an enrich job */
+  public static final float DEFAULT_ENRICH_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_INSPECT_JOB_LOAD} */
+  public static final String INSPECT_JOB_LOAD_KEY = "job.load.inspect";
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_ENRICH_JOB_LOAD} */
+  public static final String ENRICH_JOB_LOAD_KEY = "job.load.enrich";
+
+  /** The load introduced on the system by creating an inspect job */
+  private float inspectJobLoad = DEFAULT_INSPECT_JOB_LOAD;
+
+  /** The load introduced on the system by creating an enrich job */
+  private float enrichJobLoad = DEFAULT_ENRICH_JOB_LOAD;
+
   private static final Logger logger = LoggerFactory.getLogger(MediaInspectionServiceImpl.class);
 
   /** List of available operations on jobs */
@@ -64,7 +87,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Sets the Apache Tika parser.
-   * 
+   *
    * @param tikaParser
    */
   public void setTikaParser(Parser tikaParser) {
@@ -88,6 +111,22 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       ffprobeBinary = path;
     }
     inspector = new MediaInspector(workspace, tikaParser, ffprobeBinary);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   */
+  @Override
+  public void updated(Dictionary properties) throws ConfigurationException {
+    if (properties == null)
+      return;
+
+    inspectJobLoad = LoadUtil.getConfiguredLoadValue(properties, INSPECT_JOB_LOAD_KEY, DEFAULT_INSPECT_JOB_LOAD,
+            serviceRegistry);
+    enrichJobLoad = LoadUtil.getConfiguredLoadValue(properties, ENRICH_JOB_LOAD_KEY, DEFAULT_ENRICH_JOB_LOAD,
+            serviceRegistry);
   }
 
   /**
@@ -134,7 +173,8 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   @Override
   public Job inspect(URI uri) throws MediaInspectionException {
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString()));
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString()),
+              inspectJobLoad);
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
@@ -147,11 +187,11 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    *      boolean)
    */
   @Override
-  public Job enrich(final MediaPackageElement element, final boolean override) throws MediaInspectionException,
-          MediaPackageException {
+  public Job enrich(final MediaPackageElement element, final boolean override)
+          throws MediaInspectionException, MediaPackageException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Enrich.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)));
+              Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)), enrichJobLoad);
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
@@ -168,7 +208,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -178,7 +218,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -188,7 +228,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -198,7 +238,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -208,7 +248,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -218,7 +258,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -228,7 +268,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

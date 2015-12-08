@@ -11,6 +11,7 @@ General Configuration
  - [Basic Configuration](basic.md)
  - [Database Configuration](database.md)
  - [Encoding Profile Configuration](encoding.md)
+ - [Load Configuration](load.md)
  - [Logging and Privacy Configuration](logging.and.privacy.md)
  - [Message Broker Configuration](message-broker.md)
  - [Multi Tenancy Configuration](multi.tenancy.md)

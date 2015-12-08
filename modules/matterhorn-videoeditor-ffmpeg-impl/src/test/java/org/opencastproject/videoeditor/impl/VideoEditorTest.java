@@ -261,7 +261,7 @@ public class VideoEditorTest {
     Iterator<Job> it = receipts.iterator();
     while (it.hasNext()) {
       receipt = it.next();
-      JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 2000, receipt); // wait for task to finish
+      JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 2000, receipt); // wait for task to finish
       jobBarrier.waitForJobs();
       assertNotNull("Audiovisual content expected", receipt.getPayload());
       assertTrue("Merged File exists", tempFile1.exists());

@@ -67,9 +67,17 @@ import javax.xml.bind.annotation.XmlType;
                 + "count(job.status) as numJobs, "
                 + "avg(job.queueTime) as meanQueue, "
                 + "avg(job.runTime) as meanRun FROM Job job group by job.processorServiceRegistrationId, job.status"),
-        @NamedQuery(name = "ServiceRegistration.hostload", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, count(job.status) as numJobs "
+        //TODO: Figure out how to do IN clauses in JPQL.  Not as easy as job.status in ($foo), that doesn't compile
+        @NamedQuery(name = "ServiceRegistration.hostloads", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, sum(job.jobLoad) "
                 + "FROM Job job "
                 + "WHERE job.processorServiceRegistration.online=true and job.processorServiceRegistration.active=true and job.processorServiceRegistration.hostRegistration.maintenanceMode=false "
+                + "and (job.status = org.opencastproject.job.api.Job.Status.QUEUED or job.status = org.opencastproject.job.api.Job.Status.RUNNING or job.status = org.opencastproject.job.api.Job.Status.DISPATCHING) "
+                + "GROUP BY job.processorServiceRegistration, job.status"),
+        @NamedQuery(name = "ServiceRegistration.individualhostload", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, sum(job.jobLoad) "
+                + "FROM Job job "
+                + "WHERE job.processorServiceRegistration.online=true and job.processorServiceRegistration.active=true and job.processorServiceRegistration.hostRegistration.maintenanceMode=false "
+                + "and job.processorServiceRegistration.hostRegistration = :host "
+                + "and (job.status = org.opencastproject.job.api.Job.Status.QUEUED or job.status = org.opencastproject.job.api.Job.Status.RUNNING or job.status = org.opencastproject.job.api.Job.Status.DISPATCHING) "
                 + "GROUP BY job.processorServiceRegistration, job.status"),
         @NamedQuery(name = "ServiceRegistration.getRegistration", query = "SELECT r from ServiceRegistration r "
                 + "where r.hostRegistration.baseUrl = :host and r.serviceType = :serviceType"),

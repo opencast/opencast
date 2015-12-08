@@ -21,13 +21,6 @@
 
 package org.opencastproject.silencedetection.impl;
 
-import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-import org.apache.commons.lang3.StringUtils;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -47,12 +40,22 @@ import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Implementation of SilenceDetectionService using FFmpeg.
@@ -63,6 +66,12 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
    * The logging instance
    */
   private static final Logger logger = LoggerFactory.getLogger(SilenceDetectionServiceImpl.class);
+
+  public static final String JOB_LOAD_KEY = "job.load.videoeditor.silencedetection";
+
+  private static final float DEFAULT_JOB_LOAD = 2.0f;
+
+  private float jobload = DEFAULT_JOB_LOAD;
 
   private static enum Operation {
 
@@ -130,7 +139,8 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
       return serviceRegistry.createJob(
               getJobType(),
               Operation.SILENCE_DETECTION.toString(),
-              arguments);
+              arguments,
+              jobload);
 
     } catch (ServiceRegistryException ex) {
       throw new SilenceDetectionFailedException("Unable to create job! " + ex.getMessage());
@@ -247,14 +257,17 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
   }
 
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     this.properties = new Properties();
+    @SuppressWarnings("rawtypes")
     Enumeration keys = properties.keys();
     while (keys.hasMoreElements()) {
       Object key = keys.nextElement();
       this.properties.put(key, properties.get(key));
     }
     logger.debug("Properties updated!");
+
+    jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
   }
 
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
