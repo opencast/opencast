@@ -199,9 +199,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /** The default value for {@link #workflowStatsCollect} */
   public static final Boolean DEFAULT_STATS_COLLECT_CONFIG = false;
 
-  /** Configuration value for the maximum number of parallel workflows based on the number of cores in the cluster */
-  public static final String OPT_NUM_CORES = "cores";
-
   /** Constant value indicating a <code>null</code> parent id */
   private static final String NULL_PARENT_ID = "-";
 
