@@ -37,6 +37,7 @@ pages:
 - ['configuration/database.md', 'Configuration', 'Database']
 - ['configuration/message-broker.md', 'Configuration', 'Message Broker']
 - ['configuration/encoding.md', 'Configuration', 'Encoding']
+- ['configuration/load.md', 'Configuration', 'Job Loads']
 - ['configuration/logging.and.privacy.md', 'Configuration', 'Logging and Privacy']
 - ['configuration/multi.tenancy.md', 'Configuration', 'Multi Tenancy']
 - ['configuration/security.md', 'Configuration', 'Security']

@@ -56,10 +56,13 @@ import org.opencastproject.textextractor.api.TextExtractor;
 import org.opencastproject.textextractor.api.TextExtractorException;
 import org.opencastproject.textextractor.api.TextFrame;
 import org.opencastproject.textextractor.api.TextLine;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,12 +72,13 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.List;
 
 /**
  * Media analysis service that takes takes an image and returns text as extracted from that image.
  */
-public class TextAnalyzerServiceImpl extends AbstractJobProducer implements TextAnalyzerService {
+public class TextAnalyzerServiceImpl extends AbstractJobProducer implements TextAnalyzerService, ManagedService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(TextAnalyzerServiceImpl.class);
@@ -89,6 +93,15 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /** Name of encoding profile used to create tiff images */
   public static final String TIFF_CONVERSION_PROFILE = "image-conversion.http";
+
+  /** The approximate load placed on the system by creating a text analysis job */
+  public static final float DEFAULT_ANALYSIS_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_ANALYSIS_JOB_LOAD} */
+  public static final String ANALYSIS_JOB_LOAD_KEY = "job.load.analysis";
+
+  /** The approximate load placed on the system by creating a text analysis job */
+  private float analysisJobLoad = DEFAULT_ANALYSIS_JOB_LOAD;
 
   /** The text extraction implemenetation */
   private TextExtractor textExtractor = null;
@@ -143,7 +156,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   public Job extract(Attachment image) throws TextAnalyzerException, MediaPackageException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Extract.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(image)));
+              Arrays.asList(MediaPackageElementParser.getAsXml(image)), analysisJobLoad);
     } catch (ServiceRegistryException e) {
       throw new TextAnalyzerException("Unable to create job", e);
     }
@@ -173,7 +186,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
       try {
         logger.info("Converting " + image + " to tif format");
         Job conversionJob = composerService.convertImage(image, TIFF_CONVERSION_PROFILE);
-        JobBarrier barrier = new JobBarrier(serviceRegistry, conversionJob);
+        JobBarrier barrier = new JobBarrier(job, serviceRegistry, conversionJob);
         Result result = barrier.waitForJobs();
         if (!result.isSuccess()) {
           throw new TextAnalyzerException("Unable to convert " + image + " to tiff");
@@ -466,4 +479,8 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
     return organizationDirectoryService;
   }
 
+  @Override
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+    analysisJobLoad = LoadUtil.getConfiguredLoadValue(properties, ANALYSIS_JOB_LOAD_KEY, DEFAULT_ANALYSIS_JOB_LOAD, serviceRegistry);
+  }
 }
