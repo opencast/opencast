@@ -5,6 +5,7 @@
   "SUBMIT":"Speichern",
   "UPDATE":"Aktualisieren",
   "CANCEL":"Abbrechen",
+  "CONFIRM":"Bestätigen",
   "SAVE":"Speichern",
   "LOGOUT":"Ausloggen",
   "RESET":"Zurücksetzen",
@@ -22,6 +23,12 @@
       "FOOTER_TEXT":"Die Reihenfolge und Auswahl werden automatisch gespeichert. Drücken Sie \"{{resetTranslation}}\", um die Standardansicht wiederherzustellen."
     }
   },
+  "CONFIRMATIONS": {
+      "CONTINUE_ACTION" : "Sind Sie sicher, dass sie fortsetzen möchten?",
+      "ACTIONS": { 
+         "CONFIRMATION" : "Bestätigung"
+    }
+  },
   "NOTIFICATIONS":{
     "ACL_ADDED":"Die Zugriffsrichtlinie wurde erstellt",
     "ACL_NOT_SAVED":"Die Zugriffsrichtlinie konnte nicht gespeichert werden",
@@ -35,6 +42,7 @@
     "USER_NOT_DELETED":"Der Nutzer konnte nicht gelöscht werden",
     "USER_NOT_MANAGEABLE":"Dieser Nutzer kann nicht geändert werden",
     "GROUP_ADDED":"Die Gruppe wurde angelegt",
+    "GROUP_CONFLICT":"Der erzeugte Gruppenname existiert bereits",
     "GROUP_UPDATED":"Die Gruppe wurde aktualisiert",
     "GROUP_NOT_SAVED":"Die Gruppe konnte nicht gespeichert werden",
     "GROUP_DELETED":"Die Gruppe wurde gelöscht",
@@ -98,6 +106,7 @@
   "BULK_ACTIONS":{
     "CAPTION":"Aktionen",
     "SEND_MESSAGE":"Nachricht senden",
+    "WARNING":"Warnung",
     "EDIT_STATUS":{
       "CAPTION":"Status bearbeiten",
       "READY_FOR_RECORDING":"Bereit für die Aufnahme",
@@ -105,10 +114,12 @@
     },
     "DELETE":{
       "SERIES":{
-        "CAPTION":"Löschen"
+        "CAPTION": "Löschen",
+        "BUTTON": "Löschen"
       },
       "EVENTS":{
-        "CAPTION":"Löschen"
+        "CAPTION":"Löschen",
+        "BUTTON": "Löschen"
       }
     },
     "DELETE_EVENTS_WARNING_LINE1":"Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",

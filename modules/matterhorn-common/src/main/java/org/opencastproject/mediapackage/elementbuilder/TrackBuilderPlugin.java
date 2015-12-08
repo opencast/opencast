@@ -134,7 +134,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
       id = (String) xpath.evaluate("@id", elementNode, XPathConstants.STRING);
 
       // url
-      url = serializer.resolvePath(xpath.evaluate("url/text()", elementNode).trim());
+      url = serializer.decodeURI(new URI(xpath.evaluate("url/text()", elementNode).trim()));
 
       // reference
       reference = (String) xpath.evaluate("@ref", elementNode, XPathConstants.STRING);

@@ -5,6 +5,7 @@
    "SUBMIT":       "Submit",
    "UPDATE":       "Update",
    "CANCEL":       "Cancel",
+   "CONFIRM":      "Confirm",
    "SAVE":         "Save",
    "LOGOUT":       "Logout",
    "RESET":        "Reset",
@@ -46,6 +47,16 @@
         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
    },
+   "CONFIRMATIONS": {
+     "CONTINUE_ACTION" : "Are you sure you want to continue?",
+     "ACTIONS": { 
+       "CONFIRMATION" : "Confirmation required"
+     }
+   },
+   "HELP":{
+     "DOCUMENTATION": "Documentation",
+     "REST_DOC": "REST API Docs"
+   },
    "NOTIFICATIONS": {
      "ACL_ADDED":           "The access policy has been created",
      "ACL_NOT_SAVED":       "The access policy could not be saved",
@@ -59,6 +70,7 @@
      "USER_NOT_DELETED":    "The user could not be deleted",
      "USER_NOT_MANAGEABLE": "The user is not manageable",
      "GROUP_ADDED":          "The group has been created",
+     "GROUP_CONFLICT":       "The generated group name already exists",
      "GROUP_UPDATED":        "The group has been updated",
      "GROUP_NOT_SAVED":      "The group could not be saved",
      "GROUP_DELETED":        "The group has been deleted",
@@ -122,6 +134,7 @@
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
       "SEND_MESSAGE": "Send message",
+      "WARNING":"Warning",
       "EDIT_STATUS": {
           "CAPTION": "Edit Status",
           "READY_FOR_RECORDING": "Ready for recording",
@@ -129,10 +142,12 @@
       },
       "DELETE": {
           "SERIES": {
-            "CAPTION": "Delete"
+            "CAPTION": "Delete",
+            "BUTTON": "Delete"
           },
           "EVENTS": {
-            "CAPTION": "Delete"
+            "CAPTION": "Delete",
+            "BUTTON": "Delete"
           }
       },
 

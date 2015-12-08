@@ -161,6 +161,7 @@ public class StaticFileRestService {
       final InputStream file = staticFileService.getFile(uuid);
       final String filename = staticFileService.getFileName(uuid);
       final Long length = staticFileService.getContentLength(uuid);
+      // It is safe to pass the InputStream without closing it, JAX-RS takes care of that
       return RestUtil.R.ok(file, getMimeType(filename), Option.some(length), Option.some(filename));
     } catch (NotFoundException e) {
       throw e;

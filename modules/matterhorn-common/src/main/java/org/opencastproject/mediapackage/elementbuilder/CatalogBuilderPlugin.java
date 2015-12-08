@@ -146,7 +146,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
       id = (String) xpath.evaluate("@id", elementNode, XPathConstants.STRING);
 
       // url
-      url = serializer.resolvePath(xpath.evaluate("url/text()", elementNode).trim());
+      url = serializer.decodeURI(new URI(xpath.evaluate("url/text()", elementNode).trim()));
 
       // flavor
       flavor = (String) xpath.evaluate("@type", elementNode, XPathConstants.STRING);

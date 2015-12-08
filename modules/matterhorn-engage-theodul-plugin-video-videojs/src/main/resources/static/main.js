@@ -32,15 +32,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
     var PLUGIN_STYLES_DESKTOP = [
         "styles/desktop.css",
-        "lib/videojs/video-js.css"
+        "lib/videojs/video-js.min.css"
     ];
     var PLUGIN_STYLES_EMBED = [
         "styles/embed.css",
-        "lib/videojs/video-js.css"
+        "lib/videojs/video-js.min.css"
     ];
     var PLUGIN_STYLES_MOBILE = [
         "styles/mobile.css",
-        "lib/videojs/video-js.css"
+        "lib/videojs/video-js.min.css"
     ];
 
     var plugin;
@@ -952,9 +952,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     function isElementVisible(elementToBeChecked) {
         var TopView = $(window).scrollTop();
         var BotView = TopView + $(window).height();
-        var TopElement = $(elementToBeChecked).offset().top;
-        var BotElement = TopElement + $(elementToBeChecked).height();
-        return ((BotElement <= BotView) && (TopElement >= TopView));
+        if (elementToBeChecked !== undefined && $(elementToBeChecked).offset() !== undefined && $(elementToBeChecked).offset().top !== undefined) {
+            var TopElement = $(elementToBeChecked).offset().top;
+            var BotElement = TopElement + $(elementToBeChecked).height();
+            return ((BotElement <= BotView) && (TopElement >= TopView));
+        } else {
+            return false;
+        }
     }
 
     function clearAutoplay() {
@@ -965,118 +969,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         window.clearInterval(interval_initialSeek);
     }
 
-    function registerEvents(videoDisplay) {
-        var videodisplay = videojs(videoDisplay);
-
-        $(window).resize(function() {
-            checkVideoDisplaySize();
-        });
+    function changePlaybackRate(value, videodisplayMaster) {
+        if (pressedPlayOnce) {
+            var rate = videodisplayMaster.playbackRate();
+            Engage.trigger(plugin.events.playbackRateChanged.getName(), (rate + value));
+        }        
         
-        Engage.on(plugin.events.play.getName(), function() {
-            if (videosReady) {
-                clearAutoplay();
-                videodisplay.play();
-                pressedPlayOnce = true;
-            }
-        });
-        Engage.on(plugin.events.autoplay.getName(), function() {
-            interval_autoplay = window.setInterval(function() {
-                if (pressedPlayOnce) {
-                    clearAutoplay();
-                } else if (videosReady) {
-                    videodisplay.play();
-                    clearAutoplay();
-                }
-            }, interval_autoplay_ms);
-        });
-        Engage.on(plugin.events.initialSeek.getName(), function(e) {
-            parsedSeconds = Utils.parseSeconds(e);
-            interval_initialSeek = window.setInterval(function() {
-                if (pressedPlayOnce) {
-                    clearInitialSeek();
-                } else if (videosReady) {
-                    videodisplay.play();
-                    window.setTimeout(function() {
-                        Engage.trigger(plugin.events.seek.getName(), parsedSeconds);
-                    }, timeout_initialSeek_ms);
-                    clearInitialSeek();
-                }
-            }, interval_initialSeek_ms);
-        });
-        Engage.on(plugin.events.pause.getName(), function() {
-            clearAutoplay();
-            videodisplay.pause();
-        });
-        Engage.on(plugin.events.playPause.getName(), function() {
-            if (videodisplay.paused()) {
-                Engage.trigger(plugin.events.play.getName());
-            } else {
-                Engage.trigger(plugin.events.pause.getName());
-            }
-        });
-        Engage.on(plugin.events.seekLeft.getName(), function() {
-            if (pressedPlayOnce) {
-                var currTime = videodisplay.currentTime();
-                if ((currTime - seekSeconds) >= 0) {
-                    Engage.trigger(plugin.events.seek.getName(), currTime - seekSeconds);
-                } else {
-                    Engage.trigger(plugin.events.seek.getName(), 0);
-                }
-            }
-        });
-        Engage.on(plugin.events.seekRight.getName(), function() {
-            if (pressedPlayOnce) {
-                var currTime = videodisplay.currentTime();
-                var duration = parseInt(Engage.model.get("videoDataModel").get("duration")) / 1000;
-                if (duration && ((currTime + seekSeconds) < duration)) {
-                    Engage.trigger(plugin.events.seek.getName(), currTime + seekSeconds);
-                } else {
-                    Engage.trigger(plugin.events.seek.getName(), duration);
-                }
-            }
-        });
-        Engage.on(plugin.events.playbackRateIncrease.getName(), function() {
-            if (pressedPlayOnce) {
-                var rate = videodisplayMaster.playbackRate();
-                switch (rate * 100) {
-                    case 50:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
-                        break;
-                    case 75:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
-                        break;
-                    case 100:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
-                        break;
-                    case 125:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5)
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-        Engage.on(plugin.events.playbackRateDecrease.getName(), function() {
-            if (pressedPlayOnce) {
-                var rate = videodisplayMaster.playbackRate();
-                switch (rate * 100) {
-                    case 75:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5)
-                        break;
-                    case 100:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
-                        break;
-                    case 125:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
-                        break;
-                    case 150:
-                        Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
     }
 
     function registerEvents(videoDisplay, numberOfVideodisplays) {
@@ -1175,46 +1073,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             });
             Engage.on(plugin.events.playbackRateIncrease.getName(), function() {
-                if (pressedPlayOnce) {
-                    var rate = audioPlayer.playbackRate();
-                    switch (rate * 100) {
-                        case 50:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
-                            break;
-                        case 75:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
-                            break;
-                        case 100:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
-                            break;
-                        case 125:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5)
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                changePlaybackRate(0.125, videodisplayMaster);
             });
             Engage.on(plugin.events.playbackRateDecrease.getName(), function() {
-                if (pressedPlayOnce) {
-                    var rate = audioPlayer.playbackRate();
-                    switch (rate * 100) {
-                        case 75:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5)
-                            break;
-                        case 100:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
-                            break;
-                        case 125:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
-                            break;
-                        case 150:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                changePlaybackRate(-0.125, videodisplayMaster);
             });
             Engage.on(plugin.events.volumeSet.getName(), function(volume) {
                 if ((volume >= 0) && (volume <= 1)) {
@@ -1426,46 +1288,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             });
             Engage.on(plugin.events.playbackRateIncrease.getName(), function() {
-                if (pressedPlayOnce) {
-                    var rate = videodisplayMaster.playbackRate();
-                    switch (rate * 100) {
-                        case 50:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
-                            break;
-                        case 75:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
-                            break;
-                        case 100:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
-                            break;
-                        case 125:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.5)
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                changePlaybackRate(0.125, videodisplayMaster);
             });
             Engage.on(plugin.events.playbackRateDecrease.getName(), function() {
-                if (pressedPlayOnce) {
-                    var rate = videodisplayMaster.playbackRate();
-                    switch (rate * 100) {
-                        case 75:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.5)
-                            break;
-                        case 100:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 0.75)
-                            break;
-                        case 125:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.0)
-                            break;
-                        case 150:
-                            Engage.trigger(plugin.events.playbackRateChanged.getName(), 1.25)
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                changePlaybackRate(-0.125, videodisplayMaster);
             });
             Engage.on(plugin.events.volumeSet.getName(), function(volume) {
                 if ((volume >= 0) && (volume <= 1)) {
@@ -1531,162 +1357,85 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 Engage.trigger(plugin.events.fullscreenChange.getName());
             });
             
-            $("." + videoDisplayClass).on("click", function () {
-                Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
-            });
+            var numberDisplays = $("." + videoDisplayClass).length;
+            if (numberDisplays > 1) {
+                $("." + videoDisplayClass).on("click", function () {
+                    Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
+                });
 
-            Engage.on(plugin.events.focusVideo.getName(), function(display) {
-                Engage.log("Video: received focusing video " + display);
+                Engage.on(plugin.events.focusVideo.getName(), function(display) {
+                    Engage.log("Video: received focusing video " + display);
 
-                var videoDiv;
-                
-                if (display === undefined || display === "focus.none") {
-                    Engage.trigger(plugin.events.resetLayout.getName());
-                    return;
-                }
-                
+                    var videoDiv;
 
-                if (display === "focus.next" || display === "focus.prev") {
-                    if (isDefaultLayout()) {
-                        if (display === "focus.next") {
-                            Engage.trigger(plugin.events.focusVideo.getName(), 
-                                            Utils.getFlavorForVideoDisplay($("." + videoDisplayClass).first()));
-                            return;
-                        } else {
-                            Engage.trigger(plugin.events.focusVideo.getName(), 
-                                            Utils.getFlavorForVideoDisplay($("." + videoDisplayClass).last()));
-                            return;
-                        }
-                    } else {
-                        var vidDisp = $("." + videoDisplayClass);
-                        var selectNext = false;
-                        var last;
-                        var i = 0;
-                        for (var elem in vidDisp) {
-                            if (selectNext) {
+                    if (display === undefined || display === "focus.none") {
+                        Engage.trigger(plugin.events.resetLayout.getName());
+                        return;
+                    }
+
+
+                    if (display === "focus.next" || display === "focus.prev") {
+                        if (isDefaultLayout()) {
+                            if (display === "focus.next") {
                                 Engage.trigger(plugin.events.focusVideo.getName(), 
-                                            Utils.getFlavorForVideoDisplay($(vidDisp[elem])));
+                                                Utils.getFlavorForVideoDisplay($("." + videoDisplayClass).first()));
                                 return;
-                            } else if ($(vidDisp[elem]).hasClass(videoFocusedClass)) {
-                                if ((display === "focus.prev" && last === undefined) || 
-                                     (display === "focus.next" &&  i === vidDisp.length -1)) {
-                                    Engage.log("Resetting videodisplay layout");
-                                    Engage.trigger(plugin.events.resetLayout.getName());
-                                    return;
-                                } else if (display === "focus.next") {
-                                    selectNext = true;
-                                } else {
-                                    Engage.trigger(plugin.events.focusVideo.getName(), 
-                                            Utils.getFlavorForVideoDisplay(last));
-                                    return;
-                                }
+                            } else {
+                                Engage.trigger(plugin.events.focusVideo.getName(), 
+                                                Utils.getFlavorForVideoDisplay($("." + videoDisplayClass).last()));
+                                return;
                             }
-                            last = $(vidDisp[elem]);
-                            i++;
+                        } else {
+                            var vidDisp = $("." + videoDisplayClass);
+                            var selectNext = false;
+                            var last;
+                            var i = 0;
+                            for (var elem in vidDisp) {
+                                if (selectNext) {
+                                    Engage.trigger(plugin.events.focusVideo.getName(), 
+                                                Utils.getFlavorForVideoDisplay($(vidDisp[elem])));
+                                    return;
+                                } else if ($(vidDisp[elem]).hasClass(videoFocusedClass)) {
+                                    if ((display === "focus.prev" && last === undefined) || 
+                                         (display === "focus.next" &&  i === vidDisp.length -1)) {
+                                        Engage.log("Resetting videodisplay layout");
+                                        Engage.trigger(plugin.events.resetLayout.getName());
+                                        return;
+                                    } else if (display === "focus.next") {
+                                        selectNext = true;
+                                    } else {
+                                        Engage.trigger(plugin.events.focusVideo.getName(), 
+                                                Utils.getFlavorForVideoDisplay(last));
+                                        return;
+                                    }
+                                }
+                                last = $(vidDisp[elem]);
+                                i++;
+                            }
                         }
-                    }
 
-                } else {
-                    videoDiv = getDivForFlavor(display);
-                    if (videoDiv === undefined) {
-                        Engage.trigger(plugin.events.resetLayout.getName());
-                        return;
-                    }
-                    if ($(videoDiv).hasClass(videoFocusedClass)) {
-                        Engage.log("Resetting videodisplay layout");
-                        Engage.trigger(plugin.events.resetLayout.getName());
-                        return;
-                    }
-                }                
-                $("." + id_videoDisplayClass).css("width", "");
-                $("." + id_videoDisplayClass).css("left", "");
-                $("." + id_videoDisplayClass).css("top", "");
-                $("." + id_videoDisplayClass).css("margin-left", "");
-                $("#engage_video").css("height", "");
-                $("." + videoDisplayClass).removeClass(videoDefaultLayoutClass).addClass(videoUnfocusedClass);
-                $("." + videoUnfocusedClass).removeClass(videoFocusedClass);
-                $(videoDiv).addClass(videoFocusedClass).removeClass(videoUnfocusedClass);
-
-                if (isPiP) {
-                    var distance = 0;
-                    $("." + videoUnfocusedClass).each(function() {
-                        var width = $(this).width();
-                        var height = $(this).height();
-                        $(this).css("left", 0 - (width / 2) + "px");
-                        $(this).css("top", distance - (height / 2) + "px");
-                        distance = distance + height + 10;
-                    });
-                    var marginLeft;
-                    if (pipPos === "left") {
-                        marginLeft = 12;
                     } else {
-                        marginLeft = 88;
-                    }
-                    $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");                        
-                } else {
-                    var height = $("." + videoFocusedClass).height();
-                    $("#engage_video").height(height + 10);
-                }
-            });
+                        videoDiv = getDivForFlavor(display);
+                        if (videoDiv === undefined) {
+                            Engage.trigger(plugin.events.resetLayout.getName());
+                            return;
+                        }
+                        if ($(videoDiv).hasClass(videoFocusedClass)) {
+                            Engage.log("Resetting videodisplay layout");
+                            Engage.trigger(plugin.events.resetLayout.getName());
+                            return;
+                        }
+                    }                
+                    $("." + id_videoDisplayClass).css("width", "");
+                    $("." + id_videoDisplayClass).css("left", "");
+                    $("." + id_videoDisplayClass).css("top", "");
+                    $("." + id_videoDisplayClass).css("margin-left", "");
+                    $("#engage_video").css("height", "");
+                    $("." + videoDisplayClass).removeClass(videoDefaultLayoutClass).addClass(videoUnfocusedClass);
+                    $("." + videoUnfocusedClass).removeClass(videoFocusedClass);
+                    $(videoDiv).addClass(videoFocusedClass).removeClass(videoUnfocusedClass);
 
-            Engage.on(plugin.events.resetLayout.getName(), function() {
-                Engage.log("Video: received resetting layout");
-                $("#engage_video").css("height", "");
-                $("." + id_videoDisplayClass).css("margin-left", "");
-                $("." + id_videoDisplayClass).css("width", "");
-                $("." + id_videoDisplayClass).css("left", "");
-                $("." + id_videoDisplayClass).css("top", "");
-                $("." + id_videoDisplayClass).css("margin-left", "");                
-                $("." + videoDisplayClass).removeClass(videoFocusedClass).removeClass(videoUnfocusedClass).addClass(videoDefaultLayoutClass);
-                var numberDisplays = $("." + videoDisplayClass).length;
-                $("." + id_videoDisplayClass).css("width", (((1 / numberDisplays) * 100) - 0.5) + "%");                 
-            }); 
-            
-            Engage.on(plugin.events.movePiP.getName(), function(pos) {
-                if (pos !== undefined) {
-                    pipPos = pos;
-                } 
-                if (! isPiP) {
-                    return;
-                }
-                Engage.log("Video: moving PiP");
-                var marginLeft;
-                if (pipPos === "right") {
-                    marginLeft = 88;
-                    pipPos = "right";
-                } else {
-                    marginLeft = 12;
-                    pipPos = "left";
-                }
-                $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
-            });  
-
-            Engage.on(plugin.events.togglePiP.getName(), function(pip) {
-                Engage.log("Video: setting PiP to " + pip);
-                if ((pip && isPiP) || (! pip && ! isPiP)) {
-                    return;
-                }
-                if (! pip) {
-                    videoUnfocusedClass = unfocusedClass;
-                    videoFocusedClass = focusedClass;
-                    isPiP = false;
-                    if (! isDefaultLayout()) {
-                        $("." + id_videoDisplayClass).css("margin-left", "");
-                        $("." + id_videoDisplayClass).css("width", "");
-                        $("." + id_videoDisplayClass).css("left", "");
-                        $("." + id_videoDisplayClass).css("top", "");
-                        $("." + unfocusedPiPClass).addClass(videoUnfocusedClass).removeClass(unfocusedPiPClass);
-                        $("." + focusedPiPClass).addClass(videoFocusedClass).removeClass(focusedPiPClass);
-                        var height = $("." + videoFocusedClass).height();
-                        $("#engage_video").height(height + 10);
-                    }
-                } else {
-                    videoUnfocusedClass = unfocusedPiPClass;
-                    videoFocusedClass = focusedPiPClass;
-                    isPiP = true;
-                    if (! isDefaultLayout()) {
-                        $("." + unfocusedClass).addClass(videoUnfocusedClass).removeClass(unfocusedClass);
-                        $("." + focusedClass).addClass(videoFocusedClass).removeClass(focusedClass);
+                    if (isPiP) {
                         var distance = 0;
                         $("." + videoUnfocusedClass).each(function() {
                             var width = $(this).width();
@@ -1701,10 +1450,95 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                         } else {
                             marginLeft = 88;
                         }
-                        $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
+                        $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");                        
+                    } else {
+                        var height = $("." + videoFocusedClass).height();
+                        $("#engage_video").height(height + 10);
                     }
-                }
-            });
+                });
+
+                Engage.on(plugin.events.resetLayout.getName(), function() {
+                    Engage.log("Video: received resetting layout");
+                    $("#engage_video").css("height", "");
+                    $("." + id_videoDisplayClass).css("margin-left", "");
+                    $("." + id_videoDisplayClass).css("width", "");
+                    $("." + id_videoDisplayClass).css("left", "");
+                    $("." + id_videoDisplayClass).css("top", "");
+                    $("." + id_videoDisplayClass).css("margin-left", "");                
+                    $("." + videoDisplayClass).removeClass(videoFocusedClass).removeClass(videoUnfocusedClass).addClass(videoDefaultLayoutClass);
+                    var numberDisplays = $("." + videoDisplayClass).length;
+                    $("." + id_videoDisplayClass).css("width", (((1 / numberDisplays) * 100) - 0.5) + "%");                 
+                }); 
+
+                Engage.on(plugin.events.movePiP.getName(), function(pos) {
+                    var numberDisplays = $("." + videoDisplayClass).length;
+                    if (numberDisplays <= 1) return;
+                    if (pos !== undefined) {
+                        pipPos = pos;
+                    } 
+                    if (! isPiP) {
+                        return;
+                    }
+                    Engage.log("Video: moving PiP");
+                    var marginLeft;
+                    if (pipPos === "right") {
+                        marginLeft = 88;
+                        pipPos = "right";
+                    } else {
+                        marginLeft = 12;
+                        pipPos = "left";
+                    }
+                    $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
+                });  
+
+                Engage.on(plugin.events.togglePiP.getName(), function(pip) {
+                    var numberDisplays = $("." + videoDisplayClass).length;
+                    if (numberDisplays <= 1) return;
+
+                    Engage.log("Video: setting PiP to " + pip);
+                    if ((pip && isPiP) || (! pip && ! isPiP)) {
+                        return;
+                    }
+                    if (! pip) {
+                        videoUnfocusedClass = unfocusedClass;
+                        videoFocusedClass = focusedClass;
+                        isPiP = false;
+                        if (! isDefaultLayout()) {
+                            $("." + id_videoDisplayClass).css("margin-left", "");
+                            $("." + id_videoDisplayClass).css("width", "");
+                            $("." + id_videoDisplayClass).css("left", "");
+                            $("." + id_videoDisplayClass).css("top", "");
+                            $("." + unfocusedPiPClass).addClass(videoUnfocusedClass).removeClass(unfocusedPiPClass);
+                            $("." + focusedPiPClass).addClass(videoFocusedClass).removeClass(focusedPiPClass);
+                            var height = $("." + videoFocusedClass).height();
+                            $("#engage_video").height(height + 10);
+                        }
+                    } else {
+                        videoUnfocusedClass = unfocusedPiPClass;
+                        videoFocusedClass = focusedPiPClass;
+                        isPiP = true;
+                        if (! isDefaultLayout()) {
+                            $("." + unfocusedClass).addClass(videoUnfocusedClass).removeClass(unfocusedClass);
+                            $("." + focusedClass).addClass(videoFocusedClass).removeClass(focusedClass);
+                            var distance = 0;
+                            $("." + videoUnfocusedClass).each(function() {
+                                var width = $(this).width();
+                                var height = $(this).height();
+                                $(this).css("left", 0 - (width / 2) + "px");
+                                $(this).css("top", distance - (height / 2) + "px");
+                                distance = distance + height + 10;
+                            });
+                            var marginLeft;
+                            if (pipPos === "left") {
+                                marginLeft = 12;
+                            } else {
+                                marginLeft = 88;
+                            }
+                            $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
+                        }
+                    }
+                });
+            }
         }
     }
     
@@ -1850,15 +1684,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
     }
 
-    /* usage:
-            var tuples = getSortedVideosourcesArray(videoSources);
-        for (var i = 0; i < tuples.length; ++i) {
-            var key = tuples[i][0];
-            var value = tuples[i][1];
-
-            // do something with key and value
-        }
-    */
     function getSortedVideosourcesArray(videoSources) {
         var tuples = [];
 

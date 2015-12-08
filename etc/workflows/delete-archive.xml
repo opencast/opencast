@@ -19,7 +19,7 @@
           <label>Publication Channels:</label>
           <span>
             <input id="engage" name="engage" type="checkbox" checked="checked" class="configField" value="true" />
-            <span>&nbsp;Matterhorn Engage Player</span>
+            <span>&nbsp;Opencast Engage Player</span>
             <input id="youtube" name="youtube" type="checkbox" checked="checked" class="configField" value="YouTube" />
             <span>&nbsp;Youtube</span>
           </span>

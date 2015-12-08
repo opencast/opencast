@@ -50,7 +50,7 @@ angular.module('adminNg.controllers')
             });
 
             if (!loading) {
-                $scope.saveAcl();
+                $scope.save();
             }
         };
 
@@ -84,7 +84,7 @@ angular.module('adminNg.controllers')
             $scope.policies.splice(index, 1);
         }
 
-        $scope.saveAcl();
+        $scope.save();
     };
 
 

@@ -1,7 +1,7 @@
-Matterhorn Development Guides
-=============================
+Opencast Development Guides
+===========================
 
-These guides will help you if you want to participate in Matterhorn development.
+These guides will help you if you want to participate in Opencast development.
 
 
  - [Development Process](development.md)
