@@ -69,7 +69,7 @@ public class FFmpegEdit {
   public static void init(BundleContext bundleContext) {
     String path = bundleContext.getProperty(CONFIG_FFMPEG_PATH);
 
-    if (!StringUtils.isBlank(path)) {
+    if (StringUtils.isNotBlank(path)) {
       binary = path.trim();
     }
   }
