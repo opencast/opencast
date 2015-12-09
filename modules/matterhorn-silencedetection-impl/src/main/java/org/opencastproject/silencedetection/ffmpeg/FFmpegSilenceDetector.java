@@ -21,7 +21,21 @@
 
 package org.opencastproject.silencedetection.ffmpeg;
 
+import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Track;
+import org.opencastproject.silencedetection.api.MediaSegment;
+import org.opencastproject.silencedetection.api.MediaSegments;
+import org.opencastproject.silencedetection.api.SilenceDetectionFailedException;
+import org.opencastproject.silencedetection.impl.SilenceDetectionProperties;
+import org.opencastproject.util.NotFoundException;
+import org.opencastproject.workspace.api.Workspace;
+
 import com.google.common.io.LineReader;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -34,17 +48,6 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang.StringUtils;
-import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.Track;
-import org.opencastproject.silencedetection.api.MediaSegment;
-import org.opencastproject.silencedetection.api.MediaSegments;
-import org.opencastproject.silencedetection.api.SilenceDetectionFailedException;
-import org.opencastproject.silencedetection.impl.SilenceDetectionProperties;
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.workspace.api.Workspace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Find silent sequences in audio stream using Gstreamer.
@@ -56,10 +59,10 @@ public class FFmpegSilenceDetector {
   public static final String FFMPEG_BINARY_CONFIG = "org.opencastproject.composer.ffmpeg.path";
   public static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
 
-  private static final String DEFAULT_SILENCE_MIN_LENGTH = "5000";
-  private static final String DEFAULT_SILENCE_PRE_LENGTH = "2000";
+  private static final Long DEFAULT_SILENCE_MIN_LENGTH = 5000L;
+  private static final Long DEFAULT_SILENCE_PRE_LENGTH = 2000L;
   private static final String DEFAULT_THRESHOLD_DB = "-40dB";
-  private static final String DEFAULT_VOICE_MIN_LENGTH = "60000";
+  private static final Long DEFAULT_VOICE_MIN_LENGTH = 60000L;
 
   private String filePath;
   private String trackId;
@@ -76,14 +79,20 @@ public class FFmpegSilenceDetector {
   public FFmpegSilenceDetector(Properties properties, Track track, Workspace workspace)
     throws SilenceDetectionFailedException, MediaPackageException, IOException {
 
-    long minSilenceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.SILENCE_MIN_LENGTH,
-          DEFAULT_SILENCE_MIN_LENGTH));
-    long minVoiceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.VOICE_MIN_LENGTH,
-          DEFAULT_VOICE_MIN_LENGTH));
-    long preSilenceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.SILENCE_PRE_LENGTH,
-          DEFAULT_SILENCE_PRE_LENGTH));
-    String thresholdDB = properties.getProperty(SilenceDetectionProperties.SILENCE_THRESHOLD_DB, DEFAULT_THRESHOLD_DB);
+    long minSilenceLength;
+    long minVoiceLength;
+    long preSilenceLength;
+    String thresholdDB;
 
+    //Ensure properties is not null, avoids null checks later
+    if (null == properties) {
+      properties = new Properties();
+    }
+
+    minSilenceLength = parseLong(properties, SilenceDetectionProperties.SILENCE_MIN_LENGTH, DEFAULT_SILENCE_MIN_LENGTH);
+    minVoiceLength = parseLong(properties, SilenceDetectionProperties.VOICE_MIN_LENGTH, DEFAULT_VOICE_MIN_LENGTH);
+    preSilenceLength = parseLong(properties, SilenceDetectionProperties.SILENCE_PRE_LENGTH, DEFAULT_SILENCE_PRE_LENGTH);
+    thresholdDB = properties.getProperty(SilenceDetectionProperties.SILENCE_THRESHOLD_DB, DEFAULT_THRESHOLD_DB);
     String binary = properties.getProperty(FFMPEG_BINARY_CONFIG, FFMPEG_BINARY_DEFAULT);
 
     trackId = track.getIdentifier();
@@ -208,6 +217,14 @@ public class FFmpegSilenceDetector {
 
   }
 
+  private Long parseLong(Properties properties, String key, Long defaultValue) {
+    try {
+      return Long.parseLong(properties.getProperty(key, defaultValue.toString()));
+    } catch (NumberFormatException e) {
+      logger.warn("Configuration value for {} is invalid, using default value of {} instead", key, defaultValue);
+      return defaultValue;
+    }
+  }
 
   /**
    * Returns found media segments.
