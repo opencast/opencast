@@ -40,9 +40,9 @@
   "del":"Suprimir",
   "modMac":"Cmd",
   "modOther":"Ctrl",
-  "focusPrev":"Focus previous video",
-  "focusNext":"Focus next video",
-  "togglePiP":"Enable\/disable picture in picture",
-  "movePiP":"Move picture in picture",
-  "shortcuts":"Shortcuts"
+  "focusPrev":"Poner el foco en el vídeo anterior",
+  "focusNext":"Poner el foco en el vídeo siguiente",
+  "togglePiP":"Activar\/desactivar vídeo superpuesto",
+  "movePiP":"Mover vídeo superpuesto",
+  "shortcuts":"Atajos"
 }

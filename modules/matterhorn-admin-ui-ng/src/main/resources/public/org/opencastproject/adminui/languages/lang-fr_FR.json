@@ -107,7 +107,7 @@
     "EMAIL_SENT":"Le messag a été envoyé",
     "EMAIL_NOT_SENT":"Le message n'a pas pu être envoyé",
     "CONFLICT_DETECTED":"Conflit de programmation: les données sélectionnées entrent en conflit avec un événement existant. Veuillez changer l'emplacement ou les dates.",
-    "INVALID_ACL_RULES":"Rules have to contain a valid role and read or\/and write right(s).",
+    "INVALID_ACL_RULES":"Rules have to contain a valid role and Read or\/and Write right(s).",
     "MISSING_ACL_RULES":"At least one role with Read and Write permissions is required!",
     "SAVED_ACL_RULES":"The access rules have been saved.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Les événements existants dans cette série devront être retraités",
@@ -396,7 +396,7 @@
         "PROCESSING_CANCELED":"Traitement annulé"
       },
       "DETAILS":{
-        "HEADER":"Détails de l'événement {{resourceId}}",
+        "HEADER":"Détails de l'événement - {{resourceId}}",
         "TABS":{
           "GENERAL":"Général",
           "METADATA":"Métadonnées",
@@ -503,18 +503,18 @@
               "STREAM_AUDIO":"Audio streams",
               "STREAM_VIDEO":"Video streams",
               "CHANNELS":"Channels",
-              "BITRATE":"Bitrate",
-              "BITDEPTH":"Bitdepth",
-              "SAMPLINGRATE":"Samplingrate",
-              "FRAMECOUNT":"Framecount",
-              "PEAKLEVELDB":"Peak level DB",
-              "RMSLEVELDB":"RMS level DB",
-              "RMSPEAKDB":"RMS speak DB",
-              "FRAMERATE":"Framerate",
+              "BITRATE":"Bit rate",
+              "BITDEPTH":"Bit depth",
+              "SAMPLINGRATE":"Sample rate",
+              "FRAMECOUNT":"Frame count",
+              "PEAKLEVELDB":"Peak level (dB)",
+              "RMSLEVELDB":"RMS level (dB)",
+              "RMSPEAKDB":"RMS peak (dB)",
+              "FRAMERATE":"Frame rate",
               "RESOLUTION":"Resolution",
               "SIZE":"Size",
-              "SCANTYPE":"Scantype",
-              "SCANORDER":"Scanorder"
+              "SCANTYPE":"Scan type",
+              "SCANORDER":"Scan order"
             }
           },
           "PUBLICATIONS":{
@@ -634,7 +634,6 @@
           "MIMETYPE":"Type MIME",
           "URL":"URL",
           "RECORDING_DATE":"Date d'enregistrement",
-          "FLAVOR":"Flavor",
           "TAGS":"Tags",
           "DURATION":"Durée",
           "STREAM_AUDIO":"Flux audio",
@@ -727,6 +726,7 @@
         "ACTION":"Actions"
       },
       "DETAILS":{
+        "HEADER":"Series details - {{resourceId}}",
         "TABS":{
           "METADATA":"Métadonnées",
           "EXTENDED_METADATA":"Métadonnées II",
@@ -976,7 +976,7 @@
             "ACTION":"Actions",
             "NEW":"Nouvelle ligne",
             "DETAILS":"Détails",
-            "DESCRIPTION":"Please choose a pre-configured set of policies or add custom policies bellow"
+            "DESCRIPTION":"Please choose a pre-configured set of policies or add custom policies below"
           },
           "ROLES":{
             "LABEL":"Sélectionner un rôle",
@@ -1013,7 +1013,7 @@
             "ACTION":"Actions",
             "NEW":"Nouvelle ligne",
             "DETAILS":"Détails",
-            "DESCRIPTION":"Please choose a pre-configured set of policies or add custom policies bellow"
+            "DESCRIPTION":"Please choose a pre-configured set of policies or add custom policies below"
           },
           "ROLES":{
             "LABEL":"Sélectionner un rôle",

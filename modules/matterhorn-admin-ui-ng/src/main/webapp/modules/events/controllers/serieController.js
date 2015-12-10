@@ -99,6 +99,9 @@ angular.module('adminNg.controllers')
                     $scope.seriesCatalog = catalog;
                     seriesCatalogIndex = index;
                     angular.forEach(catalog.fields, function (entry) {
+                        if (entry.id === 'title') {
+                            $scope.title = entry.value;
+                        }
                         if (keepGoing && entry.locked) {
                             metadata.locked = entry.locked;
                             keepGoing = false;
