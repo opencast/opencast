@@ -51,6 +51,10 @@ angular.module('adminNg.resources')
 
                 if (sourceType === 'SCHEDULE_SINGLE') {
                     source.metadata.end = JsHelper.toZuluTimeString(data.source.SCHEDULE_SINGLE.start, data.source.SCHEDULE_SINGLE.duration);
+                    source.metadata.duration = (
+                        parseInt(data.source.SCHEDULE_SINGLE.duration.hour, 10) * 60 * 60 * 1000 +
+                        parseInt(data.source.SCHEDULE_SINGLE.duration.minute, 10) * 60 * 1000
+                    ).toString();
                 }
 
                 if (sourceType === 'SCHEDULE_MULTIPLE') {
