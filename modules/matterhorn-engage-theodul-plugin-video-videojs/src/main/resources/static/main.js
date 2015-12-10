@@ -173,6 +173,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var id_videojs_wrapper = "videojs_wrapper";
     var id_videoDisplayClass = "videoDisplay";
     var id_engageContent = "engage_content";
+    var id_engageControls = "engage_controls";
     var id_resize_container = "engage_resize_container";
     var id_videojs_wrapperClass = "videojs_wrapper";
     var id_engage_video_fullsceen_wrapper = "fullscreen_video_wrapper";
@@ -944,6 +945,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         var videoHeight = $("#" + id_engage_video).height();
         var videoWidth = $("#" + id_engage_video).width();
         var controlsHeight = ($("#" + id_resize_container).height() - videoHeight) + 5;
+        if (controlsHeight <= 0) {
+            controlsHeight = $("#" + id_engageControls).height() + 30;
+        }
+         
         var maxVideoAreaHeight = $(window).height() - controlsHeight;
         
         if (videoAreaAspectRatio === undefined) {
