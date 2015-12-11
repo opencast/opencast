@@ -75,7 +75,6 @@
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
       <version>4.9.0</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -131,7 +130,6 @@
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-queryparser</artifactId>
       <version>4.9.0</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>

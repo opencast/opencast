@@ -26,6 +26,8 @@ angular.module('adminNg.controllers')
         function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, Notifications) {
 
     var saveFns = {}, aclNotification,
+        me = this,
+        NOTIFICATION_CONTEXT = 'series-acl',
         mainCatalog = 'dublincore/series', fetchChildResources,
         createPolicy = function (role) {
             return {
@@ -202,54 +204,72 @@ angular.module('adminNg.controllers')
         });
     };
 
-    $scope.accessSave = function (field) {
-        var ace = [],
-            hasRights = false;
+    $scope.accessSave = function () {
+            var ace = [],
+                hasRights = false,
+                rulesValid = false;
 
-        if (angular.isDefined(field) && angular.isUndefined(field.role)) {
-            return;
-        }
+            angular.forEach($scope.policies, function (policy) {
+                rulesValid = false;
 
-        if (aclNotification) {
-            Notifications.remove(aclNotification, 'series-acl');
-        }
-
-        angular.forEach($scope.policies, function (policy) {
-            if (angular.isDefined(policy.role)) {
                 if (policy.read && policy.write) {
                     hasRights = true;
                 }
 
+                if ((policy.read || policy.write) && !angular.isUndefined(policy.role)) {
+                    rulesValid = true;
 
-                if (policy.read) {
-                    ace.push({
-                        'action' : 'read',
-                        'allow'  : policy.read,
-                        'role'   : policy.role
-                    });
-                }
+                    if (policy.read) {
+                        ace.push({
+                            'action' : 'read',
+                            'allow'  : policy.read,
+                            'role'   : policy.role
+                        });
+                    }
 
-                if (policy.write) {
-                    ace.push({
-                        'action' : 'write',
-                        'allow'  : policy.write,
-                        'role'   : policy.role
-                    });   
+                    if (policy.write) {
+                        ace.push({
+                            'action' : 'write',
+                            'allow'  : policy.write,
+                            'role'   : policy.role
+                        });
+                    }
                 }
+            });
+
+            me.unvalidRule = !rulesValid;
+            me.hasRights = hasRights;
+
+            if (me.unvalidRule) {
+                if (!angular.isUndefined(me.notificationRules)) {
+                    Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
+                }
+                me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);  
+            } else if (!angular.isUndefined(me.notificationRules)) {
+                Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
+                me.notificationRules = undefined;
             }
-        });
 
-        if (!hasRights) {
-            aclNotification = Notifications.add('error', 'SERIES_ACL_MISSING_READWRITE_ROLE', 'series-acl');
-            return;
-        }
+            if (!me.hasRights) {
+                if (!angular.isUndefined(me.notificationRights)) {
+                    Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
+                }
+                me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);  
+            } else if (!angular.isUndefined(me.notificationRights)) {
+                Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
+                me.notificationRights = undefined;
+            }
 
-        SeriesAccessResource.save({id: $scope.resourceId}, {
-            acl: {
-                ace: ace
-            },
-            override: true
-        });
+            if (hasRights && rulesValid) {
+                SeriesAccessResource.save({id: $scope.resourceId}, {
+                    acl: {
+                        ace: ace
+                    },
+                    override: true
+                });  
+
+                Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);              
+            }
     };
 
     // Reload tab resource on tab changes

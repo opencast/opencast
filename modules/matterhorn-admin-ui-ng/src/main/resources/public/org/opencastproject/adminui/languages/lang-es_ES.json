@@ -5,9 +5,34 @@
   "SUBMIT":"Enviar",
   "UPDATE":"Actualizar",
   "CANCEL":"Cancelar",
+  "CONFIRM":"Confirm",
   "SAVE":"Guardar",
   "LOGOUT":"Cerrar sesión",
   "RESET":"Reestablecer",
+  "LANGUAGES":{
+    "ARABIC":"Arabic",
+    "DANISH":"Danish",
+    "GERMAN":"German",
+    "GERMAN_CH":"Swiss German",
+    "FINNISH":"Finnish",
+    "HINDI":"Hindi",
+    "ITALIAN":"Italian",
+    "JAPANESE":"Japanese",
+    "DUTCH":"Dutch",
+    "NORWEGIAN":"Norwegian",
+    "FRENCH":"French",
+    "ENGLISH":"English",
+    "SPANISH":"Spanish",
+    "ROMANSH":"Romansh",
+    "POLISH":"Polish",
+    "PORTUGESE":"Portugese",
+    "SLOVENIAN":"Slovenian",
+    "SWEDISH":"Swedish",
+    "RUSSIAN":"Russian",
+    "TURKISH":"Turkish",
+    "UKRAINIAN":"Ukrainian",
+    "CHINESE":"Chinese"
+  },
   "PREFERENCES":{
     "CAPTION":"Preferencias",
     "PROFILE":"Perfil",
@@ -22,11 +47,15 @@
       "FOOTER_TEXT":"El orden y la selección se guardarán automáticamente. Pulse \"{{resetTranslation}}\" para restaurar la vista por defecto."
     }
   },
-  "CONFIRMATIONS": {
-    "CONTINUE_ACTION" : "Are you sure you want to continue?",
-    "ACTIONS": { 
-      "CONFIRMATION" : "Confirmation required"
+  "CONFIRMATIONS":{
+    "CONTINUE_ACTION":"Are you sure you want to continue?",
+    "ACTIONS":{
+      "CONFIRMATION":"Confirmation required"
     }
+  },
+  "HELP":{
+    "DOCUMENTATION":"Documentation",
+    "REST_DOC":"REST API Docs"
   },
   "NOTIFICATIONS":{
     "ACL_ADDED":"Se ha creado la política de acceso",
@@ -41,6 +70,7 @@
     "USER_NOT_DELETED":"No se ha podido eliminar el usuario",
     "USER_NOT_MANAGEABLE":"No es posible administrar el usuario",
     "GROUP_ADDED":"Se ha creado el grupo",
+    "GROUP_CONFLICT":"The generated group name already exists",
     "GROUP_UPDATED":"El grupo ha sido actualizado",
     "GROUP_NOT_SAVED":"No se ha podido guardar el grupo",
     "GROUP_DELETED":"El grupo ha sido eliminado",
@@ -77,6 +107,9 @@
     "EMAIL_SENT":"El mensaje ha sido enviado",
     "EMAIL_NOT_SENT":"No se ha podido enviar el mensaje",
     "CONFLICT_DETECTED":"Conflicto de programación: el nuevo evento coincide con otro existente. Por favor, cambie la sala, las fechas o las horas.",
+    "INVALID_ACL_RULES":"Rules have to contain a valid role and read or\/and write right(s).",
+    "MISSING_ACL_RULES":"At least one role with Read and Write permissions is required!",
+    "SAVED_ACL_RULES":"The access rules have been saved.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Los eventos que contiene esta serie deberán ser reprocesados",
     "SERIES_ACL_MISSING_READWRITE_ROLE":"La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
     "EVENT_ACL_MISSING_READWRITE_ROLE":"La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
@@ -113,11 +146,11 @@
     "DELETE":{
       "SERIES":{
         "CAPTION":"Eliminar",
-        "BUTTON": "Eliminar"
+        "BUTTON":"Eliminar"
       },
       "EVENTS":{
         "CAPTION":"Eliminar",
-        "BUTTON": "Eliminar"
+        "BUTTON":"Eliminar"
       }
     },
     "DELETE_EVENTS_WARNING_LINE1":"Al eliminar un evento, todos sus metadatos y sus archivos de audio y vídeo se eliminarán y serán irrecuperables.",
@@ -195,6 +228,14 @@
   },
   "EVENTS":{
     "LICENSE":{
+      "ALLRIGHTS":"All rights reserved",
+      "CCBY":"CC BY",
+      "CCBYSA":"CC BY-SA",
+      "CCBYND":"CC BY-ND",
+      "CCBYNC":"CC BY-NC",
+      "CCBYNCSA":"CC BY-NC-SA",
+      "CCBYNCND":"CC BY-NC-ND",
+      "CC0":"CC0",
       "BSD":"BSD",
       "CCND":"CCND",
       "GPL":"GPL"
@@ -361,7 +402,7 @@
           "METADATA":"Metadatos",
           "EXTENDED-METADATA":"Metadatos II",
           "MEDIA":"Archivos multimedia",
-          "ATTACHMENTS":"Adjuntos",
+          "ASSETS":"Assets",
           "WORKFLOWS":"Flujos de Trabajo",
           "ACCESS":"Política de acceso",
           "COMMENTS":"Comentarios"
@@ -393,6 +434,111 @@
           "MIMETYPE":"Tipo MIME",
           "TAGS":"Etiquetas",
           "LINK":"Enlace"
+        },
+        "ASSETS":{
+          "CAPTION":"Assets",
+          "TYPE":"Type",
+          "SIZE":"Size",
+          "DETAILS":"Details",
+          "ATTACHMENTS":{
+            "TITLE":"Attachments",
+            "CAPTION":"Attachments",
+            "ID":"Id",
+            "TYPE":"Type",
+            "MIMETYPE":"Mimetype",
+            "TAGS":"Tags",
+            "LINK":"Link",
+            "DETAILS":{
+              "TITLE":"Attachment details",
+              "CAPTION":"Attachment details",
+              "ID":"Id",
+              "TYPE":"Type",
+              "MIMETYPE":"Mimetype",
+              "TAGS":"Tags",
+              "URL":"URL",
+              "SIZE":"Size",
+              "CHECKSUM":"Checksum",
+              "REFERENCE":"Reference"
+            }
+          },
+          "CATALOGS":{
+            "TITLE":"Catalogs",
+            "CAPTION":"Catalogs",
+            "ID":"Id",
+            "TYPE":"Type",
+            "MIMETYPE":"Mimetype",
+            "TAGS":"Tags",
+            "LINK":"Link",
+            "DETAILS":{
+              "TITLE":"Catalog details",
+              "CAPTION":"Catalog details",
+              "ID":"Id",
+              "TYPE":"Type",
+              "MIMETYPE":"Mimetype",
+              "TAGS":"Tags",
+              "URL":"URL",
+              "SIZE":"Size",
+              "CHECKSUM":"Checksum",
+              "REFERENCE":"Reference"
+            }
+          },
+          "MEDIA":{
+            "TITLE":"Media",
+            "CAPTION":"Media",
+            "ID":"ID",
+            "TYPE":"Type",
+            "MIMETYPE":"Mimetype",
+            "TAGS":"Tags",
+            "LINK":"Link",
+            "DETAILS":{
+              "TITLE":"Media details",
+              "ID":"ID",
+              "TYPE":"Type",
+              "MIMETYPE":"Mimetype",
+              "URL":"URL",
+              "RECORDING_DATE":"Recording date",
+              "FLAVOR":"Flavor",
+              "TAGS":"Tags",
+              "DURATION":"Duration",
+              "STREAM_AUDIO":"Audio streams",
+              "STREAM_VIDEO":"Video streams",
+              "CHANNELS":"Channels",
+              "BITRATE":"Bitrate",
+              "BITDEPTH":"Bitdepth",
+              "SAMPLINGRATE":"Samplingrate",
+              "FRAMECOUNT":"Framecount",
+              "PEAKLEVELDB":"Peak level DB",
+              "RMSLEVELDB":"RMS level DB",
+              "RMSPEAKDB":"RMS speak DB",
+              "FRAMERATE":"Framerate",
+              "RESOLUTION":"Resolution",
+              "SIZE":"Size",
+              "SCANTYPE":"Scantype",
+              "SCANORDER":"Scanorder"
+            }
+          },
+          "PUBLICATIONS":{
+            "TITLE":"Publications",
+            "CAPTION":"Publications",
+            "CHANNEL":"Channel",
+            "ID":"Id",
+            "TYPE":"Type",
+            "MIMETYPE":"Mimetype",
+            "TAGS":"Tags",
+            "LINK":"Link",
+            "DETAILS":{
+              "TITLE":"Publication details",
+              "CAPTION":"Publication details",
+              "ID":"Id",
+              "TYPE":"Type",
+              "MIMETYPE":"Mimetype",
+              "TAGS":"Tags",
+              "URL":"URL",
+              "SIZE":"Size",
+              "CHANNEL":"Channel",
+              "REFERENCE":"Reference"
+            }
+          }
         },
         "ACCESS":{
           "CAPTION":"Política de acceso",
@@ -469,7 +615,8 @@
           "URL":"URL"
         },
         "WORKFLOW_DETAILS":{
-          "TITLE":"Detalles del flujo de trabajo"
+          "TITLE":"Detalles del flujo de trabajo",
+          "CONFIGURATION":"Workflow configuration"
         },
         "WORKFLOW_OPERATIONS":{
           "TITLE":"Operaciones del flujo de trabajo"
@@ -828,7 +975,8 @@
             "READ":"Lectura",
             "ACTION":"Acciones",
             "NEW":"Nueva política",
-            "DETAILS":"Detalles"
+            "DETAILS":"Detalles",
+            "DESCRIPTION":"Please choose a pre-configured set of policies or add custom policies bellow"
           },
           "ROLES":{
             "LABEL":"Seleccione un rol",
@@ -864,7 +1012,8 @@
             "READ":"Lectura",
             "ACTION":"Acciones",
             "NEW":"Nueva política",
-            "DETAILS":"Detalles"
+            "DETAILS":"Detalles",
+            "DESCRIPTION":"Please choose a pre-configured set of policies or add custom policies bellow"
           },
           "ROLES":{
             "LABEL":"Seleccione un rol",
@@ -1185,6 +1334,14 @@
     }
   },
   "FILTERS":{
+    "AGENTS":{
+      "NAME":{
+        "LABEL":"Nombre"
+      },
+      "STATUS":{
+        "LABEL":"Estado"
+      }
+    },
     "EVENTS":{
       "STATUS":{
         "LABEL":"Estado",
@@ -1299,6 +1456,12 @@
       }
     },
     "USERS":{
+      "PROVIDER":{
+        "LABEL":"Provider"
+      },
+      "ROLE":{
+        "LABEL":"Rol"
+      },
       "USERNAME":{
         "LABEL":"Nombre de usuario"
       },
@@ -1322,5 +1485,12 @@
         "CONSTRUCTION":"En obras"
       }
     }
+  },
+  "DASHBOARD":{
+    "RUNNING":"Procesando",
+    "FINISHED":"Procesado",
+    "FAILED":"Failed",
+    "FINISHED_WITH_COMMENTS":"Finished with open comments",
+    "SCHEDULED":"Programado"
   }
 }

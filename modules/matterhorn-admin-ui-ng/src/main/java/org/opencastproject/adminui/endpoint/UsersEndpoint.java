@@ -26,6 +26,8 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
+import static java.lang.String.CASE_INSENSITIVE_ORDER;
+import static org.apache.commons.lang.StringUtils.trimToEmpty;
 import static org.apache.commons.lang.StringUtils.trimToNull;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_CREATED;
@@ -71,7 +73,6 @@ import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.json.JString;
 import com.entwinemedia.fn.data.json.JValue;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
@@ -218,26 +219,30 @@ public class UsersEndpoint {
             switch (criterion.getFieldName()) {
               case "name":
                 if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(user2.getName(), user1.getName());
-                return ObjectUtils.compare(user1.getName(), user2.getName());
+                  return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user2.getName()), trimToEmpty(user1.getName()));
+                return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user1.getName()), trimToEmpty(user2.getName()));
               case "username":
                 if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(user2.getUsername(), user1.getUsername());
-                return ObjectUtils.compare(user1.getUsername(), user2.getUsername());
+                  return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user2.getUsername()),
+                          trimToEmpty(user1.getUsername()));
+                return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user1.getUsername()),
+                        trimToEmpty(user2.getUsername()));
               case "email":
                 if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(user2.getEmail(), user1.getEmail());
-                return ObjectUtils.compare(user1.getEmail(), user2.getEmail());
+                  return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user2.getEmail()), trimToEmpty(user1.getEmail()));
+                return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user1.getEmail()), trimToEmpty(user2.getEmail()));
               case "roles":
                 String roles1 = Stream.$(user1.getRoles()).map(getRoleName).sort(sortByName).mkString(",");
                 String roles2 = Stream.$(user2.getRoles()).map(getRoleName).sort(sortByName).mkString(",");
                 if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(roles2, roles1);
-                return ObjectUtils.compare(roles1, roles2);
+                  return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(roles2), trimToEmpty(roles1));
+                return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(roles1), trimToEmpty(roles2));
               case "provider":
                 if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(user2.getProvider(), user1.getProvider());
-                return ObjectUtils.compare(user1.getProvider(), user2.getProvider());
+                  return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user2.getProvider()),
+                          trimToEmpty(user1.getProvider()));
+                return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user1.getProvider()),
+                        trimToEmpty(user2.getProvider()));
               default:
                 logger.info("Unkown sort type: {}", criterion.getFieldName());
                 return 0;

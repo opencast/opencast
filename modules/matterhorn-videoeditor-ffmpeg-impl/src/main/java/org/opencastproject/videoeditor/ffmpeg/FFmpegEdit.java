@@ -52,7 +52,7 @@ public class FFmpegEdit {
 
   private static final Logger logger = LoggerFactory.getLogger(FFmpegEdit.class);
   private static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
-  private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpegpath";
+  private static final String CONFIG_FFMPEG_PATH = "org.opencastproject.composer.ffmpeg.path";
 
   private static final String DEFAULT_FFMPEG_PROPERTIES = "-strict -2 -preset faster -crf 18";
   public static final String DEFAULT_OUTPUT_FILE_EXTENSION = ".mp4";
@@ -69,8 +69,8 @@ public class FFmpegEdit {
   public static void init(BundleContext bundleContext) {
     String path = bundleContext.getProperty(CONFIG_FFMPEG_PATH);
 
-    if (path != null) {
-      binary = path;
+    if (StringUtils.isNotBlank(path)) {
+      binary = path.trim();
     }
   }
 
@@ -133,8 +133,8 @@ public class FFmpegEdit {
       String line;
       int n = 5;
       while ((line = in.readLine()) != null) {
-    if (n-- > 0)
-      logger.info(line);
+        if (n-- > 0)
+          logger.info(line);
       }
 
       // wait until the task is finished

@@ -49,7 +49,7 @@
    },
    "CONFIRMATIONS": {
      "CONTINUE_ACTION" : "Are you sure you want to continue?",
-     "ACTIONS": { 
+     "ACTIONS": {
        "CONFIRMATION" : "Confirmation required"
      }
    },
@@ -107,6 +107,9 @@
      "EMAIL_SENT": "The message has been sent",
      "EMAIL_NOT_SENT": "The message could not be sent",
      "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the room, dates or times.",
+     "INVALID_ACL_RULES":   "Rules have to contain a valid role and read or/and write right(s).",
+     "MISSING_ACL_RULES":   "At least one role with Read and Write permissions is required!",
+     "SAVED_ACL_RULES":   "The access rules have been saved.",
      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "The existing events in this series will need to be reprocessed",
      "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
@@ -233,7 +236,10 @@
         "CCBYNC": "CC BY-NC",
         "CCBYNCSA": "CC BY-NC-SA",
         "CCBYNCND": "CC BY-NC-ND",
-        "CC0": "CC0"
+        "CC0": "CC0",
+        "BSD":"BSD",
+        "CCND":"CCND",
+        "GPL":"GPL"
       },
      "SEND_MESSAGE": {
        "CAPTION": "Send message",
@@ -476,7 +482,7 @@
                     "CHECKSUM" : "Checksum",
                     "REFERENCE": "Reference"
                   }
-              },              
+              },
               "MEDIA": {
                   "TITLE": "Media",
                   "CAPTION": "Media",
@@ -511,7 +517,7 @@
                       "SCANTYPE": "Scantype",
                       "SCANORDER": "Scanorder"
                   }
-               },            
+               },
               "PUBLICATIONS": {
                   "TITLE"    : "Publications",
                   "CAPTION"  : "Publications",
@@ -629,7 +635,6 @@
            "MIMETYPE": "Mimetype",
            "URL": "URL",
            "RECORDING_DATE": "Recording date",
-           "FLAVOR": "Flavor",
            "TAGS": "Tags",
            "DURATION": "Duration",
            "STREAM_AUDIO": "Audio streams",
@@ -704,7 +709,6 @@
            "CAPTION": "Theme",
            "DESCRIPTION": "",
            "TITLE": "Theme",
-           "DESCRIPTION": "",
            "LABEL": "No theme",
            "EMPTY": "No theme found"
          },
@@ -971,7 +975,8 @@
              "READ"        : "Read",
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
-             "DETAILS"     : "Details"
+             "DETAILS"     : "Details",
+             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies bellow"
            },
            "ROLES": {
               "LABEL": "Select a role",
@@ -1007,7 +1012,8 @@
              "READ"        : "Read",
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
-             "DETAILS"     : "Details"
+             "DETAILS"     : "Details",
+             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies bellow"
            },
            "ROLES": {
               "LABEL": "Select a role",
@@ -1328,6 +1334,14 @@
      }
    },
    "FILTERS": {
+     "AGENTS": {
+       "NAME": {
+         "LABEL": "Name"
+       },
+       "STATUS": {
+         "LABEL": "Status"
+       }
+     },
      "EVENTS": {
        "STATUS": {
          "LABEL":      "Status",
@@ -1448,6 +1462,12 @@
       }
      },
      "USERS": {
+       "PROVIDER": {
+         "LABEL": "Provider"
+       },
+       "ROLE": {
+         "LABEL": "Role"
+       },
        "USERNAME": {
          "LABEL": "Username"
        },
