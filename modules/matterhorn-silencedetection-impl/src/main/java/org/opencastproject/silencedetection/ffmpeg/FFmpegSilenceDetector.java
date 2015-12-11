@@ -79,12 +79,12 @@ public class FFmpegSilenceDetector {
   public static void init(BundleContext bundleContext) {
     String binaryPath = bundleContext.getProperty(FFMPEG_BINARY_CONFIG);
     try {
-      if (binaryPath != null) {
-        File binaryFile = new File(binaryPath);
+      if (StringUtils.isNotBlank(binaryPath)) {
+        File binaryFile = new File(StringUtils.trim(binaryPath));
         if (binaryFile.exists()) {
           binary = binaryFile.getAbsolutePath();
         } else {
-          logger.warn("FFMPEG binary file {} does not exist", binaryPath);
+          logger.warn("FFMPEG binary file {} does not exist", StringUtils.trim(binaryPath));
         }
       }
     } catch (Exception ex) {
@@ -117,7 +117,6 @@ public class FFmpegSilenceDetector {
     minVoiceLength = parseLong(properties, SilenceDetectionProperties.VOICE_MIN_LENGTH, DEFAULT_VOICE_MIN_LENGTH);
     preSilenceLength = parseLong(properties, SilenceDetectionProperties.SILENCE_PRE_LENGTH, DEFAULT_SILENCE_PRE_LENGTH);
     thresholdDB = properties.getProperty(SilenceDetectionProperties.SILENCE_THRESHOLD_DB, DEFAULT_THRESHOLD_DB);
-    String binary = properties.getProperty(FFMPEG_BINARY_CONFIG, FFMPEG_BINARY_DEFAULT);
 
     trackId = track.getIdentifier();
 
