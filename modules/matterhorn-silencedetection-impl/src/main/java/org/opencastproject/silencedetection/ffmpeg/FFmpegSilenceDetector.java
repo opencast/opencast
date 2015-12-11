@@ -70,12 +70,12 @@ public class FFmpegSilenceDetector {
   public static void init(BundleContext bundleContext) {
     String binaryPath = bundleContext.getProperty(FFMPEG_BINARY_CONFIG);
     try {
-      if (binaryPath != null) {
-        File binaryFile = new File(binaryPath);
+      if (StringUtils.isNotBlank(binaryPath)) {
+        File binaryFile = new File(StringUtils.trim(binaryPath));
         if (binaryFile.exists()) {
           binary = binaryFile.getAbsolutePath();
         } else {
-          logger.warn("FFMPEG binary file {} does not exist", binaryPath);
+          logger.warn("FFMPEG binary file {} does not exist", StringUtils.trim(binaryPath));
         }
       }
     } catch (Exception ex) {
