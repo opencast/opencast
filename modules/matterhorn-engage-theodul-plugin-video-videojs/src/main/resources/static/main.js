@@ -778,6 +778,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             if ((aspectRatio == null) || (as1 < videoResultions[flavor])) {
                 as1 = videoResultions[flavor][1];
                 aspectRatio = videoResultions[flavor];
+                id_generated_videojs_flash_component = "videojs_videodisplay_" + flavor + "_flash_api";
             }
         }
         for (var v in videoSources) {
