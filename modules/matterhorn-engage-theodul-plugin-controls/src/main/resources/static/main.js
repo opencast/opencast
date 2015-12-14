@@ -737,7 +737,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
             $("#" + id_volume).slider({
                 range: "min",
-                min: 1,
+                min: 0,
                 max: 100,
                 value: 100,
                 change: function(event, ui) {}
