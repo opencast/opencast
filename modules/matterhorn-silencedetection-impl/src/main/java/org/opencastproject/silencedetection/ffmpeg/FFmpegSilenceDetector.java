@@ -48,6 +48,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.osgi.framework.BundleContext;
 
 /**
  * Find silent sequences in audio stream using Gstreamer.
@@ -64,10 +65,33 @@ public class FFmpegSilenceDetector {
   private static final String DEFAULT_THRESHOLD_DB = "-40dB";
   private static final Long DEFAULT_VOICE_MIN_LENGTH = 60000L;
 
+  private static String binary = FFMPEG_BINARY_DEFAULT;
   private String filePath;
   private String trackId;
 
   private List<MediaSegment> segments = null;
+
+  /**
+   * Update FFMPEG binary path if set in configuration.
+   *
+   * @param bundleContext
+   */
+  public static void init(BundleContext bundleContext) {
+    String binaryPath = bundleContext.getProperty(FFMPEG_BINARY_CONFIG);
+    try {
+      if (StringUtils.isNotBlank(binaryPath)) {
+        File binaryFile = new File(StringUtils.trim(binaryPath));
+        if (binaryFile.exists()) {
+          binary = binaryFile.getAbsolutePath();
+        } else {
+          logger.warn("FFMPEG binary file {} does not exist", StringUtils.trim(binaryPath));
+        }
+      }
+    } catch (Exception ex) {
+      logger.error("Failed to set ffmpeg binary path", ex);
+    }
+  }
+
 
   /**
    * Create nonsilent sequences detection pipeline.
@@ -93,7 +117,6 @@ public class FFmpegSilenceDetector {
     minVoiceLength = parseLong(properties, SilenceDetectionProperties.VOICE_MIN_LENGTH, DEFAULT_VOICE_MIN_LENGTH);
     preSilenceLength = parseLong(properties, SilenceDetectionProperties.SILENCE_PRE_LENGTH, DEFAULT_SILENCE_PRE_LENGTH);
     thresholdDB = properties.getProperty(SilenceDetectionProperties.SILENCE_THRESHOLD_DB, DEFAULT_THRESHOLD_DB);
-    String binary = properties.getProperty(FFMPEG_BINARY_CONFIG, FFMPEG_BINARY_DEFAULT);
 
     trackId = track.getIdentifier();
 
