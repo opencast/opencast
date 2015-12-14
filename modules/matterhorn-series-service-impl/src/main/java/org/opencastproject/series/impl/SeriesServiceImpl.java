@@ -199,6 +199,13 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
           logger.debug("Setting series creation date to '{}'", date.getValue());
         }
 
+        if (dublinCore.hasValue(DublinCore.PROPERTY_TITLE)) {
+          if (dublinCore.getFirst(DublinCore.PROPERTY_TITLE).length() > 255) {
+            dublinCore.set(DublinCore.PROPERTY_TITLE, dublinCore.getFirst(DublinCore.PROPERTY_TITLE).substring(0, 255));
+            logger.warn("Title was longer than 255 characters. Cutting excess off.");
+          }
+        }
+
         logger.debug("Updating series {}", id);
         index.updateIndex(dublinCore);
         try {
