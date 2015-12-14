@@ -146,6 +146,6 @@ Make sure the path to Opencast is set correctly:
 
 2. Enable service using `chkconfig` or `update-rc.d`
 
-3. Stat Opencast using
+3. Start Opencast using
 
         service opencast start
