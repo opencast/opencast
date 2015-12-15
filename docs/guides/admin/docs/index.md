@@ -35,7 +35,6 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     - [Video Segmentation](modules/videosegmentation.md)
     - [YouTube Publication](modules/youtubepublication.md)
     - [more...](modules/index.md)
- - [Upgrade Instructions](upgrade/index.md)
 
 
 Further Documentation
