@@ -82,9 +82,9 @@
 }
 
 #customError {
-    margin: 20px 0px 0px 20px;
+    margin: 20px 20px 20px 20px;
     display: none;
-    width: 350px;
+    width: 95%;
 }
 
 .alertify-log>ul, #customError_str>ul {
@@ -95,8 +95,8 @@
 
 #customError_btn-container {
     margin: 0 auto;
-    margin-top: 10px;
-    text-align: center;
+    margin: 10px;
+    text-align: left;
 }
 
 #customError_str {
@@ -112,4 +112,28 @@
     min-width: 200px;
     display: none;
     margin: 5%;
+}
+
+.form-signin-heading,
+.checkbox {
+    margin-bottom: 30px;
+}
+
+.form-control-custom {
+    position: relative;
+    font-size: 16px;
+    height: auto;
+    padding: 10px;
+    @include box-sizing(border-box);
+    &:focus {
+	z-index: 2;
+    }
+}
+
+.form-signin {
+    max-width: 380px;
+    margin: 0 auto;
+    background-color: #fff;
+    /* padding: 15px 35px 45px; */
+    /* border: 1px solid rgba(0,0,0,0.1); */
 }
