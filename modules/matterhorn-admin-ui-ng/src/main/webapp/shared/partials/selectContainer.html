@@ -34,7 +34,7 @@
                     ng-model="markedForRemoval"
                     ng-init="markedForRemoval = []"
                     ng-class="{ disabled: disabled }"
-                    ng-options="item.name group by item[groupBy] for item in resource.selected | orderBy: 'name' : false">
+                    ng-options="item.name group by item[groupBy] for item in resource.selected | orderBy: 'name' : false | limitAppend : 70 ">
                 </select>
             </div>
             <div class="row">

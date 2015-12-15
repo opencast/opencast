@@ -12,8 +12,8 @@
             <select ng-model="selectedFilter" ng-change="filter = filters.filters[selectedFilter]"
                 ng-show="showFilterSelector">
                 <option ng-repeat="(name, filter) in filters.filters"
-                    value="{{ name }}">
-                    {{ filter.label | translate }}
+                    value="{{ name | limitAppend : 70 }}">
+                    {{ filter.label | translate | limitAppend : 70 }}
                 </option>
             </select>
 
@@ -24,8 +24,8 @@
                         ng-change="selectFilterSelectValue(selectedFilter, filter)">
                         <option></option>
                         <option ng-repeat="(value, label) in filters.filters[selectedFilter].options"
-                            value="{{ value }}">
-                            {{ label | translate }}
+                            value="{{ value | limitAppend : 70 }}">
+                            {{ label | translate | limitAppend : 70 }}
                         </option>
                     </select>
                 </div>
@@ -42,7 +42,7 @@
                 class="ng-multi-value" ng-show="filter.value">
                 <span ng-switch on="filter.type">
                     <span ng-switch-when="select">
-                        {{ filter.label | translate }}: {{ filter.options[filter.value] | translate }}
+                        {{ filter.label | translate | limitAppend : 70 }}: {{ filter.options[filter.value] | translate | limitAppend : 70 }}
                     </span>
                     <span ng-switch-when="period">
                         {{ filter.label | translate }}: {{ formatDateRange('short', filter.value) }}
@@ -71,7 +71,7 @@
                         <a title="{{ profile.description }}"
                             ng-click="loadFilterProfile($index)"
                             ng-class="{ active: $index === activeProfile }">
-                            {{ profile.name }}
+                            {{ profile.name | limitAppend : 70 }}
                         </a>
                         <a ng-click="editFilterProfile($index)" class="icon edit"></a>
                         <a ng-click="removeFilterProfile($index)" class="icon remove"></a>
@@ -83,7 +83,7 @@
                 <div class="input-container">
                     <div class="btn-container">
                         <a class="save" ng-click="mode = 2">
-                            {{ 'TABLE_FILTERS.PROFILES.SAVE_FILTERS' | translate }}
+                            {{ 'TABLE_FILTERS.PROFILES.SAVE_FILTERS' | translate | limitAppend : 70 }}
                         </a>
                     </div>
                 </div>

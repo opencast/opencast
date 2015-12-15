@@ -396,7 +396,7 @@
         "PROCESSING_CANCELED":"Verarbeitung abgebrochen"
       },
       "DETAILS":{
-        "HEADER":"Aufzeichnungs-Details {{resourceId}}",
+        "HEADER":"Aufzeichnungs-Details - {{resourceId}}",
         "TABS":{
           "GENERAL":"Allgemein",
           "METADATA":"Metadaten",
@@ -506,15 +506,15 @@
               "BITRATE":"Bitrate",
               "BITDEPTH":"Bittiefe",
               "SAMPLINGRATE":"Samplingrate",
-              "FRAMECOUNT":"FrameCount",
-              "PEAKLEVELDB":"Spitzenpegel DB",
-              "RMSLEVELDB":"RMS-Pegel DB",
-              "RMSPEAKDB":"RMS speak DB",
-              "FRAMERATE":"Framerate",
+              "FRAMECOUNT":"Frame Anzahl",
+              "PEAKLEVELDB":"Spitzenpegel (dB)",
+              "RMSLEVELDB":"RMS-Pegel (dB)",
+              "RMSPEAKDB":"RMS-Spitzenpegel (dB)",
+              "FRAMERATE":"Bildfrequenz",
               "RESOLUTION":"Auflösung",
               "SIZE":"Größe",
-              "SCANTYPE":"ScanType",
-              "SCANORDER":"Scanorder"
+              "SCANTYPE":"Scan-Typ",
+              "SCANORDER":"Scan-Folge"
             }
           },
           "PUBLICATIONS":{
@@ -634,14 +634,13 @@
           "MIMETYPE":"MIME-Type",
           "URL":"URL",
           "RECORDING_DATE":"Aufnahmedatum",
-          "FLAVOR":"Flavor",
           "TAGS":"Stichwörter",
           "DURATION":"Dauer",
           "STREAM_AUDIO":"Audiospuren",
           "STREAM_VIDEO":"Videospuren",
           "CHANNELS":"Kanäle",
           "BITRATE":"Bitrate",
-          "FRAMERATE":"Framerate",
+          "FRAMERATE":"Bildfrequenz",
           "RESOLUTION":"Auflösung"
         },
         "ERRORS_AND_WARNINGS":{
@@ -727,6 +726,7 @@
         "ACTION":"Aktionen"
       },
       "DETAILS":{
+        "HEADER":"Serien-Details - {{resourceId}}",
         "TABS":{
           "METADATA":"Metadaten",
           "EXTENDED_METADATA":"Metadaten II",

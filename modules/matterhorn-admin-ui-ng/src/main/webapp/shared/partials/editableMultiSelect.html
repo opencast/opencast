@@ -15,13 +15,13 @@
         <datalist id="data-list">
             <option ng-repeat="(item, label) in collection"
                 value="{{ item }}">
-                {{ label | translate }}
+                {{ label | translate | limitAppend : 70 }}
             </option>
         </datalist>
     </div>
     <span ng-show="editMode" class="ng-multi-value"
         ng-repeat="value in params.value">
-        {{ getText(value) | translate }}
+        {{ getText(value) | translate | limitAppend : 70 }}
         <a ng-mousedown="removeValue(params.value, value)">
             <i class="fa fa-times"></i>
         </a>
