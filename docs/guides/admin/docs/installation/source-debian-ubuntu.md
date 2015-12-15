@@ -119,11 +119,11 @@ You will find service files for Opencast in `docs/scripts/service/{opt,system}/`
 
 Make sure the path to Opencast is set correctly:
 
-    vim docs/scripts/service/opt/opencast.service
+    vim docs/scripts/service/opencast.service
 
 Install the unit file:
 
-    cp docs/scripts/service/opt/opencast.service /usr/lib/systemd/system/
+    cp docs/scripts/service/opencast.service /usr/lib/systemd/system/
     systemctl daemon-reload
 
 Start Opencast and make it run automatically:
@@ -138,14 +138,14 @@ Start Opencast and make it run automatically:
 
 Make sure the path to Opencast is set correctly:
 
-    vim docs/scripts/service/opt/etc-init.d-opencast
+    vim docs/scripts/service/etc-init.d-opencast
 
 1. Install init script:
 
-        cp docs/scripts/service/opt/etc-init.d-opencast /etc/init.d/opencast
+        cp docs/scripts/service/etc-init.d-opencast /etc/init.d/opencast
 
 2. Enable service using `chkconfig` or `update-rc.d`
 
-3. Stat Opencast using
+3. Start Opencast using
 
         service opencast start
