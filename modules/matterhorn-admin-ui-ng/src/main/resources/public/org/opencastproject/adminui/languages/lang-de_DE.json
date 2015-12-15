@@ -509,11 +509,11 @@
               "FRAMECOUNT":"Frame Anzahl",
               "PEAKLEVELDB":"Spitzenpegel (dB)",
               "RMSLEVELDB":"RMS-Pegel (dB)",
-              "RMSPEAKDB":"RMS Spitzenpegel (dB)",
+              "RMSPEAKDB":"RMS-Spitzenpegel (dB)",
               "FRAMERATE":"Bildfrequenz",
               "RESOLUTION":"Auflösung",
               "SIZE":"Größe",
-              "SCANTYPE":"ScanType",
+              "SCANTYPE":"Scan-Typ",
               "SCANORDER":"Scan-Folge"
             }
           },
