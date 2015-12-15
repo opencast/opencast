@@ -10,7 +10,7 @@ angular.module('adminNg.filters')
              begin ... position to start to cut the string 
                              positive ... counting forward from the beginning of the string
                              negative ... counting backward from the end of the string
-             append ... string to be appended if and where the input string was cut 
+             append ... string to be appended (default " ... ") if and where the input string was cut 
                         (number of characters do not count into the limit)
                         
 */
