@@ -18,8 +18,3 @@ General Configuration
     - [CAS Security Configuration](security.cas.md)
  - [Workflow Configuration](workflow.md)
     - [Workflow Operation Handler](../workflowoperationhandlers/index.md)
-
-Additional Documentation
-------------------------
-
- - [List of Configuration Files and Keys](configuration.files.and.keys.md)

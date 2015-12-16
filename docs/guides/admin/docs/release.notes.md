@@ -53,6 +53,8 @@ Important Administrative Notes
    has been deprecated for years and is slowly disappearing from all major operating systems. Upgrading GStreamer proved
    nearly impossible since there are no Java bindings for the newer versions. Therefore, we decided to get rid of
    GStreamer, mainly by replacing it with FFmpeg.
+ - **Hold State** –
+   The new admin UI does not support hold-states anymore.
 
 Removed Components
 ------------------
@@ -75,8 +77,15 @@ Note that backing up your Opencast instance before doing a major update is stron
 1. Check out/download Opencast 2.0
 2. Stop your current Opencast instance
 3. Back up Opencast files and database (optional)
-4. Run the appropriate database upgrade script (docs/upgrade/1.6_to_2.0)
+4. Run the appropriate database upgrade script (`docs/upgrade/1.6_to_2.0`)
 5. Review the configuration changes and adjust your configuration accordingly
 6. Update the third party tools as documented
-7. Build Opencast 2.0
-8. Start Opencast
+7. Rebuild the search indexes
+    - Delete (or move) your search indices
+        - `${org.opencastproject.storage.dir}/searchindex`
+        - `${org.opencastproject.storage.dir}/seriesindex`
+        - `${org.opencastproject.storage.dir}/schedulerindex`
+    - The indexes will be rebuild automatically when re-starting Opencast. Rebuilding the indices can take quite a while
+      depending on the number of recordings in your system.
+8. Build Opencast 2.0
+9. Start Opencast
