@@ -143,7 +143,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var dashPath = "lib/videojs/dash.min";
     var dashPluginPath = "lib/videojs/videojs-tech-dashjs"
     var videojs_swf_path = "lib/videojs/video-js.swf";
-    var videoDisplaySizeFactor = 1.3;
+    var videoAreaAspectRatio;
     var videoDisplaySizeTimesCheck = 100; // the smaller the factor, the higher the times check!
     var checkVideoDisplaySizeTimeout = 1500;
     var audioLoadTimeoutCheckDelay = 5000;
@@ -164,6 +164,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var isUsingFlash = false;
     var mastervideotype = "";
     var aspectRatio = "";
+    var singleVideoPaddingTop = "";
     var initCount = 7;
     var infoMeChange = "change:infoMe";
     var mediapackageError = false;
@@ -172,6 +173,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var id_videojs_wrapper = "videojs_wrapper";
     var id_videoDisplayClass = "videoDisplay";
     var id_engageContent = "engage_content";
+    var id_engageControls = "engage_controls";
+    var id_resize_container = "engage_resize_container";
     var id_videojs_wrapperClass = "videojs_wrapper";
     var id_engage_video_fullsceen_wrapper = "fullscreen_video_wrapper";
     var id_page_cover = "page-cover";
@@ -516,8 +519,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
-            Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
-            Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100]);
+            Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[1] / aspectRatio[2]) * 100));
+            Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[1] / aspectRatio[2]) * 100]);
             $("." + id_videoDisplayClass).css("width", (((1 / videoDisplays.length) * 100) - 0.5) + "%");
             $("." + id_videoDisplayClass).each(function(index) {
                 if ((index % 2) == 1) {
@@ -525,7 +528,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             });
             for (var i = 0; i < videoDisplays.length; ++i) {
-                $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 90) + "%").addClass("auto-height");
+                $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
+                singleVideoPaddingTop = (aspectRatio[2] / aspectRatio[1] * 100) + "%";
             }
         } else {
             Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
@@ -565,13 +569,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             if (videoDataView.model.get("type") != "audio") {
                 $(window).resize(function(event, el) {
                     checkVideoDisplaySize();
-                    var factor = 0.01;
-                    while(!isElementVisible($('#engage_resize_container')) && factor <= 1.0){
-                        $('#'+id_engageContent).css("max-width", event.currentTarget.innerWidth / (videoDisplaySizeFactor + factor));
-                        factor += 0.01;
-                    }
                 });
-            }
+            } 
         }
     }
 
@@ -830,13 +829,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio);
                 }
                 if (videoDataView.model.get("type") != "audio") {
-                    checkVideoDisplaySize();
-                    window.setTimeout(checkVideoDisplaySize, checkVideoDisplaySizeTimeout);
+                   delayedCalculateVideoAreaAspectRatio();
                 }
             }
-        }
-        if (videoDataView.model.get("type") != "audio") {
-            checkVideoDisplaySize();
         }
     }
 
@@ -915,16 +910,71 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             $("#" + id_videojs_wrapper).html("No video available.");
         }
     }
+    
+    function delayedCalculateVideoAreaAspectRatio() {
+        calculateVideoAreaAspectRatio();
+        window.setTimeout(calculateVideoAreaAspectRatio, checkVideoDisplaySizeTimeout);
+    }
 
-    function checkVideoDisplaySize() {
-        $("#" + id_engageContent).css("max-width", "");
-        for (var i = 0; i < videoDisplaySizeTimesCheck; ++i) {
-            if ($(window).height() < ($("." + id_videojs_wrapperClass).position().top + $("." + id_videojs_wrapperClass).height())) {
-                $("#" + id_engageContent).css("max-width", $("#" + id_engageContent).width() / videoDisplaySizeFactor);
-            } else {
-                break;
+    function calculateVideoAreaAspectRatio() {
+        // Determin reasonable default for videoAreaAspectRatio as video width and height cannot be determined sometimes.
+        var numberDisplays = 1;
+        if ($("." + videoDisplayClass) !== undefined && isDefaultLayout()) {
+            numberDisplays = $("." + videoDisplayClass).length;
+        }
+        videoAreaAspectRatio = 1.7 * numberDisplays;
+        
+        // Calculate real aspect ratio if possible
+        
+        var videoHeight = $("#" + id_engage_video).height();
+        var videoWidth = $("#" + id_engage_video).width();
+        if (! isDefaultLayout()) {
+            videoHeight = $("." + videoFocusedClass).height();
+            if (isPiP) {
+                videoWidth = $("." + videoFocusedClass).width();
             }
         }
+        if (videoWidth !== undefined && videoHeight !== undefined && 
+            videoWidth > 0 && videoHeight > 0) {
+            videoAreaAspectRatio = videoWidth / videoHeight;
+        }
+        checkVideoDisplaySize();
+    }
+
+    function checkVideoDisplaySize() {
+        var videoHeight = $("#" + id_engage_video).height();
+        var videoWidth = $("#" + id_engage_video).width();
+        var controlsHeight = ($("#" + id_resize_container).height() - videoHeight) + 5;
+        if (controlsHeight <= 0) {
+            controlsHeight = $("#" + id_engageControls).height() + 30;
+        }
+         
+        var maxVideoAreaHeight = $(window).height() - controlsHeight;
+        
+        if (videoAreaAspectRatio === undefined) {
+            calculateVideoAreaAspectRatio();
+        }
+        
+        var maxVideoAreaWidth = parseInt(maxVideoAreaHeight * videoAreaAspectRatio);
+        var minVideoAreaHeight = parseInt(parseInt($("#" + id_engage_video).css("min-width")) / videoAreaAspectRatio);
+        
+        var minWidth = parseInt($("#" + id_engage_video).css("min-width"));
+        if (maxVideoAreaWidth > minWidth) {
+            if (maxVideoAreaWidth > $(window).width()) {
+                $("#" + id_engage_video).css("max-width", ($(window).width() - 10) + "px");
+            } else {
+                $("#" + id_engage_video).css("max-width", maxVideoAreaWidth + "px");
+            }
+        } else {
+            $("#" + id_engage_video).css("max-width", minWidth + "px");
+        }        
+        $("#" + id_engage_video).css("min-height", minVideoAreaHeight + "px");
+        if (maxVideoAreaHeight > minVideoAreaHeight) {
+            $("#" + id_engage_video).css("max-height", maxVideoAreaHeight + "px");
+        } else {
+            $("#" + id_engage_video).css("max-height", minVideoAreaHeight + "px");
+        }
+        
         if (! isDefaultLayout()) {
             if (isPiP) {
                 var distance = 0;
@@ -941,10 +991,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 } else {
                     marginLeft = 88;
                 }
-                $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");                        
+                $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
             } else {
-                var height = $("." + videoFocusedClass).height();
-                $("#engage_video").height(height + 10);
+                $("#" + id_engage_video).height($("." + videoFocusedClass).height());
             }
         }
     }
@@ -1143,7 +1192,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             });
 
             var videodisplayMaster = videojs(videoDisplay);
-            var paddingTop = $('#' + videoDisplay).css("padding-top");
 
             if (numberOfVideodisplays == 1) {
                 videodisplayMaster.on("play", function() {
@@ -1167,7 +1215,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             Engage.on(plugin.events.fullscreenEnable.getName(), function() {
                 if (numberOfVideodisplays == 1) {
                     videodisplayMaster.requestFullscreen();
-                    $('#' + videoDisplay).css("padding-top", "0%");
+                    $('#' + videoDisplay).css("padding-top", "0px");
                 } else if (!fullscreen) {
                     var viewer = document.getElementById(id_engage_video_fullsceen_wrapper);
                     if (viewer.mozRequestFullScreen) {
@@ -1190,10 +1238,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     }
                 }
                 $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
+                $("." + id_videoDisplayClass).css("max-width", $(window).height() * videoAreaAspectRatio);
             });
             Engage.on(plugin.events.fullscreenCancel.getName(), function() {
                 if (numberOfVideodisplays == 1) {
-                    $('#' + videoDisplay).css("padding-top", paddingTop);
+                    $('#' + videoDisplay).css("padding-top", singleVideoPaddingTop);
                 };
                 if (fullscreen && (numberOfVideodisplays > 1)) {
                     var viewer = document.getElementById(id_engage_video);
@@ -1215,6 +1264,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     }
                 }
                 $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
+                $("." + id_videoDisplayClass).css("max-width", "");
+                checkVideoDisplaySize();
             });
             Engage.on(plugin.events.playbackRateChanged.getName(), function(rate) {
                 if (pressedPlayOnce) {
@@ -1434,6 +1485,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     $("." + videoDisplayClass).removeClass(videoDefaultLayoutClass).addClass(videoUnfocusedClass);
                     $("." + videoUnfocusedClass).removeClass(videoFocusedClass);
                     $(videoDiv).addClass(videoFocusedClass).removeClass(videoUnfocusedClass);
+                    
 
                     if (isPiP) {
                         var distance = 0;
@@ -1455,6 +1507,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                         var height = $("." + videoFocusedClass).height();
                         $("#engage_video").height(height + 10);
                     }
+                    delayedCalculateVideoAreaAspectRatio();
                 });
 
                 Engage.on(plugin.events.resetLayout.getName(), function() {
@@ -1467,7 +1520,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     $("." + id_videoDisplayClass).css("margin-left", "");                
                     $("." + videoDisplayClass).removeClass(videoFocusedClass).removeClass(videoUnfocusedClass).addClass(videoDefaultLayoutClass);
                     var numberDisplays = $("." + videoDisplayClass).length;
-                    $("." + id_videoDisplayClass).css("width", (((1 / numberDisplays) * 100) - 0.5) + "%");                 
+                    $("." + id_videoDisplayClass).css("width", (((1 / numberDisplays) * 100) - 0.5) + "%");
+                    delayedCalculateVideoAreaAspectRatio();
                 }); 
 
                 Engage.on(plugin.events.movePiP.getName(), function(pos) {
@@ -1489,6 +1543,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                         pipPos = "left";
                     }
                     $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
+                    delayedCalculateVideoAreaAspectRatio();
                 });  
 
                 Engage.on(plugin.events.togglePiP.getName(), function(pip) {
@@ -1520,6 +1575,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                         if (! isDefaultLayout()) {
                             $("." + unfocusedClass).addClass(videoUnfocusedClass).removeClass(unfocusedClass);
                             $("." + focusedClass).addClass(videoFocusedClass).removeClass(focusedClass);
+                            $("#engage_video").css("height", "");
                             var distance = 0;
                             $("." + videoUnfocusedClass).each(function() {
                                 var width = $(this).width();
@@ -1535,8 +1591,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                                 marginLeft = 88;
                             }
                             $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
+
                         }
                     }
+                    delayedCalculateVideoAreaAspectRatio();
                 });
             }
         }

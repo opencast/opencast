@@ -26,10 +26,14 @@ h1, h2, h3 {
 
 #engage_content {
     width: 98%;
+    min-width: 840px;
 }
 
 #engage_video {
     margin-top: 110px;
+    min-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #engage_controls {
