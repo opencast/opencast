@@ -319,7 +319,8 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
               solrServer.commit();
             }
           } catch (Exception e) {
-            logger.warn("Unable to index series {}: {}", doc.getFieldValue(SolrFields.COMPOSITE_ID_KEY), e.getMessage());
+            logger.warn("Unable to index series {}: {}", doc.getFieldValue(SolrFields.COMPOSITE_ID_KEY),
+                    e.getMessage());
           }
         }
       });
@@ -327,8 +328,8 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
   }
 
   @Override
-  public void updateOptOutStatus(String seriesId, boolean optedOut) throws NotFoundException,
-          SeriesServiceDatabaseException {
+  public void updateOptOutStatus(String seriesId, boolean optedOut)
+          throws NotFoundException, SeriesServiceDatabaseException {
     SolrDocument seriesDoc = getSolrDocumentByID(seriesId);
     if (seriesDoc == null) {
       logger.debug("No series with ID " + seriesId + " found.");
@@ -366,8 +367,8 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
   }
 
   @Override
-  public void updateSecurityPolicy(String seriesId, AccessControlList accessControl) throws NotFoundException,
-          SeriesServiceDatabaseException {
+  public void updateSecurityPolicy(String seriesId, AccessControlList accessControl)
+          throws NotFoundException, SeriesServiceDatabaseException {
     if (accessControl == null) {
       logger.warn("Access control parameter is null: skipping update for series '{}'", seriesId);
       return;
@@ -439,7 +440,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     String dublinCoreId = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
     String orgId = securityService.getOrganization().getId();
     doc.addField(SolrFields.COMPOSITE_ID_KEY, getCompositeKey(dublinCoreId, orgId));
-    doc.addField(SolrFields.ORGANIZATION, ClientUtils.escapeQueryChars(orgId));
+    doc.addField(SolrFields.ORGANIZATION, orgId);
     try {
       doc.addField(SolrFields.XML_KEY, serializeDublinCore(dc));
     } catch (IOException e1) {
@@ -549,7 +550,8 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    * @param dcValues
    *          List of Dublin core values to be added to solr document
    */
-  private void addMultiValuedFieldToSolrDocument(SolrInputDocument doc, String solrField, List<DublinCoreValue> dcValues) {
+  private void addMultiValuedFieldToSolrDocument(SolrInputDocument doc, String solrField,
+          List<DublinCoreValue> dcValues) {
     if (!dcValues.isEmpty()) {
       List<String> values = new LinkedList<String>();
       StringBuilder builder = new StringBuilder();
@@ -971,8 +973,8 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    */
   protected SolrDocument getSolrDocumentByID(String id) throws SeriesServiceDatabaseException {
     String orgId = securityService.getOrganization().getId();
-    StringBuilder solrQueryString = new StringBuilder(SolrFields.COMPOSITE_ID_KEY).append(":").append(
-            ClientUtils.escapeQueryChars(getCompositeKey(id, orgId)));
+    StringBuilder solrQueryString = new StringBuilder(SolrFields.COMPOSITE_ID_KEY).append(":")
+            .append(ClientUtils.escapeQueryChars(getCompositeKey(id, orgId)));
 
     SolrQuery q = new SolrQuery(solrQueryString.toString());
     QueryResponse response;
