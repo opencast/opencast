@@ -868,6 +868,7 @@
         "CAPTION":"Utilisateurs",
         "NAME":"Nom",
         "USERNAME":"Nom d'utilisateur",
+        "EMAIL":"Adresse de courriel",
         "ROLES":"Rôles",
         "TYPE":"Type",
         "BLACKLIST_FROM":"Bloqué de",

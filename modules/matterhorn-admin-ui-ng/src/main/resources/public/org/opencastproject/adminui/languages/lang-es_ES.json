@@ -868,6 +868,7 @@
         "CAPTION":"Usuarios",
         "NAME":"Nombre",
         "USERNAME":"Nombre de usuario",
+        "EMAIL":"Correo electrónico",
         "ROLES":"Roles",
         "TYPE":"Tipo",
         "BLACKLIST_FROM":"En la lista negra desde",

@@ -868,6 +868,7 @@
         "CAPTION":"使用者",
         "NAME":"姓名",
         "USERNAME":"使用者名稱",
+        "EMAIL":"電子郵件",
         "ROLES":"角色",
         "TYPE":"類型",
         "BLACKLIST_FROM":"從黑名單",
