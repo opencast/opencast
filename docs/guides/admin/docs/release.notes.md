@@ -80,3 +80,10 @@ Note that backing up your Opencast instance before doing a major update is stron
 6. Update the third party tools as documented
 7. Build Opencast 2.0
 8. Start Opencast
+
+Additional Notes About 2.0.2
+----------------------------
+
+Opencast 2.0.2 is a bug fix release including a database update script. Some indexes were missing in the Opencast 2.0
+database which would eventually slow down Opencast. This is now fixed. This means that in order to update, a database
+update is required. Please use the provided update script.
