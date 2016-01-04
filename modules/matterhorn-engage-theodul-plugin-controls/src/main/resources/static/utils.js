@@ -209,5 +209,33 @@ define(["jquery"], function($) {
         return segments;
     }
 
+    /**
+     * Timer object, that can be renewed (to reset the delay).
+     * @type {Object}
+     */
+    Utils.prototype.timer = {
+        setup: function(callback, delay) {
+            this.callback = callback;
+            this.delay = delay;
+
+            if (typeof this.timeoutID === "number") {
+                this.cancel();
+            } else {
+                this.timeoutID = window.setTimeout(this.callback, this.delay);
+            }
+            return this;
+        },
+
+        renew: function() {
+            window.clearTimeout(this.timeoutID);
+            this.timeoutID = window.setTimeout(this.callback, this.delay);
+        },
+
+        cancel: function() {
+            window.clearTimeout(this.timeoutID);
+            this.timeoutID = undefined;
+        }
+    };
+
     return Utils;
 });

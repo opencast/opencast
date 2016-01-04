@@ -278,6 +278,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_prevVideo = "prevVideo";
     var id_nextVideo = "nextVideo";
     var controlsVisible = true;
+    var controlsTimer = null;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -843,7 +844,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
             });
 
-            $("#" + id_playpause_controls).click(function() {
+            $("#" + id_playpause_controls).click(function(e) {
+                e.stopPropagation();
                 if (isPlaying) {
                     Engage.trigger(plugin.events.pause.getName(), false);
                 } else {
@@ -1250,17 +1252,16 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     if (! controlsVisible) {
                         controlsVisible = true;
                         $("#" + id_engage_controls).fadeIn();
-                        if (isPlaying) {
-                            window.setTimeout(function() {
-                                $("#" + id_engage_controls).fadeOut();
-                                controlsVisible = false;
-                            }, hideTimeout*1000);
-                        }
+                        controlsTimer = Utils.timer.setup(function() {
+                            Engage.trigger(plugin.events.hideControls.getName());
+                        }, hideTimeout*1000);
+                    } else {                            // when controls are visible
+                        controlsTimer.renew();
                     }
                 });
                 Engage.on(plugin.events.hideControls.getName(), function() {
                     console.log("Hide Controls with controlsVisible=" + controlsVisible);
-                    if (isPlaying) {
+                    if (controlsVisible && isPlaying) {
                         $("#" + id_engage_controls).fadeOut();
                         controlsVisible = false;
                     }
