@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -60,6 +62,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   private static final Logger logger = LoggerFactory.getLogger(ComposeWorkflowOperationHandler.class);
   private static final String PLUS = "+";
   private static final String MINUS = "-";
+  private static final String QUESTION_MARK = "?";
 
   /** Name of the 'encode to a/v work copy' encoding profile */
   public static final String PREPARE_AV_PROFILE = "av.work";
@@ -76,16 +79,19 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   /** Name of the 'rewrite' configuration key */
   public static final String OPT_REWRITE = "rewrite";
 
+  /** Name of audio muxing configuration key */
+  public static final String OPT_AUDIO_MUXING_SOURCE_FLAVORS = "audio-muxing-source-flavors";
+
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put("source-flavor", "The \"flavor\" of the track to use as a video source input");
-    CONFIG_OPTIONS.put("promiscuous-muxing", "If there is no matching flavor to mux, try other flavors as well");
     CONFIG_OPTIONS.put("encoding-profile", "The encoding profile to use (default is 'mux-av.http')");
     CONFIG_OPTIONS.put("target-flavor", "The flavor to apply to the encoded file");
     CONFIG_OPTIONS.put(OPT_REWRITE, "Indicating whether the container for audio and video tracks should be rewritten");
+    CONFIG_OPTIONS.put(OPT_AUDIO_MUXING_SOURCE_FLAVORS, "If the video track has no audio, try to find an audio track in this sequence of flavors");
     CONFIG_OPTIONS.put("target-tags", "The tags to apply to the encoded file");
   }
 
@@ -170,8 +176,6 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     String audioVideoEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("audio-video-encoding-profile"));
     String videoOnlyEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("video-encoding-profile"));
     String audioOnlyEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("audio-encoding-profile"));
-    boolean promiscuousMuxing = "true".equalsIgnoreCase(StringUtils.trimToEmpty(operation
-            .getConfiguration("promiscuous-audio-muxing")));
 
     String[] targetTags = StringUtils.split(targetTrackTags, ",");
 
@@ -207,6 +211,13 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
       rewrite = Boolean.parseBoolean(operation.getConfiguration(OPT_REWRITE));
     }
 
+    String audioMuxingSourceFlavors = StringUtils.trimToNull(operation.getConfiguration(OPT_AUDIO_MUXING_SOURCE_FLAVORS));
+    if ((audioMuxingSourceFlavors != null)
+        && !Pattern.matches("^\\s*[^\\s,/]+/[^\\s,/]+\\s*(,\\s*[^\\s,/]+/[^\\s,/]+\\s*)*$", audioMuxingSourceFlavors))
+    {
+      throw new IllegalStateException("Option " + OPT_AUDIO_MUXING_SOURCE_FLAVORS + " has invalid value '" + audioMuxingSourceFlavors + "'");
+    }
+
     // Select those tracks that have matching flavors
     Track[] tracks = mediaPackage.getTracks(sourceFlavor);
 
@@ -218,12 +229,11 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
         logger.info("No audio/video tracks with flavor '{}' found to prepare", sourceFlavor);
         return createResult(mediaPackage, Action.CONTINUE);
       case 1:
-        if (!tracks[0].hasAudio() && tracks[0].hasVideo() && promiscuousMuxing) {
-          videoTrack = tracks[0];
-          audioTrack = findAudioTrack(tracks[0], mediaPackage);
+        videoTrack = tracks[0];
+        if (!tracks[0].hasAudio() && tracks[0].hasVideo() && (audioMuxingSourceFlavors != null)) {
+          audioTrack = findAudioTrack(tracks[0], mediaPackage, audioMuxingSourceFlavors);
         } else {
           audioTrack = tracks[0];
-          videoTrack = tracks[0];
         }
         break;
       case 2:
@@ -387,33 +397,34 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   }
 
   /**
-   * Finds a suitable audio track from the mediapackage
+   * Finds a suitable audio track from the mediapackage by scanning a source flavor sequence
    *
    * @param videoTrack
    *          the video track
    * @param mediaPackage
    *          the mediapackage
+   * @param audioMuxingSourceFlavors
+   *          sequence of source flavors where an audio track should be searched for
    * @return the found audio track
    */
-  private Track findAudioTrack(Track videoTrack, MediaPackage mediaPackage) {
-    MediaPackageElementFlavor flavor = new MediaPackageElementFlavor("*", videoTrack.getFlavor().getSubtype());
+  private Track findAudioTrack(Track videoTrack, MediaPackage mediaPackage, String audioMuxingSourceFlavors) {
 
-    // Try matching subtype first
-    for (Track t : mediaPackage.getTracks(flavor)) {
-      if (t.hasAudio()) {
-        logger.info("Promiscuous audio muxing found audio source {} with flavor {}", t, t.getFlavor());
-        return t;
+    Matcher matcher = Pattern.compile("\\s*(?<type>[^\\s,/]+)/(?<subtype>[^\\s,/]+)\\s*").matcher(audioMuxingSourceFlavors);
+    while (matcher.find()) {
+      String type = matcher.group("type");
+      if (QUESTION_MARK.equals(type)) type = videoTrack.getFlavor().getType();
+
+      String subtype = matcher.group("subtype");
+      if (QUESTION_MARK.equals(subtype)) subtype = videoTrack.getFlavor().getSubtype();
+
+      MediaPackageElementFlavor flavor = new MediaPackageElementFlavor(type, subtype);
+      for (Track track : mediaPackage.getTracks(flavor)) {
+        if (track.hasAudio()) {
+          logger.info("Audio muxing found audio source {} with flavor {}", track, track.getFlavor());
+          return track;
+        }
       }
     }
-
-    // Ok, full promiscuous mode now
-    for (Track t : mediaPackage.getTracks()) {
-      if (t.hasAudio()) {
-        logger.info("Promiscuous audio muxing resulted in audio source {}", t);
-        return t;
-      }
-    }
-
     return null;
   }
 
