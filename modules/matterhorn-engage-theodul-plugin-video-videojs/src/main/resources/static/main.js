@@ -183,13 +183,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var infoMeChange = "change:infoMe";
     var mediapackageError = false;
     var videoDisplayNamePrefix = "videojs_videodisplay_";
+    var id_video_wrapper = "video_wrapper";
     var id_engage_video = "engage_video";
     var id_videojs_wrapper = "videojs_wrapper";
     var id_videoDisplayClass = "videoDisplay";
     var id_engageContent = "engage_content";
     var id_engageControls = "engage_controls";
     var id_resize_container = "engage_resize_container";
-    var id_videojs_wrapperClass = "videojs_wrapper";
     var id_engage_video_fullsceen_wrapper = "fullscreen_video_wrapper";
     var id_page_cover = "page-cover";
     var id_btn_fullscreenCancel = "btn_fullscreenCancel";
@@ -1147,6 +1147,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
         }
 
+        // add first class to video wrapper
+        $("#" + id_video_wrapper).addClass("first");
+
         // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
         $("." + class_vjsposter).show();
         Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
@@ -2004,6 +2007,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             // event used to switch between videos in single player (e.g. mobile) mode
             Engage.on(plugin.events.switchVideo.getName(), function(direction) {
                 var isPaused = videodisplayMaster.paused();     // check if current video is paused
+                
+                // remove old classes from wrapper
+                $("#" + id_video_wrapper).removeClass("first last");
+
                 var n = globalVideoSource.length;
                 var x = currentlySelectedVideodisplay + direction;
                 // use different style of modulo, see
@@ -2013,6 +2020,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 var oldVideodisplayMaster = videodisplayMaster;
                 videodisplayMaster = videojs(Engage.model.get("videoDataModel").get("ids")[currentlySelectedVideodisplay]);
 
+                // add "first" or "last" class to wrapper if it's the first or last video showing
+                if (currentlySelectedVideodisplay == 0)
+                    $("#" + id_video_wrapper).addClass("first");
+                if (currentlySelectedVideodisplay == (n-1))
+                    $("#" + id_video_wrapper).addClass("last");
+
+                // transform to new display
                 $("." + class_vjs_wrapper).css({"transform": "translateX(-" + currentlySelectedVideodisplay*100 + "%)"});
 
                 // synchronize videos

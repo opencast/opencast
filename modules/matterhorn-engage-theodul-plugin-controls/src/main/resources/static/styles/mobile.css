@@ -3,7 +3,7 @@
  * This file is compiled with compass,
  * see http://compass-style.org/
  *********************************************************/
-/* line 14, ../scss/mobile.scss */
+/* line 15, ../scss/mobile.scss */
 #engage_controls #switchPlayers .switchButton {
   position: absolute;
   z-index: 1;
@@ -11,13 +11,20 @@
   bottom: 0;
   width: 20%;
   height: 100%;
+  visibility: visible;
+  opacity: 1;
+  -moz-transition: visibility 0s, opacity 0.7s ease-in-out 0.5s;
+  -o-transition: visibility 0s, opacity 0.7s ease-in-out 0.5s;
+  -webkit-transition: visibility 0s, opacity 0.7s ease-in-out;
+  -webkit-transition-delay: 0s, 0.5s;
+  transition: visibility 0s, opacity 0.7s ease-in-out 0.5s;
   display: block;
   background-repeat: no-repeat;
   border: 0;
   font-size: 40px;
   text-decoration: none;
 }
-/* line 27, ../scss/mobile.scss */
+/* line 32, ../scss/mobile.scss */
 #engage_controls #switchPlayers .switchButton span.glyphicon {
   position: absolute;
   top: 0;
@@ -26,14 +33,14 @@
   right: 0;
   height: 40px;
   margin: auto;
-  padding: 0 10px;
+  padding: 0 3px;
 }
-/* line 35, ../scss/mobile.scss */
+/* line 40, ../scss/mobile.scss */
 #engage_controls #switchPlayers .switchButton:focus, #engage_controls #switchPlayers .switchButton:hover {
   text-shadow: -2px 2px 2px #333;
   text-shadow: -2px 2px 2px 1px #333;
 }
-/* line 40, ../scss/mobile.scss */
+/* line 45, ../scss/mobile.scss */
 #engage_controls #switchPlayers #prevVideo {
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjEuMCIgeTE9IjAuNSIgeDI9IjAuMCIgeTI9IjAuNSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmFkKSIgLz48L3N2Zz4g');
   background-size: 100%;
@@ -44,7 +51,7 @@
   left: 0;
   text-align: left;
 }
-/* line 45, ../scss/mobile.scss */
+/* line 50, ../scss/mobile.scss */
 #engage_controls #switchPlayers #nextVideo {
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuMCIgeTE9IjAuNSIgeDI9IjEuMCIgeTI9IjAuNSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmFkKSIgLz48L3N2Zz4g');
   background-size: 100%;
@@ -55,7 +62,15 @@
   right: 0;
   text-align: right;
 }
-/* line 54, ../scss/mobile.scss */
+
+/* hide prevVideo / nextVideo controls if it's the first / last video, respectively */
+/* line 59, ../scss/mobile.scss */
+#video_wrapper.first #prevVideo, #video_wrapper.last #nextVideo {
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* line 65, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper {
   position: absolute;
   z-index: 10;
@@ -68,7 +83,7 @@
   display: -webkit-flex;
   display: flex;
 }
-/* line 67, ../scss/mobile.scss */
+/* line 78, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .ui-slider-handle {
   position: absolute;
   z-index: 2;
@@ -83,33 +98,33 @@
   top: -10px !important;
   margin-left: -12px;
 }
-/* line 82, ../scss/mobile.scss */
+/* line 93, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_control {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
 }
-/* line 84, ../scss/mobile.scss */
+/* line 95, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_control img {
   width: 30px;
   height: auto;
 }
-/* line 90, ../scss/mobile.scss */
+/* line 101, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
   margin-right: 12px;
   font-size: 12px;
 }
-/* line 94, ../scss/mobile.scss */
+/* line 105, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time #navigation_time_current {
   color: #666;
 }
-/* line 97, ../scss/mobile.scss */
+/* line 108, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time p {
   margin: 0;
   line-height: 1.2;
 }
-/* line 103, ../scss/mobile.scss */
+/* line 114, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #slider {
   -webkit-flex: 1 0 30px;
   flex: 1 0 30px;
@@ -123,13 +138,13 @@
   background: url("../images/bg-track.png") repeat top left;
   box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
 }
-/* line 118, ../scss/mobile.scss */
+/* line 129, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
   position: relative;
 }
-/* line 122, ../scss/mobile.scss */
+/* line 133, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSliderWrapper {
   position: absolute;
   bottom: 100%;
@@ -142,7 +157,7 @@
   height: 95px;
   margin-bottom: 5px;
 }
-/* line 135, ../scss/mobile.scss */
+/* line 146, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSlider {
   border-width: 1px;
   border-style: solid;
@@ -155,16 +170,16 @@
   background: url("../images/bg-track.png") repeat top left;
   box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
 }
-/* line 148, ../scss/mobile.scss */
+/* line 159, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSlider .ui-slider-handle {
   top: auto !important;
   margin-left: -7px !important;
 }
-/* line 154, ../scss/mobile.scss */
+/* line 165, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume .volume_icon {
   margin-top: 4px;
 }
-/* line 159, ../scss/mobile.scss */
+/* line 170, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .ui-slider-range {
   background: #ffffff;
   /* Old browsers */
