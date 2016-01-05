@@ -9,6 +9,8 @@
 @import "compass/css3/text-shadow";
 @import "compass/css3/flexbox";
 @import "compass/css3/transition";
+@import "compass/css3/border-radius";
+@import "compass/css3/box-shadow";
 
 #engage_controls {
 	#switchPlayers {
@@ -29,6 +31,7 @@
 			border: 0;
 			font-size: 40px;
 			text-decoration: none;
+			cursor: pointer;
 			span.glyphicon {
 				// vertical center with absolute positioning
 				position: absolute;
@@ -62,6 +65,29 @@
 }
 
 #engage_controls {
+	#big_play_button {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		font-size: 100px;
+		font-size: 20vmin;
+		line-height: 1;
+		color: #333;
+		cursor: pointer;
+		margin: -50px 0 0 -50px;
+
+		background: rgba(#fff, 0.7);
+		padding: 10px 10px 0 10px;
+		@include border-radius(10px);
+		@include box-shadow(1px 1px 9px rgba(20, 20, 20, 0.4));
+
+		&:focus, &:hover {
+			color: #111;
+			@include box-shadow(1px 1px 9px rgba(20, 20, 20, 0.6), inset 1px 1px 3px rgba(20, 20, 20, 0.6));
+		}
+	}
+
+
 	#navigation_wrapper {
 		position: absolute;
 		z-index: 10;
@@ -69,7 +95,7 @@
 		left: 0;
 
 		width: 100%;
-		padding: 5px;
+		padding: 5px 5px 2px;
 		background: rgba(#fff, 0.8);
     border-top: 1px solid #2a6496;
 
@@ -92,14 +118,13 @@
 
 		#navigation_control {
 			@include flex(0 0 auto);
-			img {
-				width: 30px;
-				height: auto;
-			}
+			font-size: 27px;
+			cursor: pointer;
 		}
 
 		#navigation_time {
 			@include flex(0 0 auto);
+			margin-top: 4px;
       margin-right: 12px;
       font-size: 12px;
       #navigation_time_current {
@@ -114,7 +139,7 @@
 		#slider {
 			@include flex(1 0 30px);
 
-	    margin: 13px 17px 0px;
+	    margin: 16px 17px 0px;
 	    border-width: 1px;
 	    border-style: solid;
 	    border-color: #333 #333 #777 #333;
@@ -122,13 +147,19 @@
 	    height: 4px;
 	    background-color: #8e8d8d;
 	    background: url('../images/bg-track.png') repeat top left;
-	    box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px
-	    rgba(250, 250, 250, .5);
+	    box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px rgba(250, 250, 250, .5);
 		}
 
 		#volume {
-			@include flex(0 0 auto);
+			@include flex(0 0 35px);
 			position: relative;
+
+			font-size: 27px;
+			text-align: center;
+
+			#volumeIcon {
+				cursor: pointer;
+			}
 
       #volumeSliderWrapper {
         position: absolute;
@@ -140,7 +171,7 @@
         padding: 13px 2px 8px;
         width: 100%;
         height: 95px;
-        margin-bottom: 5px;
+        margin-bottom: 6px;
       }
 
 			#volumeSlider {
@@ -158,13 +189,9 @@
 
         .ui-slider-handle {
           top: auto !important;
-          margin-left: -7px !important;
+          margin-left: -150% !important;
         }
 			}
-
-      .volume_icon {
-        margin-top: 4px;
-      }
 		}
 
 		.ui-slider-range {

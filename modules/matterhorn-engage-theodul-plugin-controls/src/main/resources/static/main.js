@@ -206,6 +206,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_forward_button = "forward_button";
     var id_navigation_time = "navigation_time";
     var id_navigation_time_current = "navigation_time_current";
+    var id_big_play_button = "big_play_button";
     var id_play_button = "play_button";
     var id_pause_button = "pause_button";
     var id_unmute_button = "unmute_button";
@@ -505,7 +506,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     // for mobile view
                     str_prevVideo: translate("prevVideo", "Previous Video"),
                     str_nextVideo: translate("nextVideo", "Next Video"),
-                    str_switchPlayer: translate("switchPlayer", "Switch player")
+                    str_switchPlayer: translate("switchPlayer", "Switch player"),
+                    str_showVolumeBar: translate("showVolumeBar", "Show volume bar")
                 };
 
                 // compile template and load it
@@ -843,6 +845,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
             });
 
+            if (isMobileMode) {
+                $("#" + id_big_play_button).click(function(e) {
+                    e.stopPropagation();
+                    Engage.trigger(plugin.events.play.getName(), false);
+                });
+            }
+
             $("#" + id_playpause_controls).click(function(e) {
                 e.stopPropagation();
                 if (isPlaying) {
@@ -984,12 +993,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
     function playPause() {
         if (isPlaying) {
+            if (isMobileMode) {
+                $("#" + id_big_play_button).fadeOut();
+            }
             $("#" + id_play_button).hide();
             $("#" + id_pause_button).show();
             if (!usingFlash && !isAudioOnly) {
                 $("#" + id_dropdownMenuPlaybackRate).removeClass("disabled");
             }
         } else {
+            if (isMobileMode) {
+                $("#" + id_big_play_button).fadeIn();
+            }
             $("#" + id_play_button).show();
             $("#" + id_pause_button).hide();
         }

@@ -3,7 +3,7 @@
  * This file is compiled with compass,
  * see http://compass-style.org/
  *********************************************************/
-/* line 15, ../scss/mobile.scss */
+/* line 17, ../scss/mobile.scss */
 #engage_controls #switchPlayers .switchButton {
   position: absolute;
   z-index: 1;
@@ -23,8 +23,9 @@
   border: 0;
   font-size: 40px;
   text-decoration: none;
+  cursor: pointer;
 }
-/* line 32, ../scss/mobile.scss */
+/* line 35, ../scss/mobile.scss */
 #engage_controls #switchPlayers .switchButton span.glyphicon {
   position: absolute;
   top: 0;
@@ -35,12 +36,12 @@
   margin: auto;
   padding: 0 3px;
 }
-/* line 40, ../scss/mobile.scss */
+/* line 43, ../scss/mobile.scss */
 #engage_controls #switchPlayers .switchButton:focus, #engage_controls #switchPlayers .switchButton:hover {
   text-shadow: -2px 2px 2px #333;
   text-shadow: -2px 2px 2px 1px #333;
 }
-/* line 45, ../scss/mobile.scss */
+/* line 48, ../scss/mobile.scss */
 #engage_controls #switchPlayers #prevVideo {
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjEuMCIgeTE9IjAuNSIgeDI9IjAuMCIgeTI9IjAuNSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmFkKSIgLz48L3N2Zz4g');
   background-size: 100%;
@@ -51,7 +52,7 @@
   left: 0;
   text-align: left;
 }
-/* line 50, ../scss/mobile.scss */
+/* line 53, ../scss/mobile.scss */
 #engage_controls #switchPlayers #nextVideo {
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuMCIgeTE9IjAuNSIgeDI9IjEuMCIgeTI9IjAuNSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmFkKSIgLz48L3N2Zz4g');
   background-size: 100%;
@@ -64,26 +65,53 @@
 }
 
 /* hide prevVideo / nextVideo controls if it's the first / last video, respectively */
-/* line 59, ../scss/mobile.scss */
+/* line 62, ../scss/mobile.scss */
 #video_wrapper.first #prevVideo, #video_wrapper.last #nextVideo {
   visibility: hidden;
   opacity: 0;
 }
 
-/* line 65, ../scss/mobile.scss */
+/* line 68, ../scss/mobile.scss */
+#engage_controls #big_play_button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 100px;
+  font-size: 20vmin;
+  line-height: 1;
+  color: #333;
+  cursor: pointer;
+  margin: -50px 0 0 -50px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 10px 10px 0 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  -moz-box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.4);
+  -webkit-box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.4);
+  box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.4);
+}
+/* line 84, ../scss/mobile.scss */
+#engage_controls #big_play_button:focus, #engage_controls #big_play_button:hover {
+  color: #111;
+  -moz-box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.6), inset 1px 1px 3px rgba(20, 20, 20, 0.6);
+  -webkit-box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.6), inset 1px 1px 3px rgba(20, 20, 20, 0.6);
+  box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.6), inset 1px 1px 3px rgba(20, 20, 20, 0.6);
+}
+/* line 91, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper {
   position: absolute;
   z-index: 10;
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 5px;
+  padding: 5px 5px 2px;
   background: rgba(255, 255, 255, 0.8);
   border-top: 1px solid #2a6496;
   display: -webkit-flex;
   display: flex;
 }
-/* line 78, ../scss/mobile.scss */
+/* line 104, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .ui-slider-handle {
   position: absolute;
   z-index: 2;
@@ -98,37 +126,35 @@
   top: -10px !important;
   margin-left: -12px;
 }
-/* line 93, ../scss/mobile.scss */
+/* line 119, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_control {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
+  font-size: 27px;
+  cursor: pointer;
 }
-/* line 95, ../scss/mobile.scss */
-#engage_controls #navigation_wrapper #navigation_control img {
-  width: 30px;
-  height: auto;
-}
-/* line 101, ../scss/mobile.scss */
+/* line 125, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
+  margin-top: 4px;
   margin-right: 12px;
   font-size: 12px;
 }
-/* line 105, ../scss/mobile.scss */
+/* line 130, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time #navigation_time_current {
   color: #666;
 }
-/* line 108, ../scss/mobile.scss */
+/* line 133, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time p {
   margin: 0;
   line-height: 1.2;
 }
-/* line 114, ../scss/mobile.scss */
+/* line 139, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #slider {
   -webkit-flex: 1 0 30px;
   flex: 1 0 30px;
-  margin: 13px 17px 0px;
+  margin: 16px 17px 0px;
   border-width: 1px;
   border-style: solid;
   border-color: #333 #333 #777 #333;
@@ -138,13 +164,19 @@
   background: url("../images/bg-track.png") repeat top left;
   box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
 }
-/* line 129, ../scss/mobile.scss */
+/* line 153, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume {
-  -webkit-flex: 0 0 auto;
-  flex: 0 0 auto;
+  -webkit-flex: 0 0 35px;
+  flex: 0 0 35px;
   position: relative;
+  font-size: 27px;
+  text-align: center;
 }
-/* line 133, ../scss/mobile.scss */
+/* line 160, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #volume #volumeIcon {
+  cursor: pointer;
+}
+/* line 164, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSliderWrapper {
   position: absolute;
   bottom: 100%;
@@ -155,9 +187,9 @@
   padding: 13px 2px 8px;
   width: 100%;
   height: 95px;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
-/* line 146, ../scss/mobile.scss */
+/* line 177, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSlider {
   border-width: 1px;
   border-style: solid;
@@ -170,16 +202,12 @@
   background: url("../images/bg-track.png") repeat top left;
   box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
 }
-/* line 159, ../scss/mobile.scss */
+/* line 190, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSlider .ui-slider-handle {
   top: auto !important;
-  margin-left: -7px !important;
+  margin-left: -150% !important;
 }
-/* line 165, ../scss/mobile.scss */
-#engage_controls #navigation_wrapper #volume .volume_icon {
-  margin-top: 4px;
-}
-/* line 170, ../scss/mobile.scss */
+/* line 197, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .ui-slider-range {
   background: #ffffff;
   /* Old browsers */

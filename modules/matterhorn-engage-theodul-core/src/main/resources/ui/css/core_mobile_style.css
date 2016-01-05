@@ -5,6 +5,15 @@ body {
     padding-left: 0px !important;
 }
 
+.loading {
+	width: 80%;
+}
+
+.loading img {
+	width: 100%;
+	height: auto;
+}
+
 .container {
 	padding-right: 0px !important;
 	padding-left: 0px !important;
@@ -15,12 +24,22 @@ body {
 	overflow: hidden;
 }
 
+#engage_view {
+	background: #000;
+}
+
 #engage_content {
     width: 100%;
     position: relative;
 }
 
+.inner {
+	margin: 0 auto;
+}
+
 #information_wrapper {
 	margin-top: 1em;
-	padding: 5px 8px;
+	padding: 10px 0;
+	background: rgba(255,255,255,0.96);
+	box-shadow: inset 0px 1px 3px rgba(0,0,0,0.5);
 }

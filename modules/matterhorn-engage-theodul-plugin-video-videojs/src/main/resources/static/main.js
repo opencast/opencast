@@ -217,6 +217,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var class_audio_wrapper = "audio_wrapper";
     var class_audioDisplay = "audioDisplay";
     var class_audioDisplayError = "audioDisplayError";
+    var class_inner = "inner";
     var videosReady = false;
     var pressedPlayOnce = false;
     var mediapackageChange = "change:mediaPackage";

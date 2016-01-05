@@ -16,3 +16,7 @@
 .engage_basic_description_wrap {
     float: left;
 }
+
+#engage_description {
+	padding: 0 9px;
+}
