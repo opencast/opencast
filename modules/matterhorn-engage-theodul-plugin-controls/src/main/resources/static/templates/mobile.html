@@ -1,5 +1,5 @@
 <!-- theodul controls plugin mobile mode -->
-<% if((typeof multipleVideos !== "undefined")
+<% if((typeof hasmultiplevideos !== "undefined")
    && (typeof str_prevVideo !== "undefined")
    && (typeof str_nextVideo !== "undefined")
    && (typeof str_switchPlayer !== "undefined")
@@ -11,7 +11,7 @@
    && (typeof str_muteVolume !== "undefined")
    && (typeof str_unmuteVolume !== "undefined")) { %>
 
-<% if(multipleVideos) { %>
+<% if(hasmultiplevideos) { %>
 <div id="switchPlayers" class="switchPlayers_mobile">
 	<a class="switchButton" id="prevVideo">
 		<span class="sr-only"><%= str_prevVideo %></span>

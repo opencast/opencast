@@ -496,14 +496,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     pip_position: translate(pipPosition, pipPosition),
                     translatedqualities: translatedQualities,
                     hasqualities: resolutions !== undefined,
-                    hasmultiplevideos: numberVideos > 1,
+                    hasmultiplevideos: (Engage.model.get("videoDataModel").get("ids").length > 1),
                     controlsTop: Engage.controls_top,
                     logo: logo,
                     show_embed: showEmbed,
                     str_zoomlevel: "100%",
                     flash: usingFlash,
                     // for mobile view
-                    multipleVideos: (Engage.model.get("videoDataModel").get("ids").length > 1),     // check if stream includes multiple videos
                     str_prevVideo: translate("prevVideo", "Previous Video"),
                     str_nextVideo: translate("nextVideo", "Next Video"),
                     str_switchPlayer: translate("switchPlayer", "Switch player")
@@ -972,8 +971,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 enableFullscreenButton = true;
                 $("#" + id_fullscreen_button).removeClass("disabled");
             }
-            Engage.trigger(plugin.events.movePiP.getName(), pipPos);
-            Engage.trigger(plugin.events.togglePiP.getName(), pipStatus);
+            if (isDesktopMode) {
+                Engage.trigger(plugin.events.movePiP.getName(), pipPos);
+                Engage.trigger(plugin.events.togglePiP.getName(), pipStatus);
+            }
             if (videosInitialReadyness) {
                 Engage.trigger(plugin.events.focusVideo.getName(), currentFocusFlavor);
                 videosInitialReadyness = false;
@@ -1020,7 +1021,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 $("#" + id_slider).slider("option", "value", normTime);
                 if (!$("#" + id_navigation_time_current).is(":focus")) {
                     // distinguish between desktop and mobile, because in desktop mode
-                    // a input field is used
+                    // an input field is used
                     if (isDesktopMode)
                         $("#" + id_navigation_time_current).val(Utils.formatSeconds(currentTime));
                     else
@@ -1074,7 +1075,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     if (controlsView) {
                         controlsView.render();
                     }
-                    addLayoutEvents();
+                    if (isDesktopMode) {
+                        addLayoutEvents();
+                    }
                 }
             });
             Engage.on(plugin.events.aspectRatioSet.getName(), function(as) {
@@ -1248,7 +1251,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             // register showControls event in mobile mode
             if (isMobileMode) {
                 Engage.on(plugin.events.showControls.getName(), function() {
-                    console.log("Show Controls with controlsVisible=" + controlsVisible);
                     if (! controlsVisible) {
                         controlsVisible = true;
                         $("#" + id_engage_controls).fadeIn();
@@ -1256,11 +1258,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                             Engage.trigger(plugin.events.hideControls.getName());
                         }, hideTimeout*1000);
                     } else {                            // when controls are visible
-                        controlsTimer.renew();
+                        if (controlsTimer) {
+                            controlsTimer.renew();
+                        }
                     }
                 });
                 Engage.on(plugin.events.hideControls.getName(), function() {
-                    console.log("Hide Controls with controlsVisible=" + controlsVisible);
                     if (controlsVisible && isPlaying) {
                         $("#" + id_engage_controls).fadeOut();
                         controlsVisible = false;
