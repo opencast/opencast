@@ -201,6 +201,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var id_switchPlayer_value = "switchPlayer-value";
     var id_audioDisplay = "audioDisplay";
     var id_switchPlayers = "switchPlayers";
+    var class_vjs_wrapper = "videojs_wrapper";
     var class_vjs_switchPlayer = "vjs-switchPlayer";
     var class_btn_video = "btn-video";
     var class_vjs_menu_button = "vjs-menu-button";
@@ -1123,21 +1124,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     function renderMobile(videoDataView, videoSources, videoDisplays, aspectRatio) {
         var nrOfVideoSources = 0;
-        var init = false;
 
         var tuples = getSortedVideosourcesArray(videoSources);
         for (var i = 0; i < tuples.length; ++i) {
             var key = tuples[i][0];
             var value = tuples[i][1];
 
-            if (!init) { // just init the first video
-                init = true;
-                initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
-            }
-            globalVideoSource.push({
-                id: videoDisplays[0],
-                src: value
-            });
+            initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
+            globalVideoSource.push([videoDisplays[i], value]);
         }
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
@@ -1159,14 +1153,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
         if (videoDisplays.length > 0) {
             // set first videoDisplay as master
-            registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], 1);
+            registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
 
             videosReady = true;
             Engage.trigger(plugin.events.ready.getName());
 
             if (videoDataView.model.get("type") != "audio") {
                 $(window).resize(function() {
-                    checkVideoDisplaySize();          
+                    checkVideoDisplaySize();
                 });
             }
         }
@@ -1208,7 +1202,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             str_error_AudioCodecNotSupported: translate("error_AudioCodecNotSupported", "Error: The audio codec is not supported by this browser."),
             str_error_AudioElementNotSupported: translate("error_AudioElementNotSupported", "Error: Your browser does not support the audio element.")
         };
-        if ((isEmbedMode || isMobileMode) && !isAudioOnly) {
+        if (isEmbedMode && !isAudioOnly) {
             tempVars.id = videoDataView.model.get("ids")[0];
         }
         // compile template and load into the html
@@ -1608,6 +1602,24 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     Engage.trigger(plugin.events.timeupdate.getName(), videodisplayMaster.currentTime(), true);
                 });
             }
+
+            // register events on every video display in mobile mode
+            // because only one display is playing at the same time
+            if (isMobileMode) {
+                Engage.model.get("videoDataModel").get("ids").forEach(function(id) {
+                    videojs(id).on("play", function() {
+                        Engage.trigger(plugin.events.play.getName(), true);
+                        pressedPlayOnce = true;
+                    });
+                    videojs(id).on("ended", function() {
+                        Engage.trigger(plugin.events.ended.getName(), true);
+                    });
+                    videojs(id).on("timeupdate", function() {
+                        Engage.trigger(plugin.events.timeupdate.getName(), videodisplayMaster.currentTime(), true);
+                    });
+                });
+            }
+
             $("#" + id_btn_fullscreenCancel).click(function(e) {
                 e.preventDefault();
                 Engage.trigger(plugin.events.fullscreenCancel.getName());
@@ -1817,7 +1829,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     return;
                 }
 
-
                 if (display === "focus.next" || display === "focus.prev") {
                     if (isDefaultLayout()) {
                         if (display === "focus.next") {
@@ -1998,13 +2009,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 // use different style of modulo, see
                 // http://stackoverflow.com/questions/4467539/javascript-modulo-not-behaving
                 currentlySelectedVideodisplay = ((x % n) + n) % n;
-                videojs(globalVideoSource[currentlySelectedVideodisplay].id).src(globalVideoSource[currentlySelectedVideodisplay].src);
+
+                var oldVideodisplayMaster = videodisplayMaster;
+                videodisplayMaster = videojs(Engage.model.get("videoDataModel").get("ids")[currentlySelectedVideodisplay]);
+
+                $("." + class_vjs_wrapper).css({"transform": "translateX(-" + currentlySelectedVideodisplay*100 + "%)"});
 
                 // synchronize videos
                 if (pressedPlayOnce) {
                     Engage.trigger(plugin.events.seek.getName(), currentTime);
                     if (!isPaused) {
-                        Engage.trigger(plugin.events.play.getName());
+                        oldVideodisplayMaster.pause();
+                        videodisplayMaster.play();
                     }
                 }
             });

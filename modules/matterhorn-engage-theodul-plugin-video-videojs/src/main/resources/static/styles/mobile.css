@@ -27,3 +27,19 @@
 .btn-video {
     text-transform: none !important;
 }
+
+.videojs_wrapper {
+    position: relative;
+    -webkit-transition: transform 1s ease-in-out;
+    transition: transform 1s ease-in-out;
+}
+
+/* absolutly positon all video displays.. */
+.videoDisplay {
+    position: absolute;
+    top: 0;
+}
+/* ..but the first one */
+#videoDisplay1 {
+    position: relative;
+}
