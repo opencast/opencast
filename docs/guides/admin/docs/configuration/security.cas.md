@@ -1,9 +1,12 @@
-# Configure Central Authentication Service (CAS)
+Configure Central Authentication Service (CAS)
+==============================================
 
-## CAS
- 
-Many campuses use some kind of single sign on, such as JASIG's Central Authentication Service, or CAS. This guide describes how to integrate Matterhorn into such a system.
- 
+CAS
+---
+
+Many campuses use some kind of single sign on, such as JASIG's Central Authentication Service, or CAS. This guide
+describes how to integrate Opencast into such a system.
+
 ### Step 1
 
 First, install the optional CAS feature. Via the Karaf console, this can be done like this:
@@ -11,13 +14,16 @@ First, install the optional CAS feature. Via the Karaf console, this can be done
     feature:install opencast-contrib-cas
 
 ### Step 2
-To configure matterhorn to use CAS, simply replace the default mh_default_org.xml with the contents of security_sample_cas.xml, available in the Matterhorn source. You must modify several settings in the sample to point to your CAS server:
+
+To configure Opencast to use CAS, simply replace the default `mh_default_org.xml` with the contents of
+`security_sample_cas.xml`, available in the Opencast source. You must modify several settings in the sample to point to
+your CAS server:
 
     <bean id="casEntryPoint" class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
       <property name="loginUrl" value="https://auth-test.berkeley.edu/cas/login"/>
       <property name="serviceProperties" ref="serviceProperties"/>
     </bean>
-    
+
     <bean id="casAuthenticationProvider" class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
       <property name="userDetailsService" ref="userDetailsService"/>
       <property name="serviceProperties" ref="serviceProperties" />
@@ -29,21 +35,26 @@ To configure matterhorn to use CAS, simply replace the default mh_default_org.xm
       <property name="key" value="cas"/>
     </bean>
 
-You will also need to set the public URL for your Matterhorn server:
+You will also need to set the public URL for your Opencast server:
 
     <bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties">
       <property name="service" value="http://localhost:8080/j_spring_cas_security_check"/>
       <property name="sendRenew" value="false"/>
     </bean>
- 
+
 ### Step 3
-Assuming you are using matterhorn version 1.4 and are using LDAP for user provisioning, you will need to build and deploy relevant modules with:
+
+Assuming you are using Opencast version 1.4 and are using LDAP for user provisioning, you will need to build and deploy
+relevant modules with:
 
     mvn clean install -Pdirectory-ldap,directory-cas,directory-openid -DdeployTo={your runtime server location here}
 
-If not using LDAP, of course, you don't need the directory-ldap module but CAS alone will require deploying both the directory-cas and directory-openid modules.
- 
+If not using LDAP, of course, you don't need the directory-ldap module but CAS alone will require deploying both the
+directory-cas and directory-openid modules.
+
 ### Step 4
+
 Finally, you will need to configure a UserProvider to look up users as identified by CAS, for example see:
 
-[University of Saskatchewan CAS and LDAP integration](https://opencast.jira.com/wiki/display/MH/University+of+Saskatchewan+CAS+and+LDAP+integration)
+[University of Saskatchewan CAS and LDAP integration
+](https://opencast.jira.com/wiki/display/MH/University+of+Saskatchewan+CAS+and+LDAP+integration)

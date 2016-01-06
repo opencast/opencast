@@ -472,7 +472,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
   @Override
-  public Node toManifest(Document document, MediaPackageSerializer serializer) {
+  public Node toManifest(Document document, MediaPackageSerializer serializer) throws MediaPackageException {
     return super.toManifest(document, serializer);
   }
 
@@ -582,6 +582,10 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    * Element representation.
    */
   public final class CatalogEntry implements XmlElement, Comparable<CatalogEntry>, Serializable {
+
+    /**
+     * The serial version UID
+     */
     private static final long serialVersionUID = 7195298081966562710L;
 
     private final EName name;

@@ -11,7 +11,7 @@
             "personId":1,
             "email": "email1",
             "manageable": true,
-            "name": "user1",
+            "name": "User1",
             "provider": "provider1",
             "roles": [
                 "ADMIN",
@@ -37,7 +37,7 @@
             "personId":3,
             "email": "email3",
             "manageable": true,
-            "name": "user3",
+            "name": "User3",
             "provider": "provider1",
             "roles": [],
             "username": "user3"
@@ -50,7 +50,7 @@
             "personId":4,
             "email": "email4",
             "manageable": true,
-            "name": "user1",
+            "name": "user4",
             "provider": "provider1",
             "roles": [],
             "username": "user4"

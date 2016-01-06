@@ -29,7 +29,7 @@ import java.io.InputStream;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
- * Provides a static reference to a Config object modeling the main configuration data for a a Solr instance.
+ * Provides a static reference to a config object modeling the main configuration data for a Solr instance.
  *
  */
 public class OpencastSolrConfig extends SolrConfig {

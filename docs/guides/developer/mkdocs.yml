@@ -1,5 +1,3 @@
-
-
 site_name: Opencast - Developer Guide
 repo_url: https://bitbucket.org/opencast-community/matterhorn/src/develop/docs/guides/developer/docs
 
@@ -16,10 +14,12 @@ site_dir: 'site'
 # Items will appear in this order
 
 pages:
-- ['index.md', 'Home']
-- ['development.md', 'Development Process']
-- ['reviewing-and-merging.md', 'Reviewing, Merging and Declining Pull Requests']
-- ['release-manager.md', 'Release Manager']
-- ['license.md', 'Licenses and Legal Matters']
-- ['proposal-log.md', 'Proposal Log']
-- ['packaging.md', 'Packaging']
+- Home: 'index.md'
+- Development Process:
+   - Development: 'development-process.md'
+   - Reviewing, Merging and Declining Pull Requests: 'reviewing-and-merging.md'
+   - Release Manager: 'release-manager.md'
+- Development Environment: 'development-environment.md'
+- Licenses and Legal Matters: 'license.md'
+- Packaging: 'packaging.md'
+- Proposal Log: 'proposal-log.md'

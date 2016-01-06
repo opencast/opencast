@@ -61,17 +61,33 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
     super(JOB_TYPE);
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement)
    */
   public Job execute(String exec, String params, MediaPackageElement inElement) throws ExecuteException {
-    return execute(exec, params, inElement, null, null);
+    return execute(exec, params, inElement, null, null, 1.0f);
   }
 
-  /* (non-Javadoc)
+  /**
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement, float)
+   */
+  public Job execute(String exec, String params, MediaPackageElement inElement, float load) throws ExecuteException {
+    return execute(exec, params, inElement, null, null, load);
+  }
+
+
+  /**
    * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement.Type)
    */
   public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type type)
+          throws ExecuteException {
+    return execute(exec, params, inElement, outFileName, type, 1.0f);
+  }
+
+  /**
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement.Type, float)
+   */
+  public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type type, float load)
           throws ExecuteException {
     HttpPost post = null;
     HttpResponse response = null;
@@ -81,6 +97,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
       List<NameValuePair> formStringParams = new ArrayList<NameValuePair>();
       formStringParams.add(new BasicNameValuePair(EXEC_FORM_PARAM, exec));
       formStringParams.add(new BasicNameValuePair(PARAMS_FORM_PARAM, params));
+      formStringParams.add(new BasicNameValuePair(LOAD_FORM_PARAM, String.valueOf(load)));
       formStringParams.add(new BasicNameValuePair(INPUT_ELEM_FORM_PARAM, inElementStr));
       if (outFileName != null)
         formStringParams.add(new BasicNameValuePair(OUTPUT_NAME_FORM_PARAMETER, outFileName));
@@ -111,11 +128,20 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.opencastproject.execute.api.ExecuteService#executeMediaPackage(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackage, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement.Type)
+  /**
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackage, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement.Type)
    */
   @Override
   public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type type)
+          throws ExecuteException {
+    return execute(exec, params, mp, outFileName, type, 1.0f);
+  }
+
+  /**
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackage, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement.Type, float)
+   */
+  @Override
+  public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type type, float load)
           throws ExecuteException {
     HttpPost post = null;
     HttpResponse response = null;
@@ -125,6 +151,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
       List<NameValuePair> formStringParams = new ArrayList<NameValuePair>();
       formStringParams.add(new BasicNameValuePair(EXEC_FORM_PARAM, exec));
       formStringParams.add(new BasicNameValuePair(PARAMS_FORM_PARAM, params));
+      formStringParams.add(new BasicNameValuePair(LOAD_FORM_PARAM, String.valueOf(load)));
       formStringParams.add(new BasicNameValuePair(INPUT_MP_FORM_PARAM, mpStr));
       if (outFileName != null)
         formStringParams.add(new BasicNameValuePair(OUTPUT_NAME_FORM_PARAMETER, outFileName));

@@ -268,7 +268,7 @@ public class WorkspaceImplTest {
 
   @Test
   public void testCleanup() throws Exception {
-    workspace.cleanup(Option.<Integer> none());
+    workspace.cleanup(-1);
     Assert.assertEquals(0L, workspace.getUsedSpace().get().longValue());
 
     File file = new File(PathSupport.concat(new String[] { workspaceRoot, "test", "c1", "bar.mov" }));
@@ -277,18 +277,18 @@ public class WorkspaceImplTest {
 
     Assert.assertEquals(4L, workspace.getUsedSpace().get().longValue());
 
-    workspace.cleanup(Option.<Integer> none());
+    workspace.cleanup(0);
     Assert.assertEquals(0L, workspace.getUsedSpace().get().longValue());
 
     FileUtils.write(file, "asdf");
     Assert.assertEquals(4L, workspace.getUsedSpace().get().longValue());
 
-    workspace.cleanup(Option.some(10));
+    workspace.cleanup(100);
     Assert.assertEquals(4L, workspace.getUsedSpace().get().longValue());
 
-    Prelude.sleep(2000L);
+    Prelude.sleep(1100L);
 
-    workspace.cleanup(Option.some(1));
+    workspace.cleanup(1);
     Assert.assertEquals(0L, workspace.getUsedSpace().get().longValue());
   }
 

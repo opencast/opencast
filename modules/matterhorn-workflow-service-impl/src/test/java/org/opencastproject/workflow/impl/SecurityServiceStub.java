@@ -87,4 +87,14 @@ public class SecurityServiceStub implements SecurityService {
     SecurityServiceStub.organization.set(organization);
   }
 
+  @Override
+  public String getUserIP() {
+    return null;
+  }
+
+  @Override
+  public void setUserIP(String userIP) {
+
+  }
+
 }
