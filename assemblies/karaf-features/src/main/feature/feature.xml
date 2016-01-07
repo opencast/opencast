@@ -56,11 +56,13 @@
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
 
     <!-- Spring Framework / Security -->
+    <bundle>mvn:org.springframework.ldap/org.springframework.ldap/1.3.1.RELEASE</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-core/1.2.1</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-extender/1.2.1</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-io/1.2.1</bundle>
     <bundle>mvn:org.springframework.security/spring-security-config/3.1.0.RELEASE</bundle>
     <bundle>mvn:org.springframework.security/spring-security-core/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-ldap/3.1.0.RELEASE</bundle>
     <bundle>mvn:org.springframework.security/spring-security-web/3.1.0.RELEASE</bundle>
     <bundle>mvn:org.springframework/spring-aop/3.1.0.RELEASE</bundle>
     <bundle>mvn:org.springframework/spring-asm/3.1.0.RELEASE</bundle>

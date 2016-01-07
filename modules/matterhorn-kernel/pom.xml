@@ -56,6 +56,10 @@
       <artifactId>spring-security-oauth</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-ldap</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.osgi</groupId>
       <artifactId>org.springframework.osgi.core</artifactId>
     </dependency>
@@ -226,6 +230,8 @@
               org.opencastproject.fsresources,
               org.springframework.security.core.userdetails.cache,
               org.springframework.security.core.userdetails.memory,
+              org.springframework.security.ldap,
+              org.springframework.security.ldap.authentication,
               org.xml.sax;version=0,
               META-INF.cxf,
               META-INF.cxf.osgi,
@@ -254,11 +260,11 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/bundle-info.xml,
-              OSGI-INF/cleansessions.xml, 
+              OSGI-INF/cleansessions.xml,
               OSGI-INF/http-client-factory.xml,
               OSGI-INF/http-client.xml,
               OSGI-INF/http-context.xml,
-              OSGI-INF/https-filter.xml, 
+              OSGI-INF/https-filter.xml,
               OSGI-INF/jsonp.xml,
               OSGI-INF/organization-directory-service.xml,
               OSGI-INF/organization-persistence.xml,
@@ -272,7 +278,7 @@
               OSGI-INF/static.xml,
               OSGI-INF/remote-user-and-role-filter.xml,
               OSGI-INF/security-config-scanner.xml,
-              OSGI-INF/transparentproxy-filter.xml, 
+              OSGI-INF/transparentproxy-filter.xml,
               OSGI-INF/user-and-role-directory-service.xml
             </Service-Component>
             <JPA-PersistenceUnits>
