@@ -28,7 +28,7 @@
     text-transform: none !important;
 }
 
-.videojs_wrapper {
+#engage_video {
     position: relative;
     -webkit-transition: transform 1s ease-in-out;
     transition: transform 1s ease-in-out;

@@ -241,7 +241,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var plugin_path_topIfBottom = "";
     var initCount = 6;
     if (isMobileMode) {
-        initCount += 1;          // increase initCount, because mobile version loads 1 more lib
+        initCount += 2;          // increase initCount, because mobile version loads 2 more libs
     }
     var isPlaying = false;
     var isSliding = false;
@@ -276,10 +276,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var videosInitialReadyness = true;
     // for mobile view
     var id_videoWrapper = "video_wrapper";
+    var id_gesture_container = "engage_video";
     var id_prevVideo = "prevVideo";
     var id_nextVideo = "nextVideo";
     var controlsVisible = true;
     var controlsTimer = null;
+    var hammerManager = null;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -931,6 +933,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                   e.preventDefault();
                   Engage.trigger(plugin.events.switchVideo.getName(), 1);
                 });
+
+                // create a simple hammer.js instance for touch gesture support
+                // by default, it only adds horizontal recognizers
+                var gestureElement = document.getElementById(id_gesture_container);
+                hammerManager = new Hammer(gestureElement);
+
+                // listen to events...
+                hammerManager.on("panleft panright panend swipeleft swiperight", handleGestures);
             }
         }
     }
@@ -1053,6 +1063,36 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             $("#" + id_playbackRemTime300).html(Utils.formatSeconds(!isNaN(val) ? (val / 3.0) : val));
         } else {
             $("#" + id_slider).slider("option", "value", 0);
+        }
+    }
+
+
+    function handleGestures(ev) {
+        // disable browser scrolling
+        // ev.gesture.preventDefault();
+
+        switch(ev.type) {
+            case 'panleft':
+            case 'panright':
+                Engage.log("Pan recognized!");
+
+            break;
+
+            case 'panend':
+                Engage.log("Pan ended!");
+            break;
+
+            case 'swipeleft':
+                Engage.log("Swipe left recognized!");
+                Engage.trigger(plugin.events.switchVideo.getName(), 1);
+                hammerManager.stop();
+            break;
+
+            case 'swiperight':
+                Engage.log("Swipe right recognized!");
+                Engage.trigger(plugin.events.switchVideo.getName(), -1);
+                hammerManager.stop();
+            break;
         }
     }
 
@@ -1347,6 +1387,17 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
         }
     });
+
+    // load hammer.js lib for swiping on mobile (touch enabled) devices
+    if (isMobileMode) {
+        require([relative_plugin_path + "lib/hammer.min"], function() {
+            Engage.log("Controls: Lib hammer.js loaded");
+            initCount -= 1;
+            if (initCount <= 0) {
+                initPlugin();
+            }
+        });  
+    }
 
 
     // load utils class

@@ -2008,35 +2008,38 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             // event used to switch between videos in single player (e.g. mobile) mode
             Engage.on(plugin.events.switchVideo.getName(), function(direction) {
                 var isPaused = videodisplayMaster.paused();     // check if current video is paused
-                
-                // remove old classes from wrapper
-                $("#" + id_video_wrapper).removeClass("first last");
 
                 var n = globalVideoSource.length;
                 var x = currentlySelectedVideodisplay + direction;
-                // use different style of modulo, see
-                // http://stackoverflow.com/questions/4467539/javascript-modulo-not-behaving
-                currentlySelectedVideodisplay = ((x % n) + n) % n;
+                var newSelectedVideodisplay = Math.max(0, Math.min(x, n-1));
 
-                var oldVideodisplayMaster = videodisplayMaster;
-                videodisplayMaster = videojs(Engage.model.get("videoDataModel").get("ids")[currentlySelectedVideodisplay]);
+                if (currentlySelectedVideodisplay !== newSelectedVideodisplay) {
+                    var oldVideodisplayMaster = videodisplayMaster;
+                    videodisplayMaster = videojs(Engage.model.get("videoDataModel").get("ids")[newSelectedVideodisplay]);
 
-                // add "first" or "last" class to wrapper if it's the first or last video showing
-                if (currentlySelectedVideodisplay == 0)
-                    $("#" + id_video_wrapper).addClass("first");
-                if (currentlySelectedVideodisplay == (n-1))
-                    $("#" + id_video_wrapper).addClass("last");
+                    // remove old classes from wrapper
+                    $("#" + id_video_wrapper).removeClass("first last");
 
-                // transform to new display
-                $("." + class_vjs_wrapper).css({"transform": "translateX(-" + currentlySelectedVideodisplay*100 + "%)"});
+                    // add "first" or "last" class to wrapper if it's the first or last video showing
+                    if (newSelectedVideodisplay === 0)
+                        $("#" + id_video_wrapper).addClass("first");
+                    if (newSelectedVideodisplay === (n-1))
+                        $("#" + id_video_wrapper).addClass("last");
 
-                // synchronize videos
-                if (pressedPlayOnce) {
-                    Engage.trigger(plugin.events.seek.getName(), currentTime);
-                    if (!isPaused) {
-                        oldVideodisplayMaster.pause();
-                        videodisplayMaster.play();
+                    // transform to new display
+                    $("#" + id_engage_video).css({"transform": "translateX(-" + newSelectedVideodisplay*100 + "%)"});
+
+                    // synchronize videos
+                    if (pressedPlayOnce) {
+                        Engage.trigger(plugin.events.seek.getName(), currentTime);
+                        if (!isPaused) {
+                            oldVideodisplayMaster.pause();
+                            videodisplayMaster.play();
+                        }
                     }
+
+                    currentlySelectedVideodisplay = newSelectedVideodisplay;
+                    Engage.log("Switched to video " + currentlySelectedVideodisplay);
                 }
             });
 
