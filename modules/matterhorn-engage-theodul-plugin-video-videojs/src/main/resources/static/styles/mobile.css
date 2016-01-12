@@ -30,8 +30,10 @@
 
 #engage_video {
     position: relative;
-    -webkit-transition: transform 1s ease-in-out;
-    transition: transform 1s ease-in-out;
+}
+#engage_video.animate {
+    -webkit-transition: transform 1s;
+    transition: transform 1s;
 }
 
 .vjs-poster {

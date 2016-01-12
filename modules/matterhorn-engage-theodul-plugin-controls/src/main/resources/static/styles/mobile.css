@@ -3,6 +3,10 @@
  * This file is compiled with compass,
  * see http://compass-style.org/
  *********************************************************/
+/* line 15, ../scss/mobile.scss */
+#engage_controls {
+  /* hide prevVideo / nextVideo controls if it's the first / last video, respectively */
+}
 /* line 17, ../scss/mobile.scss */
 #engage_controls #switchPlayers .switchButton {
   position: absolute;
@@ -63,12 +67,10 @@
   right: 0;
   text-align: right;
 }
-
-/* hide prevVideo / nextVideo controls if it's the first / last video, respectively */
-/* line 62, ../scss/mobile.scss */
-#video_wrapper.first #prevVideo, #video_wrapper.last #nextVideo {
-  visibility: hidden;
-  opacity: 0;
+/* line 61, ../scss/mobile.scss */
+#engage_controls.first #prevVideo, #engage_controls.last #nextVideo {
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 /* line 68, ../scss/mobile.scss */

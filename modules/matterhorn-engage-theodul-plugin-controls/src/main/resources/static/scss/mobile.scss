@@ -56,12 +56,12 @@
 			text-align: right;
 	  }
 	}
-}
 
-/* hide prevVideo / nextVideo controls if it's the first / last video, respectively */
-#video_wrapper.first #prevVideo, #video_wrapper.last #nextVideo {
-	visibility: hidden;
-	opacity: 0;
+	/* hide prevVideo / nextVideo controls if it's the first / last video, respectively */
+	&.first #prevVideo, &.last #nextVideo {
+		visibility: hidden !important;
+		opacity: 0 !important;
+	}
 }
 
 #engage_controls {

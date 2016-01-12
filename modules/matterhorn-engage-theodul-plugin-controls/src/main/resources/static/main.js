@@ -96,7 +96,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         // events for mobile view
         switchVideo: new Engage.Event("Video:switch", "switch the video", "trigger"),
         showControls: new Engage.Event("Controls:show", "show the controls", "both"),
-        hideControls: new Engage.Event("Controls:hide", "hide the controls", "both")
+        hideControls: new Engage.Event("Controls:hide", "hide the controls", "both"),
+        changeSelectedVideo: new Engage.Event("Video:c", "hide the controls", "handler")
     };
 
     var isDesktopMode = false;
@@ -276,12 +277,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var videosInitialReadyness = true;
     // for mobile view
     var id_videoWrapper = "video_wrapper";
-    var id_gesture_container = "engage_video";
+    var id_gestureContainer = "engage_video";
     var id_prevVideo = "prevVideo";
     var id_nextVideo = "nextVideo";
     var controlsVisible = true;
     var controlsTimer = null;
-    var hammerManager = null;
+    var gestureManager = null;
+    var currentDisplay = 0;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -826,7 +828,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     max: 100,
                     value: 100,
                     orientation: "vertical"      // use vertical orientation in mobile/embed mode
-                });   
+                });
             }
 
             $("#" + id_volumeIcon).click(function() {
@@ -927,20 +929,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 });
                 $("#" + id_prevVideo).click(function(e) {
                   e.preventDefault();
-                  Engage.trigger(plugin.events.switchVideo.getName(), -1);
+                  switchVideo(-1);
                 });
                 $("#" + id_nextVideo).click(function(e) {
                   e.preventDefault();
-                  Engage.trigger(plugin.events.switchVideo.getName(), 1);
+                  switchVideo(1);
                 });
 
                 // create a simple hammer.js instance for touch gesture support
                 // by default, it only adds horizontal recognizers
-                var gestureElement = document.getElementById(id_gesture_container);
-                hammerManager = new Hammer(gestureElement);
+                var gestureElement = document.getElementById(id_gestureContainer);
+                gestureManager = new Hammer(gestureElement);
 
                 // listen to events...
-                hammerManager.on("panleft panright panend swipeleft swiperight", handleGestures);
+                gestureManager.on("panstart panleft panright panend swipeleft swiperight", handleGestures);
             }
         }
     }
@@ -1066,34 +1068,102 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         }
     }
 
+    /**
+     * Switch to next or previous video, as specified in direction.
+     * @param  {int} direction either -1 for prev or +1 for next video
+     * @return {boolean} true if video was switched, false if direction was out of bounds
+     */
+    function switchVideo(direction) {
+        // number of video streams
+        var n = Engage.model.get("videoDataModel").get("ids").length;
+        var x = currentDisplay + direction;
+        var newSelectedDisplay = Math.max(0, Math.min(x, n-1));
 
+        if (currentDisplay !== newSelectedDisplay) {
+            currentDisplay = newSelectedDisplay;
+
+            // remove old classes from wrapper
+            $("#" + id_engage_controls).removeClass("first last");
+
+            // add "first" or "last" class to wrapper if it's the first or last video showing
+            if (currentDisplay === 0)
+                $("#" + id_engage_controls).addClass("first");
+            if (currentDisplay === (n-1))
+                $("#" + id_engage_controls).addClass("last");
+
+            // transform to new display
+            $("#" + id_gestureContainer).addClass("animate");
+            transformToVideo(currentDisplay);
+
+            Engage.trigger(plugin.events.switchVideo.getName(), currentDisplay);
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Handles gesture events, fired by hammer.js
+     */
     function handleGestures(ev) {
-        // disable browser scrolling
-        // ev.gesture.preventDefault();
-
         switch(ev.type) {
-            case 'panleft':
-            case 'panright':
-                Engage.log("Pan recognized!");
-
-            break;
-
-            case 'panend':
-                Engage.log("Pan ended!");
-            break;
-
             case 'swipeleft':
                 Engage.log("Swipe left recognized!");
-                Engage.trigger(plugin.events.switchVideo.getName(), 1);
-                hammerManager.stop();
+                switchVideo(1);
+                gestureManager.stop();
             break;
 
             case 'swiperight':
                 Engage.log("Swipe right recognized!");
-                Engage.trigger(plugin.events.switchVideo.getName(), -1);
-                hammerManager.stop();
+                switchVideo(-1);
+                gestureManager.stop();
+            break;
+
+            case 'panstart':
+                // remove animation class to stop css transitions
+                // from interfering with user input
+                $("#" + id_gestureContainer).removeClass("animate");
+            break;
+            
+            case 'panleft':
+            case 'panright':
+                // stick to the finger
+                var displayOffset = currentDisplay * 100;
+                var dragOffset = ev.deltaX;
+
+                // slow down at the first and last pane
+                if((currentDisplay === 0  && ev.offsetDirection === Hammer.DIRECTION_RIGHT) ||
+                   (currentDisplay === Engage.model.get("videoDataModel").get("ids").length - 1 && ev.offsetDirection === Hammer.DIRECTION_LEFT)) {
+                    dragOffset *= .3;
+                }
+
+                $("#" + id_gestureContainer).css({"transform": "translateX(calc(-" + displayOffset + "% + " + dragOffset + "px))"});
+            break;
+
+            case 'panend':
+                // turn css transitions back on
+                $("#" + id_gestureContainer).addClass("animate");
+
+                // if user panned more than 50% to left or right, switch video
+                if ((Math.abs(ev.deltaX) > $("#" + id_gestureContainer).width()/2) &&
+                    (ev.offsetDirection === Hammer.DIRECTION_RIGHT || ev.offsetDirection === Hammer.DIRECTION_LEFT)) {
+                    // if video was not switched, transform back to old screen
+                    if (!switchVideo(ev.offsetDirection === Hammer.DIRECTION_RIGHT ? -1 : 1))
+                        transformToVideo(currentDisplay);
+                }
+                else {
+                    transformToVideo(currentDisplay);
+                }
             break;
         }
+    }
+
+    /**
+     * Transform to the specified video screen in single screen (e.g. mobile) mode.
+     * @param  {int} id video id
+     */
+    function transformToVideo(id) {
+        $("#" + id_gestureContainer).css({"transform": "translateX(-" + id*100 + "%)"});
     }
 
     /**
@@ -1290,7 +1360,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 currentFocusFlavor = "focus.none";
             });
 
-
             Engage.on(plugin.events.movePiP.getName(), function(pos) {
                 if (pos !== undefined) {
                     Basil.set(storage_pip_pos, pos);
@@ -1303,8 +1372,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 }
             });
 
-            // register showControls event in mobile mode
             if (isMobileMode) {
+                // register showControls event in mobile mode
                 Engage.on(plugin.events.showControls.getName(), function() {
                     if (! controlsVisible) {
                         controlsVisible = true;
@@ -1324,6 +1393,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         controlsVisible = false;
                     }
                 });
+
+                // add first class to video wrapper
+                $("#" + id_engage_controls).addClass("first");
             }
 
             loadStoredInitialValues();
@@ -1396,7 +1468,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             if (initCount <= 0) {
                 initPlugin();
             }
-        });  
+        });
     }
 
 
