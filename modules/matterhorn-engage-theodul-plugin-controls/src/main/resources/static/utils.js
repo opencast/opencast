@@ -215,20 +215,23 @@ define(["jquery"], function($) {
      */
     Utils.prototype.timer = {
         setup: function(callback, delay) {
-            this.callback = callback;
+            this.callback = function() {
+                callback.call();
+                this.timeoutID = undefined;
+            }
             this.delay = delay;
 
             if (typeof this.timeoutID === "number") {
-                this.cancel();
+                  this.cancel();
             } else {
-                this.timeoutID = window.setTimeout(this.callback, this.delay);
+                this.timeoutID = window.setTimeout(this.callback.bind(this), this.delay);
             }
             return this;
         },
 
         renew: function() {
             window.clearTimeout(this.timeoutID);
-            this.timeoutID = window.setTimeout(this.callback, this.delay);
+            this.timeoutID = window.setTimeout(this.callback.bind(this), this.delay);
         },
 
         cancel: function() {
