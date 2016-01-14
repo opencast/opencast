@@ -43,6 +43,22 @@ describe('Groups API Resource', function () {
             expect(data.rows[0].id).toBe(sampleJSON.results[0].id);
             expect(data.rows[0].name).toBe(sampleJSON.results[0].name);
             expect(data.rows[0].description).toBe(sampleJSON.results[0].description);
+            expect(data.rows[0].role).toBe(sampleJSON.results[0].role);
+        });
+
+        it('handles payloads with zero items', function () {
+            $httpBackend.whenGET('/admin-ng/groups/groups.json').respond(JSON.stringify(
+                {
+                  count: 0,
+                  limit: 0,
+                  offset: 0,
+                  results: [],
+                  total: 0
+                }
+            ));
+            var data = GroupsResource.query();
+            $httpBackend.flush();
+            expect(data.rows.length).toBe(0);
         });
 
         it('handles payloads with one item', function () {
@@ -64,5 +80,16 @@ describe('Groups API Resource', function () {
             $httpBackend.flush();
             expect(data.rows.length).toBe(1);
         });
+
+        it('parses count, limit, offset and total correctly', function () {
+            $httpBackend.whenGET('/admin-ng/groups/groups.json').respond(JSON.stringify(sampleJSON));
+            var data = GroupsResource.query();
+            $httpBackend.flush();
+            expect(data.count).toBe(2);
+            expect(data.limit).toBe(0);
+            expect(data.offset).toBe(0);
+            expect(data.total).toBe(2);
+        });
+
     });
 });
