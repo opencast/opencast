@@ -106,7 +106,7 @@
           <tr>
             <td>Public (no authorization required)</td>
             <td class="privilege_edit"><input type="checkbox" id="anonymous_view" /></td>
-            <td class="privilege_edit"></td>
+            <td class="privilege_edit"></td><td class="privilege_edit"></td>
           </tr>
         </tbody>
       </table>
