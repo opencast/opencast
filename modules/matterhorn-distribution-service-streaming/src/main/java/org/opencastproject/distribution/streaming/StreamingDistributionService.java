@@ -44,6 +44,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.data.Option;
@@ -54,6 +55,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,10 +74,14 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.List;
 
-/** Distributes media to the local media delivery directory. */
-public class StreamingDistributionService extends AbstractJobProducer implements DistributionService {
+/**
+ * Distributes media to the local media delivery directory.
+ */
+public class StreamingDistributionService extends AbstractJobProducer implements DistributionService, ManagedService {
+
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionService.class);
 
@@ -85,6 +92,24 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   private enum Operation {
     Distribute, Retract
   }
+
+  /** The load on the system introduced by creating a distribute job */
+  public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.1f;
+
+  /** The load on the system introduced by creating a retract job */
+  public static final float DEFAULT_RETRACT_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_DISTRIBUTE_JOB_LOAD} */
+  public static final String DISTRIBUTE_JOB_LOAD_KEY = "job.load.streaming.distribute";
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_RETRACT_JOB_LOAD} */
+  public static final String RETRACT_JOB_LOAD_KEY = "job.load.streaming.retract";
+
+  /** The load on the system introduced by creating a distribute job */
+  private float distributeJobLoad = DEFAULT_DISTRIBUTE_JOB_LOAD;
+
+  /** The load on the system introduced by creating a retract job */
+  private float retractJobLoad = DEFAULT_RETRACT_JOB_LOAD;
 
   /** The workspace reference */
   protected Workspace workspace = null;
@@ -158,7 +183,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     //
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId));
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId), distributeJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -261,7 +286,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     //
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), elementId));
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), elementId), retractJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -510,6 +535,14 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       return result[0];
 
     return source;
+  }
+
+  @Override
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+    distributeJobLoad = LoadUtil.getConfiguredLoadValue(properties, DISTRIBUTE_JOB_LOAD_KEY,
+            DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
+    retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD,
+            serviceRegistry);
   }
 
   public static class Locations {

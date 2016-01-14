@@ -39,5 +39,10 @@
   "ins":"Insertar",
   "del":"Suprimir",
   "modMac":"Cmd",
-  "modOther":"Ctrl"
+  "modOther":"Ctrl",
+  "focusPrev":"Poner el foco en el vídeo anterior",
+  "focusNext":"Poner el foco en el vídeo siguiente",
+  "togglePiP":"Activar\/desactivar vídeo superpuesto",
+  "movePiP":"Mover vídeo superpuesto",
+  "shortcuts":"Atajos"
 }

@@ -297,7 +297,7 @@ public class SearchServiceImplTest {
 
     // Add the media package to the search index
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -314,7 +314,7 @@ public class SearchServiceImplTest {
 
     // Add the media package to the search index
     job = service.add(mediaPackage);
-    barrier = new JobBarrier(serviceRegistry, 1000, job);
+    barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -351,7 +351,7 @@ public class SearchServiceImplTest {
   public void testSearchForEpisodeWithSeriesMetadata() throws Exception {
     MediaPackage mediaPackage = getMediaPackage("/manifest-full.xml");
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -369,7 +369,7 @@ public class SearchServiceImplTest {
   public void testSearchForPartialStrings() throws Exception {
     MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -411,7 +411,7 @@ public class SearchServiceImplTest {
     MediaPackage mediaPackageOlder = getMediaPackage("/manifest-full-older.xml");
     Job job = service.add(mediaPackageNewer);
     Job job2 = service.add(mediaPackageOlder);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job, job2);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job, job2);
     barrier.waitForJobs();
     String olderTitle = "Older Recording";
     String newerTitle = "Land and Vegetation: Key players on the Climate Scene";
@@ -462,7 +462,7 @@ public class SearchServiceImplTest {
 
     // Add the media package to the search index
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -504,7 +504,7 @@ public class SearchServiceImplTest {
 
     // Add the media package to the search index
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -531,7 +531,7 @@ public class SearchServiceImplTest {
 
     // Add the media package to the search index
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
 
     // Now take the role away from the user
@@ -545,7 +545,7 @@ public class SearchServiceImplTest {
 
     // Try to delete it
     job = service.delete(mediaPackage.getIdentifier().toString());
-    barrier = new JobBarrier(serviceRegistry, 1000, job);
+    barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to delete mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
     Assert.assertEquals("Unauthorized user was able to delete a mediapackage", Boolean.FALSE.toString(),
@@ -557,7 +557,7 @@ public class SearchServiceImplTest {
     userResponder.setResponse(adminUser);
     Date deletedDate = new Date();
     job = service.delete(mediaPackage.getIdentifier().toString());
-    barrier = new JobBarrier(serviceRegistry, 1000, job);
+    barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Unauthorized user was able to delete a mediapackage", Job.Status.FINISHED, job.getStatus());
 

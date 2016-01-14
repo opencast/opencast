@@ -32,13 +32,13 @@
   "remainingTime":"verbleibende Zeit",
   "embedButton":"Schaltfläche zum Einbetten des Videos. Größe zum Einbetten aus der Liste auswählen.",
   "checkingLoginStatus":"Login-Status wird überprüft...",
-  "quality": "Qualität",
-  "pictureInPicture": "Bild in Bild",
-  "left": "links",
-  "right": "rechts",
-  "off": "aus",
-  "low": "Niedrig",
-  "medium": "Mittel",
-  "high": "Hoch",
-  "beside": "nebeneinander"
+  "quality":"Qualität",
+  "pictureInPicture":"Bild in Bild",
+  "left":"links",
+  "right":"rechts",
+  "off":"aus",
+  "low":"Niedrig",
+  "medium":"Mittel",
+  "high":"Hoch",
+  "beside":"nebeneinander"
 }

@@ -184,8 +184,7 @@
             <Service-Component>
               OSGI-INF/search-service.xml,
               OSGI-INF/search-service-rest.xml,
-              OSGI-INF/search-service-persistence.xml,
-              OSGI-INF/feed-service.xml
+              OSGI-INF/search-service-persistence.xml
             </Service-Component>
             <JPA-PersistenceUnits>org.opencastproject.search.impl.persistence</JPA-PersistenceUnits>
           </instructions>

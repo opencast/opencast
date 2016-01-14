@@ -3,8 +3,10 @@
   <scr:component name="org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl" immediate="true" activate="activate">
     <implementation class="org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl" />
     <property name="service.description" value="Text Analysis Service" />
+    <property name="service.pid" value="org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl" />
     <service>
       <provide interface="org.opencastproject.textanalyzer.api.TextAnalyzerService" />
+      <provide interface="org.osgi.service.cm.ManagedService" />
     </service>
     <reference name="textExtractor" interface="org.opencastproject.textextractor.api.TextExtractor"
       cardinality="1..1" policy="static" bind="setTextExtractor" />

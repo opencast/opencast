@@ -154,7 +154,7 @@ public class DownloadDistributionServiceImplTest {
     Job job1 = service.distribute("engage-player", mp, "track-1");
     Job job2 = service.distribute("engage-player", mp, "catalog-1");
     Job job3 = service.distribute("oai-pmh", mp, "catalog-1");
-    JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 500, job1, job2, job3);
+    JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 500, job1, job2, job3);
     jobBarrier.waitForJobs();
 
     File mpDir = new File(distributionRoot,
@@ -180,7 +180,7 @@ public class DownloadDistributionServiceImplTest {
     Job job3 = service.distribute("engage-player", mp, "catalog-2");
     Job job4 = service.distribute("engage-player", mp, "notes");
     Job job5 = service.distribute("oai-pmh", mp, "track-1");
-    JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 500, job1, job2, job3, job4, job5);
+    JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 500, job1, job2, job3, job4, job5);
     jobBarrier.waitForJobs();
 
     // Add the new elements to the mediapackage
@@ -210,7 +210,7 @@ public class DownloadDistributionServiceImplTest {
     Job job7 = service.retract("engage-player", mp, "catalog-1");
     Job job8 = service.retract("engage-player", mp, "catalog-2");
     Job job9 = service.retract("engage-player", mp, "notes");
-    jobBarrier = new JobBarrier(serviceRegistry, 500, job6, job7, job8, job9);
+    jobBarrier = new JobBarrier(null, serviceRegistry, 500, job6, job7, job8, job9);
     jobBarrier.waitForJobs();
 
     Assert.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("track-1")).isFile());
@@ -230,7 +230,7 @@ public class DownloadDistributionServiceImplTest {
     Job job3 = service.distribute("engage-player", mp, "catalog-2");
     Job job4 = service.distribute("engage-player", mp, "notes");
     Job job5 = service.distribute("oai-pmh", mp, "notes");
-    JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 500, job1, job2, job3, job4, job5);
+    JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 500, job1, job2, job3, job4, job5);
     jobBarrier.waitForJobs();
 
     // Add the new elements to the mediapackage
@@ -265,7 +265,7 @@ public class DownloadDistributionServiceImplTest {
     Job job7 = service.retract("engage-player", mp, job2Element.getIdentifier());
     Job job8 = service.retract("engage-player", mp, job3Element.getIdentifier());
     Job job9 = service.retract("engage-player", mp, job4Element.getIdentifier());
-    jobBarrier = new JobBarrier(serviceRegistry, 500, job6, job7, job8, job9);
+    jobBarrier = new JobBarrier(null, serviceRegistry, 500, job6, job7, job8, job9);
     jobBarrier.waitForJobs();
 
     // Remove the distributed elements from the mediapackage

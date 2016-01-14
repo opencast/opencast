@@ -110,8 +110,6 @@ public class StaticFileRestServiceTest {
     // Create BundleContext
     BundleContext bundleContext = EasyMock.createMock(BundleContext.class);
     EasyMock.expect(bundleContext.getProperty(MatterhornConstants.SERVER_URL_PROPERTY)).andReturn(SERVER_URL);
-    // EasyMock.expect(bundleContext.getProperty(StaticFileServiceImpl.STATICFILES_ROOT_DIRECTORY_KEY)).andReturn(
-    // rootDir.getAbsolutePath());
     EasyMock.expect(bundleContext.getProperty(StaticFileRestService.STATICFILES_UPLOAD_MAX_SIZE_KEY)).andReturn(
             Long.toString(maxSize));
     EasyMock.replay(bundleContext);
@@ -259,8 +257,6 @@ public class StaticFileRestServiceTest {
 
     String location = result.getMetadata().get("location").get(0).toString();
     String uuid = location.substring(location.lastIndexOf("/") + 1);
-
-    // staticFileServiceImpl.getFile(uuid);
 
     Response response = staticFileRestService.deleteStaticFile(uuid);
     assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());

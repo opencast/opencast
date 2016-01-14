@@ -235,7 +235,7 @@ angular.module('adminNg.services.modal')
             var adjacentId, adjacentIndex, params = $location.search();
 
             angular.forEach(Table.rows, function (row, index) {
-                if (row.id === me.$scope.resourceId) {
+                if (String(row.id) === String(me.$scope.resourceId)) {
                     adjacentIndex = index;
                     return;
                 }
@@ -246,6 +246,9 @@ angular.module('adminNg.services.modal')
 
             if (Table.rows[adjacentIndex]) {
                 adjacentId = Table.rows[adjacentIndex].id;
+                if(angular.isString(me.$scope.resourceId) && !angular.isString(adjacentId)) {
+                    adjacentId = adjacentId.toString();
+                }
             }
 
             if (!angular.isUndefined(adjacentId)) {

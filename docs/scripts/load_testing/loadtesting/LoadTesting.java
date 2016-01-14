@@ -6,7 +6,7 @@ public class LoadTesting {
 	// Server ip
 	public static String CORE_ADDRESS = "mhadmin:8080";
 	// REST Endpoint Username
-	public static String USER_NAME = "matterhorn_system_account";
+	public static String USER_NAME = "opencast_system_account";
 	// REST Endpoint Password
 	public static String PASSWORD = "CHANGE_ME";
 	// The main directory to run the tests from

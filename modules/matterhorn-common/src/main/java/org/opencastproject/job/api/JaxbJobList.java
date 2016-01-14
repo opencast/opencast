@@ -49,10 +49,10 @@ public class JaxbJobList {
     this.jobs.add(job);
   }
 
-  public JaxbJobList(Collection<Job> jobs) {
+  public JaxbJobList(Collection<? extends Job> jobs) {
     if (jobs != null) {
       for (Job job : jobs) {
-        this.jobs.add((JaxbJob) job);
+        add(job);
       }
     }
   }

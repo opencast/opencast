@@ -201,6 +201,10 @@
         &.ja {
             @include build-icon(auto, auto, japanese, $size, $size);
         }
+
+        &.zh {
+            @include build-icon(auto, auto, chinese, $size, $size);
+        }
     }
 }
 
