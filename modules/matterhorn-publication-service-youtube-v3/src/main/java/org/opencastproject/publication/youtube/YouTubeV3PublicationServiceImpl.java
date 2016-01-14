@@ -21,12 +21,6 @@
 
 package org.opencastproject.publication.youtube;
 
-import com.google.api.services.youtube.model.Playlist;
-import com.google.api.services.youtube.model.SearchResult;
-import com.google.api.services.youtube.model.Video;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -44,9 +38,18 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.XProperties;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.api.services.youtube.model.Playlist;
+import com.google.api.services.youtube.model.SearchResult;
+import com.google.api.services.youtube.model.Video;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -66,6 +69,24 @@ import java.util.UUID;
  * Publishes media to a Youtube play list.
  */
 public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer implements YouTubePublicationService, ManagedService {
+
+  /** The load on the system introduced by creating a publish job */
+  public static final float DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD = 1.0f;
+
+  /** The load on the system introduced by creating a retract job */
+  public static final float DEFAULT_YOUTUBE_RETRACT_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD} */
+  public static final String YOUTUBE_PUBLISH_LOAD_KEY = "job.load.youtube.publish";
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_YOUTUBE_RETRACT_JOB_LOAD} */
+  public static final String YOUTUBE_RETRACT_LOAD_KEY = "job.load.youtube.retract";
+
+  /** The load on the system introduced by creating a publish job */
+  private float youtubePublishJobLoad = DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD;
+
+  /** The load on the system introduced by creating a retract job */
+  private float youtubeRetractJobLoad = DEFAULT_YOUTUBE_RETRACT_JOB_LOAD;
 
   /** Time to wait between polling for status (milliseconds.) */
   private static final long POLL_MILLISECONDS = 30L * 1000L;
@@ -168,6 +189,9 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
     } catch (final Exception e) {
       throw new ConfigurationException("Failed to load YouTube v3 properties", dataStore, e);
     }
+
+    youtubePublishJobLoad = LoadUtil.getConfiguredLoadValue(properties, YOUTUBE_PUBLISH_LOAD_KEY, DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD, serviceRegistry);
+    youtubeRetractJobLoad = LoadUtil.getConfiguredLoadValue(properties, YOUTUBE_RETRACT_LOAD_KEY, DEFAULT_YOUTUBE_RETRACT_JOB_LOAD, serviceRegistry);
   }
 
   @Override
@@ -175,7 +199,7 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
     if (mediaPackage.contains(track)) {
       try {
         final List<String> args = Arrays.asList(MediaPackageParser.getAsXml(mediaPackage), track.getIdentifier());
-        return serviceRegistry.createJob(JOB_TYPE, Operation.Publish.toString(), args);
+        return serviceRegistry.createJob(JOB_TYPE, Operation.Publish.toString(), args, youtubePublishJobLoad);
       } catch (ServiceRegistryException e) {
         throw new PublicationException("Unable to create a job for track: " + track.toString(), e);
       }
@@ -265,7 +289,7 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
     try {
       List<String> arguments = new ArrayList<String>();
       arguments.add(MediaPackageParser.getAsXml(mediaPackage));
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(), arguments);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(), arguments, youtubeRetractJobLoad);
     } catch (ServiceRegistryException e) {
       throw new PublicationException("Unable to create a job", e);
     }

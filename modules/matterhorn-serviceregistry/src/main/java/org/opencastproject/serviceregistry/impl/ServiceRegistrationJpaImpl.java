@@ -67,9 +67,10 @@ import javax.xml.bind.annotation.XmlType;
                 + "count(job.status) as numJobs, "
                 + "avg(job.queueTime) as meanQueue, "
                 + "avg(job.runTime) as meanRun FROM Job job group by job.processorServiceRegistrationId, job.status"),
-        @NamedQuery(name = "ServiceRegistration.hostload", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, count(job.status) as numJobs "
+        @NamedQuery(name = "ServiceRegistration.hostloads", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, sum(job.jobLoad) "
                 + "FROM Job job "
                 + "WHERE job.processorServiceRegistration.online=true and job.processorServiceRegistration.active=true and job.processorServiceRegistration.hostRegistration.maintenanceMode=false "
+                + "and job.status in :statuses "
                 + "GROUP BY job.processorServiceRegistration, job.status"),
         @NamedQuery(name = "ServiceRegistration.getRegistration", query = "SELECT r from ServiceRegistration r "
                 + "where r.hostRegistration.baseUrl = :host and r.serviceType = :serviceType"),

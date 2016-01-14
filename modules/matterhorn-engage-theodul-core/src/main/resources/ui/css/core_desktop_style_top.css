@@ -26,10 +26,14 @@ h1, h2, h3 {
 
 #engage_content {
     width: 98%;
+    min-width: 840px;
 }
 
 #engage_video {
     margin-top: 110px;
+    min-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #engage_controls {
@@ -88,32 +92,8 @@ h1, h2, h3 {
     padding: 10px 20px;
 }
 
-.form-signin {
-    max-width: 380px;
-    margin: 0 auto;
-    background-color: #fff;
-    /* padding: 15px 35px 45px; */
-    /* border: 1px solid rgba(0,0,0,0.1); */
-}
-
-.form-signin-heading,
-.checkbox {
-    margin-bottom: 30px;
-}
-
 .checkbox {
     font-weight: normal;
-}
-
-.form-control-custom {
-    position: relative;
-    font-size: 16px;
-    height: auto;
-    padding: 10px;
-    @include box-sizing(border-box);
-    &:focus {
-	z-index: 2;
-    }
 }
 
 #username {

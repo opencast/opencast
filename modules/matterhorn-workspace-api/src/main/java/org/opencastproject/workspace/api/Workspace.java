@@ -23,7 +23,6 @@ package org.opencastproject.workspace.api;
 
 import org.opencastproject.storage.StorageUsage;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 
 import java.io.File;
 import java.io.IOException;
@@ -239,6 +238,6 @@ public interface Workspace extends StorageUsage {
    * @param maxAge
    *          the maximal age in seconds of a file before deletion is performed
    */
-  void cleanup(Option<Integer> maxAge);
+  void cleanup(int maxAge);
 
 }

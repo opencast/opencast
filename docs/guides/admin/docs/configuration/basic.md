@@ -26,12 +26,10 @@ your own domain name:
 processed media. At least not without an extra amount of work involving modifications to the database. That is why you
 should think about this setting carefully.
 
-Second, adjust the binding address and port in `org.ops4j.pax.web.cfg`. The binding address can be set to `0.0.0.0` for
-general network access. The port should either fit the server URL or the settings of a proxy server, if one is used. The
-properties to modify are:
+Second, adjust the binding address in `custom.properties`. The binding address can be set to `0.0.0.0` for general
+network access. The property to modify is:
 
     org.ops4j.pax.web.listening.addresses=127.0.0.1
-    org.osgi.service.http.port=8080
 
 
 Step 2: Setting the Login Details

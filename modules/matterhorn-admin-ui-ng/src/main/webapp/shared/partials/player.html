@@ -37,6 +37,7 @@
                     <div class="timecode-input">
                         <input id="timecode-hour" name="hour" type="number"
                             max="59" maxlength="2"
+                            ng-change="changeTime(time)"
                             ng-model="time.hours">
                         <span class="colon-sep">:</span>
                     </div>
@@ -49,6 +50,7 @@
                     <div class="timecode-input">
                         <input id="timecode-minute" name="minute" type="number"
                             max="59" maxlength="2"
+                            ng-change="changeTime(time)"
                             ng-model="time.minutes">
                         <span class="colon-sep">:</span>
                     </div>
@@ -61,6 +63,7 @@
                     <div class="timecode-input">
                         <input id="timecode-second" name="second" type="number"
                             max="59" maxlength="2"
+                            ng-change="changeTime(time)"
                             ng-model="time.seconds">
                         <span class="colon-sep">.</span>
                     </div>
@@ -73,6 +76,7 @@
                     <div class="timecode-input">
                         <input id="timecode-frame" name="frame" type="number"
                             max="999" maxlength="3"
+                            ng-change="changeTime(time)"
                             ng-model="time.milliseconds">
                     </div>
                     <div class="timecode-label">

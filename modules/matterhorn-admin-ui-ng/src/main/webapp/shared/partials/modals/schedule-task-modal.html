@@ -137,7 +137,7 @@
     <footer ng-if="currentForm === 'summary'">
         <a ng-click="submit()"
             data-modal-tab="next" class="submit"
-            ng-class="{active: schedulaTaskForm.$valid, inactive: scheduleTaskForm.$invalid}">
+            ng-class="{active: schedulaTaskForm.$valid, inactive: scheduleTaskForm.$invalid, disabled: submitButton}">
             {{ 'WIZARD.CREATE' | translate }}
         </a>
         <a ng-click="navigateTo('taskForm', currentForm, [generalForm, taskForm])"

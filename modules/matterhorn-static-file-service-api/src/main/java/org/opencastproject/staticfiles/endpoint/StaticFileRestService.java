@@ -158,8 +158,10 @@ public class StaticFileRestService {
           @RestResponse(description = "Returns a static file resource", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No file by the given uuid found", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
   public Response getStaticFile(@PathParam("uuid") String uuid) throws NotFoundException {
-    try (InputStream file = staticFileService.getFile(uuid)) {
+    try {
+      final InputStream file = staticFileService.getFile(uuid);
       final String filename = staticFileService.getFileName(uuid);
+      // It is safe to pass the InputStream without closing it, JAX-RS takes care of that
       return RestUtil.R.ok(file, getMimeType(filename), Option.none(Long.class), Option.some(filename));
     } catch (NotFoundException e) {
       throw e;

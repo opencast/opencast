@@ -8,13 +8,13 @@
   <version>2.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>matterhorn</name>
-  <description>The Opencast Project's Matterhorn software is a media capture, processing, and distribution system</description>
-  <url>http://opencastproject.org</url>
+  <name>opencast</name>
+  <description>Opencast is a media capture, processing, management and distribution system</description>
+  <url>http://opencast.org</url>
   <inceptionYear>2009</inceptionYear>
 
   <prerequisites>
-    <maven>3.0.4</maven>
+    <maven>3.1</maven>
   </prerequisites>
 
   <properties>
@@ -176,6 +176,11 @@
     <module>modules/matterhorn-textextractor-tesseract</module>
     <module>modules/matterhorn-themes</module>
     <module>modules/matterhorn-themes-workflowoperation</module>
+    <module>modules/matterhorn-urlsigning-common</module>
+    <module>modules/matterhorn-urlsigning-service-api</module>
+    <module>modules/matterhorn-urlsigning-service-impl</module>
+    <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+    <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
     <module>modules/matterhorn-userdirectory</module>
     <module>modules/matterhorn-userdirectory-ldap</module>
     <module>modules/matterhorn-usertracking-api</module>
@@ -528,7 +533,7 @@
         <plugin>
           <groupId>com.github.klieber</groupId>
           <artifactId>phantomjs-maven-plugin</artifactId>
-          <version>0.5</version>
+          <version>0.7</version>
           <executions>
             <execution>
               <goals>
@@ -543,7 +548,7 @@
         <plugin>
           <groupId>com.github.searls</groupId>
           <artifactId>jasmine-maven-plugin</artifactId>
-          <version>2.0-beta-01</version>
+          <version>2.0</version>
           <executions>
             <execution>
               <goals>
@@ -1069,18 +1074,8 @@
     <url>http://www.opencastproject.org/</url>
   </organization>
 
+  <!-- Active contributors to Opencast -->
   <developers>
-    <developer>
-      <id>jholtzman</id>
-      <name>Josh Holtzman</name>
-      <email>jholtzman@berkeley.edu</email>
-      <organization>UC Berkeley</organization>
-      <organizationUrl>http://berkeley.edu</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>-8</timezone>
-    </developer>
     <developer>
       <id>ruben.perez</id>
       <name>Ruben Perez Vazquez</name>
@@ -1093,98 +1088,11 @@
       <timezone>+1</timezone>
     </developer>
     <developer>
-      <id>edu.alonso</id>
-      <name>Eduardo Alonso Gil</name>
-      <email>ealonso@uvigo.es</email>
-      <organization>University of Vigo</organization>
-      <organizationUrl>http://www.uvigo.es</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>k.amundson</id>
-      <name>Kristofor Amundson</name>
-      <email>kta719@mail.usask.ca</email>
-      <organization>University of Saskatchewan</organization>
-      <organizationUrl>http://www.usask.ca/</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>-6</timezone>
-    </developer>
-    <developer>
-      <id>cab938</id>
-      <name>Christopher Brooks</name>
-      <email>cab938@mail.usask.ca</email>
-      <organization>University of Saskatchewan</organization>
-      <organizationUrl>http://www.usask.ca/</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>-6</timezone>
-    </developer>
-    <developer>
-      <id>ahochman</id>
-      <name>Adam Hochman</name>
-      <email>adam@media.berkeley.edu</email>
-      <organization>UC Berkeley</organization>
-      <organizationUrl>http://berkeley.edu</organizationUrl>
-      <roles>
-        <role>project manager/community facilitator</role>
-      </roles>
-      <timezone>-8</timezone>
-    </developer>
-    <developer>
-      <id>bwulff</id>
-      <name>Benjamin Wulff</name>
-      <email>bwulff@uos.de</email>
-      <organization>University of Osnabrueck</organization>
-      <organizationUrl>http://www.uos.de/</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>azeckoski</id>
-      <name>Aaron Zeckoski</name>
-      <email>azeckoski@vt.edu</email>
-      <url>http://tinyurl.com/azprofile</url>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>0</timezone>
-    </developer>
-    <developer>
       <id>rrolf</id>
       <name>Ruediger Rolf</name>
       <email>rrolf@uni-osnabrueck.de</email>
       <organization>University of Osnabrueck</organization>
       <organizationUrl>http://www.uni-osnabrueck.de/</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>mketterl</id>
-      <name>Markus Ketterl</name>
-      <email>mketterl@uni-osnabrueck.de</email>
-      <organization>University of Osnabrueck</organization>
-      <organizationUrl>http://www.uni-osnabrueck.de/</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>bostjan</id>
-      <name>Bostjan Pajntar</name>
-      <email>bostjan.pajntar@ijs.si</email>
-      <organization>Jozef Stefan Institute</organization>
-      <organizationUrl>http://www.ijs.si</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1201,17 +1109,6 @@
       <timezone>-6</timezone>
     </developer>
     <developer>
-      <id>nejc</id>
-      <name>Nejc Skofic</name>
-      <email>nejc.skofic@ijs.si</email>
-      <organization>Jozef Stefan Institute</organization>
-      <organizationUrl>http://www.ijs.si</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
       <id>matjaz</id>
       <name>Matjaz Rihtar</name>
       <email>matjaz.rihtar@ijs.si</email>
@@ -1225,64 +1122,9 @@
     <developer>
       <id>twunden</id>
       <name>Tobias Wunden</name>
-      <email>tobias@entwinemedia.com</email>
-      <organization>Entwine</organization>
-      <organizationUrl>http://entwinemedia.com</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>msutton</id>
-      <name>Micah Sutton</name>
-      <email>msutton3@unl.edu</email>
-      <organization>University of Nebraska-Lincoln</organization>
-      <organizationUrl>http://www.unl.edu</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>-6</timezone>
-    </developer>
-    <developer>
-      <id>jamiehodge</id>
-      <name>Jamie Hodge</name>
-      <email>jamieh@hum.ku.dk</email>
-      <organization>Copenhagen University</organization>
-      <organizationUrl>http://ku.dk</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>jemden</id>
-      <name>Johannes Emden</name>
-      <email>johannes.emden@uni-osnabrueck.de</email>
-      <organization>University of Osnabrueck</organization>
-      <organizationUrl>http://www.uni-osnabrueck.de/</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>aklassen</id>
-      <name>Andre Klassen</name>
-      <email>andre.klassen@uni-osnabrueck.de</email>
-      <organization>University of Osnabrueck</organization>
-      <organizationUrl>http://www.uni-osnabrueck.de/</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>stefan</id>
-      <name>Stefan Altevogt</name>
-      <email>saltevog@uni-osnabrueck.de</email>
-      <organization>University of Applied Sciences Osnabrueck</organization>
-      <organizationUrl>http://www.fh-osnabrueck.de/</organizationUrl>
+      <email>twunden@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1291,63 +1133,20 @@
     <developer>
       <id>akm220</id>
       <name>Adam McKenzie</name>
-      <email>akm220@mail.usask.ca</email>
-      <organization>University of Saskatchewan</organization>
-      <organizationUrl>http://www.usask.ca</organizationUrl>
+      <email>amckenzie@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
       <timezone>-6</timezone>
     </developer>
     <developer>
-      <id>denmeyer</id>
-      <name>Denis Meyer</name>
-      <email>denmeyer@uni-osnabrueck.de</email>
-      <organization>University of Osnabrueck</organization>
-      <organizationUrl>http://www.uni-osnabrueck.de/</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>mmoorman</id>
-      <name>Markus Moormann</name>
-      <email>mmoorman@uni-osnabrueck.de</email>
-      <organization>University of Osnabrueck</organization>
-      <organizationUrl>http://www.uni-osnabrueck.de/</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>kenneth</id>
-      <name>Kenneth Lui</name>
-      <email>hkkenneth@gmail.com</email>
-      <url>http://www.ugrad.cs.ubc.ca/~j7l6/</url>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>-8</timezone>
-    </developer>
-    <developer>
       <id>cedriessen</id>
       <name>Christoph Driessen</name>
-      <email>christoph@entwinemedia.com</email>
-      <organization>Entwine</organization>
-      <organizationUrl>http://entwinemedia.com</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>sozores</id>
-      <name>Susana Ozores</name>
-      <email>sozores@teltek.es</email>
-      <organization>Universidade de Vigo</organization>
-      <organizationUrl>http://www.uvigo.es</organizationUrl>
+      <email>cdriessen@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1365,33 +1164,11 @@
       <timezone>+1</timezone>
     </developer>
     <developer>
-      <id>dhorwitz</id>
-      <name>David Horwitz</name>
-      <email>david.horwitz@uct.ac.za</email>
-      <organization>University of Cape Town</organization>
-      <organizationUrl>http://www.uct.ac.za/</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+2</timezone>
-    </developer>
-    <developer>
-      <id>nbirnbaum</id>
-      <name>Nils H. Birnbaum</name>
-      <email>nbirnbau@uni-osnabrueck.de</email>
-      <organization>Universität Osnabrück</organization>
-      <organizationUrl>http://www.virtuos.uni-osnabrueck.de</organizationUrl>
-      <roles>
-        <role>Documentation and QA</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
       <id>lrohner</id>
       <name>Lukas Rohner</name>
-      <email>lukas@entwinemedia.com</email>
-      <organization>Entwine</organization>
-      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <email>lrohner@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1400,9 +1177,9 @@
     <developer>
       <id>xavier.butty</id>
       <name>Xavier Butty</name>
-      <email>xavier@entwinemedia.com</email>
-      <organization>Entwine</organization>
-      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <email></email>
+      <organization></organization>
+      <organizationUrl></organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -1418,30 +1195,6 @@
         <role>developer</role>
       </roles>
       <timezone>+2</timezone>
-    </developer>
-    <developer>
-      <id>michellezee</id>
-      <name>Michelle Ziegmann</name>
-      <email>michelle@media.berkeley.edu</email>
-      <organization>UC Berkeley</organization>
-      <organizationUrl>http://berkeley.edu</organizationUrl>
-      <roles>
-        <role>community facilitator</role>
-        <role>tester</role>
-      </roles>
-      <timezone>-8</timezone>
-    </developer>
-    <developer>
-      <id>judy</id>
-      <name>Judy Stern</name>
-      <email>jlstern@berkeley.edu</email>
-      <organization>UC Berkeley</organization>
-      <organizationUrl>http://berkeley.edu</organizationUrl>
-      <roles>
-        <role>community facilitator</role>
-        <role>tester</role>
-      </roles>
-      <timezone>-8</timezone>
     </developer>
     <developer>
       <id>jamesp</id>
@@ -1466,17 +1219,6 @@
       <timezone>0</timezone>
     </developer>
     <developer>
-      <id>jaimeg</id>
-      <name>Jaime Gago</name>
-      <email>jaime@entwinemedia.com</email>
-      <organization>Entwine</organization>
-      <organizationUrl>http://entwinemedia.com</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>-8</timezone>
-    </developer>
-    <developer>
       <id>karen</id>
       <name>Karen Dolan</name>
       <email>kdolan@dce.harvard.edu</email>
@@ -1491,27 +1233,160 @@
       <id>lkiesow</id>
       <name>Lars Kiesow</name>
       <email>lkiesow@uos.de</email>
-      <organization>Fraunhofer IAIS, University of Osnabrueck</organization>
-      <organizationUrl>http://www.uos.de/</organizationUrl>
+      <url>http://lkiesow.de</url>
+      <organization>ELAN e.V., University of Osnabrück</organization>
+      <organizationUrl>http://www.virtuos.uos.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+        <role>qa</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+      <properties>
+        <irc.nick>lkiesow</irc.nick>
+      </properties>
+    </developer>
+    <developer>
+      <id>basil.brunner</id>
+      <name>Basil Brunner</name>
+      <email>bbrunner@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
       <timezone>+1</timezone>
     </developer>
     <developer>
-      <id>basil.brunner</id>
-      <name>Basil Brunner</name>
-      <email>basil@entwinemedia.com</email>
-      <organization>Entwine</organization>
-      <organizationUrl>http://entwinemedia.com</organizationUrl>
+      <id>mstypa</id>
+      <name>Michael Stypa</name>
+      <email>michael@stypa.info</email>
+      <url>http://michael.stypa.info</url>
+      <organization>ELAN e.V., University of Osnabrück</organization>
+      <organizationUrl>http://www.virtuos.uos.de/</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
-      <timezone>+1</timezone>
+      <timezone>Europe/Berlin</timezone>
+      <properties>
+        <irc.nick>mstypa</irc.nick>
+        <bitbucket.nick>doofy</bitbucket.nick>
+      </properties>
+    </developer>
+    <developer>
+      <id>rsantos</id>
+      <name>Rute Santos</name>
+      <email>rute_santos@harvard.edu</email>
+      <organization>Harvard University, Division of Continuing Education</organization>
+      <organizationUrl>http://www.dce.harvard.edu</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-5</timezone>
     </developer>
   </developers>
 
-  <contributors><!-- TODO? -->
+  <!-- People having significantly contributed to Opencast in the past -->
+  <contributors>
+    <contributor>
+      <name>Micah Sutton</name>
+      <email>msutton3@unl.edu</email>
+    </contributor>
+    <contributor>
+      <name>Jamie Hodge</name>
+      <email>jamieh@hum.ku.dk</email>
+    </contributor>
+    <contributor>
+      <name>Johannes Emden</name>
+      <email>johannes.emden@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Andre Klassen</name>
+      <email>andre.klassen@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Stefan Altevogt</name>
+      <email>saltevog@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Josh Holtzman</name>
+      <email>jholtzman@berkeley.edu</email>
+    </contributor>
+    <contributor>
+      <name>Jaime Gago</name>
+      <email>jaime@entwinemedia.com</email>
+    </contributor>
+    <contributor>
+      <name>Judy Stern</name>
+      <email>jlstern@berkeley.edu</email>
+    </contributor>
+    <contributor>
+      <name>Michelle Ziegmann</name>
+      <email>michelle@media.berkeley.edu</email>
+    </contributor>
+    <contributor>
+      <name>David Horwitz</name>
+      <email>david.horwitz@uct.ac.za</email>
+    </contributor>
+    <contributor>
+      <name>Nils H. Birnbaum</name>
+      <email>nbirnbau@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Denis Meyer</name>
+      <email>denmeyer@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Markus Moormann</name>
+      <email>mmoorman@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Kenneth Lui</name>
+      <email>hkkenneth@gmail.com</email>
+    </contributor>
+    <contributor>
+      <name>Eduardo Alonso Gil</name>
+      <email>ealonso@uvigo.es</email>
+    </contributor>
+    <contributor>
+      <name>Kristofor Amundson</name>
+      <email>kta719@mail.usask.ca</email>
+    </contributor>
+    <contributor>
+      <name>Christopher Brooks</name>
+      <email>cab938@mail.usask.ca</email>
+    </contributor>
+    <contributor>
+      <name>Adam Hochman</name>
+      <email>adam@media.berkeley.edu</email>
+    </contributor>
+    <contributor>
+      <name>Benjamin Wulff</name>
+      <email>bwulff@uos.de</email>
+    </contributor>
+    <contributor>
+      <name>Aaron Zeckoski</name>
+      <email>azeckoski@vt.edu</email>
+    </contributor>
+    <contributor>
+      <name>Markus Ketterl</name>
+      <email>mketterl@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Bostjan Pajntar</name>
+      <email>bostjan.pajntar@ijs.si</email>
+    </contributor>
+    <contributor>
+      <name>Nejc Skofic</name>
+      <email>nejc.skofic@ijs.si</email>
+    </contributor>
+    <contributor>
+      <name>Per Pascal Grube</name>
+      <email>pascal.grube@flightmare.net</email>
+    </contributor>
+    <contributor>
+      <name>Pascal Aubort</name>
+      <email>pascal@entwinemedia.com</email>
+    </contributor>
   </contributors>
 
   <mailingLists>
@@ -1541,6 +1416,7 @@
     <system>jira</system>
     <url>https://opencast.jira.com</url>
   </issueManagement>
+
   <!-- Site Report generation settings -->
   <reporting>
     <plugins>
@@ -1591,15 +1467,6 @@
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
         </configuration>
-        <!--<reportSets>
-          <reportSet>
-            <id>aggregate</id>
-            <inherited>false</inherited>
-            <reports>
-              <report>aggregate</report>
-            </reports>
-          </reportSet>
-        </reportSets>-->
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -1631,31 +1498,6 @@
           </reportSet>
         </reportSets>
       </plugin>
-      <!--<plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>taglist-maven-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <tags>
-            <tag>TODO</tag>
-            <tag>FIXME</tag>
-            <tag>@todo</tag>
-            <tag>@deprecated</tag>
-          </tags>
-        </configuration>
-      </plugin>
-      <!- - WARNING: this plugin is beta only, we should maybe not use it -AZ - ->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jdepend-maven-plugin</artifactId>
-        <version>2.0-beta-2</version>
-      </plugin>
-      -->
-      <!-- <plugin> -->
-      <!-- <groupId>org.codehaus.mojo</groupId> -->
-      <!-- <artifactId>cobertura-maven-plugin</artifactId> -->
-      <!-- <version>2.3</version> -->
-      <!-- </plugin> -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
@@ -1669,7 +1511,7 @@
       </plugin>
     </plugins>
   </reporting>
-  <!-- defines the various repositories -->
+
   <pluginRepositories>
     <pluginRepository>
       <id>opencast</id>
