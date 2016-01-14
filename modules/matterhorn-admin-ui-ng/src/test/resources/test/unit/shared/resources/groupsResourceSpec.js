@@ -45,13 +45,6 @@ describe('Groups API Resource', function () {
             expect(data.rows[0].description).toBe(sampleJSON.results[0].description);
         });
 
-        it('handles empty payload', function () {
-            $httpBackend.whenGET('/admin-ng/groups/groups.json').respond('{}');
-            var data = GroupsResource.query();
-            $httpBackend.flush();
-            expect(data.rows.length).toBe(0);
-        });
-
         it('handles payloads with one item', function () {
             $httpBackend.whenGET('/admin-ng/groups/groups.json').respond(JSON.stringify(
                 {
