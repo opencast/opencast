@@ -18,11 +18,6 @@
       <version>4.7</version>
     </dependency>
     <dependency>
-      <groupId>net.oauth.core</groupId>
-      <artifactId>oauth-httpclient4</artifactId>
-      <version>20090913</version>
-    </dependency>
-    <dependency>
       <groupId>com.google.collections</groupId>
       <artifactId>google-collections</artifactId>
       <version>1.0</version>
@@ -31,11 +26,6 @@
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <version>0.9.5-RC2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>org.springframework.core</artifactId>
-      <version>3.0.2.RELEASE</version>
     </dependency>
     <dependency>
       <groupId>dom4j</groupId>
@@ -174,29 +164,4 @@
       </plugin>
     </plugins>
   </build>
-  <!-- This gets a pass for MH-1810 since it does not inherit the base POM -AZ -->
-  <repositories>
-    <repository>
-      <id>opencast</id>
-      <name>Opencast Repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-    <repository>
-      <id>opencast.snapshots</id>
-      <name>Opencast SNAPSHOTS</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public-snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-  </repositories>
 </project>
