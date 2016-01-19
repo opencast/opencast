@@ -40,12 +40,19 @@
     cursor: default;
 }
 
-/* absolutly positon all video displays.. */
+
 .videoDisplay {
+    /* absolutly positon all video displays.. */
     position: absolute;
     top: 0;
+    opacity: 0.4;
+    -webkit-transition: opacity 1s;
+    transition: opacity 1s;
 }
-/* ..but the first one */
 #videoDisplay1 {
+    /* ..but the first one */
     position: relative;
+}
+.videoDisplay.active {
+    opacity: 1;
 }

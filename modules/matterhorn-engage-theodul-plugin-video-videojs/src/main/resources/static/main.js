@@ -2007,6 +2007,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 // check if current video is paused
                 var isPaused = videodisplayMaster.paused();
 
+                $("#" + id_videoDisplayClass + (currentlySelectedVideodisplay+1)).removeClass("active");
+
                 // assign currentlySelectedVideodisplay in the available bounds
                 var n = globalVideoSource.length;
                 currentlySelectedVideodisplay = Math.max(0, Math.min(id, n-1));
@@ -2022,6 +2024,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                         videodisplayMaster.play();
                     }
                 }
+
+                $("#" + id_videoDisplayClass + (currentlySelectedVideodisplay+1)).addClass("active");
 
                 Engage.log("Switched to video " + currentlySelectedVideodisplay);                
             });

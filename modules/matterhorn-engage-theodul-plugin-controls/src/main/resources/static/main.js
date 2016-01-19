@@ -159,7 +159,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var logoLink = false;
     var logo = plugin_path + "images/logo.png";
     var showEmbed = true;
-    var hideTimeout = 5;            // time after controls are hidden again in seconds
+    // mobile mode: time after controls are hidden again in seconds
+    var hideTimeout = 4;
 
 
     /* don't change these variables */
@@ -1124,9 +1125,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 // from interfering with user input
                 $("#" + id_gestureContainer).removeClass("animate");
             break;
-            
+
             case 'panleft':
             case 'panright':
+                // prevent scrolling
+                ev.preventDefault();
+                
                 // stick to the finger
                 var displayOffset = currentDisplay * 100;
                 var dragOffset = ev.deltaX;

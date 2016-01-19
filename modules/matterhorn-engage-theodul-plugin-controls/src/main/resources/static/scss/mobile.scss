@@ -19,7 +19,7 @@
 	  	z-index: 1;
 		  top: 0;
 		  bottom: 0;
-			width: 20%;
+			width: 15%;
 			height: 100%;
 
 			visibility: visible;
@@ -87,7 +87,6 @@
 		}
 	}
 
-
 	#navigation_wrapper {
 		position: absolute;
 		z-index: 10;
@@ -139,12 +138,12 @@
 		#slider {
 			@include flex(1 0 30px);
 
-	    margin: 16px 17px 0px;
+	    margin: 14px 17px 0px;
 	    border-width: 1px;
 	    border-style: solid;
 	    border-color: #333 #333 #777 #333;
 	    border-radius: 25px;
-	    height: 4px;
+	    height: 6px;
 	    background-color: #8e8d8d;
 	    background: url('../images/bg-track.png') repeat top left;
 	    box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px rgba(250, 250, 250, .5);
@@ -180,7 +179,7 @@
 		    border-color: #333 #777 #333 #333;
 		    border-radius: 25px;
 		    height: 100%;
-		    width: 4px;
+		    width: 6px;
         margin: 0 auto;
 		    background-color: #8e8d8d;
 		    background: url('../images/bg-track.png') repeat top left;
@@ -189,7 +188,7 @@
 
         .ui-slider-handle {
           top: auto !important;
-          margin-left: -150% !important;
+          margin-left: -2px !important;
         }
 			}
 		}

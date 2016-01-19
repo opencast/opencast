@@ -13,7 +13,7 @@
   z-index: 1;
   top: 0;
   bottom: 0;
-  width: 20%;
+  width: 15%;
   height: 100%;
   visibility: visible;
   opacity: 1;
@@ -100,7 +100,7 @@
   -webkit-box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.6), inset 1px 1px 3px rgba(20, 20, 20, 0.6);
   box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.6), inset 1px 1px 3px rgba(20, 20, 20, 0.6);
 }
-/* line 91, ../scss/mobile.scss */
+/* line 90, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper {
   position: absolute;
   z-index: 10;
@@ -113,7 +113,7 @@
   display: -webkit-flex;
   display: flex;
 }
-/* line 104, ../scss/mobile.scss */
+/* line 103, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .ui-slider-handle {
   position: absolute;
   z-index: 2;
@@ -128,14 +128,14 @@
   top: -10px !important;
   margin-left: -12px;
 }
-/* line 119, ../scss/mobile.scss */
+/* line 118, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_control {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
   font-size: 27px;
   cursor: pointer;
 }
-/* line 125, ../scss/mobile.scss */
+/* line 124, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
@@ -143,30 +143,30 @@
   margin-right: 12px;
   font-size: 12px;
 }
-/* line 130, ../scss/mobile.scss */
+/* line 129, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time #navigation_time_current {
   color: #666;
 }
-/* line 133, ../scss/mobile.scss */
+/* line 132, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time p {
   margin: 0;
   line-height: 1.2;
 }
-/* line 139, ../scss/mobile.scss */
+/* line 138, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #slider {
   -webkit-flex: 1 0 30px;
   flex: 1 0 30px;
-  margin: 16px 17px 0px;
+  margin: 14px 17px 0px;
   border-width: 1px;
   border-style: solid;
   border-color: #333 #333 #777 #333;
   border-radius: 25px;
-  height: 4px;
+  height: 6px;
   background-color: #8e8d8d;
   background: url("../images/bg-track.png") repeat top left;
   box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
 }
-/* line 153, ../scss/mobile.scss */
+/* line 152, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume {
   -webkit-flex: 0 0 35px;
   flex: 0 0 35px;
@@ -174,11 +174,11 @@
   font-size: 27px;
   text-align: center;
 }
-/* line 160, ../scss/mobile.scss */
+/* line 159, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeIcon {
   cursor: pointer;
 }
-/* line 164, ../scss/mobile.scss */
+/* line 163, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSliderWrapper {
   position: absolute;
   bottom: 100%;
@@ -191,25 +191,25 @@
   height: 95px;
   margin-bottom: 6px;
 }
-/* line 177, ../scss/mobile.scss */
+/* line 176, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSlider {
   border-width: 1px;
   border-style: solid;
   border-color: #333 #777 #333 #333;
   border-radius: 25px;
   height: 100%;
-  width: 4px;
+  width: 6px;
   margin: 0 auto;
   background-color: #8e8d8d;
   background: url("../images/bg-track.png") repeat top left;
   box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
 }
-/* line 190, ../scss/mobile.scss */
+/* line 189, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSlider .ui-slider-handle {
   top: auto !important;
-  margin-left: -150% !important;
+  margin-left: -2px !important;
 }
-/* line 197, ../scss/mobile.scss */
+/* line 196, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .ui-slider-range {
   background: #ffffff;
   /* Old browsers */
