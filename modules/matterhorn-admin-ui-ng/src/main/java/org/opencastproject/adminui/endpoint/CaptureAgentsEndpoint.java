@@ -32,6 +32,7 @@ import static org.opencastproject.index.service.util.JSONUtils.blacklistToJSON;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.adminui.util.TextFilter;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -123,6 +124,7 @@ public class CaptureAgentsEndpoint {
     Option<String> filterName = Option.none();
     Option<String> filterStatus = Option.none();
     Option<Long> filterLastUpdated = Option.none();
+    Option<String> filterText = Option.none();
     Option<String> optSort = Option.option(trimToNull(sort));
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
@@ -139,6 +141,8 @@ public class CaptureAgentsEndpoint {
           return Response.status(Status.BAD_REQUEST).build();
         }
       }
+      if (AgentsListQuery.FILTER_TEXT_NAME.equals(name) && StringUtils.isNotBlank(filters.get(name)))
+        filterText = Option.some(filters.get(name));
     }
 
     // Get list of agents from the PM
@@ -162,7 +166,8 @@ public class CaptureAgentsEndpoint {
       // Filter list
       if ((filterName.isSome() && !filterName.get().equals(agent.getName()))
               || (filterStatus.isSome() && !filterStatus.get().equals(agent.getState()))
-              || (filterLastUpdated.isSome() && filterLastUpdated.get() != agent.getLastHeardFrom()))
+              || (filterLastUpdated.isSome() && filterLastUpdated.get() != agent.getLastHeardFrom())
+              || (filterText.isSome() && !TextFilter.match(filterText.get(), agent.getName(), agent.getState())))
         continue;
       filteredAgents.add(agent);
     }

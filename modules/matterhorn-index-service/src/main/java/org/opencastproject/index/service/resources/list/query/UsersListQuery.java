@@ -48,6 +48,8 @@ public class UsersListQuery extends ResourceListQueryImpl {
   public static final String FILTER_PROVIDER_NAME = "Provider";
   private static final String FILTER_PROVIDER_LABEL = "FILTERS.USERS.PROVIDER.LABEL";
 
+  public static final String FILTER_TEXT_NAME = "textFilter";
+
   public UsersListQuery() {
     super();
     this.availableFilters.add(createNameFilter(Option.<String> none()));
