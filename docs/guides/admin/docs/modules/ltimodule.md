@@ -8,7 +8,7 @@ How To Use It
 -------------
 
 Test if the LTI module is present in the Opencast instance.
-First of all, be sure that the module OPENCAST-lti has been compiled, deployed and starts within the opencast instance.To test if the module is running, go on the page
+First of all, be sure that the module matterhorn-lti has been compiled, deployed and starts within the opencast instance.To test if the module is running, go on the page
 `OPENCAST-URL/ltitools/index.html`.
 
 A welcome message from the LTI tools should appear. This is the default index page for the LTI tool. But two ready-to-use elements  are available in this module:
@@ -61,4 +61,4 @@ For more information about how to setting custom LTI tags, please check the docu
 
 How To Customise It
 -------------------
-The LTI module can be extended/customised to fulfil your own needs.  The default elements from the LTI module (player, series) can be found in the folder `OPENCAST/modules/OPENCAST-lti/src/main/resources/tools`.  These elements can be modified or new one can be created to extend the LTI module. Keep in mind that the player and series elements are using some files from the OPENCAST/shared-resources folder. These files are copied at compile-time. For more information about it, look at the maven pom file of the LTI module.
+The LTI module can be extended/customised to fulfil your own needs.  The default elements from the LTI module (player, series) can be found in the folder `OPENCAST/modules/matterhorn-lti/src/main/resources/tools`.  These elements can be modified or new one can be created to extend the LTI module. Keep in mind that the player and series elements are using some files from the OPENCAST/shared-resources folder. These files are copied at compile-time. For more information about it, look at the maven pom file of the LTI module.
