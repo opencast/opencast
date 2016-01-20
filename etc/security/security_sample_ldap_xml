@@ -247,10 +247,19 @@
     <!-- Defines how the user attributes are converted to authorities (roles) -->
     <constructor-arg>
       <!-- Get the authorities (roles) according to a certain attribute in the authenticated user -->
-      <!-- See the documentation of the class below to know the expected attribute format -->
       <bean class="org.opencastproject.kernel.userdirectory.LdapAttributeAuthoritiesPopulator">
-        <!-- The attribute name -->
-        <constructor-arg value="property" />
+        <constructor-arg>
+          <!-- List of attribute names in the user from which roles will be created -->
+          <!-- The specified attributes must meet few requirements:
+                 * They may be single-valued or multivalued
+                 * They may contain single roles or role lists
+                 * In lists, roles may be separated with spaces, commas or both 
+          -->
+          <list>
+            <value>attributeName1</value>
+            <value>attributeName2</value>
+          </list>
+        </constructor-arg>
       </bean>
 
       <!-- The bean below obtains the user authorities (roles) based on the groups the user belongs to -->
