@@ -56,8 +56,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -225,9 +225,9 @@ public class GroupsEndpoint {
           @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
           @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, reponses = {
-                  @RestResponse(responseCode = SC_CREATED, description = "Group created"),
-                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long"),
-                  @RestResponse(responseCode = SC_CONFLICT, description = "An group with this name already exists.") })
+          @RestResponse(responseCode = SC_CREATED, description = "Group created"),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long"),
+          @RestResponse(responseCode = SC_CONFLICT, description = "An group with this name already exists.") })
   public Response createGroup(@FormParam("name") String name, @FormParam("description") String description,
           @FormParam("roles") String roles, @FormParam("users") String users) {
 

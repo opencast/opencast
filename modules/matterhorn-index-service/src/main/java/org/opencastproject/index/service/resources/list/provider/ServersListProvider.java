@@ -30,7 +30,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,7 +125,7 @@ public class ServersListProvider implements ResourceListProvider {
             : false;
     boolean fMaintenance = query.hasFilter(FILTER_MAINTENANCE) ? (Boolean) query.getFilter(FILTER_MAINTENANCE)
             .getValue().get() : false;
-    Integer fMaxJobs = query.hasFilter(FILTER_MAXJOBS) ? (Integer) query.getFilter(FILTER_MAXJOBS).getValue().get()
+    Float fMaxJobs = query.hasFilter(FILTER_MAXJOBS) ? (Float) query.getFilter(FILTER_MAXJOBS).getValue().get()
             : -1;
     Integer fCores = query.hasFilter(FILTER_CORES) ? (Integer) query.getFilter(FILTER_CORES).getValue().get() : -1;
     Integer fMemory = query.hasFilter(FILTER_MEMORY) ? (Integer) query.getFilter(FILTER_MEMORY).getValue().get() : -1;
@@ -173,7 +173,7 @@ public class ServersListProvider implements ResourceListProvider {
         boolean vMaintenance = server.isMaintenanceMode();
         String vName = server.getBaseUrl();
         int vCores = server.getCores();
-        int vMaxJobs = server.getMaxJobs();
+        float vMaxJobs = server.getMaxLoad();
 
         if (fOffline && vOnline)
           continue;
@@ -203,7 +203,7 @@ public class ServersListProvider implements ResourceListProvider {
             list.put(vName, vName);
             break;
           case MAXJOBS:
-            list.put(Integer.toString(vMaxJobs), Integer.toString(vMaxJobs));
+            list.put(Float.toString(vMaxJobs), Float.toString(vMaxJobs));
             break;
           case MEMORY:
             list.put(Long.toString(server.getMemory()), Long.toString(server.getMemory()));

@@ -118,6 +118,8 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
+import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.series.impl.SeriesServiceImpl;
@@ -234,6 +236,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(securityService.getOrganization()).andAnswer(organizationResponder).anyTimes();
     EasyMock.replay(securityService);
     env.setSecurityService(securityService);
+
+    UrlSigningService urlSigningService = EasyMock.createNiceMock(UrlSigningService.class);
+    EasyMock.expect(urlSigningService.accepts(EasyMock.anyString())).andReturn(false).anyTimes();
+    EasyMock.replay(urlSigningService);
+    env.setUrlSigningService(urlSigningService);
 
     // AdminUISearchIndex
     AdminUISearchIndex searchIndex = EasyMock.createNiceMock(AdminUISearchIndex.class);
@@ -979,6 +986,20 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   @Override
   public AdminUIConfiguration getAdminUIConfiguration() {
     return env.getAdminUIConfiguration();
+  }
+
+  @Override
+  public long getUrlSigningExpireDuration() {
+    return UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+  }
+  @Override
+  public UrlSigningService getUrlSigningService() {
+    return env.getUrlSigningService();
+  }
+
+  @Override
+  public Boolean signWithClientIP() {
+    return false;
   }
 
 }

@@ -5,7 +5,7 @@
 
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>2.1-SNAPSHOT</version>
+  <version>2.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>opencast</name>
@@ -176,6 +176,11 @@
     <module>modules/matterhorn-textextractor-tesseract</module>
     <module>modules/matterhorn-themes</module>
     <module>modules/matterhorn-themes-workflowoperation</module>
+    <module>modules/matterhorn-urlsigning-common</module>
+    <module>modules/matterhorn-urlsigning-service-api</module>
+    <module>modules/matterhorn-urlsigning-service-impl</module>
+    <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+    <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
     <module>modules/matterhorn-userdirectory</module>
     <module>modules/matterhorn-userdirectory-ldap</module>
     <module>modules/matterhorn-usertracking-api</module>
@@ -991,9 +996,9 @@
       </dependency>
 
       <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.6</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.4</version>
       </dependency>
 
       <dependency>

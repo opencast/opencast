@@ -43,7 +43,9 @@ public interface ManifestContributor {
    * @param serializer
    *          the media package serializer
    * @return the object's xml representation
+   * @throws MediaPackageException
+   *           if the mediapackage can't be serialized
    */
-  Node toManifest(Document document, MediaPackageSerializer serializer);
+  Node toManifest(Document document, MediaPackageSerializer serializer) throws MediaPackageException;
 
 }

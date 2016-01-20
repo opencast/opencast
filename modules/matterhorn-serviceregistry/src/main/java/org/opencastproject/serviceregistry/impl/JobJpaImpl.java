@@ -186,6 +186,12 @@ public class JobJpaImpl extends JaxbJob {
   }
 
   public JobJpaImpl(User user, Organization organization, ServiceRegistrationJpaImpl creatorServiceRegistration,
+          String operation, List<String> arguments, String payload, boolean dispatchable, Float loadValue) {
+    this(user, organization, creatorServiceRegistration, operation, arguments, payload, dispatchable);
+    setJobLoad(loadValue);
+  }
+
+  public JobJpaImpl(User user, Organization organization, ServiceRegistrationJpaImpl creatorServiceRegistration,
           String operation, List<String> arguments, String payload, boolean dispatchable, JobJpaImpl rootJob,
           JobJpaImpl parentJob) {
     this(user, organization, creatorServiceRegistration, operation, arguments, payload, dispatchable);
@@ -195,6 +201,18 @@ public class JobJpaImpl extends JaxbJob {
     this.parentJob = parentJob;
   }
 
+  public JobJpaImpl(User user, Organization organization, ServiceRegistrationJpaImpl creatorServiceRegistration,
+          String operation, List<String> arguments, String payload, boolean dispatchable, JobJpaImpl rootJob,
+          JobJpaImpl parentJob, Float loadValue) {
+    this(user, organization, creatorServiceRegistration, operation, arguments, payload, dispatchable, rootJob, parentJob);
+    setJobLoad(loadValue);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.Job#getId()
+   */
   @Id
   @GeneratedValue
   @Column(name = "id")
@@ -363,6 +381,31 @@ public class JobJpaImpl extends JaxbJob {
   @Override
   public boolean isDispatchable() {
     return super.dispatchable;
+  }
+
+  @Column(name = "job_load")
+  @XmlAttribute
+  @Override
+  public Float getJobLoad() {
+    return super.jobLoad;
+  }
+
+  @Column(name = "blocking_job_list")
+  @OrderColumn(name = "job_index")
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "mh_blocking_job", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
+  @XmlElement(name = "jobId")
+  @XmlElementWrapper(name = "blockingJobId")
+  @Override
+  public List<Long> getBlockedJobIds() {
+    return blockedJobIds;
+  }
+
+  @Override
+  @Column(name = "blocking_job")
+  @XmlElement(name = "blockingJobId")
+  public Long getBlockingJobId() {
+    return blockingJobId;
   }
 
   @Override

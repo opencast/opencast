@@ -4,9 +4,11 @@
     activate="activate">
     <implementation class="org.opencastproject.distribution.streaming.StreamingDistributionService" />
     <property name="service.description" value="Distribution Service (Local)" />
+    <property name="service.pid" value="org.opencastproject.distribution.distribution.streaming.StreamingDistributionService" />
     <property name="distribution.channel" value="streaming" />
     <service>
       <provide interface="org.opencastproject.distribution.api.DistributionService" />
+      <provide interface="org.osgi.service.cm.ManagedService" />
     </service>
     <reference name="WORKSPACE" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
       policy="static" bind="setWorkspace" />

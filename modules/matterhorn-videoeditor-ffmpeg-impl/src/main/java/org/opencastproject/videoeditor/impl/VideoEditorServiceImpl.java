@@ -46,6 +46,7 @@ import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 import org.opencastproject.videoeditor.api.VideoEditorService;
@@ -81,6 +82,12 @@ import javax.xml.bind.JAXBException;
  * Implementation of VideoeditorService using FFMPEG
  */
 public class VideoEditorServiceImpl extends AbstractJobProducer implements VideoEditorService, ManagedService {
+
+  public static final String JOB_LOAD_KEY = "job.load.videoeditor";
+
+  private static final float DEFAULT_JOB_LOAD = 2.0f;
+
+  private float jobload = DEFAULT_JOB_LOAD;
 
   /**
    * The logging instance
@@ -332,7 +339,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       incident().recordJobCreationIncident(job, e);
       throw new MediaInspectionException("Media inspection of " + workspaceURI + " failed", e);
     }
-    JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
+    JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
     if (!barrier.waitForJobs().isSuccess()) {
       throw new ProcessFailedException("Media inspection of " + workspaceURI + " failed");
     }
@@ -388,7 +395,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         for (SmilMediaParam param : paramGroup.getParams()) {
           if (SmilMediaParam.PARAM_NAME_TRACK_ID.equals(param.getName())) {
             jobs.add(serviceRegistry.createJob(getJobType(), Operation.PROCESS_SMIL.toString(),
-                    Arrays.asList(smil.toXML(), paramGroup.getId())));
+                    Arrays.asList(smil.toXML(), paramGroup.getId()), jobload));
           }
         }
       }
@@ -446,15 +453,19 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     logger.debug("deactivating...");
   }
 
+
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     this.properties = new Properties();
+    @SuppressWarnings("rawtypes")
     Enumeration keys = properties.keys();
     while (keys.hasMoreElements()) {
       Object key = keys.nextElement();
       this.properties.put(key, properties.get(key));
     }
     logger.debug("Properties updated!");
+
+    jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
   }
 
   public void setMediaInspectionService(MediaInspectionService inspectionService) {

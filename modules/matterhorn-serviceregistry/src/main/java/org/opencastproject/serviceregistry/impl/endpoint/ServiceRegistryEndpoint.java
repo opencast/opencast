@@ -27,8 +27,8 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.JaxbJobList;
@@ -44,6 +44,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceState;
+import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
@@ -54,7 +55,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.util.Arrays;
@@ -215,11 +216,11 @@ public class ServiceRegistryEndpoint {
           @RestParameter(name = "address", isRequired = true, description = "The IP address", type = Type.STRING),
           @RestParameter(name = "memory", isRequired = true, description = "The allocated memory", type = Type.STRING),
           @RestParameter(name = "cores", isRequired = true, description = "The available cores", type = Type.STRING),
-          @RestParameter(name = "maxJobs", isRequired = true, description = "The maximum number of concurrent jobs this host can run", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was registered successfully") })
+          @RestParameter(name = "maxLoad", isRequired = true, description = "The maximum load this host support", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was registered successfully") })
   public void register(@FormParam("host") String host, @FormParam("address") String address,
-          @FormParam("memory") long memory, @FormParam("cores") int cores, @FormParam("maxJobs") int maxJobs) {
+          @FormParam("memory") long memory, @FormParam("cores") int cores, @FormParam("maxLoad") float maxLoad) {
     try {
-      serviceRegistry.registerHost(host, address, memory, cores, maxJobs);
+      serviceRegistry.registerHost(host, address, memory, cores, maxLoad);
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }
@@ -416,6 +417,7 @@ public class ServiceRegistryEndpoint {
           @RestParameter(name = "operation", isRequired = true, type = Type.STRING, description = "The operation this job should execute"),
           @RestParameter(name = "payload", isRequired = false, type = Type.TEXT, description = "The job type identifier"),
           @RestParameter(name = "start", isRequired = false, type = Type.BOOLEAN, description = "Whether the job should be queued for dispatch and execution"),
+          @RestParameter(name = "jobLoad", isRequired = false, type = Type.STRING, description = "The load this job will incur on the system"),
           @RestParameter(name = "arg", isRequired = false, type = Type.TEXT, description = "An argument for the operation"),
           @RestParameter(name = "arg", isRequired = false, type = Type.TEXT, description = "An argument for the operation"),
           @RestParameter(name = "arg", isRequired = false, type = Type.TEXT, description = "An argument for the operation"),
@@ -436,8 +438,15 @@ public class ServiceRegistryEndpoint {
     boolean start = StringUtils.isBlank(request.getParameter("start"))
             || Boolean.TRUE.toString().equalsIgnoreCase(request.getParameter("start"));
     try {
-      Job job = ((ServiceRegistryJpaImpl) serviceRegistry).createJob(host, jobType, operation, arguments, payload,
-              start, serviceRegistry.getCurrentJob());
+      Job job = null;
+      if (StringUtils.isNotBlank(request.getParameter("jobLoad"))) {
+        Float jobLoad = Float.parseFloat(request.getParameter("jobLoad"));
+        job = ((ServiceRegistryJpaImpl) serviceRegistry).createJob(host, jobType, operation, arguments, payload,
+              start, serviceRegistry.getCurrentJob(), jobLoad);
+      } else {
+        job = ((ServiceRegistryJpaImpl) serviceRegistry).createJob(host, jobType, operation, arguments, payload,
+                start, serviceRegistry.getCurrentJob());
+      }
       return Response.created(job.getUri()).entity(new JaxbJob(job)).build();
     } catch (IllegalArgumentException e) {
       throw new WebApplicationException(Status.BAD_REQUEST);
@@ -553,14 +562,53 @@ public class ServiceRegistryEndpoint {
   @Path("maxconcurrentjobs")
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "maxconcurrentjobs", description = "Returns the number of jobs that the servers in this service registry can execute concurrently. If there is only one server in this service registry this will be the number of jobs that one server is able to do at one time. If it is a distributed install across many servers then this number will be the total number of jobs the cluster can process concurrently.", returnDescription = "The maximum number of concurrent jobs", reponses = { @RestResponse(responseCode = SC_OK, description = "Maximum number of concurrent jobs returned.") })
+  @Deprecated
   public Response getMaximumConcurrentWorkflows() {
+    return Response.status(Status.MOVED_PERMANENTLY).type(MediaType.TEXT_PLAIN)
+            .header("Location", servicePath + "/maxload").build();
+  }
+
+  @GET
+  @Path("maxload")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "maxload", description = "Returns the maximum load that servers in this service registry can execute concurrently.  "
+          + "If there is only one server in this service registry this will be the maximum load that one server is able to handle at one time.  "
+          + "If it is a distributed install across many servers then this number will be the maximum load the cluster can process concurrently.",
+          returnDescription = "The maximum load of the cluster or server", restParameters = {
+              @RestParameter(name = "host", isRequired = false, type = Type.STRING, description = "The host you want to know the maximum load for.")
+          }, reponses = { @RestResponse(responseCode = SC_OK, description = "Maximum load for the cluster.") })
+  public Response getMaxLoadOnNode(@QueryParam("host") String host) throws NotFoundException {
     try {
-      Integer count = serviceRegistry.getMaxConcurrentJobs();
-      return Response.ok(count).build();
+      if (StringUtils.isEmpty(host)) {
+        return Response.ok(serviceRegistry.getMaxLoads()).build();
+      } else {
+        SystemLoad systemLoad = new SystemLoad();
+        systemLoad.addNodeLoad(serviceRegistry.getMaxLoadOnNode(host));
+        return Response.ok(systemLoad).build();
+      }
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }
   }
+
+  @GET
+  @Path("currentload")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "currentload", description = "Returns the current load on the servers in this service registry.  "
+          + "If there is only one server in this service registry this will be the the load that one server.  "
+          + "If it is a distributed install across many servers then this number will be a dictionary of the load on all nodes in the cluster.",
+          returnDescription = "The current load across the cluster", restParameters = {
+              @RestParameter(name = "activeOnly", isRequired = false, type = Type.BOOLEAN, description = "Whether to only get the load of active nodes.  Defaults to false.")
+          }, reponses = { @RestResponse(responseCode = SC_OK, description = "Current load for the cluster.") })
+  public Response getCurrentLoad(@QueryParam("activeOnly") String activeOnly) {
+    try {
+      boolean activeOnlyBool = Boolean.valueOf(activeOnly);
+      return Response.ok(serviceRegistry.getCurrentHostLoads(activeOnlyBool)).build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
 
   @DELETE
   @Path("job/{id}")

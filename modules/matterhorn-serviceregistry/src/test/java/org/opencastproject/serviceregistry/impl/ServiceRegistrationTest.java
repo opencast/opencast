@@ -34,6 +34,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceState;
+import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.util.UrlSupport;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
@@ -134,7 +135,7 @@ public class ServiceRegistrationTest {
   public void testHostCapacity() throws Exception {
     List<ServiceRegistration> services = serviceRegistry.getServiceRegistrations();
     List<HostRegistration> hosts = serviceRegistry.getHostRegistrations();
-    Map<String, Integer> hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
+    SystemLoad hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
     List<ServiceRegistration> availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1,
             services, hosts, hostLoads);
 

@@ -32,7 +32,7 @@ import java.util.List;
 public interface Job {
   /** The status of the job that this receipt represents */
   public static enum Status {
-    QUEUED, PAUSED, RUNNING, FINISHED, FAILED, DELETED, INSTANTIATED, DISPATCHING, RESTART, CANCELED;
+    QUEUED, PAUSED, RUNNING, FINISHED, FAILED, DELETED, INSTANTIATED, DISPATCHING, RESTART, CANCELED, WAITING;
 
     /** Return if the job is terminated. */
     public boolean isTerminated() {
@@ -281,4 +281,49 @@ public interface Job {
 
   /** Gets the job signature by calculating the hash code from the concatenation of the jobType + the job arguments */
   int getSignature();
+
+  /**
+   * Gets the job's load.  For example, a job which uses four cores would have a load of 4.0
+   *
+   * @return the job's load
+   */
+  Float getJobLoad();
+
+  /**
+   * Gets the list of job IDs that are blocking this job from continuing
+   * 
+   * @return the list of Job IDs that are blocking this job
+   */
+  List<Long> getBlockedJobIds();
+
+  /**
+   * Sets the list of job IDs that are blocking this job from continuing
+   * 
+   * @param list the list of Job IDs that are blocking this job
+   */
+  void setBlockedJobIds(List<Long> list);
+
+  /**
+   * Clears the list of jobs blocking this job from continuing
+   */
+  void removeBlockedJobsIds();
+
+  /**
+   * Gets which job, if any, this job is blocking
+   * 
+   * @return the Job ID this job is blocking, or null
+   */
+  Long getBlockingJobId();
+
+  /**
+   * Sets which job this job is blocking
+   * 
+   * @param jobId the ID of the job this job is blocking, or null if it is not blocking anything
+   */
+  void setBlockingJobId(Long jobId);
+
+  /**
+   * Clears the reference to the job which this job is blocking, if any
+   */
+  void removeBlockingJobId();
 }

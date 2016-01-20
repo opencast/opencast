@@ -35,7 +35,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.conflictJson;
 import static org.opencastproject.index.service.util.RestUtils.notFound;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
@@ -133,6 +133,8 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.urlsigning.exception.UrlSigningException;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.MatterhornConstants;
@@ -174,9 +176,9 @@ import com.entwinemedia.fn.data.json.JValue;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpStatus;
 import org.codehaus.jettison.json.JSONException;
 import org.json.simple.JSONArray;
@@ -279,6 +281,12 @@ public abstract class AbstractEventEndpoint {
   public abstract EventCatalogUIAdapter getEpisodeCatalogUIAdapter();
 
   public abstract AdminUIConfiguration getAdminUIConfiguration();
+
+  public abstract long getUrlSigningExpireDuration();
+
+  public abstract UrlSigningService getUrlSigningService();
+
+  public abstract Boolean signWithClientIP();
 
   /** Default server URL */
   protected String serverUrl = "http://localhost:8080";
@@ -2311,7 +2319,7 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("channel", vN(publication.getChannel())));
     fields.add(f("mimetype", vN(publication.getMimeType())));
     fields.add(f("tags", a($(publication.getTags()).map(toStringJValue))));
-    fields.add(f("url", vN(publication.getURI())));
+    fields.add(f("url", vN(signUrl(publication.getURI()))));
     fields.addAll(getCommonElementFields(publication));
     return j(fields);
   }
@@ -2336,7 +2344,7 @@ public abstract class AbstractEventEndpoint {
     for (Publication publication : publications) {
       publicationJSON.add(j(f("id", vN(publication.getIdentifier())), f("channel", vN(publication.getChannel())),
               f("mimetype", vN(publication.getMimeType())), f("tags", a($(publication.getTags()).map(toStringJValue))),
-              f("url", vN(publication.getURI()))));
+              f("url", vN(signUrl(publication.getURI())))));
     }
     return publicationJSON;
   }
@@ -2363,7 +2371,7 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("mimetype", vN(element.getMimeType())));
     List<JValue> tags = Stream.$(element.getTags()).map(toStringJValue).toList();
     fields.add(f("tags", a(tags)));
-    fields.add(f("url", vN(element.getURI())));
+    fields.add(f("url", vN(signUrl(element.getURI()))));
     return fields;
   }
 
@@ -2374,14 +2382,30 @@ public abstract class AbstractEventEndpoint {
     }
   };
 
-  private static final Fn<Publication, JObjectWrite> publicationToJson = new Fn<Publication, JObjectWrite>() {
+  private final Fn<Publication, JObjectWrite> publicationToJson = new Fn<Publication, JObjectWrite>() {
     @Override
     public JObjectWrite ap(Publication publication) {
       Opt<String> channel = Opt.nul(PUBLICATION_CHANNELS.get(publication.getChannel()));
       return j(f("name", v(channel.or("EVENTS.EVENTS.DETAILS.GENERAL.CUSTOM"))),
-              f("url", v(publication.getURI().toString())));
+              f("url", v(signUrl(publication.getURI()).toString())));
     }
   };
+
+  private URI signUrl(URI url) {
+    if (getUrlSigningService().accepts(url.toString())) {
+      try {
+        String clientIP = null;
+        if (signWithClientIP()) {
+          clientIP = getSecurityService().getUserIP();
+        }
+        return URI.create(getUrlSigningService().sign(url.toString(), getUrlSigningExpireDuration(), null, clientIP));
+      } catch (UrlSigningException e) {
+        logger.warn("Unable to sign url '{}': {}", url, ExceptionUtils.getStackTrace(e));
+      }
+    }
+    return url;
+  }
+
 
   private final Function<Recording, List<Person>> getRecipients = new Function<Recording, List<Person>>() {
     @Override

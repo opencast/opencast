@@ -21,7 +21,7 @@
 
 package org.opencastproject.workflow.impl;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Collections.mkString;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.FAILED;
@@ -107,10 +107,10 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.FnX;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceException;
 import org.osgi.framework.ServiceReference;
@@ -193,9 +193,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /** The set of 'no' values */
   public static final Set<String> NO;
 
-  /** The configuration key for setting {@link #maxConcurrentWorkflows} */
-  public static final String MAX_CONCURRENT_CONFIG_KEY = "max.concurrent";
-
   /** The configuration key for setting {@link #workflowStatsCollect} */
   public static final String STATS_COLLECT_CONFIG_KEY = "workflowstats.collect";
 
@@ -211,6 +208,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /** Workflow statistics JMX type */
   private static final String JMX_WORKFLOWS_STATISTICS_TYPE = "WorkflowsStatistics";
 
+  /** The load imposed on the system by a workflow job.
+   *  We are keeping this hardcoded because otherwise bad things will likely happen,
+   *  like an inability to process a workflow past a certain point in high-load conditions
+   */
+  private static final float WORKFLOW_JOB_LOAD = 0.0f;
+
   /** The list of registered JMX beans */
   private final List<ObjectInstance> jmxBeans = new ArrayList<ObjectInstance>();
 
@@ -221,9 +224,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   /** Remove references to the component context once felix scr 1.2 becomes available */
   protected ComponentContext componentContext = null;
-
-  /** The maximum number of cluster-wide workflows that will cause this service to stop accepting new jobs */
-  protected int maxConcurrentWorkflows = -1;
 
   /** Flag whether to collect JMX statistics */
   protected boolean workflowStatsCollect = DEFAULT_STATS_COLLECT_CONFIG;
@@ -678,7 +678,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
 
         Job job = serviceRegistry.createJob(JOB_TYPE, Operation.START_WORKFLOW.toString(), arguments,
-                workflowInstanceXml, false, null);
+                workflowInstanceXml, false, null, WORKFLOW_JOB_LOAD);
 
         // Have the workflow take on the job's identity
         workflowInstance.setId(job.getId());
@@ -845,7 +845,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     try {
       logger.info("Scheduling workflow %s for execution", workflow.getId());
       Job job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
-              Arrays.asList(Long.toString(workflow.getId())), null, false, null);
+              Arrays.asList(Long.toString(workflow.getId())), null, false, null, WORKFLOW_JOB_LOAD);
       operation.setId(job.getId());
       update(workflow);
       job.setStatus(Status.QUEUED);
@@ -960,7 +960,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         case RUNNING:
           try {
             job = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
-                    Arrays.asList(Long.toString(workflow.getId())), null, false, null);
+                    Arrays.asList(Long.toString(workflow.getId())), null, false, null, WORKFLOW_JOB_LOAD);
             currentOperation.setId(job.getId());
             update(workflow);
             job.setStatus(Status.QUEUED);
@@ -1196,7 +1196,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       try {
         // the operation has its own job. Update that too.
         Job operationJob = serviceRegistry.createJob(JOB_TYPE, Operation.START_OPERATION.toString(),
-                Arrays.asList(Long.toString(workflowInstanceId)), null, false, null);
+                Arrays.asList(Long.toString(workflowInstanceId)), null, false, null, WORKFLOW_JOB_LOAD);
 
         // this method call is publicly visible, so it doesn't necessarily go through the accept method. Set the
         // workflow state manually.
@@ -1771,36 +1771,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /**
    * {@inheritDoc}
    *
-   * If we are already running the maximum number of workflows, don't accept another START_WORKFLOW job.
-   *
    * @see org.opencastproject.job.api.JobProducer#isReadyToAcceptJobs(String)
    */
   @Override
   public boolean isReadyToAcceptJobs(String operation) throws ServiceRegistryException {
-    if (!Operation.START_WORKFLOW.toString().equals(operation))
-      return true;
-
-    long runningWorkflows;
-    try {
-      runningWorkflows = serviceRegistry.countByOperation(JOB_TYPE, Operation.START_WORKFLOW.toString(),
-              Job.Status.RUNNING);
-    } catch (ServiceRegistryException e) {
-      logger.warn(e, "Unable to determine the number of running workflows");
-      return false;
-    }
-
-    // If no hard maximum has been configured, ask the service registry for the number of cores in the system
-    int maxWorkflows = maxConcurrentWorkflows;
-    if (maxWorkflows < 1) {
-      maxWorkflows = serviceRegistry.getMaxConcurrentJobs();
-    }
-
-    // Reject if there's enough going on already.
-    if (runningWorkflows >= maxWorkflows) {
-      logger.debug("Refused to accept new workflow. This server is already running %s workflows.", runningWorkflows);
-      return false;
-    }
-
     return true;
   }
 
@@ -2280,16 +2254,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
-    String maxConfiguration = StringUtils.trimToNull((String) properties.get(MAX_CONCURRENT_CONFIG_KEY));
-    if (StringUtils.isNotEmpty(maxConfiguration)) {
-      try {
-        maxConcurrentWorkflows = Integer.parseInt(maxConfiguration);
-        logger.info("Set maximum concurrent workflows to %d", maxConcurrentWorkflows);
-      } catch (NumberFormatException e) {
-        logger.warn("Can not set max concurrent workflows to %s. %s must be an integer", maxConfiguration,
-                MAX_CONCURRENT_CONFIG_KEY);
-      }
-    }
     String workflowStatsConfiguration = StringUtils.trimToNull((String) properties.get(STATS_COLLECT_CONFIG_KEY));
     if (StringUtils.isNotEmpty(workflowStatsConfiguration)) {
       try {

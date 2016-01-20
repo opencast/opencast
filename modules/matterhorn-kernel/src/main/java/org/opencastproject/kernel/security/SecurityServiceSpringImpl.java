@@ -46,6 +46,9 @@ public class SecurityServiceSpringImpl implements SecurityService {
   /** Holds delegates users for new threads that have been spawned from authenticated threads */
   private static final ThreadLocal<User> delegatedUserHolder = new ThreadLocal<User>();
 
+  /** Holds the IP address for the delegated user for the current thread */
+  private static final ThreadLocal<String> delegatedUserIPHolder = new ThreadLocal<String>();
+
   /** Holds organization responsible for the current thread */
   private static final ThreadLocal<Organization> organization = new ThreadLocal<Organization>();
 
@@ -118,6 +121,16 @@ public class SecurityServiceSpringImpl implements SecurityService {
   @Override
   public void setUser(User user) {
     delegatedUserHolder.set(user);
+  }
+
+  @Override
+  public String getUserIP() {
+    return delegatedUserIPHolder.get();
+  }
+
+  @Override
+  public void setUserIP(String userIP) {
+    delegatedUserIPHolder.set(userIP);
   }
 
 }

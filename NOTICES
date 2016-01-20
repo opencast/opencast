@@ -742,14 +742,14 @@ matterhorn-caption-remote
 
 matterhorn-capture-admin-service-api
   GroupId                                ArtifactId                                       License
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
 
 
 matterhorn-capture-admin-service-impl
   GroupId                                ArtifactId                                       License
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.xerces             The Apache Software License, Version 2.0
@@ -763,7 +763,7 @@ matterhorn-comments
   commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
   commons-collections                    commons-collections                              The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   org.apache.cxf                         cxf-bundle-jaxrs                                 The Apache Software License, Version 2.0
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
@@ -782,7 +782,7 @@ matterhorn-common
   commons-collections                    commons-collections                              The Apache Software License, Version 2.0
   commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   de.schlichtherle                       truezip                                          Apache License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
@@ -1008,7 +1008,7 @@ matterhorn-ingest-service-impl
   commons-collections                    commons-collections                              The Apache Software License, Version 2.0
   commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   net.sourceforge.htmlunit               htmlunit                                         Apache License, Version 2.0
@@ -1050,7 +1050,7 @@ matterhorn-kernel
   commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
   commons-collections                    commons-collections                              The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   net.sourceforge.nekohtml               com.springsource.org.cyberneko.html              The Apache Software License, Version 2.0
   org.apache.cxf                         cxf-bundle-jaxrs                                 The Apache Software License, Version 2.0
@@ -1088,7 +1088,7 @@ matterhorn-load-test-engage
 
 matterhorn-lti
   GroupId                                ArtifactId                                       License
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
 
 
 matterhorn-manager-impl
@@ -1129,7 +1129,7 @@ matterhorn-messages
   commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
   commons-collections                    commons-collections                              The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   org.apache.cxf                         cxf-bundle-jaxrs                                 The Apache Software License, Version 2.0
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
@@ -1146,7 +1146,7 @@ matterhorn-migration
   commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
   commons-collections                    commons-collections                              The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -1210,7 +1210,7 @@ matterhorn-runtime-dependencies
   commons-dbcp                           commons-dbcp                                     The Apache Software License, Version 2.0
   commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   commons-pool                           commons-pool                                     The Apache Software License, Version 2.0
   joda-time                              joda-time                                        Apache 2
   net.sourceforge.nekohtml               com.springsource.org.cyberneko.html              The Apache Software License, Version 2.0
@@ -1328,7 +1328,7 @@ matterhorn-search
   GroupId                                ArtifactId                                       License
   com.sun.jna                            jna                                              null
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   org.elasticsearch                      elasticsearch                                    The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -1498,7 +1498,7 @@ matterhorn-test-harness
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-cli                            commons-cli                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   dom4j                                  dom4j                                            -
   junit                                  junit                                            Common Public License Version 1.0
   log4j                                  log4j                                            The Apache Software License, Version 2.0
@@ -1537,7 +1537,7 @@ matterhorn-themes
   commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
   commons-collections                    commons-collections                              The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -1644,7 +1644,7 @@ matterhorn-workspace-impl
   GroupId                                ArtifactId                                       License
   commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-lang                           commons-lang                                     The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 

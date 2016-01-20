@@ -36,6 +36,7 @@
     <bundle>mvn:org.apache.commons/com.springsource.org.apache.commons.beanutils/1.7.0</bundle>
     <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-csv/1.0</bundle>
+    <bundle>mvn:org.apache.commons/commons-lang3/3.4</bundle>
     <bundle>mvn:org.apache.cxf/cxf-bundle-jaxrs/2.2.9</bundle>
     <bundle>mvn:org.apache.httpcomponents/httpclient-osgi/4.3.6</bundle>
     <bundle>mvn:org.apache.httpcomponents/httpcore-osgi/4.3.3</bundle>
@@ -96,6 +97,11 @@
     <bundle>mvn:org.opencastproject/matterhorn-static-file-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-static-file-service-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-userdirectory/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-urlsigning-common/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-urlsigning-service-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-urlsigning-service-impl/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-urlsigning-verifier-service-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-urlsigning-verifier-service-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-workflow-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-working-file-repository-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-working-file-repository-service-impl/${project.version}</bundle>
