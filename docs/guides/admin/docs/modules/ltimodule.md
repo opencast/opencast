@@ -57,7 +57,7 @@ For the series overview the id is passed as custom_series:
 For debugging purposes, it could be useful to set the following custom tag:
 `custom_test = true`
 
-For more information about how to setting custom LTI tags, please check the documenation of your LMS.
+For more information about how to set custom LTI tags, please check the documenation of your LMS.
 
 How To Customise It
 -------------------

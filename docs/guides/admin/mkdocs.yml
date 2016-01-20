@@ -40,7 +40,6 @@ pages:
    - Workflow: 'configuration/workflow.md'
 - Modules:
    - Overview: 'modules/index.md'
-   - Atom/RSS Feed: 'modules/atomrss.md'
    - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
    - Player:
