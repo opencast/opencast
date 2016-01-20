@@ -3,7 +3,6 @@
 This is a documentation for modules included in Opencast that do not to be configured by default, but that allow some
 tweaking. For some modules some more in depth documentation is available too.
 
- - [Atom and RSS Feed](atomrss.md)
  - [Media Module](mediamodule.configuration.md)
  - [LTI Module](ltimodule.md)
  - Player 2.0+

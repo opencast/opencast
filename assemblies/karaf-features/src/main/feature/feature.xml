@@ -108,11 +108,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-workspace-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-workspace-impl/${project.version}</bundle>
 
-    <!-- Fixes MH-11263 - should be removed as soon as feeds to no longer get registered by the
-                          kernel bundle (see commit 18f3e27) -->
-    <bundle>mvn:org.opencastproject/matterhorn-search-service-api/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-search-service-impl/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-solr/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-allinone" version="${project.version}">

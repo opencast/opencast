@@ -40,6 +40,7 @@ import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.adminui.util.TextFilter;
 import org.opencastproject.index.service.resources.list.query.UsersListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.kernel.security.persistence.JpaOrganization;
@@ -179,30 +180,38 @@ public class UsersEndpoint {
     Option<String> filterName = Option.none();
     Option<String> filterRole = Option.none();
     Option<String> filterProvider = Option.none();
+    Option<String> filterText = Option.none();
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
     for (String name : filters.keySet()) {
-      if (UsersListQuery.FILTER_NAME_NAME.equals(name))
-        filterName = Option.some(filters.get(name));
-      if (UsersListQuery.FILTER_ROLE_NAME.equals(name))
-        filterRole = Option.some(filters.get(name));
-      if (UsersListQuery.FILTER_PROVIDER_NAME.equals(name)) {
-        filterProvider = Option.some(filters.get(name));
+      String value = filters.get(name);
+      if (UsersListQuery.FILTER_NAME_NAME.equals(name)) {
+        filterName = Option.some(value);
+      } else if (UsersListQuery.FILTER_ROLE_NAME.equals(name)) {
+        filterRole = Option.some(value);
+      } else if (UsersListQuery.FILTER_PROVIDER_NAME.equals(name)) {
+        filterProvider = Option.some(value);
+      } else if ((UsersListQuery.FILTER_TEXT_NAME.equals(name)) && (StringUtils.isNotBlank(value))) {
+        filterText = Option.some(value);
       }
     }
 
-    // Filter agents by filter criteria
+    // Filter users by filter criteria
     List<User> filteredUsers = new ArrayList<User>();
     for (Iterator<User> i = userDirectoryService.getUsers(); i.hasNext();) {
       User user = i.next();
 
       // Filter list
-      boolean mismatchName = filterName.isSome() && !filterName.get().equals(user.getName());
-      boolean mismatchRole = filterRole.isSome()
-              && !Stream.$(user.getRoles()).map(getRoleName).toSet().contains(filterRole.get());
-      boolean mismatchProvider = filterProvider.isSome() && !filterProvider.get().equals(user.getProvider());
-      if (mismatchName || mismatchRole || mismatchProvider)
+      if (filterName.isSome() && !filterName.get().equals(user.getName())
+          || (filterRole.isSome()
+              && !Stream.$(user.getRoles()).map(getRoleName).toSet().contains(filterRole.get()))
+          || (filterProvider.isSome()
+              && !filterProvider.get().equals(user.getProvider()))
+          || (filterText.isSome()
+              && !TextFilter.match(filterText.get(), user.getUsername(), user.getName(), user.getEmail(), user.getProvider())
+              && !TextFilter.match(filterText.get(), Stream.$(user.getRoles()).map(getRoleName).mkString(" ")))) {
         continue;
+      }
 
       filteredUsers.add(user);
     }
