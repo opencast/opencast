@@ -18,13 +18,13 @@ The latest version of the bundle is available after a restart of opencast as wel
 Attaching a Remote Debugger to Karaf
 ------------------------------------
 
-To debug a running Opencast system, you can attach a remote debugger in you IDE (Eclipse or NetBeans, i.e.). For that you have to enable the remote debugging in Karaf OSGI server that runs Opencast.
+To debug a running Opencast system, you can attach a remote debugger in your IDE (Eclipse or NetBeans, i.e.). For that you have to enable the remote debugging in Karaf OSGI server that runs Opencast.
 
-To enable the connection of a remote debugger you have to export the debugging options in the Shell where were you will start your Opencast server:
+To enable the connection of a remote debugger you have to export the debugging options in the Shell where you will start your Opencast server:
 
 `export DEFAULT_JAVA_DEBUG_OPTS='-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005'`
 
-You now can connect the remote debugger of you IDE on port `5005`.
+You now can connect the remote debugger of your IDE on port `5005`.
 
 For more information on remote debugging with Karaf you can visit [this site.](https://karaf.apache.org/manual/latest-2.2.x/developers-guide/debugging.html)
 
