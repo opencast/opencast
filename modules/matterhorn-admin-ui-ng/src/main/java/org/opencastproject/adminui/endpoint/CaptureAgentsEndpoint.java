@@ -21,16 +21,14 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import com.entwinemedia.fn.data.json.JValue;
 
+import org.apache.commons.lang3.StringUtils;
+import org.opencastproject.adminui.util.TextFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,9 +73,6 @@ public class CaptureAgentsEndpoint {
   /** The capture agent service */
   private CaptureAgentStateService service;
 
-  /** The participation persistence */
-//  private ParticipationManagementDatabase participationPersistence;
-
   /**
    * Sets the capture agent service
    *
@@ -87,11 +82,6 @@ public class CaptureAgentsEndpoint {
   public void setCaptureAgentService(CaptureAgentStateService service) {
     this.service = service;
   }
-
-//  /** OSGi callback for participation persistence. */
-//  public void setParticipationPersistence(ParticipationManagementDatabase participationPersistence) {
-//    this.participationPersistence = participationPersistence;
-//  }
 
   @GET
   @Produces({ MediaType.APPLICATION_JSON })
@@ -107,6 +97,7 @@ public class CaptureAgentsEndpoint {
     Option<String> filterName = Option.none();
     Option<String> filterStatus = Option.none();
     Option<Long> filterLastUpdated = Option.none();
+    Option<String> filterText = Option.none();
     Option<String> optSort = Option.option(trimToNull(sort));
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
@@ -123,6 +114,8 @@ public class CaptureAgentsEndpoint {
           return Response.status(Status.BAD_REQUEST).build();
         }
       }
+      if (AgentsListQuery.FILTER_TEXT_NAME.equals(name) && StringUtils.isNotBlank(filters.get(name)))
+        filterText = Option.some(filters.get(name));
     }
 
     // Filter agents by filter criteria
@@ -133,7 +126,8 @@ public class CaptureAgentsEndpoint {
       // Filter list
       if ((filterName.isSome() && !filterName.get().equals(agent.getName()))
               || (filterStatus.isSome() && !filterStatus.get().equals(agent.getState()))
-              || (filterLastUpdated.isSome() && filterLastUpdated.get() != agent.getLastHeardFrom()))
+              || (filterLastUpdated.isSome() && filterLastUpdated.get() != agent.getLastHeardFrom())
+              || (filterText.isSome() && !TextFilter.match(filterText.get(), agent.getName(), agent.getState())))
         continue;
       filteredAgents.add(agent);
     }
@@ -176,18 +170,4 @@ public class CaptureAgentsEndpoint {
     return okJsonList(agentsJSON, offset, limit, total);
   }
 
-  /**
-   * Generate a JSON devices list
-   *
-   * @param devices
-   *          an array of devices String
-   * @return A {@link JValue} representing the devices
-   */
-  private JValue generateJsonDevice(String[] devices) {
-    List<JValue> jsonDevices = new ArrayList<JValue>();
-    for (String device : devices) {
-      jsonDevices.add(j(f("id", v(device)), f("value", v(TRANSLATION_KEY_PREFIX + device.toUpperCase()))));
-    }
-    return a(jsonDevices);
-  }
 }

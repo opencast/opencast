@@ -232,7 +232,6 @@
               javax.xml.namespace;version=0,
               javax.xml.parsers;version=0,
               javax.xml.validation;version=0,
-              org.opencastproject.feed.impl,
               org.opencastproject.fsresources,
               org.springframework.security.core.userdetails.cache,
               org.springframework.security.core.userdetails.memory,
@@ -264,8 +263,7 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/bundle-info.xml,
-              OSGI-INF/cleansessions.xml,
-              OSGI-INF/feed-service.xml,
+              OSGI-INF/cleansessions.xml, 
               OSGI-INF/http-client-factory.xml,
               OSGI-INF/http-client.xml,
               OSGI-INF/http-context.xml,
