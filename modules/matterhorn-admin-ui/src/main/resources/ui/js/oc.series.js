@@ -200,7 +200,9 @@ ocSeries.init = function(){
     });
     $.each(ocSeries.seriesRolesList, function(index, value) {
       if(index == ocSeries.anonymous_role) {
-        $('#anonymous_view').attr('checked', 'checked');
+        if(value.read) {
+          $('#anonymous_view').attr('checked', 'checked');
+        }
       }
       else {
         $row = $(privilegeRow);
