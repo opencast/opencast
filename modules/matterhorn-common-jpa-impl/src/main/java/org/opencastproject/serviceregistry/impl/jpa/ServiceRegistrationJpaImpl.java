@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.serviceregistry.impl.jpa;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
@@ -52,18 +53,31 @@ import javax.persistence.UniqueConstraint;
 @Entity(name = "ServiceRegistration")
 @Access(AccessType.FIELD)
 @Table(name = "mh_service_registration", uniqueConstraints = @UniqueConstraint(columnNames = { "host_registration",
-"service_type" }))
+        "service_type" }))
 @NamedQueries({
-  @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT job.processorServiceRegistration.id, job.status, COUNT(job.status), AVG(job.queueTime), AVG(job.runTime) FROM Job job GROUP BY job.processorServiceRegistration.id, job.status"),
-  @NamedQuery(name = "ServiceRegistration.hostload", query = "SELECT COUNT(job.status) as numJobs, job.processorServiceRegistration as serviceRegistration, job.status FROM Job job WHERE job.processorServiceRegistration.online=true and job.processorServiceRegistration.active=true and job.processorServiceRegistration.hostRegistration.maintenanceMode=false GROUP BY job.processorServiceRegistration, job.status"),
-  @NamedQuery(name = "ServiceRegistration.getRegistration", query = "SELECT r from ServiceRegistration r WHERE r.hostRegistration.baseUrl = :host and r.serviceType = :serviceType"),
-  @NamedQuery(name = "ServiceRegistration.getAll", query = "SELECT rh FROM ServiceRegistration rh WHERE rh.hostRegistration.active = true"),
-  @NamedQuery(name = "ServiceRegistration.getAllOnline", query = "SELECT rh FROM ServiceRegistration rh WHERE rh.hostRegistration.online=true AND rh.hostRegistration.active = true"),
-  @NamedQuery(name = "ServiceRegistration.getByHost", query = "SELECT rh FROM ServiceRegistration rh WHERE rh.hostRegistration.baseUrl=:host AND rh.hostRegistration.active = true"),
-  @NamedQuery(name = "ServiceRegistration.getByType", query = "SELECT rh FROM ServiceRegistration rh WHERE rh.serviceType=:serviceType AND rh.hostRegistration.active = true"),
-  @NamedQuery(name = "ServiceRegistration.relatedservices.warning_error", query = "SELECT rh FROM ServiceRegistration rh WHERE rh.serviceType = :serviceType AND (rh.serviceState = 1 OR rh.serviceState = 2)"),
-  @NamedQuery(name = "ServiceRegistration.relatedservices.warning", query = "SELECT rh FROM ServiceRegistration rh WHERE rh.serviceType = :serviceType AND rh.serviceState = 1"),
-  @NamedQuery(name = "ServiceRegistration.countNotNormal", query = "SELECT count(rh) FROM ServiceRegistration rh WHERE rh.serviceState <> 0 AND rh.hostRegistration.active = true") })
+        @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT job.processorServiceRegistrationId as serviceRegistration, job.status, "
+                + "count(job.status) as numJobs, "
+                + "avg(job.queueTime) as meanQueue, "
+                + "avg(job.runTime) as meanRun FROM Job job group by job.processorServiceRegistrationId, job.status"),
+        @NamedQuery(name = "ServiceRegistration.hostloads", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, sum(job.jobLoad) "
+                + "FROM Job job "
+                + "WHERE job.processorServiceRegistration.online=true and job.processorServiceRegistration.active=true and job.processorServiceRegistration.hostRegistration.maintenanceMode=false "
+                + "and job.status in :statuses "
+                + "GROUP BY job.processorServiceRegistration, job.status"),
+        @NamedQuery(name = "ServiceRegistration.getRegistration", query = "SELECT r from ServiceRegistration r "
+                + "where r.hostRegistration.baseUrl = :host and r.serviceType = :serviceType"),
+        @NamedQuery(name = "ServiceRegistration.getAll", query = "SELECT rh FROM ServiceRegistration rh WHERE rh.hostRegistration.active = true"),
+        @NamedQuery(name = "ServiceRegistration.getAllOnline", query = "SELECT rh FROM ServiceRegistration rh WHERE rh.hostRegistration.online=true AND rh.hostRegistration.active = true"),
+        @NamedQuery(name = "ServiceRegistration.getByHost", query = "SELECT rh FROM ServiceRegistration rh "
+                + "where rh.hostRegistration.baseUrl=:host AND rh.hostRegistration.active = true"),
+        @NamedQuery(name = "ServiceRegistration.getByType", query = "SELECT rh FROM ServiceRegistration rh "
+                + "where rh.serviceType=:serviceType AND rh.hostRegistration.active = true"),
+        @NamedQuery(name = "ServiceRegistration.relatedservices.warning_error", query = "SELECT rh FROM ServiceRegistration rh "
+                + "WHERE rh.serviceType = :serviceType AND (rh.serviceState = 1 OR rh.serviceState = 2)"),
+        @NamedQuery(name = "ServiceRegistration.relatedservices.warning", query = "SELECT rh FROM ServiceRegistration rh "
+                + "WHERE rh.serviceType = :serviceType AND rh.serviceState = 1"),
+        @NamedQuery(name = "ServiceRegistration.countNotNormal", query = "SELECT count(rh) FROM ServiceRegistration rh "
+                + "WHERE rh.serviceState <> 0 AND rh.hostRegistration.active = true") })
 public class ServiceRegistrationJpaImpl implements ServiceRegistration {
 
   /** The logger */
@@ -142,10 +156,12 @@ public class ServiceRegistrationJpaImpl implements ServiceRegistration {
   /**
    * Creates a new service registration which is online and not in maintenance mode.
    *
-   * @param processingHost
-   *          the host
-   * @param serviceId
-   *          the job type
+   * @param hostRegistration
+   *          the host registration
+   * @param serviceType
+   *          the type of job this service handles
+   * @param path
+   *          the URL path on this host to the service endpoint
    * @param jobProducer
    */
   public ServiceRegistrationJpaImpl(HostRegistrationJpaImpl hostRegistration, String serviceType, String path,

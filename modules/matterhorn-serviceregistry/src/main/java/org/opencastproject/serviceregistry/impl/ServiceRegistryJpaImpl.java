@@ -52,6 +52,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.serviceregistry.api.SystemLoad;
+import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.serviceregistry.impl.jmx.HostsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.JobsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.ServicesStatistics;
@@ -91,6 +92,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -221,8 +225,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   static {
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING = new ArrayList<Status>();
+    JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.QUEUED);
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.DISPATCHING);
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.RUNNING);
+    JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.WAITING);
   }
 
   /** OSGi DI */
@@ -231,12 +237,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   public void activate(ComponentContext cc) {
-    logger.info("Activate service registery");
-
-    logger.debug("activate");
-
-    // Clean all undispatchable jobs
-    cleanUndispatchableJobs();
+    logger.info("Activate service registry");
 
     // Find this host's url
     if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY))) {
@@ -244,6 +245,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     } else {
       hostName = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
     }
+
+    // Clean all undispatchable jobs that were orphaned when this host was last deactivated
+    cleanUndispatchableJobs(hostName);
 
     // Register JMX beans with statistics
     try {
@@ -255,7 +259,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       jmxBeans.add(JmxUtil.registerMXBean(servicesStatistics, JMX_SERVICES_STATISTICS_TYPE));
       jmxBeans.add(JmxUtil.registerMXBean(jobsStatistics, JMX_JOBS_STATISTICS_TYPE));
     } catch (ServiceRegistryException e) {
-      logger.error("Error registarting JMX statistic beans {}", e);
+      logger.error("Error registering JMX statistic beans {}", e);
     }
 
     // Find the jobs URL
@@ -267,24 +271,25 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Register this host
     try {
-      int maxJobs = -1;
-      if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OPT_MAXLOAD))) {
-        maxJobs = Runtime.getRuntime().availableProcessors();
-      } else {
+      float maxLoad = Runtime.getRuntime().availableProcessors();
+      if (cc != null && StringUtils.isNotBlank(cc.getBundleContext().getProperty(OPT_MAXLOAD))) {
         try {
-          maxJobs = Integer.parseInt(cc.getBundleContext().getProperty(OPT_MAXLOAD));
+          maxLoad = Float.parseFloat(cc.getBundleContext().getProperty(OPT_MAXLOAD));
+          logger.info("Max load has been manually to {}", maxLoad);
         } catch (NumberFormatException e) {
-          maxJobs = Runtime.getRuntime().availableProcessors();
           logger.warn("Configuration key '{}' is not an integer. Falling back to the number of cores ({})",
-                  OPT_MAXLOAD, maxJobs);
+                  OPT_MAXLOAD, maxLoad);
         }
       }
+
+      logger.info("Node maximum load set to {}", maxLoad);
+
 
       String address = InetAddress.getByName(URI.create(hostName).getHost()).getHostAddress();
       long maxMemory = Runtime.getRuntime().maxMemory();
       int cores = Runtime.getRuntime().availableProcessors();
 
-      registerHost(hostName, address, maxMemory, cores, maxJobs);
+      registerHost(hostName, address, maxMemory, cores, maxLoad);
     } catch (Exception e) {
       throw new IllegalStateException("Unable to register host " + hostName + " in the service registry", e);
     }
@@ -295,7 +300,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         tracker = new RestServiceTracker(cc.getBundleContext());
         tracker.open(true);
       } catch (InvalidSyntaxException e) {
-        logger.error("Invlid filter syntax: {}", e);
+        logger.error("Invalid filter syntax: {}", e);
         throw new IllegalStateException(e);
       }
     }
@@ -307,6 +312,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     // Schedule the job dispatching with the default interval
     scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), DEFAULT_DISPATCH_INTERVAL, DEFAULT_DISPATCH_INTERVAL,
             TimeUnit.MILLISECONDS);
+  }
+
+  public String getRegistryHostname() {
+    return hostName;
   }
 
   public void deactivate() {
@@ -338,7 +347,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public Job createJob(String type, String operation) throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, null, null, true, getCurrentJob());
+    return createJob(this.hostName, type, operation, null, null, true, getCurrentJob(), 1.0f);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String, Float)
+   */
+  @Override
+  public Job createJob(String type, String operation, Float jobLoad) throws ServiceRegistryException {
+    return createJob(this.hostName, type, operation, null, null, true, getCurrentJob(), jobLoad);
   }
 
   /**
@@ -349,7 +368,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public Job createJob(String type, String operation, List<String> arguments) throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, null, true, getCurrentJob());
+    return createJob(this.hostName, type, operation, arguments, null, true, getCurrentJob(), 1.0f);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
+   *      java.util.List, Float)
+   */
+  @Override
+  public Job createJob(String type, String operation, List<String> arguments, Float jobLoad)
+          throws ServiceRegistryException {
+    return createJob(this.hostName, type, operation, arguments, null, true, getCurrentJob(), jobLoad);
   }
 
   /**
@@ -361,7 +392,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload)
           throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob());
+    return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob(), 1.0f);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
+   *      java.util.List, java.lang.String, Float)
+   */
+  @Override
+  public Job createJob(String type, String operation, List<String> arguments, String payload, Float jobLoad)
+          throws ServiceRegistryException {
+    return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob(), jobLoad);
   }
 
   /**
@@ -373,7 +416,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable)
           throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, getCurrentJob());
+    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, getCurrentJob(), 1.0f);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
+   *      java.util.List, java.lang.String, boolean, Float)
+   */
+  @Override
+  public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable,
+          Float jobLoad) throws ServiceRegistryException {
+    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, getCurrentJob(), jobLoad);
   }
 
   /**
@@ -384,12 +439,34 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable,
           Job parentJob) throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob);
+    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob, 1.0f);
   }
 
-  /** Creates a job on a remote host. */
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
+   *      java.util.List, java.lang.String, boolean, org.opencastproject.job.api.Job, Float)
+   */
+  @Override
+  public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable,
+          Job parentJob, Float jobLoad) throws ServiceRegistryException {
+    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob, jobLoad);
+  }
+
+  /**
+   * Creates a job on a remote host with a jobLoad of 1.0.
+   */
   public Job createJob(String host, String serviceType, String operation, List<String> arguments, String payload,
           boolean dispatchable, Job parentJob) throws ServiceRegistryException {
+    return createJob(host, serviceType, operation, arguments, payload, dispatchable, parentJob, 1.0f);
+  }
+
+  /**
+   * Creates a job on a remote host.
+   */
+  public Job createJob(String host, String serviceType, String operation, List<String> arguments, String payload,
+          boolean dispatchable, Job parentJob, float jobLoad) throws ServiceRegistryException {
     if (StringUtils.isBlank(host)) {
       throw new IllegalArgumentException("Host can't be null");
     }
@@ -419,7 +496,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         logger.warn("Creating a job from {}, which is currently inactive.", creatingService.getHost());
       }
       JobJpaImpl job = new JobJpaImpl(currentUser, currentOrganization, creatingService, operation, arguments, payload,
-              dispatchable);
+              dispatchable, jobLoad);
 
       // Bind the given parent job to the new job
       if (parentJob != null) {
@@ -750,7 +827,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       Job jpaJob = updateInternal(em, job);
 
       // All WorkflowService Jobs will be ignored
-      if (oldJob.getStatus() != job.getStatus() && !"org.opencastproject.workflow".equals(job.getJobType())) {
+      if (oldJob.getStatus() != job.getStatus() && !TYPE_WORKFLOW.equals(job.getJobType())) {
         updateServiceForFailover(job);
       }
 
@@ -883,6 +960,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     fromDb.setVersion(job.getVersion());
     fromDb.setOperation(job.getOperation());
     fromDb.setArguments(job.getArguments());
+    fromDb.setBlockedJobIds(job.getBlockedJobIds());
+    fromDb.setBlockingJobId(job.getBlockingJobId());
     if (job.getDateCreated() == null) {
       job.setDateCreated(now);
       fromDb.setDateCreated(now);
@@ -892,7 +971,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               job.getJobType(), job.getProcessingHost());
       fromDb.setProcessorServiceRegistration(processingService);
     }
-    if (Status.RUNNING.equals(status)) {
+    if (Status.RUNNING.equals(status) && !Status.WAITING.equals(fromDb.getStatus())) {
       job.setDateStarted(now);
       job.setQueueTime(now.getTime() - job.getDateCreated().getTime());
       fromDb.setDateStarted(now);
@@ -941,10 +1020,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(String, String, long, int, int)
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(String, String, long, int, float)
    */
   @Override
-  public void registerHost(String host, String address, long memory, int cores, int maxConcurrentJobs)
+  public void registerHost(String host, String address, long memory, int cores, float maxLoad)
           throws ServiceRegistryException {
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -955,17 +1034,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       // Find the existing registrations for this host and if it exists, update it
       HostRegistrationJpaImpl hostRegistration = fetchHostRegistration(em, host);
       if (hostRegistration == null) {
-        hostRegistration = new HostRegistrationJpaImpl(host, address, memory, cores, maxConcurrentJobs, true, false);
+        hostRegistration = new HostRegistrationJpaImpl(host, address, memory, cores, maxLoad, true, false);
         em.persist(hostRegistration);
       } else {
         hostRegistration.setIpAddress(address);
         hostRegistration.setMemory(memory);
         hostRegistration.setCores(cores);
-        hostRegistration.setMaxJobs(maxConcurrentJobs);
+        hostRegistration.setMaxLoad(maxLoad);
         hostRegistration.setOnline(true);
         em.merge(hostRegistration);
       }
-      logger.info("Registering {} with a maximum load of {}", host, maxConcurrentJobs);
+      logger.info("Registering {} with a maximum load of {}", host, maxLoad);
       tx.commit();
       hostsStatistics.updateHost(hostRegistration);
     } catch (Exception e) {
@@ -1220,8 +1299,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     cleanRunningJobs(serviceType, baseUrl);
   }
 
-  /** Find all undispatchable jobs and set them to CANCELED. */
-  private void cleanUndispatchableJobs() {
+  /** Find all undispatchable jobs that were orphaned when this host was last deactivated and set them to CANCELED. */
+  private void cleanUndispatchableJobs(String hostName) {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -1236,9 +1315,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       @SuppressWarnings("unchecked")
       List<JobJpaImpl> undispatchableJobs = query.getResultList();
       for (JobJpaImpl job : undispatchableJobs) {
-        logger.info("Marking undispatchable job {} as canceled", job);
-        job.setStatus(Status.CANCELED);
-        em.merge(job);
+        // Make sure the job was processed on this host
+        String jobHost = "";
+        if (job.getProcessorServiceRegistration() != null) {
+          jobHost = job.getProcessorServiceRegistration().getHost();
+        }
+        if (!jobHost.equals(hostName)) {
+          logger.debug("Will not cancel undispatchable job {}, it is running on a different host", job);
+
+        } else {
+          logger.info("Cancelling the running undispatchable job {}, it was orphaned on this host", job);
+          job.setStatus(Status.CANCELED);
+          em.merge(job);
+        }
       }
       tx.commit();
     } catch (Exception e) {
@@ -1273,6 +1362,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       List<Integer> statuses = new ArrayList<Integer>();
       statuses.add(Status.RUNNING.ordinal());
       statuses.add(Status.DISPATCHING.ordinal());
+      statuses.add(Status.WAITING.ordinal());
       query.setParameter("statuses", statuses);
       query.setParameter("host", baseUrl);
       query.setParameter("serviceType", serviceType);
@@ -1692,7 +1782,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCountOfAbnormalServices()
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countOfAbnormalServices()
    */
   @Override
   public long countOfAbnormalServices() throws ServiceRegistryException {
@@ -1800,10 +1890,26 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      Map<String, Integer> loadByHost = getHostLoads(em, true);
+      SystemLoad loadByHost = getHostLoads(em, true);
       List<HostRegistration> hostRegistrations = getHostRegistrations();
       List<ServiceRegistration> serviceRegistrations = getServiceRegistrationsByType(serviceType);
       return getServiceRegistrationsByLoad(serviceType, serviceRegistrations, hostRegistrations, loadByHost);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCurrentHostLoads(boolean)
+   */
+  public SystemLoad getCurrentHostLoads(boolean activeOnly) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      return getHostLoads(em, activeOnly);
     } finally {
       if (em != null)
         em.close();
@@ -1820,30 +1926,29 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @return the map of hosts to job counts
    */
   @SuppressWarnings("unchecked")
-  protected Map<String, Integer> getHostLoads(EntityManager em, boolean activeOnly) {
+  SystemLoad getHostLoads(EntityManager em, boolean activeOnly) {
 
-    // Initialize the list of hosts
-    List<ServiceRegistration> services = em.createNamedQuery("ServiceRegistration.getAll").getResultList();
-    Map<String, Integer> loadByHost = new HashMap<String, Integer>();
-    for (ServiceRegistration s : services) {
-      if (!loadByHost.containsKey(s.getHost()))
-        loadByHost.put(s.getHost(), 0);
-    }
+    Map<String, NodeLoad> loadByHost = new LinkedHashMap<String, NodeLoad>();
 
-    // Find all jobs that are currently running on any given host
-    Query q = em.createNamedQuery("ServiceRegistration.hostload");
+    // Find all jobs that are currently running on any given host, or get all of them
+    Query q = em.createNamedQuery("ServiceRegistration.hostloads");
+    List<Integer> statuses = new LinkedList<Integer>();
+    statuses.add(Status.QUEUED.ordinal());
+    statuses.add(Status.RUNNING.ordinal());
+    statuses.add(Status.DISPATCHING.ordinal());
+    q.setParameter("statuses", statuses);
 
     // Accumulate the numbers for relevant job statuses per host
     for (Object result : q.getResultList()) {
       Object[] resultArray = (Object[]) result;
-      ServiceRegistrationJpaImpl service = (ServiceRegistrationJpaImpl) resultArray[1];
+      ServiceRegistrationJpaImpl service = (ServiceRegistrationJpaImpl) resultArray[0];
 
       // Workflow related jobs are not counting. Workflows are load balanced by the workflow service directly
       if (TYPE_WORKFLOW.equals(service.getServiceType()))
         continue;
 
-      Job.Status status = Status.values()[(int) resultArray[2]];
-      int count = ((Number) resultArray[0]).intValue();
+      Job.Status status = Status.values()[(int) resultArray[1]];
+      float load = ((Number) resultArray[2]).floatValue();
 
       if (activeOnly && (service.isInMaintenanceMode() || !service.isOnline())) {
         continue;
@@ -1851,19 +1956,33 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       // Only queued and running jobs are adding to the load, so every other status is discarded
       if (status == null || !JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(status)) {
-        count = 0;
+        load = 0.0f;
       }
 
       // Add the service registration
       if (loadByHost.containsKey(service.getHost())) {
-        Integer previousServiceLoad = loadByHost.get(service.getHost());
-        loadByHost.put(service.getHost(), previousServiceLoad + count);
+        NodeLoad serviceLoad = loadByHost.get(service.getHost());
+        float newLoad = serviceLoad.getLoadFactor() + load;
+        serviceLoad.setLoadFactor(newLoad);
+        loadByHost.put(service.getHost(), serviceLoad);
       } else {
-        loadByHost.put(service.getHost(), count);
+        loadByHost.put(service.getHost(), new NodeLoad(service.getHost(), load));
       }
     }
 
-    return loadByHost;
+    SystemLoad systemLoad = new SystemLoad();
+    systemLoad.setNodeLoads(loadByHost.values());
+
+    // Initialize the list of hosts
+    List<HostRegistration> hosts = em.createNamedQuery("HostRegistration.getAll").getResultList();
+    //This is important, otherwise services which have no current load are not listed in the output!
+    for (HostRegistration h : hosts) {
+      if (!systemLoad.containsHost(h.getBaseUrl())) {
+        systemLoad.addNodeLoad(new NodeLoad(h.getBaseUrl(), 0.0f));
+      }
+    }
+
+    return systemLoad;
   }
 
   /**
@@ -1994,16 +2113,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
       super.removedService(reference, service);
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getLoad()
-   */
-  @Override
-  public SystemLoad getLoad() throws ServiceRegistryException {
-    throw new UnsupportedOperationException();
   }
 
   /**
@@ -2453,14 +2562,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *          the complete list of service registrations
    * @param hostRegistrations
    *          the complete list of host registrations
-   * @param loadByHost
+   * @param systemLoad
    *          the map of hosts to the number of running jobs
    * @param jobType
    *          the job type for which the services registrations are filtered
    */
   protected List<ServiceRegistration> getServiceRegistrationsWithCapacity(String jobType,
           List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
-          final Map<String, Integer> loadByHost) {
+          final SystemLoad systemLoad) {
 
     List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
 
@@ -2491,10 +2600,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
 
       // Determine the maximum load for this host
-      Integer hostLoadMax = null;
+      Float hostLoadMax = null;
       for (HostRegistration host : hostRegistrations) {
         if (host.getBaseUrl().equals(service.getHost())) {
-          hostLoadMax = host.getMaxJobs();
+          hostLoadMax = host.getMaxLoad();
           break;
         }
       }
@@ -2502,14 +2611,16 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         logger.warn("Unable to determine max load for host {}", service.getHost());
 
       // Determine the current load for this host
-      Integer hostLoad = loadByHost.get(service.getHost());
+      Float hostLoad = systemLoad.get(service.getHost()).getLoadFactor();
       if (hostLoad == null)
         logger.warn("Unable to determine current load for host {}", service.getHost());
 
+      boolean canAcceptJobs = service.isOnline() && !service.isInMaintenanceMode()
+              && service.getServiceState() != ERROR;
       boolean hasCapacity = hostLoad == null || hostLoadMax == null || hostLoad < hostLoadMax;
 
       // Is this host suited for processing?
-      if (hasCapacity) {
+      if (canAcceptJobs && hasCapacity) {
         logger.debug("Adding candidate service {} for processing of jobs of type '{}'", service, jobType);
         filteredList.add(service);
       }
@@ -2517,7 +2628,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
 
     // Sort the list by capacity
-    Collections.sort(filteredList, new LoadComparator(loadByHost));
+    Collections.sort(filteredList, new LoadComparator(systemLoad));
 
     return filteredList;
   }
@@ -2537,7 +2648,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   protected List<ServiceRegistration> getServiceRegistrationsByLoad(String jobType,
           List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
-          final Map<String, Integer> loadByHost) {
+          final SystemLoad systemLoad) {
 
     List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
 
@@ -2575,7 +2686,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
 
     // Sort the list by capacity
-    Collections.sort(filteredList, new LoadComparator(loadByHost));
+    Collections.sort(filteredList, new LoadComparator(systemLoad));
 
     return filteredList;
   }
@@ -2583,16 +2694,49 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getMaxConcurrentJobs()
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getMaxLoads()
    */
   @Override
-  public int getMaxConcurrentJobs() throws ServiceRegistryException {
+  public SystemLoad getMaxLoads() throws ServiceRegistryException {
     Query query = null;
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      query = em.createNamedQuery("HostRegistration.cores");
-      return ((Number) query.getSingleResult()).intValue();
+      query = em.createNamedQuery("HostRegistration.getAll");
+      SystemLoad loads = new SystemLoad();
+      @SuppressWarnings("unchecked")
+      Iterator<HostRegistration> hrIter = query.getResultList().iterator();
+      while (hrIter.hasNext()) {
+        HostRegistration hr = hrIter.next();
+        NodeLoad load = new NodeLoad(hr.getBaseUrl(), hr.getMaxLoad());
+        loads.addNodeLoad(load);
+      }
+      return loads;
+    } catch (Exception e) {
+      throw new ServiceRegistryException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getMaxLoadOnNode(java.lang.String)
+   */
+  @Override
+  public NodeLoad getMaxLoadOnNode(String host) throws ServiceRegistryException, NotFoundException {
+    Query query = null;
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      query = em.createNamedQuery("HostRegistration.getMaxLoadByHostName");
+      query.setParameter("host", host);
+      NodeLoad load = new NodeLoad(host, ((Float) query.getSingleResult()).floatValue());
+      return load;
+    } catch (NoResultException e) {
+      throw new NotFoundException(e);
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
@@ -2629,11 +2773,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
         // Make sure dispatching is happening in an ideal order
         Collections.sort(jobsToDispatch, new DispatchableComparator());
-
-        // Initialize collections used to dispatch the current list of jobs
-        Map<String, Integer> hostLoads = getHostLoads(em, true);
-        List<ServiceRegistration> services = getServiceRegistrations(em);
-        List<HostRegistration> hosts = getHostRegistrations(em);
 
         for (Job job : jobsToDispatch) {
 
@@ -2673,6 +2812,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           // Start dispatching
           try {
 
+            SystemLoad systemLoad = getHostLoads(em, true);
+            List<ServiceRegistration> services = getServiceRegistrations(em);
+            List<HostRegistration> hosts = getHostRegistrations(em);
             List<ServiceRegistration> candidateServices = null;
 
             // Depending on whether this running job is trying to reach out to other services or whether this is an
@@ -2705,10 +2847,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             if (parentJob == null || TYPE_WORKFLOW.equals(jobType) || parentHasRunningChildren) {
               logger.trace("Using available capacity only for dispatching of {} to a service of type '{}'", job,
                       jobType);
-              candidateServices = getServiceRegistrationsWithCapacity(jobType, services, hosts, hostLoads);
+              candidateServices = getServiceRegistrationsWithCapacity(jobType, services, hosts, systemLoad);
             } else {
               logger.trace("Using full list of services for dispatching of {} to a service of type '{}'", job, jobType);
-              candidateServices = getServiceRegistrationsByLoad(jobType, services, hosts, hostLoads);
+              candidateServices = getServiceRegistrationsByLoad(jobType, services, hosts, systemLoad);
             }
 
             // Try to dispatch the job
@@ -2727,11 +2869,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             }
 
             logger.debug("Job {} dispatched to {}", job.getId(), hostAcceptingJob);
-            if (hostLoads.containsKey(hostAcceptingJob)) {
-              Integer previousServiceLoad = hostLoads.get(hostAcceptingJob);
-              hostLoads.put(hostAcceptingJob, ++previousServiceLoad);
+            if (systemLoad.containsHost(hostAcceptingJob)) {
+              NodeLoad serviceLoad = systemLoad.get(hostAcceptingJob);
+              float newLoad = serviceLoad.getLoadFactor() + job.getJobLoad();
+              serviceLoad.setLoadFactor(newLoad);
+              systemLoad.addNodeLoad(serviceLoad);
             } else {
-              hostLoads.put(hostAcceptingJob, 1);
+              systemLoad.addNodeLoad(new NodeLoad(hostAcceptingJob, job.getJobLoad()));
             }
 
           } catch (ServiceRegistryException e) {
@@ -2843,7 +2987,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   private static final class LoadComparator implements Comparator<ServiceRegistration> {
 
-    private Map<String, Integer> loadByHost = null;
+    private SystemLoad loadByHost = null;
 
     /**
      * Creates a new comparator which is using the given map of host names and loads.
@@ -2851,7 +2995,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
      * @param loadByHost
      *          the current work load by host
      */
-    public LoadComparator(Map<String, Integer> loadByHost) {
+    public LoadComparator(SystemLoad loadByHost) {
       this.loadByHost = loadByHost;
     }
 
@@ -2859,7 +3003,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public int compare(ServiceRegistration serviceA, ServiceRegistration serviceB) {
       String hostA = serviceA.getHost();
       String hostB = serviceB.getHost();
-      return loadByHost.get(hostA) - loadByHost.get(hostB);
+      return Float.compare(loadByHost.get(hostA).getLoadFactor(), loadByHost.get(hostB).getLoadFactor());
     }
 
   }

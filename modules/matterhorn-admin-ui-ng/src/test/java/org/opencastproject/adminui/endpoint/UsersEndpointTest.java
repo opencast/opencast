@@ -33,10 +33,12 @@ import org.opencastproject.rest.RestServiceTestEnv;
 import com.jayway.restassured.http.ContentType;
 
 import org.apache.http.HttpStatus;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -91,6 +93,23 @@ public class UsersEndpointTest {
             .contentType(ContentType.JSON).body("total", equalTo(total)).body("offset", equalTo(offset))
             .body("limit", equalTo(limit)).body("results", hasSize(limit > 0 ? limit : total - offset)).when()
             .get(rt.host("/users.json"));
+  }
+
+  @Test
+  public void testSorting() throws Exception {
+    JSONObject actual = (JSONObject) parser.parse(given().log().all().queryParam("sort", "name:ASC").expect()
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).body("total", equalTo(4))
+            .body("offset", equalTo(0)).body("limit", equalTo(100)).body("results", hasSize(4)).when()
+            .get(rt.host("/users.json")).asString());
+    JSONArray users = (JSONArray) actual.get("results");
+    JSONObject user1 = (JSONObject) users.get(0);
+    JSONObject user2 = (JSONObject) users.get(1);
+    JSONObject user3 = (JSONObject) users.get(2);
+    JSONObject user4 = (JSONObject) users.get(3);
+    Assert.assertEquals("User1", user1.get("name"));
+    Assert.assertEquals("user2", user2.get("name"));
+    Assert.assertEquals("User3", user3.get("name"));
+    Assert.assertEquals("user4", user4.get("name"));
   }
 
   @Before

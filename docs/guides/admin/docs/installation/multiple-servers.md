@@ -5,23 +5,24 @@ Install Across Multiple Servers
 practices and presents what a lot of people are running.*
 
 
-Step 1: Install Matterhorn
+Step 1: Install Opencast
 --------------------------
 
 Opencast consists of a large set of modules which together build the whole system. In a distributed set-up, different
 kinds of nodes are basically only defined by the existence or absence of specific modules.
 
 While it is possible to stick together a system module by module, opencast comes with a set of pre-defined distribution
-which can directly be built and installed. To build these distributions, you would compile Opencast just like it is outlined in the basic installation guides and will then find a set of different distributions, both as archive and in a separate directory.
+which can directly be built and installed. To build these distributions, you would compile Opencast just like it is
+outlined in the basic installation guides and will then find a set of different distributions, both as archive and in a
+separate directory.
 
 To list all distributions, run the following command after Opencast is built:
 
-    % ls -d assemblies/karaf-dist-*/target/opencast*
-    assemblies/karaf-dist-admin/target/opencast-karaf-dist-admin-${version}
-    assemblies/karaf-dist-admin/target/opencast-karaf-dist-admin-${version}.tar.gz
-    assemblies/karaf-dist-admin/target/opencast-karaf-dist-admin-${version}.zip
-    assemblies/karaf-dist-allinone/target/opencast-karaf-dist-allinone-${version}
-    assemblies/karaf-dist-allinone/target/opencast-karaf-dist-allinone-${version}.tar.gz
+    % ls -1 build/*.tar.gz
+    build/opencast-dist-admin-${version}.tar.gz
+    build/opencast-dist-allinone-${version}.tar.gz
+    build/opencast-dist-presentation-${version}.tar.gz
+    build/opencast-dist-worker-${version}.tar.g
     ...
 
 
@@ -33,8 +34,9 @@ The following list describes possible set-ups:
 
 ### All-In-One
 
-This is the default set-up described in the basic installation guides. It works fine for testing purposes. It should usually
-not be used in production. It is not distributed but is listed here to have a comprehensive list of predefined distributions.
+This is the default set-up described in the basic installation guides. It works fine for testing purposes. It should
+usually not be used in production. It is not distributed but is listed here to have a comprehensive list of predefined
+distributions.
 
 
 ### Two-Server Set-up
@@ -56,11 +58,11 @@ performance simply by adding further worker nodes to the system.
 Step 2: Set-Up NFS Server
 -------------------------
 
-Though it is possible to have Matterhorn run without shared storage, it is still a good idea to do so, as hard links can
+Though it is possible to have Opencast run without shared storage, it is still a good idea to do so, as hard links can
 be used to link files instead of copying them and not everything has to be tunneled over HTTP.
 
 Thus you should first set-up your NFS server. The best solution is certainly to have a dedicated storage server. For
-smaller set-ups, however, it can also be put on one of the Matterhorn nodes, i.e. on the admin node.
+smaller set-ups, however, it can also be put on one of the Opencast nodes, i.e. on the admin node.
 
 To do this, you first have to install and enable the NFS server:
 
@@ -69,22 +71,22 @@ To do this, you first have to install and enable the NFS server:
     service nfs start
 
 You want to have one common user on all your systems, so that file permissions do not become an issue.. As preparation
-for this it makes sense to manually create a matterhorn user and group with a common UID and GID:
+for this it makes sense to manually create an *opencast* user and group with a common UID and GID:
 
-    groupadd -g 1234 matterhorn
-    useradd -g 1234 -u 1234 matterhorn
+    groupadd -g 1234 opencast
+    useradd -g 1234 -u 1234 opencast
 
 If the user and group id `1234` is already used, just pick another one but make sure to pick the same one on all your
-Matterhorn nodes.
+Opencast nodes.
 
 Then create the directory to be shared and set its ownership to the newly created users:
 
-    mkdir -p /srv/matterhorn
-    chown matterhorn:matterhorn /srv/matterhorn
+    mkdir -p /srv/opencast
+    chown opencast:opencast /srv/opencast
 
 Next we actually share the storage dir. For this we need to edit the file `/etc/exports` and set:
 
-    /srv/matterhorn  131.173.172.190(rw,sync,no_subtree_check)
+    /srv/opencast  131.173.172.190(rw,sync,no_subtree_check)
 
 with 131.173.172.190 being the IP address of the other machine that should get access. Finally we enable the share with:
 
@@ -99,15 +101,17 @@ for example:
 You can set them by editing `/etc/sysconfig/iptables` and restarting the service afterwards.
 
 Now you have set-up your storage server. What is still left to do is to mount the network storage on all other servers
-of the matterhorn clusters except the capture agents. To do that you need to edit the `/etc/fstab` on each server and
-add the command to mount the network storage on startup:
+of the Opencast clusters except the capture agents. To do that you need to edit the `/etc/fstab` on each server and add
+the command to mount the network storage on startup:
 
-    storageserver.example.com:/srv/matterhorn /srv/matterhorn   nfs rw,hard,intr,rsize=32768,wsize=32768 0 0
+    storageserver.example.com:/srv/opencast /srv/opencast   nfs rw,hard,intr,rsize=32768,wsize=32768 0 0
 
-*Important:* Do not use multiple NFS shares for different parts of the Matterhorn storage dir. Matterhorn will check if
+*Important:* Do not use multiple NFS shares for different parts of the Opencast storage dir. Opencast will check if
 hard links are possible across in a distributed set-up, but the detection may fail if hard links are only possible
 between certain parts of the storage. This may lead to failures.
 
+*Important:* Do not share the Karaf data directory. Doing so will cause Opencast to fail. Please share the storage
+directory only.
 
 
 Step 3: Set-Up the Database
@@ -125,16 +129,16 @@ configure your firewall:
 Step 4: Set-Up ActiveMQ
 -----------------------
 
-Since version 2, Opencast Matterhorn requires an Apache ActiveMQ message broker as message relay for the administrative
-user interface. ActiveMQ can either be set up to run on its own machine or on one of the existing Matterhorn nodes
-(usually the admin node).
+Since version 2, Opencast requires an Apache ActiveMQ message broker as message relay for the administrative user
+interface. ActiveMQ can either be set up to run on its own machine or on one of the existing Opencast nodes (usually the
+admin node).
 
 ActiveMQ 5.10 or above should work. ActiveMQ 5.6 will not work. Versions in between are untested.
 
 
 ### Installation
 
- - If you use the Matterhorn RPM repository, simply install the `activemq-dist` package.
+ - If you use the Opencast RPM repository, simply install the `activemq-dist` package.
  - If you are running RHEL, CentOS or Fedora you can use the [ActiveMQ-dist Copr RPM repository
    ](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
  - You can download binary distributions from the [Apache ActiveMQ website](http://activemq.apache.org/download.html)
@@ -142,13 +146,14 @@ ActiveMQ 5.10 or above should work. ActiveMQ 5.6 will not work. Versions in betw
 
 ### Configuration
 
-What you basically need to do is to point all your Matterhorn nodes to your message broker. For more information about
+What you basically need to do is to point all your Opencast nodes to your message broker. For more information about
 the configuration, have a look at the [Message Broker Set-Up Guide](../configuration/message-broker.md).
 
-Do not forget that ActiveMQ uses TCP port 61616 (default configuration) for communication which you might have to allow in your firewall.
+Do not forget that ActiveMQ uses TCP port 61616 (default configuration) for communication which you might have to allow
+in your firewall.
 
 
-Step 5: Configure Matterhorn
+Step 5: Configure Opencast
 ----------------------------
 
 You did already set-up and configured your database and message broker in the last steps, but there is some more
@@ -164,7 +169,7 @@ This may either be this nodes IP address or preferable its domain name:
 
 Set the location of the shared storage directory:
 
-    org.opencastproject.storage.dir=/srv/matterhorn
+    org.opencastproject.storage.dir=/srv/opencast
 
 Define that the file repository shall access all files locally:
 

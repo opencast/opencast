@@ -25,6 +25,7 @@ import static org.opencastproject.job.api.Job.FailureReason.NONE;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -111,6 +112,15 @@ public class JaxbJob implements Job {
   /** Whether this job is queueable */
   protected boolean dispatchable;
 
+  /** The load value for this job.  This should be roughly the number of cores that this job occupies while running. */
+  protected Float jobLoad = 1.0f;
+
+  /** The list of job IDs that are blocking this job from continuing. */
+  protected List<Long> blockedJobIds = new LinkedList<Long>();
+
+  /** The job that this job is blocking from continuing. */
+  protected Long blockingJobId = null;
+
   /** Default constructor needed by jaxb */
   public JaxbJob() {
     this.context = new JaxbJobContext();
@@ -158,6 +168,9 @@ public class JaxbJob implements Job {
     this.uri = job.getUri();
     this.creator = job.getCreator();
     this.organization = job.getOrganization();
+    this.jobLoad = job.getJobLoad();
+    setBlockedJobIds(job.getBlockedJobIds());
+    setBlockingJobId(job.getBlockingJobId());
   }
 
   /**
@@ -617,6 +630,60 @@ public class JaxbJob implements Job {
   /**
    * {@inheritDoc}
    *
+   * @see org.opencastproject.job.api.Job#getCreator()
+   */
+  @Override
+  @XmlElement(name = "jobLoad")
+  public Float getJobLoad() {
+    return jobLoad;
+  }
+
+  /**
+   * Sets the job's load value
+   *
+   * @param newLoad the load value for the job
+   */
+  public void setJobLoad(Float newLoad) {
+    this.jobLoad = newLoad;
+  }
+
+  @Override
+  @XmlElement(name = "jobId")
+  @XmlElementWrapper(name = "blockingJobId")
+  public List<Long> getBlockedJobIds() {
+    return blockedJobIds;
+  }
+
+  @Override
+  public void setBlockedJobIds(List<Long> list) {
+    //FIXME: This should be using Immutable to create a safe copy of the list that can't be changed easily
+    if (null != list)
+      blockedJobIds = list;
+    else
+      blockedJobIds = new LinkedList<Long>();
+  }
+
+  public void removeBlockedJobsIds() {
+    setBlockedJobIds(null);
+  }
+
+  @Override
+  @XmlElement(name = "blockingJobId")
+  public Long getBlockingJobId() {
+    return blockingJobId;
+  }
+
+  public void setBlockingJobId(Long jobId) {
+    this.blockingJobId = jobId;
+  }
+
+  public void removeBlockingJobId() {
+    this.blockingJobId = null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -646,5 +713,4 @@ public class JaxbJob implements Job {
   public String toString() {
     return "Job {id:" + this.id + ", version:" + version + "}";
   }
-
 }

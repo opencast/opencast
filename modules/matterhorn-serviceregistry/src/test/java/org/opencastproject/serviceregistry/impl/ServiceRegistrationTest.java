@@ -35,6 +35,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceState;
+import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.persistence.PersistenceUtil;
@@ -47,7 +48,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ServiceRegistrationTest {
 
@@ -118,7 +118,7 @@ public class ServiceRegistrationTest {
   public void testHostCapacity() throws Exception {
     List<ServiceRegistration> services = serviceRegistry.getServiceRegistrations();
     List<HostRegistration> hosts = serviceRegistry.getHostRegistrations();
-    Map<String, Integer> hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
+    SystemLoad hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
     List<ServiceRegistration> availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1,
             services, hosts, hostLoads);
 

@@ -95,13 +95,13 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
       def = parseWorkflowDefinitionFile(artifact);
 
       if (def == null) {
-        logger.warn("Unable to install workflow from {}", artifact.getAbsolutePath());
+        logger.warn("Unable to install workflow from '{}'", artifact.getName());
         artifactsWithError.add(artifact);
         return;
       }
     }
 
-    logger.info("Installing workflow from file {}", artifact.getAbsolutePath());
+    logger.info("Installing workflow from file '{}'", artifact.getName());
     artifactsWithError.remove(artifact);
     artifactIds.put(artifact, def.getId());
     putWorkflowDefinition(def.getId(), def);
@@ -113,7 +113,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
       }
     });
 
-    logger.info("Worfkflow definition '{}' from file {} installed", def.getId(), artifact.getAbsolutePath());
+    logger.info("Worfkflow definition '{}' from file '{}' installed", def.getId(), artifact.getName());
 
     // Once all profiles have been loaded, announce readiness
     if ((filesInDirectory.length - artifactsWithError.size()) == artifactIds.size() && !isWFSinitiliazed) {
@@ -136,7 +136,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
     String id = artifactIds.remove(artifact);
     if (id != null) {
       WorkflowDefinition def = removeWorkflowDefinition(id);
-      logger.info("Uninstalling workflow definition '{}' from file {}", def.getId(), artifact.getAbsolutePath());
+      logger.info("Uninstalling workflow definition '{}' from file '{}'", def.getId(), artifact.getName());
     }
   }
 
@@ -171,7 +171,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
         logger.warn("Workflow '{}' has no operations", def.getId());
       return def;
     } catch (Exception e) {
-      logger.warn("Unable to parse workflow from file {}, {}", artifact.getAbsolutePath(), e.getMessage());
+      logger.warn("Unable to parse workflow from file '{}', {}", artifact.getName(), e.getMessage());
       return null;
     } finally {
       IOUtils.closeQuietly(stream);

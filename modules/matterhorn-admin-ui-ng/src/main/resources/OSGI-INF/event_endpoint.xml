@@ -10,6 +10,7 @@
   <service>
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.adminui.endpoint.OsgiEventEndpoint" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
   <reference bind="setAdminUIConfiguration"
              cardinality="1..1"
@@ -102,4 +103,9 @@
              policy="dynamic"
              bind="addCatalogUIAdapter"
              unbind="removeCatalogUIAdapter" />
+ <reference name="UrlSigningService" 
+             interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
+             cardinality="1..1" 
+             policy="static" 
+             bind="setUrlSigningService" />
 </scr:component>

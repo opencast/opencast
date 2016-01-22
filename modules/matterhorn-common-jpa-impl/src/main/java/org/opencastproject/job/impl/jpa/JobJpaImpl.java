@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +65,7 @@ import javax.persistence.Transient;
 import javax.persistence.Version;
 
 /**
- * A long running, asynchronously executed job. This concrete implementations adds JPA annotations to {@link JaxbJob}.
+ * A long running, asynchronously executed job.
  */
 @Entity(name = "Job")
 @Access(AccessType.FIELD)
@@ -195,6 +196,21 @@ public class JobJpaImpl implements Job {
   @Column(name = "dispatchable")
   private boolean dispatchable;
 
+  /** The load value for this job.  This should be roughly the number of cores that this job occupies while running. */
+  @Column(name = "job_load")
+  private Float jobLoad = 1.0f;
+
+  /** The list of job IDs that are blocking this job from continuing. */
+  @Column(name = "blocking_job_list")
+  @OrderColumn(name = "job_index")
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "mh_blocking_job", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
+  private List<Long> blockedJobIds = new LinkedList<Long>();
+
+  /** The job that this job is blocking from continuing. */
+  @Column(name = "blocking_job")
+  private Long blockingJobId = null;
+
   @Transient
   private Long parentJobId = -1L;
 
@@ -208,6 +224,9 @@ public class JobJpaImpl implements Job {
   @ManyToOne
   @JoinColumn(name = "processor_service")
   private ServiceRegistrationJpaImpl processorServiceRegistration;
+
+  @Column(name = "processor_service", insertable = false, updatable = false)
+  protected long processorServiceRegistrationId;
 
   @Transient
   private List<JobPropertyJpaImpl> properties;
@@ -238,16 +257,22 @@ public class JobJpaImpl implements Job {
     this.operation = operation;
     this.context = new JaxbJobContext();
     this.childJobs = new ArrayList<JobJpaImpl>();
-    this.payload = payload;
-    this.dateCreated = new Date();
-    this.createdHost = creatorServiceRegistration.getHost();
-    this.jobType = creatorServiceRegistration.getServiceType();
-    this.dispatchable = dispatchable;
-    this.status = Status.INSTANTIATED.ordinal();
-    this.creatorServiceRegistration = creatorServiceRegistration;
     if (arguments != null) {
       this.arguments = new ArrayList<String>(arguments);
     }
+    setPayload(payload);
+    setDateCreated(new Date());
+    setCreatedHost(creatorServiceRegistration.getHost());
+    setJobType(creatorServiceRegistration.getServiceType());
+    setDispatchable(dispatchable);
+    setStatus(Status.INSTANTIATED);
+    this.creatorServiceRegistration = creatorServiceRegistration;
+  }
+
+  public JobJpaImpl(User user, Organization organization, ServiceRegistrationJpaImpl creatorServiceRegistration,
+          String operation, List<String> arguments, String payload, boolean dispatchable, Float loadValue) {
+    this(user, organization, creatorServiceRegistration, operation, arguments, payload, dispatchable);
+    setJobLoad(loadValue);
   }
 
   public JobJpaImpl(User user, Organization organization, ServiceRegistrationJpaImpl creatorServiceRegistration,
@@ -258,6 +283,13 @@ public class JobJpaImpl implements Job {
     this.parentJobId = parentJob.getId();
     this.rootJob = rootJob;
     this.parentJob = parentJob;
+  }
+
+  public JobJpaImpl(User user, Organization organization, ServiceRegistrationJpaImpl creatorServiceRegistration,
+          String operation, List<String> arguments, String payload, boolean dispatchable, JobJpaImpl rootJob,
+          JobJpaImpl parentJob, Float loadValue) {
+    this(user, organization, creatorServiceRegistration, operation, arguments, payload, dispatchable, rootJob, parentJob);
+    setJobLoad(loadValue);
   }
 
   @Override
@@ -351,7 +383,6 @@ public class JobJpaImpl implements Job {
   public String getOperation() {
     return operation;
   }
-
   @Override
   public void setOperation(String operation) {
     this.operation = operation;
@@ -379,6 +410,14 @@ public class JobJpaImpl implements Job {
   @Override
   public String getCreatedHost() {
     return createdHost;
+  }
+
+  /**
+   * @param createdHost
+   *          the createdHost to set
+   */
+  public void setCreatedHost(String createdHost) {
+    this.createdHost = createdHost;
   }
 
   @Override
@@ -442,6 +481,53 @@ public class JobJpaImpl implements Job {
   }
 
   @Override
+  public Float getJobLoad() {
+    return jobLoad;
+  }
+
+  /**
+   * Sets the job's load value
+   *
+   * @param newLoad the load value for the job
+   */
+  public void setJobLoad(Float newLoad) {
+    this.jobLoad = newLoad;
+  }
+
+  @Override
+  public List<Long> getBlockedJobIds() {
+    return blockedJobIds;
+  }
+
+  @Override
+  public void setBlockedJobIds(List<Long> list) {
+    //FIXME: This should be using Immutable to create a safe copy of the list that can't be changed easily
+    if (null != list)
+      blockedJobIds = list;
+    else
+      blockedJobIds = new LinkedList<Long>();
+  }
+
+  public void removeBlockedJobsIds() {
+    setBlockedJobIds(null);
+  }
+
+  @Override
+  public Long getBlockingJobId() {
+    return blockingJobId;
+  }
+
+  @Override
+  public void setBlockingJobId(Long jobId) {
+    this.blockingJobId = jobId;
+  }
+
+  @Override
+  public void removeBlockingJobId() {
+    this.blockingJobId = null;
+  }
+
+  @Override
   public void setDispatchable(boolean dispatchable) {
     this.dispatchable = dispatchable;
   }
@@ -480,8 +566,16 @@ public class JobJpaImpl implements Job {
     }
   }
 
+  /**
+   * Returns the identifier of the processor service
+   * <p>
+   * Use this method instead of {@link #getProcessorServiceRegistration()} when you only need/want the identifier of the
+   * service and not the service registration object.
+   *
+   * @return the processor service identifier
+   */
   public long getProcessorServiceRegistrationId() {
-    return processorServiceRegistration.getId();
+    return processorServiceRegistrationId;
   }
 
   @PreUpdate

@@ -119,6 +119,11 @@
     <bundle>mvn:org.opencastproject/matterhorn-static-file-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-static-file-service-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-userdirectory/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-urlsigning-common/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-urlsigning-service-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-urlsigning-service-impl/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-urlsigning-verifier-service-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-urlsigning-verifier-service-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-workflow-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-working-file-repository-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-working-file-repository-service-impl/${project.version}</bundle>

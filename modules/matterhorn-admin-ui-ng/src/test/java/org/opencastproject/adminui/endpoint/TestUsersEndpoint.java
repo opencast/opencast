@@ -33,7 +33,6 @@ import org.easymock.EasyMock;
 import org.junit.Ignore;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,7 +58,6 @@ public class TestUsersEndpoint extends UsersEndpoint {
 
 //    pmService = EasyMock.createNiceMock(ParticipationManagementDatabase.class);
     userDirectoryService = EasyMock.createNiceMock(UserDirectoryService.class);
-    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     users = new ArrayList<User>();
 
     JpaOrganization organization = new JpaOrganization("org", "org", new HashMap<String, Integer>(), "ADMIN",
@@ -69,10 +67,10 @@ public class TestUsersEndpoint extends UsersEndpoint {
     roles.add(new JpaRole("ADMIN", organization));
     roles.add(new JpaRole("USER", organization));
 
-    user1 = new JpaUser("user1", "pass", organization, "user1", "email1", "provider1", true, roles);
+    user1 = new JpaUser("user1", "pass", organization, "User1", "email1", "provider1", true, roles);
     user2 = new JpaUser("user2", "pass", organization, "user2", "email2", "provider1", true);
-    user3 = new JpaUser("user3", "pass", organization, "user3", "email3", "provider1", true);
-    user4 = new JpaUser("user4", "pass", organization, "user1", "email4", "provider1", true);
+    user3 = new JpaUser("user3", "pass", organization, "User3", "email3", "provider1", true);
+    user4 = new JpaUser("user4", "pass", organization, "user4", "email4", "provider1", true);
 
 //    Person person1 = new Person(1L, user1.getName(), user1.getEmail(), new ArrayList<PersonType>());
 //    Person person2 = new Person(2L, user2.getName(), user2.getEmail(), new ArrayList<PersonType>());
@@ -83,6 +81,17 @@ public class TestUsersEndpoint extends UsersEndpoint {
     users.add(user2);
     users.add(user3);
     users.add(user4);
+
+    List<Period> periods1 = new ArrayList<Period>();
+    periods1.add(new Period(Option.some(12L), fromUTC("2012-12-12T12:12:12Z"), fromUTC("2025-12-24T12:12:12Z"),
+            Option.<String> none(), Option.<String> none()));
+    periods1.add(new Period(Option.some(14L), fromUTC("2026-12-12T12:12:12Z"), fromUTC("2026-12-12T16:12:12Z"),
+            Option.<String> none(), Option.<String> none()));
+    List<Period> periods2 = new ArrayList<Period>();
+    periods2.add(new Period(Option.some(12L), fromUTC("2028-12-12T12:12:12Z"), fromUTC("2029-12-24T12:12:12Z"),
+            Option.<String> none(), Option.<String> none()));
+    periods2.add(new Period(Option.some(14L), fromUTC("2006-12-12T12:12:12Z"), fromUTC("2006-12-12T16:12:12Z"),
+            Option.<String> none(), Option.<String> none()));
 
 //    List<Period> periods1 = new ArrayList<Period>();
 //    periods1.add(new Period(Option.some(12L), fromUTC("2012-12-12T12:12:12Z"), fromUTC("2025-12-24T12:12:12Z"), Option

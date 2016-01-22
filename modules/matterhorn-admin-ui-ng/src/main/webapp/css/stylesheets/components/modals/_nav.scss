@@ -23,6 +23,7 @@
 .modal .modal-nav {
 
     $height: 50px;
+    $line-height: 20px;
     width: 100%;
     height: $height;
     background: $modal-nav-bg-color;
@@ -34,7 +35,11 @@
         display: inline-block;
         text-align: center;
         position: relative;
-        line-height: $height;
+        overflow: hidden;
+        padding: 5px;
+        box-sizing: border-box;
+        height : $height; 
+        line-height: $line-height;
         color: $modal-nav-link-color;
         font-size: 13px;
 

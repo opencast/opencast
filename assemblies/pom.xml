@@ -12,6 +12,7 @@
 
   <properties>
     <checkstyle.skip>true</checkstyle.skip>
+    <opencast.basedir>${project.basedir}/..</opencast.basedir>
   </properties>
 
   <groupId>org.opencastproject.assemblies</groupId>
@@ -21,10 +22,151 @@
 
   <modules>
     <module>karaf-features</module>
-    <module>karaf-dist-admin</module>
-    <module>karaf-dist-allinone</module>
-    <module>karaf-dist-presentation</module>
-    <module>karaf-dist-worker</module>
+    <module>dist-admin</module>
+    <module>dist-allinone</module>
+    <module>dist-presentation</module>
+    <module>dist-worker</module>
   </modules>
+
+  <build>
+    <plugins>
+      <!-- Make sure to clean build dir before rebuilding assemblies -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <inherited>false</inherited>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${opencast.basedir}/</directory>
+              <includes>
+                <include>build/</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <!-- Make sure to delete old assemblies before rebuilding them -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <configuration>
+            <filesets>
+              <fileset>
+                <directory>${opencast.basedir}/build/</directory>
+                <includes>
+                  <include>${project.artifactId}*.tar.gz</include>
+                  <include>${project.artifactId}-*/</include>
+                </includes>
+              </fileset>
+            </filesets>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>process-resources</id>
+              <goals>
+                <goal>resources</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.karaf.tooling</groupId>
+          <artifactId>karaf-maven-plugin</artifactId>
+          <version>${karaf.version}</version>
+          <extensions>true</extensions>
+          <configuration>
+            <archiveZip>false</archiveZip>
+            <archiveTarGz>false</archiveTarGz>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <executions>
+            <execution>
+              <phase>prepare-package</phase>
+              <configuration>
+                <target>
+                  <!-- Remove Karaf Spring bundle since it conflicts with the one used by Opencast -->
+                  <replaceregexp
+                    file="target/assembly/etc/startup.properties"
+                    match="^.*org.apache.karaf.deployer/org.apache.karaf.deployer.spring.*$"
+                    replace="#\0"
+                    byline="true" />
+                  <!-- Make sure to deactivate JMX by default -->
+                  <replaceregexp
+                    file="target/assembly/bin/karaf"
+                    match="-Dcom.sun.management.jmxremote"
+                    replace=""
+                    byline="true" />
+                  <!-- Correct the start script name -->
+                  <replaceregexp
+                    file="target/assembly/bin/karaf"
+                    match="^KARAF_SCRIPT=.*$"
+                    replace="KARAF_SCRIPT='start-opencast'"
+                    byline="true" />
+                  <!-- Remove SSHd and JMX from default start -->
+                  <replaceregexp
+                    file="target/assembly/etc/org.apache.karaf.features.cfg"
+                    match="^(featuresBoot = .*),ssh,management(.*)$"
+                    replace="#\0${line.separator}\1\2"
+                    byline="true" />
+                  <!-- Make sure bundle cache gets cleared by default -->
+                  <replaceregexp
+                    file="target/assembly/etc/system.properties"
+                    match="^karaf.clean.cache .*=.*$"
+                    replace="karaf.clean.cache = true"
+                    byline="true" />
+                  <!-- Special configuration for development -->
+                  <replaceregexp
+                    file="target/classes/package.xml"
+                    match="tar\.gz"
+                    replace="dir"
+                    byline="true" />
+                  <replaceregexp
+                    file="target/classes/package.xml"
+                    match="baseDirectory&gt;.*&lt;/baseDirectory&gt;"
+                    replace="includeBaseDirectory&gt;false&lt;/includeBaseDirectory&gt;"
+                    byline="true" />
+                </target>
+              </configuration>
+              <goals>
+                <goal>run</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>bin</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+              <configuration>
+                <descriptors>
+                  <descriptor>${opencast.basedir}/assemblies/package.xml</descriptor>
+                </descriptors>
+                <outputDirectory>${opencast.basedir}/build/</outputDirectory>
+                <appendAssemblyId>false</appendAssemblyId>
+                <tarLongFileMode>gnu</tarLongFileMode>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>

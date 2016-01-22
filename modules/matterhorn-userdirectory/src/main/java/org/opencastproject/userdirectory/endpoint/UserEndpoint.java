@@ -21,6 +21,7 @@
 
 package org.opencastproject.userdirectory.endpoint;
 
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -30,10 +31,11 @@ import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.apache.commons.lang.StringUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONValue;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.JaxbUserList;
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
@@ -47,9 +49,6 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +74,11 @@ import javax.ws.rs.core.Response;
  * Provides a sorted set of known users
  */
 @Path("/")
-@RestService(name = "UsersUtils", title = "User utils", notes = "This service offers the default CRUD Operations for the internal matterhorn users.", abstractText = "Provides operations for internal matterhorn users")
+@RestService(
+  name = "UsersUtils",
+  title = "User utils",
+  notes = "This service offers the default CRUD Operations for the internal Opencast users.",
+  abstractText = "Provides operations for internal Opencast users")
 public class UserEndpoint {
 
   /** The logger */
@@ -102,10 +105,6 @@ public class UserEndpoint {
     this.securityService = securityService;
   }
 
-  /**
-   * @param persistenceProperties
-   *          the persistenceProperties to set
-   */
   public void setJpaUserAndRoleProvider(JpaUserAndRoleProvider jpaUserAndRoleProvider) {
     this.jpaUserAndRoleProvider = jpaUserAndRoleProvider;
   }
@@ -113,15 +112,35 @@ public class UserEndpoint {
   @GET
   @Path("users.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "allusersasjson", description = "Returns a list of users", returnDescription = "Returns a JSON representation of the list of user accounts", restParameters = {
-          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
+  @RestQuery(
+    name = "allusersasjson",
+    description = "Returns a list of users",
+    returnDescription = "Returns a JSON representation of the list of user accounts",
+    restParameters = {
+      @RestParameter(
+        name = "limit",
+        defaultValue = "100",
+        description = "The maximum number of items to return per page.",
+        isRequired = false,
+        type = RestParameter.Type.STRING),
+      @RestParameter(
+        name = "offset",
+        defaultValue = "0",
+        description = "The page number.",
+        isRequired = false,
+        type = RestParameter.Type.STRING)
+    }, reponses = {
+      @RestResponse(
+        responseCode = SC_OK,
+        description = "The user accounts.")
+    })
   public JaxbUserList getUsersAsJson(@QueryParam("limit") int limit, @QueryParam("offset") int offset)
           throws IOException {
 
     // Set the maximum number of items to return to 100 if this limit parameter is not given
-    if (limit < 1)
+    if (limit < 1) {
       limit = 100;
+    }
 
     JaxbUserList userList = new JaxbUserList();
     for (Iterator<User> i = jpaUserAndRoleProvider.findUsers("%", offset, limit); i.hasNext();) {
@@ -133,108 +152,188 @@ public class UserEndpoint {
   @GET
   @Path("{username}.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "user", description = "Returns a user", returnDescription = "Returns a JSON representation of a user", pathParameters = { @RestParameter(description = "The username.", isRequired = true, name = "username", type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "The user account."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found") })
-  public JaxbUser getUserAsJson(@PathParam("username") String username) throws NotFoundException {
+  @RestQuery(
+    name = "user",
+    description = "Returns a user",
+    returnDescription = "Returns a JSON representation of a user",
+    pathParameters = {
+      @RestParameter(
+        name = "username",
+        description = "The username.",
+        isRequired = true,
+        type = STRING)
+    }, reponses = {
+      @RestResponse(
+        responseCode = SC_OK,
+        description = "The user account."),
+      @RestResponse(
+        responseCode = SC_NOT_FOUND,
+        description = "User not found")
+    })
+  public Response getUserAsJson(@PathParam("username") String username) throws NotFoundException {
     User user = jpaUserAndRoleProvider.loadUser(username);
-    if (user == null)
-      throw new NotFoundException();
-    return JaxbUser.fromUser(user);
+    if (user == null) {
+      logger.debug("Requested user not found: {}", username);
+      return Response.status(SC_NOT_FOUND).build();
+    }
+    return Response.ok(JaxbUser.fromUser(user)).build();
   }
 
   @POST
   @Path("/")
-  @RestQuery(name = "createUser", description = "Create a new  user", returnDescription = "The location of the new ressource", restParameters = {
-          @RestParameter(description = "The username.", isRequired = true, name = "username", type = STRING),
-          @RestParameter(description = "The password.", isRequired = true, name = "password", type = STRING),
-          @RestParameter(description = "The name.", isRequired = false, name = "name", type = STRING),
-          @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
-          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]") }, reponses = {
-          @RestResponse(responseCode = SC_CREATED, description = "User has been created."),
-          @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.") })
+  @RestQuery(
+    name = "createUser",
+    description = "Create a new  user",
+    returnDescription = "Location of the new ressource",
+    restParameters = {
+      @RestParameter(
+        name = "username",
+        description = "The username.",
+        isRequired = true,
+        type = STRING),
+      @RestParameter(
+        name = "password",
+        description = "The password.",
+        isRequired = true,
+        type = STRING),
+      @RestParameter(
+        name = "name",
+        description = "The name.",
+        isRequired = false,
+        type = STRING),
+      @RestParameter(
+        name = "email",
+        description = "The email.",
+        isRequired = false,
+        type = STRING),
+      @RestParameter(
+        name = "roles",
+        description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]",
+        isRequired = false,
+        type = STRING)
+    }, reponses = {
+      @RestResponse(
+        responseCode = SC_BAD_REQUEST,
+        description = "Malformed request syntax."),
+      @RestResponse(
+        responseCode = SC_CREATED,
+        description = "User has been created."),
+      @RestResponse(
+        responseCode = SC_CONFLICT,
+        description = "An user with this username already exist.")
+    })
   public Response createUser(@FormParam("username") String username, @FormParam("password") String password,
           @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles)
           throws NotFoundException {
 
-    User existingUser = jpaUserAndRoleProvider.loadUser(username);
-    if (existingUser != null) {
+    if (jpaUserAndRoleProvider.loadUser(username) != null) {
       return Response.status(SC_CONFLICT).build();
     }
 
-    JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
+    try {
+      Set<JpaRole> rolesSet = parseRoles(roles);
 
-    JSONArray rolesArray = (JSONArray) JSONValue.parse(roles);
-    Set<JpaRole> rolesSet = new HashSet<JpaRole>();
+      /* Add new user */
+      logger.debug("Updating user {}", username);
+      JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
+      JpaUser user = new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider.getName(), true,
+              rolesSet);
+      jpaUserAndRoleProvider.addUser(user);
+      return Response.created(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
 
-    // Add the roles given
-    if (rolesArray != null) {
-      // Add the roles given
-      for (Object role : rolesArray) {
-        rolesSet.add(new JpaRole((String) role, organization));
-      }
-    } else {
-      rolesSet.add(new JpaRole(organization.getAnonymousRole(), organization));
+    } catch (IllegalArgumentException e) {
+      logger.debug("Request with malformed ROLE data: {}", roles);
+      return Response.status(SC_BAD_REQUEST).build();
     }
-
-    JpaUser user = new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider.getName(), true,
-            rolesSet);
-    jpaUserAndRoleProvider.addUser(user);
-
-    return Response.created(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
   }
 
   @PUT
   @Path("{username}.json")
-  @RestQuery(name = "updateUser", description = "Update an user", returnDescription = "Status ok", restParameters = {
-          @RestParameter(description = "The password.", isRequired = false, name = "password", type = STRING),
-          @RestParameter(description = "The name.", isRequired = false, name = "name", type = STRING),
-          @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
-          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]") }, pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
-          @RestResponse(responseCode = SC_OK, description = "User has been updated."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
-  public Response updateUser(@PathParam("username") String username, @FormParam("password") String password,
+  @RestQuery(
+    name = "updateUser",
+    description = "Update an user",
+    returnDescription = "Status ok",
+    restParameters = {
+      @RestParameter(
+        name = "password",
+        description = "The password.",
+        isRequired = true,
+        type = STRING),
+      @RestParameter(
+        name = "name",
+        description = "The name.",
+        isRequired = false,
+        type = STRING),
+      @RestParameter(
+        name = "email",
+        description = "The email.",
+        isRequired = false,
+        type = STRING),
+      @RestParameter(
+        name = "roles",
+        description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]",
+        isRequired = false,
+        type = STRING)
+    }, pathParameters = @RestParameter(
+      name = "username",
+      description = "The username",
+      isRequired = true,
+      type = STRING),
+    reponses = {
+      @RestResponse(
+        responseCode = SC_BAD_REQUEST,
+        description = "Malformed request syntax."),
+      @RestResponse(
+        responseCode = SC_OK,
+        description = "User has been updated.")    })
+  public Response setUser(@PathParam("username") String username, @FormParam("password") String password,
           @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles)
           throws NotFoundException {
 
     User user = jpaUserAndRoleProvider.loadUser(username);
     if (user == null) {
-      throw new NotFoundException("User " + username + " does not exist.");
+      return createUser(username, password, name, email, roles);
     }
 
-    JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
-    Set<JpaRole> rolesSet = new HashSet<JpaRole>();
+    try {
+      Set<JpaRole> rolesSet = parseRoles(roles);
 
-    JSONArray rolesArray = (JSONArray) JSONValue.parse(roles);
-    if (rolesArray != null) {
-      // Add the roles given
-      for (Object role : rolesArray) {
-        rolesSet.add(new JpaRole((String) role, organization));
-      }
-    } else {
-      // Or the use the one from the user if no one is given
-      for (Role role : user.getRoles()) {
-        rolesSet.add(new JpaRole(role.getName(), organization));
-      }
+      logger.debug("Updating user {}", username);
+      JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
+      jpaUserAndRoleProvider.updateUser(new JpaUser(username, password, organization, name, email,
+            jpaUserAndRoleProvider.getName(), true, rolesSet));
+      return Response.status(SC_OK).build();
+
+    } catch (IllegalArgumentException e) {
+      logger.debug("Request with malformed ROLE data: {}", roles);
+      return Response.status(SC_BAD_REQUEST).build();
     }
-
-    jpaUserAndRoleProvider.updateUser(new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider
-            .getName(), true, rolesSet));
-    return Response.status(SC_OK).build();
   }
 
   @DELETE
   @Path("{username}.json")
-  @RestQuery(name = "deleteUser", description = "Deleter a new  user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
-          @RestResponse(responseCode = SC_OK, description = "User has been deleted."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
+  @RestQuery(
+    name = "deleteUser",
+    description = "Delete a new  user",
+    returnDescription = "Status ok",
+    pathParameters = @RestParameter(
+      name = "username",
+      type = STRING,
+      isRequired = true,
+      description = "The username"),
+    reponses = {
+      @RestResponse(
+        responseCode = SC_OK,
+        description = "User has been deleted."),
+      @RestResponse(
+        responseCode = SC_NOT_FOUND,
+        description = "User not found.")
+    })
   public Response deleteUser(@PathParam("username") String username) throws NotFoundException {
-    Organization organization = securityService.getOrganization();
-
     try {
-      jpaUserAndRoleProvider.deleteUser(username, organization.getId());
+      jpaUserAndRoleProvider.deleteUser(username, securityService.getOrganization().getId());
     } catch (NotFoundException e) {
-      logger.error("User {} not found.", username);
+      logger.debug("User {} not found.", username);
       return Response.status(SC_NOT_FOUND).build();
     } catch (Exception e) {
       logger.error("Error during deletion of user {}: {}", username, e);
@@ -244,4 +343,33 @@ public class UserEndpoint {
     logger.debug("User {} removed.", username);
     return Response.status(SC_OK).build();
   }
+
+  /**
+   * Parse JSON roles array.
+   *
+   * @param roles
+   *          String representation of JSON array containing roles
+   */
+  private Set<JpaRole> parseRoles(String roles) throws IllegalArgumentException {
+    JSONArray rolesArray = null;
+    /* Try parsing JSON. Return Bad Request if malformed. */
+    try {
+      rolesArray = (JSONArray) JSONValue.parseWithException(StringUtils.isEmpty(roles) ? "[]" : roles);
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Error parsing JSON array", e);
+    }
+
+    Set<JpaRole> rolesSet = new HashSet<JpaRole>();
+    /* Add given roles */
+    for (Object role : rolesArray) {
+      try {
+        rolesSet.add(new JpaRole((String) role, (JpaOrganization) securityService.getOrganization()));
+      } catch (ClassCastException e) {
+        throw new IllegalArgumentException("Error parsing array vales as String", e);
+      }
+    }
+
+    return rolesSet;
+  }
+
 }

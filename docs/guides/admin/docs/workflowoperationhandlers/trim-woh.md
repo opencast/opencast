@@ -1,9 +1,13 @@
 # TrimWorkflowOperationHandler
 
 ## Description
-The TrimWorkflowOperationHandler makes it possible to remove the undesired parts of the media at the beginning and the end of the recordings.
 
-This operation UI also allows users to select/deselect tracks for being further processed and distributed (e.g. one could remove the presenter track if its quality does not meet the required standards). The recording metadata fields (e.g. title, presenter, series, etc.) may be also be edited in the UI provided.
+The TrimWorkflowOperationHandler makes it possible to remove the undesired parts of the media at the beginning and the
+end of the recordings.
+
+This operation UI also allows users to select/deselect tracks for being further processed and distributed (e.g. one
+could remove the presenter track if its quality does not meet the required standards). The recording metadata fields
+(e.g. title, presenter, series, etc.) may be also be edited in the UI provided.
 
 ## Parameter Table
 
@@ -15,14 +19,23 @@ This operation UI also allows users to select/deselect tracks for being further 
 |target-flavor-subtype	|"master"	|The flavors of the elements created after the trim will be modified by changing the second half of the flavor with the value of this parameter. E.g., if it is set to "trimmed", a source track's flavor "presenter/work" would become "presenter/trimmed".|EMPTY|
 
 ### Duration Threshold Tag
-The "duration-threshold" parameter  accepts a threshold value in milliseconds. It is meant to deal with length differences between the tracks in a mediapackage (which in theory should have the same length). Since all the tracks in the mediapackage are trimmed at the same time points, the trimming point may be within a certain track's duration, but outside another. If the difference between the trim point and the track length is shorter than the threshold, then the outpoint is adjusted to the length of the track, for that track only. For instance, if the trim point is at 5'31'' but one of the tracks is 5'30'' long, with a threshold of 2000 (2 seconds), the shorter track will be trimmed to 5'30 instead, thus not failing. In the end, when some tracks are longer and others slightly shorter than the trim point, you will end up with a set of tracks that are trimmed either at the exact point or not shorter than <threshold> milliseconds
 
-The parameter is currently in the default workflow, but commented. The threshold is 0 by default, i.e. no difference between the trim outpoint and the track length is allowed.
+The "duration-threshold" parameter  accepts a threshold value in milliseconds. It is meant to deal with length
+differences between the tracks in a mediapackage (which in theory should have the same length). Since all the tracks in
+the mediapackage are trimmed at the same time points, the trimming point may be within a certain track's duration, but
+outside another. If the difference between the trim point and the track length is shorter than the threshold, then the
+outpoint is adjusted to the length of the track, for that track only. For instance, if the trim point is at 5'31'' but
+one of the tracks is 5'30'' long, with a threshold of 2000 (2 seconds), the shorter track will be trimmed to 5'30
+instead, thus not failing. In the end, when some tracks are longer and others slightly shorter than the trim point, you
+will end up with a set of tracks that are trimmed either at the exact point or not shorter than <threshold> milliseconds
+
+The parameter is currently in the default workflow, but commented. The threshold is 0 by default, i.e. no difference
+between the trim outpoint and the track length is allowed.
 
 
 ## Capture UI
 
-![Trim UI](workflowoperationhandlers/MatterhornTrimOperation.png)
+![Trim UI](trim.png)
 
 ## Operation Example
 

@@ -339,7 +339,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
           IllegalArgumentException {
     if (serviceRegistry == null)
       throw new IllegalStateException("Can't wait for job status without providing a service registry first");
-    JobBarrier barrier = new JobBarrier(serviceRegistry, jobs);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobs);
     return barrier.waitForJobs(timeout);
   }
 

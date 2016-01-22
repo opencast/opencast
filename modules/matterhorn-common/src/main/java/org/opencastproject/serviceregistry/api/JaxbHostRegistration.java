@@ -52,11 +52,10 @@ public class JaxbHostRegistration implements HostRegistration {
   protected int cores;
 
   /**
-   * The maximum number of concurrent jobs this host can run. Typically, this is the number of cores available to the
-   * JVM.
+   * The maximum load this host can run.  This is not necessarily 1-to-1 with the number of jobs.
    */
-  @XmlElement(name = "max_jobs")
-  protected int maxJobs;
+  @XmlElement(name = "max_load")
+  protected float maxLoad;
 
   @XmlElement(name = "online")
   protected boolean online;
@@ -87,20 +86,20 @@ public class JaxbHostRegistration implements HostRegistration {
    *          the allocated memory of this host
    * @param cores
    *          the available cores of this host
-   * @param maxJobs
-   *          the maximum number of concurrent jobs that this host can run.
+   * @param maxLoad
+   *          the maximum load that this host can support
    * @param online
    *          whether the host is online and available for service
    * @param online
    *          whether the host is in maintenance mode
    */
-  public JaxbHostRegistration(String baseUrl, String address, long memory, int cores, int maxJobs, boolean online,
+  public JaxbHostRegistration(String baseUrl, String address, long memory, int cores, float maxLoad, boolean online,
           boolean maintenance) {
     this.baseUrl = baseUrl;
     this.address = address;
     this.memory = memory;
     this.cores = cores;
-    this.maxJobs = maxJobs;
+    this.maxLoad = maxLoad;
     this.online = online;
     this.maintenanceMode = maintenance;
     this.active = true;
@@ -116,7 +115,7 @@ public class JaxbHostRegistration implements HostRegistration {
     this.address = hostRegistration.getIpAddress();
     this.memory = hostRegistration.getMemory();
     this.cores = hostRegistration.getCores();
-    this.maxJobs = hostRegistration.getMaxJobs();
+    this.maxLoad = hostRegistration.getMaxLoad();
     this.online = hostRegistration.isOnline();
     this.active = hostRegistration.isActive();
     this.maintenanceMode = hostRegistration.isMaintenanceMode();
@@ -205,21 +204,21 @@ public class JaxbHostRegistration implements HostRegistration {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.HostRegistration#getMaxJobs()
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#getMaxLoad()
    */
   @Override
-  public int getMaxJobs() {
-    return maxJobs;
+  public float getMaxLoad() {
+    return maxLoad;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.HostRegistration#setMaxJobs(int)
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#setMaxLoad(int)
    */
   @Override
-  public void setMaxJobs(int maxJobs) {
-    this.maxJobs = maxJobs;
+  public void setMaxLoad(float maxLoad) {
+    this.maxLoad = maxLoad;
   }
 
   /**

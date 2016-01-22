@@ -18,8 +18,8 @@ prior option, the tarball download, needs less tools and you do not have to down
 
 Using the tarball:
 
-Select the tarball for the version you want to install from the [BitBucket downloads
-section](https://bitbucket.org/opencast-community/matterhorn/downloads).
+Select the tarball for the version you want to install from the [BitBucket downloads section
+](https://bitbucket.org/opencast-community/matterhorn/downloads).
 
     # Download desired tarball
     curl -O https://bitbucket.org/opencast-community/matterhorn/...
@@ -42,7 +42,7 @@ Please make sure to install the following dependencies. Note that not all depend
 Required:
 
     openjdk-7-jdk or openjdk-8-jdk
-    ffmpeg >= 2.5
+    ffmpeg >= 2.8
     maven >= 3.1
 
 Required (not necessarily on the same machine):
@@ -81,8 +81,8 @@ Automatically build all Opencast modules and assemble distributions for differen
 
 Deploy all-in-one distribution:
 
-    ca assemblies/karaf-dist-allinone/target/opencast-karaf-dist-allinone-*
-    mv opencast-karaf-dist-allinone-* /opt/opencast
+    cd build/
+    mv opencast-dist-allinone-*/ /opt/opencast
 
 Make sure everything belongs to the user `opencast`:
 
@@ -113,4 +113,39 @@ Run Opencast as a service
 Usually, you do not want to run Opencast in interactive mode but as system service to make sure it is only running
 once on a system and is started automatically.
 
-*TODO: Add notes about Systemd and SysV-Init scripts once they are added.*
+You will find service files for Opencast in `docs/scripts/service/{opt,system}/`.
+
+### Using Systemd
+
+Make sure the path to Opencast is set correctly:
+
+    vim docs/scripts/service/opencast.service
+
+Install the unit file:
+
+    cp docs/scripts/service/opencast.service /usr/lib/systemd/system/
+    systemctl daemon-reload
+
+Start Opencast and make it run automatically:
+
+    systemctl start opencast.service
+    systemctl enable opencast.service
+
+### Using SysV-Init
+
+> Note that this option is for compatibility to older systems. If you have the choice of either using the Systemd unit
+> file or the Init script, it is recommended to use the Systemd unit file.
+
+Make sure the path to Opencast is set correctly:
+
+    vim docs/scripts/service/etc-init.d-opencast
+
+1. Install init script:
+
+        cp docs/scripts/service/etc-init.d-opencast /etc/init.d/opencast
+
+2. Enable service using `chkconfig` or `update-rc.d`
+
+3. Start Opencast using
+
+        service opencast start

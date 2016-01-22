@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.serviceregistry.impl.jpa;
 
 import org.opencastproject.serviceregistry.api.HostRegistration;
@@ -40,7 +41,8 @@ import javax.persistence.UniqueConstraint;
 @Access(AccessType.FIELD)
 @Table(name = "mh_host_registration", uniqueConstraints = @UniqueConstraint(columnNames = "host"))
 @NamedQueries({
-  @NamedQuery(name = "HostRegistration.cores", query = "SELECT sum(hr.maxJobs) FROM HostRegistration hr where hr.active = true"),
+        @NamedQuery(name = "HostRegistration.getMaxLoad", query = "SELECT sum(hr.maxLoad) FROM HostRegistration hr where hr.active = true"),
+        @NamedQuery(name = "HostRegistration.getMaxLoadByHostName", query = "SELECT hr.maxLoad FROM HostRegistration hr where hr.baseUrl = :host and hr.active = true"),
   @NamedQuery(name = "HostRegistration.byHostName", query = "SELECT hr from HostRegistration hr where hr.baseUrl = :host"),
   @NamedQuery(name = "HostRegistration.getAll", query = "SELECT hr FROM HostRegistration hr where hr.active = true") })
 public class HostRegistrationJpaImpl implements HostRegistration {
@@ -49,8 +51,8 @@ public class HostRegistrationJpaImpl implements HostRegistration {
   @Column(name = "id")
   @GeneratedValue
   private Long id;
-  @Column(name = "host", nullable = false, length = 255)
 
+  @Column(name = "host", nullable = false, length = 255)
   private String baseUrl;
 
   @Column(name = "address", nullable = false, length = 39)
@@ -62,8 +64,11 @@ public class HostRegistrationJpaImpl implements HostRegistration {
   @Column(name = "cores", nullable = false)
   private int cores;
 
-  @Column(name = "max_jobs", nullable = false)
-  private int maxJobs;
+  /**
+   * The maximum load this host can run.  This is not necessarily 1-to-1 with the number of jobs.
+   */
+  @Column(name = "max_load", nullable = false)
+  private float maxLoad;
 
   @Column(name = "online", nullable = false)
   private boolean online = true;
@@ -80,15 +85,16 @@ public class HostRegistrationJpaImpl implements HostRegistration {
   public HostRegistrationJpaImpl() {
   }
 
-  public HostRegistrationJpaImpl(String baseUrl, String address, long memory, int cores, int maxJobs, boolean online,
+  public HostRegistrationJpaImpl(String baseUrl, String address, long memory, int cores, float maxLoad, boolean online,
           boolean maintenance) {
     this.baseUrl = baseUrl;
     this.ipAddress = address;
     this.memory = memory;
     this.cores = cores;
-    this.maxJobs = maxJobs;
+    this.maxLoad = maxLoad;
     this.online = online;
     this.maintenanceMode = maintenance;
+    this.active = true;
   }
 
   public Long getId() {
@@ -140,13 +146,13 @@ public class HostRegistrationJpaImpl implements HostRegistration {
   }
 
   @Override
-  public int getMaxJobs() {
-    return maxJobs;
+  public float getMaxLoad() {
+    return maxLoad;
   }
 
   @Override
-  public void setMaxJobs(int maxJobs) {
-    this.maxJobs = maxJobs;
+  public void setMaxLoad(float maxLoad) {
+    this.maxLoad = maxLoad;
   }
 
   @Override
