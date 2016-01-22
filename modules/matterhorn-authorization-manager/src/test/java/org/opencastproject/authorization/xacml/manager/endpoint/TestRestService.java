@@ -80,6 +80,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Path;
 
 // use base path /test to prevent conflicts with the production service
@@ -100,6 +101,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   public static final ServiceRegistry serviceRegistry;
   public static final DownloadDistributionServiceImpl distributionService = new DownloadDistributionServiceImpl();
   public static final MessageSender messageSender;
+  public static final EntityManagerFactory authorizationEMF = newTestEntityManagerFactory(OsgiJpaAclTransitionDb.PERSISTENCE_UNIT);
 
   static {
     SecurityService testSecurityService = EasyMock.createNiceMock(SecurityService.class);
@@ -289,13 +291,13 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
 
   private static AclTransitionDb newTransitionPersistence() {
     OsgiJpaAclTransitionDb aclManagerDatabase = new OsgiJpaAclTransitionDb();
-    aclManagerDatabase.setEntityManagerFactory(newTestEntityManagerFactory(OsgiJpaAclTransitionDb.PERSISTENCE_UNIT));
+    aclManagerDatabase.setEntityManagerFactory(authorizationEMF);
     aclManagerDatabase.activate(null);
     return aclManagerDatabase;
   }
 
   private static AclDb newAclPersistence() {
-    return new JpaAclDb(persistenceEnvironment(newTestEntityManagerFactory(OsgiJpaAclTransitionDb.PERSISTENCE_UNIT)));
+    return new JpaAclDb(persistenceEnvironment(authorizationEMF));
   }
 
   private static SeriesService newSeriesService() {

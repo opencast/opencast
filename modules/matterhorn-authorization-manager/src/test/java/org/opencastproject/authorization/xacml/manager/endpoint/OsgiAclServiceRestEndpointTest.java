@@ -43,7 +43,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Date;
@@ -51,11 +50,6 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Response;
 
-//import static com.jayway.restassured.RestAssured.*;
-//import static com.jayway.restassured.matcher.RestAssuredMatchers.*;
-
-// FIXME
-@Ignore
 public class OsgiAclServiceRestEndpointTest {
 
   private static final String NEW_ROLE = "NEW_ROLE";

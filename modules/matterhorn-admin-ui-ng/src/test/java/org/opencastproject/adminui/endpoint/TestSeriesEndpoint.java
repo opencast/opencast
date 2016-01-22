@@ -191,6 +191,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     EasyMock.expectLastCall().andThrow(new SeriesException());
     seriesService.updateSeriesProperty("11", SeriesEndpoint.THEME_KEY, "1");
     EasyMock.expectLastCall().andThrow(new NotFoundException());
+    EasyMock.replay(seriesService);
 
     List<ManagedAcl> managedAcls = new ArrayList<>();
     ManagedAcl managedAcl1 = new ManagedAclImpl(43L, "Public", defaultOrganization.getId(), acl);
