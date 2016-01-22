@@ -57,7 +57,6 @@ import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchQuery.Order;
 import org.opencastproject.matterhorn.search.SortCriterion;
-import org.opencastproject.util.SmartIterator;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -126,21 +125,6 @@ public class CaptureAgentsEndpoint {
       }
     }
 
-    // Get list of agents from the PM
-    // TODO Activate with Participation Management
-//    Map<String, CaptureAgent> captureAgents = new HashMap<String, CaptureAgent>();
-
-//    if (participationPersistence != null) {
-//      try {
-//        for (CaptureAgent agent : participationPersistence.getCaptureAgents()) {
-//          captureAgents.put(agent.getMhAgent(), agent);
-//        }
-//      } catch (ParticipationManagementDatabaseException e) {
-//        logger.warn("Not able to get the capture agents from the participation management persistence service: {}", e);
-//        return Response.status(SC_INTERNAL_SERVER_ERROR).build();
-//      }
-//    }
-
     // Filter agents by filter criteria
     List<Agent> filteredAgents = new ArrayList<Agent>();
     for (Entry<String, Agent> entry : service.getKnownAgents().entrySet()) {
@@ -186,71 +170,11 @@ public class CaptureAgentsEndpoint {
       });
     }
 
-    // Apply Limit and offset
-    filteredAgents = new SmartIterator<Agent>(limit, offset).applyLimitAndOffset(filteredAgents);
-
     // Run through and build a map of updates (rather than states)
     List<JValue> agentsJSON = new ArrayList<JValue>();
 
-    // TODO Activate with Participation Management
-//    for (Agent agent : filteredAgents) {
-//      List<Blacklist> blacklist = new ArrayList<Blacklist>();
-//
-//      Room room = null;
-//      CaptureAgent captureAgent = captureAgents.get(agent.getName());
-//      try {
-//        if (captureAgent != null) {
-//          room = participationPersistence.getRoom(captureAgent.getRoom().getId());
-//          // TODO Activate with Participation Management
-////          blacklist.addAll(participationPersistence.findBlacklists(room));
-//        }
-//      } catch (ParticipationManagementDatabaseException e) {
-//        logger.warn("Not able to find the blacklist for the agent {} {}:", agent.getName(), e);
-//        return Response.status(SC_INTERNAL_SERVER_ERROR).build();
-//      } catch (NotFoundException e) {
-//        logger.debug("Not able to find the capture agent in the room {}.", captureAgent.getRoom());
-//      }
-//      agentsJSON.add(generateJsonAgent(agent, Option.option(room), blacklist, inputs));
-//    }
-
     return okJsonList(agentsJSON, offset, limit, total);
   }
-
-  // TODO Activate with Participation Management
-//  /**
-//   * Generate a JSON Object for the given capture agent with its related blacklist periods
-//   *
-//   * @param agent
-//   *          The target capture agent
-//   * @param room
-//   *          the participation room
-//   * @param blacklist
-//   *          The blacklist periods related to the capture agent
-//   * @param withInputs
-//   *          Whether the agent has inputs
-//   * @return A {@link JValue} representing the capture agent
-//   */
-//  private JValue generateJsonAgent(Agent agent, Option<Room> room, List<Blacklist> blacklist, boolean withInputs) {
-//    JValue blacklistJSON = blacklistToJSON(blacklist);
-//
-//    List<JField> fields = new ArrayList<JField>();
-//    fields.add(f("Status", vN(agent.getState())));
-//    fields.add(f("Name", v(agent.getName())));
-//    fields.add(f("Update", vN(DateTimeSupport.toUTC(agent.getLastHeardFrom()))));
-//    if (room.isSome()) {
-//      fields.add(f("roomId", v(room.get().getId())));
-//    } else {
-//      fields.add(f("roomId", v(-1)));
-//    }
-//    fields.add(f("blacklist", blacklistJSON));
-//
-//    if (withInputs) {
-//      String devices = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
-//      fields.add(f("inputs", (StringUtils.isEmpty(devices)) ? a() : generateJsonDevice(devices.split(","))));
-//    }
-//
-//    return j(fields);
-//  }
 
   /**
    * Generate a JSON devices list
@@ -266,20 +190,4 @@ public class CaptureAgentsEndpoint {
     }
     return a(jsonDevices);
   }
-
-  // TODO Activate with Participation Management
-//  private Option<SortType> getAgentSortField(String input) {
-//    if (StringUtils.isNotBlank(input)) {
-//      String upperCase = input.toUpperCase();
-//      SortType sortType = null;
-//      try {
-//        sortType = SortType.valueOf(upperCase);
-//      } catch (IllegalArgumentException e) {
-//        return Option.<SortType> none();
-//      }
-//      return Option.option(sortType);
-//    }
-//    return Option.<SortType> none();
-//  }
-
 }

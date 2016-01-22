@@ -110,10 +110,6 @@ public class UsersEndpoint {
   /** The internal role and user provider */
   private JpaUserAndRoleProvider jpaUserAndRoleProvider;
 
-  // TODO Activate with Participation Management
-//  /** The participation persistence */
-//  private ParticipationManagementDatabase participationPersistence;
-
   /** The security service */
   private SecurityService securityService;
 
@@ -145,12 +141,6 @@ public class UsersEndpoint {
   public void setJpaUserAndRoleProvider(JpaUserAndRoleProvider jpaUserAndRoleProvider) {
     this.jpaUserAndRoleProvider = jpaUserAndRoleProvider;
   }
-
-  // TODO Activate with Participation Management
-//  /** OSGi callback for participation persistence. */
-//  public void setParticipationPersistence(ParticipationManagementDatabase participationPersistence) {
-//    this.participationPersistence = participationPersistence;
-//  }
 
   /** OSGi callback. */
   protected void activate(ComponentContext cc) {
@@ -255,21 +245,6 @@ public class UsersEndpoint {
 
     List<JValue> usersJSON = new ArrayList<JValue>();
     for (User user : filteredUsers) {
-      // TODO Activate with Participation Management
-//      List<Blacklist> blacklist = new ArrayList<Blacklist>();
-//      Person person = null;
-//      if (participationPersistence != null) {
-//        try {
-//          person = participationPersistence.getPerson(user.getEmail());
-//          blacklist.addAll(participationPersistence.findBlacklists(person));
-//        } catch (ParticipationManagementDatabaseException e) {
-//          logger.warn("Not able to find the blacklist for the user {}: {}", user.getEmail(), e);
-//          return Response.status(SC_INTERNAL_SERVER_ERROR).build();
-//        } catch (NotFoundException e) {
-//          logger.debug("Not able to find the person with the email address {}.", user.getEmail());
-//        }
-//      }
-//      usersJSON.add(generateJsonUser(user, Option.option(person), blacklist));
       usersJSON.add(generateJsonUser(user));
     }
 
@@ -342,20 +317,6 @@ public class UsersEndpoint {
     if (JpaUserAndRoleProvider.PROVIDER_NAME.equals(user.getProvider()))
       user = jpaUserAndRoleProvider.loadUser(username);
 
-//    List<Blacklist> blacklist = new ArrayList<Blacklist>();
-//    Person person = null;
-//    if (participationPersistence != null) {
-//      try {
-//        person = participationPersistence.getPerson(user.getEmail());
-//        blacklist.addAll(participationPersistence.findBlacklists(person));
-//      } catch (ParticipationManagementDatabaseException e) {
-//        logger.warn("Not able to find the blacklist for the user {}: {}", user.getEmail(), e);
-//        return Response.status(SC_INTERNAL_SERVER_ERROR).build();
-//      } catch (NotFoundException e) {
-//        logger.debug("Not able to find the person with the email address {}.", user.getEmail());
-//      }
-//    }
-
     return RestUtils.okJson(generateJsonUser(user));
   }
 
@@ -422,33 +383,6 @@ public class UsersEndpoint {
     logger.debug("User {} removed.", username);
     return Response.status(SC_OK).build();
   }
-
-  // TODO Activate with Participation Management
-//  /**
-//   * Generate a JSON Object for the given user with its related blacklist periods
-//   *
-//   * @param user
-//   *          The target user
-//   * @param person
-//   *          the participation person
-//   * @param blacklist
-//   *          The blacklist periods related to the user
-//   * @return A {@link JValue} representing the user
-//   */
-//  private JValue generateJsonUser(User user, Option<Person> person, List<Blacklist> blacklist) {
-//    JValue blacklistJSON = blacklistToJSON(blacklist);
-//
-//    // Prepare the roles
-//    List<JString> rolesJSON = Stream.$(user.getRoles()).map(getRoleName).sort(sortByName).map(toJString).toList();
-//
-//    JValue personValue = v(-1);
-//    if (person.isSome())
-//      personValue = v(person.get().getId());
-//
-//    return j(f("username", vN(user.getUsername())), f("manageable", v(user.isManageable())),
-//            f("name", vN(user.getName())), f("email", vN(user.getEmail())), f("roles", a(rolesJSON)),
-//            f("provider", vN(user.getProvider())), f("personId", personValue), f("blacklist", blacklistJSON));
-//  }
 
   private JValue generateJsonUser(User user) {
     // Prepare the roles

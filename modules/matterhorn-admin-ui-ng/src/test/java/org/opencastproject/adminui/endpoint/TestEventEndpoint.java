@@ -505,24 +505,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
             messageSender, messageReceiver);
     env.setArchive(archive);
 
-//    ParticipationManagementDatabase pmDatabase = EasyMock.createNiceMock(ParticipationManagementDatabase.class);
-//    EasyMock.expect(pmDatabase.getRecordingByEvent(EasyMock.anyString())).andReturn(
-//            createRecording(1, "A", "Test title A"));
-//    EasyMock.expect(pmDatabase.getRecordingByEvent(EasyMock.anyString())).andReturn(
-//            createRecording(2, "B", "Test title B"));
-//    EasyMock.expect(pmDatabase.getRecordingByEvent(EasyMock.anyString())).andReturn(
-//            createRecording(3, "C", "Test title C"));
-//    EasyMock.expect(pmDatabase.getMessagesByRecordingId(EasyMock.anyLong(), EasyMock.anyObject(Option.class)))
-//            .andReturn(Arrays.asList(createMessage(1, "template1", "Titel 1", "Body 1")));
-//    EasyMock.expect(pmDatabase.getMessagesByRecordingId(EasyMock.anyLong(), EasyMock.anyObject(Option.class)))
-//            .andReturn(
-//                    Arrays.asList(createMessage(2, "template2", "Titel 2", "Body 2"),
-//                            createMessage(3, "template3", "Titel 3", "Body 3")));
-//    EasyMock.expect(pmDatabase.getMessagesByRecordingId(EasyMock.anyLong(), EasyMock.anyObject(Option.class)))
-//            .andReturn(Arrays.asList(createMessage(4, "template4", "Titel 4", "Body 4")));
-//    EasyMock.replay(pmDatabase);
-//    env.setParticipationManagementDatabase(pmDatabase);
-
     DublinCoreCatalogService dublinCoreCatalogService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
     env.setDublinCoreCatalogService(dublinCoreCatalogService);
 
@@ -814,58 +796,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     Date date = new Date(DateTimeSupport.fromUTC("2014-06-05T09:15:56Z"));
     return new IncidentImpl(0, 0, "servicetype", "host", date, s, "code", Incidents.NO_DETAILS, Incidents.NO_PARAMS);
   }
-
-//  private Recording createRecording(long recordingId, String activityId, String title) {
-//    List<Person> staff = new ArrayList<>();
-//    List<PersonType> staffTypes = new ArrayList<>();
-//    staffTypes.add(new PersonType("group", "open door"));
-//    Person staff1 = person("Staff 1", "staff1@manchester.ac.uk", staffTypes);
-//    staff1.setId(9L);
-//    staff.add(staff1);
-//    Person staff2 = person("Staff 2", "staff2@manchester.ac.uk", staffTypes);
-//    staff2.setId(10L);
-//    staff.add(staff2);
-//
-//    List<Person> students = new ArrayList<>();
-//    List<PersonType> studentTypes = new ArrayList<>();
-//    studentTypes.add(new PersonType("student", "learning"));
-//    students.add(person("Student 1", "student1@manchester.ac.uk", studentTypes));
-//    students.add(person("Student 2", "student2@manchester.ac.uk", studentTypes));
-//
-//    Room room = new Room("Aula");
-//    CaptureAgent captureAgent = new CaptureAgent(room, CaptureAgent.getMhAgentIdFromRoom(room));
-//    Course course = new Course("mathe", "uuid", "Math", "Simple course about algebra.");
-//
-//    Recording recording = Recording.recording(activityId, title, staff, some(course), room, new Date(), new DateTime()
-//            .plusHours(2).toDate(), new DateTime().plusHours(3).toDate(), students, nil(Message.class), some("4"),
-//            captureAgent, nil(Action.class), false, false);
-//    recording.setId(Option.some(recordingId));
-//    return recording;
-//  }
-//
-//  private Message createMessage(long id, String name, String subject, String body) throws Exception {
-//    Date now = new Date(DateTimeSupport.fromUTC("2014-06-04T13:32:37Z"));
-//    List<PersonType> staffTypes = new ArrayList<>();
-//    PersonType personType = new PersonType("group", "open door");
-//    personType.setId(33L);
-//    staffTypes.add(personType);
-//    Person staff1 = person("Staff 1", "staff1@manchester.ac.uk", staffTypes);
-//    staff1.setId(9L);
-//
-//    List<JaxbRole> roles = Arrays.asList(new JaxbRole(GLOBAL_ADMIN_ROLE, defaultOrganization), new JaxbRole(
-//            defaultOrganization.getAdminRole(), defaultOrganization));
-//    User user = new JaxbUser("admin", null, "Admin", "admin@test.com", "test", defaultOrganization,
-//            new HashSet<>(roles));
-//    MessageTemplate messageTemplate = new MessageTemplate(name, user, subject, body, TemplateType.INVITATION, now,
-//            Collections.EMPTY_LIST);
-//    messageTemplate.setId(id);
-//    MessageSignature signature = new MessageSignature(11L, "Default", user, EmailAddress.emailAddress(
-//            "sender@test.com", "Sender Address"), Option.none(EmailAddress.class), "Nothing", now,
-//            Collections.EMPTY_LIST);
-//    Message message = new Message(now, staff1, messageTemplate, signature, Collections.EMPTY_LIST);
-//    message.setId(id);
-//    return message;
-//  }
 
   @Override
   public WorkflowService getWorkflowService() {

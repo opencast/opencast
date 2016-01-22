@@ -46,7 +46,6 @@ import javax.ws.rs.Path;
 @Ignore
 public class TestUsersEndpoint extends UsersEndpoint {
 
-//  private ParticipationManagementDatabase pmService;
   private UserDirectoryService userDirectoryService;
   private static ArrayList<User> users;
   private User user1;
@@ -56,7 +55,6 @@ public class TestUsersEndpoint extends UsersEndpoint {
 
   public TestUsersEndpoint() throws Exception {
 
-//    pmService = EasyMock.createNiceMock(ParticipationManagementDatabase.class);
     userDirectoryService = EasyMock.createNiceMock(UserDirectoryService.class);
     users = new ArrayList<User>();
 
@@ -72,62 +70,10 @@ public class TestUsersEndpoint extends UsersEndpoint {
     user3 = new JpaUser("user3", "pass", organization, "User3", "email3", "provider1", true);
     user4 = new JpaUser("user4", "pass", organization, "user4", "email4", "provider1", true);
 
-//    Person person1 = new Person(1L, user1.getName(), user1.getEmail(), new ArrayList<PersonType>());
-//    Person person2 = new Person(2L, user2.getName(), user2.getEmail(), new ArrayList<PersonType>());
-//    Person person3 = new Person(3L, user3.getName(), user3.getEmail(), new ArrayList<PersonType>());
-//    Person person4 = new Person(4L, user4.getName(), user4.getEmail(), new ArrayList<PersonType>());
-
     users.add(user1);
     users.add(user2);
     users.add(user3);
     users.add(user4);
-
-    List<Period> periods1 = new ArrayList<Period>();
-    periods1.add(new Period(Option.some(12L), fromUTC("2012-12-12T12:12:12Z"), fromUTC("2025-12-24T12:12:12Z"),
-            Option.<String> none(), Option.<String> none()));
-    periods1.add(new Period(Option.some(14L), fromUTC("2026-12-12T12:12:12Z"), fromUTC("2026-12-12T16:12:12Z"),
-            Option.<String> none(), Option.<String> none()));
-    List<Period> periods2 = new ArrayList<Period>();
-    periods2.add(new Period(Option.some(12L), fromUTC("2028-12-12T12:12:12Z"), fromUTC("2029-12-24T12:12:12Z"),
-            Option.<String> none(), Option.<String> none()));
-    periods2.add(new Period(Option.some(14L), fromUTC("2006-12-12T12:12:12Z"), fromUTC("2006-12-12T16:12:12Z"),
-            Option.<String> none(), Option.<String> none()));
-
-//    List<Period> periods1 = new ArrayList<Period>();
-//    periods1.add(new Period(Option.some(12L), fromUTC("2012-12-12T12:12:12Z"), fromUTC("2025-12-24T12:12:12Z"), Option
-//            .<String> none(), Option.<String> none()));
-//    periods1.add(new Period(Option.some(14L), fromUTC("2026-12-12T12:12:12Z"), fromUTC("2026-12-12T16:12:12Z"), Option
-//            .<String> none(), Option.<String> none()));
-//    List<Period> periods2 = new ArrayList<Period>();
-//    periods2.add(new Period(Option.some(12L), fromUTC("2028-12-12T12:12:12Z"), fromUTC("2029-12-24T12:12:12Z"), Option
-//            .<String> none(), Option.<String> none()));
-//    periods2.add(new Period(Option.some(14L), fromUTC("2006-12-12T12:12:12Z"), fromUTC("2006-12-12T16:12:12Z"), Option
-//            .<String> none(), Option.<String> none()));
-//
-//    List<Blacklist> blacklist1 = new ArrayList<Blacklist>();
-//    blacklist1.add(new Blacklist(person1, periods1));
-//    List<Blacklist> blacklist2 = new ArrayList<Blacklist>();
-//    blacklist2.add(new Blacklist(person3, periods2));
-//    blacklist2.add(new Blacklist(person4, periods2));
-//    List<Blacklist> blacklist3 = new ArrayList<Blacklist>();
-//
-//    EasyMock.expect(userDirectoryService.getUsers()).andReturn(users.iterator()).anyTimes();
-//    EasyMock.expect(userDirectoryService.findUsers(EasyMock.anyString(), EasyMock.anyInt(), EasyMock.anyInt()))
-//            .andDelegateTo(new TestUsers()).anyTimes();
-//    EasyMock.expect(pmService.getPerson(user1.getEmail())).andReturn(person1).anyTimes();
-//    EasyMock.expect(pmService.getPerson(user2.getEmail())).andReturn(person2).anyTimes();
-//    EasyMock.expect(pmService.getPerson(user3.getEmail())).andReturn(person3).anyTimes();
-//    EasyMock.expect(pmService.getPerson(user4.getEmail())).andReturn(person4).anyTimes();
-//    EasyMock.expect(pmService.findBlacklists(person1)).andReturn(blacklist1).anyTimes();
-//    EasyMock.expect(pmService.findBlacklists(person3)).andReturn(blacklist2).anyTimes();
-//    EasyMock.expect(pmService.findBlacklists(person4)).andReturn(blacklist2).anyTimes();
-//    EasyMock.expect(pmService.findBlacklists(person2)).andReturn(blacklist3).anyTimes();
-//
-//    EasyMock.replay(pmService);
-//    EasyMock.replay(userDirectoryService);
-//
-//    this.setParticipationPersistence(pmService);
-//    this.setUserDirectoryService(userDirectoryService);
 
     this.setSecurityService(null);
     this.setJpaUserAndRoleProvider(null);

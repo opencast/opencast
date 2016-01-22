@@ -467,76 +467,6 @@ public abstract class AbstractEventEndpoint {
     return removedScheduler && removedWorkflow && removedArchive;
   }
 
-  // @GET
-  // @Produces(MediaType.APPLICATION_JSON)
-  // @Path("events/recipients")
-  // @RestQuery(name = "geteventsrecipients", description = "Returns the events recipients as JSON", returnDescription =
-  // "Returns the events recipients as JSON", restParameters = { @RestParameter(name = "eventIds", isRequired = true,
-  // description = "A list of comma separated event IDs", type = STRING), }, reponses = {
-  // @RestResponse(responseCode = SC_OK, description = "The events recipients as JSON."),
-  // @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "At least one event id must be
-  // set.") })
-  // public Response getEventsRecordingsAndRecipients(@QueryParam("eventIds") String eventIds) {
-  // if (getPMPersistence() == null)
-  // return Response.status(Status.SERVICE_UNAVAILABLE).build();
-  //
-  // final Monadics.ListMonadic<String> eIds = splitCommaSeparatedParam(option(eventIds));
-  // if (eIds.value().isEmpty())
-  // return badRequest();
-  //
-  // List<Recording> recordings = ParticipationUtils.getRecordingsByEventId(getSchedulerService(), getPMPersistence(),
-  // eIds.value());
-  // List<Val> recipientsArr = mlist(new HashSet<Person>(mlist(recordings).flatMap(getRecipients).value())).map(
-  // JSONUtils.personToJsonVal).value();
-  // return Response.ok(obj(p("recipients", arr(recipientsArr))).toJson()).build();
-  // }
-  //
-  // @GET
-  // @Produces(MediaType.APPLICATION_JSON)
-  // @Path("{eventId}/messages")
-  // @RestQuery(name = "geteventmessages", description = "Returns the event messages as JSON", returnDescription =
-  // "Returns the event messages as JSON", pathParameters = { @RestParameter(name = "eventId", isRequired = true,
-  // description = "The event identifier", type = STRING) }, restParameters = { @RestParameter(name = "sort", isRequired
-  // = false, description = "The sort order. May include any of the following: DATE OR SENDER. Add '_DESC' to reverse
-  // the sort order (e.g. DATE_DESC).", type = STRING) }, reponses = {
-  // @RestResponse(responseCode = SC_OK, description = "The event messages as JSON."),
-  // @RestResponse(responseCode = SC_NOT_FOUND, description = "The event has not been found"),
-  // @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid SORT type, it was not DATE, DATE_DESC SENDER or
-  // SENDER_DESC"),
-  // @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this
-  // action") })
-  // public Response getRecordingMessages(@PathParam("eventId") String eventId, @QueryParam("sort") String sort)
-  // throws NotFoundException {
-  // if (getPMPersistence() == null)
-  // return Response.status(Status.SERVICE_UNAVAILABLE).build();
-  //
-  // Option<SortType> sortType = Option.<SortType> none();
-  // sortType = ParticipationUtils.getMessagesSortField(sort);
-  // if (StringUtils.isNotBlank(sort) && sortType.isNone()) {
-  // return Response.status(SC_BAD_REQUEST).build();
-  // }
-  //
-  // Long scheduledEventId;
-  // try {
-  // scheduledEventId = getSchedulerService().getEventId(eventId);
-  // } catch (SchedulerException e) {
-  // logger.error("Unable to get scheduled event id by event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
-  // throw new WebApplicationException(e);
-  // }
-  //
-  // try {
-  // Long recordingId = getPMPersistence().getRecordingByEvent(scheduledEventId).getId().getOrElse(-1L);
-  // List<Val> jsonArr = new ArrayList<org.opencastproject.util.Jsons.Val>();
-  // for (Message m : getPMPersistence().getMessagesByRecordingId(recordingId, sortType)) {
-  // jsonArr.add(m.toJson());
-  // }
-  // return Response.ok(org.opencastproject.util.Jsons.arr(jsonArr).toJson()).build();
-  // } catch (ParticipationManagementDatabaseException e) {
-  // logger.error("Unable to get messages by recording {}: {}", eventId, ExceptionUtils.getStackTrace(e));
-  // throw new WebApplicationException(e);
-  // }
-  // }
-
   @GET
   @Path("{eventId}/general.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -2420,14 +2350,6 @@ public abstract class AbstractEventEndpoint {
     }
     return url;
   }
-
-
-  private final Function<Recording, List<Person>> getRecipients = new Function<Recording, List<Person>>() {
-    @Override
-    public List<Person> apply(Recording a) {
-      return a.getStaff();
-    }
-  };
 
   private final Fn<Publication, Boolean> internalChannelFilter = new Fn<Publication, Boolean>() {
     @Override

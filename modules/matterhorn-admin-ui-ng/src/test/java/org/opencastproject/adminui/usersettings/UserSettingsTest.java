@@ -26,7 +26,6 @@ import static org.opencastproject.util.data.Option.none;
 
 import org.opencastproject.adminui.endpoint.SeriesEndpointTest;
 import org.opencastproject.kernel.mail.EmailAddress;
-import org.opencastproject.messages.MessageSignature;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.data.Option;
 
@@ -39,8 +38,6 @@ import org.junit.Test;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.LinkedList;
 
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
@@ -70,10 +67,6 @@ public class UserSettingsTest {
     Option<EmailAddress> replyTo = none();
     DateTime dateTime = new DateTime(1401465634101L);
     dateTime.toDateTime(DateTimeZone.UTC);
-//    MessageSignature messageSignature = new MessageSignature(10L, "Adam McKenzie", creator, sender, replyTo,
-//            "This is the signature", dateTime.toDate(), nil(Comment.class));
-    Collection<MessageSignature> signatures = new LinkedList<MessageSignature>();
-//    signatures.add(messageSignature);
 
     UserSetting userSetting = new UserSetting(98, "Test Key", "Test Value");
     UserSettings userSettings = new UserSettings();
