@@ -32,15 +32,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
     var PLUGIN_STYLES_DESKTOP = [
         "styles/desktop.css",
-        "lib/videojs/video-js.min.css"
+        "lib/video-js/video-js.min.css"
     ];
     var PLUGIN_STYLES_EMBED = [
         "styles/embed.css",
-        "lib/videojs/video-js.min.css"
+        "lib/video-js/video-js.min.css"
     ];
     var PLUGIN_STYLES_MOBILE = [
         "styles/mobile.css",
-        "lib/videojs/video-js.min.css"
+        "lib/video-js/video-js.min.css"
     ];
 
     var plugin;
@@ -136,15 +136,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     }
 
     /* change these variables */
-    var videoPath = "lib/videojs/video";
-    var synchronizePath = "lib/synchronize";
-    var mediaSourcesPath = "lib/videojs/videojs-media-sources";
-    var hlsPath = "lib/videojs/videojs.hls.min";
-    var dashPath = "lib/videojs/dash.min";
-    var dashPluginPath = "lib/videojs/videojs-tech-dashjs"
-    var videojs_swf_path = "lib/videojs/video-js.swf";
+    var videoPath = "lib/video-js/video"; /* https://github.com/videojs/video.js/releases */
+    var videojs_swf_path = "lib/video-js/video-js.swf";
+    var synchronizePath = "lib/synchronize-min"; /* https://github.com/CallToPower/Synchronize.js */
+    var mediaSourcesPath = "lib/video-js/videojs-media-sources.min"; /* https://github.com/videojs/videojs-contrib-media-sources */
+    var hlsPath = "lib/video-js/videojs.hls.min"; /* https://github.com/videojs/videojs-contrib-hls */
     var videoAreaAspectRatio;
-    var videoDisplaySizeTimesCheck = 100; // the smaller the factor, the higher the times check!
     var checkVideoDisplaySizeTimeout = 1500;
     var audioLoadTimeoutCheckDelay = 5000;
     var seekSeconds = 5;
@@ -172,10 +169,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var id_engage_video = "engage_video";
     var id_videojs_wrapper = "videojs_wrapper";
     var id_videoDisplayClass = "videoDisplay";
-    var id_engageContent = "engage_content";
     var id_engageControls = "engage_controls";
     var id_resize_container = "engage_resize_container";
-    var id_videojs_wrapperClass = "videojs_wrapper";
     var id_engage_video_fullsceen_wrapper = "fullscreen_video_wrapper";
     var id_page_cover = "page-cover";
     var id_btn_fullscreenCancel = "btn_fullscreenCancel";
@@ -221,16 +216,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var event_sjs_debug = "sjs:debug";
     var event_sjs_stopBufferChecker = "sjs:stopBufferChecker";
     var currentlySelectedVideodisplay = 0;
-    var globalVideoSource = new Array();
-    var videoResultions = new Array();
+    var globalVideoSource = [];
+    var videoResultions = [];
     var loadDash = false;
     var loadHls = false;
     var flavors = "";
     var mimetypes = "";
-    var translations = new Array();
+    var translations = [];
     var videoDataView = undefined;
     var fullscreen = false;
-    var mappedResolutions = undefined;
     var videoDisplayClass = "videoDisplay";
     
     var videoDefaultLayoutClass = "videoDefaultLayout";
@@ -302,7 +296,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             return tracks;
         }
         var filterTagsArray = filterTags.split(",");
-        var newTracksArray = new Array();
+        var newTracksArray = [];
         
         for (var i = 0; i < tracks.length; i++) {
             var found = false;
@@ -365,7 +359,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         if (foundQualities) {
             return foundQualities;
         }
-        var qualitesList = new Array();
+        var qualitesList = [];
         var tagsList = getTags(videoSources, "-quality");
         tagsList.forEach(function(quality, value) {
             qualitesList.push(quality.substring(0, quality.indexOf("-quality")));
@@ -377,14 +371,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 break;
             }            
         }
-        var sortedResolutionsList = new Array();
-        for (var i = 0; i< qualitesList.length; i++){
+        var sortedResolutionsList = [];
+        for (var i = 0; i < qualitesList.length; i++){
             var currentTrack = filterTracksByTag(tracks, qualitesList[i] + "-quality")[0];
             sortedResolutionsList.push([qualitesList[i], currentTrack.resolution.substring(0, currentTrack.resolution.indexOf("x"))]);
         }
         sortedResolutionsList.sort(compareQuality);
-        foundQualities = new Array();
-        for (var i = 0; i < sortedResolutionsList.length; i++){
+        foundQualities = [];
+        for (i = 0; i < sortedResolutionsList.length; i++){
             foundQualities.push(sortedResolutionsList[i][0]);
         }
         return foundQualities;
@@ -405,7 +399,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             return tracks;
         }
         var filterFormatsArray = filterFormats.split(",");
-        var newTracksArray = new Array();
+        var newTracksArray = [];
         
         for (var i = 0; i < tracks.length; i++) {
             for (var j = 0; j < filterFormatsArray.length; j++) {
@@ -527,7 +521,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     $(videoDataView).css("float", "right");
                 }
             });
-            for (var i = 0; i < videoDisplays.length; ++i) {
+            for (i = 0; i < videoDisplays.length; ++i) {
                 $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
                 singleVideoPaddingTop = (aspectRatio[2] / aspectRatio[1] * 100) + "%";
             }
@@ -549,7 +543,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             if (nr >= 2) {
                 registerSynchronizeEvents();
 
-                var i = 0;
+                i = 0;
                 for (var vd in videoDisplays) {
                     if (i > 0) {
                         // sync every other videodisplay with the master
@@ -658,12 +652,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     }
 
     function renderEmbed(videoDataView, videoSources, videoDisplays, aspectRatio) {
-        var nrOfVideoSources = 0;
         var init = false;
 
         var tuples = getSortedVideosourcesArray(videoSources);
         for (var i = 0; i < tuples.length; ++i) {
-            var key = tuples[i][0];
             var value = tuples[i][1];
 
             if (!init) { // just init the first video
@@ -687,7 +679,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[2] / aspectRatio[1]) * 100));
             Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
             $("." + id_videoDisplayClass).css("width", "100%");
-            for (var i = 0; i < videoDisplays.length; ++i) {
+            for (i = 0; i < videoDisplays.length; ++i) {
                 $("#" + videoDisplays[i]).css("padding-top", (aspectRatio[2] / aspectRatio[1] * 100) + "%").addClass("auto-height");
             }
         } else {
@@ -714,12 +706,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     }
 
     function renderMobile(videoDataView, videoSources, videoDisplays, aspectRatio) {
-        var nrOfVideoSources = 0;
         var init = false;
 
         var tuples = getSortedVideosourcesArray(videoSources);
         for (var i = 0; i < tuples.length; ++i) {
-            var key = tuples[i][0];
             var value = tuples[i][1];
 
             if (!init) { // just init the first video
@@ -1766,9 +1756,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             return -1;
         } else if (s2 == mastervideotype) {
             return 1;
-        } else {
-            return 0;
         }
+
         return 0;
     }
 
