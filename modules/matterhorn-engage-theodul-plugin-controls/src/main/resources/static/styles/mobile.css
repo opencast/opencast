@@ -11,12 +11,9 @@
 #engage_controls #switchPlayers .switchButton {
   position: absolute;
   z-index: 1;
-  top: 0;
-  bottom: 0;
-  width: 15%;
-  height: 100%;
+  top: 46%;
   visibility: visible;
-  opacity: 1;
+  opacity: 0.8;
   -moz-transition: visibility 0s, opacity 0.7s ease-in-out 0.5s;
   -o-transition: visibility 0s, opacity 0.7s ease-in-out 0.5s;
   -webkit-transition: visibility 0s, opacity 0.7s ease-in-out;
@@ -29,51 +26,28 @@
   text-decoration: none;
   cursor: pointer;
 }
-/* line 35, ../scss/mobile.scss */
-#engage_controls #switchPlayers .switchButton span.glyphicon {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40px;
-  margin: auto;
-  padding: 0 3px;
-}
-/* line 43, ../scss/mobile.scss */
+/* line 32, ../scss/mobile.scss */
 #engage_controls #switchPlayers .switchButton:focus, #engage_controls #switchPlayers .switchButton:hover {
   text-shadow: -2px 2px 2px #333;
   text-shadow: -2px 2px 2px 1px #333;
 }
-/* line 48, ../scss/mobile.scss */
+/* line 37, ../scss/mobile.scss */
 #engage_controls #switchPlayers #prevVideo {
-  background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjEuMCIgeTE9IjAuNSIgeDI9IjAuMCIgeTI9IjAuNSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmFkKSIgLz48L3N2Zz4g');
-  background-size: 100%;
-  background-image: -webkit-gradient(linear, 100% 50%, 0% 50%, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.5)));
-  background-image: -moz-linear-gradient(right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
-  background-image: -webkit-linear-gradient(right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
-  background-image: linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
   left: 0;
   text-align: left;
 }
-/* line 53, ../scss/mobile.scss */
+/* line 41, ../scss/mobile.scss */
 #engage_controls #switchPlayers #nextVideo {
-  background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuMCIgeTE9IjAuNSIgeDI9IjEuMCIgeTI9IjAuNSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjAiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmFkKSIgLz48L3N2Zz4g');
-  background-size: 100%;
-  background-image: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.5)));
-  background-image: -moz-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
-  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
   right: 0;
   text-align: right;
 }
-/* line 61, ../scss/mobile.scss */
+/* line 48, ../scss/mobile.scss */
 #engage_controls.first #prevVideo, #engage_controls.last #nextVideo {
   visibility: hidden !important;
   opacity: 0 !important;
 }
 
-/* line 68, ../scss/mobile.scss */
+/* line 55, ../scss/mobile.scss */
 #engage_controls #big_play_button {
   position: absolute;
   top: 50%;
@@ -93,14 +67,14 @@
   -webkit-box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.4);
   box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.4);
 }
-/* line 84, ../scss/mobile.scss */
+/* line 71, ../scss/mobile.scss */
 #engage_controls #big_play_button:focus, #engage_controls #big_play_button:hover {
   color: #111;
   -moz-box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.6), inset 1px 1px 3px rgba(20, 20, 20, 0.6);
   -webkit-box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.6), inset 1px 1px 3px rgba(20, 20, 20, 0.6);
   box-shadow: 1px 1px 9px rgba(20, 20, 20, 0.6), inset 1px 1px 3px rgba(20, 20, 20, 0.6);
 }
-/* line 90, ../scss/mobile.scss */
+/* line 77, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper {
   position: absolute;
   z-index: 10;
@@ -113,7 +87,7 @@
   display: -webkit-flex;
   display: flex;
 }
-/* line 103, ../scss/mobile.scss */
+/* line 90, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .ui-slider-handle {
   position: absolute;
   z-index: 2;
@@ -128,14 +102,14 @@
   top: -10px !important;
   margin-left: -12px;
 }
-/* line 118, ../scss/mobile.scss */
+/* line 105, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_control {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
   font-size: 27px;
   cursor: pointer;
 }
-/* line 124, ../scss/mobile.scss */
+/* line 111, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
@@ -143,16 +117,16 @@
   margin-right: 12px;
   font-size: 12px;
 }
-/* line 129, ../scss/mobile.scss */
+/* line 116, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time #navigation_time_current {
   color: #666;
 }
-/* line 132, ../scss/mobile.scss */
+/* line 119, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time p {
   margin: 0;
   line-height: 1.2;
 }
-/* line 138, ../scss/mobile.scss */
+/* line 125, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #slider {
   -webkit-flex: 1 0 30px;
   flex: 1 0 30px;
@@ -166,7 +140,7 @@
   background: url("../images/bg-track.png") repeat top left;
   box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
 }
-/* line 152, ../scss/mobile.scss */
+/* line 139, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume {
   -webkit-flex: 0 0 35px;
   flex: 0 0 35px;
@@ -174,11 +148,11 @@
   font-size: 27px;
   text-align: center;
 }
-/* line 159, ../scss/mobile.scss */
+/* line 146, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeIcon {
   cursor: pointer;
 }
-/* line 163, ../scss/mobile.scss */
+/* line 150, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSliderWrapper {
   position: absolute;
   bottom: 100%;
@@ -191,7 +165,7 @@
   height: 95px;
   margin-bottom: 6px;
 }
-/* line 176, ../scss/mobile.scss */
+/* line 163, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSlider {
   border-width: 1px;
   border-style: solid;
@@ -204,12 +178,12 @@
   background: url("../images/bg-track.png") repeat top left;
   box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
 }
-/* line 189, ../scss/mobile.scss */
+/* line 176, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSlider .ui-slider-handle {
   top: auto !important;
   margin-left: -2px !important;
 }
-/* line 196, ../scss/mobile.scss */
+/* line 183, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .ui-slider-range {
   background: #ffffff;
   /* Old browsers */

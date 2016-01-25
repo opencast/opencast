@@ -279,8 +279,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     // for mobile view
     var id_videoWrapper = "video_wrapper";
     var id_gestureContainer = "engage_video";
-    var id_prevVideo = "prevVideo";
-    var id_nextVideo = "nextVideo";
     var controlsVisible = true;
     var controlsTimer = null;
     var currentDisplay = 0;
@@ -927,13 +925,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 $("#" + id_videoWrapper).click(function(e) {
                     Engage.trigger(plugin.events.showControls.getName());
                 });
-                $("#" + id_prevVideo).click(function(e) {
-                  e.preventDefault();
-                  switchVideoByDirection(-1);
-                });
-                $("#" + id_nextVideo).click(function(e) {
-                  e.preventDefault();
-                  switchVideoByDirection(1);
+
+                $(".videoDisplay").hammer().bind("tap", function(e) {
+                    if (!$(this).hasClass("active")) {
+                        var id = (+this.id.replace('videoDisplay','')) - 1;
+                        switchVideoById(id);
+                    }
                 });
 
                 // create a simple hammer.js jquery plugin instance for touch gesture support
