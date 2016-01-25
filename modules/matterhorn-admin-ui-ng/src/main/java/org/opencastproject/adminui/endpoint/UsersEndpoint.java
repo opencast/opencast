@@ -26,6 +26,8 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
+import static java.lang.String.CASE_INSENSITIVE_ORDER;
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_CREATED;
@@ -38,6 +40,7 @@ import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.adminui.util.TextFilter;
 import org.opencastproject.index.service.resources.list.query.UsersListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.kernel.security.persistence.JpaOrganization;
@@ -71,7 +74,6 @@ import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.json.JString;
 import com.entwinemedia.fn.data.json.JValue;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
@@ -178,30 +180,38 @@ public class UsersEndpoint {
     Option<String> filterName = Option.none();
     Option<String> filterRole = Option.none();
     Option<String> filterProvider = Option.none();
+    Option<String> filterText = Option.none();
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
     for (String name : filters.keySet()) {
-      if (UsersListQuery.FILTER_NAME_NAME.equals(name))
-        filterName = Option.some(filters.get(name));
-      if (UsersListQuery.FILTER_ROLE_NAME.equals(name))
-        filterRole = Option.some(filters.get(name));
-      if (UsersListQuery.FILTER_PROVIDER_NAME.equals(name)) {
-        filterProvider = Option.some(filters.get(name));
+      String value = filters.get(name);
+      if (UsersListQuery.FILTER_NAME_NAME.equals(name)) {
+        filterName = Option.some(value);
+      } else if (UsersListQuery.FILTER_ROLE_NAME.equals(name)) {
+        filterRole = Option.some(value);
+      } else if (UsersListQuery.FILTER_PROVIDER_NAME.equals(name)) {
+        filterProvider = Option.some(value);
+      } else if ((UsersListQuery.FILTER_TEXT_NAME.equals(name)) && (StringUtils.isNotBlank(value))) {
+        filterText = Option.some(value);
       }
     }
 
-    // Filter agents by filter criteria
+    // Filter users by filter criteria
     List<User> filteredUsers = new ArrayList<User>();
     for (Iterator<User> i = userDirectoryService.getUsers(); i.hasNext();) {
       User user = i.next();
 
       // Filter list
-      boolean mismatchName = filterName.isSome() && !filterName.get().equals(user.getName());
-      boolean mismatchRole = filterRole.isSome()
-              && !Stream.$(user.getRoles()).map(getRoleName).toSet().contains(filterRole.get());
-      boolean mismatchProvider = filterProvider.isSome() && !filterProvider.get().equals(user.getProvider());
-      if (mismatchName || mismatchRole || mismatchProvider)
+      if (filterName.isSome() && !filterName.get().equals(user.getName())
+          || (filterRole.isSome()
+              && !Stream.$(user.getRoles()).map(getRoleName).toSet().contains(filterRole.get()))
+          || (filterProvider.isSome()
+              && !filterProvider.get().equals(user.getProvider()))
+          || (filterText.isSome()
+              && !TextFilter.match(filterText.get(), user.getUsername(), user.getName(), user.getEmail(), user.getProvider())
+              && !TextFilter.match(filterText.get(), Stream.$(user.getRoles()).map(getRoleName).mkString(" ")))) {
         continue;
+      }
 
       filteredUsers.add(user);
     }
@@ -218,26 +228,30 @@ public class UsersEndpoint {
             switch (criterion.getFieldName()) {
               case "name":
                 if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(user2.getName(), user1.getName());
-                return ObjectUtils.compare(user1.getName(), user2.getName());
+                  return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user2.getName()), trimToEmpty(user1.getName()));
+                return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user1.getName()), trimToEmpty(user2.getName()));
               case "username":
                 if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(user2.getUsername(), user1.getUsername());
-                return ObjectUtils.compare(user1.getUsername(), user2.getUsername());
+                  return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user2.getUsername()),
+                          trimToEmpty(user1.getUsername()));
+                return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user1.getUsername()),
+                        trimToEmpty(user2.getUsername()));
               case "email":
                 if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(user2.getEmail(), user1.getEmail());
-                return ObjectUtils.compare(user1.getEmail(), user2.getEmail());
+                  return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user2.getEmail()), trimToEmpty(user1.getEmail()));
+                return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user1.getEmail()), trimToEmpty(user2.getEmail()));
               case "roles":
                 String roles1 = Stream.$(user1.getRoles()).map(getRoleName).sort(sortByName).mkString(",");
                 String roles2 = Stream.$(user2.getRoles()).map(getRoleName).sort(sortByName).mkString(",");
                 if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(roles2, roles1);
-                return ObjectUtils.compare(roles1, roles2);
+                  return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(roles2), trimToEmpty(roles1));
+                return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(roles1), trimToEmpty(roles2));
               case "provider":
                 if (order.equals(Order.Descending))
-                  return ObjectUtils.compare(user2.getProvider(), user1.getProvider());
-                return ObjectUtils.compare(user1.getProvider(), user2.getProvider());
+                  return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user2.getProvider()),
+                          trimToEmpty(user1.getProvider()));
+                return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user1.getProvider()),
+                        trimToEmpty(user2.getProvider()));
               default:
                 logger.info("Unkown sort type: {}", criterion.getFieldName());
                 return 0;

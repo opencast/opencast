@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +91,8 @@ public class FeedServlet extends HttpServlet {
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+    /* Temporary unavailable until someone fixes the feed service
     ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(FeedServlet.class.getClassLoader());
@@ -97,6 +100,7 @@ public class FeedServlet extends HttpServlet {
     } finally {
       Thread.currentThread().setContextClassLoader(originalContextClassLoader);
     }
+    */
   }
 
   /**

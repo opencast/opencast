@@ -1,0 +1,13 @@
+[Unit]
+Description=Opencast
+After=local-fs.target
+After=network.target
+
+[Service]
+ExecStart=/opt/opencast/bin/start-opencast server
+ExecStop=/opt/opencast/bin/stop-opencast
+Restart=always
+User=opencast
+
+[Install]
+WantedBy=multi-user.target

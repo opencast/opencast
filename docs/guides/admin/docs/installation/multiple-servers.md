@@ -110,6 +110,8 @@ the command to mount the network storage on startup:
 hard links are possible across in a distributed set-up, but the detection may fail if hard links are only possible
 between certain parts of the storage. This may lead to failures.
 
+*Important:* Do not share the Karaf data directory. Doing so will cause Opencast to fail. Please share the storage
+directory only.
 
 
 Step 3: Set-Up the Database

@@ -371,7 +371,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
     try {
       if (indexManager.add(mediaPackage, acl, now)) {
-        logger.info("Added mediapackage {} to the search index", mediaPackage.getIdentifier());
+        logger.info("Added mediapackage `{}` to the search index, using ACL `{}`", mediaPackage, acl);
       } else {
         logger.warn("Failed to add mediapackage {} to the search index", mediaPackage.getIdentifier());
       }

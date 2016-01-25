@@ -30,6 +30,7 @@ requirejs.config({
             exports: "Bowser"
         },
         "bootbox": {
+            deps: ["bootstrap"],
             exports: "Bootbox"
         }
     }

@@ -43,9 +43,13 @@
     <!-- Apply access control lists from series to the mediapackage -->
 
     <operation
-      id="apply-acl"
+      id="series"
       exception-handler-workflow="ng-partial-error"
       description="Applying access control entries">
+      <configurations>
+        <configuration key="attach">*</configuration>
+        <configuration key="apply-acl">true</configuration>
+      </configurations>
     </operation>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->

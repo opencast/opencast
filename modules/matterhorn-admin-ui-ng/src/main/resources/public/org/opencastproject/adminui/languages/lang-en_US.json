@@ -49,7 +49,7 @@
    },
    "CONFIRMATIONS": {
      "CONTINUE_ACTION" : "Are you sure you want to continue?",
-     "ACTIONS": { 
+     "ACTIONS": {
        "CONFIRMATION" : "Confirmation required"
      }
    },
@@ -107,6 +107,9 @@
      "EMAIL_SENT": "The message has been sent",
      "EMAIL_NOT_SENT": "The message could not be sent",
      "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the room, dates or times.",
+     "INVALID_ACL_RULES":   "Rules have to contain a valid role and Read or/and Write right(s).",
+     "MISSING_ACL_RULES":   "At least one role with Read and Write permissions is required!",
+     "SAVED_ACL_RULES":   "The access rules have been saved.",
      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "The existing events in this series will need to be reprocessed",
      "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
@@ -233,7 +236,10 @@
         "CCBYNC": "CC BY-NC",
         "CCBYNCSA": "CC BY-NC-SA",
         "CCBYNCND": "CC BY-NC-ND",
-        "CC0": "CC0"
+        "CC0": "CC0",
+        "BSD":"BSD",
+        "CCND":"CCND",
+        "GPL":"GPL"
       },
      "SEND_MESSAGE": {
        "CAPTION": "Send message",
@@ -391,7 +397,7 @@
          "PROCESSING_CANCELED": "Processing canceled"
        },
        "DETAILS": {
-         "HEADER": "Event details {{resourceId}}",
+         "HEADER": "Event details - {{resourceId}}",
          "TABS": {
            "GENERAL":     "General",
            "METADATA":    "Metadata",
@@ -476,7 +482,7 @@
                     "CHECKSUM" : "Checksum",
                     "REFERENCE": "Reference"
                   }
-              },              
+              },
               "MEDIA": {
                   "TITLE": "Media",
                   "CAPTION": "Media",
@@ -498,20 +504,20 @@
                       "STREAM_AUDIO": "Audio streams",
                       "STREAM_VIDEO": "Video streams",
                       "CHANNELS": "Channels",
-                      "BITRATE": "Bitrate",
-                      "BITDEPTH": "Bitdepth",
-                      "SAMPLINGRATE": "Samplingrate",
-                      "FRAMECOUNT": "Framecount",
-                      "PEAKLEVELDB": "Peak level DB",
-                      "RMSLEVELDB": "RMS level DB",
-                      "RMSPEAKDB": "RMS speak DB",
-                      "FRAMERATE": "Framerate",
+                      "BITRATE": "Bit rate",
+                      "BITDEPTH": "Bit depth",
+                      "SAMPLINGRATE": "Sample rate",
+                      "FRAMECOUNT": "Frame count",
+                      "PEAKLEVELDB": "Peak level (dB)",
+                      "RMSLEVELDB": "RMS level (dB)",
+                      "RMSPEAKDB": "RMS peak (dB)",
+                      "FRAMERATE": "Frame rate",
                       "RESOLUTION": "Resolution",
                       "SIZE": "Size",
-                      "SCANTYPE": "Scantype",
-                      "SCANORDER": "Scanorder"
+                      "SCANTYPE": "Scan type",
+                      "SCANORDER": "Scan order"
                   }
-               },            
+               },
               "PUBLICATIONS": {
                   "TITLE"    : "Publications",
                   "CAPTION"  : "Publications",
@@ -629,14 +635,13 @@
            "MIMETYPE": "Mimetype",
            "URL": "URL",
            "RECORDING_DATE": "Recording date",
-           "FLAVOR": "Flavor",
            "TAGS": "Tags",
            "DURATION": "Duration",
            "STREAM_AUDIO": "Audio streams",
            "STREAM_VIDEO": "Video streams",
            "CHANNELS": "Channels",
-           "BITRATE": "Bitrate",
-           "FRAMERATE": "Framerate",
+           "BITRATE": "Bit rate",
+           "FRAMERATE": "Frame rate",
            "RESOLUTION": "Resolution"
          },
          "ERRORS_AND_WARNINGS": {
@@ -704,7 +709,6 @@
            "CAPTION": "Theme",
            "DESCRIPTION": "",
            "TITLE": "Theme",
-           "DESCRIPTION": "",
            "LABEL": "No theme",
            "EMPTY": "No theme found"
          },
@@ -723,7 +727,8 @@
          "ACTION":       "Actions"
        },
        "DETAILS": {
-         "TABS": {
+          "HEADER": "Series details - {{resourceId}}",
+          "TABS": {
            "METADATA":    "Metadata",
            "EXTENDED_METADATA":    "Metadata II",
            "EVENTS":      "Events",
@@ -971,7 +976,8 @@
              "READ"        : "Read",
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
-             "DETAILS"     : "Details"
+             "DETAILS"     : "Details",
+             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below"
            },
            "ROLES": {
               "LABEL": "Select a role",
@@ -1007,7 +1013,8 @@
              "READ"        : "Read",
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
-             "DETAILS"     : "Details"
+             "DETAILS"     : "Details",
+             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below"
            },
            "ROLES": {
               "LABEL": "Select a role",
@@ -1328,6 +1335,14 @@
      }
    },
    "FILTERS": {
+     "AGENTS": {
+       "NAME": {
+         "LABEL": "Name"
+       },
+       "STATUS": {
+         "LABEL": "Status"
+       }
+     },
      "EVENTS": {
        "STATUS": {
          "LABEL":      "Status",
@@ -1448,6 +1463,12 @@
       }
      },
      "USERS": {
+       "PROVIDER": {
+         "LABEL": "Provider"
+       },
+       "ROLE": {
+         "LABEL": "Role"
+       },
        "USERNAME": {
          "LABEL": "Username"
        },
@@ -1471,5 +1492,12 @@
          "CONSTRUCTION":     "Construction"
        }
      }
+   },
+   "DASHBOARD":{
+       "RUNNING":   "Running",
+       "FINISHED":  "Finished",
+       "FAILED" :   "Failed",
+       "FINISHED_WITH_COMMENTS": "Finished with open comments",
+       "SCHEDULED" : "Scheduled"
    }
 }

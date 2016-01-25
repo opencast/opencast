@@ -32,6 +32,8 @@ angular.module('adminNg.controllers')
         OptoutsResource) {
 
         var saveFns = {},
+            me = this,
+            NOTIFICATION_CONTEXT = 'events-access',
             mainCatalog = 'dublincore/episode',
             createPolicy = function (role) {
                 return {
@@ -99,8 +101,7 @@ angular.module('adminNg.controllers')
                     }
                 });
                 $scope.comments    = CommentResource.query({ resource: 'event', resourceId: id, type: 'comments' });
-            },
-            eventNotification;
+            };
 
         $scope.policies = [];
         $scope.baseAcl = {};
@@ -255,23 +256,20 @@ angular.module('adminNg.controllers')
             $scope.exitReplyMode();
         };
 
-        $scope.accessSave = function (field) {
+        $scope.accessSave = function () {
             var ace = [],
-                hasRights = false;
-
-            if (angular.isDefined(field) && angular.isUndefined(field.role)) {
-                return;
-            }
-
-            if (eventNotification) {
-                Notifications.remove(eventNotification, 'event-acl');
-            }
+                hasRights = false,
+                rulesValid = false;
 
             angular.forEach($scope.policies, function (policy) {
-                if (angular.isDefined(policy.role)) {
-                    if (policy.read && policy.write) {
-                        hasRights = true;
-                    }
+                rulesValid = false;
+
+                if (policy.read && policy.write) {
+                    hasRights = true;
+                }
+
+                if ((policy.read || policy.write) && !angular.isUndefined(policy.role)) {
+                    rulesValid = true;
 
                     if (policy.read) {
                         ace.push({
@@ -291,17 +289,39 @@ angular.module('adminNg.controllers')
                 }
             });
 
-            if (!hasRights) {
-                eventNotification = Notifications.add('error', 'EVENT_ACL_MISSING_READWRITE_ROLE', 'event-acl');
-                return;
+            me.unvalidRule = !rulesValid;
+            me.hasRights = hasRights;
+
+            if (me.unvalidRule) {
+                if (!angular.isUndefined(me.notificationRules)) {
+                    Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
+                }
+                me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);  
+            } else if (!angular.isUndefined(me.notificationRules)) {
+                Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
+                me.notificationRules = undefined;
             }
 
-            EventAccessResource.save({id: $scope.resourceId}, {
-                acl: {
-                    ace: ace
-                },
-                override: true
-            });
+            if (!me.hasRights) {
+                if (!angular.isUndefined(me.notificationRights)) {
+                    Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
+                }
+                me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);  
+            } else if (!angular.isUndefined(me.notificationRights)) {
+                Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
+                me.notificationRights = undefined;
+            }
+
+            if (hasRights && rulesValid) {
+                EventAccessResource.save({id: $scope.resourceId}, {
+                    acl: {
+                        ace: ace
+                    },
+                    override: true
+                });  
+
+                Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);        
+            }
         };
 
         $scope.severityColor = function (severity) {
