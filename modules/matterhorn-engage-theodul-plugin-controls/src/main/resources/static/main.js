@@ -243,7 +243,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var plugin_path_topIfBottom = "";
     var initCount = 6;
     if (isMobileMode) {
-        initCount += 2;          // increase initCount, because mobile version loads 2 more libs
+        initCount += 3;          // increase initCount, because mobile version loads 3 more libs
     }
     var isPlaying = false;
     var isSliding = false;
@@ -283,7 +283,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_nextVideo = "nextVideo";
     var controlsVisible = true;
     var controlsTimer = null;
-    var gestureManager = null;
     var currentDisplay = 0;
 
     function initTranslate(language, funcSuccess, funcError) {
@@ -926,24 +925,20 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             // register special events for mobile template
             if (isMobileMode) {
                 $("#" + id_videoWrapper).click(function(e) {
-                  Engage.trigger(plugin.events.showControls.getName());
+                    Engage.trigger(plugin.events.showControls.getName());
                 });
                 $("#" + id_prevVideo).click(function(e) {
                   e.preventDefault();
-                  switchVideo(-1);
+                  switchVideoByDirection(-1);
                 });
                 $("#" + id_nextVideo).click(function(e) {
                   e.preventDefault();
-                  switchVideo(1);
+                  switchVideoByDirection(1);
                 });
 
-                // create a simple hammer.js instance for touch gesture support
+                // create a simple hammer.js jquery plugin instance for touch gesture support
                 // by default, it only adds horizontal recognizers
-                var gestureElement = document.getElementById(id_gestureContainer);
-                gestureManager = new Hammer(gestureElement);
-
-                // listen to events...
-                gestureManager.on("panstart panleft panright panend swipeleft swiperight", handleGestures);
+                $("#" + id_gestureContainer).hammer().bind("panstart panleft panright panend swipeleft swiperight", handleGestures);
             }
         }
     }
@@ -1070,37 +1065,47 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     }
 
     /**
-     * Switch to next or previous video, as specified in direction.
+     * Switch screen to display the next or previous video, as specified in direction.
      * @param  {int} direction either -1 for prev or +1 for next video
      * @return {boolean} true if video was switched, false if direction was out of bounds
      */
-    function switchVideo(direction) {
+    function switchVideoByDirection(direction) {
         // number of video streams
         var n = Engage.model.get("videoDataModel").get("ids").length;
         var x = currentDisplay + direction;
         var newSelectedDisplay = Math.max(0, Math.min(x, n-1));
 
         if (currentDisplay !== newSelectedDisplay) {
-            currentDisplay = newSelectedDisplay;
-
-            // remove old classes from wrapper
-            $("#" + id_engage_controls).removeClass("first last");
-
-            // add "first" or "last" class to wrapper if it's the first or last video showing
-            if (currentDisplay === 0)
-                $("#" + id_engage_controls).addClass("first");
-            if (currentDisplay === (n-1))
-                $("#" + id_engage_controls).addClass("last");
-
-            // transform to new display
-            $("#" + id_gestureContainer).addClass("animate");
-            transformToVideo(currentDisplay);
-
-            Engage.trigger(plugin.events.switchVideo.getName(), currentDisplay);
-
+            switchVideoById(newSelectedDisplay);
             return true;
         }
         return false;
+    }
+
+    /**
+     * Switch screen to display the specified video.
+     * @param  {int} id video id, with 0 being the first
+     */
+    function switchVideoById(id) {
+        currentDisplay = id;
+
+        // number of video streams
+        var n = Engage.model.get("videoDataModel").get("ids").length;
+
+        // remove old classes from wrapper
+        $("#" + id_engage_controls).removeClass("first last");
+
+        // add "first" or "last" class to wrapper if it's the first or last video showing
+        if (currentDisplay === 0)
+            $("#" + id_engage_controls).addClass("first");
+        if (currentDisplay === (n-1))
+            $("#" + id_engage_controls).addClass("last");
+
+        // transform to new display
+        $("#" + id_gestureContainer).addClass("animate");
+        transformToVideo(currentDisplay);
+
+        Engage.trigger(plugin.events.switchVideo.getName(), currentDisplay);
     }
 
     /**
@@ -1109,15 +1114,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     function handleGestures(ev) {
         switch(ev.type) {
             case 'swipeleft':
-                Engage.log("Swipe left recognized!");
-                switchVideo(1);
-                gestureManager.stop();
+                switchVideoByDirection(1);
+                $("#" + id_gestureContainer).data("hammer").stop();
             break;
 
             case 'swiperight':
-                Engage.log("Swipe right recognized!");
-                switchVideo(-1);
-                gestureManager.stop();
+                switchVideoByDirection(-1);
+                $("#" + id_gestureContainer).data("hammer").stop();
             break;
 
             case 'panstart':
@@ -1130,14 +1133,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             case 'panright':
                 // prevent scrolling
                 ev.preventDefault();
-                
+
                 // stick to the finger
                 var displayOffset = currentDisplay * 100;
-                var dragOffset = ev.deltaX;
+                var dragOffset = ev.gesture.deltaX;
 
                 // slow down at the first and last pane
-                if((currentDisplay === 0  && ev.offsetDirection === Hammer.DIRECTION_RIGHT) ||
-                   (currentDisplay === Engage.model.get("videoDataModel").get("ids").length - 1 && ev.offsetDirection === Hammer.DIRECTION_LEFT)) {
+                if((currentDisplay === 0  && ev.gesture.offsetDirection === Hammer.DIRECTION_RIGHT) ||
+                   (currentDisplay === Engage.model.get("videoDataModel").get("ids").length - 1 && ev.gesture.offsetDirection === Hammer.DIRECTION_LEFT)) {
                     dragOffset *= .3;
                 }
 
@@ -1149,10 +1152,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 $("#" + id_gestureContainer).addClass("animate");
 
                 // if user panned more than 50% to left or right, switch video
-                if ((Math.abs(ev.deltaX) > $("#" + id_gestureContainer).width()/2) &&
-                    (ev.offsetDirection === Hammer.DIRECTION_RIGHT || ev.offsetDirection === Hammer.DIRECTION_LEFT)) {
+                if ((Math.abs(ev.gesture.deltaX) > $("#" + id_gestureContainer).width()/2) &&
+                    (ev.gesture.offsetDirection === Hammer.DIRECTION_RIGHT || ev.gesture.offsetDirection === Hammer.DIRECTION_LEFT)) {
                     // if video was not switched, transform back to old screen
-                    if (!switchVideo(ev.offsetDirection === Hammer.DIRECTION_RIGHT ? -1 : 1))
+                    if (!switchVideoByDirection(ev.gesture.offsetDirection === Hammer.DIRECTION_RIGHT ? -1 : 1))
                         transformToVideo(currentDisplay);
                 }
                 else {
@@ -1464,7 +1467,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         }
     });
 
-    // load hammer.js lib for swiping on mobile (touch enabled) devices
+    // load hammer.js lib for gestures on mobile (touch enabled) devices
     if (isMobileMode) {
         require([relative_plugin_path + "lib/hammer.min"], function() {
             Engage.log("Controls: Lib hammer.js loaded");
@@ -1472,6 +1475,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             if (initCount <= 0) {
                 initPlugin();
             }
+
+            require([relative_plugin_path + "lib/jquery.hammer"], function() {
+                initCount -= 1;
+                if (initCount <= 0) {
+                    initPlugin();
+                }
+            });
         });
     }
 
