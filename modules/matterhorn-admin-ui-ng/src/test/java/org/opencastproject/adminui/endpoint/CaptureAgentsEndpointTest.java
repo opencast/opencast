@@ -42,12 +42,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 
-@Ignore
 public class CaptureAgentsEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestCaptureAgentsEndpoint.class);
   private JSONParser parser = new JSONParser();
@@ -105,17 +103,7 @@ public class CaptureAgentsEndpointTest {
         assertEquals(expected.get("Name"), captureAgentJson.get("Name"));
         assertEquals(expected.get("Status"), captureAgentJson.get("Status"));
         assertEquals(expected.get("Update"), captureAgentJson.get("Update"));
-        assertEquals(expected.get("roomId"), captureAgentJson.get("roomId"));
 
-        // Check blacklist
-        if ("".equals(captureAgentJson.get("blacklist"))) {
-          assertEquals(expected.get("blacklist"), captureAgentJson.get("blacklist"));
-        } else {
-          JSONObject expectedBlacklist = (JSONObject) expected.get("blacklist");
-          JSONObject actualBlacklist = (JSONObject) captureAgentJson.get("blacklist");
-          assertEquals(expectedBlacklist.get("start"), actualBlacklist.get("start"));
-          assertEquals(expectedBlacklist.get("end"), actualBlacklist.get("end"));
-        }
         if (checkInputs) {
           // Check inputs
           JSONObject expectedInputs = (JSONObject) ((JSONArray) expected.get("inputs")).get(0);

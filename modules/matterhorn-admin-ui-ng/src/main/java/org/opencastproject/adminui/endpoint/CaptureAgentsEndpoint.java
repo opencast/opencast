@@ -21,14 +21,23 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.f;
+import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.v;
+import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.StringUtils;
 import org.opencastproject.adminui.util.TextFilter;
+import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.SmartIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,7 +164,7 @@ public class CaptureAgentsEndpoint {
                   return agent2.getLastHeardFrom().compareTo(agent1.getLastHeardFrom());
                 return agent1.getLastHeardFrom().compareTo(agent2.getLastHeardFrom());
               default:
-                logger.info("Unkown sort type: {}", criterion.getFieldName());
+                logger.info("Unknown sort type: {}", criterion.getFieldName());
                 return 0;
             }
           }
@@ -164,10 +173,39 @@ public class CaptureAgentsEndpoint {
       });
     }
 
+    // Apply Limit and offset
+    filteredAgents = new SmartIterator<Agent>(limit, offset).applyLimitAndOffset(filteredAgents);
+
     // Run through and build a map of updates (rather than states)
     List<JValue> agentsJSON = new ArrayList<JValue>();
+    for (Agent agent : filteredAgents) {
+      agentsJSON.add(generateJsonAgent(agent, inputs));
+    }
 
     return okJsonList(agentsJSON, offset, limit, total);
+  }
+
+  private JValue generateJsonAgent(Agent agent, boolean withInputs) {
+
+    List<JField> fields = new ArrayList<JField>();
+    fields.add(f("Status", vN(agent.getState())));
+    fields.add(f("Name", v(agent.getName())));
+    fields.add(f("Update", vN(DateTimeSupport.toUTC(agent.getLastHeardFrom()))));
+
+    if (withInputs) {
+      String devices = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
+      fields.add(f("inputs", (StringUtils.isEmpty(devices)) ? a() : generateJsonDevice(devices.split(","))));
+    }
+
+    return j(fields);
+  }
+
+  private JValue generateJsonDevice(String[] devices) {
+    List<JValue> jsonDevices = new ArrayList<JValue>();
+    for (String device : devices) {
+      jsonDevices.add(j(f("id", v(device)), f("value", v(TRANSLATION_KEY_PREFIX + device.toUpperCase()))));
+    }
+    return a(jsonDevices);
   }
 
 }
