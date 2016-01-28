@@ -69,7 +69,7 @@ public class SearchServicePersistenceTest {
     EasyMock.replay(securityService);
 
     searchDatabase = new SearchServiceDatabaseImpl();
-    searchDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNI));
+    searchDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT));
     searchDatabase.setSecurityService(securityService);
     searchDatabase.activate(null);
 

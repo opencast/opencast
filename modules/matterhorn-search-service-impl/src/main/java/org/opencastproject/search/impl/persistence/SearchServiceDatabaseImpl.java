@@ -59,7 +59,7 @@ import javax.persistence.TypedQuery;
 public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /** JPA persistence unit name */
-  public static final String PERSISTENCE_UNI = "org.opencastproject.search.impl.persistence";
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.search.impl.persistence";
 
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceDatabaseImpl.class);

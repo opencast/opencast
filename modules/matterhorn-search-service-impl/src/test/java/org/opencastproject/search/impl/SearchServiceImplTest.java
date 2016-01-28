@@ -192,7 +192,7 @@ public class SearchServiceImplTest {
 
     // Persistence storage
     searchDatabase = new SearchServiceDatabaseImpl();
-    searchDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNI));
+    searchDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT));
     searchDatabase.activate(null);
     searchDatabase.setSecurityService(securityService);
 
