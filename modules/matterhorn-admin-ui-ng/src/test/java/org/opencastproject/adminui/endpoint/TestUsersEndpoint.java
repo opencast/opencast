@@ -21,6 +21,10 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
@@ -29,7 +33,6 @@ import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.SmartIterator;
 
-import org.easymock.EasyMock;
 import org.junit.Ignore;
 
 import java.text.ParseException;
@@ -55,7 +58,6 @@ public class TestUsersEndpoint extends UsersEndpoint {
 
   public TestUsersEndpoint() throws Exception {
 
-    userDirectoryService = EasyMock.createNiceMock(UserDirectoryService.class);
     users = new ArrayList<User>();
 
     JpaOrganization organization = new JpaOrganization("org", "org", new HashMap<String, Integer>(), "ADMIN",
@@ -75,6 +77,11 @@ public class TestUsersEndpoint extends UsersEndpoint {
     users.add(user3);
     users.add(user4);
 
+    userDirectoryService = createNiceMock(UserDirectoryService.class);
+    expect(userDirectoryService.getUsers()).andStubReturn(users.iterator());
+    replay(userDirectoryService);
+
+    this.setUserDirectoryService(userDirectoryService);
     this.setSecurityService(null);
     this.setJpaUserAndRoleProvider(null);
   }

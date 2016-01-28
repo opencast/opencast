@@ -41,15 +41,12 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-// FIXME
-@Ignore
 public class UsersEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestUsersEndpoint.class);
 
