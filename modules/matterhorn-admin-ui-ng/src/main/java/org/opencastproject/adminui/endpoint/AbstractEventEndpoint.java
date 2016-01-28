@@ -81,7 +81,7 @@ import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.provider.CommentsListProvider.RESOLUTION;
+import org.opencastproject.index.service.resources.list.provider.EventCommentsListProvider.RESOLUTION;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
 import org.opencastproject.index.service.util.AccessInformationUtil;

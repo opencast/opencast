@@ -38,9 +38,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CommentsListProvider implements ResourceListProvider {
+public class EventCommentsListProvider implements ResourceListProvider {
 
-  private static final Logger logger = LoggerFactory.getLogger(CommentsListProvider.class);
+  private static final Logger logger = LoggerFactory.getLogger(EventCommentsListProvider.class);
 
   public static final String PROVIDER_PREFIX = "comments";
 
