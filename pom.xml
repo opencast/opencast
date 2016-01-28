@@ -23,7 +23,6 @@
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <checkstyle.skip>false</checkstyle.skip>
     <eclipselink.version>2.6.0</eclipselink.version>
     <commons-compress.version>1.9</commons-compress.version>
     <jmeter.version>2.4</jmeter.version>
