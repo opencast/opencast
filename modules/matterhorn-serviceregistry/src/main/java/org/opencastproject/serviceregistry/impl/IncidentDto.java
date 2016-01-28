@@ -26,7 +26,6 @@ import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.JsonVal;
@@ -94,7 +93,7 @@ public class IncidentDto {
           Long jobId,
           Date date,
           String code,
-          Incident.Severity severity,
+          Severity severity,
           Map<String, String> parameters,
           List<Tuple<String, String>> details) {
     IncidentDto dto = new IncidentDto();
@@ -131,7 +130,7 @@ public class IncidentDto {
   }
 
   /** @see org.opencastproject.job.api.Incident#getSeverity() */
-  public Incident.Severity getSeverity() {
+  public Severity getSeverity() {
     return Severity.values()[severity];
   }
 
