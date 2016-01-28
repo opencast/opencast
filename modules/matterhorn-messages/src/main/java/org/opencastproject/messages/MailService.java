@@ -336,7 +336,6 @@ public class MailService {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public List<MessageSignature> getMessageSignatures() throws MailServiceException {
     EntityManager em = null;
     try {
@@ -363,7 +362,6 @@ public class MailService {
    * @return A list of all of the message signatures.
    * @throws UserSettingsServiceException
    */
-  @SuppressWarnings("unchecked")
   public List<MessageSignature> getMessageSignaturesByUserName() throws MailServiceException {
     EntityManager em = null;
     try {
