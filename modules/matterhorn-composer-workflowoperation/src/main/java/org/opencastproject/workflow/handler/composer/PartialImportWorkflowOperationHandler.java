@@ -779,21 +779,20 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
           MediaPackageElementFlavor targetFlavor, Float videoDuration, List<MediaPackageElement> elementsToClean)
           throws EncoderException, MediaPackageException, WorkflowOperationException, NotFoundException,
           ServiceRegistryException, IOException {
-    // CHECKSTYLE:OFF Ignore inner allocation warning
-    Track trackToTrim;
     MediaPackageElement[] elements = mediaPackage.getElementsByFlavor(targetFlavor);
-    if (elements.length == 0) {
+    if (elements.length == 0)
       return 0;
-    } else if (elements.length == 1 && (trackToTrim = (Track) elements[0]).getDuration() / 1000 > videoDuration) {
+
+    Track trackToTrim = (Track) elements[0];
+    if (elements.length == 1 && trackToTrim.getDuration() / 1000 > videoDuration) {
       Long trimSeconds = (long) (trackToTrim.getDuration() / 1000 - videoDuration);
-      logger.info("Shorten track {} to target duration {} by {} seconds", new String[] { trackToTrim.toString(),
-              videoDuration.toString(), trimSeconds.toString() });
+      logger.info("Shorten track {} to target duration {} by {} seconds",
+              new String[] { trackToTrim.toString(), videoDuration.toString(), trimSeconds.toString() });
       return trimEnd(mediaPackage, trimProfile, trackToTrim, videoDuration, elementsToClean);
     } else if (elements.length > 1) {
       logger.warn("Multiple tracks with flavor {} found! Trimming not possible!", targetFlavor);
     }
     return 0;
-    // CHECKSTYLE:ON
   }
 
   private List<Track> getPureVideoTracks(MediaPackage mediaPackage, MediaPackageElementFlavor videoFlavor) {

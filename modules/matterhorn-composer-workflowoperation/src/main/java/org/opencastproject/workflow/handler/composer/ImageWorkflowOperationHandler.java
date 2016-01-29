@@ -440,7 +440,6 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /**
    * The WOH's configuration options.
    */
-  // CHECKSTYLE:OFF
   static final class Cfg {
     /** List of source tracks, with duration. */
     private final List<Track> sourceTracks;
@@ -470,7 +469,6 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
       this.targetBaseNameFormatPercent = targetBaseNameFormatPercent;
     }
   }
-  // CHECKSTYLE:ON
 
   /** Get and parse the configuration options. */
   private Cfg configure(MediaPackage mp, WorkflowOperationInstance woi) throws WorkflowOperationException {
