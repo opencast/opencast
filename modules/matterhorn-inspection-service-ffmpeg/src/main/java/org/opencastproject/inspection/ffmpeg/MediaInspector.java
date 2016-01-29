@@ -80,7 +80,7 @@ public class MediaInspector {
   private final String ffprobePath;
 
   /** Whether the calculation of the frames is accurate or not */
-  private boolean accurateFrameCount;
+  private boolean accurateFrameCount = false;
 
   public void setAccurateFrameCount(boolean accurateFrameCount) {
     this.accurateFrameCount = accurateFrameCount;
