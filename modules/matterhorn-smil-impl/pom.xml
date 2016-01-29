@@ -44,6 +44,11 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>android-mms</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
@@ -68,25 +73,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <skip>${checkstyle.skip}</skip>
-          <!-- disabled checking external w3c SMIL interfaces -->
-          <excludes>
-            com/android/**
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -100,9 +86,6 @@
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
-              com.android.mms.dom.events;version=${project.version},
-              com.android.mms.dom.smil;version=${project.version},
-              com.android.mms.dom.smil.parser;version=${project.version},
               org.opencastproject.smil.endpoint.*;version=${project.version},
               org.opencastproject.smil.impl.*;version=${project.version},
               org.opencastproject.smil.util;version=${project.version}
