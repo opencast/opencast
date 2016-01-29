@@ -83,7 +83,6 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   private Marshaller jobMarshaller;
   private Unmarshaller jobUnmarshaller;
   private HashMap<String, FileUploadJob> jobCache = new HashMap<String, FileUploadJob>();
-  private byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
   private FileUploadServiceCleaner cleaner;
   private int jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
 
@@ -329,6 +328,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     }
     OutputStream out = null;
     try {
+      byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
       out = new FileOutputStream(chunkFile, false);
       int bytesRead = 0;
       long bytesReadTotal = 0l;
