@@ -21,7 +21,7 @@
 
 package org.opencastproject.composer.impl;
 
-import static java.lang.String.format;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.fun.juc.Immutables.list;
 import static org.opencastproject.serviceregistry.api.Incidents.NO_DETAILS;
 import static org.opencastproject.util.data.Option.none;
@@ -292,14 +292,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       final EncoderEngine encoderEngine = getEncoderEngine(job, profile);
 
       if (audioTrack != null && videoTrack != null)
-        logger.info(format("Muxing audio track %s and video track %s into %s", audioTrack.getIdentifier(),
-                videoTrack.getIdentifier(), targetTrackId));
+        logger.info("Muxing audio track {} and video track {} into {}",
+                new Object[] { audioTrack.getIdentifier(), videoTrack.getIdentifier(), targetTrackId });
       else if (audioTrack == null)
-        logger.info(format("Encoding video track %s to %s using profile '%s'", videoTrack.getIdentifier(),
-                targetTrackId, profileId));
+        logger.info("Encoding video track {} to {} using profile '{}'",
+                new Object[] { videoTrack.getIdentifier(), targetTrackId, profileId });
       else if (videoTrack == null)
-        logger.info(format("Encoding audio track %s to %s using profile '%s'", audioTrack.getIdentifier(),
-                targetTrackId, profileId));
+        logger.info("Encoding audio track {} to {} using profile '{}'",
+                new Object[] { audioTrack.getIdentifier(), targetTrackId, profileId });
 
       // Do the work
       Option<File> output;
@@ -402,7 +402,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
 
       // List of encoded tracks
-      LinkedList <Track> encodedTracks = new LinkedList<Track>();
+      LinkedList<Track> encodedTracks = new LinkedList<Track>();
       // Do the work
       int i = 0;
       for (File encodingOutput : encoderEngine.parallelEncode(mediaFile, profile, properties)) {
@@ -450,9 +450,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           }
         }
 
-// Will the mimetype be provided by the inspect service?
-//        if (profile.getMimeType() != null)
-//          inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
+        // Will the mimetype be provided by the inspect service?
+        // if (profile.getMimeType() != null)
+        // inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
 
         encodedTracks.add(inspectedTrack);
         i++;
@@ -469,7 +469,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
   }
 
-    /**
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.composer.api.ComposerService#encode(org.opencastproject.mediapackage.Track,
@@ -478,7 +478,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Override
   public Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException {
     try {
-logger.info("Starting parallel encode with profile {} ", profileId);
+      logger.info("Starting parallel encode with profile {} ", profileId);
       return serviceRegistry.createJob(JOB_TYPE, Operation.ParallelEncode.toString(),
               Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId));
     } catch (ServiceRegistryException e) {
@@ -752,26 +752,30 @@ logger.info("Starting parallel encode with profile {} ", profileId);
           throw new EncoderException("Unable to access right watermark image " + watermarkOption.get().getElement());
         }
         if (upperLaidOutElement.isSome()) {
-          logger.info(format(
-                  "Composing lower video track %s %s and upper video track %s %s including watermark %s %s into %s",
-                  lowerLaidOutElement.getElement().getIdentifier(), lowerLaidOutElement.getElement().getURI(),
-                  upperLaidOutElement.get().getElement().getIdentifier(), upperLaidOutElement.get().getElement()
-                          .getURI(), watermarkOption.get().getElement().getIdentifier(), watermarkOption.get()
-                          .getElement().getURI(), targetTrackId));
+          logger.info("Composing lower video track {} {} and upper video track {} {} including watermark {} {} into {}",
+                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
+                          lowerLaidOutElement.getElement().getURI(),
+                          upperLaidOutElement.get().getElement().getIdentifier(),
+                          upperLaidOutElement.get().getElement().getURI(),
+                          watermarkOption.get().getElement().getIdentifier(),
+                          watermarkOption.get().getElement().getURI(), targetTrackId });
         } else {
-          logger.info(format("Composing video track %s %s including watermark %s %s into %s", lowerLaidOutElement
-                  .getElement().getIdentifier(), lowerLaidOutElement.getElement().getURI(), watermarkOption.get()
-                  .getElement().getIdentifier(), watermarkOption.get().getElement().getURI(), targetTrackId));
+          logger.info("Composing video track {} {} including watermark {} {} into {}",
+                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
+                          lowerLaidOutElement.getElement().getURI(), watermarkOption.get().getElement().getIdentifier(),
+                          watermarkOption.get().getElement().getURI(), targetTrackId });
         }
       } else {
         if (upperLaidOutElement.isSome()) {
-          logger.info(format("Composing lower video track %s %s and upper video track %s %s into %s",
-                  lowerLaidOutElement.getElement().getIdentifier(), lowerLaidOutElement.getElement().getURI(),
-                  upperLaidOutElement.get().getElement().getIdentifier(), upperLaidOutElement.get().getElement()
-                          .getURI(), targetTrackId));
+          logger.info("Composing lower video track {} {} and upper video track {} {} into {}",
+                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
+                          lowerLaidOutElement.getElement().getURI(),
+                          upperLaidOutElement.get().getElement().getIdentifier(),
+                          upperLaidOutElement.get().getElement().getURI(), targetTrackId });
         } else {
-          logger.info(format("Composing video track %s %s into %s", lowerLaidOutElement.getElement().getIdentifier(),
-                  lowerLaidOutElement.getElement().getURI(), targetTrackId));
+          logger.info("Composing video track {} {} into {}",
+                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
+                          lowerLaidOutElement.getElement().getURI(), targetTrackId });
         }
       }
 
@@ -821,10 +825,10 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       return some(inspectedTrack);
     } catch (Exception e) {
       if (upperLaidOutElement.isSome()) {
-        logger.warn("Error composing " + lowerLaidOutElement.getElement() + " and "
-                + upperLaidOutElement.get().getElement(), e);
+        logger.warn("Error composing {}  and {}: {}", new Object[] { lowerLaidOutElement.getElement(),
+                upperLaidOutElement.get().getElement(), getStackTrace(e) });
       } else {
-        logger.warn("Error composing " + lowerLaidOutElement.getElement(), e);
+        logger.warn("Error composing {}: {}", lowerLaidOutElement.getElement(), getStackTrace(e));
       }
       if (e instanceof EncoderException) {
         throw (EncoderException) e;
@@ -920,9 +924,9 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       final EncoderEngine encoderEngine = getEncoderEngine(job, profile);
 
       if (onlyAudio) {
-        logger.info(format("Concatenating audio tracks %s into %s", trackFiles, targetTrackId));
+        logger.info("Concatenating audio tracks {} into {}", trackFiles, targetTrackId);
       } else {
-        logger.info(format("Concatenating video tracks %s into %s", trackFiles, targetTrackId));
+        logger.info("Concatenating video tracks {} into {}", trackFiles, targetTrackId);
       }
 
       // Creating video filter command for concat
@@ -1020,7 +1024,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       // Create the engine
       final EncoderEngine encoderEngine = getEncoderEngine(job, profile);
 
-      logger.info(format("Converting image attachment %s into video %s", sourceImage.getIdentifier(), targetTrackId));
+      logger.info("Converting image attachment {} into video {}", sourceImage.getIdentifier(), targetTrackId);
 
       Map<String, String> properties = new HashMap<String, String>();
       if (time == null || time == -1)
@@ -1083,18 +1087,18 @@ logger.info("Starting parallel encode with profile {} ", profileId);
     if (times.length == 0)
       throw new IllegalArgumentException("At least one time argument has to be specified");
 
-    String[] parameters = new String[times.length + 3];
-    parameters[0] = MediaPackageElementParser.getAsXml(sourceTrack);
-    parameters[1] = profileId;
-    parameters[2] = Boolean.TRUE.toString();
+    List<String> parameters = new ArrayList<>();
+    parameters.add(MediaPackageElementParser.getAsXml(sourceTrack));
+    parameters.add(profileId);
+    parameters.add(Boolean.TRUE.toString());
     for (int i = 0; i < times.length; i++) {
-      parameters[i + 3] = Double.toString(times[i]);
+      parameters.add(Double.toString(times[i]));
     }
 
     // TODO: This is unfortunate, since ffmpeg is slow on single images and it would be nice to be able to start a
     // separate job per image, so extraction can be spread over multiple machines in a cluster.
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Image.toString(), Arrays.asList(parameters));
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Image.toString(), parameters);
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
