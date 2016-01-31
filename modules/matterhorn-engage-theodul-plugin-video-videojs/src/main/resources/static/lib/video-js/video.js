@@ -1,6 +1,6 @@
 /**
  * @license
- * Video.js 5.4.6 <http://videojs.com/>
+ * Video.js 5.5.3 <http://videojs.com/>
  * Copyright Brightcove, Inc. <https://www.brightcove.com/>
  * Available under Apache License Version 2.0
  * <https://github.com/videojs/video.js/blob/master/LICENSE>
@@ -7668,6 +7668,7 @@ var ErrorDisplay = (function (_ModalDialog) {
 
 ErrorDisplay.prototype.options_ = _utilsMergeOptions2['default'](_modalDialog2['default'].prototype.options_, {
   fillAlways: true,
+  temporary: false,
   uncloseable: true
 });
 
@@ -9255,7 +9256,7 @@ var Player = (function (_Component) {
     // prevent dispose from being called twice
     this.off('dispose');
 
-    if (this.styleEl_) {
+    if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
     }
 
@@ -9307,6 +9308,7 @@ var Player = (function (_Component) {
     // Update tag id/class for use as HTML5 playback tech
     // Might think we should do this after embedding in container so .vjs-tech class
     // doesn't flash 100% width/height, but class only applies with .video-js parent
+    tag.playerId = tag.id;
     tag.id += '_html5_api';
     tag.className = 'vjs-tech';
 
@@ -9756,7 +9758,7 @@ var Player = (function (_Component) {
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
     // This fixes both issues. Need to wait for API, so it updates displays correctly
-    if (this.tag && this.options_.autoplay && this.paused()) {
+    if (this.src() && this.tag && this.options_.autoplay && this.paused()) {
       delete this.tag.poster; // Chrome Fix. Fixed in Chrome v16.
       this.play();
     }
@@ -11083,7 +11085,7 @@ var Player = (function (_Component) {
   /**
    * Get or set the autoplay attribute.
    *
-   * @param {Boolean} value Boolean to determine if preload should be used
+   * @param {Boolean} value Boolean to determine if video should autoplay
    * @return {String} The autoplay attribute value when getting
    * @return {Player} Returns the player when setting
    * @method autoplay
@@ -11101,7 +11103,7 @@ var Player = (function (_Component) {
   /**
    * Get or set the loop attribute on the video element.
    *
-   * @param {Boolean} value Boolean to determine if preload should be used
+   * @param {Boolean} value Boolean to determine if video should loop
    * @return {String} The loop attribute value when getting
    * @return {Player} Returns the player when setting
    * @method loop
@@ -15480,7 +15482,7 @@ module.exports = exports['default'];
 
 },{"../component":65,"../media-error.js":101,"../tracks/html-track-element":117,"../tracks/html-track-element-list":116,"../tracks/text-track":124,"../tracks/text-track-list":122,"../utils/buffer.js":126,"../utils/fn.js":130,"../utils/log.js":133,"../utils/merge-options.js":134,"../utils/time-ranges.js":136,"global/document":1,"global/window":2}],116:[function(_dereq_,module,exports){
 /**
- * @file html-track-element.js
+ * @file html-track-element-list.js
  */
 
 'use strict';
@@ -15571,6 +15573,10 @@ exports['default'] = HtmlTrackElementList;
 module.exports = exports['default'];
 
 },{"../utils/browser.js":125,"global/document":1}],117:[function(_dereq_,module,exports){
+/**
+ * @file html-track-element.js
+ */
+
 'use strict';
 
 exports.__esModule = true;
@@ -17360,8 +17366,9 @@ function getEl(id) {
 /**
  * Creates an element and applies properties.
  *
- * @param  {String=} tagName    Name of tag to be created.
- * @param  {Object=} properties Element properties to be applied.
+ * @param  {String} [tagName='div'] Name of tag to be created.
+ * @param  {Object} [properties={}] Element properties to be applied.
+ * @param  {Object} [attributes={}] Element attributes to be applied.
  * @return {Element}
  * @function createEl
  */
@@ -19037,7 +19044,7 @@ if (typeof HTMLVideoElement === 'undefined') {
  * @method videojs
  */
 var videojs = function videojs(id, options, ready) {
-  var tag; // Element of ID
+  var tag = undefined; // Element of ID
 
   // Allow for element or ID to be passed in
   // String ID
@@ -19080,7 +19087,7 @@ var videojs = function videojs(id, options, ready) {
 
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
-  return tag['player'] || new _player2['default'](tag, options, ready);
+  return tag['player'] || _player2['default'].players[tag.playerId] || new _player2['default'](tag, options, ready);
 };
 
 // Add default styles
@@ -19101,7 +19108,7 @@ setup.autoSetupTimeout(1, videojs);
  *
  * @type {String}
  */
-videojs.VERSION = '5.4.6';
+videojs.VERSION = '5.5.3';
 
 /**
  * The global options object. These are the settings that take effect
@@ -19540,6 +19547,17 @@ videojs.isEl = Dom.isEl;
  * @return {Boolean}
  */
 videojs.isTextNode = Dom.isTextNode;
+
+/**
+ * Creates an element and applies properties.
+ *
+ * @method createEl
+ * @param  {String} [tagName='div'] Name of tag to be created.
+ * @param  {Object} [properties={}] Element properties to be applied.
+ * @param  {Object} [attributes={}] Element attributes to be applied.
+ * @return {Element}
+ */
+videojs.createEl = Dom.createEl;
 
 /**
  * Check if an element has a CSS class
