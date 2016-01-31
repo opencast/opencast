@@ -136,7 +136,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     }
 
     /* change these variables */
-    var videoPath = "lib/video-js/video"; /* https://github.com/videojs/video.js/releases */
+    var videoPath = "lib/video-js/video.min"; /* https://github.com/videojs/video.js/releases */
     var videojs_swf_path = "lib/video-js/video-js.swf";
     var synchronizePath = "lib/synchronize-min"; /* https://github.com/CallToPower/Synchronize.js */
     var mediaSourcesPath = "lib/video-js/videojs-media-sources.min"; /* https://github.com/videojs/videojs-contrib-media-sources */
@@ -1838,7 +1838,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     // load video.js lib
     require([relative_plugin_path + videoPath], function(videojs) {
-        Engage.log("Video: Lib video loaded");
+        Engage.log("Video: Lib video loaded ####################");
+        window.videojs = videojs;
         initCount -= 1;
         if (initCount <= 0) {
             initPlugin();
@@ -1846,7 +1847,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     });
 
     // load synchronize.js lib
-    require([relative_plugin_path + synchronizePath], function(videojs) {
+    require([relative_plugin_path + synchronizePath], function(synchronizejs) {
         Engage.log("Video: Lib synchronize loaded");
         initCount -= 1;
         if (initCount <= 0) {
