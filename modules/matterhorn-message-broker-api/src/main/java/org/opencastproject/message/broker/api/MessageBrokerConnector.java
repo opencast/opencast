@@ -21,22 +21,20 @@
 
 package org.opencastproject.message.broker.api;
 
-import org.opencastproject.message.broker.api.MessageSender.DestinationType;
-
-import java.io.Serializable;
-import java.util.concurrent.FutureTask;
-
-public interface MessageReceiver extends MessageBrokerConnector {
+public interface MessageBrokerConnector {
 
   /**
-   * {@link java.util.concurrent.Future} for the next {@link Serializable} from an {@link java.jms.ObjectMessage}.
+   * Return if there is a connection to the message broker.
    *
-   * @param destinationId
-   *          The unique id for the queue or topic to listen to.
-   * @param type
-   *          The type of destination either queue or topic.
-   * @return An {@link Serializable} {@link Object}.
+   * @return If the connection to the message broker is active.
    */
-  FutureTask<Serializable> receiveSerializable(String destinationId, DestinationType type);
+  boolean isConnected();
+
+  /**
+   * Try reconnecting if there was no reconnection attempt in the immediate past.
+   *
+   * @return If the re-connection attempt was successful.
+   */
+  boolean reconnect();
 
 }
