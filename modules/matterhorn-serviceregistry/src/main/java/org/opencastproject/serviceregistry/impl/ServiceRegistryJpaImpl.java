@@ -92,6 +92,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -1937,6 +1938,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Find all jobs that are currently running on any given host, or get all of them
     Query q = em.createNamedQuery("ServiceRegistration.hostloads");
+    List<Status> statuses = new LinkedList<Status>();
+    statuses.add(Status.QUEUED);
+    statuses.add(Status.RUNNING);
+    statuses.add(Status.DISPATCHING);
+    q.setParameter("statuses", statuses);
 
     // Accumulate the numbers for relevant job statuses per host
     for (Object result : q.getResultList()) {

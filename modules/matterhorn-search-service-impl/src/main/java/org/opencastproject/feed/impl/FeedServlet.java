@@ -31,6 +31,10 @@ import com.sun.syndication.io.SyndFeedOutput;
 import com.sun.syndication.io.WireFeedOutput;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.http.HttpContext;
+import org.osgi.service.http.HttpService;
+import org.osgi.service.http.NamespaceException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +91,8 @@ public class FeedServlet extends HttpServlet {
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+    /* Temporary unavailable until someone fixes the feed service
     ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(FeedServlet.class.getClassLoader());
@@ -94,6 +100,7 @@ public class FeedServlet extends HttpServlet {
     } finally {
       Thread.currentThread().setContextClassLoader(originalContextClassLoader);
     }
+    */
   }
 
   /**
@@ -223,6 +230,24 @@ public class FeedServlet extends HttpServlet {
       }
     } else {
       return new FeedInfo(type, version, query);
+    }
+  }
+
+  /**
+   * Sets the http service.
+   *
+   * @param httpService
+   *          the http service
+   */
+  public void setHttpService(HttpService httpService) {
+    try {
+      HttpContext httpContext = httpService.createDefaultHttpContext();
+      httpService.registerServlet("/feeds", FeedServlet.this, null, httpContext);
+      logger.debug("Feed servlet registered");
+    } catch (ServletException e) {
+      e.printStackTrace();
+    } catch (NamespaceException e) {
+      e.printStackTrace();
     }
   }
 

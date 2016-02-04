@@ -29,6 +29,8 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.util.data.Option;
 
+import java.util.Map;
+
 /**
  * Encodes media and (optionally) periodically alerts a statusService endpoint of the status of this encoding job.
  */
@@ -73,9 +75,9 @@ public interface ComposerService {
    * @param compositeTrackSize
    *          The composite track dimension
    * @param upperTrack
-   *          the upper track of the composition
+   *          an optional upper track of the composition
    * @param lowerTrack
-   *          the lower track of the composition
+   *          lower track of the composition
    * @param watermark
    *          The optional watermark attachment
    * @param profileId
@@ -88,7 +90,7 @@ public interface ComposerService {
    * @throws MediaPackageException
    *           if the mediapackage is invalid
    */
-  Job composite(Dimension compositeTrackSize, LaidOutElement<Track> upperTrack, LaidOutElement<Track> lowerTrack,
+  Job composite(Dimension compositeTrackSize, Option<LaidOutElement<Track>> upperTrack, LaidOutElement<Track> lowerTrack,
           Option<LaidOutElement<Attachment>> watermark, String profileId, String background) throws EncoderException,
           MediaPackageException;
 
@@ -167,6 +169,25 @@ public interface ComposerService {
    */
   // TODO revise
   Job image(Track sourceTrack, String profileId, double... time) throws EncoderException, MediaPackageException;
+
+  /**
+   * Extracts an image from the media package element identified by <code>sourceTrack</code>. The image is taken by the
+   * given properties and the corresponding encoding profile.
+   *
+   * @param sourceTrack
+   *          the source video track
+   * @param profileId
+   *          identifier of the encoding profile
+   * @param properties
+   *          the properties applied to the encoding profile
+   * @return the extracted image as an attachment
+   * @throws EncoderException
+   *           if image extraction fails
+   * @throws MediaPackageException
+   *           if the mediapackage is invalid
+   */
+  Job image(Track sourceTrack, String profileId, Map<String, String> properties) throws EncoderException,
+          MediaPackageException;
 
   /**
    * Converts the given image to a different image format using the specified image profile.
