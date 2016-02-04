@@ -12,7 +12,7 @@ This can be done through the [bundle:watch](https://karaf.apache.org/manual/late
  - Make your changes and rebuild the module (e.g. execute `mvn clean install` in the module folder).
  - Watch how Karaf automatically redeploys the changed jars from your local Maven repository. You can verify that everything went smoothly by checking the log with `log:tail`.
 
-The updated bundles are only available in the curently running Karaf instance. To create a Opencast version that has this changes permanently, you have to run `mvn clean install` in the the assemblies directory again. Your current instance will be deleted by the new assembly! 
+The updated bundles are only available in the currently running Karaf instance. To create a Opencast version that has this changes permanently, you have to run `mvn clean install` in the the assemblies directory again. Your current instance will be deleted by the new assembly! 
 
 In several cases the bundle:watch can bring Karaf in an unstable condition, as dependencies between bundles will not correctly be restored, after the new bundle has been deployed.
 
@@ -25,6 +25,10 @@ To debug a running Opencast system, you can attach a remote debugger in your IDE
 To enable the connection of a remote debugger you have to export the debugging options in the Shell where you will start your Opencast server:
 
 `export DEFAULT_JAVA_DEBUG_OPTS='-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005'`
+
+As a shortcut thisis also done if you start Opencast with
+
+`bin/start-opencast debug`
 
 You now can connect the remote debugger of your IDE on port `5005`.
 
