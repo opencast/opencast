@@ -415,7 +415,7 @@ public class ComposerServiceTest {
     LaidOutElement<Track> upperLaiedOutElement = new LaidOutElement<Track>(sourceTrack, multiShapeLayout.getShapes()
             .get(1));
 
-    Job composite = composerService.composite(outputDimension, lowerLaidOutElement, upperLaiedOutElement,
+    Job composite = composerService.composite(outputDimension, Option.option(lowerLaidOutElement), upperLaiedOutElement,
             watermarkOption, "composite.work", "black");
     JobBarrier barrier = new JobBarrier(null, serviceRegistry, composite);
     if (!barrier.waitForJobs().isSuccess()) {

@@ -1,8 +1,8 @@
-# Composite workflow Operation Handler
+# Composite Workflow Operation Handler
 
 ## Description
 
-The CompositeWorkflowOperationHandler is used to composite two videos (upper and lower) and an optionally watermark into
+The CompositeWorkflowOperationHandler is used to composite two videos (upper and lower) and an optional watermark into
 one video, including encoding to different formats. The audio track is always taken from the lower video. Everything is
 done using FFmpeg. The composition can be done in various layout formats e.g. side by side or picture in picture. The
 layout has to be defined in JSON format and is described in section "Layout Definition". For some general information
@@ -34,11 +34,17 @@ Tags and flavors can be used in combination.
 |\* **encoding-profile**|String|	composite	|The encoding profile to use.|EMPTY|
 |\* **output-resolution**|width , "x" , height	|1900x1080|The resulting resolution of the compound video e.g. 1900x1080.|EMPTY|
 |output-background|String	|red|The resulting background color of the compound video http://www.ffmpeg.org/ffmpeg-utils.html#Color.|black|
-|\* **layout**|name | Json , ";" , Json , [ ";" , Json ]	|topleft	|The layout name to use or a semi-colon separated JSON layout definition (lower video, upper video, optional watermark). If a layout name is given than the corresponding layout-{name} key must be defined.|EMPTY|
+|layout|name | Json , ";" , Json , [ ";" , Json ]|The layout name to use or a semi-colon separated JSON layout definition (lower video, upper video, optional watermark). If a layout name is given than the corresponding layout-{name} key must be defined.|EMPTY|
+|layout-single|name | Json , ";" , Json , [ ";" , Json ]|Layout to be used in case of one input video track (see *layout*)|EMPTY|
+|layout-dual|name | Json , ";" , Json , [ ";" , Json ]|Layout to be used in case of two input video tracks (see *layout*). Defaults to value of *layout* if not set.|EMPTY|
 |layout-{name}|Json , ";" , Json , [ ";" , Json ]	 	|Define semi-colon separated JSON layouts (lower video, upper video, optional watermark) to provide by name.|EMPTY|
 
 
 \* **mandatory**
+
+Notes:
+
+* At least one of the configuration keys *layout*, *layout-single*, or *layout-multiple* must be set
 
 ## Layout Definition
 
