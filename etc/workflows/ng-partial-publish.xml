@@ -123,7 +123,7 @@
       description="Inspecting audio and video streams">
       <configurations>
         <configuration key="overwrite">false</configuration>
-        <configuration key="accept-no-media">false</configuration>s
+        <configuration key="accept-no-media">false</configuration>
       </configurations>
     </operation>
 
