@@ -183,7 +183,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_engage_controls_topIfBottom = "engage_controls_second";
     var id_slider = "slider";
     var id_volumeSlider = "volumeSlider";
-    var id_volumeSliderWrapper = "volumeSliderWrapper";             // for mobile template
     var id_volumeIcon = "volumeIcon";
     var id_dropdownMenuPlaybackRate = "dropdownMenuPlaybackRate";
     var id_playbackRate075 = "playback075";
@@ -812,22 +811,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 value: 0
             });
 
-            if (isDesktopMode) {
-                $("#" + id_volumeSlider).slider({
-                    range: "min",
-                    min: 1,
-                    max: 100,
-                    value: 100
-                });
-            } else {
-                $("#" + id_volumeSlider).slider({
-                    range: "max",
-                    min: 1,
-                    max: 100,
-                    value: 100,
-                    orientation: "vertical"      // use vertical orientation in mobile/embed mode
-                });
-            }
+            $("#" + id_volumeSlider).slider({
+                range: "min",
+                min: 1,
+                max: 100,
+                value: 100
+            });
 
             $("#" + id_volumeIcon).click(function() {
                 // use as mute button in desktop mode
@@ -842,7 +831,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     }
                 } else {
                     // toggle volume slider in mobile/embed mode
-                    $("#" + id_volumeSliderWrapper).fadeToggle(150);
+                    $(this).parent().toggleClass("active");
                 }
 
             });
@@ -865,11 +854,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
             $("#" + id_fullscreen_button).click(function(e) {
                 e.preventDefault();
+
+                $(this).toggleClass("active");
                 var isInFullScreen = document.fullScreen ||
                     document.mozFullScreen ||
                     document.webkitIsFullScreen;
                 if (!isInFullScreen) {
                     Engage.trigger(plugin.events.fullscreenEnable.getName());
+                } else if (isMobileMode) {
+                    Engage.trigger(plugin.events.fullscreenCancel.getName());
                 }
             });
 
@@ -896,7 +889,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 Engage.trigger(plugin.events.sliderMousemove.getName(), currPos * dur);
             });
             // volume event
-            $("#" + id_volumeSlider).on(event_slidestop, function(event, ui) {
+            $("#" + id_volumeSlider).on(event_slidestop, function(e, ui) {
                 Engage.trigger(plugin.events.volumeSet.getName(), ui.value / 100);
             });
             // check segments

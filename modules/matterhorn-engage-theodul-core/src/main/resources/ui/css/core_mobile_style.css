@@ -23,6 +23,8 @@ body {
 #video_wrapper {
 	position: relative;
 	overflow: hidden;
+	width: 100%;
+	background: #000;
 }
 
 #engage_view {

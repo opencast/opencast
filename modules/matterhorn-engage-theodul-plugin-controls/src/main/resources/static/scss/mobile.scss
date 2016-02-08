@@ -130,53 +130,44 @@
 	    border-style: solid;
 	    border-color: #333 #333 #777 #333;
 	    border-radius: 25px;
-	    height: 6px;
+	    height: 7px;
 	    background-color: #8e8d8d;
 	    background: url('../images/bg-track.png') repeat top left;
 	    box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px rgba(250, 250, 250, .5);
 		}
 
 		#volume {
-			@include flex(0 0 35px);
+			@include flex(0 0 auto);
 			position: relative;
 
 			font-size: 27px;
-			text-align: center;
+			width: 27px;
+			margin-right: 12px;
+			@include transition(width 0.5s);
+			overflow: hidden;
 
 			#volumeIcon {
 				cursor: pointer;
+				width: 27px;
 			}
 
-      #volumeSliderWrapper {
-        position: absolute;
-        bottom: 100%;
-        background: rgba(#fff, 0.8);
-        border-radius: 5px 5px 0 0;
-        border: 1px solid #2a6496;
-        border-bottom: none;
-        padding: 13px 2px 8px;
-        width: 100%;
-        height: 95px;
-        margin-bottom: 6px;
-      }
-
 			#volumeSlider {
+				position: absolute;
+				top: 14px;
+				left: 32px;
 		    border-width: 1px;
 		    border-style: solid;
 		    border-color: #333 #777 #333 #333;
 		    border-radius: 25px;
-		    height: 100%;
-		    width: 6px;
-        margin: 0 auto;
+		    width: 80px;
+		    height: 7px;
 		    background-color: #8e8d8d;
 		    background: url('../images/bg-track.png') repeat top left;
-		    box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px
-		    rgba(250, 250, 250, .5);
+		    box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5), 0 1px 0 0px rgba(250, 250, 250, .5);
+			}
 
-        .ui-slider-handle {
-          top: auto !important;
-          margin-left: -2px !important;
-        }
+			&.active {
+				width: 122px;
 			}
 		}
 

@@ -1630,7 +1630,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     videodisplayMaster.requestFullscreen();
                     $('#' + videoDisplay).css("padding-top", "0px");
                 } else if (!fullscreen) {
-                    var viewer = document.getElementById(id_engage_video_fullsceen_wrapper);
+                    // use video wrapper as fullscreen viewer in mobile mode
+                    if (isMobileMode)
+                        var viewer = document.getElementById(id_video_wrapper);
+                    else
+                        var viewer = document.getElementById(id_engage_video_fullsceen_wrapper);
                     if (viewer.mozRequestFullScreen) {
                         viewer.mozRequestFullScreen();
                     } else if (viewer.webkitRequestFullscreen) {
@@ -1650,7 +1654,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                         fullscreen = true;
                     }
                 }
-                $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
+                if (isDesktopMode)
+                    $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
                 $("." + id_videoDisplayClass).css("max-width", $(window).height() * videoAreaAspectRatio);
             });
             Engage.on(plugin.events.fullscreenCancel.getName(), function() {
