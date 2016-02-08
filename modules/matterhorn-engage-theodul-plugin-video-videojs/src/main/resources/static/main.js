@@ -177,7 +177,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var isAudioOnly = false;
     var isUsingFlash = false;
     var mastervideotype = "";
-    var aspectRatio = "";
+    var aspectRatio = null;
     var singleVideoPaddingTop = "";
     var initCount = 7;
     var infoMeChange = "change:infoMe";
@@ -217,7 +217,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var class_audio_wrapper = "audio_wrapper";
     var class_audioDisplay = "audioDisplay";
     var class_audioDisplayError = "audioDisplayError";
-    var class_inner = "inner";
     var videosReady = false;
     var pressedPlayOnce = false;
     var mediapackageChange = "change:mediaPackage";
@@ -1169,7 +1168,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     function calculateAspectRatio(videoSources) {
         Engage.log("Video: Calculating Aspect ratio");
-        aspectRatio = null;
         var as1 = 0;
         for (var flavor in videoResultions) {
             if ((aspectRatio == null) || (as1 < videoResultions[flavor])) {
@@ -1340,24 +1338,34 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     function checkVideoDisplaySize() {
         var videoHeight = $("#" + id_engage_video).height();
         var videoWidth = $("#" + id_engage_video).width();
-        var controlsHeight = ($("#" + id_resize_container).height() - videoHeight) + 5;
-        if (controlsHeight <= 0) {
-            controlsHeight = $("#" + id_engageControls).height() + 30;
+         
+        if (!isMobileMode) {
+            var controlsHeight = ($("#" + id_resize_container).height() - videoHeight) + 5;
+            if (controlsHeight <= 0) {
+                controlsHeight = $("#" + id_engageControls).height() + 30;
+            }
+            var maxVideoAreaHeight = $(window).height() - controlsHeight;
+        } else {
+            var maxVideoAreaHeight = $(window).height();
         }
-
-        var maxVideoAreaHeight = $(window).height() - controlsHeight;
-
-        if (videoAreaAspectRatio === undefined) {
+        
+        if (videoAreaAspectRatio === undefined && !isMobileMode) {
             calculateVideoAreaAspectRatio();
         }
-
-        var maxVideoAreaWidth = parseInt(maxVideoAreaHeight * videoAreaAspectRatio);
-        var minVideoAreaHeight = parseInt(parseInt($("#" + id_engage_video).css("min-width")) / videoAreaAspectRatio);
+        
+        if (!isMobileMode) {
+            var maxVideoAreaWidth = parseInt(maxVideoAreaHeight * videoAreaAspectRatio);
+            var minVideoAreaHeight = parseInt(parseInt($("#" + id_engage_video).css("min-width")) / videoAreaAspectRatio);  
+        } else {
+            var maxVideoAreaWidth = parseInt(maxVideoAreaHeight * (aspectRatio[1] / aspectRatio[2]));
+            var minVideoAreaHeight = parseInt(parseInt($("#" + id_engage_video).css("min-width")) / (aspectRatio[1] / aspectRatio[2]));
+        }
 
         var minWidth = parseInt($("#" + id_engage_video).css("min-width"));
         if (maxVideoAreaWidth > minWidth) {
             if (maxVideoAreaWidth > $(window).width()) {
-                $("#" + id_engage_video).css("max-width", ($(window).width() - 10) + "px");
+                var maxWidth = !isMobileMode ? $(window).width() - 10 : $(window).width();
+                $("#" + id_engage_video).css("max-width", maxWidth + "px");
             } else {
                 $("#" + id_engage_video).css("max-width", maxVideoAreaWidth + "px");
             }
@@ -1825,7 +1833,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             videodisplayMaster.on(event_html5player_fullscreenchange, function() {
                 Engage.trigger(plugin.events.fullscreenChange.getName());
             });
-
+            
             Engage.on(plugin.events.focusVideo.getName(), function(display) {
                 Engage.log("Video: received focusing video " + display);
                 var videoDiv;
