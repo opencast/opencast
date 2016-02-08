@@ -72,8 +72,8 @@ import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentImpl;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.IncidentTreeImpl;
-import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
@@ -268,7 +268,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     // service registry
     final ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
-    JaxbJob job = new JaxbJob(12L);
+    Job job = new JobImpl(12L);
     Date dateCreated = new Date(DateTimeSupport.fromUTC("2014-06-05T15:00:00Z"));
     Date dateCompleted = new Date(DateTimeSupport.fromUTC("2014-06-05T16:00:00Z"));
     job.setDateCreated(dateCreated);
@@ -277,8 +277,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(
             serviceRegistry.createJob((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
-            .andReturn(new JaxbJob()).anyTimes();
-    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JaxbJob()).anyTimes();
+            .andReturn(new JobImpl()).anyTimes();
+    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JobImpl()).anyTimes();
     EasyMock.expect(serviceRegistry.getJobs((String) EasyMock.anyObject(), (Job.Status) EasyMock.anyObject()))
             .andReturn(new ArrayList<Job>()).anyTimes();
     EasyMock.replay(serviceRegistry);

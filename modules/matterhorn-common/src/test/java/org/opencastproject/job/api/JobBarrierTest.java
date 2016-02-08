@@ -110,7 +110,7 @@ public class JobBarrierTest {
     }
   };
 
-  public static class TestJob extends JaxbJob {
+  public static class TestJob extends JobImpl {
     private final Status endStatus;
     private long finishTime;
     private Status lastReportedStatus;

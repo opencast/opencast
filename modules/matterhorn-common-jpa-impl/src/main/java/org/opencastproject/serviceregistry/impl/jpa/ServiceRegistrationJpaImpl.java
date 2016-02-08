@@ -55,10 +55,10 @@ import javax.persistence.UniqueConstraint;
 @Table(name = "mh_service_registration", uniqueConstraints = @UniqueConstraint(columnNames = { "host_registration",
         "service_type" }))
 @NamedQueries({
-        @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT job.processorServiceRegistrationId as serviceRegistration, job.status, "
+        @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT job.processorServiceRegistration.id as serviceRegistration, job.status, "
                 + "count(job.status) as numJobs, "
                 + "avg(job.queueTime) as meanQueue, "
-                + "avg(job.runTime) as meanRun FROM Job job group by job.processorServiceRegistrationId, job.status"),
+                + "avg(job.runTime) as meanRun FROM Job job group by job.processorServiceRegistration, job.status"),
         @NamedQuery(name = "ServiceRegistration.hostloads", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, sum(job.jobLoad) "
                 + "FROM Job job "
                 + "WHERE job.processorServiceRegistration.online=true and job.processorServiceRegistration.active=true and job.processorServiceRegistration.hostRegistration.maintenanceMode=false "

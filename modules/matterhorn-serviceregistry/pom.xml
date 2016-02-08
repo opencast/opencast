@@ -127,11 +127,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              org.opencastproject.job.api;version=${project.version},
-              org.opencastproject.serviceregistry.api;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.serviceregistry.command;version=${project.version},
               org.opencastproject.serviceregistry.impl;version=${project.version},

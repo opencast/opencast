@@ -79,7 +79,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${build.number}</Build-Number>
             <Export-Package>
-              org.opencastproject.job.impl.jpa,
+              org.opencastproject.job.jpa,
               org.opencastproject.security.impl.jpa,
               org.opencastproject.serviceregistry.impl.jpa
             </Export-Package>

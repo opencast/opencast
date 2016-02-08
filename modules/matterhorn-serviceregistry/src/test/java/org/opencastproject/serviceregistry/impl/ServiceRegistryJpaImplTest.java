@@ -23,8 +23,8 @@ package org.opencastproject.serviceregistry.impl;
 
 import static org.junit.Assert.assertEquals;
 
+import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
-import org.opencastproject.job.impl.jpa.JobJpaImpl;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -60,8 +60,8 @@ import javax.persistence.Query;
 
 public class ServiceRegistryJpaImplTest {
   private Query query = null;
-  private JobJpaImpl undispatchableJob1 = null;
-  private JobJpaImpl undispatchableJob2 = null;
+  private Job undispatchableJob1 = null;
+  private Job undispatchableJob2 = null;
   private EntityTransaction tx = null;
   private EntityManager em = null;
   private EntityManagerFactory emf = null;
@@ -99,9 +99,9 @@ public class ServiceRegistryJpaImplTest {
 
   public void setUpUndispatchableJobs() throws ServiceRegistryException {
 
-    undispatchableJob1 = (JobJpaImpl) serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_OPERATION, null,
+    undispatchableJob1 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_OPERATION, null,
             null, false, null);
-    undispatchableJob2 = (JobJpaImpl) serviceRegistryJpaImpl.createJob(TEST_HOST_OTHER, TEST_SERVICE, TEST_OPERATION,
+    undispatchableJob2 = serviceRegistryJpaImpl.createJob(TEST_HOST_OTHER, TEST_SERVICE, TEST_OPERATION,
             null, null, false, null);
     undispatchableJob1.setDateStarted(new Date());
     undispatchableJob1.setStatus(Status.RUNNING);
@@ -179,9 +179,9 @@ public class ServiceRegistryJpaImplTest {
     registerTestHostAndService();
     setUpUndispatchableJobs();
     // verify the current running status
-    undispatchableJob1 = (JobJpaImpl) serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
+    undispatchableJob1 = serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
     assertEquals(Status.RUNNING, undispatchableJob1.getStatus());
-    undispatchableJob2 = (JobJpaImpl) serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
+    undispatchableJob2 = serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());
 
     // remove the activate beans, so this can be reactivated
@@ -192,10 +192,10 @@ public class ServiceRegistryJpaImplTest {
     // reactivate and expect local undispatchable job to be canceled, but not the remote job
     serviceRegistryJpaImpl.activate(null);
     System.out.println("Undispatachable job 1 " + undispatchableJob1.getId());
-    undispatchableJob1 = (JobJpaImpl) serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
+    undispatchableJob1 = serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
     assertEquals(Status.CANCELED, undispatchableJob1.getStatus());
     System.out.println("Undispatachable job 1 " + undispatchableJob2.getId());
-    undispatchableJob2 = (JobJpaImpl) serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
+    undispatchableJob2 = serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());
 
   }

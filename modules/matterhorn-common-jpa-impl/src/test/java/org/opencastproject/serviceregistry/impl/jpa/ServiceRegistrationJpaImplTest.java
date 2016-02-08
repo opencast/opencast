@@ -22,7 +22,7 @@ package org.opencastproject.serviceregistry.impl.jpa;
 
 import static org.junit.Assert.assertEquals;
 
-import org.opencastproject.job.impl.jpa.JobJpaImpl;
+import org.opencastproject.job.jpa.JpaJob;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
@@ -35,7 +35,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +75,7 @@ public class ServiceRegistrationJpaImplTest {
     HostRegistrationJpaImpl host = new HostRegistrationJpaImpl("http://localhost:8081", "http://localhost:8081", 1024L,
             1, 1, true, false);
     ServiceRegistrationJpaImpl serviceReg = new ServiceRegistrationJpaImpl(host, "NOP", "/nop", false);
-    JobJpaImpl job = new JobJpaImpl(user, org, serviceReg, "NOP", Collections.EMPTY_LIST, null, true);
+    JpaJob job = new JpaJob(user, org, serviceReg, "NOP", null, null, true, 1.0F);
     job.setProcessorServiceRegistration(serviceReg);
     job.setQueueTime(500L);
     job.setRunTime(1000L);

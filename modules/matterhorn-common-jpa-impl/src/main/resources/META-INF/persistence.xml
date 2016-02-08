@@ -7,8 +7,7 @@
   <persistence-unit name="org.opencastproject.common" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <non-jta-data-source>osgi:service/jdbc/matterhorn</non-jta-data-source>
-    <class>org.opencastproject.job.impl.jpa.JobJpaImpl</class>
-    <class>org.opencastproject.job.impl.jpa.JobPropertyJpaImpl</class>
+    <class>org.opencastproject.job.jpa.JpaJob</class>
     <class>org.opencastproject.security.impl.jpa.JpaUser</class>
     <class>org.opencastproject.security.impl.jpa.JpaGroup</class>
     <class>org.opencastproject.security.impl.jpa.JpaOrganization</class>

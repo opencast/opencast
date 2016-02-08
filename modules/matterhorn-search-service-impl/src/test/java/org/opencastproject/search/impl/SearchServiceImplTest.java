@@ -29,10 +29,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 
-import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobBarrier;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
@@ -590,8 +590,7 @@ public class SearchServiceImplTest {
       mediaPackage.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew());
       searchDatabase.storeMediaPackage(mediaPackage, acl, new Date());
       String payload = MediaPackageParser.getAsXml(mediaPackage);
-      JaxbJob job = new JaxbJob();
-      job.setId(i);
+      Job job = new JobImpl(i);
       job.setArguments(args);
       job.setPayload(payload);
       job.setStatus(Status.FINISHED);
@@ -602,8 +601,8 @@ public class SearchServiceImplTest {
     EasyMock.expect(
             serviceRegistry.createJob((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
-                    .andReturn(new JaxbJob()).anyTimes();
-    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JaxbJob()).anyTimes();
+                    .andReturn(new JobImpl()).anyTimes();
+    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JobImpl()).anyTimes();
     EasyMock.expect(serviceRegistry.getJobs((String) EasyMock.anyObject(), (Status) EasyMock.anyObject()))
     .andReturn(jobs).anyTimes();
     EasyMock.replay(serviceRegistry);

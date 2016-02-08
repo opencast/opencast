@@ -621,7 +621,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_TRACK, null, null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,

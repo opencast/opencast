@@ -70,15 +70,13 @@ public final class JobParser {
    *
    * @param in
    *          The serialized data
-   * @param format
-   *          the serialization format
    * @return The job
    */
   public static Job parseJob(InputStream in) throws IOException {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), JaxbJob.class).getValue();
+      return unmarshaller.unmarshal(new StreamSource(in), JaxbJob.class).getValue().toJob();
     } catch (Exception e) {
       throw new IOException(e);
     } finally {
@@ -120,7 +118,7 @@ public final class JobParser {
   /**
    * Parses a stream representing a {@link JaxbJobList}
    *
-   * @param content
+   * @param in
    *          the serialized data
    * @return the job list
    */

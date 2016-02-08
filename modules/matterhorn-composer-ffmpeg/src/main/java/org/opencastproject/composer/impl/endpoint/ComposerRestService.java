@@ -137,7 +137,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   /**
    * Encodes a track.
    *
-   * @param sourceTrack
+   * @param sourceTrackAsXml
    *          The source track
    * @param profileId
    *          The profile to use in encoding this track
@@ -176,7 +176,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   /**
    * Encodes a track to multiple tracks in parallel.
    *
-   * @param sourceTrack
+   * @param sourceTrackAsXml
    *          The source track
    * @param profileId
    *          The profile to use in encoding this track
@@ -212,7 +212,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   /**
    * Trims a track to a new length.
    *
-   * @param sourceTrack
+   * @param sourceTrackAsXml
    *          The source track
    * @param profileId
    *          the encoding profile to use for trimming
@@ -273,9 +273,9 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   /**
    * Encodes a track.
    *
-   * @param audioSourceTrack
+   * @param audioSourceTrackXml
    *          The audio source track
-   * @param videoSourceTrack
+   * @param videoSourceTrackXml
    *          The video source track
    * @param profileId
    *          The profile to use in encoding this track
@@ -608,7 +608,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
    *
    * @param sourceTrackXml
    *          media file to which captions will be embedded
-   * @param captionsXml
+   * @param captionsAsXml
    *          captions that will be embedded
    * @return A response containing the job for this encoding job in the response body.
    * @throws Exception
@@ -654,7 +654,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   /**
    * watermarks a track.
    *
-   * @param sourceTrack
+   * @param sourceTrackAsXml
    *          The source track
    * @param watermark
    *          Filename of the watermark image (jpg, gif, png)

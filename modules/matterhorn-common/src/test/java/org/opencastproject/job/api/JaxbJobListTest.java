@@ -44,7 +44,7 @@ public class JaxbJobListTest {
 
   @Test
   public void testAddJob() throws Exception {
-    Job job1 = createNiceMock(Job.class);
+    JaxbJob job1 = createNiceMock(JaxbJob.class);
     replay(job1);
 
     JaxbJobList jobList = new JaxbJobList();

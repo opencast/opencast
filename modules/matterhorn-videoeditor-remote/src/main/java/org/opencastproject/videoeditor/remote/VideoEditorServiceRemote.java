@@ -31,6 +31,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
@@ -70,8 +71,8 @@ public class VideoEditorServiceRemote extends RemoteBase implements VideoEditorS
         String entity = EntityUtils.toString(response.getEntity());
         if (StringUtils.isNotEmpty(entity)) {
           List<Job> jobs = new LinkedList<Job>();
-          for (Job job : JobParser.parseJobList(entity).getJobs()) {
-            jobs.add(job);
+          for (JaxbJob job : JobParser.parseJobList(entity).getJobs()) {
+            jobs.add(job.toJob());
           }
           logger.info(
                   "Start proccessing smil '{}' on remote videoeditor service", smil.getId());
