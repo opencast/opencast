@@ -91,6 +91,20 @@
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.fileinstall</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>org.osgi.core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>org.osgi.compendium</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -98,6 +112,18 @@
       <scope>provided</scope>
     </dependency>
     <!-- Testing -->
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common-jpa-impl</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-kernel</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-distribution-service-download</artifactId>
@@ -163,6 +189,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.empulse.eclipselink</groupId>
+        <artifactId>staticweave-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -193,7 +223,9 @@
               OSGI-INF/acl-service-rest.xml,
               OSGI-INF/acl-scheduler.xml
             </Service-Component>
-            <JPA-PersistenceUnits>org.opencastproject.authorization.xacml.manager</JPA-PersistenceUnits>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>
