@@ -947,7 +947,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     fromDb.setPayload(job.getPayload());
     fromDb.setStatus(job.getStatus());
     fromDb.setDispatchable(job.isDispatchable());
-    fromDb.setVersion(job.getVersion());  // TODO Think about this again!
+    fromDb.setVersion(job.getVersion());
     fromDb.setOperation(job.getOperation());
     fromDb.setArguments(job.getArguments());
     fromDb.setBlockedJobIds(job.getBlockedJobIds());
