@@ -24,7 +24,13 @@ Configure Opencast
 ------------------------
 
 The integration of Opencast in the LMS through the LTI module has to be configured on both sides: In Opencast and in the LMS.
-To let the LMS access Opencast, the security file etc/security/mh_default_org.org from the opencast folder must be configured. The concerned part is the one below:
+To let the LMS access Opencast, the security file etc/security/mh_default_org.org from the opencast folder must be configured. The relevant sections are shown below:
+
+```
+<sec:custom-filter after="BASIC_AUTH_FILTER" ref="oauthProtectedResourceFilter" />
+```
+and
+
 ```
   <!-- ####################### -->
   <!-- # OAuth (LTI) Support # -->
@@ -42,14 +48,14 @@ They are then required to embed OPENCAST into my LMS.
 Configure the LMS
 -----------------
 
-originally written by Per Pascal Grube
-To connect OPENCAST to the LMS additional configuration parameters besides the LTI endpoint (ENGAGE-URL/LTI), the consumerkey and consumersecret are needed on the LMS side. OPENCAST uses custom LTI tags to pass additional information. These include the kind of interface to present (engage player or media module) and the id of the media to show
+To connect OPENCAST to the LMS additional configuration parameters besides the LTI endpoint (ENGAGE-URL/LTI), the consumerkey and consumersecret are needed on the LMS side. OPENCAST uses custom LTI tags to pass additional information. These include the kind of interface to present (engage player or media module) and the id of the media to show.
+
 The interface is passed using the custom_tool parameter:
 `custom_tool = ltitools/player/index.html  (to show the engage player)`
 or
 `custom_tool = ltitools/series/index.html (to show the series overview)`
 
-The ID of the series/episode needs to be passed different depending on the interface chosen. For the engage player the custom_id field is used:
+The ID of the series/episode needs to be passed differently depending on the interface chosen. For the engage player the custom_id field is used:
 `custom_id = 3e9f15b1-97ef-4be6-8276-59da869ceecd`
 For the series overview the id is passed as custom_series:
 `custom_series = 3e9f15b1-97ef-4be6-8276-59da869ceecd`
@@ -61,4 +67,4 @@ For more information about how to set custom LTI tags, please check the documena
 
 How To Customise It
 -------------------
-The LTI module can be extended/customised to fulfil your own needs.  The default elements from the LTI module (player, series) can be found in the folder `OPENCAST/modules/matterhorn-lti/src/main/resources/tools`.  These elements can be modified or new one can be created to extend the LTI module. Keep in mind that the player and series elements are using some files from the OPENCAST/shared-resources folder. These files are copied at compile-time. For more information about it, look at the maven pom file of the LTI module.
+The LTI module can be extended/customised to fullfil your own needs.  The default elements from the LTI module (player, series) can be found in the folder `OPENCAST/modules/matterhorn-lti/src/main/resources/tools`.  These elements can be modified or new one can be created to extend the LTI module. Keep in mind that the player and series elements are using some files from the OPENCAST/shared-resources folder. These files are copied at compile-time. For more information about it, look at the maven pom file of the LTI module.
