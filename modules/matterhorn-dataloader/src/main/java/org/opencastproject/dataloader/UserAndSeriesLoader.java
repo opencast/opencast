@@ -24,7 +24,6 @@ package org.opencastproject.dataloader;
 import static org.opencastproject.security.api.DefaultOrganization.DEFAULT_ORGANIZATION_ID;
 
 import org.opencastproject.kernel.security.OrganizationDirectoryServiceImpl;
-import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -40,12 +39,13 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.impl.jpa.JpaGroup;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaRole;
+import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.userdirectory.JpaGroup;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
-import org.opencastproject.userdirectory.JpaRole;
-import org.opencastproject.userdirectory.JpaUser;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 import org.opencastproject.util.NotFoundException;
 

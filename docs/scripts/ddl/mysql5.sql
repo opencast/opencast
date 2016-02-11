@@ -345,6 +345,9 @@ CREATE TABLE mh_archive_version_claim (
 CREATE INDEX IX_mh_archive_version_claim_mediapackage on mh_archive_version_claim (mediapackage);
 CREATE INDEX IX_mh_archive_version_claim_last_claimed on mh_archive_version_claim (last_claimed);
 
+--
+-- ACL manager
+--
 CREATE TABLE mh_acl_managed_acl (
   pk BIGINT(20) NOT NULL,
   acl TEXT NOT NULL,

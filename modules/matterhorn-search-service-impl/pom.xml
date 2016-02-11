@@ -150,6 +150,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.empulse.eclipselink</groupId>
+        <artifactId>staticweave-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -187,7 +191,9 @@
               OSGI-INF/search-service-persistence.xml,
               OSGI-INF/feed-service.xml
             </Service-Component>
-            <JPA-PersistenceUnits>org.opencastproject.search.impl.persistence</JPA-PersistenceUnits>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

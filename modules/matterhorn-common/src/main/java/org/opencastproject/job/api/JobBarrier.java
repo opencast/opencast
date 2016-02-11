@@ -21,6 +21,8 @@
 
 package org.opencastproject.job.api;
 
+import com.entwinemedia.fn.data.Opt;
+
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -59,7 +61,7 @@ public final class JobBarrier {
   private final long pollingInterval;
 
   /** The job that's waiting */
-  private final Job waiter;
+  private final Opt<Long> waiterJobId;
 
   /** The jobs to wait on */
   private final List<Job> jobs;
@@ -137,26 +139,30 @@ public final class JobBarrier {
       throw new IllegalArgumentException("Polling interval must be a positive number");
     this.serviceRegistry = registry;
     this.pollingInterval = pollingInterval;
-    this.waiter = waiter;
+    if (waiter != null)
+      this.waiterJobId = Opt.some(waiter.getId());
+    else
+      this.waiterJobId = Opt.none();
     this.jobs = new ArrayList<Job>(Arrays.asList(jobs));
   }
 
   private void suspendWaiterJob() {
-    if (this.waiter != null) {
+    if (this.waiterJobId.isSome()) {
       try {
-        this.waiter.setStatus(Job.Status.WAITING);
+        final Job waiter = serviceRegistry.getJob(waiterJobId.get());
+        waiter.setStatus(Job.Status.WAITING);
         List<Long> blockedForJobs = new LinkedList<Long>();
         for (Job j : jobs) {
           blockedForJobs.add(j.getId());
-          j.setBlockingJobId(this.waiter.getId());
+          j.setBlockingJobId(waiter.getId());
           this.serviceRegistry.updateJob(j);
         }
-        this.waiter.setBlockedJobIds(blockedForJobs);
-        this.serviceRegistry.updateJob(this.waiter);
+        waiter.setBlockedJobIds(blockedForJobs);
+        this.serviceRegistry.updateJob(waiter);
       } catch (ServiceRegistryException e) {
-        logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}", this.waiter, e.getMessage());
+        logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}", waiterJobId, e.getMessage());
       } catch (NotFoundException e) {
-        logger.warn("Unable to put {} into a waiting state, job not found by the service registry.  This may cause a deadlock: {}", this.waiter, e.getMessage());
+        logger.warn("Unable to put {} into a waiting state, job not found by the service registry.  This may cause a deadlock: {}", waiterJobId, e.getMessage());
       }
     } else {
       logger.debug("No waiting job set, unable to put waiting job into waiting state");
@@ -164,20 +170,21 @@ public final class JobBarrier {
   }
 
   private void wakeWaiterJob() {
-    if (this.waiter != null) {
+    if (this.waiterJobId.isSome()) {
       try {
-        this.waiter.setStatus(Job.Status.RUNNING);
+        final Job waiter = serviceRegistry.getJob(waiterJobId.get());
+        waiter.setStatus(Job.Status.RUNNING);
         for (Job j : jobs) {
           Job updatedJob = this.serviceRegistry.getJob(j.getId());
           updatedJob.removeBlockingJobId();
           this.serviceRegistry.updateJob(updatedJob);
         }
-        this.waiter.removeBlockedJobsIds();
-        this.serviceRegistry.updateJob(this.waiter);
+        waiter.removeBlockedJobsIds();
+        this.serviceRegistry.updateJob(waiter);
       } catch (ServiceRegistryException e) {
-        logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}", this.waiter, e.getMessage());
+        logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}", waiterJobId, e.getMessage());
       } catch (NotFoundException e) {
-        logger.warn("Unable to put {} into a waiting state, job not found by the service registry.  This may cause a deadlock: {}", this.waiter, e.getMessage());
+        logger.warn("Unable to put {} into a waiting state, job not found by the service registry.  This may cause a deadlock: {}", waiterJobId, e.getMessage());
       }
     } else {
       logger.debug("No waiting job set, unable to put waiting job into waiting state");

@@ -23,6 +23,7 @@ package org.opencastproject.sox.impl.endpoint;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -42,7 +43,7 @@ import javax.ws.rs.core.Response;
  */
 public class SoxRestServiceTest {
 
-  private JaxbJob job;
+  private Job job;
   private Track audioTrack;
   private SoxRestService restService;
 
@@ -53,7 +54,7 @@ public class SoxRestServiceTest {
     audioTrack = (Track) builder.newElement(Track.TYPE, MediaPackageElements.PRESENTATION_SOURCE);
     audioTrack.setIdentifier("audio1");
 
-    job = new JaxbJob();
+    job = new JobImpl();
     job.setStatus(Job.Status.QUEUED);
     job.setJobType(SoxService.JOB_TYPE);
 
