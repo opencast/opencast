@@ -1,8 +1,8 @@
-Matterhorn Configuration Guides
-===============================
+Opencast Configuration Guides
+=============================
 
-These guides will help you to configure Matterhorn. If you are a first-time user, please make sure to at lease have a
-look at the [basic configuration guide](basic.md).
+These guides will help you to configure Opencast. If you are a first-time user, please make sure to at lease have a look
+at the [basic configuration guide](basic.md).
 
 
 General Configuration
@@ -11,6 +11,7 @@ General Configuration
  - [Basic Configuration](basic.md)
  - [Database Configuration](database.md)
  - [Encoding Profile Configuration](encoding.md)
+ - [Load Configuration](load.md)
  - [Logging and Privacy Configuration](logging.and.privacy.md)
  - [Message Broker Configuration](message-broker.md)
  - [Multi Tenancy Configuration](multi.tenancy.md)
@@ -18,8 +19,3 @@ General Configuration
     - [CAS Security Configuration](security.cas.md)
  - [Workflow Configuration](workflow.md)
     - [Workflow Operation Handler](../workflowoperationhandlers/index.md)
-
-Additional Documentation
-------------------------
-
- - [List of Configuration Files and Keys](configuration.files.and.keys.md)

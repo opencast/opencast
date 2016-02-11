@@ -12,6 +12,7 @@
   <service>
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.adminui.endpoint.ToolsEndpoint" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
 
   <reference bind="setAdminUIConfiguration"
@@ -34,6 +35,11 @@
              interface="org.opencastproject.smil.api.SmilService"
              name="SmilService"
              policy="static" />
+  <reference name="SecurityService"
+             interface="org.opencastproject.security.api.SecurityService"
+             cardinality="1..1"
+             policy="static"
+             bind="setSecurityService" />
   <reference bind="setWorkspace"
              cardinality="1..1"
              interface="org.opencastproject.workspace.api.Workspace"
@@ -44,6 +50,12 @@
              interface="org.opencastproject.archive.api.Archive"
              name="Archive"
              policy="static" />
+  <reference bind="setUrlSigningService"
+             cardinality="1..1"
+             interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
+             name="UrlSigningService"
+             policy="static"
+             />
   <reference bind="setWorkflowService"
              cardinality="1..1"
              interface="org.opencastproject.workflow.api.WorkflowService"

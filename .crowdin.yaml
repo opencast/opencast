@@ -1,0 +1,16 @@
+project_identifier: opencast-matterhorn
+base_path: .
+preserve_hierarchy: true
+
+files:
+  -
+    source: '/modules/matterhorn-admin-ui-ng/src/main/resources/public/org/opencastproject/adminui/languages/lang-en_US.json'
+    translation: '/modules/matterhorn-admin-ui-ng/src/main/resources/public/org/opencastproject/adminui/languages/lang-%locale_with_underscore%.json'
+
+  -
+    source: '/modules/matterhorn-engage-theodul-core/src/main/resources/ui/language/en.json'
+    translation: '/modules/matterhorn-engage-theodul-core/src/main/resources/ui/language/%two_letters_code%.json'
+
+  -
+    source: '/modules/**/src/main/resources/static/language/en.json'
+    translation: '/modules/**/src/main/resources/static/language/%two_letters_code%.json'

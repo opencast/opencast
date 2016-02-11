@@ -1,11 +1,11 @@
 # Non-standard plugins
 
-This page lists non-standard (3rd-party) plugins for the Matterhorn Engage Player in Matterhorn version 2.x (Theodul Pass Player).
+This page lists non-standard (3rd-party) plugins for the Player in Opencast version 2.x (Theodul Pass Player).
 
 To add one of the plugins to an existing installation, the normal approach is the following:
 
  - Download the jar file of the plugin
- - Copy it into the Matterhorn "/lib" folder
+ - Copy it into the Opencast "/lib" folder
 
 |Name|Description|Author|License|Download|
 |----|-----------|------|-------|--------|

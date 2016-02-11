@@ -1,9 +1,16 @@
-# Composite workflow Operation Handler
+# Composite Workflow Operation Handler
 
 ## Description
-The CompositeWorkflowOperationHandler is used to composite two videos (upper and lower) and an optionally watermark into one video, including encoding to different formats. The audio track is always taken from the lower video. Everything is done using FFmpeg. The composition can be done in various layout formats e.g. side by side or picture in picture. The layout has to be defined in JSON format and is described in section "Layout Definition". For some general information about layouts see Matterhorn Composer Layout Module.
- 
-The internal ffmpeg command is using the following filters: scale for scaling the videos, pad for defining the output dimension including the background color, movie for adding additional videos and images and overlay for aligning the videos and images to the output dimension. More info can be found here: https://trac.ffmpeg.org/wiki/FilteringGuide
+
+The CompositeWorkflowOperationHandler is used to composite two videos (upper and lower) and an optional watermark into
+one video, including encoding to different formats. The audio track is always taken from the lower video. Everything is
+done using FFmpeg. The composition can be done in various layout formats e.g. side by side or picture in picture. The
+layout has to be defined in JSON format and is described in section "Layout Definition". For some general information
+about layouts see Opencast Composer Layout Module.
+
+The internal ffmpeg command is using the following filters: scale for scaling the videos, pad for defining the output
+dimension including the background color, movie for adding additional videos and images and overlay for aligning the
+videos and images to the output dimension. More info can be found here: https://trac.ffmpeg.org/wiki/FilteringGuide
 
 ### Sample complex composite filter command
 
@@ -27,22 +34,29 @@ Tags and flavors can be used in combination.
 |\* **encoding-profile**|String|	composite	|The encoding profile to use.|EMPTY|
 |\* **output-resolution**|width , "x" , height	|1900x1080|The resulting resolution of the compound video e.g. 1900x1080.|EMPTY|
 |output-background|String	|red|The resulting background color of the compound video http://www.ffmpeg.org/ffmpeg-utils.html#Color.|black|
-|\* **layout**|name | Json , ";" , Json , [ ";" , Json ]	|topleft	|The layout name to use or a semi-colon separated JSON layout definition (lower video, upper video, optional watermark). If a layout name is given than the corresponding layout-{name} key must be defined.|EMPTY|
+|layout|name | Json , ";" , Json , [ ";" , Json ]|The layout name to use or a semi-colon separated JSON layout definition (lower video, upper video, optional watermark). If a layout name is given than the corresponding layout-{name} key must be defined.|EMPTY|
+|layout-single|name | Json , ";" , Json , [ ";" , Json ]|Layout to be used in case of one input video track (see *layout*)|EMPTY|
+|layout-dual|name | Json , ";" , Json , [ ";" , Json ]|Layout to be used in case of two input video tracks (see *layout*). Defaults to value of *layout* if not set.|EMPTY|
 |layout-{name}|Json , ";" , Json , [ ";" , Json ]	 	|Define semi-colon separated JSON layouts (lower video, upper video, optional watermark) to provide by name.|EMPTY|
 
 
 \* **mandatory**
 
+Notes:
+
+* At least one of the configuration keys *layout*, *layout-single*, or *layout-multiple* must be set
+
 ## Layout Definition
 
-The layout definitions are provided as JSON. Each definition consist of the layout specifications for the lower and upper video and an optional specification for the watermark. The specifications have to be separated by comma.
+The layout definitions are provided as JSON. Each definition consist of the layout specifications for the lower and
+upper video and an optional specification for the watermark. The specifications have to be separated by comma.
 
 **It is always ensured that the media does not exceed the canvas. Offset and scaling is adjusted appropriately.**
 
 A single layout is specified as follows:
 
     {
-      // How much of the canvas shall be covered. [0.0 - 1.0] 
+      // How much of the canvas shall be covered. [0.0 - 1.0]
       // 1.0 means that the media is scaled to cover the complete width of the canvas keeping the aspect ratio.
       "horizontalCoverage": Double,
       // The offset between the anchor points of the media and the canvas
@@ -66,8 +80,8 @@ A single layout is specified as follows:
         }
       }
     }
-     
-    // Example. 
+
+    // Example.
     // The media is scaled to cover the whole width of the canvas and is placed in the upper left corner.
     {
       "horizontalCoverage": 1.0,
@@ -86,9 +100,9 @@ A single layout is specified as follows:
         }
       }
     }
-     
+
     // Example.
-    // The media is scaled to cover 20% of the width of the canvas and is placed in the lower right corner 
+    // The media is scaled to cover 20% of the width of the canvas and is placed in the lower right corner
     // with an offset of -10px on both x and y axis so that it does not touch the canvas' border.
     {
       "horizontalCoverage": 0.2,
@@ -108,8 +122,8 @@ A single layout is specified as follows:
       }
     }
 
-##Operation Example
- 
+## Operation Example
+
     <operation
       id="composite"
       fail-on-error="true"

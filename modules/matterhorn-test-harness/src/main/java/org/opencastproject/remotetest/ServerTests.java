@@ -32,7 +32,6 @@ import org.opencastproject.remotetest.server.DistributionDownloadRestEndpointTes
 import org.opencastproject.remotetest.server.EngageModuleTest;
 import org.opencastproject.remotetest.server.IngestRestEndpointTest;
 import org.opencastproject.remotetest.server.IngestZipTest;
-import org.opencastproject.remotetest.server.LtiAuthenticationTest;
 import org.opencastproject.remotetest.server.MaintenanceModeTest;
 import org.opencastproject.remotetest.server.MultiPartTest;
 import org.opencastproject.remotetest.server.OaiPmhServerTest;
@@ -64,7 +63,6 @@ import org.opencastproject.remotetest.server.SeriesFeedTest;
   UploadTest.class,
   MaintenanceModeTest.class,
   OaiPmhServerTest.class,
-  LtiAuthenticationTest.class,
   SeriesFeedTest.class
 })
 

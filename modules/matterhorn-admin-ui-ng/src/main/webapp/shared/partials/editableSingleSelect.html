@@ -12,7 +12,7 @@
                 name="{{ params.name }}"
                 ng-selected="item === params.value"
                 value="{{ item }}">
-                {{ label | translate }}
+                {{ label | translate | limitAppend : 70 }}
             </option>
         </select>
     </div>

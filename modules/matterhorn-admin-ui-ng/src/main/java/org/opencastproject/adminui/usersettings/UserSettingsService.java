@@ -33,13 +33,10 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Finds the user settings and message signatures from the current user.
@@ -49,12 +46,6 @@ public class UserSettingsService {
 
   /** Logging utilities */
   private static final Log logger = new Log(LoggerFactory.getLogger(UserSettingsService.class));
-
-  /** Persistence provider set by OSGi */
-  protected PersistenceProvider persistenceProvider;
-
-  /** Persistence properties used to create {@link EntityManagerFactory} */
-  protected Map<String, Object> persistenceProperties;
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
@@ -75,31 +66,11 @@ public class UserSettingsService {
    */
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for user settings");
-    emf = persistenceProvider.createEntityManagerFactory(PERSISTENCE_UNIT, persistenceProperties);
   }
 
-  /** For unit testing purposes. */
+  /** OSGi DI */
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
-  }
-
-  /**
-   * Closes entity manager factory.
-   *
-   * @param cc
-   */
-  public void deactivate(ComponentContext cc) {
-    emf.close();
-  }
-
-  /**
-   * OSGi callback to set persistence properties.
-   *
-   * @param persistenceProperties
-   *          persistence properties
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
   }
 
   /**
@@ -110,16 +81,6 @@ public class UserSettingsService {
    */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
-  }
-
-  /**
-   * OSGi callback to set persistence provider.
-   *
-   * @param persistenceProvider
-   *          {@link PersistenceProvider} object
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
   }
 
   /**
@@ -170,12 +131,12 @@ public class UserSettingsService {
   private int getUserSettingsTotal() throws UserSettingsServiceException {
     EntityManager em = null;
     try {
-    em = emf.createEntityManager();
-    String orgId = securityService.getOrganization().getId();
-    String username = securityService.getUser().getUsername();
-    Query q = em.createNamedQuery("UserSettings.countByUserName").setParameter("username", username).setParameter("org", orgId);
-    Number countResult = (Number) q.getSingleResult();
-    return countResult.intValue();
+      em = emf.createEntityManager();
+      String orgId = securityService.getOrganization().getId();
+      String username = securityService.getUser().getUsername();
+      Query q = em.createNamedQuery("UserSettings.countByUserName").setParameter("username", username).setParameter("org", orgId);
+      Number countResult = (Number) q.getSingleResult();
+      return countResult.intValue();
     }  catch (Exception e) {
       logger.error("Could not count message signatures: %s", ExceptionUtils.getStackTrace(e));
       throw new UserSettingsServiceException(e);

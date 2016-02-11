@@ -33,18 +33,16 @@ First you have to install the necessary repositories so that your package manage
 
  - Add Opencast repository:
 
-    ```
-    cd /etc/yum.repos.d
-    curl -O http://repo.virtuos.uos.de/matterhorn-testing.repo \
-      -d 'version=$releasever' -d os=fc \
-      -u [your_username]:[your_password]
-    ```
+        cd /etc/yum.repos.d
+        curl -O http://repo.virtuos.uos.de/opencast-testing.repo \
+          -d 'version=$releasever' -d os=fc \
+          -u [your_username]:[your_password]
 
  - Add RPMfusion repository:
 
-    dnf install --nogpgcheck \
-      http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-      http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonf
+        dnf install --nogpgcheck \
+          http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+          http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonf
 
 
 Install 3rd-party-tools

@@ -217,7 +217,7 @@ public class EventsLoader {
     Job job = serviceRegistry.createJob(WorkflowService.JOB_TYPE, "START_WORKFLOW", null, null, false);
     job.setStatus(Status.FINISHED);
     job.setPayload(xml);
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
 
     workflowInstance.setId(job.getId());
     workflowService.update(workflowInstance);

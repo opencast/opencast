@@ -1,35 +1,22 @@
 angular.module('adminNg.resources')
-.factory('GroupsResource', ['$resource', function ($resource) {
-    return $resource('/admin-ng/groups/:ext', {}, {
-        query: {
-            method: 'GET',
-            params: { ext: 'groups.json' },
-            isArray: false,
-            transformResponse: function (json) {
-              var result = [], parse, data;
-              data = JSON.parse(json);
+.factory('GroupsResource', ['$resource', 'ResourceHelper', function ($resource, ResourceHelper) {
 
-              parse = function (r) {
+    return $resource('/admin-ng/groups/:ext', {}, {
+
+        query: {
+          method: 'GET',
+          params: { ext: 'groups.json' },
+          isArray: false,
+          transformResponse: function (json) {
+              return ResourceHelper.parseResponse(json, function (r) {
                   var row = {};
                   row.id = r.id;
                   row.description = r.description;
                   row.name = r.name;
                   row.role = r.role;
                   return row;
-              };
-
-              angular.forEach(data.results, function (item) {
-                  result.push(parse(item));
               });
-
-              return {
-                  rows   : result,
-                  total  : result.lenght,
-                  offset : 0,
-                  count  : result.length,
-                  limit  : 0
-              };
-            }
+          }
         },
         create: {
           params: { ext: '' },

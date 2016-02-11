@@ -1,5 +1,3 @@
-
-
 site_name: Opencast - Users Guide
 repo_url: https://bitbucket.org/opencast-community/matterhorn/src/develop/docs/guides/user/docs
 
@@ -16,18 +14,18 @@ site_dir: 'site'
 # Items will appear in this order
 
 pages:
-- ['index.md', 'Introduction']
-- ['login.md', 'Log-in']
-- ['events.md', 'Events']
-- ['series.md', 'Series']
-- ['systems.md', 'Systems']
-- ['users.md', 'Users']
-- ['groups.md', 'Groups']
-- ['accesspolicies.md', 'Access Policies']
-- ['themes.md', 'Themes']
-- ['processing.md', 'Processing']
-- ['videoeditor.md', 'Video Editor']
-- ['searchandfilter.md', 'Search & Filter']
-- ['configure.md', 'Configure the UI']
-- ['glossary.md', 'Glossary']
-- ['i18n.md', 'Internationalization']
+- Introduction: 'index.md'
+- Log-in: 'login.md'
+- Events: 'events.md'
+- Series: 'series.md'
+- Systems: 'systems.md'
+- Users: 'users.md'
+- Groups: 'groups.md'
+- Access Policies: 'accesspolicies.md'
+- Themes: 'themes.md'
+- Processing: 'processing.md'
+- Video Editor: 'videoeditor.md'
+- Search & Filter: 'searchandfilter.md'
+- Configure the UI: 'configure.md'
+- Glossary: 'glossary.md'
+- Internationalization: 'i18n.md'

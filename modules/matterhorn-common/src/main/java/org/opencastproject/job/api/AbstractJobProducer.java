@@ -21,6 +21,11 @@
 
 package org.opencastproject.job.api;
 
+import static com.entwinemedia.fn.data.Opt.none;
+import static com.entwinemedia.fn.data.Opt.some;
+
+import com.entwinemedia.fn.data.Opt;
+
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.security.api.Organization;
@@ -31,6 +36,8 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.SystemLoad;
+import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
@@ -96,14 +103,15 @@ public abstract class AbstractJobProducer implements JobProducer {
    * @see org.opencastproject.job.api.JobProducer#acceptJob(org.opencastproject.job.api.Job)
    */
   @Override
-  public void acceptJob(Job job) throws ServiceRegistryException {
+  public void acceptJob(final Job job) throws ServiceRegistryException {
+    final Job runningJob;
     try {
       job.setStatus(Job.Status.RUNNING);
-      getServiceRegistry().updateJob(job);
+      runningJob = getServiceRegistry().updateJob(job);
     } catch (NotFoundException e) {
       throw new IllegalStateException(e);
     }
-    executor.submit(new JobRunner(job, getServiceRegistry().getCurrentJob()));
+    executor.submit(new JobRunner(runningJob, getServiceRegistry().getCurrentJob()));
   }
 
   /**
@@ -123,6 +131,24 @@ public abstract class AbstractJobProducer implements JobProducer {
    */
   @Override
   public boolean isReadyToAccept(Job job) throws ServiceRegistryException, UndispatchableJobException {
+    NodeLoad maxload;
+    try {
+      maxload = getServiceRegistry().getMaxLoadOnNode(getServiceRegistry().getRegistryHostname());
+    } catch (NotFoundException e) {
+      throw new ServiceRegistryException(e);
+    }
+
+    SystemLoad systemLoad = getServiceRegistry().getCurrentHostLoads(true);
+    //Note: We are not adding the job load in the next line because it is already accounted for in the load values we
+    //get back from the service registry.
+    float currentLoad = systemLoad.get(getServiceRegistry().getRegistryHostname()).getLoadFactor();
+    if (currentLoad > maxload.getLoadFactor()) {
+      logger.debug("Declining job {} of type {} because load of {} would exceed this node's limit of {}.",
+              new Object[] { job.getId(), job.getJobType(), currentLoad, maxload.getLoadFactor() });
+      return false;
+    }
+    logger.debug("Accepting job {} of type {} because load of {} is within this node's limit of {}.",
+            new Object[] { job.getId(), job.getJobType(), currentLoad, maxload.getLoadFactor() });
     return true;
   }
 
@@ -174,10 +200,10 @@ public abstract class AbstractJobProducer implements JobProducer {
   class JobRunner implements Callable<Void> {
 
     /** The job to dispatch */
-    private final Job job;
+    private final long jobId;
 
     /** The current job */
-    private final Job currentJob;
+    private final Opt<Long> currentJobId;
 
     /**
      * Constructs a new job runner
@@ -188,52 +214,65 @@ public abstract class AbstractJobProducer implements JobProducer {
      *         the current running job
      */
     JobRunner(Job job, Job currentJob) {
-      this.job = job;
-      this.currentJob = currentJob;
+      this.jobId = job.getId();
+      if (currentJob != null) {
+        this.currentJobId = some(currentJob.getId());
+      }
+      else {
+        currentJobId = none();
+      }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.util.concurrent.Callable#call()
-     */
     @Override
     public Void call() throws Exception {
-      SecurityService securityService = getSecurityService();
+      final SecurityService securityService = getSecurityService();
+      final ServiceRegistry serviceRegistry = getServiceRegistry();
+      final Job jobBeforeProcessing = serviceRegistry.getJob(jobId);
+
+      if (currentJobId.isSome())
+        serviceRegistry.setCurrentJob(serviceRegistry.getJob(currentJobId.get()));
+
+      final Organization organization = getOrganizationDirectoryService().getOrganization(jobBeforeProcessing.getOrganization());
+      securityService.setOrganization(organization);
+      final User user = getUserDirectoryService().loadUser(jobBeforeProcessing.getCreator());
+      securityService.setUser(user);
+
       try {
-        Organization organization = getOrganizationDirectoryService().getOrganization(job.getOrganization());
-        getServiceRegistry().setCurrentJob(currentJob);
-        securityService.setOrganization(organization);
-        User user = getUserDirectoryService().loadUser(job.getCreator());
-        securityService.setUser(user);
-        String payload = process(job);
-        if (job.getStatus() == Status.FAILED) {
-          logger.warn("Error handling operation '{}' of job {}", job.getOperation(), job.getId());
-          return null;
-        }
-        job.setPayload(payload);
-        job.setStatus(Status.FINISHED);
-      } catch (JobCanceledException e) {
-        logger.info(e.getMessage());
-      } catch (Throwable e) {
-        job.setStatus(Status.FAILED);
-        getServiceRegistry().incident().unhandledException(job, Severity.FAILURE, e);
-        logger.error("Error handling operation '{}': {}", job.getOperation(), ExceptionUtils.getStackTrace(e));
-        if (e instanceof ServiceRegistryException)
-          throw (ServiceRegistryException) e;
+        final String payload = process(jobBeforeProcessing);
+        handleSuccessfulProcessing(payload);
+      } catch (Throwable t) {
+        handleFailedProcessing(t);
       } finally {
-        try {
-          getServiceRegistry().updateJob(job);
-        } catch (NotFoundException e) {
-          throw new ServiceRegistryException(e);
-        } finally {
-          getServiceRegistry().setCurrentJob(null);
-          securityService.setUser(null);
-          securityService.setOrganization(null);
-        }
+        serviceRegistry.setCurrentJob(null);
+        securityService.setUser(null);
+        securityService.setOrganization(null);
       }
+
       return null;
     }
-  }
 
+    private void handleSuccessfulProcessing(final String payload) throws Exception {
+      // The job may gets updated internally during processing. It therefore needs to be reload from the service
+      // registry in order to prevent inconsistencies.
+      final Job jobAfterProcessing = getServiceRegistry().getJob(jobId);
+      jobAfterProcessing.setPayload(payload);
+      jobAfterProcessing.setStatus(Status.FINISHED);
+      getServiceRegistry().updateJob(jobAfterProcessing);
+    }
+
+    private void handleFailedProcessing(final Throwable t) throws Exception {
+      if (t instanceof JobCanceledException) {
+        logger.info(t.getMessage());
+      } else {
+        final Job jobAfterProcessing = getServiceRegistry().getJob(jobId);
+        jobAfterProcessing.setStatus(Status.FAILED);
+        getServiceRegistry().updateJob(jobAfterProcessing);
+        getServiceRegistry().incident().unhandledException(jobAfterProcessing, Severity.FAILURE, t);
+        logger.error("Error handling operation '{}': {}", jobAfterProcessing.getOperation(), ExceptionUtils.getStackTrace(t));
+        if (t instanceof ServiceRegistryException)
+          throw (ServiceRegistryException) t;
+      }
+    }
+
+  }
 }
