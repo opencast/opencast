@@ -18,17 +18,16 @@
  * the License.
  *
  */
-
 package org.opencastproject.kernel.bundleinfo;
 
+import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
+
 import org.opencastproject.util.persistence.PersistenceEnv;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.spi.PersistenceProvider;
-import java.util.Map;
-
-import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
+import javax.persistence.EntityManagerFactory;
 
 /** OSGi bound bundle info database. */
 public class OsgiBundleInfoDb extends AbstractBundleInfoDb {
@@ -36,9 +35,13 @@ public class OsgiBundleInfoDb extends AbstractBundleInfoDb {
 
   public static final String PERSISTENCE_UNIT = "org.opencastproject.kernel";
 
+  private EntityManagerFactory emf;
   private PersistenceEnv penv;
-  private Map<String, Object> persistenceProperties;
-  private PersistenceProvider persistenceProvider;
+
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
+  }
 
   @Override protected PersistenceEnv getPersistenceEnv() {
     return penv;
@@ -46,23 +49,11 @@ public class OsgiBundleInfoDb extends AbstractBundleInfoDb {
 
   /** OSGi callback */
   public void activate() {
-    penv = persistenceEnvironment(persistenceProvider,
-                                  PERSISTENCE_UNIT,
-                                  persistenceProperties);
+    penv = persistenceEnvironment(emf);
   }
 
   public void deactivate() {
     logger.info("Closing persistence environment");
     penv.close();
-  }
-
-  /** OSGi DI */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  /** OSGi DI */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
   }
 }

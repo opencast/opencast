@@ -26,6 +26,8 @@ import org.opencastproject.usertracking.api.UserSession;
 
 import java.util.Date;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,6 +52,7 @@ import javax.xml.bind.annotation.XmlType;
  * A JAXB-annotated implementation of {@link UserAction}
  */
 @Entity(name = "UserAction")
+@Access(AccessType.FIELD)
 @Table(name = "mh_user_action")
 @NamedQueries({
         @NamedQuery(name = "findUserActions", query = "SELECT a FROM UserAction a"),
@@ -126,68 +129,84 @@ public class UserActionImpl implements UserAction {
   public UserActionImpl() {
   }
 
+  @Override
   public Long getId() {
     return id;
   }
 
+  @Override
   public void setId(Long id) {
     this.id = id;
   }
 
+  @Override
   public void setSession(UserSession session) {
     this.session = (UserSessionImpl) session;
   }
 
+  @Override
   public UserSession getSession() {
     return session;
   }
 
+  @Override
   public String getMediapackageId() {
     return mediapackageId;
   }
 
+  @Override
   public void setMediapackageId(String mediapackageId) {
     this.mediapackageId = mediapackageId;
   }
 
+  @Override
   public int getInpoint() {
     return inpoint;
   }
 
+  @Override
   public void setInpoint(int inpoint) {
     this.inpoint = inpoint;
     updateLength();
   }
 
+  @Override
   public int getOutpoint() {
     return outpoint;
   }
 
+  @Override
   public void setOutpoint(int outpoint) {
     this.outpoint = outpoint;
     updateLength();
   }
 
+  @Override
   public int getLength() {
     return length;
   }
 
+  @Override
   public String getType() {
     return type;
   }
 
+  @Override
   public void setType(String type) {
     this.type = type;
   }
 
+  @Override
   public boolean getIsPlaying() {
     return isPlaying;
   }
 
+  @Override
   public void setIsPlaying(boolean isPlaying) {
     this.isPlaying = isPlaying;
   }
 
+  @Override
   public Date getCreated() {
     return created;
   }

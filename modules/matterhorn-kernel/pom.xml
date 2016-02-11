@@ -20,6 +20,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common-jpa-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -164,7 +169,7 @@
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.core</artifactId>
-      <scope>test</scope>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -195,6 +200,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.empulse.eclipselink</groupId>
+        <artifactId>staticweave-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -223,7 +232,6 @@
               javax.xml.namespace;version=0,
               javax.xml.parsers;version=0,
               javax.xml.validation;version=0,
-              org.opencastproject.feed.impl,
               org.opencastproject.fsresources,
               org.springframework.security.core.userdetails.cache,
               org.springframework.security.core.userdetails.memory,
@@ -255,8 +263,7 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/bundle-info.xml,
-              OSGI-INF/cleansessions.xml,
-              OSGI-INF/feed-service.xml,
+              OSGI-INF/cleansessions.xml, 
               OSGI-INF/http-client-factory.xml,
               OSGI-INF/http-client.xml,
               OSGI-INF/http-context.xml,
@@ -277,9 +284,9 @@
               OSGI-INF/transparentproxy-filter.xml, 
               OSGI-INF/user-and-role-directory-service.xml
             </Service-Component>
-            <JPA-PersistenceUnits>
-              org.opencastproject.kernel
-            </JPA-PersistenceUnits>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

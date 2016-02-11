@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features name="opencast-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.1 http://karaf.apache.org/xmlns/features/v1.2.1">
 
+  <feature name="jpa-eclipselink" version="${project.version}">
+    <!-- NOTE: This feature may be removed as soon as we switch to Karaf 4 which comes with support for EclipseLink
+               out-of-the-box. See https://bitbucket.org/rmserra/karaf-eclipselink/ for more information -->
+
+    <!-- Copy from enterprise-3.0.3-features.xml jpa/2.1.0 -->
+    <feature version="[1.1,2)">transaction</feature>
+    <!-- The following bundle is the diference from the original feature jpa/2.1.0 -->
+    <bundle start-level="30">mvn:org.eclipse.persistence/javax.persistence/2.1.0</bundle>
+    <bundle start-level="30">mvn:org.apache.aries.jpa/org.apache.aries.jpa.api/1.0.2</bundle>
+    <bundle start-level="30">mvn:org.apache.aries.jpa/org.apache.aries.jpa.blueprint.aries/1.0.4</bundle>
+    <bundle start-level="30">mvn:org.apache.aries.jpa/org.apache.aries.jpa.container/1.0.2</bundle>
+    <bundle start-level="30">mvn:org.apache.aries.jpa/org.apache.aries.jpa.container.context/1.0.4</bundle>
+    <!-- END Copy from enterprise-3.0.3-features.xml jpa/2.1.0 -->
+
+    <bundle>mvn:org.apache.aries.jpa/org.apache.aries.jpa.eclipselink.adapter/2.2.0</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.antlr/${eclipselink.version}</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.asm/${eclipselink.version}</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.core/${eclipselink.version}</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.jpa/${eclipselink.version}</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.jpa.jpql/${eclipselink.version}</bundle>
+  </feature>
+
+
   <feature name="opencast-core" version="${project.version}">
 
     <!-- Base features -->
@@ -20,7 +43,11 @@
     <bundle>mvn:javax.servlet.jsp/javax.servlet.jsp-api/2.3.1</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
     <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1.1/2.5.0</bundle>
-    <bundle>mvn:org.eclipse.persistence/javax.persistence/2.0.3</bundle>
+
+    <!-- JPA -->
+    <feature>jndi</feature>
+    <feature>jpa-eclipselink</feature>
+
 
     <!-- 3rd party libraries -->
     <bundle>mvn:com.entwinemedia.common/functional/1.1.1</bundle>
@@ -54,6 +81,7 @@
     <bundle>mvn:org.apache.tika/tika-core/1.1</bundle>
     <bundle>mvn:org.codehaus.jettison/jettison/1.3.1</bundle>
     <bundle>mvn:org.jdom/com.springsource.org.jdom/1.0.0</bundle>
+    <bundle>wrap:mvn:org.opencastproject/android-mms/1.0</bundle>
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
 
     <!-- Spring Framework / Security -->
@@ -73,16 +101,11 @@
     <bundle>mvn:org.springframework/spring-tx/3.1.0.RELEASE</bundle>
     <bundle>mvn:org.springframework/spring-web/3.1.0.RELEASE</bundle>
 
-    <!-- EclipseLink -->
-    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.antlr/2.0.2</bundle>
-    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.asm/2.0.2</bundle>
-    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.core/2.0.2</bundle>
-    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.jpa/2.0.2</bundle>
-
     <!-- Opencast -->
     <bundle>mvn:org.opencastproject/matterhorn-archive-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-authorization-xacml/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-common/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-common-jpa-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-db/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dublincore/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-kernel/${project.version}</bundle>
@@ -127,7 +150,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-capture-admin-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-capture-admin-service-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-capture-workflowoperation/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-comments/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-comments-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-composer-ffmpeg/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-composer-service-api/${project.version}</bundle>
@@ -158,6 +180,7 @@
     <bundle>mvn:org.opencastproject/matterhorn-engage-theodul-plugin-timeline-statistics/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-engage-theodul-plugin-video-videojs/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-engage-ui/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-holdstate-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
@@ -231,7 +254,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-capture-admin-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-capture-admin-service-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-capture-workflowoperation/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-comments/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-comments-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-composer-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-composer-service-remote/${project.version}</bundle>
@@ -247,6 +269,7 @@
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-download-remote/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-streaming-remote/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-workflowoperation/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-holdstate-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>

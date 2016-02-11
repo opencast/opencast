@@ -23,6 +23,7 @@ package org.opencastproject.serviceregistry.impl;
 
 import static org.junit.Assert.assertEquals;
 
+import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
@@ -38,23 +39,18 @@ import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.opencastproject.util.persistence.PersistenceUtil;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.component.ComponentContext;
 
 import java.beans.PropertyVetoException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.management.ObjectInstance;
 import javax.persistence.EntityManager;
@@ -64,15 +60,14 @@ import javax.persistence.Query;
 
 public class ServiceRegistryJpaImplTest {
   private Query query = null;
-  private JobJpaImpl undispatchableJob1 = null;
-  private JobJpaImpl undispatchableJob2 = null;
+  private Job undispatchableJob1 = null;
+  private Job undispatchableJob2 = null;
   private EntityTransaction tx = null;
   private EntityManager em = null;
   private EntityManagerFactory emf = null;
   private BundleContext bundleContext = null;
   private ComponentContext cc = null;
   private ServiceRegistryJpaImpl serviceRegistryJpaImpl = null;
-  private ComboPooledDataSource pooledDataSource = null;
 
   private static final String TEST_SERVICE = "ingest";
   private static final String TEST_OPERATION = "ingest";
@@ -82,10 +77,7 @@ public class ServiceRegistryJpaImplTest {
 
   @Before
   public void setUp() throws InvalidSyntaxException, PropertyVetoException, NotFoundException {
-    // Setup mock objects
-    setUpQuery();
-    setUpEntityTransaction();
-    setUpEntityManager();
+    // Setup JPA context
     setUpEntityManagerFactory();
     // Setup context settings
     setupBundleContext();
@@ -103,23 +95,13 @@ public class ServiceRegistryJpaImplTest {
       serviceRegistryJpaImpl.unRegisterService(service.getServiceType(), service.getHost());
     }
     serviceRegistryJpaImpl.deactivate();
-    pooledDataSource.close();
-  }
-
-  public void setUpQuery() {
-    query = EasyMock.createNiceMock(Query.class);
-    EasyMock.expect(query.getSingleResult())
-            .andReturn(new HostRegistrationJpaImpl(TEST_HOST, "127.0.0.1", 1024 * 1024 * 1024, 9, 9, true, false))
-            .anyTimes();
-    EasyMock.expect(query.getResultList()).andReturn(new ArrayList<Object>()).anyTimes();
-    EasyMock.replay(query);
   }
 
   public void setUpUndispatchableJobs() throws ServiceRegistryException {
 
-    undispatchableJob1 = (JobJpaImpl) serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_OPERATION, null,
+    undispatchableJob1 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_OPERATION, null,
             null, false, null);
-    undispatchableJob2 = (JobJpaImpl) serviceRegistryJpaImpl.createJob(TEST_HOST_OTHER, TEST_SERVICE, TEST_OPERATION,
+    undispatchableJob2 = serviceRegistryJpaImpl.createJob(TEST_HOST_OTHER, TEST_SERVICE, TEST_OPERATION,
             null, null, false, null);
     undispatchableJob1.setDateStarted(new Date());
     undispatchableJob1.setStatus(Status.RUNNING);
@@ -130,43 +112,13 @@ public class ServiceRegistryJpaImplTest {
 
   }
 
-  public void setUpEntityTransaction() {
-    tx = EasyMock.createNiceMock(EntityTransaction.class);
-  }
-
-  public void setUpEntityManager() {
-    em = EasyMock.createNiceMock(EntityManager.class);
-    EasyMock.expect(em.getTransaction()).andReturn(tx).anyTimes();
-    EasyMock.expect(em.createNamedQuery("HostRegistration.byHostName")).andReturn(query);
-    EasyMock.expect(em.createNamedQuery("ServiceRegistration.statistics")).andReturn(query);
-    EasyMock.expect(em.createNamedQuery("ServiceRegistration.getAll")).andReturn(query);
-    EasyMock.replay(em);
-  }
-
   public void setUpEntityManagerFactory() {
-    emf = EasyMock.createMock(EntityManagerFactory.class);
-    EasyMock.expect(emf.createEntityManager()).andReturn(em).anyTimes();
-    EasyMock.replay(emf);
+    emf = PersistenceUtil.newTestEntityManagerFactory("org.opencastproject.common");
   }
 
   public void setUpServiceRegistryJpaImpl() throws PropertyVetoException, NotFoundException {
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + System.currentTimeMillis());
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
-    final PersistenceProvider pp = new PersistenceProvider();
     serviceRegistryJpaImpl = new ServiceRegistryJpaImpl();
-    serviceRegistryJpaImpl.setPersistenceProvider(pp);
-    serviceRegistryJpaImpl.setPersistenceProperties(props);
+    serviceRegistryJpaImpl.setEntityManagerFactory(emf);
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
@@ -227,9 +179,9 @@ public class ServiceRegistryJpaImplTest {
     registerTestHostAndService();
     setUpUndispatchableJobs();
     // verify the current running status
-    undispatchableJob1 = (JobJpaImpl) serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
+    undispatchableJob1 = serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
     assertEquals(Status.RUNNING, undispatchableJob1.getStatus());
-    undispatchableJob2 = (JobJpaImpl) serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
+    undispatchableJob2 = serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());
 
     // remove the activate beans, so this can be reactivated
@@ -240,10 +192,10 @@ public class ServiceRegistryJpaImplTest {
     // reactivate and expect local undispatchable job to be canceled, but not the remote job
     serviceRegistryJpaImpl.activate(null);
     System.out.println("Undispatachable job 1 " + undispatchableJob1.getId());
-    undispatchableJob1 = (JobJpaImpl) serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
+    undispatchableJob1 = serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
     assertEquals(Status.CANCELED, undispatchableJob1.getStatus());
     System.out.println("Undispatachable job 1 " + undispatchableJob2.getId());
-    undispatchableJob2 = (JobJpaImpl) serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
+    undispatchableJob2 = serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());
 
   }

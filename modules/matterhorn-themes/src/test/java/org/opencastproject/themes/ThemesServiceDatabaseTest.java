@@ -21,6 +21,8 @@
 
 package org.opencastproject.themes;
 
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
@@ -33,12 +35,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
-
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.DataSources;
-
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,15 +43,12 @@ import org.junit.Test;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Tests persistence: storing, merging, retrieving and removing.
  */
 public class ThemesServiceDatabaseTest {
 
-  private ComboPooledDataSource pooledDataSource;
   private ThemesServiceDatabaseImpl themesDatabase;
 
   /**
@@ -62,20 +56,6 @@ public class ThemesServiceDatabaseTest {
    */
   @Before
   public void setUp() throws Exception {
-    long currentTime = System.currentTimeMillis();
-
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + currentTime);
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     User user = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
@@ -95,8 +75,7 @@ public class ThemesServiceDatabaseTest {
     EasyMock.replay(messageSender);
 
     themesDatabase = new ThemesServiceDatabaseImpl();
-    themesDatabase.setPersistenceProvider(new PersistenceProvider());
-    themesDatabase.setPersistenceProperties(props);
+    themesDatabase.setEntityManagerFactory(newTestEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
     themesDatabase.setSecurityService(securityService);
     themesDatabase.setUserDirectoryService(userDirectoryService);
     themesDatabase.setMessageSender(messageSender);
@@ -109,7 +88,6 @@ public class ThemesServiceDatabaseTest {
   @After
   public void tearDown() throws Exception {
     themesDatabase.deactivate(null);
-    DataSources.destroy(pooledDataSource);
   }
 
   @Test

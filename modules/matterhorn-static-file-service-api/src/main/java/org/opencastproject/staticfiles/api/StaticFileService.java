@@ -53,6 +53,17 @@ public interface StaticFileService {
   String getFileName(String uuid) throws NotFoundException;
 
   /**
+   * Returns the content length of a file stored in the static file service.
+   *
+   * @param uuid
+   *          The UUID of the file.
+   * @return The content length.
+   * @throws NotFoundException
+   *           If the file with the given UUID was not found.
+   */
+  Long getContentLength(String uuid) throws NotFoundException;
+
+  /**
    * Stores a file in the temporary storage section of the static file service. Make sure you call
    * {@link #persistFile(String)} if you want to persist a file durable. A file that is stored in the temporary storage
    * section may be removed at any time without notice!

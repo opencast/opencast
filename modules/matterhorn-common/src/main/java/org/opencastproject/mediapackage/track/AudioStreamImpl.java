@@ -77,24 +77,6 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
   }
 
   /**
-   * Construct an audio stream from another audio stream
-   *
-   * @param s
-   */
-  public AudioStreamImpl(AudioStreamImpl s) {
-    this.bitdepth = s.bitdepth;
-    this.bitrate = s.bitrate;
-    this.channels = s.channels;
-    this.device = s.device;
-    this.encoder = s.encoder;
-    this.identifier = s.identifier;
-    this.samplingrate = s.samplingrate;
-    this.pkLevDb = s.pkLevDb;
-    this.rmsLevDb = s.rmsLevDb;
-    this.rmsPkDb = s.rmsPkDb;
-  }
-
-  /**
    * @see org.opencastproject.mediapackage.ManifestContributor#toManifest(org.w3c.dom.Document,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */

@@ -1432,6 +1432,7 @@ matterhorn-smil-impl
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
   org.slf4j                              slf4j-log4j12                                    MIT License
+  org.opencastproject                    android-mms                                      The Apache Software License, Version 2.0 / W3C License
 
 
 matterhorn-solr

@@ -18,7 +18,6 @@
  * the License.
  *
  */
-
 package org.opencastproject.messages.persistence;
 
 import org.opencastproject.messages.EmailConfiguration;

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- For the unit tests. Placing it into the test/resources folder did not work. -->
 <persistence
-  version="2.0" 
-  xmlns="http://java.sun.com/xml/ns/persistence"
+  version="2.1"
+  xmlns="http://xmlns.jcp.org/xml/ns/persistence"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
-    http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="test" transaction-type="RESOURCE_LOCAL">
     <class>org.opencastproject.util.persistence.TestDto</class>
+    <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
+      <property name="eclipselink.ddl-generation" value="create-tables" />
+      <property name="eclipselink.logging.logger" value="JavaLogger" />
       <property name="eclipselink.create-ddl-jdbc-file-name" value="create-matterhorn-kernel-jpa.jdbc"/>
       <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-matterhorn-kernel-jpa.jdbc"/>
     </properties>

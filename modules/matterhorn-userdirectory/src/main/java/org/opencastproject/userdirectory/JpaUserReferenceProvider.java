@@ -21,12 +21,14 @@
 
 package org.opencastproject.userdirectory;
 
-import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaRole;
+import org.opencastproject.security.impl.jpa.JpaUserReference;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -41,7 +43,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -50,7 +51,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Manages and locates users references using JPA.
@@ -71,13 +71,8 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
   /** Encoding expected from all inputs */
   public static final String ENCODING = "UTF-8";
 
-  /** The JPA provider */
-  protected PersistenceProvider persistenceProvider = null;
-
   /** The security service */
   protected SecurityService securityService = null;
-
-  protected Map<String, Object> persistenceProperties;
 
   /** The delimiter for the User cache */
   private static final String DELIMITER = ";==;";
@@ -88,20 +83,12 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
   /** A token to store in the miss cache */
   protected final Object nullToken = new Object();
 
-  /**
-   * @param persistenceProvider
-   *          the persistenceProvider to set
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
-  }
+  /** The factory used to generate the entity manager */
+  protected EntityManagerFactory emf = null;
 
-  /**
-   * @param persistenceProperties
-   *          the persistenceProperties to set
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
   /**
@@ -111,9 +98,6 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
-
-  /** The factory used to generate the entity manager */
-  protected EntityManagerFactory emf = null;
 
   /**
    * Callback for activation of this component.
@@ -136,16 +120,6 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
     });
 
     // Set up persistence
-    emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.userdirectory", persistenceProperties);
-  }
-
-  /**
-   * Callback for inactivation of this component.
-   */
-  public void deactivate() {
-    if (emf != null && emf.isOpen()) {
-      emf.close();
-    }
   }
 
   @Override
@@ -189,7 +163,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
     String orgId = securityService.getOrganization().getId();
     List<User> users = new ArrayList<User>();
     for (JpaUserReference userRef : findUserReferencesByQuery(orgId, query, limit, offset, emf)) {
-      users.add(userRef.toUser());
+      users.add(userRef.toUser(PROVIDER_NAME));
     }
     return users.iterator();
   }
@@ -233,7 +207,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
   private User loadUser(String userName, String organization) {
     JpaUserReference userReference = findUserReference(userName, organization, emf);
     if (userReference != null)
-      return userReference.toUser();
+      return userReference.toUser(PROVIDER_NAME);
     return null;
   }
 
@@ -242,7 +216,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
     String orgId = securityService.getOrganization().getId();
     List<User> users = new ArrayList<User>();
     for (JpaUserReference userRef : findUserReferences(orgId, 0, 0, emf)) {
-      users.add(userRef.toUser());
+      users.add(userRef.toUser(PROVIDER_NAME));
     }
     return users.iterator();
   }
@@ -296,7 +270,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
         throw new IllegalStateException("User '" + user.getUsername() + "' already exists");
       }
       tx.commit();
-      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser());
+      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
     } finally {
       if (tx.isActive()) {
         tx.rollback();
@@ -327,7 +301,7 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
         em.merge(foundUserRef);
       }
       tx.commit();
-      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser());
+      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user.toUser(PROVIDER_NAME));
     } finally {
       if (tx.isActive()) {
         tx.rollback();

@@ -23,7 +23,7 @@
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
+    <eclipselink.version>2.6.0</eclipselink.version>
     <commons-compress.version>1.9</commons-compress.version>
     <jmeter.version>2.4</jmeter.version>
     <json-simple.version>1.1</json-simple.version>
@@ -51,9 +51,9 @@
     <module>modules/matterhorn-capture-admin-service-api</module>
     <module>modules/matterhorn-capture-admin-service-impl</module>
     <module>modules/matterhorn-capture-workflowoperation</module>
-    <module>modules/matterhorn-comments</module>
     <module>modules/matterhorn-comments-workflowoperation</module>
     <module>modules/matterhorn-common</module>
+    <module>modules/matterhorn-common-jpa-impl</module>
     <module>modules/matterhorn-composer-ffmpeg</module>
     <module>modules/matterhorn-composer-service-api</module>
     <module>modules/matterhorn-composer-service-remote</module>
@@ -79,6 +79,7 @@
     <module>modules/matterhorn-distribution-service-streaming-remote</module>
     <module>modules/matterhorn-distribution-workflowoperation</module>
     <module>modules/matterhorn-dublincore</module>
+    <module>modules/matterhorn-event-comment</module>
     <module>modules/matterhorn-engage-theodul-api</module>
     <module>modules/matterhorn-engage-theodul-core</module>
     <module>modules/matterhorn-engage-theodul-plugin-archetype</module>
@@ -307,17 +308,19 @@
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
       <plugin>
-         <groupId>com.github.eirslett</groupId>
-         <artifactId>frontend-maven-plugin</artifactId>
-         <version>0.0.23</version>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>0.0.23</version>
       </plugin>
     </plugins>
-    <!-- This defines the global plugin configurations.  Plugins with configuration shared across multiple child poms
-         should be configured here, and then referenced in the child. -->
+    <!-- This defines the global plugin configurations. Plugins with configuration
+      shared across multiple child poms should be configured here, and then referenced
+      in the child. -->
     <pluginManagement>
       <plugins>
         <!-- Fix eclipse (indigo) maven integration -->
-        <!-- See http://wiki.eclipse.org/M2E_plugin_execution_not_covered for more information -->
+        <!-- See http://wiki.eclipse.org/M2E_plugin_execution_not_covered for
+          more information -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
@@ -365,6 +368,21 @@
                   </pluginExecutionFilter>
                   <action>
                     <execute />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>de.empulse.eclipselink</groupId>
+                    <artifactId>staticweave-maven-plugin</artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>weave</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>true</runOnIncremental>
+                    </execute>
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -516,7 +534,7 @@
           <artifactId>maven-pmd-plugin</artifactId>
           <version>3.3</version>
           <configuration>
-            <!--<includeTests>true</includeTests>-->
+            <!--<includeTests>true</includeTests> -->
             <typeResolution>true</typeResolution>
             <targetJdk>1.7</targetJdk>
           </configuration>
@@ -529,6 +547,31 @@
               </goals>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>de.empulse.eclipselink</groupId>
+          <artifactId>staticweave-maven-plugin</artifactId>
+          <version>1.0.0</version>
+          <executions>
+            <execution>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>weave</goal>
+              </goals>
+              <configuration>
+                <persistenceXMLLocation>META-INF/persistence.xml
+                </persistenceXMLLocation>
+                <logLevel>FINE</logLevel>
+              </configuration>
+            </execution>
+          </executions>
+          <dependencies>
+            <dependency>
+              <groupId>org.eclipse.persistence</groupId>
+              <artifactId>org.eclipse.persistence.jpa</artifactId>
+              <version>${eclipselink.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>com.github.klieber</groupId>
@@ -649,7 +692,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>17.0</version>
+        <version>18.0</version>
       </dependency>
 
       <dependency>
@@ -658,11 +701,11 @@
         <version>1.0-rc2-patched</version>
       </dependency>
 
-        <dependency>
-          <groupId>org.apache.servicemix.bundles</groupId>
-          <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
-          <version>1.8.5_1</version>
-        </dependency>
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
+        <version>1.8.5_1</version>
+      </dependency>
 
       <!-- OSGi -->
       <dependency>
@@ -721,31 +764,37 @@
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.core</artifactId>
-        <version>2.0.2</version>
+        <version>${eclipselink.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.jpa</artifactId>
-        <version>2.0.2</version>
+        <version>${eclipselink.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.jpa.jpql</artifactId>
+        <version>${eclipselink.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.asm</artifactId>
-        <version>2.0.2</version>
+        <version>${eclipselink.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.antlr</artifactId>
-        <version>2.0.2</version>
+        <version>${eclipselink.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>javax.persistence</artifactId>
-        <version>2.0.3</version>
+        <version>2.1.0</version>
       </dependency>
 
       <!-- CXF -->
@@ -1537,6 +1586,11 @@
       <releases>
         <enabled>true</enabled>
       </releases>
+    </repository>
+    <repository>
+      <id>eclipse-gemini</id>
+      <name>Eclipse Gemini Maven repository</name>
+      <url>http://download.eclipse.org/gemini/mvn/</url>
     </repository>
   </repositories>
 </project>

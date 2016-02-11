@@ -115,10 +115,10 @@ public class HttpNotificationWorkflowOperationHandlerTest {
 
     // operation configuration
     Map<String, String> configurations = new HashMap<String, String>();
-    configurations.put(HttpNotificationWorkflowOperationHandler.OPT_URL_PATH, "http://www.host-does-not-exist.com");
+    configurations.put(HttpNotificationWorkflowOperationHandler.OPT_URL_PATH, "http://127.0.0.1:9");
     configurations.put(HttpNotificationWorkflowOperationHandler.OPT_NOTIFICATION_SUBJECT, "test");
     configurations.put(HttpNotificationWorkflowOperationHandler.OPT_MAX_RETRY, "0");
-    configurations.put(HttpNotificationWorkflowOperationHandler.OPT_TIMEOUT, Integer.toString(10 * 1000));
+    configurations.put(HttpNotificationWorkflowOperationHandler.OPT_TIMEOUT, Integer.toString(10));
 
     // run the operation handler
     try {

@@ -23,6 +23,8 @@ package org.opencastproject.usertracking.impl;
 
 import org.opencastproject.usertracking.api.UserSession;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -37,6 +39,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @Entity(name = "UserSession")
+@Access(AccessType.FIELD)
 @Table(name = "mh_user_session")
 @NamedQueries({
         @NamedQuery(name = "findUserSessionBySessionId", query = "SELECT s FROM UserSession s WHERE s.sessionId = :sessionId") })
@@ -72,34 +75,42 @@ public class UserSessionImpl implements UserSession {
 
   }
 
+  @Override
   public String getUserId() {
     return userId;
   }
 
+  @Override
   public void setUserId(String userId) {
     this.userId = userId;
   }
 
+  @Override
   public String getUserIp() {
     return userIp;
   }
 
+  @Override
   public void setUserIp(String userIp) {
     this.userIp = userIp;
   }
 
+  @Override
   public String getSessionId() {
     return sessionId;
   }
 
+  @Override
   public void setSessionId(String sessionId) {
     this.sessionId = sessionId;
   }
 
+  @Override
   public String getUserAgent() {
     return userAgent;
   }
 
+  @Override
   public void setUserAgent(String userAgent) {
     this.userAgent = userAgent;
   }
