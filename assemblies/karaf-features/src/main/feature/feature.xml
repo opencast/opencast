@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<features name="opencast-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.1 http://karaf.apache.org/xmlns/features/v1.2.1">
+<features name="opencast-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.1 http://karaf.apache.org/xmlns/features/v1.2.1">
 
   <feature name="opencast-core" version="${project.version}">
 
@@ -308,10 +310,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dictionary-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dictionary-regexp/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-api/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-download/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-streaming/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-inspection-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-inspection-service-ffmpeg/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata-api/${project.version}</bundle>
@@ -342,6 +340,10 @@
 
     <bundle>mvn:org.opencastproject/matterhorn-annotation-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-annotation-impl/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-download/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-distribution-service-streaming/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-engage-theodul-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-engage-theodul-core/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-engage-theodul-plugin-controls/${project.version}</bundle>
