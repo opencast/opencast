@@ -43,9 +43,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 import java.io.IOException;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class ThemesEndpointTest {
 

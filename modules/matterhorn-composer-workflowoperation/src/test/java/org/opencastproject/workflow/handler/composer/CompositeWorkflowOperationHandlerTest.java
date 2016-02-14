@@ -36,7 +36,9 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
@@ -54,7 +56,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -83,7 +88,7 @@ public class CompositeWorkflowOperationHandlerTest {
   private static final String COMPOUND_TRACK_ID = "compound-workflow-operation-test-work";
 
   private static final String TEST_LAYOUT = "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}};{\"horizontalCoverage\":0.2,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":0.0,\"top\":0.0}}};{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":1.0,\"top\":0.0}}}";
-
+  private static final String TEST_SINGLE_LAYOUT = "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\": {\"left\":1.0,\"top\":1.0} ,\"offset\": {\"y\":-20,\"x\":-20} ,\"reference\": {\"left\":1.0,\"top\":1.0} }}; {\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\": {\"left\":1.0,\"top\":0.0} ,\"offset\": {\"y\":20,\"x\":20} ,\"reference\": {\"left\":1.0,\"top\":0.0} }}";
   @Before
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
@@ -140,6 +145,7 @@ public class CompositeWorkflowOperationHandlerTest {
     configurations.put("encoding-profile", "composite");
     configurations.put("layout", "test");
     configurations.put("layout-test", TEST_LAYOUT);
+    configurations.put("layout-single", TEST_SINGLE_LAYOUT);
     configurations.put("output-resolution", "1900x1080");
     configurations.put("output-background", "black");
 
@@ -168,6 +174,7 @@ public class CompositeWorkflowOperationHandlerTest {
     configurations.put("encoding-profile", "composite");
     configurations.put("layout", "test");
     configurations.put("layout-test", TEST_LAYOUT);
+    configurations.put("layout-single", TEST_SINGLE_LAYOUT);
     configurations.put("output-resolution", "1900x1080");
     configurations.put("output-background", "black");
 
@@ -195,6 +202,7 @@ public class CompositeWorkflowOperationHandlerTest {
     configurations.put("target-flavor", "composite/work");
     configurations.put("encoding-profile", "composite");
     configurations.put("layout", TEST_LAYOUT);
+    configurations.put("layout-single", TEST_SINGLE_LAYOUT);
     configurations.put("output-resolution", "1900x1080");
     configurations.put("output-background", "black");
 
@@ -222,6 +230,7 @@ public class CompositeWorkflowOperationHandlerTest {
     configurations.put("target-flavor", "composite/work");
     configurations.put("encoding-profile", "composite");
     configurations.put("layout", "test");
+    configurations.put("layout-single", TEST_SINGLE_LAYOUT);
     configurations.put("output-resolution", "1900x1080");
     configurations.put("output-background", "black");
 
@@ -231,7 +240,47 @@ public class CompositeWorkflowOperationHandlerTest {
     } catch (WorkflowOperationException e) {
       return;
     }
-    Assert.fail("No error occured when using missing layout");
+    Assert.fail("No error occurred when using missing layout");
+  }
+
+  @Test
+  public void testSingleVideoStream() throws URISyntaxException, MalformedURLException, MediaPackageException, IOException, IllegalArgumentException, NotFoundException, ServiceRegistryException {
+    MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
+
+    // test resources
+    URI uriMP = InspectWorkflowOperationHandler.class.getResource("/composite_mediapackage.xml").toURI();
+    URI uriMPEncode = InspectWorkflowOperationHandler.class.getResource("/compound_mediapackage.xml").toURI();
+    mp = builder.loadFromXml(uriMP.toURL().openStream());
+    mpEncode = builder.loadFromXml(uriMPEncode.toURL().openStream());
+    encodedTracks = mpEncode.getTracks();
+
+    // set up mock workspace
+    workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(
+            workspace.moveTo((URI) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (String) EasyMock.anyObject())).andReturn(uriMPEncode);
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(
+            new File(getClass().getResource("/watermark.jpg").toURI()));
+    EasyMock.replay(workspace);
+
+    // set up mock receipt
+    job = EasyMock.createNiceMock(Job.class);
+    EasyMock.expect(job.getPayload()).andReturn(MediaPackageElementParser.getAsXml(encodedTracks[0])).anyTimes();
+    EasyMock.expect(job.getStatus()).andReturn(Job.Status.FINISHED);
+    EasyMock.expect(job.getDateCreated()).andReturn(new Date());
+    EasyMock.expect(job.getDateStarted()).andReturn(new Date());
+    EasyMock.expect(job.getQueueTime()).andReturn(new Long(0));
+    EasyMock.replay(job);
+
+    // set up mock service registry
+    ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
+    EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job);
+    EasyMock.replay(serviceRegistry);
+
+    // set up service
+    operationHandler = new CompositeWorkflowOperationHandler();
+    operationHandler.setWorkspace(workspace);
+    operationHandler.setServiceRegistry(serviceRegistry);
   }
 
   @SuppressWarnings("unchecked")
@@ -248,7 +297,7 @@ public class CompositeWorkflowOperationHandlerTest {
     composerService = EasyMock.createNiceMock(ComposerService.class);
     EasyMock.expect(composerService.getProfile(PROFILE_ID)).andReturn(profile);
     EasyMock.expect(
-            composerService.composite((Dimension) EasyMock.anyObject(), (LaidOutElement<Track>) EasyMock.anyObject(),
+            composerService.composite((Dimension) EasyMock.anyObject(), Option.option((LaidOutElement<Track>) EasyMock.anyObject()),
                     (LaidOutElement<Track>) EasyMock.anyObject(),
                     (Option<LaidOutElement<Attachment>>) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (String) EasyMock.anyObject())).andReturn(job);

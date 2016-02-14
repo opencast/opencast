@@ -32,14 +32,13 @@ import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.opencast.OpencastArchive;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.comments.events.EventCommentService;
+import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase;
 import org.opencastproject.rest.NotFoundExceptionMapper;
 import org.opencastproject.rest.RestServiceTestEnv;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -61,10 +60,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 // TODO re-ignore tests
 @Ignore
@@ -131,6 +130,16 @@ public class AbstractEventEndpointTest {
 
     String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).expect()
             .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/comment/{commentId}")).asString();
+
+    assertThat(eventString, SameJSONAs.sameJSONAs(result));
+  }
+
+  @Test
+  public void testGetEventParticipation() throws Exception {
+    String eventString = IOUtils.toString(getClass().getResource("/eventParticipation.json"));
+
+    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
+            .get(rt.host("{eventId}/participation")).asString();
 
     assertThat(eventString, SameJSONAs.sameJSONAs(result));
   }
@@ -519,7 +528,6 @@ public class AbstractEventEndpointTest {
     private ListProvidersService listProviderService;
     private AclService aclService;
     private SeriesService seriesService;
-    private ParticipationManagementDatabase participationManagementDatabase;
     private DublinCoreCatalogService dublinCoreCatalogService;
     private EventCommentService eventCommentService;
     private SecurityService securityService;
@@ -595,14 +603,6 @@ public class AbstractEventEndpointTest {
 
     public void setSeriesService(SeriesService seriesService) {
       this.seriesService = seriesService;
-    }
-
-    public ParticipationManagementDatabase getPmPersistence() {
-      return participationManagementDatabase;
-    }
-
-    public void setParticipationManagementDatabase(ParticipationManagementDatabase participationManagementDatabase) {
-      this.participationManagementDatabase = participationManagementDatabase;
     }
 
     public DublinCoreCatalogService getDublinCoreService() {

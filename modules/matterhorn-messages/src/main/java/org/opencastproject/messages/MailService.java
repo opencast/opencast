@@ -18,7 +18,6 @@
  * the License.
  *
  */
-
 package org.opencastproject.messages;
 
 import static org.opencastproject.kernel.mail.EmailAddress.getAddress;
@@ -27,13 +26,9 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 
-import org.opencastproject.comments.Comment;
-import org.opencastproject.comments.persistence.CommentDatabaseUtils;
-import org.opencastproject.comments.persistence.CommentDto;
 import org.opencastproject.kernel.mail.BaseSmtpService;
 import org.opencastproject.kernel.mail.EmailAddress;
 import org.opencastproject.messages.persistence.EmailConfigurationDto;
-import org.opencastproject.messages.persistence.MailServiceException;
 import org.opencastproject.messages.persistence.MessageSignatureDto;
 import org.opencastproject.messages.persistence.MessageTemplateDto;
 import org.opencastproject.security.api.Organization;
@@ -53,7 +48,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.mail.Address;
 import javax.mail.MessagingException;
@@ -69,7 +63,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * OSGi service that allows to send e-mails by templates using {@link BaseSmtpService} and implements permanent storage
@@ -80,12 +73,6 @@ public class MailService {
 
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(MailService.class);
-
-  /** Persistence provider set by OSGi */
-  protected PersistenceProvider persistenceProvider;
-
-  /** Persistence properties used to create {@link EntityManagerFactory} */
-  protected Map<String, Object> persistenceProperties;
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
@@ -109,7 +96,6 @@ public class MailService {
    */
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for participation management");
-    emf = persistenceProvider.createEntityManagerFactory(PERSISTENCE_UNIT, persistenceProperties);
 
     for (Organization org : organizationDirectoryService.getOrganizations()) {
       SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), new Effect0() {
@@ -126,28 +112,9 @@ public class MailService {
     }
   }
 
-  /** For unit testing purposes. */
+  /** OSGi DI */
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
-  }
-
-  /**
-   * Closes entity manager factory.
-   *
-   * @param cc
-   */
-  public void deactivate(ComponentContext cc) {
-    emf.close();
-  }
-
-  /**
-   * OSGi callback to set persistence properties.
-   *
-   * @param persistenceProperties
-   *          persistence properties
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
   }
 
   /**
@@ -158,16 +125,6 @@ public class MailService {
    */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
-  }
-
-  /**
-   * OSGi callback to set persistence provider.
-   *
-   * @param persistenceProvider
-   *          {@link PersistenceProvider} object
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
   }
 
   /**
@@ -264,7 +221,6 @@ public class MailService {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public List<MessageTemplate> getMessageTemplates() throws MailServiceException {
     EntityManager em = null;
     try {
@@ -286,7 +242,6 @@ public class MailService {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public List<MessageTemplate> getMessageTemplateByName(String messageTemplateName) throws MailServiceException {
     EntityManager em = null;
     try {
@@ -310,7 +265,6 @@ public class MailService {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public List<MessageTemplate> getMessageTemplatesStartingWith(String filterText) throws MailServiceException {
     EntityManager em = null;
     try {
@@ -382,7 +336,6 @@ public class MailService {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public List<MessageSignature> getMessageSignatures() throws MailServiceException {
     EntityManager em = null;
     try {
@@ -404,12 +357,11 @@ public class MailService {
     }
   }
 
-   /**
-    * Get all of the message signatures for the current user.
-    * @return A list of all of the message signatures.
-    * @throws UserSettingsServiceException
-    */
-   @SuppressWarnings("unchecked")
+  /**
+   * Get all of the message signatures for the current user.
+   * @return A list of all of the message signatures.
+   * @throws UserSettingsServiceException
+   */
   public List<MessageSignature> getMessageSignaturesByUserName() throws MailServiceException {
     EntityManager em = null;
     try {
@@ -423,14 +375,14 @@ public class MailService {
         signatures.add(m.toMessageSignature(userDirectoryService));
       }
       return signatures;
-     } catch (Exception e) {
-       logger.error("Could not get message signatures: {}", ExceptionUtils.getStackTrace(e));
-       throw new MailServiceException(e);
-     } finally {
-         if (em != null) {
-            em.close();
-         }
-     }
+    } catch (Exception e) {
+      logger.error("Could not get message signatures: {}", ExceptionUtils.getStackTrace(e));
+      throw new MailServiceException(e);
+    } finally {
+      if (em != null) {
+        em.close();
+      }
+    }
   }
 
 
@@ -449,7 +401,7 @@ public class MailService {
       MessageSignatureDto messageSignatureDto = q.getSingleResult();
       return messageSignatureDto.toMessageSignature(userDirectoryService);
     } catch (NoResultException e) {
-        throw new NotFoundException(e);
+      throw new NotFoundException(e);
     } catch (Exception e) {
       logger.error("Could not get message signatures: {}", ExceptionUtils.getStackTrace(e));
       throw new MailServiceException(e);
@@ -612,11 +564,6 @@ public class MailService {
   }
 
   public static MessageTemplateDto mergeMessageTemplate(MessageTemplate template, String organization, EntityManager em) {
-    ArrayList<CommentDto> comments = new ArrayList<CommentDto>();
-    for (Comment c : template.getComments()) {
-      comments.add(CommentDatabaseUtils.mergeComment(c, em));
-    }
-
     Option<MessageTemplateDto> dtoOption = findMessageTemplate(option(template.getId()), template.getName(),
             organization, em);
     MessageTemplateDto dto;
@@ -628,13 +575,11 @@ public class MailService {
       dto.setSubject(template.getSubject());
       dto.setBody(template.getBody());
       dto.setCreationDate(template.getCreationDate());
-      dto.setComments(comments);
       dto.setHidden(template.isHidden());
       em.merge(dto);
     } else {
       dto = new MessageTemplateDto(template.getName(), organization, template.getCreator().getUsername(),
-              template.getSubject(), template.getBody(), template.getType().getType(), template.getCreationDate(),
-              comments);
+              template.getSubject(), template.getBody(), template.getType().getType(), template.getCreationDate());
       dto.setHidden(template.isHidden());
       em.persist(dto);
     }
@@ -673,17 +618,11 @@ public class MailService {
 
   public static MessageSignatureDto mergeMessageSignature(MessageSignature signature, String organization,
           EntityManager em) {
-    ArrayList<CommentDto> comments = new ArrayList<CommentDto>();
-    for (Comment c : signature.getComments()) {
-      comments.add(CommentDatabaseUtils.mergeComment(c, em));
-    }
-
     Option<MessageSignatureDto> signatureOption = findMessageSignature(option(signature.getId()), signature.getName(),
             organization, em);
     MessageSignatureDto dto;
     if (signatureOption.isSome()) {
       dto = signatureOption.get();
-      dto.setComments(comments);
       dto.setCreationDate(signature.getCreationDate());
       dto.setCreator(signature.getCreator().getUsername());
       dto.setSender(signature.getSender().getAddress());
@@ -697,7 +636,7 @@ public class MailService {
       dto = new MessageSignatureDto(signature.getName(), organization, signature.getCreator().getUsername(), signature
               .getSender().getAddress(), signature.getSender().getName(), signature.getReplyTo().map(getAddress)
               .getOrElseNull(), signature.getReplyTo().map(getName).getOrElseNull(), signature.getSignature(),
-              signature.getCreationDate(), comments);
+              signature.getCreationDate());
       em.persist(dto);
     }
     return dto;

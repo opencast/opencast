@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reply xmlns="http://comment.opencastproject.org" id="1">
+	<creationDate>2014-06-21T10:09:45Z</creationDate>
+	<modificationDate>2014-07-21T12:09:45Z</modificationDate>
+	<author>
+		<username>test</username>
+		<email />
+		<name />
+	</author>
+	<text><![CDATA[Test reply]]></text>
+</reply>

@@ -34,9 +34,10 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.LoadUtil;
+import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.tika.parser.Parser;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -72,6 +73,9 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   private static final Logger logger = LoggerFactory.getLogger(MediaInspectionServiceImpl.class);
 
+  /** The accurate frame count configuration key */
+  private static final String CFG_KEY_ACCURATE_FRAME_COUNT = "accurate_frame_count";
+
   /** List of available operations on jobs */
   private enum Operation {
     Inspect, Enrich
@@ -105,34 +109,31 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
     final String path = cc.getBundleContext().getProperty(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG);
     final String ffprobeBinary;
     if (path == null) {
-      logger.debug("DEFAULT " + FFmpegAnalyzer.FFPROBE_BINARY_CONFIG + ": "
-          + FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT);
+      logger.debug("DEFAULT " + FFmpegAnalyzer.FFPROBE_BINARY_CONFIG + ": " + FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT);
       ffprobeBinary = FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT;
     } else {
       logger.debug("FFprobe config binary: {}", path);
       ffprobeBinary = path;
     }
-    inspector = new MediaInspector(workspace, tikaParser, ffprobeBinary);
+    inspector = new MediaInspector(workspace, tikaParser, ffprobeBinary, false);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
-   */
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
-    final String path = StringUtils.trimToNull((String) properties.get(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG));
-    if (path != null) {
-      logger.info("Setting the path to ffprobe to " + path);
-      inspector = new MediaInspector(workspace, tikaParser, path);
-    }
 
-    inspectJobLoad = LoadUtil.getConfiguredLoadValue(properties, INSPECT_JOB_LOAD_KEY, DEFAULT_INSPECT_JOB_LOAD, serviceRegistry);
-    enrichJobLoad = LoadUtil.getConfiguredLoadValue(properties, ENRICH_JOB_LOAD_KEY, DEFAULT_ENRICH_JOB_LOAD, serviceRegistry);
+    inspectJobLoad = LoadUtil.getConfiguredLoadValue(properties, INSPECT_JOB_LOAD_KEY, DEFAULT_INSPECT_JOB_LOAD,
+            serviceRegistry);
+    enrichJobLoad = LoadUtil.getConfiguredLoadValue(properties, ENRICH_JOB_LOAD_KEY, DEFAULT_ENRICH_JOB_LOAD,
+            serviceRegistry);
+
+    for (String accurateFrameCountString : OsgiUtil.getOptCfg(properties, CFG_KEY_ACCURATE_FRAME_COUNT).toOpt()) {
+      boolean accurateFrameCount = BooleanUtils.toBoolean(accurateFrameCountString);
+      inspector.setAccurateFrameCount(accurateFrameCount);
+      logger.info("Set accurate frame count to {}", accurateFrameCount);
+    }
   }
 
   /**
@@ -179,7 +180,8 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   @Override
   public Job inspect(URI uri) throws MediaInspectionException {
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString()), inspectJobLoad);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString()),
+              inspectJobLoad);
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
@@ -192,11 +194,11 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    *      boolean)
    */
   @Override
-  public Job enrich(final MediaPackageElement element, final boolean override) throws MediaInspectionException,
-          MediaPackageException {
+  public Job enrich(final MediaPackageElement element, final boolean override)
+          throws MediaInspectionException, MediaPackageException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Enrich.toString(),
-          Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)), enrichJobLoad);
+              Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)), enrichJobLoad);
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
