@@ -21,12 +21,12 @@
 
 package org.opencastproject.adminui.impl;
 
+import static org.junit.Assert.assertEquals;
+
 import org.opencastproject.adminui.api.LanguageService;
 import org.opencastproject.adminui.util.Language;
 import org.opencastproject.adminui.util.PathInspector;
 import org.opencastproject.adminui.util.TestClassPathInspector;
-
-import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 

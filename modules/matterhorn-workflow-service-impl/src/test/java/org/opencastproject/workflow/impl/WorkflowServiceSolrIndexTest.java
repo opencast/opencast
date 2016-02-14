@@ -23,8 +23,8 @@ package org.opencastproject.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
 
-import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -53,7 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Test cases for the implementation at {@link WorkflowServiceDaoSolrImpl}.
+ * Test cases for the implementation at {@link WorkflowServiceSolrIndex}.
  */
 public class WorkflowServiceSolrIndexTest {
 
@@ -74,7 +74,7 @@ public class WorkflowServiceSolrIndexTest {
 
     // Create a job with a workflow as its payload
     List<Job> jobs = new ArrayList<Job>();
-    JaxbJob job = new JaxbJob();
+    Job job = new JobImpl();
     WorkflowInstanceImpl workflow = new WorkflowInstanceImpl();
     workflow.setId(123);
     workflow.setCreator(securityService.getUser());

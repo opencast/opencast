@@ -21,38 +21,31 @@
 
 package org.opencastproject.authorization.xacml.manager.impl.persistence;
 
+import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
+
 import org.opencastproject.authorization.xacml.manager.impl.AclDb;
 import org.opencastproject.util.osgi.SimpleServicePublisher;
 import org.opencastproject.util.persistence.PersistenceEnv;
+
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 
-import javax.persistence.spi.PersistenceProvider;
 import java.util.Dictionary;
-import java.util.Map;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newPersistenceEnvironment;
+import javax.persistence.EntityManagerFactory;
 
 /** Publishes a {@link JpaAclDb}. */
 public class OsgiJpaAclDbPublisher extends SimpleServicePublisher {
-  /** Persistence properties used to create {@link javax.persistence.EntityManagerFactory} */
-  private Map<String, Object> persistenceProperties;
 
-  /** Persistence provider set by OSGi */
-  private PersistenceProvider persistenceProvider;
+  private EntityManagerFactory emf;
 
-  /** OSGi callback to set persistence properties. */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  /** OSGi callback to set persistence provider. */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
   @Override public ServiceReg registerService(Dictionary properties, ComponentContext cc) throws ConfigurationException {
-    PersistenceEnv penv = newPersistenceEnvironment(persistenceProvider, "org.opencastproject.authorization.xacml.manager", persistenceProperties);
+    PersistenceEnv penv = persistenceEnvironment(emf);
     final JpaAclDb aclDb = new JpaAclDb(penv);
     return ServiceReg.reg(registerService(cc, aclDb, AclDb.class, "JPA based ACL Provider"), close(penv));
   }

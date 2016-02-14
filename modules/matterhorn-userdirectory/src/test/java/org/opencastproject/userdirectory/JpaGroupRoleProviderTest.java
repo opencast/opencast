@@ -21,58 +21,41 @@
 
 package org.opencastproject.userdirectory;
 
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.Collections.set;
 
-import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
-
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.opencastproject.security.impl.jpa.JpaGroup;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaRole;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.http.HttpStatus;
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
 public class JpaGroupRoleProviderTest {
 
-  private ComboPooledDataSource pooledDataSource = null;
   private JpaGroupRoleProvider provider = null;
-  private JpaOrganization org1 = null;
-  private JpaOrganization org2 = null;
+  private static JpaOrganization org1 = new JpaOrganization("org1", "org1", "localhost", 80, "admin", "anon", null);
+  private static JpaOrganization org2 = new JpaOrganization("org2", "org2", "127.0.0.1", 80, "admin", "anon", null);
 
   @Before
   public void setUp() throws Exception {
-    org1 = new JpaOrganization("org1", "org1", "localhost", 80, "admin", "anon", null);
-    org2 = new JpaOrganization("org2", "org2", "127.0.0.1", 80, "admin", "anon", null);
-
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + System.currentTimeMillis());
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
 
     // Set the security sevice
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -89,15 +72,13 @@ public class JpaGroupRoleProviderTest {
     provider = new JpaGroupRoleProvider();
     provider.setSecurityService(securityService);
     provider.setMessageSender(messageSender);
-    provider.setPersistenceProperties(props);
-    provider.setPersistenceProvider(new PersistenceProvider());
+    provider.setEntityManagerFactory(newTestEntityManagerFactory(JpaUserAndRoleProvider.PERSISTENCE_UNIT));
     provider.activate(null);
   }
 
   @After
   public void tearDown() throws Exception {
     provider.deactivate();
-    pooledDataSource.close();
   }
 
   @Test
