@@ -22,3 +22,5 @@ pages:
 - Licenses and Legal Matters: 'license.md'
 - Packaging: 'packaging.md'
 - Proposal Log: 'proposal-log.md'
+- Infrastructure:
+   - Overview: 'infrastructure/index.md'
