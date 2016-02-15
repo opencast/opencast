@@ -24,6 +24,7 @@
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <opencast.nexus.url>http://nexus.opencast.org</opencast.nexus.url>
 
     <commons-compress.version>1.9</commons-compress.version>
     <jmeter.version>2.4</jmeter.version>
@@ -1517,7 +1518,7 @@
     <pluginRepository>
       <id>opencast</id>
       <name>Opencast Repo</name>
-      <url>http://nexus.opencast.org/nexus/content/groups/public</url>
+      <url>${opencast.nexus.url}/nexus/content/groups/public</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -1531,7 +1532,7 @@
     <repository>
       <id>opencast</id>
       <name>Opencast Repo</name>
-      <url>http://nexus.opencast.org/nexus/content/groups/public</url>
+      <url>${opencast.nexus.url}/nexus/content/groups/public</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
