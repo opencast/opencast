@@ -492,12 +492,16 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     }
 
     function renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio) {
+        Engage.log('Rendering for desktop view');
+
         var tuples = getSortedVideosourcesArray(videoSources);
+        console.log('Extracted tuples: ', tuples);
 
         for (var i = 0; i < tuples.length; ++i) {
             var value = tuples[i][1];
 
             globalVideoSource.push([videoDisplays[i], value]);
+            console.log('Pushing to globalVideoSources: ', [videoDisplays[i], value]);
 
             initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
         }
@@ -782,11 +786,16 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
                 }
             }
         }
+        Engage.log('Calculated aspect ratio: ' + aspectRatio);
     }
 
     function renderVideoDisplay(videoDataView) {
         Engage.log('Video: Rendering video displays');
-        var src = (videoDataView.model.get('videoSources') && videoDataView.model.get('videoSources')['audio']) ? videoDataView.model.get('videoSources')['audio'] : [];
+
+        var videoDisplays = videoDataView.model.get('ids');
+        var videoSources = videoDataView.model.get('videoSources');
+
+        var src = (videoSources && videoSources['audio']) ? videoSources['audio'] : [];
         var tempVars = {
             ids: videoDataView.model.get('ids'),
             type: videoDataView.model.get('type'),
@@ -799,10 +808,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         }
         // compile template and load into the html
         videoDataView.$el.html(_.template(videoDataView.template, tempVars));
-
-        var i = 0;
-        var videoDisplays = videoDataView.model.get('ids');
-        var videoSources = videoDataView.model.get('videoSources');
 
         if (!mediapackageError) {
             calculateAspectRatio(videoSources);
@@ -860,7 +865,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
         if (id) {
             if (videoSource) {
-
                 if (!isAudioOnly) {
                     var videoOptions = {
                         controls: false,
@@ -874,6 +878,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
                     if (isEmbedMode || isMobileMode) {
                         videoOptions.controls = true;
                     }
+
+                    console.log('Initializing (ID, options):', id, videoOptions);
 
                     // init video.js
                     videojs(id, videoOptions, function() {
@@ -1598,126 +1604,175 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         });
         return found;
     }
+
+    function extractFlavorsAndMimetypes(mediaInfo) {
+        var flavors = '';
+        var mimetypes = '';
+
+        if (mediaInfo.tracks && (mediaInfo.tracks.length > 0)) {
+            for (var k = 0; k < mediaInfo.tracks.length; ++k) {
+                if (flavors.indexOf(mediaInfo.tracks[k].type) < 0) {
+                    flavors += mediaInfo.tracks[k].type + ',';
+                }
+
+                // rtmp is treated differently for video.js. Mimetype and URL have to be changed
+                if ((mediaInfo.tracks[k].mimetype == 'video/mp4') &&
+                    (mediaInfo.tracks[k].url.toLowerCase().indexOf('rtmp://') > -1)) {
+                    mediaInfo.tracks[k].mimetype = 'rtmp/mp4';
+                    mediaInfo.tracks[k].url = Utils.replaceAll(mediaInfo.tracks[k].url, 'mp4:', '&mp4:');
+                }
+
+                // adaptive streaming manifests don't have a resolution. Extract these from regular videos
+                if (mediaInfo.tracks[k].mimetype.match(/video/g) && mediaInfo.tracks[k] &&
+                    mediaInfo.tracks[k].video && mediaInfo.tracks[k].video.resolution &&
+                    videoResultions[Utils.extractFlavorMainType(mediaInfo.tracks[k].type)] == null) {
+                    videoResultions[Utils.extractFlavorMainType(mediaInfo.tracks[k].type)] = Utils.parseVideoResolution(mediaInfo.tracks[k].video.resolution);
+                }
+
+                if (mimetypes.indexOf(mediaInfo.tracks[k].mimetype) < 0) {
+                    mimetypes += mediaInfo.tracks[k].mimetype + ',';
+                }
+            }
+        }
+
+        return {
+            flavors: flavors.substring(0, flavors.length - 1),
+            mimetypes: mimetypes.substring(0, mimetypes.length - 1)
+        }
+    }
+
+    function extractVideoSourcesAndDuration(mediaInfo, flavorsArray) {
+        var videoSources = [];
+        var duration = 0;
+        var hasAudio = false;
+        var hasVideo = false;
+        var allowedTags = Engage.model.get('meInfo').get('allowedtags');
+        var allowedFormats = Engage.model.get('meInfo').get('allowedformats');
+
+        videoSources.audio = [];
+
+        for (var j = 0; j < flavorsArray.length; ++j) {
+            videoSources[Utils.extractFlavorMainType(flavorsArray[j])] = [];
+        }
+
+        mediaInfo.tracks = filterTracksByFormat(filterTracksByTag(mediaInfo.tracks, allowedTags), allowedFormats);
+        if (mediaInfo.tracks) {
+            $(mediaInfo.tracks).each(function(i, track) {
+                if (track.mimetype && track.type && acceptFormat(track)) {
+                    if (track.mimetype.match(/video/g) || track.mimetype.match(/application/g) || track.mimetype.match(/rtmp/g)) {
+                        hasVideo = true;
+                        if (track.duration > duration) {
+                            duration = track.duration;
+                        }
+                        var resolution = (track.video && track.video.resolution) ? track.video.resolution : '';
+                        // filter for different video sources
+                        Engage.log('Video: Adding video source: ' + track.url + ' (' + track.mimetype + ')');
+                        if (track.mimetype == 'application/dash+xml') {
+                            loadDash = true;
+                        } else if (track.mimetype == 'application/x-mpegURL') {
+                            loadHls = true;
+                        }
+                        videoSources[Utils.extractFlavorMainType(track.type)].push({
+                            src: track.url,
+                            type: track.mimetype,
+                            typemh: track.type,
+                            resolution: resolution,
+                            tags: track.tags
+                        });
+                    } else if (track.mimetype.match(/audio/g)) {
+                        hasAudio = true;
+                        if (track.duration > duration) {
+                            duration = track.duration;
+                        }
+                        videoSources.audio.push({
+                            src: track.url,
+                            type: track.mimetype,
+                            typemh: track.type,
+                            tags: track.tags
+                        });
+                    }
+                }
+            });
+
+            if (!hasVideo) {
+                for (var i = 0; i < videoSources.length; ++i) {
+                    if (videoSources[i] !== videoSources.audio) {
+                        delete videoSources.flavor;
+                    }
+                }
+            }
+
+            if (hasVideo || !hasAudio) {
+                delete videoSources.audio;
+            }
+        }
+
+        return {
+            videoSources: videoSources,
+            duration: duration
+        };
+    }
+
+    function extractVideoDisplays(videoSources) {
+        var videoDisplays = [];
+
+        for (var v in videoSources) {
+            if (videoSources[v].length > 0) {
+                var name = videoDisplayNamePrefix.concat(v);
+                videoDisplays.push(name);
+            }
+        }
+
+        return videoDisplays;
+    }
+
+    function setVideoSourcePosters(mediaInfo, videoSources) {
+        if (mediaInfo.attachments && (mediaInfo.attachments.length > 0)) {
+            $(mediaInfo.attachments).each(function(i, attachment) {
+                if (attachment.mimetype &&
+                    attachment.type &&
+                    attachment.mimetype.match(/image/g) &&
+                    attachment.type.match(/player/g)) {
+                    // filter for different video sources
+                    videoSources[Utils.extractFlavorMainType(attachment.type)]['poster'] = attachment.url;
+                }
+            });
+        }
+    }
     
     function setupStreams(tracks, attachments) {
         Engage.log('Video: Setting up streams');
 
+        var mediaInfo = {};
+        var videoSources;
+        var videoDisplays;
+        var duration = 0;
+
         mastervideotype = Engage.model.get('meInfo').get('mastervideotype').toLowerCase();
         Engage.log('Video: Master video type is \'' + mastervideotype + '\'');
 
-        var mediaInfo = {};
         mediaInfo.tracks = tracks;
         mediaInfo.attachments = attachments;
 
         if (mediaInfo.tracks && (mediaInfo.tracks.length > 0)) {
-            for (var i = 0; i < mediaInfo.tracks.length; ++i) {
-                if (flavors.indexOf(mediaInfo.tracks[i].type) < 0) {
-                    flavors += mediaInfo.tracks[i].type + ',';
-                }
-
-                // rtmp is treated differently for video.js. Mimetype and URL have to be changed                      
-                if ((mediaInfo.tracks[i].mimetype == 'video/mp4') &&
-                    (mediaInfo.tracks[i].url.toLowerCase().indexOf('rtmp://') > -1)) {
-                    mediaInfo.tracks[i].mimetype = 'rtmp/mp4';
-                    mediaInfo.tracks[i].url = Utils.replaceAll(mediaInfo.tracks[i].url, 'mp4:', '&mp4:');
-                }
-
-                // adaptive streaming manifests don't have a resolution. Extract these from regular videos
-                if (mediaInfo.tracks[i].mimetype.match(/video/g) && mediaInfo.tracks[i] &&
-                    mediaInfo.tracks[i].video && mediaInfo.tracks[i].video.resolution &&
-                    videoResultions[Utils.extractFlavorMainType(mediaInfo.tracks[i].type)] == null) {
-                    videoResultions[Utils.extractFlavorMainType(mediaInfo.tracks[i].type)] = Utils.parseVideoResolution(mediaInfo.tracks[i].video.resolution);
-                }
-
-                if (mimetypes.indexOf(mediaInfo.tracks[i].mimetype) < 0) {
-                    mimetypes += mediaInfo.tracks[i].mimetype + ',';
-                }
-            }
-            flavors = flavors.substring(0, flavors.length - 1);
-            mimetypes = mimetypes.substring(0, mimetypes.length - 1);
+            var flavorsAndMimetypes = extractFlavorsAndMimetypes(mediaInfo);
+            flavors = flavorsAndMimetypes.flavors;
+            mimetypes = flavorsAndMimetypes.mimetypes;
+            Engage.log('Extracted flavors: ' + flavors, mimetypes);
+            Engage.log('Extracted mimetypes: ' + mimetypes);
 
             var flavorsArray = flavors.split(',');
 
-            var videoDisplays = [];
-            var videoSources = [];
-            videoSources.audio = [];
-
-            for (var i = 0; i < flavorsArray.length; ++i) {
-                videoSources[Utils.extractFlavorMainType(flavorsArray[i])] = [];
-            }
-
-            var hasVideo = false;
-            var hasAudio = false;
-
             // look for video sources
-            var duration = 0;
-            var allowedTags = Engage.model.get('meInfo').get('allowedtags');
-            var allowedFormats = Engage.model.get('meInfo').get('allowedformats');
-            mediaInfo.tracks = filterTracksByFormat(filterTracksByTag(mediaInfo.tracks, allowedTags), allowedFormats);
-            if (mediaInfo.tracks) {
-                $(mediaInfo.tracks).each(function(i, track) {
-                    if (track.mimetype && track.type && acceptFormat(track)) {
-                        if (track.mimetype.match(/video/g) || track.mimetype.match(/application/g) || track.mimetype.match(/rtmp/g)) {
-                            hasVideo = true;
-                            if (track.duration > duration) {
-                                duration = track.duration;
-                            }
-                            var resolution = (track.video && track.video.resolution) ? track.video.resolution : '';
-                            // filter for different video sources
-                            Engage.log('Video: Adding video source: ' + track.url + ' (' + track.mimetype + ')');
-                            if (track.mimetype == 'application/dash+xml') {
-                                loadDash = true;
-                            } else if (track.mimetype == 'application/x-mpegURL') {
-                                loadHls = true;
-                            }
-                            videoSources[Utils.extractFlavorMainType(track.type)].push({
-                                src: track.url,
-                                type: track.mimetype,
-                                typemh: track.type,
-                                resolution: resolution,
-                                tags: track.tags
-                            });
-                        } else if (track.mimetype.match(/audio/g)) {
-                            hasAudio = true;
-                            if (track.duration > duration) {
-                                duration = track.duration;
-                            }
-                            videoSources.audio.push({
-                                src: track.url,
-                                type: track.mimetype,
-                                typemh: track.type,
-                                tags: track.tags
-                            });
-                        }
-                    }
-                });
+            var videoSourcesAndDuration = extractVideoSourcesAndDuration(mediaInfo, flavorsArray);
+            videoSources = videoSourcesAndDuration.videoSources;
+            duration = videoSourcesAndDuration.duration;
+            console.log('Extracted video sources: ', videoSources);
 
-                if (!hasVideo) {
-                    for (var i = 0; i < videoSources.length; ++i) {
-                        if (videoSources[i] !== videoSources.audio) {
-                            delete videoSources.flavor;
-                        }
-                    }
-                }
+            setVideoSourcePosters(mediaInfo, videoSources);
 
-                if (hasVideo || !hasAudio) {
-                    delete videoSources.audio;
-                }
-            }
-            if (mediaInfo.attachments && (mediaInfo.attachments.length > 0)) {
-                $(mediaInfo.attachments).each(function(i, attachment) {
-                    if (attachment.mimetype && attachment.type && attachment.mimetype.match(/image/g) && attachment.type.match(/player/g)) {
-                        // filter for different video sources
-                        videoSources[Utils.extractFlavorMainType(attachment.type)]['poster'] = attachment.url;
-                    }
-                });
-            }
-            for (var v in videoSources) {
-                if (videoSources[v].length > 0) {
-                    var name = videoDisplayNamePrefix.concat(v);
-                    videoDisplays.push(name);
-                }
-            }
+            videoDisplays = extractVideoDisplays(videoSources);
+            Engage.log('Extracted video displays: ' + videoDisplays.join(', '));
 
             Engage.model.set('videoDataModel', new VideoDataModel(videoDisplays, videoSources, duration));
         }
@@ -1761,6 +1816,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
             var videojs_swf = plugin.pluginPath + videojs_swf_path;
             Engage.log('Video: SWF path: ' + videojs_swf_path);
             Engage.model.on(videoDataModelChange, function() {
+                Engage.log('The video data model changed, refreshing the view.');
                 videoDataView = new VideoDataView(this.get('videoDataModel'), plugin.template, videojs_swf);
             });
             Engage.on(plugin.events.mediaPackageModelError.getName(), function() {
