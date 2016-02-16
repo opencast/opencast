@@ -24,3 +24,4 @@ pages:
 - Proposal Log: 'proposal-log.md'
 - Infrastructure:
    - Overview: 'infrastructure/index.md'
+   - Nexus Maven Repository: 'infrastructure/nexus.md'
