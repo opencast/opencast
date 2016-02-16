@@ -113,6 +113,7 @@ public class ConcatWorkflowOperationHandlerTest {
 
     // set up service
     operationHandler = new ConcatWorkflowOperationHandler();
+    operationHandler.setJobBarrierPollingInterval(0);
     operationHandler.setWorkspace(workspace);
     operationHandler.setServiceRegistry(serviceRegistry);
   }
