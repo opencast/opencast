@@ -66,8 +66,8 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.smil.util.SmilUtil;
 import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.LoadUtil;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ProgressInputStream;
 import org.opencastproject.util.XmlUtil;
@@ -1737,5 +1737,5 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD, serviceRegistry);
     ingestZipJobLoad = LoadUtil.getConfiguredLoadValue(properties, ZIP_JOB_LOAD_KEY, DEFAULT_INGEST_ZIP_JOB_LOAD, serviceRegistry);
   }
-  
+
 }

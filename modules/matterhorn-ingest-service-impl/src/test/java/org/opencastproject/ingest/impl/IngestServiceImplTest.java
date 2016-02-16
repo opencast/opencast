@@ -23,9 +23,9 @@ package org.opencastproject.ingest.impl;
 
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.inspection.api.MediaInspectionService;
-import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -280,7 +280,7 @@ public class IngestServiceImplTest {
                   element.addStream(new AudioStreamImpl());
                 }
                 i++;
-                JaxbJob succeededJob = new JaxbJob();
+                JobImpl succeededJob = new JobImpl();
                 succeededJob.setStatus(Status.FINISHED);
                 succeededJob.setPayload(MediaPackageElementParser.getAsXml(element));
                 return succeededJob;
