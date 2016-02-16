@@ -52,12 +52,14 @@ import org.opencastproject.workflow.api.WorkflowParser;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.json.simple.JSONObject;
@@ -441,6 +443,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             try {
               startTime = Long.parseLong(IOUtils.toString(item.openStream()));
             } catch (Exception e) {
+              logger.info("Unable to parse the 'startTime' parameter: {}", ExceptionUtils.getMessage(e));
               return Response.serverError().status(Status.BAD_REQUEST).build();
             }
           }
