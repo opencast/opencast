@@ -148,7 +148,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   private static final Logger logger = LoggerFactory.getLogger(IngestServiceImpl.class);
 
   /** The source SMIL name */
-  private static final String PARTIAL_SMIL_NAME = "source+partial.smil";
+  private static final String PARTIAL_SMIL_NAME = "source_partial.smil";
 
   /** The configuration key that defines the default workflow definition */
   protected static final String WORKFLOW_DEFINITION_DEFAULT = "org.opencastproject.workflow.default.definition";
