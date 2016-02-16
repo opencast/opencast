@@ -37,8 +37,8 @@ import org.opencastproject.archive.base.persistence.ArchiveDb;
 import org.opencastproject.archive.base.storage.DeletionSelector;
 import org.opencastproject.archive.base.storage.ElementStore;
 import org.opencastproject.inspection.api.MediaInspectionService;
-import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -177,8 +177,8 @@ public final class ArchiveTestEnv {
     EasyMock.expect(
             serviceRegistry.createJob((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
-            .andReturn(new JaxbJob()).anyTimes();
-    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JaxbJob()).anyTimes();
+            .andReturn(new JobImpl()).anyTimes();
+    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JobImpl()).anyTimes();
     EasyMock.expect(serviceRegistry.getJobs((String) EasyMock.anyObject(), (Job.Status) EasyMock.anyObject()))
             .andReturn(new ArrayList<Job>()).anyTimes();
     EasyMock.replay(serviceRegistry);
@@ -224,7 +224,7 @@ public final class ArchiveTestEnv {
                         .getCurrentArguments()[0]).clone();
                 mpe.setChecksum(Checksum.create("md5", mpe.getIdentifier()));
                 // create job
-                final Job job = new JaxbJob(1L);
+                final Job job = new JobImpl(1L);
                 job.setPayload(MediaPackageElementParser.getAsXml(mpe));
                 job.setStatus(Job.Status.FINISHED);
                 return job;

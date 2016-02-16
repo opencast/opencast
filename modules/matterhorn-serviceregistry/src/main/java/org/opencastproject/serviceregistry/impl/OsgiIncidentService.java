@@ -42,10 +42,9 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
-import javax.persistence.spi.PersistenceProvider;
+import javax.persistence.EntityManagerFactory;
 
 public class OsgiIncidentService extends AbstractIncidentService implements BundleListener {
   /** The logging instance */
@@ -53,18 +52,13 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
 
   public static final String INCIDENT_L10N_DIR = "incident-l10n";
 
-  /** Persistence provider set by OSGi */
-  private PersistenceProvider persistenceProvider;
-
-  /** Persistence properties used to create {@link javax.persistence.EntityManagerFactory} */
-  private Map<String, Object> persistenceProperties;
-
   /** Reference to the receipt service registry */
   private ServiceRegistry serviceRegistry;
 
   /** Reference to the receipt workflow service */
   private WorkflowService workflowService;
 
+  private EntityManagerFactory emf;
   private PersistenceEnv penv;
 
   @Override
@@ -80,26 +74,6 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
   @Override
   protected PersistenceEnv getPenv() {
     return penv;
-  }
-
-  /**
-   * OSGi callback to set persistence provider.
-   *
-   * @param persistenceProvider
-   *          {@link PersistenceProvider} object
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
-  }
-
-  /**
-   * OSGi callback to set persistence properties.
-   *
-   * @param persistenceProperties
-   *          persistence properties
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
   }
 
   /**
@@ -127,8 +101,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
    */
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for job incidents");
-    penv = PersistenceEnvs.persistenceEnvironment(persistenceProvider.createEntityManagerFactory(PERSISTENCE_UNIT_NAME,
-            persistenceProperties));
+    penv = PersistenceEnvs.persistenceEnvironment(emf);
     // scan bundles for incident localizations
     cc.getBundleContext().addBundleListener(this);
     for (Bundle b : cc.getBundleContext().getBundles()) {
@@ -141,6 +114,11 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
    */
   public void deactivate() {
     penv.close();
+  }
+
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
   @Override

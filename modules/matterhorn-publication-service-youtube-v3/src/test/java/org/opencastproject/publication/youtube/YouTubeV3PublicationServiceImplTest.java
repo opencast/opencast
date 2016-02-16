@@ -27,7 +27,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 
-import org.opencastproject.job.api.JaxbJob;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.publication.youtube.auth.ClientCredentials;
@@ -98,7 +98,7 @@ public class YouTubeV3PublicationServiceImplTest {
     expect(youTubeService.addVideoToMyChannel(anyObject(VideoUpload.class))).andReturn(new Video()).once();
     expect(youTubeService.addPlaylistItem(anyObject(String.class), anyObject(String.class))).andReturn(new PlaylistItem()).once();
 
-    expect(registry.createJob(anyObject(String.class), anyObject(String.class), anyObject(List.class), anyObject(Float.class))).andReturn(new JaxbJob()).once();
+    expect(registry.createJob(anyObject(String.class), anyObject(String.class), anyObject(List.class), anyObject(Float.class))).andReturn(new JobImpl()).once();
     replay(youTubeService, orgDirectory, security, registry, userDirectoryService, workspace);
     service.updated(getServiceProperties());
     service.publish(mediaPackage, mediaPackage.getTracks()[0]);

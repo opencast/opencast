@@ -28,6 +28,7 @@ import org.opencastproject.composer.api.EncodingProfileImpl;
 import org.opencastproject.composer.api.EncodingProfileList;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
@@ -50,7 +51,7 @@ import javax.ws.rs.core.Response.Status;
  */
 public class ComposerRestServiceTest {
 
-  private JaxbJob job;
+  private JobImpl job;
   private EncodingProfileImpl profile;
   private EncodingProfileList profileList;
   private Track audioTrack;
@@ -70,7 +71,7 @@ public class ComposerRestServiceTest {
 
     profileId = "profile1";
 
-    job = new JaxbJob();
+    job = new JobImpl(1);
     job.setStatus(Job.Status.QUEUED);
     job.setJobType(ComposerService.JOB_TYPE);
     profile = new EncodingProfileImpl();

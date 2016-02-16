@@ -26,7 +26,7 @@ import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.job.api.Incident;
+import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.JsonVal;
 import org.opencastproject.util.Jsons;
@@ -78,7 +78,7 @@ public class IncidentDto {
   private String code;
 
   @Column(name = "severity")
-  private Incident.Severity severity;
+  private Integer severity;
 
   @Lob
   @Column(name = "parameters", length = 65535)
@@ -93,14 +93,14 @@ public class IncidentDto {
           Long jobId,
           Date date,
           String code,
-          Incident.Severity severity,
+          Severity severity,
           Map<String, String> parameters,
           List<Tuple<String, String>> details) {
     IncidentDto dto = new IncidentDto();
     dto.jobId = jobId;
     dto.timestamp = date;
     dto.code = code;
-    dto.severity = severity;
+    dto.severity = severity.ordinal();
 
     List<Prop> props = new ArrayList<Jsons.Prop>();
     for (Entry<String, String> entry : parameters.entrySet()) {
@@ -130,8 +130,8 @@ public class IncidentDto {
   }
 
   /** @see org.opencastproject.job.api.Incident#getSeverity() */
-  public Incident.Severity getSeverity() {
-    return severity;
+  public Severity getSeverity() {
+    return Severity.values()[severity];
   }
 
   /** @see org.opencastproject.job.api.Incident#getCode() */

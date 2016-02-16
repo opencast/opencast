@@ -42,6 +42,13 @@ public interface MediaPackageElements {
   /** Track containing presentational material */
   MediaPackageElementFlavor PRESENTATION_SOURCE = new MediaPackageElementFlavor("presentation", "source");
 
+  /** Track containing the presenter/s partial material */
+  MediaPackageElementFlavor PRESENTER_SOURCE_PARTIAL = new MediaPackageElementFlavor("presenter", "source+partial");
+
+  /** Track containing presentational partial material */
+  MediaPackageElementFlavor PRESENTATION_SOURCE_PARTIAL = new MediaPackageElementFlavor("presentation",
+          "source+partial");
+
   /** Track capturing the audience */
   MediaPackageElementFlavor AUDIENCE_SOURCE = new MediaPackageElementFlavor("audience", "source");
 

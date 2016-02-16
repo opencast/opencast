@@ -52,14 +52,14 @@
 
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-comments</artifactId>
+      <artifactId>matterhorn-event-comment</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-participation-api</artifactId>
+      <artifactId>matterhorn-messages</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -166,7 +166,6 @@
               OSGI-INF/list_providers_service.xml,
               OSGI-INF/list-providers/acl.xml,
               OSGI-INF/list-providers/agents.xml,
-              OSGI-INF/list-providers/blacklists.xml,
               OSGI-INF/list-providers/comments.xml,
               OSGI-INF/list-providers/contributors.xml,
               OSGI-INF/list-providers/email.xml,

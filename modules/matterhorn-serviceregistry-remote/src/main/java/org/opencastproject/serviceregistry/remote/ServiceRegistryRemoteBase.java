@@ -21,8 +21,10 @@
 
 package org.opencastproject.serviceregistry.remote;
 
+import static com.entwinemedia.fn.Stream.$;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.JaxbJobList;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -428,7 +430,7 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
     final HttpPut put = put("job/" + job.getId() + ".xml");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-      params.add(new BasicNameValuePair("job", JobParser.toXml(job)));
+      params.add(new BasicNameValuePair("job", JobParser.toXml(new JaxbJob(job))));
       put.setEntity(new UrlEncodedFormEntity(params));
     } catch (UnsupportedEncodingException e) {
       throw new ServiceRegistryException("Can not url encode post parameters", e);
@@ -487,8 +489,8 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
       response = getHttpClient().execute(get);
       responseStatusCode = response.getStatusLine().getStatusCode();
       if (responseStatusCode == HttpStatus.SC_OK) {
-        JaxbJobList jaxbJobList = JobParser.parseJobList(response.getEntity().getContent());
-        return new ArrayList<Job>(jaxbJobList.getJobs());
+        final JaxbJobList jaxbJobList = JobParser.parseJobList(response.getEntity().getContent());
+        return $(jaxbJobList.getJobs()).map(JaxbJob.fnToJob()).toList();
       }
     } catch (IOException e) {
       throw new ServiceRegistryException("Unable to get job id=" + id, e);
@@ -510,8 +512,8 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
       response = getHttpClient().execute(get);
       responseStatusCode = response.getStatusLine().getStatusCode();
       if (responseStatusCode == HttpStatus.SC_OK) {
-        JaxbJobList jaxbJobList = JobParser.parseJobList(response.getEntity().getContent());
-        return new ArrayList<Job>(jaxbJobList.getJobs());
+        final JaxbJobList jaxbJobList = JobParser.parseJobList(response.getEntity().getContent());
+        return $(jaxbJobList.getJobs()).map(JaxbJob.fnToJob()).toList();
       }
     } catch (IOException e) {
       throw new ServiceRegistryException("Unable to get jobs", e);
@@ -746,7 +748,7 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCountOfAbnormalServices()
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countOfAbnormalServices()
    */
   @Override
   public long countOfAbnormalServices() throws ServiceRegistryException {
@@ -819,7 +821,7 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getMaxLoad()
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getMaxLoads()
    */
   @Override
   public SystemLoad getMaxLoads() throws ServiceRegistryException {

@@ -18,36 +18,26 @@
  * the License.
  *
  */
-
 package org.opencastproject.messages.persistence;
 
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
 
-import org.opencastproject.comments.Comment;
-import org.opencastproject.comments.persistence.CommentDto;
 import org.opencastproject.messages.MessageTemplate;
 import org.opencastproject.messages.TemplateType;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -96,12 +86,6 @@ public class MessageTemplateDto {
   @Column(name = "creator_username", nullable = false)
   private String creator;
 
-  @OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.REMOVE })
-  @JoinTable(name = "mh_message_template_mh_comment", joinColumns = {
-          @JoinColumn(name = "message_template_id", referencedColumnName = "id") }, inverseJoinColumns = {
-                  @JoinColumn(name = "comments_id", referencedColumnName = "id", unique = true) })
-  private List<CommentDto> comments = new ArrayList<CommentDto>();
-
   /** Default constructor */
   public MessageTemplateDto() {
   }
@@ -125,7 +109,7 @@ public class MessageTemplateDto {
    *          the comments
    */
   public MessageTemplateDto(String name, String organization, String creator, String subject, String body,
-          TemplateType.Type type, Date creationDate, List<CommentDto> comments) {
+          TemplateType.Type type, Date creationDate) {
     this.name = notEmpty(name, "name");
     this.organization = notEmpty(organization, "organization");
     this.creator = notNull(creator, "creator");
@@ -133,7 +117,6 @@ public class MessageTemplateDto {
     this.body = notEmpty(body, "body");
     this.type = notNull(type, "type");
     this.creationDate = notNull(creationDate, "creationDate");
-    this.comments = notNull(comments, "comments");
   }
 
   /**
@@ -303,59 +286,14 @@ public class MessageTemplateDto {
   }
 
   /**
-   * Sets the comment list
-   *
-   * @param comments
-   *          the comment list
-   */
-  public void setComments(List<CommentDto> comments) {
-    this.comments = comments;
-  }
-
-  /**
-   * Returns the comment list
-   *
-   * @return the comment list
-   */
-  public List<CommentDto> getComments() {
-    return comments;
-  }
-
-  /**
-   * Add a comment to the signature
-   *
-   * @param comment
-   *          the comment to add to this signature
-   * @return true if this collection changed as a result of the call
-   */
-  public boolean addComment(CommentDto comment) {
-    return comments.add(notNull(comment, "comment"));
-  }
-
-  /**
-   * Remove a comment from the signature
-   *
-   * @param comment
-   *          the comment to remove from this signature
-   * @return true if this collection changed as a result of the call
-   */
-  public boolean removeComment(Comment comment) {
-    return comments.remove(notNull(comment, "comment"));
-  }
-
-  /**
    * Returns the business object of the message template
    *
    * @return the business object model of this message template
    */
   public MessageTemplate toMessageTemplate(UserDirectoryService userDirectoryService) {
     User user = userDirectoryService.loadUser(creator);
-    MessageTemplate msgTmpl = new MessageTemplate(name, user, subject, body, type.getType(), creationDate,
-            new ArrayList<Comment>());
+    MessageTemplate msgTmpl = new MessageTemplate(name, user, subject, body, type.getType(), creationDate);
     msgTmpl.setHidden(hidden);
-    for (CommentDto c : this.comments) {
-      msgTmpl.addComment(c.toComment(userDirectoryService));
-    }
     msgTmpl.setId(id);
     return msgTmpl;
   }

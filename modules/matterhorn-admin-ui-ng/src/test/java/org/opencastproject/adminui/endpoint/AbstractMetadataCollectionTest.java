@@ -29,6 +29,7 @@ import org.opencastproject.index.service.catalog.adapter.MetadataField;
 
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JValue;
+
 import org.junit.Before;
 import org.junit.Test;
 

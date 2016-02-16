@@ -28,6 +28,8 @@ import org.opencastproject.util.data.Option;
 
 import java.util.Date;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,6 +42,7 @@ import javax.persistence.TemporalType;
 
 /** Entity object for themes. */
 @Entity(name = "Themes")
+@Access(AccessType.FIELD)
 @Table(name = "mh_themes")
 @NamedQueries({
         @NamedQuery(name = "Themes.count", query = "SELECT COUNT(t) FROM Themes t WHERE t.organization = :org"),

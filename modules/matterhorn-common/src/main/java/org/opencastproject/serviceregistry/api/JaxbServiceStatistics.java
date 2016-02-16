@@ -78,6 +78,17 @@ public class JaxbServiceStatistics implements ServiceStatistics {
   }
 
   /**
+   * Constructs a new service statistics instance without statistics.
+   *
+   * @param serviceRegistration
+   *          the service registration
+   */
+  public JaxbServiceStatistics(ServiceRegistration serviceRegistration) {
+    super();
+    this.serviceRegistration = new JaxbServiceRegistration(serviceRegistration);
+  }
+
+  /**
    * Constructs a new service statistics instance with statistics.
    *
    * @param serviceRegistration
