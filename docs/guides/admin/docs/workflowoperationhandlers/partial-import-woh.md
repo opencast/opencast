@@ -112,4 +112,24 @@ To avoid the necessity to call further workflow operations just for audio muxing
 
 5. **Ensure specific output formats:**
 There may be situations where you want to ensure that the output of this operations comes with a specific file format, e.g. *MP4*.
-The configuration keys *force-encoding* and *required_extensions* can be used to control the behavior of the PartialImportWorkflowOperation: In case the *force-encoding* is set to *true*, the target tracks will be re-encoded using the *force-encoding-profile*. The target tracks will also be re-encoded using that encoding profile in case its file extensions don't match the *required_extensions*. 
+The configuration keys *force-encoding* and *required_extensions* can be used to control the behavior of the PartialImportWorkflowOperation: In case the *force-encoding* is set to *true*, the target tracks will be re-encoded using the *force-encoding-profile*. The target tracks will also be re-encoded using that encoding profile in case its file extensions don't match the *required_extensions*.
+
+##Encoding Profiles
+The PartialImportWorkflowOperation uses a number of encoding profiles to perform its processing. Some of the encoding profiles can be explicitly configured by the user, others are used implictly in means of being hard-coded and are not supposed to be changed by the user.
+
+### Hard-coded Encoding Profiles
+
+|encoding profile|description|
+|----------------|-----------|
+|import.preview  |Extract the first frame of a given partial track|
+|import.image-frame|Extract the last frame of a given partial track. Note that this profile is used to extract the *exactly* last frame of a partial track - not just a frame close to the last one. To make this work for video files with headers that don't contain the exact frame count, set *accurate\_frame\_count* to *true* in  etc/org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.cfg|
+|image-movie.work|Generate video partial tracks based on extracted images used to fill video gaps|
+|import.silent|Generate silent audio tracks used to fill audio gaps|
+
+### Configurable Encoding Profiles
+
+|configuration key|description|
+|-----------------|-----------|
+|concat-encoding-profile|Used to concat partial tracks into tracks|
+|trim-encoding-profile|Used to trim the resulting concatenated single tracks if necessary|
+|force-encoding-profile|Used to re-encode target tracks if desired|
