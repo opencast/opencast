@@ -42,6 +42,7 @@ public class DispatchableComparatorTest {
   private Comparator<JpaJob> dispatchableComparator;
   private Date dt;
   private Date dtPlusOneHour;
+  private JpaJob j1;
 
   @Before
   public void setUp() {
@@ -55,37 +56,25 @@ public class DispatchableComparatorTest {
     calPlusOneHour.setTimeInMillis(cal.getTimeInMillis());
     calPlusOneHour.add(Calendar.HOUR, 1);
     dtPlusOneHour = calPlusOneHour.getTime();
+
+    j1 = createJob(1L, "non-wf", Status.RESTART, dt);
   }
 
   private JpaJob createJob(long id, String type, Job.Status status, Date created) {
-    Job job = EasyMock.createNiceMock(Job.class);
+    JpaJob job = EasyMock.createNiceMock(JpaJob.class);
     EasyMock.expect(job.getId()).andReturn(id).anyTimes();
     EasyMock.expect(job.getJobType()).andReturn(type).anyTimes();
     EasyMock.expect(job.getStatus()).andReturn(status).anyTimes();
     EasyMock.expect(job.getDateCreated()).andReturn(created).anyTimes();
-    EasyMock.expect(job.getDateCompleted()).andReturn(null).anyTimes();
-    EasyMock.expect(job.getDateStarted()).andReturn(null).anyTimes();
-    EasyMock.expect(job.getQueueTime()).andReturn(null).anyTimes();
-    EasyMock.expect(job.getRunTime()).andReturn(null).anyTimes();
-    EasyMock.expect(job.getVersion()).andReturn(0L).anyTimes();
-    EasyMock.expect(job.getPayload()).andReturn(null).anyTimes();
-    EasyMock.expect(job.getOperation()).andReturn(null).anyTimes();
-    EasyMock.expect(job.getArguments()).andReturn(null).anyTimes();
-    EasyMock.expect(job.getParentJobId()).andReturn(null).anyTimes();
-    EasyMock.expect(job.getRootJobId()).andReturn(0L).anyTimes();
-    EasyMock.expect(job.isDispatchable()).andReturn(true).anyTimes();
-    EasyMock.expect(job.getUri()).andReturn(null).anyTimes();
-    EasyMock.expect(job.getCreator()).andReturn(null).anyTimes();
-    EasyMock.expect(job.getOrganization()).andReturn(null).anyTimes();
+
     EasyMock.replay(job);
 
-    return JpaJob.from(job);
+    return job;
   }
 
   @Test
   public void testEquals() {
     // Test equals: same job type, same status, same date
-    JpaJob j1 = createJob(1L, "non-wf", Status.RESTART, dt);
     JpaJob j2 = createJob(2L, "non-wf", Status.RESTART, dt);
     assertEquals("Two jobs with equal type, status and creation date must be considered equal", 0,
             dispatchableComparator.compare(j1, j2));
@@ -94,7 +83,6 @@ public class DispatchableComparatorTest {
   @Test
   public void testLessThanByJobStatus() {
     // Test first less than second: same job type, different status, same date
-    JpaJob j1 = createJob(1L, "non-wf", Status.RESTART, dt);
     JpaJob j3 = createJob(3L, "non-wf", Status.QUEUED, dt);
     assertEquals("Jobs with RESTART status should be less than those with QUEUED status", -1,
             dispatchableComparator.compare(j1, j3));
@@ -103,7 +91,6 @@ public class DispatchableComparatorTest {
   @Test
   public void testLessThanByJobType() {
     // Test first less than second: different job type, same status, same date
-    JpaJob j1 = createJob(1L, "non-wf", Status.RESTART, dt);
     JpaJob j4 = createJob(4L, ServiceRegistryJpaImpl.TYPE_WORKFLOW, Status.RESTART, dt);
     assertEquals("Non-workflow jobs should be less than workflow jobs", -1, dispatchableComparator.compare(j1, j4));
   }
@@ -111,7 +98,6 @@ public class DispatchableComparatorTest {
   @Test
   public void testLessThanByDateCreated() {
     // Test first less than second: same job type, same status, different date
-    JpaJob j1 = createJob(1L, "non-wf", Status.RESTART, dt);
     JpaJob j5 = createJob(5L, "non-wf", Status.RESTART, dtPlusOneHour);
     assertEquals("Jobs with earlier created date should be less than jobs with later created date", -1,
             dispatchableComparator.compare(j1, j5));
@@ -120,7 +106,6 @@ public class DispatchableComparatorTest {
   @Test
   public void testGreaterThanByJobStatus() {
     // Test first greater than second: same job type, different status, same date
-    JpaJob j1 = createJob(1L, "non-wf", Status.RESTART, dt);
     JpaJob j3 = createJob(3L, "non-wf", Status.QUEUED, dt);
     assertEquals("Jobs with RESTART status should be less than those with QUEUED status", 1,
             dispatchableComparator.compare(j3, j1));
@@ -129,7 +114,6 @@ public class DispatchableComparatorTest {
   @Test
   public void testGreaterThanByJobType() {
     // Test first greater than second: different job type, same status, same date
-    JpaJob j1 = createJob(1L, "non-wf", Status.RESTART, dt);
     JpaJob j4 = createJob(4L, ServiceRegistryJpaImpl.TYPE_WORKFLOW, Status.RESTART, dt);
     assertEquals("Non-workflow jobs should be less than workflow jobs", 1, dispatchableComparator.compare(j4, j1));
   }
@@ -137,7 +121,6 @@ public class DispatchableComparatorTest {
   @Test
   public void testGreaterThanByDateCreated() {
     // Test first greater than second: same job type, same status, different date
-    JpaJob j1 = createJob(1L, "non-wf", Status.RESTART, dt);
     JpaJob j5 = createJob(5L, "non-wf", Status.RESTART, dtPlusOneHour);
     assertEquals("Jobs with earlier created date should be less than jobs with later created date", 1,
             dispatchableComparator.compare(j5, j1));
