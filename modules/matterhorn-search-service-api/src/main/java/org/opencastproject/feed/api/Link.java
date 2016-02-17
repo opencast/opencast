@@ -130,7 +130,7 @@ public interface Link {
   /**
    * Sets the link mediapackage element flavour.
    *
-   * @param flavour
+   * @param flavor
    *          the link flavour to set, <b>null</b> if none
    */
   void setFlavour(String flavor);

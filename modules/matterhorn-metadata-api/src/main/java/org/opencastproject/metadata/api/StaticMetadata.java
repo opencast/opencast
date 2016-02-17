@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * Provides access to a commonly accepted set of metadata.
- * <p/>
+ * <p>
  * Please note that there is <em>no</em> default implementation with setters for each field available
  * to enforce a different style of usage. Whenever you need to return <code>StaticMetadata</code>
  * create an anonymous implementation with each getter implementation annotated with <code>@Override</code>.

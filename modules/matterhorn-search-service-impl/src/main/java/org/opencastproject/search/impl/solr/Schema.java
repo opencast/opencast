@@ -143,7 +143,7 @@ public final class Schema {
 
   /**
    * Implement this interface to ensure that you don't miss any fields.
-   * <p/>
+   * <p>
    * Return some(..) to set a field, return none to skip setting it.
    */
   interface FieldCollector {

@@ -71,8 +71,6 @@ public final class GroupIndexUtils {
    * @param group
    *          the group
    * @return the set of metadata
-   * @throws IOException
-   *           if marshalling fails
    */
   public static SearchMetadataCollection toSearchMetadata(Group group) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(group.getIdentifier().concat(
@@ -106,7 +104,7 @@ public final class GroupIndexUtils {
    * @param user
    *          the user
    * @param searchIndex
-   *          the {@link ExternalIndex} to search in
+   *          the Index to search in
    * @return the group
    * @throws SearchIndexException
    *           if querying the search index fails

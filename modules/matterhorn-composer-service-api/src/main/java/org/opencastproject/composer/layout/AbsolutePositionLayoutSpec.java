@@ -26,7 +26,7 @@ import static org.opencastproject.util.EqualsUtil.hash;
 
 /**
  * This layout specification describes where to position a shape in relation to another.
- * <p/>
+ * <p>
  * In contrast to the {@link HorizontalCoverageLayoutSpec} this spec does not scale any shape.
  */
 public final class AbsolutePositionLayoutSpec {

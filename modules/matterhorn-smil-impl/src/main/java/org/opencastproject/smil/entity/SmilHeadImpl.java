@@ -105,7 +105,7 @@ public class SmilHeadImpl extends SmilObjectImpl implements SmilHead {
   }
 
   /**
-   * {@inheritedDoc}
+   * {@inheritDoc}
    */
   @Override
   protected String getIdPrefix() {
@@ -113,7 +113,7 @@ public class SmilHeadImpl extends SmilObjectImpl implements SmilHead {
   }
 
   /**
-   * {@inheritedDoc}
+   * {@inheritDoc}
    */
   @Override
   public SmilObject removeElement(String elementId) {

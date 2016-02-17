@@ -1720,7 +1720,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Gets jobs of all types that are in the {@value Status#QUEUED} and {@value Status#RESTART} state.
+   * Gets jobs of all types that are in the QUEUED and RESTART state.
    *
    * @param em
    *          the entity manager

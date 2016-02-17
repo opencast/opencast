@@ -117,7 +117,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
   /**
    * Analyze an audio track.
    *
-   * @param sourceAudioTrack
+   * @param sourceAudioTrackAsXml
    *          The source audio track
    * @return A response containing the job for this audio analyzing job in the response body.
    * @throws Exception
@@ -152,7 +152,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
   /**
    * Normalize an audio track.
    *
-   * @param sourceAudioTrack
+   * @param sourceAudioTrackAsXml
    *          The source audio track
    * @param targetRmsLevDb
    *          the target RMS level dB

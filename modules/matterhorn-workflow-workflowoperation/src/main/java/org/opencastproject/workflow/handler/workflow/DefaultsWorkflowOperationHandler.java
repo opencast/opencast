@@ -90,9 +90,6 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)

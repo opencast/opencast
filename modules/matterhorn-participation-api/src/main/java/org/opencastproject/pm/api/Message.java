@@ -167,7 +167,7 @@ public class Message {
   /**
    * Returns the creator
    * 
-   * @returns the creator of the message
+   * @return the creator of the message
    */
   public Person getCreator() {
     return this.creator;

@@ -101,7 +101,7 @@ public class TextAnnotationImpl implements TextAnnotation {
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.TextAnnotation#addKeywordAnnotation(org.opencastproject.mediapackage.mpeg7.KeywordAnnotation)
+   * @see org.opencastproject.metadata.mpeg7.TextAnnotation#addKeywordAnnotation(org.opencastproject.metadata.mpeg7.KeywordAnnotation)
    */
   public void addKeywordAnnotation(KeywordAnnotation keywordAnnotation) {
     keywordAnnotations.add(keywordAnnotation);
@@ -118,42 +118,42 @@ public class TextAnnotationImpl implements TextAnnotation {
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.TextAnnotation#addFreeTextAnnotation(org.opencastproject.mediapackage.mpeg7.FreeTextAnnotation)
+   * @see org.opencastproject.metadata.mpeg7.TextAnnotation#addFreeTextAnnotation(org.opencastproject.metadata.mpeg7.FreeTextAnnotation)
    */
   public void addFreeTextAnnotation(FreeTextAnnotation freeTextAnnotation) {
     freeTextAnnotations.add(freeTextAnnotation);
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.TextAnnotation#getConfidence()
+   * @see org.opencastproject.metadata.mpeg7.TextAnnotation#getConfidence()
    */
   public float getConfidence() {
     return confidence;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.TextAnnotation#getLanguage()
+   * @see org.opencastproject.metadata.mpeg7.TextAnnotation#getLanguage()
    */
   public String getLanguage() {
     return language;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.TextAnnotation#getRelevance()
+   * @see org.opencastproject.metadata.mpeg7.TextAnnotation#getRelevance()
    */
   public float getRelevance() {
     return relevance;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.TextAnnotation#keywordAnnotations()
+   * @see org.opencastproject.metadata.mpeg7.TextAnnotation#keywordAnnotations()
    */
   public Iterator<KeywordAnnotation> keywordAnnotations() {
     return keywordAnnotations.iterator();
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.TextAnnotation#freeTextAnnotations()
+   * @see org.opencastproject.metadata.mpeg7.TextAnnotation#freeTextAnnotations()
    */
   public Iterator<FreeTextAnnotation> freeTextAnnotations() {
     return freeTextAnnotations.iterator();

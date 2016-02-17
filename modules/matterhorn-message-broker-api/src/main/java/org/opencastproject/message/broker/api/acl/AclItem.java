@@ -52,14 +52,8 @@ public class AclItem implements MessageItem, Serializable {
   }
 
   /**
-   * @param mediapackage
-   *          The mediapackage to update.
-   * @param acl
-   *          The access control list of the mediapackage to update.
-   * @param version
-   *          The version of the mediapackage.
-   * @param date
-   *          The modification date.
+   * @param currentAclName
+   * @param newAclName
    * @return Builds a {@link AclItem} for updating a mediapackage.
    */
   public static AclItem update(String currentAclName, String newAclName) {

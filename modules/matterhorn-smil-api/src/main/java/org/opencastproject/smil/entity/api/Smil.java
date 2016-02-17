@@ -61,7 +61,7 @@ public interface Smil extends SmilObject {
    *
    * @param elementId element Id
    * @throws SmilException if there is no element with the same Id
-   * @returnelement with given Id
+   * @return element with given Id
    */
   SmilObject get(String elementId) throws SmilException;
 }

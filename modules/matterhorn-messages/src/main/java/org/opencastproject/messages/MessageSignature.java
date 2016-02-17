@@ -136,7 +136,7 @@ public class MessageSignature {
   /**
    * Returns the creator
    *
-   * @returns the creator of the signature
+   * @return the creator of the signature
    */
   public User getCreator() {
     return this.creator;

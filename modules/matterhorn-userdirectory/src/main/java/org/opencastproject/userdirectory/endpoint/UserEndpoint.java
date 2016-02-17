@@ -106,6 +106,10 @@ public class UserEndpoint {
     this.securityService = securityService;
   }
 
+  /**
+   * @param jpaUserAndRoleProvider
+   *          the persistenceProperties to set
+   */
   public void setJpaUserAndRoleProvider(JpaUserAndRoleProvider jpaUserAndRoleProvider) {
     this.jpaUserAndRoleProvider = jpaUserAndRoleProvider;
   }

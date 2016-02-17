@@ -91,7 +91,7 @@ public final class ZipUtil {
   /**
    * Compresses source files into a zip archive
    *
-   * @param files
+   * @param sourceFiles
    *          A {@link java.io.File} array with the files to include in the root of the archive
    * @param destination
    *          A {@link java.io.File} descriptor to the location where the zip file should be created

@@ -151,42 +151,42 @@ public class MediaDurationImpl implements MediaDuration {
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MediaDuration#getDays()
+   * @see org.opencastproject.metadata.mpeg7.MediaDuration#getDays()
    */
   public int getDays() {
     return days;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MediaDuration#getFractions()
+   * @see org.opencastproject.metadata.mpeg7.MediaDuration#getFractions()
    */
   public int getFractions() {
     return fractions;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MediaDuration#getFractionsPerSecond()
+   * @see org.opencastproject.metadata.mpeg7.MediaDuration#getFractionsPerSecond()
    */
   public int getFractionsPerSecond() {
     return fractionsPerSecond;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MediaDuration#getHours()
+   * @see org.opencastproject.metadata.mpeg7.MediaDuration#getHours()
    */
   public int getHours() {
     return hours;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MediaDuration#getMinutes()
+   * @see org.opencastproject.metadata.mpeg7.MediaDuration#getMinutes()
    */
   public int getMinutes() {
     return minutes;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MediaDuration#getSeconds()
+   * @see org.opencastproject.metadata.mpeg7.MediaDuration#getSeconds()
    */
   public int getSeconds() {
     return seconds;
@@ -275,7 +275,7 @@ public class MediaDurationImpl implements MediaDuration {
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MediaDuration#getDurationInMilliseconds()
+   * @see org.opencastproject.metadata.mpeg7.MediaDuration#getDurationInMilliseconds()
    */
   public long getDurationInMilliseconds() {
     long s = seconds * MS_PER_SECOND;

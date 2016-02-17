@@ -45,7 +45,7 @@ public class IngestionGroup {
    *          The number of ingests that we will be executing at the same time.
    * @param delayToIngest
    *          The amount of time in minutes to wait until starting these ingests.
-   * @param newLoadTesting
+   * @param loadTest
    *          The load testing context these ingests will be done in.
    * @param client
    *          The TrustedHttpClient we will use to ingest to the core.

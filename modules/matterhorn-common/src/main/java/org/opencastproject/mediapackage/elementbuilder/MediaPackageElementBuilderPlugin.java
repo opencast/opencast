@@ -34,7 +34,7 @@ import java.net.URI;
 /**
  * An element builder plugin is an object that is able to recognize one ore more filetypes slated for ingest into
  * matterhorn.
- * <p/>
+ * <p>
  * <strong>Implementation note:</strong> Builder plugins may be stateful. They are intended to be used as throw-away
  * objects.
  */

@@ -27,7 +27,7 @@ import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Definition of a contract for the use of a {@link PersistenceEnv} in an OSGi environment.
- * <p/>
+ * <p>
  * Use in conjunction with {@link PersistenceEnvBuilder}.
  */
 public interface OsgiPersistenceEnvUser {
@@ -39,7 +39,7 @@ public interface OsgiPersistenceEnvUser {
 
   /**
    * Return the persistence environment.
-   * <p/>
+   * <p>
    * Create the persistence environment in the activate method like so:
    * <pre>
    *   penv = PersistenceEnvs.persistenceEnvironment(persistenceProvider, "my.persistence.context", persistenceProperties);

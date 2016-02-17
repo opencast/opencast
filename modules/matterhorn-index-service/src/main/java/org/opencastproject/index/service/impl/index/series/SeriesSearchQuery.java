@@ -441,7 +441,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   /**
    * Selects series with the given recording status (opted out).
    *
-   * @param optedOut
+   * @param optOut
    *          the recording status
    * @return the enhanced search query
    */
@@ -589,7 +589,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   }
 
   /**
-   * Defines the sort order for the series created date & time.
+   * Defines the sort order for the series created date &amp; time.
    *
    * @param order
    *          the order

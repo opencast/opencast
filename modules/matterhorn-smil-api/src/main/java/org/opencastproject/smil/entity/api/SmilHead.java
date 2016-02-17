@@ -32,7 +32,7 @@ public interface SmilHead extends SmilObject {
 
   /**
    * Returns {@link List} of meta elements inside. The {@link List} is
-   * immutable, use {@link SmilService} to modify it.
+   * immutable, use SmilService to modify it.
    *
    * @return the meta data elements.
    */
@@ -40,7 +40,7 @@ public interface SmilHead extends SmilObject {
 
   /**
    * Returns {@link List} of paramGroup elements. The {@link List} is immutable,
-   * use {@link SmilService} to modify it.
+   * use SmilService to modify it.
    *
    * @return the param groups
    */

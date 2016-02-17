@@ -372,7 +372,7 @@ public class SolrIndexManager {
   /**
    * Posts the media package to solr. Depending on what is referenced in the media package, the method might create one
    * or two entries: one for the episode and one for the series that the episode belongs to.
-   * <p/>
+   * <p>
    * Note: Media package element URIs need to be URLs pointing to existing locations.
    * 
    * @param sourceMediaPackage

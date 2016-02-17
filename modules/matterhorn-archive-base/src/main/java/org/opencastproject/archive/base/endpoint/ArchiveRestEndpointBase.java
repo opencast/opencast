@@ -93,7 +93,7 @@ import javax.ws.rs.core.Response;
 
 /**
  * A base REST endpoint for the archive. It leaves out all metadata related methods like find.
- * <p/>
+ * <p>
  * No @Path annotation here since this class cannot be created by JAX-RS. Put it on the concrete implementations.
  */
 @RestService(name = "archive", title = "Archive",

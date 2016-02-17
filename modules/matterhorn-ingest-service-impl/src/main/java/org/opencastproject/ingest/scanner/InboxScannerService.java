@@ -65,7 +65,7 @@ import java.util.Map;
 
 /**
  * The inbox scanner monitors a directory for incoming media packages.
- * <p/>
+ * <p>
  * There is one InboxScanner instance per inbox. Each instance is configured by a config file in
  * <code>.../etc/load</code> named <code>&lt;inbox-scanned-pid&gt;-&lt;name&gt;.cfg</code> where <code>name</code>
  * can be arbitrarily chosen and has no further meaning. <code>inbox-scanned-pid</code> must confirm to the PID given to

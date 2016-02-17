@@ -397,8 +397,8 @@ public final class UserDirectoryPersistenceUtil {
   /**
    * Returns a list of users by a search query if set or all users if search query is <code>null</code>
    *
-   * @param query
-   *          the query to search
+   * @param orgId,
+   *          the organization id
    * @param limit
    *          the limit
    * @param offset

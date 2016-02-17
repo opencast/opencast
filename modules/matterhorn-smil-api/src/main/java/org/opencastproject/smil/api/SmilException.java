@@ -22,7 +22,7 @@
 package org.opencastproject.smil.api;
 
 /**
- * Will be thrown, if editing {@link Smil} fail.
+ * Will be thrown, if editing Smil fail.
  */
 public class SmilException extends Exception {
 

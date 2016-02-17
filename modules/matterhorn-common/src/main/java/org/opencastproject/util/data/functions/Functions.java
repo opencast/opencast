@@ -216,7 +216,7 @@ public final class Functions {
     };
   }
 
-  /** Curry a function of arity 2. (a, b) -> c => a -> b -> c */
+  /** Curry a function of arity 2. (a, b) -gt; c =gt; a -gt; b -gt; c */
   public static <A, B, C> Function<A, Function<B, C>> curry(final Function2<? super A, ? super B, ? extends C> f) {
     return new Function<A, Function<B, C>>() {
       @Override
@@ -231,7 +231,7 @@ public final class Functions {
     };
   }
 
-  /** Uncurry to a function of arity 2. a -> b -> c => (a, b) -> c */
+  /** Uncurry to a function of arity 2. a -gt; b -gt; c =gt; (a, b) -gt; c */
   public static <A, B, C> Function2<A, B, C> uncurry(final Function<? super A, Function<B, C>> f) {
     return new Function2<A, B, C>() {
       @Override
@@ -354,7 +354,7 @@ public final class Functions {
   /**
    * Identity function. The type is based on the type of the example object to save some nasty typing, e.g.
    * <code>Function.&lt;Integer&gt;identity()</code> vs. <code>identity(0)</code>
-   * <p/>
+   *
    * Please note that this constructor is only due to Java's insufficient type inference.
    */
   public static <A> Function<A, A> identity(A example) {
@@ -525,7 +525,7 @@ public final class Functions {
 
   /**
    * Throw a checked exception like a RuntimeException removing any needs to declare a throws clause.
-   * <p/>
+   *
    * This technique has been described by James Iry at
    * http://james-iry.blogspot.de/2010/08/on-removing-java-checked-exceptions-by.html
    */
@@ -533,7 +533,7 @@ public final class Functions {
     return Functions.<RuntimeException, A> castGeneric(t);
   }
 
-  /** Kleisli composition of list monads. (a -> m b) -> (b -> m c) -> a -> m c */
+  /** Kleisli composition of list monads. (a -&gt; m b) -&gt; (b -&gt; m c) -&gt; a -&gt; m c */
   public static <A, B, C> Function<A, List<C>> kleisliCompList(final Function<? super A, List<B>> m,
           final Function<? super B, List<C>> n) {
     return new Function<A, List<C>>() {

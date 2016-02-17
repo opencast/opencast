@@ -116,7 +116,7 @@ public class SchedulerItem implements MessageItem, Serializable {
   }
 
   /**
-   * @param mediaPackageId
+   * @param mediapackageId
    *          the mediapackage id
    * @param blacklisted
    *          the blacklist status

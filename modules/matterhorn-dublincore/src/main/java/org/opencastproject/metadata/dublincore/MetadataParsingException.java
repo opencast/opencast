@@ -30,9 +30,8 @@ public class MetadataParsingException extends Exception {
 
   /**
    * Constructor without cause.
-   * 
+   *
    * @param message
-   * @param cause
    */
   public MetadataParsingException(String message) {
     super(message);
@@ -40,7 +39,7 @@ public class MetadataParsingException extends Exception {
 
   /**
    * Full fledged constructor.
-   * 
+   *
    * @param message
    * @param cause
    */

@@ -139,7 +139,7 @@ public final class DateTimeSupport {
 
   /**
    * Forward to the next week day.
-   * <p/>
+   * <p>
    * If it's Monday forwarding to Tuesday will add 1 day. If it's Friday forwarding to Thursday will go to next week's
    * Thursday which is adding 6 days. Forward to Monday if on Monday simply returns <code>time</code>.
    *

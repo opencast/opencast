@@ -231,7 +231,7 @@ public interface SeriesService {
    *
    * @param seriesID
    *          series to be retrieved
-   * @return {@link Map<String, String>} representing series properties
+   * @return representing series properties
    * @throws SeriesException
    *           if retrieving fails
    * @throws NotFoundException

@@ -35,8 +35,8 @@ public class EventCommentServiceImpl implements EventCommentService {
   /**
    * OSGi callback to set the event comment database service.
    *
-   * @param messageSender
-   *          the message sender
+   * @param eventCommentDatabaseService
+   *          the event comment database service
    */
   public void setEventCommentDatabaseService(EventCommentDatabaseService eventCommentDatabaseService) {
     this.eventCommentDatabaseService = eventCommentDatabaseService;

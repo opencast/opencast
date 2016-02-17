@@ -57,7 +57,7 @@ public final class PersistenceEnvs {
 
   /**
    * Create a new, concurrently usable persistence environment which uses JPA local transactions.
-   * <p/>
+   * <p>
    * Transaction propagation is supported on a per thread basis.
    */
   public static PersistenceEnv persistenceEnvironment(final EntityManagerFactory emf) {

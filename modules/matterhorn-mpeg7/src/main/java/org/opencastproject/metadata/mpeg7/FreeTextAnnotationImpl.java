@@ -44,9 +44,6 @@ public class FreeTextAnnotationImpl implements FreeTextAnnotation {
     this.text = text;
   }
 
-  /**
-   * @see org.opencastproject.mediapackage.mpeg7.FreeTextAnnotation#getText()
-   */
   public String getText() {
     return text;
   }

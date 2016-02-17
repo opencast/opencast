@@ -106,7 +106,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
    *          the endpoint's return type
    * @param name
    *          the endpoint's name (this should be unique in the same type of endpoints)
-   * @param method
+   * @param httpMethod
    *          the HTTP method used for this endpoint
    * @param path
    *          the path for this endpoint (e.g. /search OR /add/{id})
@@ -185,7 +185,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
 
   /**
    * Adds a required form parameter for this endpoint, this would be a parameter which is passed encoded as part of the
-   * request body (commonly referred to as a post or form parameter). <br/>
+   * request body (commonly referred to as a post or form parameter). <br>
    * WARNING: This should generally be reserved for endpoints which are used for processing, it is better to use path
    * params unless the required parameter is not part of an identifier for the resource.
    *

@@ -129,7 +129,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    *
    * @param ctx
    *          the component context
-   * @throws IOException
+   * @throws ComponentException
    *           if the search index cannot be initialized
    */
   public void activate(ComponentContext ctx) throws ComponentException {
@@ -151,8 +151,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.matterhorn.contentrepository.VersionedContentRepositoryIndex#getIndexVersion()
    */
   @Override
   public int getIndexVersion() {
@@ -161,8 +159,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.matterhorn.search.impl.SearchIndex#clear()
    */
   @Override
   public void clear() throws IOException {
