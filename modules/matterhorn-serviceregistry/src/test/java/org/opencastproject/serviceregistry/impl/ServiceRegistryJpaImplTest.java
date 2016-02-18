@@ -49,6 +49,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
@@ -63,6 +65,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 public class ServiceRegistryJpaImplTest {
+  private static final Logger logger = LoggerFactory.getLogger(ServiceRegistryJpaImplTest.class);
   private Query query = null;
   private JobJpaImpl undispatchableJob1 = null;
   private JobJpaImpl undispatchableJob2 = null;
@@ -239,10 +242,10 @@ public class ServiceRegistryJpaImplTest {
 
     // reactivate and expect local undispatchable job to be canceled, but not the remote job
     serviceRegistryJpaImpl.activate(null);
-    System.out.println("Undispatachable job 1 " + undispatchableJob1.getId());
+    logger.info("Undispatachable job 1 " + undispatchableJob1.getId());
     undispatchableJob1 = (JobJpaImpl) serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
     assertEquals(Status.CANCELED, undispatchableJob1.getStatus());
-    System.out.println("Undispatachable job 1 " + undispatchableJob2.getId());
+    logger.info("Undispatachable job 1 " + undispatchableJob2.getId());
     undispatchableJob2 = (JobJpaImpl) serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());
 

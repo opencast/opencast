@@ -31,6 +31,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.net.ServerSocket;
@@ -42,6 +44,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class TrustedHttpClientResourceClosingTest {
+  private static final Logger logger = LoggerFactory.getLogger(TrustedHttpClientResourceClosingTest.class);
   private static final int PORT = 8952;
 
   private static final class TestHttpClient extends TrustedHttpClientImpl {
@@ -75,9 +78,9 @@ public class TrustedHttpClientResourceClosingTest {
       @Override public Void call() throws Exception {
         // notify that the server is ready
         barrier.countDown();
-        System.out.println("Waiting for incoming connection");
+        logger.info("Waiting for incoming connection");
         final Socket s = socket.accept();
-        System.out.println("Connected");
+        logger.info("Connected");
         final PrintStream out = new PrintStream(s.getOutputStream());
         out.println("HTTP/1.1 200 OK\n\n");
         out.flush();
@@ -85,12 +88,12 @@ public class TrustedHttpClientResourceClosingTest {
         s.getInputStream().close();
         s.close();
         es.shutdown();
-        System.out.println("Terminate server");
+        logger.info("Terminate server");
         return null;
       }
     };
     es.submit(server);
-    System.out.println("Waiting for server...");
+    logger.info("Waiting for server...");
     barrier.await();
   }
 }

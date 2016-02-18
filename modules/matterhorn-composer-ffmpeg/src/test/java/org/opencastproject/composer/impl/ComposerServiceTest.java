@@ -130,7 +130,7 @@ public class ComposerServiceTest {
       int status = p.waitFor();
       stdout.stopReading();
       stderr.stopReading();
-      System.out.println(buffer.toString());
+      logger.info(buffer.toString());
       if (status != 0)
         throw new IllegalStateException();
       if (buffer.toString().startsWith("ffmpeg version 2"))
