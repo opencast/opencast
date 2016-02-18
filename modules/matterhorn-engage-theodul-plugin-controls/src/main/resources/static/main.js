@@ -34,8 +34,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
     var PLUGIN_STYLES_DESKTOP = [
         Engage.controls_top ? "styles/desktop_top.css" : "styles/desktop_bottom.css",
-        "lib/bootstrap/css/bootstrap.css",
-        "lib/jqueryui/themes/base/jquery-ui.css"
+        "lib/bootstrap/css/bootstrap.min.css",
+        "lib/jqueryui/jquery-ui.min.css"
     ];
     var PLUGIN_STYLES_EMBED = [
         "styles/embed.css"
