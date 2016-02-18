@@ -16,7 +16,7 @@ Its primary use is to post-process audio and video files ingested by capture age
 |**concat-encoding-profile**\*|String|Encoding profile used for concatenating audio or video files||
 |**trim-encoding-profile**\*|String|Encoding profile using for trimming tracks|
 |force-encoding|Boolean|If set to *true*, all generated target files will be encoded using the encoding profile *force-encoding-profile*|false|
-|force-encoding-profile|String|Encoding profile to be used when *force-encoding* is set to *true*||
+|**force-encoding-profile**\*|String|Encoding profile to be used when *force-encoding* is set to *true* or a given target track has a file extension not included in *required-extensions*||
 |required-extensions|String , { "," , String }|Comma-separated list of file extension names (case insensitive). All generated target files whose file extensions are not in this list will be encoded using the encoding profile *force-encoding-profile*|"mp4"|
 |enforce-divisible-by-two|Boolean|If set, all video targets will have widths and heights divisible by two. This might be necessary depending since some encoder fail when encountering uneven widths or heights.|false|
 
@@ -132,4 +132,4 @@ The PartialImportWorkflowOperation uses a number of encoding profiles to perform
 |-----------------|-----------|
 |concat-encoding-profile|Used to concat partial tracks into tracks|
 |trim-encoding-profile|Used to trim the resulting concatenated single tracks if necessary|
-|force-encoding-profile|Used to re-encode target tracks if desired|
+|force-encoding-profile|Used to re-encode target tracks in case the file exenstion of a given target track is not included in *required-extensions* or the configuration key *force-encoding* is set to *true* |
