@@ -86,6 +86,7 @@ To achieve this, the PartialImportWorkflowOperation is used to post-process the 
         <configuration key="target-presentation-flavor">presentation/standard</configuration>
         <configuration key="concat-encoding-profile">import.concat</configuration>
         <configuration key="trim-encoding-profile">import.trim</configuration>
+        <configuration key="force-encoding-profile">mp4-hd.http</configuration>
       </configurations>
     </operation>
 
