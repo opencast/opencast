@@ -77,7 +77,6 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
-      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -224,6 +223,7 @@
               javax.xml.parsers;version=0,
               javax.xml.validation;version=0,
               org.opencastproject.fsresources,
+              org.opencastproject.lti,
               org.springframework.security.core.userdetails.cache,
               org.springframework.security.core.userdetails.memory,
               org.xml.sax;version=0,
@@ -260,6 +260,7 @@
               OSGI-INF/http-context.xml,
               OSGI-INF/https-filter.xml, 
               OSGI-INF/jsonp.xml,
+              OSGI-INF/opencast-lti.xml,
               OSGI-INF/organization-directory-service.xml,
               OSGI-INF/organization-persistence.xml,
               OSGI-INF/organization-filter.xml,

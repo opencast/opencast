@@ -9,35 +9,21 @@ Licenses and Legal Matters
 Which Licenses May I Use for Opencast?
 --------------------------------------
 
-All libraries that are used in Opencast need to be compatible with the Educational Community License version 2.0:
+All libraries that are used in Opencast need to be compatible with the Educational Community License version 2.0.
 
- - In short, if the license is on this list, it is fine to use the library:
-    - http://www.apache.org/legal/resolved.html#category-a
+In short, if the license is on:
 
- - If instead it is listed here, we cannot use it:
-    - http://www.apache.org/legal/resolved.html#category-x
+ - the Apereo or Apache Category-A list, it is fine to use the library.
+ - the Apereo or Apache Category-B list, we may use it unmodified. Please avoid Category-B if possible.
+ - the Apereo or Apache Category-X list, we cannot use it.
 
-Everything else needs to go to the Apereo lawyers.
+Everything else needs to go to the Apereo foundation for approval.
+
+These lists, along with a more detailed explanation, can be found on the [Apereo page about practices on third-party
+licenses](https://apereo.org/licensing/third-party)
 
 
 Here is the slightly longer section from the „Apereo Licensing & Intellectual Property Practices“ page:
-
-> Third-Party Content
->
-> Third-party content (source code, binary artifacts like libraries, documentation, etc.) is anything that was not
-> submitted directly to Apereo or that is not covered under an ICLA, CCLA, or SGLA. Apereo projects can use third-party
-> content as long as the project is in compliance with the license under which the content is acquired, and as long as
-> use of the third-party content does not violate Apereo's own licensing and policies. Use of any third-party content
-> not available under one of the licenses on ASF's "Category A" list must first be reviewed by the project’s governance
-> body since this has implications for how the derivative work can be used. See the Apereo documentation on Third-Party
-> Licenses for more details.
->
-> Third-party content should be handled much differently from Apereo content. Copyright and license notices inside
-> source files should not be modified and the standard Apereo source header should not be added. Licenses for the
-> third-party content should be included with the distribution and appropriate notices should be included in the NOTICE
-> file. Minor modifications to third-party sources should be licensed under the same terms as the original third-party
-> source, while major modifications to third-party sources should be handed on a case-by-cases by the project's
-> governance body.
 
 
 How To Label Third Party Libraries
