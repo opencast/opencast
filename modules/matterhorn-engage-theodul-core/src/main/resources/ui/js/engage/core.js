@@ -80,7 +80,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var id_btn_login = "btn_login";
     var id_btn_tryAnyway = "btn_tryAnyway";
     var id_customError = "customError";
-    var id_customError_str = "customError_str";
     var class_loading = "loading";
     var plugins_loaded = {};
     var loadingDelay1 = 500;
@@ -170,12 +169,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         }
         return ((translationData != null) && (translationData[str] != undefined)) ? translationData[str] : strIfNotFound;
     }
-
-    /*
-    if (window.console) {
-        console.log("Core: Init");
-    }
-    */
 
     function login() {
         if (!askedForLogin) {
@@ -398,7 +391,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                 // add full plugin path to the template data
                 template_data.plugin_path = "engage/theodul/" + plugin_path;
                 // process the template using underscore and set it in the plugin obj
-                plugin.templateProcessed = _.template(template, template_data);
+                var _template = _.template(template);
+                plugin.templateProcessed = _template(template_data);
                 plugin.template = template;
                 plugin.pluginPath = "engage/theodul/" + plugin_path;
                 if (plugin.insertIntoDOM) {
@@ -478,7 +472,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     // add full plugin path to the template data
                     template_data.plugin_path = "engage/theodul/" + plugin_path;
                     // process the template using underscore and set it in the plugin obj
-                    plugin.templateProcessed_topIfBottom = _.template(template, template_data);
+                    var _template = _.template(template);
+                    plugin.templateProcessed_topIfBottom = _template(template_data);
                     plugin.template_topIfBottom = template;
                     plugin.pluginPath_topIfBottom = "engage/theodul/" + plugin_path;
                     loadTemplate(plugin, plugin_name, plugin_path);

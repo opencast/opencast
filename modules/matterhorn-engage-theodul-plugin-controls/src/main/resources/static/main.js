@@ -477,8 +477,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     show_embed: showEmbed
                 };
 
-                // compile template and load it
-                this.$el.html(_.template(this.template, tempVars));
+                // compile template and load into the html
+                var template = _.template(this.template);
+                this.$el.html(template(tempVars));
+
                 if (isDesktopMode) {
                     initControlsEvents();
                     if (aspectRatioTriggered) {
@@ -545,7 +547,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 };
 
                 // compile template and load into the html
-                this.$el.html(_.template(this.template, tempVars));
+                var template = _.template(this.template);
+                this.$el.html(template(tempVars));
             }
         }
     });
