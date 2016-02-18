@@ -69,6 +69,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -186,9 +187,10 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
     notNull(channelId, "channelId");
     try {
       return serviceRegistry.createJob(
-              JOB_TYPE, Operation.Distribute.toString(), Arrays.asList(channelId,
-                      MediaPackageParser.getAsXml(mediapackage), elementId, Boolean.toString(checkAvailability)),
-              distributeJobLoad);
+              JOB_TYPE,
+              Operation.Distribute.toString(),
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId,
+                      Boolean.toString(checkAvailability)), distributeJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -274,7 +276,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
                   @Override
                   public void xrun(Integer status) throws Exception {
                     if (ne(status, HttpServletResponse.SC_OK)) {
-                      logger.warn("Status code of distributed file {}: {}", uri, status);
+                      logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
                       throw new DistributionException("Unable to load distributed file " + uri.toString());
                     }
                   }
@@ -416,7 +418,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
    */
   private File findDuplicatedElementSource(final File source, final String mpId) throws IOException {
     String orgId = securityService.getOrganization().getId();
-    final Path rootPath = new File(path(distributionDirectory.getAbsolutePath(), orgId)).toPath();
+    final Path rootPath = Paths.get(distributionDirectory.getAbsolutePath(), orgId);
 
     if (!Files.exists(rootPath))
       return source;
@@ -424,7 +426,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
     List<Path> mediaPackageDirectories = new ArrayList<>();
     try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(rootPath)) {
       for (Path path : directoryStream) {
-        Path mpDir = new File(path.toFile(), mpId).toPath();
+        Path mpDir = path.resolve(mpId);
         if (Files.exists(mpDir)) {
           mediaPackageDirectories.add(mpDir);
         }
