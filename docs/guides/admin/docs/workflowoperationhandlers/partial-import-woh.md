@@ -116,7 +116,7 @@ There may be situations where you want to ensure that the output of this operati
 The configuration keys *force-encoding* and *required_extensions* can be used to control the behavior of the PartialImportWorkflowOperation: In case the *force-encoding* is set to *true*, the target tracks will be re-encoded using the *force-encoding-profile*. The target tracks will also be re-encoded using that encoding profile in case its file extensions don't match the *required_extensions*.
 
 ##Encoding Profiles
-The PartialImportWorkflowOperation uses a number of encoding profiles to perform its processing. Some of the encoding profiles can be explicitly configured by the user, others are used implictly in means of being hard-coded and are not supposed to be changed by the user.
+The PartialImportWorkflowOperation uses a number of encoding profiles to perform its processing. Some of the encoding profiles can be explicitly configured by the user, others are used implicitly in means of being hard-coded and are not supposed to be changed by the user.
 
 ### Hard-coded Encoding Profiles
 
@@ -131,6 +131,6 @@ The PartialImportWorkflowOperation uses a number of encoding profiles to perform
 
 |configuration key|description|
 |-----------------|-----------|
-|concat-encoding-profile|Used to concat partial tracks into tracks|
+|concat-encoding-profile|Used to concatenate partial tracks into tracks|
 |trim-encoding-profile|Used to trim the resulting concatenated single tracks if necessary|
-|force-encoding-profile|Used to re-encode target tracks in case the file exenstion of a given target track is not included in *required-extensions* or the configuration key *force-encoding* is set to *true* |
+|force-encoding-profile|Used to re-encode target tracks in case the file extension of a given target track is not included in *required-extensions* or the configuration key *force-encoding* is set to *true* |
