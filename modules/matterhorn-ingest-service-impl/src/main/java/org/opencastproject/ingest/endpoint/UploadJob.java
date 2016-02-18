@@ -24,6 +24,8 @@ package org.opencastproject.ingest.endpoint;
 
 import java.util.UUID;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -36,7 +38,8 @@ import javax.persistence.Table;
  * Holds information about a file upload.
  *
  */
-@Entity
+@Entity(name = "UploadJob")
+@Access(AccessType.FIELD)
 @Table(name = "mh_upload")
 // FIXME @NamedQueries necessary with only one NamedQuery
 @NamedQueries({ @NamedQuery(name = "UploadJob.getByID", query = "SELECT o FROM UploadJob o WHERE o.id = :id") })

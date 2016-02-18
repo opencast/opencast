@@ -18,7 +18,6 @@
  * the License.
  *
  */
-
 package org.opencastproject.inspection.ffmpeg;
 
 import org.opencastproject.inspection.ffmpeg.api.AudioStreamMetadata;
@@ -42,7 +41,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,7 +62,11 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(FFmpegAnalyzer.class);
 
-  public FFmpegAnalyzer() {
+  /** Whether the calculation of the frames is accurate or not */
+  private boolean accurateFrameCount;
+
+  public FFmpegAnalyzer(boolean accurateFrameCount) {
+    this.accurateFrameCount = accurateFrameCount;
     // instantiated using MediaAnalyzerFactory via newInstance()
     this.binary = FFPROBE_BINARY_DEFAULT;
   }
@@ -81,12 +86,18 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
 
   @Override
   public MediaContainerMetadata analyze(File media) throws MediaAnalyzerException {
-
     if (binary == null)
       throw new IllegalStateException("Binary is not set");
 
-    String[] command = new String[] { "-show_format", "-show_streams", "-count_frames", "-of", "json",
-            media.getAbsolutePath().replaceAll(" ", "\\ ") };
+    List<String> command = new ArrayList<>();
+    command.add("-show_format");
+    command.add("-show_streams");
+    if (accurateFrameCount)
+      command.add("-count_frames");
+    command.add("-of");
+    command.add("json");
+    command.add(media.getAbsolutePath().replaceAll(" ", "\\ "));
+
     String commandline = StringUtils.join(command, " ");
 
     /* Execute ffprobe and obtain the result */
@@ -96,7 +107,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
 
     final StringBuilder sb = new StringBuilder();
     try {
-      ProcessInfo info = ProcessRunner.mk(binary, command);
+      ProcessInfo info = ProcessRunner.mk(binary, command.toArray(new String[command.size()]));
       int exitCode = ProcessRunner.run(info, new Pred<String>() {
         @Override
         public Boolean ap(String s) {

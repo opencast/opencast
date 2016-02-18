@@ -23,6 +23,7 @@ package org.opencastproject.kernel.security.persistence;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.util.NotFoundException;
 
 import org.osgi.service.component.ComponentContext;
@@ -37,7 +38,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Implements {@link OrganizationDatabase}. Defines permanent storage for series.
@@ -47,17 +47,18 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(OrganizationDatabaseImpl.class);
 
-  /** Persistence provider set by OSGi */
-  protected PersistenceProvider persistenceProvider;
-
-  /** Persistence properties used to create {@link EntityManagerFactory} */
-  protected Map<String, Object> persistenceProperties;
+  static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
 
   /** The security service */
   protected SecurityService securityService;
+
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
+  }
 
   /**
    * Creates {@link EntityManagerFactory} using persistence provider and properties passed via OSGi.
@@ -66,36 +67,6 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
    */
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for kernel");
-    emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.kernel", persistenceProperties);
-  }
-
-  /**
-   * Closes entity manager factory.
-   *
-   * @param cc
-   */
-  public void deactivate(ComponentContext cc) {
-    emf.close();
-  }
-
-  /**
-   * OSGi callback to set persistence properties.
-   *
-   * @param persistenceProperties
-   *          persistence properties
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  /**
-   * OSGi callback to set persistence provider.
-   *
-   * @param persistenceProvider
-   *          {@link PersistenceProvider} object
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
   }
 
   /**
@@ -219,7 +190,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
 
   @Override
   public Organization getOrganizationByHost(String host, int port) throws OrganizationDatabaseException,
-          NotFoundException {
+  NotFoundException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
